@@ -108,7 +108,8 @@ class ManifestWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     """Emitted (path) when user clicks on link"""
 
-    contextmenu = None
+    filecontextmenu = None
+    subrepocontextmenu = None
 
     def __init__(self, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
@@ -265,15 +266,32 @@ class ManifestWidget(QWidget):
 
     def menuRequest(self, point):
         point = self.mapToGlobal(point)
-        if not self.contextmenu:
-            self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']:
+        itemissubrepo = self.path in self._repo[self._rev].substate.keys()
+
+        # Subrepos and regular items have different context menus
+        if itemissubrepo:
+            contextmenu = self.subrepocontextmenu
+            actionlist = []
+        else:
+            contextmenu = self.filecontextmenu
+            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+                        'navigate', 'diffnavigate']
+
+        if not contextmenu:
+            contextmenu = QMenu(self)
+            for act in actionlist:
                 if act:
-                    self.contextmenu.addAction(self._actions[act])
+                    contextmenu.addAction(self._actions[act])
                 else:
-                    self.contextmenu.addSeparator()
-        self.contextmenu.exec_(point)
+                    contextmenu.addSeparator()
+
+            if itemissubrepo:
+                self.subrepocontextmenu = contextmenu
+            else:
+                self.filecontextmenu = contextmenu
+
+        if actionlist:
+            contextmenu.exec_(point)
 
     @property
     def toolbar(self):
