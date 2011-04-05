@@ -262,6 +262,7 @@ class RepoWidget(QWidget):
         w = ManifestWidget(self.repo, rev, self)
         w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
+        w.linkActivated.connect(self._openLink)
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         return w

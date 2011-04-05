@@ -20,7 +20,7 @@ from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
 from tortoisehg.hgqt import visdiff, revert
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 class ManifestDialog(QMainWindow):
@@ -29,6 +29,7 @@ class ManifestDialog(QMainWindow):
     """
 
     finished = pyqtSignal(int)
+    linkActivated = pyqtSignal(QString)
 
     def __init__(self, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
@@ -45,6 +46,7 @@ class ManifestDialog(QMainWindow):
 
         self.setStatusBar(QStatusBar())
         self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
+        self._manifest_widget.linkActivated.connect(self.linkActivated)
 
         self._readsettings()
         self._updatewindowtitle()
@@ -103,6 +105,9 @@ class ManifestWidget(QWidget):
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
+    linkActivated = pyqtSignal(QString)
+    """Emitted (path) when user clicks on link"""
+
     contextmenu = None
 
     def __init__(self, repo, rev=None, parent=None):
@@ -144,6 +149,7 @@ class ManifestWidget(QWidget):
         self._splitter.addWidget(self._fileview)
         self._splitter.setStretchFactor(1, 3)
         self._fileview.revisionSelected.connect(self.setRev)
+        self._fileview.linkActivated.connect(self.linkActivated)
         for name in ('showMessage', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
