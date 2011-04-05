@@ -42,11 +42,6 @@ class RevDetailsWidget(QWidget):
         self.createActions()
         self.setupModels()
 
-        self.fileview.setFont(getfont('fontdiff').font())
-        self.fileview.showMessage.connect(self.showMessage)
-        self.fileview.grepRequested.connect(self.grepRequested)
-        self.fileview.revisionSelected.connect(self.revisionSelected)
-
     def setRepo(self, repo):
         self.repo = repo
         self.fileview.setRepo(repo)
@@ -160,6 +155,12 @@ class RevDetailsWidget(QWidget):
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QSize(0, 0))
         self.fileview.linkActivated.connect(self.linkActivated)
+        self.fileview.setFont(getfont('fontdiff').font())
+        self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.grepRequested.connect(self.grepRequested)
+        self.fileview.revisionSelected.connect(self.revisionSelected)
+        self.filelist.fileSelected.connect(self.fileview.displayFile)
+        self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
         self.revpanel = RevPanelWidget(self.repo)
         self.revpanel.linkActivated.connect(self.linkActivated)
@@ -168,9 +169,6 @@ class RevDetailsWidget(QWidget):
         cset_and_file_details_layout.addWidget(self.message_splitter)
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
-
-        self.filelist.fileSelected.connect(self.fileview.displayFile)
-        self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def forwardFont(self, font):
         self.message.setFont(font)
