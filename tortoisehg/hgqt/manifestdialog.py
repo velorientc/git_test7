@@ -188,6 +188,9 @@ class ManifestWidget(QWidget):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
+              'Alt+Ctrl+O', _('Open the selected subrepository'),
+              self.opensubrepo),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -289,7 +292,7 @@ class ManifestWidget(QWidget):
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = []
+            actionlist = ['opensubrepo']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
