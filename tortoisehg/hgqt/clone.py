@@ -133,7 +133,7 @@ class CloneDialog(QDialog):
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
-        self.insecure_chk = QCheckBox(_('Do not check certificates'))
+        self.insecure_chk = QCheckBox(_('Do not verify host certificate'))
         optbox.addWidget(self.insecure_chk)
         self.insecure_chk.setEnabled(False)
 
@@ -185,7 +185,6 @@ class CloneDialog(QDialog):
         self.src_combo.editTextChanged.connect(self.composeCommand)
         self.src_combo.editTextChanged.connect(self.onUrlHttps)
         self.dest_combo.editTextChanged.connect(self.composeCommand)
-        self.dest_combo.editTextChanged.connect(self.onUrlHttps)
         self.rev_chk.toggled.connect(self.composeCommand)
         self.rev_text.textChanged.connect(self.composeCommand)
         self.noupdate_chk.toggled.connect(self.composeCommand)
@@ -268,8 +267,7 @@ class CloneDialog(QDialog):
         cmdline.append('--verbose')
         src = self.getSrc()
         dest = self.getDest()
-        if (self.insecure_chk.isChecked()
-              and (src.startswith('https://') or dest.startswith('https://'))):
+        if self.insecure_chk.isChecked() and src.startswith('https://'):
             cmdline.append('--insecure')
         cmdline.append(src)
         if dest:
@@ -426,8 +424,7 @@ class CloneDialog(QDialog):
             self.reject()
 
     def onUrlHttps(self):
-        self.insecure_chk.setEnabled(self.getSrc().startswith('https://')
-                or self.getDest().startswith('https://'))
+        self.insecure_chk.setEnabled(self.getSrc().startswith('https://'))
         self.composeCommand()
 
     def command_canceling(self):
