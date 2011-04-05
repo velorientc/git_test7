@@ -35,18 +35,18 @@ class RevDetailsWidget(QWidget):
     def __init__(self, repo, parent):
         QWidget.__init__(self, parent)
 
-        self._deschtmlize = qtlib.descriptionhtmlizer(repo.ui)
-        repo.configChanged.connect(self._updatedeschtmlizer)
-
         self.repo = repo
+        self.ctx = repo[None]
         self.splitternames = []
-        self._last_rev = None
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
         self.setupUi()
         self.createActions()
         self.setupModels()
+
+        self._deschtmlize = qtlib.descriptionhtmlizer(repo.ui)
+        repo.configChanged.connect(self._updatedeschtmlizer)
 
     def setRepo(self, repo):
         self.repo = repo
@@ -190,7 +190,7 @@ class RevDetailsWidget(QWidget):
     def createActions(self):
         self.actionUpdate = a = self.filelisttbar.addAction(
             qtlib.geticon('hg-update'), _('Update to this revision'))
-        a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
+        a.triggered.connect(lambda: self.updateToRevision.emit(self.ctx.rev()))
         self.filelisttbar.addSeparator()
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -253,7 +253,6 @@ class RevDetailsWidget(QWidget):
 
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'
-        self._last_rev = rev
         self.ctx = ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
@@ -272,14 +271,15 @@ class RevDetailsWidget(QWidget):
     @pyqtSlot()
     def _updatedeschtmlizer(self):
         self._deschtmlize = qtlib.descriptionhtmlizer(self.repo.ui)
-        self.onRevisionSelected(self._last_rev)  # regenerate desc html
+        self.onRevisionSelected(self.ctx.rev())  # regenerate desc html
 
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
-        if type(self._last_rev) is int and len(self.repo) <= self._last_rev:
-            self._last_rev = 'tip'
+        rev = self.ctx.rev()
+        if type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev():
+            rev = 'tip'
         f = self.filelist.currentFile()
-        self.onRevisionSelected(self._last_rev)
+        self.onRevisionSelected(rev)
         self.filelist.selectFile(f)
 
     def navigate(self, filename=None):
