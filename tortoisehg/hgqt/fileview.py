@@ -300,6 +300,8 @@ class HgFileView(QFrame):
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+        self.actionNextDiff.setEnabled(False)
+        self.actionPrevDiff.setEnabled(False)
 
     def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):
@@ -405,8 +407,6 @@ class HgFileView(QFrame):
                 self.timer.stop()
 
             self._fd = fd
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
             self.blk.syncPageStep()
             self.timer.start()
 
