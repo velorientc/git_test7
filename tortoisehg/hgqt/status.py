@@ -190,6 +190,7 @@ class StatusWidget(QWidget):
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.setContext(self.repo[None])
+        self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
 
         self.split = split
