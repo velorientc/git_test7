@@ -107,6 +107,10 @@ class FileData(object):
                 def genSubrepoRevChangedDescription(subrelpath, sfrom, sto):
                     """Generate a subrepository revision change description"""
                     out = []
+                    def getLog(_ui, srepo, opts):
+                        _ui.pushbuffer()
+                        commands.log(_ui, srepo, **opts)
+                        return _ui.popbuffer()
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     subabspath = os.path.join(repo.root, subrelpath)
                     missingsub = not os.path.isdir(subabspath)
@@ -127,6 +131,15 @@ class FileData(object):
                         sstatedesc = 'removed'
                         out.append(_('Subrepo removed from repository.') + u'\n\n')
                         return out, sstatedesc
+                    elif sfrom == sto:
+                        sstatedesc = 'unchanged'
+                        out.append(_('Subrepo was not changed.') + u'\n\n')
+                        out.append(_('Subrepo state is:') + u'\n')
+                        if missingsub:
+                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
+                        else:
+                            out.append(hglib.tounicode(getLog(_ui, srepo, opts)))
+                        return out, sstatedesc
                     else:
                         sstatedesc = 'changed'
 
@@ -134,9 +147,7 @@ class FileData(object):
                         if missingsub:
                             out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
                         else:
-                            _ui.pushbuffer()
-                            commands.log(_ui, srepo, **opts)
-                            out.append(hglib.tounicode(_ui.popbuffer()))
+                            out.append(hglib.tounicode(getLog(_ui, srepo, opts)))
 
                         out.append(_('To:') + u'\n')
                     if missingsub:
@@ -145,9 +156,7 @@ class FileData(object):
                         stolog += _('Further subrepository revision information cannot be retrieved.') + '\n'
                     else:
                         opts['rev'] = [sto]
-                        _ui.pushbuffer()
-                        commands.log(_ui, srepo, **opts)
-                        stolog = _ui.popbuffer()
+                        stolog = getLog(_ui, srepo, opts)
 
                     if not stolog:
                         stolog = _('Initial revision')
@@ -204,6 +213,7 @@ class FileData(object):
                     sstatedesc = 'removed'
                 lbl = {
                     'changed':   _('(is a changed sub-repository)'),
+                    'unchanged':   _('(is an unchanged sub-repository)'),
                     'dirty':   _('(is a dirty sub-repository)'),
                     'new':   _('(is a new sub-repository)'),
                     'removed':   _('(is a removed sub-repository)'),
