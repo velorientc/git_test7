@@ -576,7 +576,8 @@ class DiffBrowser(QFrame):
     def displayFile(self, filename, status):
         self.clearDisplay()
         if filename == self._lastfile:
-            reenable = [c.fromline for c in self.curchunks[1:] if c.selected]
+            reenable = [(c.fromline, len(c.before)) for c in self.curchunks[1:]\
+                        if c.selected]
         else:
             reenable = []
         self._lastfile = filename
@@ -627,6 +628,6 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self.curchunks = chunks
         for c in chunks[1:]:
-            if c.fromline in reenable:
+            if (c.fromline, len(c.before)) in reenable:
                 self.toggleChunk(c)
         self.updateSummary()
