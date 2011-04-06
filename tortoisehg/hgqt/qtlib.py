@@ -18,6 +18,7 @@ import weakref
 from mercurial import extensions, util
 
 from tortoisehg.util import hglib, paths, wconfig
+from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
@@ -89,6 +90,12 @@ def loadIniFile(rcpath, parent):
     return fn, wconfig.readfile(fn)
 
 def editfiles(repo, files, lineno=None, search=None, parent=None):
+    if len(files) == 1:
+        path = repo.wjoin(files[0])
+        cwd = os.path.dirname(path)
+        files = [os.path.basename(path)]
+    else:
+        cwd = repo.root
     files = [util.shellquote(util.localpath(f)) for f in files]
     editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
@@ -138,16 +145,13 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
     cmdline = util.quotecommand(cmdline)
     try:
-        try:
-            cwd = os.path.dirname(files[0])
-        except:
-            cwd = repo.root
         subprocess.Popen(cmdline, shell=True, creationflags=openflags,
                          stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
-                _('%s : %s') % (cmd, str(e)))
+                u'%s : %s' % (hglib.tounicode(cmdline),
+                              hglib.tounicode(str(e))))
     return False
 
 # _styles maps from ui labels to effects
