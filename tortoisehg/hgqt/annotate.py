@@ -94,7 +94,10 @@ class AnnotateView(qscilib.Scintilla):
         menu = self.createStandardContextMenu()
         line = self.lineAt(point)
         point = self.mapToGlobal(point)
-        if line < 0 or not self.isAnnotationEnabled():
+
+        if not self.isAnnotationEnabled():
+            return menu.exec_(point)
+        if line < 0 or line >= len(self._links):
             return menu.exec_(point)
 
         fctx, line = self._links[line]
