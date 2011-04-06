@@ -70,6 +70,8 @@ class SyncWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    showBusyIcon = pyqtSignal(QString)
+    hideBusyIcon = pyqtSignal(QString)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -576,11 +578,14 @@ class SyncWidget(QWidget):
         for b in self.opbuttons:
             b.setEnabled(False)
         self.stopAction.setEnabled(True)
-        if not self.embedded:
+        if self.embedded:
+            self.showBusyIcon.emit('thg-sync')
+        else:
             self.cmd.setShowOutput(True)
             self.cmd.setVisible(True)
 
     def commandFinished(self, ret):
+        self.hideBusyIcon.emit('thg-sync')
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
             b.setEnabled(True)

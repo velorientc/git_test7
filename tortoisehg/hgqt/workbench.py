@@ -494,6 +494,8 @@ class Workbench(QMainWindow):
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
             lambda title: tw.setTabText(tw.indexOf(rw), title))
+        rw.showIcon.connect(
+            lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
         self.reporegistry.addRepo(repo)
 
         self.updateMenu()

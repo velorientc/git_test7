@@ -50,6 +50,8 @@ class RepoWidget(QWidget):
     titleChanged = pyqtSignal(unicode)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
+    showIcon = pyqtSignal(QIcon)
+
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
@@ -64,6 +66,7 @@ class RepoWidget(QWidget):
         self.branch = ''
         self.bundle = None
         self.revset = []
+        self.busyIcons = []
         self.namedTabs = {}
         self.repolen = len(repo)
         self.destroyed.connect(self.repo.thginvalidate)
@@ -276,8 +279,24 @@ class RepoWidget(QWidget):
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
         sw.pullCompleted.connect(self.onPullCompleted)
+        sw.showBusyIcon.connect(self.onShowBusyIcon)
+        sw.hideBusyIcon.connect(self.onHideBusyIcon)
         sw.refreshTargets(self.rev)
         return sw
+
+    @pyqtSlot(QString)
+    def onShowBusyIcon(self, iconname):
+        self.busyIcons.append(iconname)
+        self.showIcon.emit(qtlib.geticon(self.busyIcons[-1]))
+
+    @pyqtSlot(QString)
+    def onHideBusyIcon(self, iconname):
+        if iconname in self.busyIcons:
+            self.busyIcons.remove(iconname)
+        if self.busyIcons:
+            self.showIcon.emit(qtlib.geticon(self.busyIcons[-1]))
+        else:
+            self.showIcon.emit(QIcon())
 
     @pyqtSlot(QString)
     def setBundle(self, bfile):
