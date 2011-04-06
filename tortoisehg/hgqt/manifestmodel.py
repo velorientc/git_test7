@@ -14,6 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
+from mercurial.subrepo import hgsubrepo
 from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib, status, visdiff
 
@@ -182,6 +183,47 @@ class ManifestModel(QAbstractItemModel):
 
     def _buildrootentry(self):
         """Rebuild the tree of files and directories"""
+
+        def pathinstatus(path, status, uncleanpaths):
+            """Test path is included by the status filter"""
+            if util.any(c in self._statusfilter and path in e
+                        for c, e in status.iteritems()):
+                return True
+            if 'C' in self._statusfilter and path not in uncleanpaths:
+                return True
+            return False
+
+        def getctxtreeinfo(ctx, repo):
+            """
+            Get the context information that is relevant to populating the tree
+            """
+            status = dict(zip(('M', 'A', 'R'),
+                      (set(a) for a in self._repo.status(ctx.parents()[0],
+                                                             ctx)[:3])))
+            uncleanpaths = status['M'] | status['A'] | status['R']
+            files = itertools.chain(ctx.manifest(), status['R'])
+            return status, uncleanpaths, files
+
+        def addfilestotree(treeroot, files, status, uncleanpaths):
+            """Add files to the tree according to their state"""
+            for path in files:
+                if not pathinstatus(path, status, uncleanpaths):
+                    continue
+
+                e = treeroot
+                for p in hglib.tounicode(path).split('/'):
+                    if not p in e:
+                        e.addchild(p)
+                    e = e[p]
+
+                for st, files in status.iteritems():
+                    if path in files:
+                        # TODO: what if added & removed at once?
+                        e.setstatus(st)
+                        break
+                else:
+                    e.setstatus('C')
+
         roote = _Entry()
         ctx = self._repo[self._rev]
 
@@ -203,38 +245,25 @@ class ManifestModel(QAbstractItemModel):
             e = e[p]
             e.setstatus('S')
 
+            # If the subrepo exists in the working directory
+            # and it is a mercurial subrepo,
+            # add the files that it contains to the tree as well, according ot
+            # the status filter
+            abspath = os.path.join(self._repo.root, path)
+            if os.path.isdir(abspath):
+                # Add subrepo files to the tree
+                srev = ctx.substate[path][1]
+                sub = ctx.sub(path)
+                if isinstance(sub, hgsubrepo):
+                    srepo = sub._repo
+                    sctx = srepo[srev]
+                    status, uncleanpaths, files = getctxtreeinfo(sctx, srepo)
+                    addfilestotree(e, files, status, uncleanpaths)
+
         # Add regular files to the tree
-        status = dict(zip(('M', 'A', 'R'),
-                          (set(a) for a in self._repo.status(ctx.parents()[0],
-                                                             ctx)[:3])))
-        uncleanpaths = status['M'] | status['A'] | status['R']
-        def pathinstatus(path):
-            """Test path is included by the status filter"""
-            if util.any(c in self._statusfilter and path in e
-                        for c, e in status.iteritems()):
-                return True
-            if 'C' in self._statusfilter and path not in uncleanpaths:
-                return True
-            return False
+        status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
 
-        for path in itertools.chain(ctx.manifest(), status['R']):
-            if not pathinstatus(path):
-                continue
-
-            e = roote
-            for p in hglib.tounicode(path).split('/'):
-                if not p in e:
-                    e.addchild(p)
-                e = e[p]
-
-            for st, files in status.iteritems():
-                if path in files:
-                    # TODO: what if added & removed at once?
-                    e.setstatus(st)
-                    break
-            else:
-                e.setstatus('C')
-
+        addfilestotree(roote, files, status, uncleanpaths)
         roote.sort()
 
         self.beginResetModel()
