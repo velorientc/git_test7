@@ -63,7 +63,7 @@ class RepoWidget(QWidget):
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
-        self.branch = ''
+        self.ubranch = u''
         self.bundle = None
         self.revset = []
         self.busyIcons = []
@@ -207,9 +207,8 @@ class RepoWidget(QWidget):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
             return _('%s <incoming>') % self.repo.shortname
-        elif self.branch:
-            return u'%s [%s]' % (self.repo.shortname,
-                                 hglib.tounicode(self.branch))
+        elif self.ubranch:
+            return u'%s [%s]' % (self.repo.shortname, self.ubranch)
         else:
             return self.repo.shortname
 
@@ -601,7 +600,8 @@ class RepoWidget(QWidget):
     def setupModels(self):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
-        self.repomodel = HgRepoListModel(self.repo, self.branch, self.revset,
+        branch = hglib.fromunicode(self.ubranch)
+        self.repomodel = HgRepoListModel(self.repo, branch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
@@ -780,10 +780,10 @@ class RepoWidget(QWidget):
         else:
             self.taskTabsWidget.tabBar().hide()
 
-    @pyqtSlot(unicode, bool)
+    @pyqtSlot(QString, bool)
     def setBranch(self, branch, allparents=True):
         'Change the branch filter'
-        self.branch = branch
+        self.ubranch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
         if self.revset:

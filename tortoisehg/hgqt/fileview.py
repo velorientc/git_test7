@@ -551,7 +551,7 @@ class HgFileView(QFrame):
                     add(name, func)
             return menu.exec_(point)
 
-        if line < 0:
+        if line < 0 or line >= len(self.sci._links):
             return menu.exec_(point)
 
         fctx, line = self.sci._links[line]
