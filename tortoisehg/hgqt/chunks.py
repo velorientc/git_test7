@@ -214,7 +214,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     repo.wopener(self.currentFile, 'wb').write(
-                        hglib.fromunicode(self.diffbrowse.origcontents))
+                        repo['.'][self.currentFile].data())
                     fp = cStringIO.StringIO()
                     chunks[0].write(fp)
                     for c in kchunks:
@@ -624,7 +624,6 @@ class DiffBrowser(QFrame):
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines) + 1
-        self.origcontents = fd.olddata
         self.countselected = 0
         self.curchunks = chunks
         for c in chunks[1:]:
