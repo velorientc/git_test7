@@ -224,7 +224,8 @@ class HgFileListView(QTableView):
         else:
             QMessageBox.warning(self,
                 _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
+                _("The selected subrepository does not exist in the working"
+                  " directory"))
 
     def doubleClickHandler(self):
         index = self.currentIndex()
