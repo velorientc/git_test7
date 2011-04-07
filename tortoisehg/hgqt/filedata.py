@@ -16,6 +16,7 @@ from tortoisehg.hgqt.i18n import _
 class FileData(object):
     def __init__(self, ctx, ctx2, wfile, status=None):
         self.contents = None
+        self.ucontents = None
         self.error = None
         self.olddata = None
         self.diff = None
@@ -91,7 +92,7 @@ class FileData(object):
                 data = ctx[wfile].data()
             else:
                 data = os.readlink(absfile)
-            self.contents = hglib.tounicode(data)
+            self.contents = data
             self.flabel += _(' <i>(is a symlink)</i>')
             return
 
@@ -208,7 +209,7 @@ class FileData(object):
                         out += subrepochange
                         if data:
                             sstatedesc += ' and dirty'
-                self.contents = u''.join(out)
+                self.ucontents = u''.join(out)
                 if not sactual:
                     sstatedesc = 'removed'
                 lbl = {
@@ -244,7 +245,7 @@ class FileData(object):
                     if '\0' in olddata:
                         self.error = 'binary file'
                     else:
-                        self.contents = hglib.tounicode(olddata)
+                        self.contents = olddata
                 self.flabel += _(' <i>(was deleted)</i>')
             else:
                 self.flabel += _(' <i>(was added, now missing)</i>')
@@ -258,7 +259,7 @@ class FileData(object):
                 if '\0' in data:
                     self.error = 'binary file'
                 else:
-                    self.contents = hglib.tounicode(data)
+                    self.contents = data
             if status in ('I', '?'):
                 self.flabel += _(' <i>(is unversioned)</i>')
             return
@@ -268,7 +269,7 @@ class FileData(object):
             if res is None:
                 return
             fctx, newdata = res
-            self.contents = hglib.tounicode(newdata)
+            self.contents = newdata
             change = None
             for pfctx in fctx.parents():
                 if 'x' in fctx.flags() and 'x' not in pfctx.flags():
@@ -299,7 +300,7 @@ class FileData(object):
         else:
             return
 
-        self.olddata = hglib.tounicode(olddata)
+        self.olddata = olddata
         newdate = util.datestr(ctx.date())
         olddate = util.datestr(ctx2.date())
         revs = [str(ctx), str(ctx2)]

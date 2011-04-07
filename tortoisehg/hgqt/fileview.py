@@ -341,8 +341,8 @@ class HgFileView(QFrame):
             return
 
         candiff = bool(fd.diff)
-        canfile = bool(fd.contents)
-        canann = canfile and type(self._ctx.rev()) is int
+        canfile = bool(fd.contents or fd.ucontents)
+        canann = bool(fd.contents) and type(self._ctx.rev()) is int
 
         if not candiff or not canfile:
             self.restrictModes(candiff, canfile, canann)
@@ -367,7 +367,7 @@ class HgFileView(QFrame):
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
             if lexer is None:
-                self.setFont(qtlib.getfont('fontlog').font())
+                self.sci.setFont(qtlib.getfont('fontlog').font())
             # trim first three lines, for example:
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
             # --- a/tortoisehg/hgqt/thgrepo.py
@@ -379,17 +379,23 @@ class HgFileView(QFrame):
                 else:
                     # there was an error or rename without diffs
                     self.sci.setText(hglib.tounicode(fd.diff))
-        elif fd.contents is None:
-            return
-        else:
+        elif fd.ucontents:
+            # subrepo summary and perhaps other data
+            self.sci.setText(fd.ucontents)
+            self.sci.setLexer(None)
+            self.sci.setFont(qtlib.getfont('fontlog').font())
+            self.sci._updatemarginwidth()
+        elif fd.contents:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
             if lexer is None:
-                self.setFont(qtlib.getfont('fontlog').font())
-            self.sci.setText(fd.contents)
+                self.sci.setFont(qtlib.getfont('fontlog').font())
+            self.sci.setText(hglib.tounicode(fd.contents))
             self.sci._updatemarginwidth()
             if self._mode == AnnMode:
                 self.sci._updateannotation(self._ctx, filename)
+        else:
+            return
 
         # Recover the last scroll position
         # Make sure that lastScrollPosition never exceeds the amount of
@@ -399,7 +405,8 @@ class HgFileView(QFrame):
 
         self.highlightText(*self._lastSearch)
         uf = hglib.tounicode(filename)
-        self.fileDisplayed.emit(uf, fd.contents or QString())
+        uc = hglib.tounicode(fd.contents) or ''
+        self.fileDisplayed.emit(uf, uc)
 
         if self._mode != DiffMode and fd.contents and fd.olddata:
             # Update blk margin
