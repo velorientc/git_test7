@@ -227,7 +227,10 @@ class HgFileListView(QTableView):
                 _("The selected subrepository does not exist on the working directory"))
 
     def doubleClickHandler(self):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+        itemissubrepo = (self.model().dataFromIndex(index)['status'] == 'S')
         if itemissubrepo:
             self.opensubrepo()
         else:
@@ -281,7 +284,10 @@ class HgFileListView(QTableView):
             self.addAction(act)
 
     def contextMenuEvent(self, event):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+        itemissubrepo = (self.model().dataFromIndex(index)['status'] == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:
