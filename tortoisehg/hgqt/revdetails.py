@@ -372,6 +372,8 @@ class RevDetailsWidget(QWidget):
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         index = self.filelist.currentIndex()
+        if not index.isValid():
+            return
         model = self.filelist.model()
         itemissubrepo = (model.dataFromIndex(index)['status'] == 'S')
 
