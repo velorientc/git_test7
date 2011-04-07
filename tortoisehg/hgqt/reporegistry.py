@@ -40,8 +40,11 @@ class RepoTreeView(QTreeView):
         # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
+        self.setAutoScroll(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setDropIndicatorShown(True)
+        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.createActions()
         self.setHeaderHidden(True)
@@ -82,7 +85,10 @@ class RepoTreeView(QTreeView):
             self.workbench.showMessage('')
 
     def mouseDoubleClickEvent(self, event):
-        self.showFirstTabOrOpen()
+        if self.selitem and self.selitem.internalPointer().details():
+            self.showFirstTabOrOpen()
+        else:
+            super(RepoTreeView, self).mouseDoubleClickEvent(event)
 
     def selectionChanged(self, selected, deselected):
         selection = self.selectedIndexes()
@@ -182,11 +188,8 @@ class RepoTreeView(QTreeView):
             return
         root = self.selitem.internalPointer().rootpath()
         d = CloneDialog(args=[root, root + '-clone'], parent=self)
-        def cmdfinished(res):
-            if res == 0:
-                dest = d.getDest()
-                self.workbench.openRepo(dest)
-        d.cmdfinished.connect(cmdfinished)
+        d.finished.connect(d.deleteLater)
+        d.clonedRepository.connect(self.workbench.showRepo)
         d.show()
 
     def explore(self):
