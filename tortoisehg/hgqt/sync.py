@@ -694,7 +694,7 @@ class SyncWidget(QWidget):
             bfile = bfile.replace('/', '_')
             bfile = tempfile.mktemp('.hg', bfile+'_', qtlib.gettempdir())
             self.finishfunc = finished
-            cmdline = ['--repository', self.repo.root, 'incoming',
+            cmdline = ['--repository', self.repo.root, 'incoming', '--quiet',
                        '--bundle', bfile]
             self.run(cmdline, ('force', 'branch', 'rev'))
         else:
