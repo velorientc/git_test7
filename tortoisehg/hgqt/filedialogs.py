@@ -23,14 +23,13 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, getmenuicon
 from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import visdiff
+from tortoisehg.hgqt import qtlib, visdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -44,7 +43,7 @@ class _AbstractFileDialog(QMainWindow):
         QMainWindow.__init__(self)
         self.repo = repo
 
-        self._font = getfont('fontdiff').font()
+        self._font = qtlib.getfont('fontdiff').font()
         self.setupUi(self)
         self.setRepoViewer(repoviewer)
         self._show_rev = None
@@ -182,12 +181,12 @@ class FileLogDialog(_AbstractFileDialog):
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
         self.actionReload.triggered.connect(self.reload)
-        self.actionReload.setIcon(geticon('view-refresh'))
+        self.actionReload.setIcon(qtlib.geticon('view-refresh'))
 
         self.actionBack = QAction(_('Back'), self, enabled=False,
-                                  icon=geticon('go-previous'))
+                                  icon=qtlib.geticon('go-previous'))
         self.actionForward = QAction(_('Forward'), self, enabled=False,
-                                     icon=geticon('go-next'))
+                                     icon=qtlib.geticon('go-next'))
         self.repoview.revisionSelected.connect(self._updateHistoryActions)
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
@@ -215,17 +214,17 @@ class FileLogDialog(_AbstractFileDialog):
         if self.menu is None:
             self.menu = menu = QMenu(self)
             a = menu.addAction(_('Visual diff...'))
-            a.setIcon(getmenuicon('visualdiff'))
+            a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
             a = menu.addAction(_('Diff to local...'))
-            a.setIcon(getmenuicon('ldiff'))
+            a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
             a = menu.addAction(_('Visual diff file...'))
-            a.setIcon(getmenuicon('visualdiff'))
+            a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiffFile)
             a = menu.addAction(_('Diff file to local...'))
-            a.setIcon(getmenuicon('ldiff'))
+            a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffFileToLocal)
         self.selection = selection
         self.menu.exec_(point)
@@ -430,13 +429,13 @@ class FileDiffDialog(_AbstractFileDialog):
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
         self.actionReload.triggered.connect(self.reload)
-        self.actionReload.setIcon(geticon('view-refresh'))
+        self.actionReload.setIcon(qtlib.geticon('view-refresh'))
 
-        self.actionNextDiff = QAction(geticon('go-down'), 'Next diff', self)
+        self.actionNextDiff = QAction(qtlib.geticon('go-down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
 
-        self.actionPrevDiff = QAction(geticon('go-up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(qtlib.geticon('go-up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
 
