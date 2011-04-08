@@ -19,8 +19,6 @@ Qt4 dialogs to display hg revisions of a file
 
 import difflib
 
-from mercurial import hg
-
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
