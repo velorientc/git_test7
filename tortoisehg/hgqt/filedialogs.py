@@ -23,10 +23,9 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
-from tortoisehg.hgqt import fileview
+from tortoisehg.hgqt import fileview, repoview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -124,7 +123,8 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.repoview = HgRepoView(self.repo, 'fileLogDialog', self.splitter)
+        self.repoview = repoview.HgRepoView(self.repo, 'fileLogDialog',
+                                            self.splitter)
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -318,9 +318,9 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
-        self.tableView_revisions_left = HgRepoView(self.repo,
+        self.tableView_revisions_left = repoview.HgRepoView(self.repo,
                                                    'fileDiffDialogLeft', self)
-        self.tableView_revisions_right = HgRepoView(self.repo,
+        self.tableView_revisions_right = repoview.HgRepoView(self.repo,
                                                     'fileDiffDialogRight', self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
