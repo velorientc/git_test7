@@ -195,7 +195,7 @@ class SyncWidget(QWidget):
         self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.hostentry)
-        
+
         self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
         tbar.addWidget(w)
@@ -1146,7 +1146,7 @@ class SecureDialog(QDialog):
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText('### host certificate fingerprint ###')
         hbox.addWidget(le)
         try:
