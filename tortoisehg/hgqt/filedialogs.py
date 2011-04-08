@@ -23,12 +23,11 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import qtlib, visdiff, filerevmodel
+from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -354,7 +353,7 @@ class FileDiffDialog(_AbstractFileDialog):
         self.viewers = {}
         # block are diff-block displayers
         self.block = {}
-        self.diffblock = BlockMatch(self.frame)
+        self.diffblock = blockmatcher.BlockMatch(self.frame)
         lay = QHBoxLayout(self.frame)
         lay.setSpacing(0)
         lay.setContentsMargins(0, 0, 0, 0)
@@ -392,7 +391,7 @@ class FileDiffDialog(_AbstractFileDialog):
             sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
 
             self.viewers[side] = sci
-            blk = BlockList(self.frame)
+            blk = blockmatcher.BlockList(self.frame)
             blk.linkScrollBar(sci.verticalScrollBar())
             self.diffblock.linkScrollBar(sci.verticalScrollBar(), side)
             lay.insertWidget(idx, blk)
