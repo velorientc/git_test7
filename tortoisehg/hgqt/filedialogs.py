@@ -23,11 +23,10 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher
+from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -41,7 +40,6 @@ class _AbstractFileDialog(QMainWindow):
         QMainWindow.__init__(self)
         self.repo = repo
 
-        self._font = qtlib.getfont('fontdiff').font()
         self.setupUi(self)
         self.setRepoViewer(repoviewer)
         self._show_rev = None
@@ -49,7 +47,6 @@ class _AbstractFileDialog(QMainWindow):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
         self.filename = filename
-        self.findLexer()
 
         self.createActions()
         self.setupToolbars()
@@ -66,20 +63,6 @@ class _AbstractFileDialog(QMainWindow):
         'Reload toolbar action handler'
         self.repo.thginvalidate()
         self.setupModels()
-
-    def findLexer(self):
-        # try to find a lexer for our file.
-        f = self.repo.file(self.filename)
-        head = f.heads()[0]
-        if f.size(f.rev(head)) < 1e6:
-            data = f.read(head)
-        else:
-            data = '' # too big
-        lexer = get_lexer(self.filename, data, self)
-        if lexer:
-            lexer.setDefaultFont(self._font)
-            lexer.setFont(self._font)
-        self.lexer = lexer
 
     def onRevisionActivated(self, rev):
         """
@@ -158,7 +141,6 @@ class FileLogDialog(_AbstractFileDialog):
         vbox.addWidget(self.textView, 1)
 
     def setupViews(self):
-        self.textView.setFont(self._font)
         self.textView.showMessage.connect(self.statusBar().showMessage)
 
     def setupToolbars(self):
@@ -357,9 +339,15 @@ class FileDiffDialog(_AbstractFileDialog):
         lay = QHBoxLayout(self.frame)
         lay.setSpacing(0)
         lay.setContentsMargins(0, 0, 0, 0)
+
+        try:
+            contents = open(self.repo.wjoin(self.filename), "rb").read(1024)
+            lexer = lexers.get_lexer(self.filename, contents, self)
+        except Exception:
+            lexer = None
+
         for side, idx  in (('left', 0), ('right', 3)):
             sci = QsciScintilla(self.frame)
-            sci.setFont(self._font)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
@@ -367,8 +355,10 @@ class FileDiffDialog(_AbstractFileDialog):
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
             sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
-            if self.lexer:
-                sci.setLexer(self.lexer)
+
+            sci.setLexer(lexer)
+            if lexer is None:
+                sci.setFont(qtlib.getfont('fontdiff').font())
 
             sci.setReadOnly(True)
             sci.setUtf8(True)
