@@ -317,7 +317,7 @@ class CloneDialog(QDialog):
         self.prev_dest = dest
 
         # start cloning
-        self.cmd.run(cmdline)
+        self.cmd.run(cmdline, useproc=src.startswith('p4://'))
 
     ### Signal Handlers ###
 
