@@ -23,9 +23,8 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
-from tortoisehg.hgqt import fileview, repoview
+from tortoisehg.hgqt import fileview, repoview, revpanel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -132,7 +131,7 @@ class FileLogDialog(_AbstractFileDialog):
         vbox.setMargin(0)
         self.contentframe.setLayout(vbox)
 
-        self.revpanel = RevPanelWidget(self.repo)
+        self.revpanel = revpanel.RevPanelWidget(self.repo)
         self.revpanel.linkActivated.connect(self.onLinkActivated)
         vbox.addWidget(self.revpanel, 0)
 
