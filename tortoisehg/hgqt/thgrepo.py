@@ -81,7 +81,10 @@ class ThgRepoWrapper(QObject):
             freq = max(100, int(freq))
         except:
             freq = 500
-        self._timerevent = self.startTimer(freq)
+        if isinstance(repo, bundlerepo.bundlerepository):
+            dbgoutput('not starting timer for bundle repository')
+        else:
+            self._timerevent = self.startTimer(freq)
 
     def timerEvent(self, event):
         if not os.path.exists(self.repo.path):
