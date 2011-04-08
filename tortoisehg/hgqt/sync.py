@@ -401,7 +401,7 @@ class SyncWidget(QWidget):
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
-            w.setHidden(schemeIndex == 0)
+            w.setDisabled(schemeIndex == 0)
         self.securebutton.setVisible(schemeIndex == 3)
 
     def currentUrl(self, hidepw):
