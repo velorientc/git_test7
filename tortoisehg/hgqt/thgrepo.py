@@ -40,16 +40,16 @@ def repository(_ui=None, path='', create=False, bundle=None):
         if _ui is None:
             _ui = uimod.ui()
         repo = bundlerepo.bundlerepository(_ui, path, bundle)
-        repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
+        repo._pyqtobj = ThgRepoWrapper(repo)
         return repo
     if create or path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path, create)
-            repo._pyqtobj = ThgRepoWrapper(repo)
             repo.__class__ = _extendrepo(repo)
+            repo._pyqtobj = ThgRepoWrapper(repo)
             _repocache[path] = repo
             return repo
         except EnvironmentError:
@@ -106,6 +106,11 @@ class ThgRepoWrapper(QObject):
         for f in existing:
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
+                self.watcher.addPath(f)
+        _, existing = self.repo.uifiles()
+        for f in existing:
+            if f and hglib.tounicode(f) not in files:
+                dbgoutput('add ui file to watcher:', f)
                 self.watcher.addPath(f)
 
     def pollStatus(self):
