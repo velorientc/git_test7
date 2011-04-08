@@ -21,6 +21,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 class CloneDialog(QDialog):
 
     cmdfinished = pyqtSignal(int)
+    clonedRepository = pyqtSignal(QString)
 
     def __init__(self, args=None, opts={}, parent=None):
         super(CloneDialog, self).__init__(parent)
@@ -132,11 +133,22 @@ class CloneDialog(QDialog):
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
+        self.insecure_chk = QCheckBox(_('Do not verify host certificate'))
+        optbox.addWidget(self.insecure_chk)
+        self.insecure_chk.setEnabled(False)
+
         self.remote_chk, self.remote_text = chktext(_('Remote command:'))
 
         # allow to specify start revision for p4 & svn repos.
         self.startrev_chk, self.startrev_text = chktext(_('Start revision:'),
                                                         stretch=40)
+
+        self.hgcmd_lbl = QLabel(_('Hg command:'))
+        self.hgcmd_lbl.setAlignment(Qt.AlignRight)
+        self.hgcmd_txt = QLineEdit()
+        self.hgcmd_txt.setReadOnly(True)
+        grid.addWidget(self.hgcmd_lbl, 3, 0)
+        grid.addWidget(self.hgcmd_txt, 3, 1)
 
         ## command widget
         self.cmd = cmdui.Widget(True, True, self)
@@ -169,6 +181,22 @@ class CloneDialog(QDialog):
         self.setWindowTitle(_('Clone - %s') % ucwd)
         self.setWindowIcon(qtlib.geticon('hg-clone'))
 
+        # connect extra signals
+        self.src_combo.editTextChanged.connect(self.composeCommand)
+        self.src_combo.editTextChanged.connect(self.onUrlHttps)
+        self.dest_combo.editTextChanged.connect(self.composeCommand)
+        self.rev_chk.toggled.connect(self.composeCommand)
+        self.rev_text.textChanged.connect(self.composeCommand)
+        self.noupdate_chk.toggled.connect(self.composeCommand)
+        self.pproto_chk.toggled.connect(self.composeCommand)
+        self.uncomp_chk.toggled.connect(self.composeCommand)
+        self.qclone_chk.toggled.connect(self.composeCommand)
+        self.proxy_chk.toggled.connect(self.composeCommand)
+        self.insecure_chk.toggled.connect(self.composeCommand)
+        self.remote_chk.toggled.connect(self.composeCommand)
+        self.remote_text.textChanged.connect(self.composeCommand)
+        self.startrev_chk.toggled.connect(self.composeCommand)
+
         # prepare to show
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
@@ -186,10 +214,15 @@ class CloneDialog(QDialog):
         self.src_combo.setFocus()
         self.src_combo.lineEdit().selectAll()
 
-    def getDest(self):
-        return hglib.fromunicode(self.dest_combo.currentText()).strip()
+        self.composeCommand()
 
     ### Private Methods ###
+
+    def getSrc(self):
+        return hglib.fromunicode(self.src_combo.currentText()).strip()
+
+    def getDest(self):
+        return hglib.fromunicode(self.dest_combo.currentText()).strip()
 
     def show_options(self, visible):
         self.rev_chk.setVisible(visible)
@@ -198,11 +231,50 @@ class CloneDialog(QDialog):
         self.pproto_chk.setVisible(visible)
         self.uncomp_chk.setVisible(visible)
         self.proxy_chk.setVisible(visible)
+        self.insecure_chk.setVisible(visible)
         self.qclone_chk.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
         self.startrev_chk.setVisible(visible and self.startrev_available())
         self.startrev_text.setVisible(visible and self.startrev_available())
+
+    def composeCommand(self):
+        remotecmd = hglib.fromunicode(self.remote_text.text().trimmed())
+        rev = hglib.fromunicode(self.rev_text.text().trimmed())
+        startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
+        if self.qclone_chk.isChecked():
+            cmdline = ['qclone']
+        else:
+            cmdline = ['clone']
+        if self.noupdate_chk.isChecked():
+            cmdline.append('--noupdate')
+        if self.uncomp_chk.isChecked():
+            cmdline.append('--uncompressed')
+        if self.pproto_chk.isChecked():
+            cmdline.append('--pull')
+        if self.ui.config('http_proxy', 'host'):
+            if not self.proxy_chk.isChecked():
+                cmdline += ['--config', 'http_proxy.host=']
+        if self.remote_chk.isChecked() and remotecmd:
+            cmdline.append('--remotecmd')
+            cmdline.append(remotecmd)
+        if self.rev_chk.isChecked() and rev:
+            cmdline.append('--rev')
+            cmdline.append(rev)
+        if self.startrev_chk.isChecked() and startrev:
+            cmdline.append('--startrev')
+            cmdline.append(startrev)
+        cmdline.append('--verbose')
+        src = self.getSrc()
+        dest = self.getDest()
+        if self.insecure_chk.isChecked() and src.startswith('https://'):
+            cmdline.append('--insecure')
+        cmdline.append(src)
+        if dest:
+            cmdline.append('--')
+            cmdline.append(dest)
+        self.hgcmd_txt.setText(hglib.tounicode(' '.join(['hg'] + cmdline)))
+        return cmdline
 
     def startrev_available(self):
         entry = cmdutil.findcmd('clone', commands.table)[1]
@@ -247,10 +319,6 @@ class CloneDialog(QDialog):
         s.setValue('clone/source', self.shist)
         s.setValue('clone/dest', self.dhist)
 
-        remotecmd = hglib.fromunicode(self.remote_text.text().trimmed())
-        rev = hglib.fromunicode(self.rev_text.text().trimmed())
-        startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
-
         # verify input
         if src == '':
             qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
@@ -279,34 +347,9 @@ class CloneDialog(QDialog):
                 dest = os.path.join(os.path.dirname(dirabs), dest)
 
         # prepare command line
-        if self.qclone_chk.isChecked():
-            cmdline = ['qclone']
-        else:
-            cmdline = ['clone']
-        if self.noupdate_chk.isChecked():
-            cmdline.append('--noupdate')
-        if self.uncomp_chk.isChecked():
-            cmdline.append('--uncompressed')
-        if self.pproto_chk.isChecked():
-            cmdline.append('--pull')
-        if self.ui.config('http_proxy', 'host'):
-            if not self.proxy_chk.isChecked():
-                cmdline += ['--config', 'http_proxy.host=']
-        if self.remote_chk.isChecked() and remotecmd:
-            cmdline.append('--remotecmd')
-            cmdline.append(remotecmd)
-        if self.rev_chk.isChecked() and rev:
-            cmdline.append('--rev')
-            cmdline.append(rev)
-        if self.startrev_chk.isChecked() and startrev:
-            cmdline.append('--startrev')
-            cmdline.append(startrev)
-
-        cmdline.append('--verbose')
-        cmdline.append(src)
-        if dest:
-            cmdline.append('--')
-            cmdline.append(dest)
+        self.src_combo.setEditText(hglib.tounicode(src))
+        self.dest_combo.setEditText(hglib.tounicode(dest))
+        cmdline = self.composeCommand()
 
         # do not make the same clone twice (see #514)
         if dest == self.prev_dest:
@@ -325,6 +368,7 @@ class CloneDialog(QDialog):
         target.setEnabled(checked)
         if checked:
             target.setFocus()
+        self.composeCommand()
 
     def detail_toggled(self, checked):
         self.cmd.setShowOutput(checked)
@@ -337,6 +381,7 @@ class CloneDialog(QDialog):
         if path:
             self.src_combo.setEditText(QDir.toNativeSeparators(path))
             self.dest_combo.setFocus()
+        self.composeCommand()
 
     def browse_dest(self):
         FD = QFileDialog
@@ -346,6 +391,7 @@ class CloneDialog(QDialog):
         if path:
             self.dest_combo.setEditText(QDir.toNativeSeparators(path))
             self.dest_combo.setFocus()
+        self.composeCommand()
 
     def command_started(self):
         self.cmd.setShown(True)
@@ -366,11 +412,20 @@ class CloneDialog(QDialog):
         else:
             self.accept()
 
+        if not ret:
+            # Let the workbench know that a repository has been successfully
+            # cloned
+            self.clonedRepository.emit(self.dest_combo.currentText())
+
     def onCloseClicked(self):
         if self.ret is 0:
             self.accept()
         else:
             self.reject()
+
+    def onUrlHttps(self):
+        self.insecure_chk.setEnabled(self.getSrc().startswith('https://'))
+        self.composeCommand()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)

@@ -154,7 +154,6 @@ class FileLogDialog(_AbstractFileDialog):
         vbox.addWidget(self.revpanel, 0)
 
         self.textView = HgFileView(self.repo, self)
-        self.textView.forceMode('file')
         self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 
@@ -218,7 +217,7 @@ class FileLogDialog(_AbstractFileDialog):
         pos = self.textView.verticalScrollBar().value()
         ctx = self.filerevmodel.repo.changectx(rev)
         self.textView.setContext(ctx)
-        self.textView.displayFile(self.filerevmodel.graph.filename(rev))
+        self.textView.displayFile(self.filerevmodel.graph.filename(rev), None)
         self.textView.verticalScrollBar().setValue(pos)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)

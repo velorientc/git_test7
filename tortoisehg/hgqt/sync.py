@@ -14,7 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error
+from mercurial import hg, ui, url, util, error, demandimport
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
@@ -22,6 +22,15 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
 _schemes = ['local', 'ssh', 'http', 'https']
+
+demandimport.disable()
+try:
+    # hg <= 1.8
+    from mercurial.hg import localpath
+except ImportError:
+    # hg >= 1.9
+    from mercurial.url import localpath
+demandimport.enable()
 
 def parseurl(path):
     if path.startswith('ssh://'):
@@ -61,6 +70,8 @@ class SyncWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    showBusyIcon = pyqtSignal(QString)
+    hideBusyIcon = pyqtSignal(QString)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -164,46 +175,51 @@ class SyncWidget(QWidget):
         hbox.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(hbox)
 
+        self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
+        tbar.setIconSize(QSize(16, 16))
+        hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.schemecombo)
+        tbar.addWidget(self.schemecombo)
 
-        self.securebutton = QPushButton(qtlib.geticon('thg-password'), '')
-        self.securebutton.setToolTip(
-            _('Manage HTTPS connection security and user authentication'))
-        hbox.addWidget(self.securebutton)
+        a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
+        a.setToolTip(_('Manage HTTPS connection security and user authentication'))
+        self.securebutton = a
 
+        fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
         self.hostentry.setToolTip(_('Hostname'))
         self.hostentry.setAcceptDrops(False)
+        self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.hostentry, 1)
+        tbar.addWidget(self.hostentry)
+        
         self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
-        fontm = QFontMetrics(self.font())
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.portentry)
+        tbar.addWidget(self.portentry)
         self.HostAndPortWidgets.append(self.portentry)
         w = QLabel('/')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
         self.pathentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.pathentry, 4)
+        tbar.addWidget(self.pathentry)
 
-        self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
-        self.savebutton.setToolTip(_('Save current URL under an alias'))
-        hbox.addWidget(self.savebutton)
+        a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
+                          _('Save'))
+        a.setToolTip(_('Save current URL under an alias'))
+        self.savebutton = a
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -238,8 +254,8 @@ class SyncWidget(QWidget):
 
         self.layout().addLayout(hbox, 1)
 
-        self.savebutton.clicked.connect(self.saveclicked)
-        self.securebutton.clicked.connect(self.secureclicked)
+        self.savebutton.triggered.connect(self.saveclicked)
+        self.securebutton.triggered.connect(self.secureclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
@@ -346,7 +362,7 @@ class SyncWidget(QWidget):
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if hg.islocal(path):
-                known.add(os.path.abspath(hg.localpath(path)).lower())
+                known.add(os.path.abspath(localpath(path)).lower())
             else:
                 known.add(path)
         related = {}
@@ -368,7 +384,7 @@ class SyncWidget(QWidget):
                 ui = tempui
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
-                    abs = os.path.abspath(hg.localpath(path)).lower()
+                    abs = os.path.abspath(localpath(path)).lower()
                 else:
                     abs = path
                 if abs not in known:
@@ -386,7 +402,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
             w.setHidden(schemeIndex == 0)
-        self.securebutton.setHidden(schemeIndex != 3)
+        self.securebutton.setVisible(schemeIndex == 3)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
@@ -562,11 +578,14 @@ class SyncWidget(QWidget):
         for b in self.opbuttons:
             b.setEnabled(False)
         self.stopAction.setEnabled(True)
-        if not self.embedded:
+        if self.embedded:
+            self.showBusyIcon.emit('thg-sync')
+        else:
             self.cmd.setShowOutput(True)
             self.cmd.setVisible(True)
 
     def commandFinished(self, ret):
+        self.hideBusyIcon.emit('thg-sync')
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
             b.setEnabled(True)
