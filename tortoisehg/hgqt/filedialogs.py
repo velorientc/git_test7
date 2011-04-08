@@ -23,10 +23,10 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
+from tortoisehg.hgqt import fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -136,7 +136,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.revpanel.linkActivated.connect(self.onLinkActivated)
         vbox.addWidget(self.revpanel, 0)
 
-        self.textView = HgFileView(self.repo, self)
+        self.textView = fileview.HgFileView(self.repo, self)
         self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 
