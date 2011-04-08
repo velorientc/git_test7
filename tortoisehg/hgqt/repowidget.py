@@ -1241,6 +1241,7 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
+            dlg.deleteLater()
 
     def visualDiffToLocal(self):
         assert type(self.rev) is int
@@ -1248,6 +1249,7 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
+            dlg.deleteLater()
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
@@ -1263,6 +1265,7 @@ class RepoWidget(QWidget):
     def mergeWithRevision(self):
         dlg = merge.MergeDialog(self.rev, self.repo, self)
         dlg.exec_()
+        dlg.deleteLater()
 
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
