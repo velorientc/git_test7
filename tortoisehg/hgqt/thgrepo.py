@@ -83,9 +83,9 @@ class ThgRepoWrapper(QObject):
         else:
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(repo.path)
-            self.addMissingPaths()
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
+            self.addMissingPaths()
 
     @pyqtSlot(QString)
     def onDirChange(self, directory):
@@ -107,9 +107,9 @@ class ThgRepoWrapper(QObject):
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
                 self.watcher.addPath(f)
-        _, existing = self.repo.uifiles()
-        for f in existing:
-            if f and hglib.tounicode(f) not in files:
+        _, files = self.repo.uifiles()
+        for f in files:
+            if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
                 self.watcher.addPath(f)
 
@@ -117,6 +117,13 @@ class ThgRepoWrapper(QObject):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
+            # disable watcher by removing all watched paths
+            dirs = self.watcher.directories()
+            if dirs:
+                self.watcher.removePaths(dirs)
+            files = self.watcher.files()
+            if files:
+                self.watcher.removePaths(files)
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
             return
