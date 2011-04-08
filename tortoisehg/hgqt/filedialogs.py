@@ -23,13 +23,12 @@ from mercurial import hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import qtlib, visdiff
+from tortoisehg.hgqt import qtlib, visdiff, filerevmodel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -169,7 +168,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionForward)
 
     def setupModels(self):
-        self.filerevmodel = FileRevModel(self.repo, parent=self)
+        self.filerevmodel = filerevmodel.FileRevModel(self.repo, parent=self)
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.onRevisionSelected)
         self.repoview.revisionActivated.connect(self.onRevisionActivated)
@@ -421,7 +420,7 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = FileRevModel(self.repo, self.filename, parent=self)
+        self.filerevmodel = filerevmodel.FileRevModel(self.repo, self.filename, parent=self)
         self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)
