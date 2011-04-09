@@ -15,7 +15,7 @@ from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox
+from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
@@ -1153,6 +1153,25 @@ class RepoWidget(QWidget):
 
         def exportPair():
             self.exportRevisions(self.menuselection)
+        def exportDiff():
+            root = self.repo.root
+            filename = '%s_%d_to_%d.diff' % (os.path.basename(root),
+                                             self.menuselection[0],
+                                             self.menuselection[1])
+            file = QFileDialog.getSaveFileName(self, _('Write diff file'),
+                               hglib.tounicode(os.path.join(root, filename)))
+            if not file:
+                return
+            diff = self.copyPatch(returnval=True)
+            f = None
+            try:
+                f = open(file, "wb")
+                f.write(diff)
+            except Exception, e:
+                WarningMsgBox(_('Repository Error'),
+                              _('Unable to write diff file'))
+            finally:
+                if f: f.close()
         def exportDagRange():
             l = dagrange()
             if l:
@@ -1204,15 +1223,22 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Visual Diff...'), diffPair, 'visualdiff'),
+                (_('Export Diff...'), exportDiff, 'hg-export'),
+                (None, None, None),
                 (_('Export Selected...'), exportPair, 'hg-export'),
                 (_('Email Selected...'), emailPair, 'mail-forward'),
+                (None, None, None),
                 (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
                 (_('Bundle DAG Range...'), bundleDagRange, 'menurelocate'),
+                (None, None, None),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
                 (_('Compress History...'), compressDlg, 'hg-compress')
                 ):
+            if name is None:
+                menu.addSeparator()
+                continue
             a = QAction(name, self)
             if icon:
                 a.setIcon(qtlib.getmenuicon(icon))
@@ -1493,18 +1519,19 @@ class RepoWidget(QWidget):
         cmdline.append(hglib.fromunicode(file))
         self.runCommand(cmdline)
 
-    def copyPatch(self):
+    def copyPatch(self, returnval=False):
         from mercurial import commands
         _ui = self.repo.ui
         _ui.pushbuffer()
         try:
-            if self.rev:
+            if self.rev and len(self.menuselection) == 1:
                 class Writable(object):
                     def write(self, *args, **opts): _ui.write(*args, **opts)
                     def close(self): pass
                 commands.export(_ui, self.repo, self.rev, output=Writable())
             else:
-                commands.diff(_ui, self.repo)
+                revs = self.rev and self.menuselection or None
+                commands.diff(_ui, self.repo, rev=revs)
         except NameError:
             raise
         except Exception, e:
@@ -1515,7 +1542,10 @@ class RepoWidget(QWidget):
                 traceback.print_exc()
             return
         output = _ui.popbuffer()
-        QApplication.clipboard().setText(hglib.tounicode(output))
+        if returnval:
+            return output
+        else:
+            QApplication.clipboard().setText(hglib.tounicode(output))
 
     def copyHash(self):
         clip = QApplication.clipboard()
