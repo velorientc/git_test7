@@ -583,7 +583,7 @@ class Workbench(QMainWindow):
         self._openRepo(path=hglib.fromunicode(path))
 
     def _openRepo(self, path, reuse=False):
-        if path:
+        if path and not path.startswith('ssh://'):
             if reuse:
                 for rw in self._findrepowidget(path):
                     return
