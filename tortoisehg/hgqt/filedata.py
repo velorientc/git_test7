@@ -255,7 +255,7 @@ class FileData(object):
             if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
                 self.error = mde
             else:
-                data = open(repo.wjoin(wfile), 'r').read()
+                data = util.posixfile(repo.wjoin(wfile), 'r').read()
                 if '\0' in data:
                     self.error = 'binary file'
                 else:
