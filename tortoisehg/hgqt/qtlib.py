@@ -154,6 +154,32 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                               hglib.tounicode(str(e))))
     return False
 
+_user_shell = None
+def openshell(root):
+    global _user_shell
+    if _user_shell:
+        cwd = os.getcwd()
+        try:
+            os.chdir(repo.root)
+            QProcess.startDetached(_user_shell)
+        finally:
+            os.chdir(cwd)
+    else:
+        InfoMsgBox(_('No shell configured'),
+                   _('A terminal shell must be configured'))
+
+def configureshell(ui):
+    global _user_shell
+    _user_shell = ui.config('tortoisehg', 'shell')
+    if _user_shell:
+        return
+    if sys.platform == 'darwin':
+        return # Terminal.App does not support open-to-folder
+    elif os.name == 'nt':
+        _user_shell = 'cmd.exe'
+    else:
+        _user_shell = 'xterm'
+
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style
@@ -184,6 +210,8 @@ _thgstyles = {
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
 
 def configstyles(ui):
+    configureshell(ui)
+
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))

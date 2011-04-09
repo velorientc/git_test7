@@ -60,10 +60,9 @@ def iterRepoItemFromXml(source, model=None):
             yield undumpObject(xr, model)
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, openrepofunc, filename=None, parent=None):
-        QAbstractItemModel.__init__(self, parent)
 
-        self.openrepofunc = openrepofunc
+    def __init__(self, filename, parent):
+        QAbstractItemModel.__init__(self, parent)
 
         root = None
         all = None

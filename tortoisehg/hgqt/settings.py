@@ -370,7 +370,8 @@ INFO = (
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
-        _('Specify your preferred terminal shell application')),
+        _('Specify your preferred terminal shell application'),
+        globalonly=True),
     _fi(_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
         _('Space separated list of shell operations you would like '
           'to be performed immediately, without user interaction. '

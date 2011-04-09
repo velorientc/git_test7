@@ -9,9 +9,7 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
-from tortoisehg.hgqt.repotreemodel import RepoTreeModel
-from tortoisehg.hgqt.clone import CloneDialog
+from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -24,12 +22,13 @@ def settingsfilename():
 
 
 class RepoTreeView(QTreeView):
+    showMessage = pyqtSignal(QString)
+    openRepo = pyqtSignal(QString, bool)
 
     contextmenu = None
 
-    def __init__(self, parent, workbench):
+    def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
-        self.workbench = workbench
         self.selitem = None
         self.msg  = ''
 
@@ -72,7 +71,7 @@ class RepoTreeView(QTreeView):
         if idx.isValid():
             item = idx.internalPointer()
             self.msg  = item.details()
-        self.workbench.showMessage(self.msg)
+        self.showMessage.emit(self.msg)
         super(RepoTreeView, self).mouseMoveEvent(event)
 
     def keyPressEvent(self, event):
@@ -80,9 +79,10 @@ class RepoTreeView(QTreeView):
             self.showFirstTabOrOpen()
         else:
             super(RepoTreeView, self).keyPressEvent(event)
+
     def leaveEvent(self, event):
         if self.msg != '':
-            self.workbench.showMessage('')
+            self.showMessage.emit('')
 
     def mouseDoubleClickEvent(self, event):
         if self.selitem and self.selitem.internalPointer().details():
@@ -145,27 +145,34 @@ class RepoTreeView(QTreeView):
     def startSettings(self):
         if not self.selitem:
             return
-        self.selitem.internalPointer().startSettings(self.parent())
+        root = self.selitem.internalPointer().rootpath()
+        sd = settings.SettingsDialog(configrepo=True, focus='web.name',
+                                     parent=self, root=root)
+        sd.exec_()
 
     def startRename(self):
         if not self.selitem:
             return
         self.edit(self.selitem)
 
-    def open(self):
-        if not self.selitem:
-            return
-        self.selitem.internalPointer().open()
-
     def openAll(self):
         if not self.selitem:
             return
         self.selitem.internalPointer().openAll()
 
-    def showFirstTabOrOpen(self):
+    def open(self):
+        'open context menu action, open repowidget unconditionally'
         if not self.selitem:
             return
-        self.selitem.internalPointer().showFirstTabOrOpen(workbench=self.workbench)
+        root = self.selitem.internalPointer().rootpath()
+        self.openRepo.emit(hglib.tounicode(root), False)
+
+    def showFirstTabOrOpen(self):
+        'Enter or double click events, show existing or open a new repowidget'
+        if not self.selitem:
+            return
+        root = self.selitem.internalPointer().rootpath()
+        self.openRepo.emit(hglib.tounicode(root), True)
 
     def newGroup(self):
         m = self.model()
@@ -187,23 +194,22 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         root = self.selitem.internalPointer().rootpath()
-        d = CloneDialog(args=[root, root + '-clone'], parent=self)
+        d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
         d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self.workbench.showRepo)
+        d.clonedRepository.connect(self.open)
         d.show()
 
     def explore(self):
         if not self.selitem:
             return
         root = self.selitem.internalPointer().rootpath()
-        self.workbench.launchExplorer(root)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
     def terminal(self):
         if not self.selitem:
             return
         root = self.selitem.internalPointer().rootpath()
-        repo = thgrepo.repository(path=root)
-        self.workbench.launchTerminal(repo)
+        qtlib.openshell(root)
 
     def addRepo(self):
         if not self.selitem:
@@ -218,10 +224,11 @@ class RepoTreeView(QTreeView):
 
 class RepoRegistryView(QDockWidget):
 
+    showMessage = pyqtSignal(QString)
     openRepoSignal = pyqtSignal(QString, bool)
 
-    def __init__(self, workbench):
-        QDockWidget.__init__(self, workbench)
+    def __init__(self, parent):
+        QDockWidget.__init__(self, parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -234,15 +241,15 @@ class RepoRegistryView(QDockWidget):
         mainframe.setLayout(lay)
         self.setWidget(mainframe)
 
-        self.tmodel = m = RepoTreeModel(self.openrepo, settingsfilename(),
-                                        parent=self)
-
-        self.tview = tv = RepoTreeView(self, workbench)
-        lay.addWidget(tv)
+        self.tmodel = m = repotreemodel.RepoTreeModel(settingsfilename(), self)
+        self.tview = tv = RepoTreeView(self)
         tv.setModel(m)
+        lay.addWidget(tv)
 
         tv.setIndentation(10)
         tv.setFirstColumnSpanned(0, QModelIndex(), True)
+        tv.openRepo.connect(self.openRepo)
+        tv.showMessage.connect(self.showMessage)
 
         self.tview.setColumnHidden(1, True)
         QTimer.singleShot(0, self.expand)
@@ -258,8 +265,8 @@ class RepoRegistryView(QDockWidget):
         else:
             it.ensureRepoLoaded()
 
-    def openrepo(self, path, reuse=False):
-        self.openRepoSignal.emit(hglib.tounicode(path), reuse)
+    def openRepo(self, path, reuse=False):
+        self.openRepoSignal.emit(path, reuse)
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)

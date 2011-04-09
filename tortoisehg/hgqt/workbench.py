@@ -46,6 +46,8 @@ class Workbench(QMainWindow):
 
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
+        rr.showMessage.connect(self.showMessage)
+        rr.openRepoSignal.connect(self.openRepo)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
@@ -56,8 +58,6 @@ class Workbench(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
         self._setupActions()
-
-        rr.openRepoSignal.connect(self.openRepo)
 
         self.repoTabChanged()
         self.restoreSettings()
@@ -335,11 +335,11 @@ class Workbench(QMainWindow):
         if rw:
             rw.switchToNamedTaskTab(str(action.data().toString()))
 
-    def openRepo(self, repopath, reuse=False):
-        """ Open repo by openRepoSignal from reporegistry """
-        if isinstance(repopath, (unicode, QString)):  # as Qt slot
-            repopath = hglib.fromunicode(repopath)
-        self._openRepo(path=repopath, reuse=reuse)
+    @pyqtSlot(QString, bool)
+    def openRepo(self, root, reuse):
+        """ Open repo by openRepoSignal from reporegistry [unicode] """
+        root = hglib.fromunicode(root)
+        self._openRepo(root, reuse)
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
@@ -349,13 +349,15 @@ class Workbench(QMainWindow):
             rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
 
     @pyqtSlot(QString)
-    def showRepo(self, path):
+    def showRepo(self, root):
         """Activate the repo tab or open it if not available [unicode]"""
+        root = hglib.fromunicode(root)
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == path:
-                return self.repoTabsWidget.setCurrentIndex(i)
-        self.openRepo(path)
+            if hglib.tounicode(w.repo.root) == root:
+                self.repoTabsWidget.setCurrentIndex(i)
+                return
+        self._openRepo(root, False)
 
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
@@ -553,7 +555,7 @@ class Workbench(QMainWindow):
         dlg.finished.connect(dlg.deleteLater)
         if dlg.exec_():
             path = dlg.getPath()
-            self.openRepo(path)
+            self._openRepo(path, False)
 
     def cloneRepository(self):
         """ Run clone dialog """
@@ -581,24 +583,21 @@ class Workbench(QMainWindow):
         FD = QFileDialog
         path = FD.getExistingDirectory(self, caption, cwd,
                                        FD.ShowDirsOnly | FD.ReadOnly)
-        self._openRepo(path=hglib.fromunicode(path))
+        self._openRepo(hglib.fromunicode(path), False)
 
-    def _openRepo(self, path, reuse=False):
-        if path and not path.startswith('ssh://'):
+    def _openRepo(self, root, reuse):
+        if root and not root.startswith('ssh://'):
             if reuse:
-                for rw in self._findrepowidget(path):
+                for rw in self._findrepowidget(root):
+                    self.repoTabsWidget.setCurrentWidget(rw)
                     return
             try:
-                repo = thgrepo.repository(path=path)
+                repo = thgrepo.repository(path=root)
                 self.addRepoTab(repo)
             except RepoError:
-                upath = hglib.tounicode(path)
+                upath = hglib.tounicode(root)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % upath)
-
-    def goto(self, root, rev):
-        for rw in self._findrepowidget(root):
-            rw.goto(rev)
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
@@ -642,7 +641,7 @@ class Workbench(QMainWindow):
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
         for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
-            self._openRepo(path)
+            self._openRepo(path, False)
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
@@ -673,29 +672,12 @@ class Workbench(QMainWindow):
     def explore(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            self.launchExplorer(w.repo.root)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(w.repo.root))
 
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            self.launchTerminal(w.repo)
-
-    def launchExplorer(self, root):
-        """open Windows Explorer at the repo root"""
-        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
-
-    def launchTerminal(self, repo):
-        shell = repo.shell()
-        if shell:
-            cwd = os.getcwd()
-            try:
-                os.chdir(repo.root)
-                QProcess.startDetached(shell)
-            finally:
-                os.chdir(cwd)
-        else:
-            qtlib.InfoMsgBox(_('No shell configured'),
-                       _('A terminal shell must be configured'))
+            qtlib.openshell(w.repo.root)
 
     def editSettings(self):
         tw = self.repoTabsWidget

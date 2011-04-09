@@ -249,7 +249,7 @@ class ThgRepoWrapper(QObject):
         except (EnvironmentError, ValueError):
             pass
 
-_uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
+_uiprops = '''_uifiles _uimtime postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
 
@@ -322,18 +322,6 @@ def _extendrepo(repo):
                 return n[8:]
             else:
                 return n
-
-        @propertycache
-        def _shell(self):
-            s = self.ui.config('tortoisehg', 'shell')
-            if s:
-                return s
-            if sys.platform == 'darwin':
-                return None # Terminal.App does not support open-to-folder
-            elif os.name == 'nt':
-                return 'cmd.exe'
-            else:
-                return 'xterm'
 
         @propertycache
         def _uifiles(self):
@@ -458,10 +446,6 @@ def _extendrepo(repo):
             for branchname, nodes in self.branchmap().iteritems():
                 heads.extend(nodes)
             return heads
-
-        def shell(self):
-            'Returns terminal shell configured for this repo'
-            return self._shell
 
         def uifiles(self):
             'Returns latest mtime and complete list of config files'

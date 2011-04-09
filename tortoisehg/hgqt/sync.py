@@ -518,20 +518,8 @@ class SyncWidget(QWidget):
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        shell = self.repo.shell()
-        if shell:
-            cwd = os.getcwd()
-            try:
-                os.chdir(folder)
-                QProcess.startDetached(shell)
-            except EnvironmentError, e:
-                qtlib.InfoMsgBox(_('Repository not found'),
-                                 hglib.tounicode(str(e)))
-            finally:
-                os.chdir(cwd)
-        else:
-            qtlib.InfoMsgBox(_('No shell configured'),
-                        _('A terminal shell must be configured'))
+        qtlib.openshell(folder)
+
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
             _('Delete %s from your repo configuration file?') % self.menualias,
