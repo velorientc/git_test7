@@ -641,11 +641,17 @@ class RepoWidget(QWidget):
             self.revDetailsWidget.onRevisionSelected(rev)
             self.revisionSelected.emit(rev)
             if type(rev) != str: # unapplied patch
-                self.manifestDemand.forward('setRev', rev)
+                if self.manifestDemand.isHidden():
+                    self.manifestDemand.forward('selectRev', rev)
+                else:
+                    self.manifestDemand.forward('setRev', rev)
                 self.grepDemand.forward('setRevision', rev)
                 self.syncDemand.forward('refreshTargets', rev)
             else:
-                self.manifestDemand.forward('setRev', None)
+                if self.manifestDemand.isHidden():
+                    self.manifestDemand.forward('selectRev', None)
+                else:
+                    self.manifestDemand.forward('setRev', None)
         except (IndexError, error.RevlogError, error.Abort), e:
             self.showMessage(hglib.tounicode(str(e)))
 

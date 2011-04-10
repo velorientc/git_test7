@@ -115,6 +115,7 @@ class ManifestWidget(QWidget):
         super(ManifestWidget, self).__init__(parent)
         self._repo = repo
         self._rev = rev
+        self._selectedrev = rev
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
@@ -277,6 +278,13 @@ class ManifestWidget(QWidget):
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
 
+    def showEvent(self, event):
+        QWidget.showEvent(self, event)
+        if self._selectedrev != self._rev:
+            # If the selected revision is not the same as the current revision
+            # we must "reload" the manifest contents with the selected revision
+            self.setRev(self._selectedrev)
+
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         itemissubrepo = self.path in self._repo[self._rev].substate.keys()
@@ -370,10 +378,17 @@ class ManifestWidget(QWidget):
         """Return current revision"""
         return self._rev
 
+    def selectRev(self, rev):
+        """
+        Select the revision that must be set when the dialog is shown again
+        """
+        self._selectedrev = rev
+
     @pyqtSlot(int)
     @pyqtSlot(object)
     def setRev(self, rev):
         """Change revision to show"""
+        self._selectedrev = rev
         if rev == self._rev:
             return
         self._rev = rev
