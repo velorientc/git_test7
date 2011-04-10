@@ -251,7 +251,7 @@ class ManifestModel(QAbstractItemModel):
                     # Add subrepo files to the tree
                     srev = ctx.substate[path][1]
                     sub = ctx.sub(path)
-                    if isinstance(sub, hgsubrepo):
+                    if srev and isinstance(sub, hgsubrepo):
                         srepo = sub._repo
                         sctx = srepo[srev]
                         e = addrepocontentstotree(e, sctx)

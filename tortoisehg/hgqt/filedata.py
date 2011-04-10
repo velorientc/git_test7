@@ -112,7 +112,7 @@ class FileData(object):
             topctx = ctx
             topwfile = wfile
             
-        absfile = repo.wjoin(os.path.join(wsub or '',wfile))
+        absfile = repo.wjoin(os.path.join(wsub or '', wfile))
         if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
             if wfile in ctx:
@@ -212,7 +212,7 @@ class FileData(object):
                 out = []
                 _ui = uimod.ui()
 
-                if srepo is None or ctx.rev() is not None:
+                if srepo is None or (topctx.rev() is not None and ctx.rev() is not None):
                     data = []
                 else:
                     _ui.pushbuffer()
@@ -224,7 +224,7 @@ class FileData(object):
                         out.append(u'\n')
 
                 sstatedesc = 'changed'
-                if ctx.rev() is not None:
+                if topctx.rev() is not None and ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
                     subrepochange, sstatedesc = \
                         genSubrepoRevChangedDescription(wfile, \
@@ -284,16 +284,19 @@ class FileData(object):
             return
 
         if status in ('I', '?', 'C'):
-            if os.path.getsize(repo.wjoin(wfile)) > maxdiff:
-                self.error = mde
-            else:
-                data = util.posixfile(repo.wjoin(wfile), 'r').read()
-                if '\0' in data:
-                    self.error = 'binary file'
+            if topctx.rev() is None or ctx.rev() is None:
+                if status in ('I', '?'):
+                    self.flabel += _(' <i>(is unversioned)</i>')
+                if os.path.getsize(absfile) > maxdiff:
+                    self.error = mde
                 else:
-                    self.contents = data
-            if status in ('I', '?'):
-                self.flabel += _(' <i>(is unversioned)</i>')
+                    data = util.posixfile(absfile, 'r').read()
+            else:
+                data = ctx.filectx(wfile).data()
+            if '\0' in data:
+                self.error = 'binary file'
+            else:
+                self.contents = data
             return
 
         if status in ('M', 'A'):
