@@ -7,12 +7,11 @@
 
 import sys, os
 
-from mercurial import node, error
+from mercurial import node
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo
-from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -118,12 +117,6 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
-    def open(self, reuse=False):
-        pass
-
-    def openAll(self):
-        pass
-
     def details(self):
         return ''
 
@@ -134,7 +127,7 @@ class RepoTreeItem(object):
                 return ri
         return None
 
-    def okToDelete(self, parentWidget):
+    def okToDelete(self):
         return True
 
 
@@ -261,13 +254,8 @@ class RepoGroupItem(RepoTreeItem):
         self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
 
-    def okToDelete(self, parentWidget):
-        labels = [(QMessageBox.Yes, _('&Delete')),
-                  (QMessageBox.No, _('Cancel'))]
-        return qtlib.QuestionMsgBox(
-            _('Confirm Delete'),
-            _("Delete Group '%s' and all its entries?") % self.name,
-            labels=labels, parent=parentWidget)
+    def okToDelete(self):
+        return False
 
 
 class AllRepoGroupItem(RepoTreeItem):

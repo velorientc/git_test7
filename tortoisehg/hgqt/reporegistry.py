@@ -184,7 +184,12 @@ class RepoTreeView(QTreeView):
             return
         s = self.selitem
         if not s.internalPointer().okToDelete(self):
-            return
+            labels = [(QMessageBox.Yes, _('&Delete')),
+                      (QMessageBox.No, _('Cancel'))]
+            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
+                                    _("Delete Group '%s' and all its entries?")%
+                                    self.name, labels=labels, parent=self):
+                return
         m = self.model()
         row = s.row()
         parent = s.parent()
