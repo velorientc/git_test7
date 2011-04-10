@@ -216,54 +216,56 @@ class ManifestModel(QAbstractItemModel):
                         e.addchild(p)
                     e = e[p]
 
-                for st, files in status.iteritems():
-                    if path in files:
-                        # TODO: what if added & removed at once?
+                for st, filesofst in status.iteritems():
+                    if path in filesofst:
                         e.setstatus(st)
                         break
                 else:
                     e.setstatus('C')
 
-        roote = _Entry()
-        ctx = self._repo[self._rev]
-
         # Add subrepos to the tree
-        subpaths = ctx.substate.keys()
-        for path in subpaths:
-            if not 'S' in self._statusfilter:
-                break
-            e = roote
-            pathelements = hglib.tounicode(path).split('/')
-            for p in pathelements[:-1]:
+        def addrepocontentstotree(roote, ctx):
+            subpaths = ctx.substate.keys()
+            for path in subpaths:
+                if not 'S' in self._statusfilter:
+                    break
+                e = roote
+                pathelements = hglib.tounicode(path).split('/')
+                for p in pathelements[:-1]:
+                    if not p in e:
+                        e.addchild(p)
+                    e = e[p]
+    
+                p = pathelements[-1]
                 if not p in e:
                     e.addchild(p)
                 e = e[p]
-
-            p = pathelements[-1]
-            if not p in e:
-                e.addchild(p)
-            e = e[p]
-            e.setstatus('S')
-
-            # If the subrepo exists in the working directory
-            # and it is a mercurial subrepo,
-            # add the files that it contains to the tree as well, according ot
-            # the status filter
-            abspath = os.path.join(self._repo.root, path)
-            if os.path.isdir(abspath):
-                # Add subrepo files to the tree
-                srev = ctx.substate[path][1]
-                sub = ctx.sub(path)
-                if isinstance(sub, hgsubrepo):
-                    srepo = sub._repo
-                    sctx = srepo[srev]
-                    status, uncleanpaths, files = getctxtreeinfo(sctx, srepo)
-                    addfilestotree(e, files, status, uncleanpaths)
-
-        # Add regular files to the tree
-        status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
-
-        addfilestotree(roote, files, status, uncleanpaths)
+                e.setstatus('S')
+    
+                # If the subrepo exists in the working directory
+                # and it is a mercurial subrepo,
+                # add the files that it contains to the tree as well, according ot
+                # the status filter
+                abspath = os.path.join(ctx._repo.root, path)
+                if os.path.isdir(abspath):
+                    # Add subrepo files to the tree
+                    srev = ctx.substate[path][1]
+                    sub = ctx.sub(path)
+                    if isinstance(sub, hgsubrepo):
+                        srepo = sub._repo
+                        sctx = srepo[srev]
+                        e = addrepocontentstotree(e, sctx)
+    
+            # Add regular files to the tree
+            status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
+    
+            addfilestotree(roote, files, status, uncleanpaths)
+            return roote
+ 
+        roote = _Entry()
+        ctx = self._repo[self._rev]
+       
+        addrepocontentstotree(roote, ctx)
         roote.sort()
 
         self.beginResetModel()

@@ -132,7 +132,7 @@ class FileData(object):
             try:
                 from mercurial import subrepo, commands
 
-                def genSubrepoRevChangedDescription(subrelpath, sfrom, sto):
+                def genSubrepoRevChangedDescription(subrelpath, sfrom, sto, repo):
                     """Generate a subrepository revision change description"""
                     out = []
                     def getLog(_ui, srepo, opts):
@@ -195,7 +195,7 @@ class FileData(object):
                 srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
                 srepo = None
                 try:
-                    subabspath = os.path.join(repo.root, wfile)
+                    subabspath = os.path.join(ctx._repo.root, wfile)
                     if not os.path.isdir(subabspath):
                         sactual = ''
                     else:
@@ -226,13 +226,16 @@ class FileData(object):
                 sstatedesc = 'changed'
                 if ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
-                    subrepochange, sstatedesc = genSubrepoRevChangedDescription(wfile, sparent, srev)
+                    subrepochange, sstatedesc = \
+                        genSubrepoRevChangedDescription(wfile, \
+                            sparent, srev, ctx._repo)
                     out += subrepochange
                 else:
                     sstatedesc = 'dirty'
                     if srev != sactual:
                         subrepochange, sstatedesc = \
-                            genSubrepoRevChangedDescription(wfile, srev, sactual)
+                            genSubrepoRevChangedDescription(wfile, \
+                                srev, sactual, ctx._repo)
                         out += subrepochange
                         if data:
                             sstatedesc += ' and dirty'

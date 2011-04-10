@@ -574,7 +574,7 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
             srev = ctx.substate[wsub][1]
             sctx = ctx.sub(wsub)._repo[srev]
             wfileinsub =  wfile[len(wsub)+1:]
-            if wfileinsub in sctx.files():
+            if wfileinsub in sctx.substate.keys() or wfileinsub in sctx.files():
                 return wsub, wfileinsub, sctx
             else:
                 wsubsub, wfileinsub, sctx = \
