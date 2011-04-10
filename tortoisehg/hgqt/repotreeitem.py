@@ -199,9 +199,6 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-    def open(self, reuse=False):
-        self.model.openrepofunc(self._root, reuse)
-
     def ensureRepoLoaded(self):
         """load repo object if necessary
 
@@ -252,9 +249,8 @@ class RepoGroupItem(RepoTreeItem):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             | Qt.ItemIsEditable)
 
-    def openAll(self):
-        for c in self.childs:
-            c.open(reuse=True)
+    def childRoots(self):
+        return [c._root for c in self.childs]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)

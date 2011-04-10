@@ -158,7 +158,8 @@ class RepoTreeView(QTreeView):
     def openAll(self):
         if not self.selitem:
             return
-        self.selitem.internalPointer().openAll()
+        for root in self.selitem.internalPointer().childRoots():
+            self.openRepo.emit(hglib.tounicode(root), False)
 
     def open(self):
         'open context menu action, open repowidget unconditionally'
