@@ -160,7 +160,7 @@ def openshell(root):
     if _user_shell:
         cwd = os.getcwd()
         try:
-            os.chdir(repo.root)
+            os.chdir(root)
             QProcess.startDetached(_user_shell)
         finally:
             os.chdir(cwd)
