@@ -236,9 +236,10 @@ class FileData(object):
                         out += subrepochange
                         if data:
                             sstatedesc += ' and dirty'
+                    elif srev and not sactual:
+                        sstatedesc = 'removed'
                 self.ucontents = u''.join(out)
-                if not sactual:
-                    sstatedesc = 'removed'
+                
                 lbl = {
                     'changed':   _('(is a changed sub-repository)'),
                     'unchanged':   _('(is an unchanged sub-repository)'),
