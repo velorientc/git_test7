@@ -124,9 +124,6 @@ class RepoTreeItem(object):
     def openAll(self):
         pass
 
-    def showFirstTabOrOpen(self, workbench=None):
-        pass
-
     def details(self):
         return ''
 
@@ -204,20 +201,6 @@ class RepoItem(RepoTreeItem):
 
     def open(self, reuse=False):
         self.model.openrepofunc(self._root, reuse)
-
-    def showFirstTabOrOpen(self, workbench=None):
-        workbench.showRepo(hglib.tounicode(self._root))
-
-    def startSettings(self, parent):
-        try:
-            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                 root=self._root)
-            self.ensureRepoLoaded()
-            dlg.exec_()
-        except error.RepoError:
-            pass
-        finally:
-            dlg.deleteLater()
 
     def ensureRepoLoaded(self):
         """load repo object if necessary
