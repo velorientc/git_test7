@@ -567,9 +567,9 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
     Also return the corresponding subrepo context and the filename relative to
     its containing subrepo
     """ 
-    if wfile in ctx.files():
+    if wfile in ctx.manifest():
         return '', wfile, ctx
-    for wsub in ctx.substate.keys():
+    for wsub in ctx.substate:
         if wfile.startswith(wsub):
             srev = ctx.substate[wsub][1]
             stype = ctx.substate[wsub][2]
@@ -584,7 +584,7 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
                 # The selected revision does not exist in the working copy
                 continue 
             wfileinsub =  wfile[len(wsub)+1:]
-            if wfileinsub in sctx.substate.keys() or wfileinsub in sctx.files():
+            if wfileinsub in sctx.substate or wfileinsub in sctx.manifest():
                 return wsub, wfileinsub, sctx
             else:
                 wsubsub, wfileinsub, sctx = \
