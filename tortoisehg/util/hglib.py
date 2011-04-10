@@ -559,3 +559,28 @@ def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
     except AttributeError:
         from mercurial import patch
         return patch.export(repo, revs, template, fp, switch_parent, opts)
+
+def getDeepestSubrepoContainingFile(wfile, ctx):
+    """
+    Given a filename and context, get the deepest subrepo that contains the file
+    
+    Also return the corresponding subrepo context and the filename relative to
+    its containing subrepo
+    """ 
+    if wfile in ctx.files():
+        return '', wfile, ctx
+    for wsub in ctx.substate.keys():
+        if wfile.startswith(wsub):
+            srev = ctx.substate[wsub][1]
+            sctx = ctx.sub(wsub)._repo[srev]
+            wfileinsub =  wfile[len(wsub)+1:]
+            if wfileinsub in sctx.files():
+                return wsub, wfileinsub, sctx
+            else:
+                wsubsub, wfileinsub, sctx = \
+                    getDeepestSubrepoContainingFile(wfileinsub, sctx)
+                if wsubsub is None:
+                    return None, wfile, ctx
+                else:
+                    return os.path.join(wsub, wsubsub), wfileinsub, sctx
+    return None, wfile, ctx

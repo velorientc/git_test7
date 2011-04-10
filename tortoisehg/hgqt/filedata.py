@@ -27,7 +27,7 @@ class FileData(object):
         except (EnvironmentError, error.LookupError), e:
             self.error = hglib.tounicode(str(e))
 
-    def checkMaxDiff(self, ctx, wfile):
+    def checkMaxDiff(self, ctx, wfile, maxdiff=None):
         p = _('File or diffs not displayed: ')
         try:
             fctx = ctx.filectx(wfile)
@@ -41,7 +41,7 @@ class FileData(object):
         except (EnvironmentError, error.LookupError), e:
             self.error = p + hglib.tounicode(str(e))
             return None
-        if size > ctx._repo.maxdiff:
+        if size > maxdiff:
             self.error = p + _('File is larger than the specified max size.\n')
             return None
         try:
@@ -85,7 +85,18 @@ class FileData(object):
                 self.flabel += _(' <i>(is a symlink)</i>')
             return
 
-        absfile = repo.wjoin(wfile)
+        wsub, wfileinsub, sctx = \
+            hglib.getDeepestSubrepoContainingFile(wfile, ctx)
+        if wsub:
+            topctx = ctx
+            topwfile = wfile
+            ctx = sctx
+            wfile = wfileinsub
+        else:
+            topctx = ctx
+            topwfile = wfile
+            
+        absfile = repo.wjoin(os.path.join(wsub or '',wfile))
         if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
             if wfile in ctx:
@@ -265,7 +276,7 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
-            res = self.checkMaxDiff(ctx, wfile)
+            res = self.checkMaxDiff(ctx, wfile, repo.maxdiff)
             if res is None:
                 return
             fctx, newdata = res
