@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import error
-
 from tortoisehg.hgqt import thgrepo, qtlib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
