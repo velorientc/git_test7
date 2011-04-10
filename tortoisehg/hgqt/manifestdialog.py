@@ -192,6 +192,13 @@ class ManifestWidget(QWidget):
             ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
               'Alt+Ctrl+O', _('Open the selected subrepository'),
               self.opensubrepo),
+            ('explore', _('Explore subrepository'), 'system-file-manager',
+              'Alt+Ctrl+E', _('Open the selected subrepository'),
+              self.explore),
+            ('terminal', _('Open terminal in subrepository'),
+              'utilities-terminal', 'Alt+Ctrl+T', 
+              _('Open a shell terminal in the selected subrepository root'),
+              self.terminal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -278,6 +285,16 @@ class ManifestWidget(QWidget):
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
 
+    def explore(self):
+        root = os.path.join(self._repo.root, self.path)
+        if os.path.isdir(root):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+
+    def terminal(self):
+        root = os.path.join(self._repo.root, self.path)
+        if os.path.isdir(root):
+            qtlib.openshell(root)
+
     def showEvent(self, event):
         QWidget.showEvent(self, event)
         if self._selectedrev != self._rev:
@@ -287,7 +304,8 @@ class ManifestWidget(QWidget):
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
-        itemissubrepo = self.path in self._repo[self._rev].substate.keys()
+        currentindex = self._treeview.currentIndex()
+        itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
         if itemissubrepo:
             self.opensubrepo()
         else:
@@ -295,12 +313,14 @@ class ManifestWidget(QWidget):
 
     def menuRequest(self, point):
         point = self.mapToGlobal(point)
-        itemissubrepo = self.path in self._repo[self._rev].substate.keys()
+
+        currentindex = self._treeview.currentIndex()
+        itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo']
+            actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',

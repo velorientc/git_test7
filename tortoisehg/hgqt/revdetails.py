@@ -237,6 +237,13 @@ class RevDetailsWidget(QWidget):
             ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
               'Alt+Ctrl+O', _('Open the selected subrepository'),
               self.opensubrepo),
+            ('explore', _('Explore subrepository'), 'system-file-manager',
+              'Alt+Ctrl+E', _('Open the selected subrepository'),
+              self.explore),
+            ('terminal', _('Open terminal in subrepository'),
+              'utilities-terminal', 'Alt+Ctrl+T', 
+              _('Open a shell terminal in the selected subrepository root'),
+              self.terminal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -360,6 +367,16 @@ class RevDetailsWidget(QWidget):
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
 
+    def explore(self):
+        root = os.path.join(self.repo.root, self.filelist.currentFile())
+        if os.path.isdir(root):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+
+    def terminal(self):
+        root = os.path.join(self.repo.root, self.filelist.currentFile())
+        if os.path.isdir(root):
+            qtlib.openshell(root)
+
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         model = self.filelist.model()
@@ -380,7 +397,7 @@ class RevDetailsWidget(QWidget):
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo']
+            actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
