@@ -212,10 +212,26 @@ class RepoTreeView(QTreeView):
         qtlib.openshell(root)
 
     def addRepo(self):
+        'menu action handler for adding a new repository'
         if not self.selitem:
             return
-        m = self.model()
-        m.addRepo(self.selitem, None)
+        caption = _('Select repository directory to add')
+        FD = QFileDialog
+        path = FD.getExistingDirectory(caption=caption,
+                                       options=FD.ShowDirsOnly | FD.ReadOnly)
+        if path:
+            try:
+                lpath = hglib.fromunicode(path)
+                repo = thgrepo.repository(None, path=lpath)
+                self.model().addRepo(self.selitem, repo)
+            except error.RepoError:
+                # NOTE: here we cannot pass parent=self because self
+                # isn't a QWidget. Codes under `if not repo:` should
+                # be handled by a widget, not by a model.
+                qtlib.WarningMsgBox(
+                    _('Failed to add repository'),
+                    _('%s is not a valid repository') % path)
+                return
 
     def sizeHint(self):
         size = super(RepoTreeView, self).sizeHint()
@@ -258,11 +274,13 @@ class RepoRegistryView(QDockWidget):
         self.tview.expandToDepth(0)
 
     def addRepo(self, repo):
+        'workbench has opened a new repowidget, ensure its in the registry'
         m = self.tmodel
         it = m.getRepoItem(repo.root)
         if it == None:
             m.addRepo(None, repo)
         else:
+            # ensure the registry item has a thgrepo instance
             it.ensureRepoLoaded()
 
     def openRepo(self, path, reuse=False):

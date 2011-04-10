@@ -204,25 +204,6 @@ class RepoTreeModel(QAbstractItemModel):
         return self.createIndex(0, 0, self.allrepos)
 
     def addRepo(self, group, repo):
-        if not repo:
-            caption = _('Select repository directory to add')
-            FD = QFileDialog
-            path = FD.getExistingDirectory(caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
-            if path:
-                try:
-                    lpath = hglib.fromunicode(path)
-                    repo = thgrepo.repository(None, path=lpath)
-                except error.RepoError:
-                    # NOTE: here we cannot pass parent=self because self
-                    # isn't a QWidget. Codes under `if not repo:` should
-                    # be handled by a widget, not by a model.
-                    qtlib.WarningMsgBox(
-                        _('Failed to add repository'),
-                        _('%s is not a valid repository') % path)
-                    return
-            else:
-                return
         grp = group
         if grp == None:
             grp = self.allreposIndex()
