@@ -194,7 +194,7 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         item = index.internalPointer()
         if item.setData(index.column(), value):
-            self.emit(SIGNAL('dataChanged(index, index)'), index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 
