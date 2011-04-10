@@ -572,7 +572,17 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
     for wsub in ctx.substate.keys():
         if wfile.startswith(wsub):
             srev = ctx.substate[wsub][1]
-            sctx = ctx.sub(wsub)._repo[srev]
+            stype = ctx.substate[wsub][2]
+            if stype != 'hg':
+                continue
+            if not os.path.exists(ctx._repo.wjoin(wsub)):
+                # Maybe the repository does not exist in the working copy?
+                continue
+            try:
+                sctx = ctx.sub(wsub)._repo[srev]
+            except:
+                # The selected revision does not exist in the working copy
+                continue 
             wfileinsub =  wfile[len(wsub)+1:]
             if wfileinsub in sctx.substate.keys() or wfileinsub in sctx.files():
                 return wsub, wfileinsub, sctx
