@@ -173,7 +173,7 @@ class FileData(object):
 
                         out.append(_('Revision has changed from:') + u'\n\n')
                         if missingsub:
-                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
+                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n\n'))
                         else:
                             out.append(hglib.tounicode(getLog(_ui, srepo, opts)))
 
