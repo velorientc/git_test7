@@ -47,7 +47,7 @@ class Workbench(QMainWindow):
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
-        rr.openRepoSignal.connect(self.openRepo)
+        rr.openRepo.connect(self.openRepo)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
