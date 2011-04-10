@@ -92,6 +92,22 @@ class FileData(object):
             topwfile = wfile
             ctx = sctx
             wfile = wfileinsub
+            if ctx2:
+                # If a revision to compare to was provided, we must put it in
+                # the context of the subrepo as well
+                # Here we had two choices:
+                # We could translate the seo
+                wsub2, wfileinsub2, sctx2 = \
+                    hglib.getDeepestSubrepoContainingFile(topwfile, ctx2)
+                if wsub2:
+                    ctx2 = sctx2
+            else:
+                # Note that this is NOT THE SAME as topctx.p1()!
+                # [TODO] Perhaps we should try instead to get the context from
+                # the state of the supreop at topctx.p1(), that is, something
+                # such as:  wsub2, wfileinsub2, ctx2 = \
+                # ... hglib.getDeepestSubrepoContainingFile(topwfile, topctx.p1())
+                pass # This is set below to ctx2 = ctx.p1()
         else:
             topctx = ctx
             topwfile = wfile
