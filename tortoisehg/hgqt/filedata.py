@@ -266,10 +266,11 @@ class FileData(object):
         mde = _('File or diffs not displayed: ') + \
               _('File is larger than the specified max size.\n')
 
+        maxdiff = repo.maxdiff
         if status in ('R', '!'):
             if wfile in ctx.p1():
                 fctx = ctx.p1()[wfile]
-                if fctx._filelog.rawsize(fctx.filerev()) > ctx._repo.maxdiff:
+                if fctx._filelog.rawsize(fctx.filerev()) > maxdiff:
                     self.error = mde
                 else:
                     olddata = fctx.data()
@@ -283,7 +284,7 @@ class FileData(object):
             return
 
         if status in ('I', '?', 'C'):
-            if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
+            if os.path.getsize(repo.wjoin(wfile)) > maxdiff:
                 self.error = mde
             else:
                 data = util.posixfile(repo.wjoin(wfile), 'r').read()
@@ -296,7 +297,7 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
-            res = self.checkMaxDiff(ctx, wfile, repo.maxdiff)
+            res = self.checkMaxDiff(ctx, wfile, maxdiff)
             if res is None:
                 return
             fctx, newdata = res
