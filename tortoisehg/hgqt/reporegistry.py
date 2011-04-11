@@ -271,12 +271,13 @@ class RepoRegistryView(QDockWidget):
 
     def removeSelected(self):
         s = self.selitem
-        if not s.internalPointer().okToDelete():
+        item = s.internalPointer()
+        if not item.okToDelete():
             labels = [(QMessageBox.Yes, _('&Delete')),
                       (QMessageBox.No, _('Cancel'))]
             if not qtlib.QuestionMsgBox(_('Confirm Delete'),
                                     _("Delete Group '%s' and all its entries?")%
-                                    self.name, labels=labels, parent=self):
+                                    item.name, labels=labels, parent=self):
                 return
         m = self.tview.model()
         row = s.row()
