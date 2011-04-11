@@ -242,7 +242,7 @@ class FileData(object):
                             sstatedesc += ' and dirty'
                     elif srev and not sactual:
                         sstatedesc = 'removed'
-                self.ucontents = u''.join(out)
+                self.ucontents = u''.join(out).strip()
 
                 lbl = {
                     'changed':   _('(is a changed sub-repository)'),
