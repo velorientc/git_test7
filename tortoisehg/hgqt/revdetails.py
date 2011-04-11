@@ -368,12 +368,12 @@ class RevDetailsWidget(QWidget):
                 _("The selected subrepository does not exist on the working directory"))
 
     def explore(self):
-        root = os.path.join(self.repo.root, self.filelist.currentFile())
+        root = self.repo.wjoin(self.filelist.currentFile())
         if os.path.isdir(root):
             QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
     def terminal(self):
-        root = os.path.join(self.repo.root, self.filelist.currentFile())
+        root = self.repo.wjoin(self.filelist.currentFile())
         if os.path.isdir(root):
             qtlib.openshell(root)
 

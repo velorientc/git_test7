@@ -278,7 +278,7 @@ class ManifestWidget(QWidget):
         dlg.activateWindow()
 
     def opensubrepo(self):
-        path = os.path.join(self._repo.root, self.path)
+        path = self._repo.wjoin(self.path)
         if os.path.isdir(path):
             self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
@@ -287,12 +287,12 @@ class ManifestWidget(QWidget):
                 _("The selected subrepository does not exist on the working directory"))
 
     def explore(self):
-        root = os.path.join(self._repo.root, self.path)
+        root = self._repo.wjoin(self.path)
         if os.path.isdir(root):
             QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
     def terminal(self):
-        root = os.path.join(self._repo.root, self.path)
+        root = self._repo.wjoin(self.path)
         if os.path.isdir(root):
             qtlib.openshell(root)
 
