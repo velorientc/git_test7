@@ -163,7 +163,7 @@ class FileData(object):
                     elif sfrom == sto:
                         sstatedesc = 'unchanged'
                         out.append(_('Subrepo was not changed.') + u'\n\n')
-                        out.append(_('Subrepo state is:') + u'\n')
+                        out.append(_('Subrepo state is:') + u'\n\n')
                         if missingsub:
                             out.append(_('changeset: %s') % sfrom + u'\n')
                         else:
