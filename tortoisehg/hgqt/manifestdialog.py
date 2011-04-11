@@ -305,8 +305,7 @@ class ManifestWidget(QWidget):
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
-        currentindex = self._treeview.currentIndex()
-        itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
+        itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
         if itemissubrepo:
             self.opensubrepo()
         else:
