@@ -228,14 +228,14 @@ class FileData(object):
                 if topctx.rev() is not None and ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
                     subrepochange, sstatedesc = \
-                        genSubrepoRevChangedDescription(wfile, \
+                        genSubrepoRevChangedDescription(wfile,
                             sparent, srev, ctx._repo)
                     out += subrepochange
                 else:
                     sstatedesc = 'dirty'
                     if srev != sactual:
                         subrepochange, sstatedesc = \
-                            genSubrepoRevChangedDescription(wfile, \
+                            genSubrepoRevChangedDescription(wfile,
                                 srev, sactual, ctx._repo)
                         out += subrepochange
                         if data:
