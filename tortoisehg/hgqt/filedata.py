@@ -112,7 +112,7 @@ class FileData(object):
         else:
             topctx = ctx
             topwfile = wfile
-            
+
         absfile = repo.wjoin(os.path.join(wsub or '', wfile))
         if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
@@ -243,7 +243,7 @@ class FileData(object):
                     elif srev and not sactual:
                         sstatedesc = 'removed'
                 self.ucontents = u''.join(out)
-                
+
                 lbl = {
                     'changed':   _('(is a changed sub-repository)'),
                     'unchanged':   _('(is an unchanged sub-repository)'),
