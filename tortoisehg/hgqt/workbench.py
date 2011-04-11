@@ -290,7 +290,9 @@ class Workbench(QMainWindow):
                   menu='repository')
 
         newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
-        newaction(_("About"), self.onAbout, menu='help', icon='thg-logo')
+        newaction(_("About Qt"), QApplication.aboutQt, menu='help')
+        newaction(_("About TortoiseHg"), self.onAbout, menu='help',
+                  icon='thg-logo')
 
         newseparator(toolbar='edit')
         self.actionBack = \
