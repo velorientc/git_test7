@@ -171,9 +171,9 @@ class RepoRegistryView(QDockWidget):
              ("clone", _("Clone..."), 'hg-clone',
                 _("Clone Repository"), self.cloneRepo),
              ("explore", _("Explore"), 'system-file-manager',
-                _("Open the repository in Windows Explorer"), self.explore),
+                _("Open the repository in a file browser"), self.explore),
              ("terminal", _("Terminal"), 'utilities-terminal',
-                _("Open a shell terminal in repository root"), self.terminal),
+                _("Open a shell terminal in the repository root"), self.terminal),
              ("add", _("Add repository..."), 'hg',
                 _("Add a repository to this group"), self.addNewRepo),
              ]
