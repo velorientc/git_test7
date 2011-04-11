@@ -42,7 +42,8 @@ class FileData(object):
             self.error = p + hglib.tounicode(str(e))
             return None
         if size > maxdiff:
-            self.error = p + _('File is larger than the specified max size.\n')
+            self.error = p + _('File is larger than the specified max size.\n'
+                               'maxdiff = %s KB') % (maxdiff // 1024)
             return None
         try:
             data = fctx.data()
@@ -263,10 +264,11 @@ class FileData(object):
 
         # TODO: elif check if a subdirectory (for manifest tool)
 
-        mde = _('File or diffs not displayed: ') + \
-              _('File is larger than the specified max size.\n')
-
         maxdiff = repo.maxdiff
+        mde = _('File or diffs not displayed: '
+                'File is larger than the specified max size.\n'
+                'maxdiff = %s KB') % (maxdiff // 1024)
+
         if status in ('R', '!'):
             if wfile in ctx.p1():
                 fctx = ctx.p1()[wfile]
