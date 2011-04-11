@@ -165,7 +165,7 @@ class FileData(object):
                         out.append(_('Subrepo was not changed.') + u'\n\n')
                         out.append(_('Subrepo state is:') + u'\n')
                         if missingsub:
-                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
+                            out.append(_('changeset: %s') % sfrom + u'\n')
                         else:
                             out.append(hglib.tounicode(getLog(_ui, srepo, opts)))
                         return out, sstatedesc
@@ -174,7 +174,7 @@ class FileData(object):
 
                         out.append(_('Revision has changed from:') + u'\n\n')
                         if missingsub:
-                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n\n'))
+                            out.append(_('changeset: %s') % sfrom + u'\n\n')
                         else:
                             out.append(hglib.tounicode(getLog(_ui, srepo, opts)))
 
