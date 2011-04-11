@@ -229,6 +229,16 @@ class HgignoreDialog(QDialog):
         self.le.clear()
 
     def refresh(self):
+        try:
+            l = open(self.ignorefile, 'rb').readlines()
+            self.doseoln = l[0].endswith('\r\n')
+        except (IOError, ValueError, IndexError):
+            self.doseoln = os.name == 'nt'
+            l = []
+        self.ignorelines = [line.strip() for line in l]
+        self.ignorelist.clear()
+        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
+
         uni = hglib.tounicode
         try:
             self.repo.thginvalidate()
@@ -244,6 +254,7 @@ class HgignoreDialog(QDialog):
                 err = uni(str(e))
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 err, parent=self)
+            self.lclunknowns = []
             return
 
         self.lclunknowns = wctx.unknown()
@@ -254,16 +265,6 @@ class HgignoreDialog(QDialog):
                 item = self.unknownlist.item(i)
                 self.unknownlist.setItemSelected(item, True)
                 self.unknownlist.setCurrentItem(item)
-
-        try:
-            l = open(self.ignorefile, 'rb').readlines()
-            self.doseoln = l[0].endswith('\r\n')
-        except (IOError, ValueError, IndexError):
-            self.doseoln = os.name == 'nt'
-            l = []
-        self.ignorelines = [line.strip() for line in l]
-        self.ignorelist.clear()
-        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
 
     def writeIgnoreFile(self):
         eol = self.doseoln and '\r\n' or '\n'
