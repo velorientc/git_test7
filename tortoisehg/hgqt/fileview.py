@@ -337,6 +337,10 @@ class HgFileView(QFrame):
 
         if not fd.isValid():
             self.sci.setText(fd.error)
+            self.sci.setLexer(None)
+            self.sci.setFont(qtlib.getfont('fontlog').font())
+            self.sci.setMarginWidth(1, 0)
+            self.blk.setVisible(False)
             self.restrictModes(False, False, False)
             return
 
