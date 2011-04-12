@@ -544,7 +544,7 @@ class MergePage(BasePage):
             else:
                 self.groups.set_visible(False, 'dirty')
                 self.groups.set_visible(False, 'merged')
-                self.wd_status.set_status(_('Clean'), True)
+                self.wd_status.set_status(_('Clean', 'working dir state'), True)
             self.completeChanged.emit()
             if callable(callback):
                 callback()
