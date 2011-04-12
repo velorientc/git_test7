@@ -384,13 +384,16 @@ class HgFileView(QFrame):
             self.sci.setText(fd.ucontents)
             self.sci.setLexer(None)
             self.sci.setFont(qtlib.getfont('fontlog').font())
-            self.sci._updatemarginwidth()
+            self.sci.setMarginWidth(1, 0)
+            self.blk.setVisible(False)
+            return
         elif fd.contents:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
             self.sci.setText(hglib.tounicode(fd.contents))
+            self.blk.setVisible(True)
             self.sci._updatemarginwidth()
             if self._mode == AnnMode:
                 self.sci._updateannotation(self._ctx, filename)
@@ -408,13 +411,14 @@ class HgFileView(QFrame):
         uc = hglib.tounicode(fd.contents) or ''
         self.fileDisplayed.emit(uf, uc)
 
+        if self._mode != DiffMode:
+            self.blk.setVisible(True)
+            self.blk.syncPageStep()
+
         if self._mode != DiffMode and fd.contents and fd.olddata:
-            # Update blk margin
             if self.timer.isActive():
                 self.timer.stop()
-
             self._fd = fd
-            self.blk.syncPageStep()
             self.timer.start()
 
     #
