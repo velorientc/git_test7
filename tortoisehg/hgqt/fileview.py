@@ -671,8 +671,7 @@ class AnnotateView(qscilib.Scintilla):
         try:
             fctx = self._links[line][0]
             if fctx.rev() != self._lastrev:
-                s = hglib.get_revision_desc(fctx,
-                                            hglib.fromunicode(self.annfile))
+                s = hglib.get_revision_desc(fctx, self.annfile)
                 self.showMessage.emit(s)
                 self._lastrev = fctx.rev()
         except IndexError:
