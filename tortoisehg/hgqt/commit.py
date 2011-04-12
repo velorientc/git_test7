@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, wconfig
+from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 
 # Technical Debt for CommitWidget
@@ -188,6 +188,8 @@ class CommitWidget(QWidget):
 
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        self.opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
+        self.opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
@@ -219,6 +221,25 @@ class CommitWidget(QWidget):
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
         tbar.setIconSize(QSize(16,16))
+
+        if self.opts['bugtraqplugin'] != None:
+            self.bugtraq = self.createBugTracker()
+            try:
+                parameters = self.opts['bugtraqparameters']
+                linktext = self.bugtraq.get_link_text(parameters)
+            except Exception, e:
+                tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
+                qtlib.ErrorMsgBox(_('Issue Tracker'),
+                                  _('Failed to load issue tracker \'%s\': %s'
+                                    % (tracker, e)),
+                                  parent=self)
+                self.bugtraq = None
+            else:
+                # connect UI because we have a valid bug tracker
+                self.commitComplete.connect(self.bugTrackerPostCommit)
+                tbar.addAction(linktext).triggered.connect(
+                    self.getBugTrackerCommitMessage)
+
         self.stopAction = tbar.addAction(_('Stop'))
         self.stopAction.triggered.connect(self.stop)
         self.stopAction.setIcon(qtlib.geticon('process-stop'))
@@ -295,6 +316,26 @@ class CommitWidget(QWidget):
     def apiPrepFinished(self):
         'QsciAPIs has finished parsing displayed file'
         self.msgte.lexer().setAPIs(self._apis)
+
+    def bugTrackerPostCommit(self):
+        # commit already happened, get last message in history
+        message = self.lastmessage
+        error = self.bugtraq.on_commit_finished(message)
+        if error != None and len(error) > 0:
+            qtlib.ErrorMsgBox(_('Issue Tracker'), error, parent=self)
+        # recreate bug tracker to get new COM object for next commit
+        self.bugtraq = self.createBugTracker()
+
+    def createBugTracker(self):
+        bugtraqid = self.opts['bugtraqplugin'].split(' ', 1)[0]
+        result = bugtraq.BugTraq(bugtraqid)
+        return result
+
+    def getBugTrackerCommitMessage(self):
+        parameters = self.opts['bugtraqparameters']
+        message = self.getMessage()
+        newMessage = self.bugtraq.get_commit_message(parameters, message)
+        self.setMessage(newMessage)
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
@@ -629,6 +670,8 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            # capture last message for BugTraq plugin
+            self.lastmessage = self.getMessage()
             self.branchop = None
             umsg = self.msgte.text()
             if umsg:
