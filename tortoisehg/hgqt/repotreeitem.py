@@ -240,7 +240,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-            | Qt.ItemIsEditable)
+            | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
 
     def childRoots(self):
         return [c._root for c in self.childs]
@@ -261,6 +261,7 @@ class RepoGroupItem(RepoTreeItem):
 class AllRepoGroupItem(RepoTreeItem):
     def __init__(self, model, parent=None):
         RepoTreeItem.__init__(self, model, parent)
+        self.name = _('default')
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -270,7 +271,7 @@ class AllRepoGroupItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            return QVariant(_('default'))
+            return QVariant(self.name)
         return QVariant()
 
     def setData(self, column, value):
@@ -280,7 +281,8 @@ class AllRepoGroupItem(RepoTreeItem):
         return ['add', 'newGroup']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+        return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            | Qt.ItemIsDragEnabled)
 
     def dump(self, xw):
         RepoTreeItem.dump(self, xw)
