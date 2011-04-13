@@ -38,10 +38,11 @@ class ChunksWidget(QWidget):
 
     contextmenu = None
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent, multiselectable):
         QWidget.__init__(self, parent)
 
         self.repo = repo
+        self.multiselectable = multiselectable
         self.currentFile = None
 
         layout = QVBoxLayout(self)
@@ -55,7 +56,7 @@ class ChunksWidget(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.layout().addWidget(self.splitter)
 
-        self.filelist = filelistview.HgFileListView(repo, self)
+        self.filelist = filelistview.HgFileListView(repo, self, multiselectable)
         self.filelistmodel = filelistmodel.HgFileListModel(self)
         self.filelist.setModel(self.filelistmodel)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -215,6 +216,9 @@ class ChunksWidget(QWidget):
             return self.currentFile, [chunks[0]] + dchunks
         else:
             return self.currentFile, []
+        
+    def getSelectedFiles(self):
+        return self.filelist.getSelectedFiles()
 
     def deleteSelectedChunks(self):
         'delete currently selected chunks'

@@ -32,14 +32,18 @@ class HgFileListView(QTableView):
     linkActivated = pyqtSignal(QString)
     clearDisplay = pyqtSignal()
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent, multiselectable):
         QTableView.__init__(self, parent)
         self.repo = repo
+        self.multiselectable = multiselectable
         self.setShowGrid(False)
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
         self.verticalHeader().setDefaultSectionSize(20)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        if multiselectable:
+            self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        else:
+            self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
 
@@ -59,7 +63,13 @@ class HgFileListView(QTableView):
     def currentFile(self):
         index = self.currentIndex()
         return self.model().fileFromIndex(index)
-
+    
+    def getSelectedFiles(self):
+        model = self.model()
+        sf = [model.fileFromIndex(eachIndex)
+                for eachIndex in self.selectedRows()]
+        return sf 
+    
     def layoutChanged(self):
         'file model has new contents'
         index = self.currentIndex()
