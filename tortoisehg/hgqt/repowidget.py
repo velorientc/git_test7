@@ -156,28 +156,28 @@ class RepoWidget(QWidget):
         w.showMessage.connect(self.showMessage)
         w.updateToRevision.connect(lambda rev: self.updateToRevision())
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
-        tt.setTabToolTip(idx, _("Revision details"))
+        tt.setTabToolTip(idx, _("Revision details", "tab tooltip"))
 
         self.commitDemand = w = DemandWidget('createCommitWidget', self)
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
-        tt.setTabToolTip(idx, _("Commit"))
+        tt.setTabToolTip(idx, _("Commit", "tab tooltip"))
 
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
+        tt.setTabToolTip(idx, _("Synchronize", "tab tooltip"))
 
         self.manifestDemand = w = DemandWidget('createManifestWidget', self)
         self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
-        tt.setTabToolTip(idx, _('Manifest'))
+        tt.setTabToolTip(idx, _("Manifest", "tab tooltip"))
 
         self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
-        tt.setTabToolTip(idx, _("Search"))
+        tt.setTabToolTip(idx, _("Search", "tab tooltip"))
 
         self.mqDemand = w = DemandWidget('createMQWidget', self)
         if 'mq' in self.repo.extensions():
             self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue"))
+            tt.setTabToolTip(idx, _("Patch Queue", "tab tooltip"))
             self.namedTabs['mq'] = idx
         else:
             self.mqTabIndex = -1
@@ -185,7 +185,7 @@ class RepoWidget(QWidget):
         self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
         if 'pbranch' in self.repo.extensions():
             self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
-            tt.setTabToolTip(idx, _("Patch Branch"))
+            tt.setTabToolTip(idx, _("Patch Branch", "tab tooltip"))
             self.namedTabs['pbranch'] = idx
         else:
             self.pbranchTabIndex = -1
