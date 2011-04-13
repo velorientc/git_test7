@@ -379,6 +379,8 @@ class Workbench(QMainWindow):
         clickedtabindex = clickedwidget.tabAt(point)
         if clickedtabindex > -1:
             self.repoTabsWidget.lastClickedTab = clickedtabindex
+        else:
+            self.repoTabsWidget.lastClickedTab = self.repoTabsWidget.currentIndex()
 
         actionlist = ['closetab', 'closeothertabs']
 
