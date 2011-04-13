@@ -119,7 +119,7 @@ class CompressDialog(QDialog):
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         self.showMessage.emit(_('Changes have been moved, you must now commit'))
-        self.compressbtn.setText(_('Commit'))
+        self.compressbtn.setText(_('Commit', 'action button'))
         self.compressbtn.clicked.disconnect(self.compress)
         self.compressbtn.clicked.connect(self.commit)
 

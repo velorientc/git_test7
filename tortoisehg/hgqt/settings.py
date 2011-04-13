@@ -363,7 +363,7 @@ INFO = (
           'extension, rebase equates to pull --rebase.  Default: none')),
     )),
 
-({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
+({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is<br>'
           '"Full Name &lt;email@example.com&gt;"')),

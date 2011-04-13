@@ -225,7 +225,7 @@ class BackoutDialog(QDialog):
                  finished = False
                  self.msgTextEdit.setEnabled(True)
                  self.backoutBtn.setEnabled(True)
-                 self.backoutBtn.setText(_('Commit'))
+                 self.backoutBtn.setText(_('Commit', 'action button'))
                  self.backoutBtn.clicked.disconnect(self.backout)
                  self.backoutBtn.clicked.connect(self.commit)
                  self.checkResolve()

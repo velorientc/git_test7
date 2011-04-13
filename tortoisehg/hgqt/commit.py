@@ -176,7 +176,7 @@ class CommitWidget(QWidget):
         self.msghistory = []
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(not embedded, self)
-        self.runner.setTitle(_('Commit'))
+        self.runner.setTitle(_('Commit', 'window title'))
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
@@ -618,13 +618,13 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
         self.stopAction.setEnabled(True)
-        self.progress.emit(*cmdui.startProgress(_('Commit'), ''))
+        self.progress.emit(*cmdui.startProgress(_('Commit', 'start progress'), ''))
 
     def stop(self):
         self.runner.cancel()
 
     def commandFinished(self, ret):
-        self.progress.emit(*cmdui.stopProgress(_('Commit')))
+        self.progress.emit(*cmdui.stopProgress(_('Commit', 'stop progress')))
         self.stopAction.setEnabled(False)
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
@@ -923,7 +923,7 @@ class CommitDialog(QDialog):
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
         self.commitButton = bb.button(BB.Ok)
-        self.commitButton.setText(_('Commit'))
+        self.commitButton.setText(_('Commit', 'action button'))
         self.bb = bb
 
         layout.addWidget(self.bb)

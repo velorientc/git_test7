@@ -230,7 +230,7 @@ class RepoWidget(QWidget):
         pats, opts = {}, {}
         cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
-        b = QPushButton(_('Commit'))
+        b = QPushButton(_('Commit', 'action button'))
         b.setAutoDefault(True)
         f = b.font()
         f.setWeight(QFont.Bold)
