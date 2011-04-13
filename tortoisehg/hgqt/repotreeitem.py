@@ -7,12 +7,11 @@
 
 import sys, os
 
-from mercurial import node, error
+from mercurial import node
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo
-from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -118,15 +117,6 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
-    def open(self, reuse=False):
-        pass
-
-    def openAll(self):
-        pass
-
-    def showFirstTabOrOpen(self, workbench=None):
-        pass
-
     def details(self):
         return ''
 
@@ -137,7 +127,7 @@ class RepoTreeItem(object):
                 return ri
         return None
 
-    def okToDelete(self, parentWidget):
+    def okToDelete(self):
         return True
 
 
@@ -202,23 +192,6 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-    def open(self, reuse=False):
-        self.model.openrepofunc(self._root, reuse)
-
-    def showFirstTabOrOpen(self, workbench=None):
-        workbench.showRepo(hglib.tounicode(self._root))
-
-    def startSettings(self, parent):
-        try:
-            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                 root=self._root)
-            self.ensureRepoLoaded()
-            dlg.exec_()
-        except error.RepoError:
-            pass
-        finally:
-            dlg.deleteLater()
-
     def ensureRepoLoaded(self):
         """load repo object if necessary
 
@@ -269,9 +242,8 @@ class RepoGroupItem(RepoTreeItem):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             | Qt.ItemIsEditable)
 
-    def openAll(self):
-        for c in self.childs:
-            c.open(reuse=True)
+    def childRoots(self):
+        return [c._root for c in self.childs]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
@@ -282,13 +254,8 @@ class RepoGroupItem(RepoTreeItem):
         self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
 
-    def okToDelete(self, parentWidget):
-        labels = [(QMessageBox.Yes, _('&Delete')),
-                  (QMessageBox.No, _('Cancel'))]
-        return qtlib.QuestionMsgBox(
-            _('Confirm Delete'),
-            _("Delete Group '%s' and all its entries?") % self.name,
-            labels=labels, parent=parentWidget)
+    def okToDelete(self):
+        return False
 
 
 class AllRepoGroupItem(RepoTreeItem):

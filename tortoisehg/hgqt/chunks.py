@@ -15,8 +15,8 @@ from hgext import record
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, wctxactions
-from tortoisehg.hgqt import filelistmodel, filelistview, fileview
+from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, visdiff, revert
+from tortoisehg.hgqt import filelistmodel, filelistview, filedata
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -36,6 +36,8 @@ class ChunksWidget(QWidget):
     fileModelEmpty = pyqtSignal(bool)
     fileModified = pyqtSignal()
 
+    contextmenu = None
+
     def __init__(self, repo, parent):
         QWidget.__init__(self, parent)
 
@@ -53,9 +55,12 @@ class ChunksWidget(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.layout().addWidget(self.splitter)
 
-        self.filelist = filelistview.HgFileListView(self)
-        self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
+        self.filelist = filelistview.HgFileListView(repo, self)
+        self.filelistmodel = filelistmodel.HgFileListModel(self)
         self.filelist.setModel(self.filelistmodel)
+        self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.filelist.customContextMenuRequested.connect(self.menuRequest)
+        self.filelist.doubleClicked.connect(self.vdiff)
 
         self.fileListFrame = QFrame(self.splitter)
         self.fileListFrame.setFrameShape(QFrame.NoFrame)
@@ -71,18 +76,72 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)
 
-        self.filelist.fileRevSelected.connect(self.displayFile)
+        self.filelist.fileSelected.connect(self.displayFile)
         self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 3)
         self.timerevent = self.startTimer(500)
 
+        self._actions = {}
+        for name, desc, icon, key, tip, cb in [
+            ('diff', _('Visual Diff'), 'visualdiff', 'Ctrl+D',
+              _('View file changes in external diff tool'), self.vdiff),
+            ('edit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
+              _('Edit current file in working copy'), self.editCurrentFile),
+            ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
+              _('Revert file(s) to contents at this revision'),
+              self.revertfile),
+            ]:
+            act = QAction(desc, self)
+            if icon:
+                act.setIcon(qtlib.getmenuicon(icon))
+            if key:
+                act.setShortcut(key)
+            if tip:
+                act.setStatusTip(tip)
+            if cb:
+                act.triggered.connect(cb)
+            self._actions[name] = act
+            self.addAction(act)
+
+    @pyqtSlot(QPoint)
+    def menuRequest(self, point):
+        actionlist = ['diff', 'edit', 'revert']
+        if not self.contextmenu:
+            menu = QMenu(self)
+            for act in actionlist:
+                menu.addAction(self._actions[act])
+            self.contextmenu = menu
+        self.contextmenu.exec_(self.filelist.mapToGlobal(point))
+
+    def vdiff(self):
+        filename = self.filelist.currentFile()
+        if filename is None:
+            return
+        pats = [filename]
+        opts = {'change':self.ctx.rev()}
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def revertfile(self):
+        filename = self.filelist.currentFile()
+        if filename is None:
+            return
+        rev = self.ctx.rev()
+        if rev is None:
+            rev = self.ctx.p1().rev()
+        dlg = revert.RevertDialog(self.repo, filename, rev, self)
+        dlg.exec_()
+        dlg.deleteLater()
+
     def timerEvent(self, event):
         'Periodic poll of currently displayed patch or working file'
-        if not hasattr(self, 'filelistmodel'):
+        if not hasattr(self, 'filelist'):
             return
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if ctx is None:
             return
         if isinstance(ctx, patchctx):
@@ -142,12 +201,12 @@ class ChunksWidget(QWidget):
         return ok
 
     def editCurrentFile(self):
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             path = ctx._path
         else:
-            path = self.repo.wjoin(self.currentFile)
-        wctxactions.edit(self, self.repo.ui, self.repo, [path])
+            path = self.currentFile
+        qtlib.editfiles(self.repo, [path], parent=self)
 
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
@@ -170,7 +229,7 @@ class ChunksWidget(QWidget):
         if not kchunks and qtlib.QuestionMsgBox(_('No chunks remain'),
                                                 _('Remove all file changes?')):
             revertall = True
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
@@ -214,7 +273,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     repo.wopener(self.currentFile, 'wb').write(
-                        repo['.'][self.currentFile].data())
+                        self.diffbrowse.origcontents)
                     fp = cStringIO.StringIO()
                     chunks[0].write(fp)
                     for c in kchunks:
@@ -234,7 +293,7 @@ class ChunksWidget(QWidget):
                     return True
             return False
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             if wfile in ctx._files:
                 patchchunks = ctx._files[wfile]
@@ -295,11 +354,11 @@ class ChunksWidget(QWidget):
             return False
 
     def getFileList(self):
-        return self.filelistmodel._ctx.files()
+        return self.ctx.files()
 
     def removeFile(self, wfile):
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
@@ -326,7 +385,7 @@ class ChunksWidget(QWidget):
 
     def getChunksForFile(self, wfile):
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             if wfile in ctx._files:
                 return ctx._files[wfile]
@@ -347,8 +406,11 @@ class ChunksWidget(QWidget):
             else:
                 return []
 
-    @pyqtSlot(object, object, object)
-    def displayFile(self, file, rev, status):
+    @pyqtSlot(QString, QString)
+    def displayFile(self, file, status):
+        if isinstance(file, (unicode, QString)):
+            file = hglib.fromunicode(file)
+            status = hglib.fromunicode(status)
         if file:
             self.currentFile = file
             path = self.repo.wjoin(file)
@@ -366,7 +428,7 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelistmodel.setContext(ctx)
+        self.filelist.setContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
@@ -375,9 +437,12 @@ class ChunksWidget(QWidget):
             self.diffbrowse.clearDisplay()
             self.diffbrowse.clearChunks()
         self.diffbrowse.updateSummary()
+        self.ctx = ctx
+        for act in ['diff', 'revert']:
+            self._actions[act].setEnabled(ctx.rev() is None)
 
     def refresh(self):
-        ctx = self.filelistmodel._ctx
+        ctx = self.ctx
         if isinstance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
             ctx = self.repo.changectx(ctx._path)
@@ -385,8 +450,6 @@ class ChunksWidget(QWidget):
             self.repo.thginvalidate()
             ctx = self.repo.changectx(ctx.node())
         self.setContext(ctx)
-        if self.currentFile:
-            self.filelist.selectFile(self.currentFile)
 
     def loadSettings(self, qs, prefix):
         self.diffbrowse.loadSettings(qs, prefix)
@@ -583,7 +646,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = fileview.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -624,6 +687,7 @@ class DiffBrowser(QFrame):
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines) + 1
+        self.origcontents = fd.olddata
         self.countselected = 0
         self.curchunks = chunks
         for c in chunks[1:]:

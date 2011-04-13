@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import error
-
 from tortoisehg.hgqt import thgrepo, qtlib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -60,10 +58,9 @@ def iterRepoItemFromXml(source, model=None):
             yield undumpObject(xr, model)
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, openrepofunc, filename=None, parent=None):
-        QAbstractItemModel.__init__(self, parent)
 
-        self.openrepofunc = openrepofunc
+    def __init__(self, filename, parent):
+        QAbstractItemModel.__init__(self, parent)
 
         root = None
         all = None
@@ -195,7 +192,7 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         item = index.internalPointer()
         if item.setData(index.column(), value):
-            self.emit(SIGNAL('dataChanged(index, index)'), index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 
@@ -205,25 +202,6 @@ class RepoTreeModel(QAbstractItemModel):
         return self.createIndex(0, 0, self.allrepos)
 
     def addRepo(self, group, repo):
-        if not repo:
-            caption = _('Select repository directory to add')
-            FD = QFileDialog
-            path = FD.getExistingDirectory(caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
-            if path:
-                try:
-                    lpath = hglib.fromunicode(path)
-                    repo = thgrepo.repository(None, path=lpath)
-                except error.RepoError:
-                    # NOTE: here we cannot pass parent=self because self
-                    # isn't a QWidget. Codes under `if not repo:` should
-                    # be handled by a widget, not by a model.
-                    qtlib.WarningMsgBox(
-                        _('Failed to add repository'),
-                        _('%s is not a valid repository') % path)
-                    return
-            else:
-                return
         grp = group
         if grp == None:
             grp = self.allreposIndex()

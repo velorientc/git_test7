@@ -10,13 +10,15 @@ import sys
 import atexit
 import shutil
 import stat
+import subprocess
 import tempfile
 import re
 import weakref
 
-from mercurial import extensions
+from mercurial import extensions, util
 
 from tortoisehg.util import hglib, paths, wconfig
+from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
@@ -28,6 +30,12 @@ if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
                      (QT_VERSION_STR, PYQT_VERSION_STR))
     sys.exit()
+
+try:
+    import win32con
+    openflags = win32con.CREATE_NO_WINDOW
+except ImportError:
+    openflags = 0
 
 tmproot = None
 def gettempdir():
@@ -81,6 +89,97 @@ def loadIniFile(rcpath, parent):
 
     return fn, wconfig.readfile(fn)
 
+def editfiles(repo, files, lineno=None, search=None, parent=None):
+    if len(files) == 1:
+        path = repo.wjoin(files[0])
+        cwd = os.path.dirname(path)
+        files = [os.path.basename(path)]
+    else:
+        cwd = repo.root
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    editor = repo.ui.config('tortoisehg', 'editor')
+    assert len(files) == 1 or lineno == None
+    if editor:
+        try:
+            regexp = re.compile('\[([^\]]*)\]')
+            expanded = []
+            pos = 0
+            for m in regexp.finditer(editor):
+                expanded.append(editor[pos:m.start()-1])
+                phrase = editor[m.start()+1:m.end()-1]
+                pos=m.end()+1
+                if '$LINENUM' in phrase:
+                    if lineno is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$LINENUM', str(lineno))
+                elif '$SEARCH' in phrase:
+                    if search is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$SEARCH', search)
+                if '$FILE' in phrase:
+                    phrase = phrase.replace('$FILE', files[0])
+                    files = []
+                expanded.append(phrase)
+            expanded.append(editor[pos:])
+            cmdline = ' '.join(expanded + files)
+        except ValueError, e:
+            # '[' or ']' not found
+            cmdline = ' '.join([editor] + files)
+        except TypeError, e:
+            # variable expansion failed
+            cmdline = ' '.join([editor] + files)
+    else:
+        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
+                 or os.environ.get('EDITOR', 'vi')
+        cmdline = ' '.join([editor] + files)
+    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        res = QMessageBox.critical(parent,
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
+        return
+
+    cmdline = util.quotecommand(cmdline)
+    try:
+        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+                         stderr=None, stdout=None, stdin=None, cwd=cwd)
+    except (OSError, EnvironmentError), e:
+        QMessageBox.warning(parent,
+                _('Editor launch failure'),
+                u'%s : %s' % (hglib.tounicode(cmdline),
+                              hglib.tounicode(str(e))))
+    return False
+
+_user_shell = None
+def openshell(root):
+    global _user_shell
+    if _user_shell:
+        cwd = os.getcwd()
+        try:
+            os.chdir(root)
+            QProcess.startDetached(_user_shell)
+        finally:
+            os.chdir(cwd)
+    else:
+        InfoMsgBox(_('No shell configured'),
+                   _('A terminal shell must be configured'))
+
+def configureshell(ui):
+    global _user_shell
+    _user_shell = ui.config('tortoisehg', 'shell')
+    if _user_shell:
+        return
+    if sys.platform == 'darwin':
+        return # Terminal.App does not support open-to-folder
+    elif os.name == 'nt':
+        _user_shell = 'cmd.exe'
+    else:
+        _user_shell = 'xterm'
+
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style
@@ -111,6 +210,8 @@ _thgstyles = {
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
 
 def configstyles(ui):
+    configureshell(ui)
+
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))
