@@ -582,6 +582,7 @@ class Workbench(QMainWindow):
         for reporoot in self.lastClosedRepoRootList:
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
+        self.lastClosedRepoRootList = []
 
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
