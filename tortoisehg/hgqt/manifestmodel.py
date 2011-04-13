@@ -32,6 +32,7 @@ class ManifestModel(QAbstractItemModel):
 
         self._repo = repo
         self._rev = rev
+        self._subinfo = {}
 
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
@@ -55,6 +56,20 @@ class ManifestModel(QAbstractItemModel):
             return ''
 
         return index.internalPointer().path
+
+    def fileSubrepoCtx(self, index):
+        """Return the subrepo context of the specified index"""
+        path = self.filePath(index)
+        return self.fileSubrepoCtxFromPath(path)
+    
+    def fileSubrepoCtxFromPath(self, path):
+        """Return the subrepo context of the specified file"""
+        if not path:
+            return None, path
+        for subpath in sorted(self._subinfo.keys())[::-1]:
+            if path.startswith(subpath):
+                return self._subinfo[subpath], path[len(subpath)+1:]
+        return None, path
 
     def fileIcon(self, index):
         ic = QApplication.style().standardIcon(
@@ -224,7 +239,7 @@ class ManifestModel(QAbstractItemModel):
                     e.setstatus('C')
 
         # Add subrepos to the tree
-        def addrepocontentstotree(roote, ctx):
+        def addrepocontentstotree(roote, ctx, toproot=''):
             subpaths = ctx.substate.keys()
             for path in subpaths:
                 if not 'S' in self._statusfilter:
@@ -235,17 +250,17 @@ class ManifestModel(QAbstractItemModel):
                     if not p in e:
                         e.addchild(p)
                     e = e[p]
-    
+
                 p = pathelements[-1]
                 if not p in e:
                     e.addchild(p)
                 e = e[p]
                 e.setstatus('S')
-    
+
                 # If the subrepo exists in the working directory
                 # and it is a mercurial subrepo,
-                # add the files that it contains to the tree as well, according ot
-                # the status filter
+                # add the files that it contains to the tree as well, according
+                # to the status filter
                 abspath = os.path.join(ctx._repo.root, path)
                 if os.path.isdir(abspath):
                     # Add subrepo files to the tree
@@ -254,17 +269,32 @@ class ManifestModel(QAbstractItemModel):
                     if srev and isinstance(sub, hgsubrepo):
                         srepo = sub._repo
                         sctx = srepo[srev]
-                        e = addrepocontentstotree(e, sctx)
-    
+
+                        # Add the subrepo info to the _subinfo dictionary:
+                        # The value is the subrepo context, while the key is
+                        # the path of the subrepo relative to the topmost repo
+                        if toproot:
+                            # Note that we cannot use os.path.join() because we
+                            # need path items to be separated by "/"
+                            toprelpath = '/'.join([toproot, path])
+                        else:
+                            toprelpath = path
+                        self._subinfo[toprelpath] = sctx
+                        
+                        # Add the subrepo contents to the tree
+                        e = addrepocontentstotree(e, sctx, toprelpath)
+
             # Add regular files to the tree
             status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
-    
+
             addfilestotree(roote, files, status, uncleanpaths)
             return roote
- 
+
+        # Clear the _subinfo
+        self._subinfo = {}
         roote = _Entry()
         ctx = self._repo[self._rev]
-       
+
         addrepocontentstotree(roote, ctx)
         roote.sort()
 

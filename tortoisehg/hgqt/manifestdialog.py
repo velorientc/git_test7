@@ -459,11 +459,24 @@ class ManifestWidget(QWidget):
     def setPath(self, path):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
-
+    
+    def displayFile(self):
+        ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
+        if ctx is None:
+            ctx = self._repo[self._rev]
+        else:
+            ctx._repo.tabwidth = self._repo.tabwidth
+            ctx._repo.maxdiff = self._repo.maxdiff
+        self._fileview.setContext(ctx)
+        self._fileview.displayFile(path, self.status)
+    
     @pyqtSlot()
     def _updatecontent(self):
-        self._fileview.setContext(self._repo[self._rev])
-        self._fileview.displayFile(self.path, self.status)
+        if True:
+            self.displayFile()
+        else:
+            self._fileview.setContext(self._repo[self._rev])
+            self._fileview.displayFile(self.path, self.status)
 
     @pyqtSlot()
     def _emitPathChanged(self):

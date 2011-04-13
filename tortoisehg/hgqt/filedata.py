@@ -86,34 +86,16 @@ class FileData(object):
                 self.flabel += _(' <i>(is a symlink)</i>')
             return
 
-        wsub, wfileinsub, sctx = \
-            hglib.getDeepestSubrepoContainingFile(wfile, ctx)
-        if wsub:
-            topctx = ctx
-            topwfile = wfile
-            ctx = sctx
-            wfile = wfileinsub
-            if ctx2:
-                # If a revision to compare to was provided, we must put it in
-                # the context of the subrepo as well
-                # Here we had two choices:
-                # We could translate the seo
+        if ctx2:
+            # If a revision to compare to was provided, we must put it in
+            # the context of the subrepo as well
+            if ctx2._repo.root != ctx._repo.root:
                 wsub2, wfileinsub2, sctx2 = \
-                    hglib.getDeepestSubrepoContainingFile(topwfile, ctx2)
+                    hglib.getDeepestSubrepoContainingFile(wfile, ctx2)
                 if wsub2:
                     ctx2 = sctx2
-            else:
-                # Note that this is NOT THE SAME as topctx.p1()!
-                # [TODO] Perhaps we should try instead to get the context from
-                # the state of the supreop at topctx.p1(), that is, something
-                # such as:  wsub2, wfileinsub2, ctx2 = \
-                # ... hglib.getDeepestSubrepoContainingFile(topwfile, topctx.p1())
-                pass # This is set below to ctx2 = ctx.p1()
-        else:
-            topctx = ctx
-            topwfile = wfile
 
-        absfile = repo.wjoin(os.path.join(wsub or '', wfile))
+        absfile = repo.wjoin(wfile)
         if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
             if wfile in ctx:
@@ -213,7 +195,7 @@ class FileData(object):
                 out = []
                 _ui = uimod.ui()
 
-                if srepo is None or (topctx.rev() is not None and ctx.rev() is not None):
+                if srepo is None or ctx.rev() is not None:
                     data = []
                 else:
                     _ui.pushbuffer()
@@ -225,7 +207,7 @@ class FileData(object):
                         out.append(u'\n')
 
                 sstatedesc = 'changed'
-                if topctx.rev() is not None and ctx.rev() is not None:
+                if ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
                     subrepochange, sstatedesc = \
                         genSubrepoRevChangedDescription(wfile,
@@ -286,7 +268,7 @@ class FileData(object):
             return
 
         if status in ('I', '?', 'C'):
-            if topctx.rev() is None or ctx.rev() is None:
+            if ctx.rev() is None:
                 if status in ('I', '?'):
                     self.flabel += _(' <i>(is unversioned)</i>')
                 if os.path.getsize(absfile) > maxdiff:
