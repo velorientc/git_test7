@@ -74,7 +74,7 @@ class Workbench(QMainWindow):
             self.dockMenu.addAction(_('Open Repository...'),
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
-            
+
         # Create the actions that will be displayed on the context menu
         self.createActions()
         self.lastClosedRepoRootList = []
@@ -366,7 +366,7 @@ class Workbench(QMainWindow):
             if cb:
                 act.triggered.connect(cb)
             self.addAction(act)
-                
+
     @pyqtSlot(QPoint)
     def tabBarContextMenuRequest(self, point):
         # Activate the clicked tab
@@ -379,21 +379,21 @@ class Workbench(QMainWindow):
         clickedtabindex = clickedwidget.tabAt(point)
         if clickedtabindex > -1:
             self.repoTabsWidget.lastClickedTab = clickedtabindex
-        
+
         actionlist = ['closetab', 'closeothertabs']
 
         existingClosedRepoList = []
-        
+
         for reporoot in self.lastClosedRepoRootList:
             if os.path.isdir(reporoot):
                 existingClosedRepoList.append(reporoot)
         self.lastClosedRepoRootList = existingClosedRepoList
-        
+
         if len(self.lastClosedRepoRootList) > 1:
             actionlist += ['', 'reopenlastclosedgroup']
         elif len(self.lastClosedRepoRootList) > 0:
             actionlist += ['', 'reopenlastclosed']
-            
+
         contextmenu = QMenu(self)
         for act in actionlist:
             if act:
@@ -405,8 +405,9 @@ class Workbench(QMainWindow):
             contextmenu.exec_(self.repoTabsWidget.mapToGlobal(point))
 
     def closeLastClickedTab(self):
-        self.repoTabCloseRequested(self.repoTabsWidget.lastClickedTab)
-    
+        if self.repoTabsWidget.lastClickedTab > -1:
+            self.repoTabCloseRequested(self.repoTabsWidget.lastClickedTab)
+
     def _closeOtherTabs(self, tabIndex):
         if tabIndex > -1:
             tb = self.repoTabsWidget.tabBar()
@@ -418,11 +419,11 @@ class Workbench(QMainWindow):
                     # repoTabCloseRequested updates self.lastClosedRepoRootList
                     closedRepoRootList += self.lastClosedRepoRootList
             self.lastClosedRepoRootList = closedRepoRootList
-            
-                    
+
+
     def closeNotLastClickedTabs(self):
         self._closeOtherTabs(self.repoTabsWidget.lastClickedTab)
-        
+
     def onSwitchRepoTaskTab(self, action):
         rw = self.repoTabsWidget.currentWidget()
         if rw:
@@ -552,7 +553,10 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             w = self.repoTabsWidget.widget(index)
-            reporoot = w.repo.root
+            try:
+                reporoot = w.repo.root
+            except:
+                reporoot = ''
             self.repoTabsWidget.removeTab(index)
             widget.deleteLater()
             self.updateMenu()
@@ -560,14 +564,18 @@ class Workbench(QMainWindow):
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
-        w = tw.widget(index)
-        reporoot = w.repo.root
-        if w and w.closeRepoWidget():
-            tw.removeTab(index)
-            w.deleteLater()
-            self.updateMenu()
-            self.lastClosedRepoRootList = [reporoot]
-    
+        if 0 <= index < tw.count():
+            w = tw.widget(index)
+            try:
+                reporoot = w.repo.root
+            except:
+                reporoot = ''
+            if w and w.closeRepoWidget():
+                tw.removeTab(index)
+                w.deleteLater()
+                self.updateMenu()
+                self.lastClosedRepoRootList = [reporoot]
+
     def reopenLastClosedTabs(self):
         for reporoot in self.lastClosedRepoRootList:
             if os.path.isdir(reporoot):
