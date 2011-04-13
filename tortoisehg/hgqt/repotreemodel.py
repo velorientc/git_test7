@@ -21,6 +21,7 @@ reporegistryXmlElementName = 'reporegistry'
 
 repoRegMimeType = 'application/thg-reporegistry'
 repoRegGroupMimeType = 'application/thg-reporegistrygroup'
+repoExternalMimeType = 'text/uri-list'
 
 
 def writeXml(target, item, rootElementName):
@@ -160,7 +161,8 @@ class RepoTreeModel(QAbstractItemModel):
         return res
 
     def mimeTypes(self):
-        return QStringList([repoRegMimeType, repoRegGroupMimeType])
+        return QStringList([repoRegMimeType, repoRegGroupMimeType,
+                            repoExternalMimeType])
 
     def mimeData(self, indexes):
         i = indexes[0]
@@ -211,14 +213,15 @@ class RepoTreeModel(QAbstractItemModel):
     def allreposIndex(self):
         return self.createIndex(0, 0, self.allrepos)
 
-    def addRepo(self, group, repo):
+    def addRepo(self, group, repo, row=-1):
         grp = group
         if grp == None:
             grp = self.allreposIndex()
         rgi = grp.internalPointer()
-        cc = rgi.childCount()
-        self.beginInsertRows(grp, cc, cc + 1)
-        rgi.appendChild(RepoItem(self, repo))
+        if row < 0:
+            row = rgi.childCount()
+        self.beginInsertRows(grp, row, row)
+        rgi.insertChild(row, RepoItem(self, repo))
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
@@ -236,3 +239,11 @@ class RepoTreeModel(QAbstractItemModel):
         f.open(QIODevice.WriteOnly)
         writeXml(f, self.rootItem, reporegistryXmlElementName)
         f.close()
+
+    def depth(self, index):
+        count = 0
+        while True:
+            index = index.parent()
+            if index.row() < 0:
+                return count
+            count += 1

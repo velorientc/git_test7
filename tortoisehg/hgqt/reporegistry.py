@@ -7,9 +7,9 @@
 
 import os
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
+from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -25,6 +25,7 @@ class RepoTreeView(QTreeView):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
     menuRequested = pyqtSignal(object, object)
+    addRepo = pyqtSignal(object, QModelIndex, int)
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
@@ -40,7 +41,7 @@ class RepoTreeView(QTreeView):
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setAutoScroll(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setDragDropMode(QAbstractItemView.DragDrop)
         self.setDropIndicatorShown(True)
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -50,6 +51,71 @@ class RepoTreeView(QTreeView):
             return
         self.menuRequested.emit(event.globalPos(), self.selitem)
 
+    def dragEnterEvent(self, event):
+        if event.source() is self:
+            # Use the default event handler for internal dragging
+            super(RepoTreeView, self).dragEnterEvent(event)
+            return
+
+        d = event.mimeData()
+        for u in d.urls():
+            root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
+            if root:
+                event.setDropAction(Qt.LinkAction)
+                event.accept()
+                self.setState(QAbstractItemView.DraggingState)
+                break
+
+    def dropLocation(self, event):
+        index = self.indexAt(event.pos())
+
+        # Determine where the item was dropped.
+        # Depth in tree: 1 = group, 2 = repo, and (eventually) 3+ = subrepo
+        depth = self.model().depth(index)
+        if depth == 1:
+            group = index
+            row = -1
+        elif depth == 2:
+            indicator = self.dropIndicatorPosition()
+            group = index.parent()
+            row = index.row()
+            if indicator == QAbstractItemView.BelowItem:
+                row = index.row() + 1
+        else:
+            index = group = row = None
+
+        return index, group, row
+
+    def dropEvent(self, event):
+        data = event.mimeData()
+        index, group, row = self.dropLocation(event)
+
+        if index:
+            if event.source() is self:
+                # Event is an internal move, so pass it to the model
+                col = 0
+                drop = self.model().dropMimeData(data, Qt.MoveAction, row,
+                                                 col, group)
+                if drop:
+                    event.setDropAction(Qt.MoveAction)
+                    event.accept()
+            else:
+                # Event is a drop of an external repo
+                accept = False
+                for u in data.urls():
+                    root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
+                    if root:
+                        repo = thgrepo.repository(None,
+                                                  path=hglib.fromunicode(root))
+                        self.addRepo.emit(repo, group, row)
+                        accept = True
+                if accept:
+                    event.setDropAction(Qt.LinkAction)
+                    event.accept()
+        self.setAutoScroll(False)
+        self.setState(QAbstractItemView.NoState)
+        self.viewport().update()
+
     def mouseMoveEvent(self, event):
         self.msg  = ''
         pos = event.pos()
@@ -58,6 +124,11 @@ class RepoTreeView(QTreeView):
             item = idx.internalPointer()
             self.msg  = item.details()
         self.showMessage.emit(self.msg)
+
+        if event.buttons() == Qt.NoButton:
+            # Bail out early to avoid tripping over this bug:
+            # http://bugreports.qt.nokia.com/browse/QTBUG-10180
+            return
         super(RepoTreeView, self).mouseMoveEvent(event)
 
     def keyPressEvent(self, event):
@@ -127,6 +198,7 @@ class RepoRegistryView(QDockWidget):
         tv.showMessage.connect(self.showMessage)
         tv.openRepo.connect(self.openRepo)
         tv.menuRequested.connect(self.onMenuRequest)
+        tv.addRepo.connect(self.addRepo)
 
         self.createActions()
         QTimer.singleShot(0, self.expand)
@@ -134,12 +206,12 @@ class RepoRegistryView(QDockWidget):
     def expand(self):
         self.tview.expandToDepth(0)
 
-    def addRepo(self, repo):
+    def addRepo(self, repo, group=None, row=-1):
         'workbench has opened a new repowidget, ensure its in the registry'
         m = self.tview.model()
         it = m.getRepoItem(repo.root)
         if it == None:
-            m.addRepo(None, repo)
+            m.addRepo(group, repo, row)
         else:
             # ensure the registry item has a thgrepo instance
             it.ensureRepoLoaded()
