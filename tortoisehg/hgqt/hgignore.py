@@ -228,9 +228,11 @@ class HgignoreDialog(QDialog):
             l = []
         self.ignorelines = [line.strip() for line in l]
         self.ignorelist.clear()
-        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
 
         uni = hglib.tounicode
+        
+        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
+
         try:
             self.repo.thginvalidate()
             wctx = self.repo[None]
