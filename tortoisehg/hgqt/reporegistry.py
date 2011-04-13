@@ -218,6 +218,7 @@ class RepoRegistryView(QDockWidget):
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
+        self.tview.setHeaderHidden(not show)
         if show:
             self.tview.resizeColumnToContents(0)
             self.tview.resizeColumnToContents(1)
