@@ -117,24 +117,23 @@ class ChunksWidget(QWidget):
         self.contextmenu.exec_(self.filelist.mapToGlobal(point))
 
     def vdiff(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.getSelectedFiles()
+        if len(filenames) == 0:
             return
-        pats = [filename]
         opts = {'change':self.ctx.rev()}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
         if dlg:
             dlg.exec_()
             dlg.deleteLater()
 
     def revertfile(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.getSelectedFiles()
+        if len(filenames) == 0:
             return
         rev = self.ctx.rev()
         if rev is None:
             rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, filename, rev, self)
+        dlg = revert.RevertDialog(self.repo, filenames, rev, self)
         dlg.exec_()
         dlg.deleteLater()
 
@@ -204,10 +203,10 @@ class ChunksWidget(QWidget):
     def editCurrentFile(self):
         ctx = self.ctx
         if isinstance(ctx, patchctx):
-            path = ctx._path
+            paths = [ctx._path]
         else:
-            path = self.currentFile
-        qtlib.editfiles(self.repo, [path], parent=self)
+            paths = self.getSelectedFiles()
+        qtlib.editfiles(self.repo, paths, parent=self)
 
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
