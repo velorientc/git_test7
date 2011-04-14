@@ -12,7 +12,7 @@ import shutil
 from mercurial import cmdutil, hg, ui
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt.i18n import _, ngettext
 from tortoisehg.hgqt import qtlib, cmdui
 
 from PyQt4.QtCore import *
@@ -111,16 +111,21 @@ class PurgeDialog(QDialog):
                 self.showMessage.emit(_('Ready to purge.'))
                 U, I, T = self.files
                 if U:
-                    self.ucb.setText(_('Delete %d unknown files') % len(U))
+                    self.ucb.setText(ngettext(
+                        'Delete %d unknown file',
+                        'Delete %d unknown files', len(U)) % len(U))
                     self.ucb.setChecked(True)
                     self.ucb.setEnabled(True)
                 if I:
-                    self.icb.setText(_('Delete %d ignored files') % len(I))
+                    self.icb.setText(ngettext(
+                       'Delete %d ignored file',
+                       'Delete %d ignored files', len(I)) % len(I))
                     self.icb.setChecked(True)
                     self.icb.setEnabled(True)
                 if T:
-                    self.tcb.setText(_('Delete %d files in .hg/Trashcan') %
-                                     len(T))
+                    self.tcb.setText(ngettext(
+                        'Delete %d file in .hg/Trashcan',
+                        'Delete %d files in .hg/Trashcan', len(T)) % len(T))
                     self.tcb.setChecked(True)
                     self.tcb.setEnabled(True)
 
