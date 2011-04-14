@@ -484,7 +484,10 @@ class WctxFileTree(QTreeView):
             self.menuAction.emit()
 
     def selectedRows(self):
-        return self.selectionModel().selectedRows()
+        if self.selectionModel():
+            return self.selectionModel().selectedRows()
+        # Invalid selectionModel found
+        return []
 
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
