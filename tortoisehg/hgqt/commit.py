@@ -642,7 +642,7 @@ class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
     def __init__(self, opts, userhistory, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('%s - commit options' % parent.repo.displayname)
+        self.setWindowTitle(_('%s - commit options') % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QVBoxLayout()
@@ -936,7 +936,7 @@ class CommitDialog(QDialog):
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
-        self.setWindowTitle('%s - commit' % commit.repo.displayname)
+        self.setWindowTitle(_('%s - commit') % commit.repo.displayname)
         self.commit = commit
         self.commit.reload()
         self.updateUndo()

@@ -67,7 +67,7 @@ class PurgeDialog(QDialog):
         self.bb = bb
         self.layout().addWidget(bb)
 
-        self.setWindowTitle('%s - purge' % repo.displayname)
+        self.setWindowTitle(_('%s - purge') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-purge'))
         self.repo = repo
 

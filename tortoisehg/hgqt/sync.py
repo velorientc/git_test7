@@ -1369,7 +1369,7 @@ class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
     def __init__(self, opts, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('%s - sync options' % parent.repo.displayname)
+        self.setWindowTitle(_('%s - sync options') % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QFormLayout()
