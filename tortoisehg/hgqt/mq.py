@@ -919,7 +919,7 @@ class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
     def __init__(self, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('MQ options')
+        self.setWindowTitle(_('MQ options'))
 
         layout = QFormLayout()
         self.setLayout(layout)

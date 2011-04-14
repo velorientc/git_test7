@@ -41,7 +41,7 @@ class QuickOpDialog(QDialog):
             command = 'remove'
         self.command = command
 
-        self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
+        self.setWindowTitle(_('%s - hg %s') % (repo.displayname, command))
         self.setWindowIcon(qtlib.geticon(ICONS[command]))
 
         layout = QVBoxLayout()

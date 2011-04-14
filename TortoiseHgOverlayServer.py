@@ -196,7 +196,10 @@ class MainWindow:
         while cnt <= max_try and self.pipethread.isAlive():
             print "testing pipe [try %d] ..." % cnt
             try:
-                self.pipethread.terminate()
+                try:
+                    self.pipethread.terminate()
+                except ValueError:
+                    pass
                 win32pipe.CallNamedPipe(PIPENAME, '', PIPEBUFSIZE, 0)
             except:
                 logger.msg(traceback.format_exc())
