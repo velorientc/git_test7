@@ -7,6 +7,8 @@
 
 import os
 
+from mercurial import error
+
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings, thgrepo
