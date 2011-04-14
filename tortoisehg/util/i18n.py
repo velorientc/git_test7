@@ -60,6 +60,9 @@ def _(message, context=''):
             return tmsg
     return t.gettext(message)
 
+def ngettext(singular, plural, n):
+    return t.ngettext(singular, plural, n)
+
 def agettext(message, context=''):
     """Translate message and convert to local encoding
     such as 'ascii' before being returned.
