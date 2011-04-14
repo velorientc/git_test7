@@ -92,7 +92,7 @@ class RevDetailsWidget(QWidget):
 
         self.filelisttbar = QToolBar(_('File List Toolbar'))
         self.filelisttbar.setIconSize(QSize(16,16))
-        self.filelist = HgFileListView(self.repo, self, False)
+        self.filelist = HgFileListView(self.repo, self, True)
         self.filelist.linkActivated.connect(self.linkActivated)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
@@ -293,52 +293,51 @@ class RevDetailsWidget(QWidget):
         self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
     def vdiff(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.filelist.getSelectedFiles()
+        if not filenames:
             return
-        pats = [filename]
         opts = {'change':self.ctx.rev()}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
         if dlg:
             dlg.exec_()
 
     def vdifflocal(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.filelist.getSelectedFiles()
+        if not filenames:
             return
-        pats = [filename]
         assert type(self.ctx.rev()) is int
         opts = {'rev':['rev(%d)' % (self.ctx.rev())]}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
         if dlg:
             dlg.exec_()
 
     def editfile(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.filelist.getSelectedFiles()
+        if not filenames:
             return
         rev = self.ctx.rev()
         if rev is None:
-            qtlib.editfiles(self.repo, [filename], parent=self)
+            qtlib.editfiles(self.repo, filenames, parent=self)
         else:
-            base, _ = visdiff.snapshot(self.repo, [filename], self.ctx)
-            files = [os.path.join(base, filename)]
+            base, _ = visdiff.snapshot(self.repo, filenames, self.ctx)
+            files = [os.path.join(base, filename)
+                     for filename in filenames]
             qtlib.editfiles(self.repo, files, parent=self)
 
     def editlocal(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        filenames = self.filelist.getSelectedFiles()
+        if not filenames:
             return
-        qtlib.editfiles(self.repo, [filename], parent=self)
+        qtlib.editfiles(self.repo, filenames, parent=self)
 
     def revertfile(self):
-        filename = self.filelist.currentFile()
-        if filename is None:
+        fileSelection = self.filelist.getSelectedFiles()
+        if len(fileSelection) == 0:
             return
         rev = self.ctx.rev()
         if rev is None:
             rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, filename, rev, self)
+        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
