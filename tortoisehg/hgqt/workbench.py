@@ -760,6 +760,10 @@ class Workbench(QMainWindow):
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
 
+    def goto(self, root, rev):
+        for rw in self._findrepowidget(root):
+            rw.goto(rev)
+
     def closeEvent(self, event):
         if not self.closeRepoTabs():
             event.ignore()
