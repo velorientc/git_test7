@@ -259,7 +259,7 @@ class ManifestWidget(QWidget):
             return
         if self.rev is None:
             rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, self.path, self.rev, self)
+        dlg = revert.RevertDialog(self._repo, [self.path], self.rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
