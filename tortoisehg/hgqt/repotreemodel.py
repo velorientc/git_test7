@@ -108,7 +108,7 @@ class RepoTreeModel(QAbstractItemModel):
             return QModelIndex()
         childItem = index.internalPointer()
         parentItem = childItem.parent()
-        if parentItem is None:
+        if parentItem is self.rootItem:
             return QModelIndex()
         return self.createIndex(parentItem.row(), 0, parentItem)
 
@@ -179,14 +179,15 @@ class RepoTreeModel(QAbstractItemModel):
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
+        group = parent.internalPointer()
         if data.hasUrls():
             d = str(data.data(repoRegMimeType))
         else:
             row = parent.row()
-            parent = self.parent(parent)
+            group = self.rootItem
+            parent = QModelIndex()
             d = str(data.data(repoRegGroupMimeType))
         itemread = readXml(d, extractXmlElementName, self)
-        group = parent.internalPointer()
         if group is None:
             return False
         if row < 0:
@@ -241,7 +242,7 @@ class RepoTreeModel(QAbstractItemModel):
         f.close()
 
     def depth(self, index):
-        count = 0
+        count = 1
         while True:
             index = index.parent()
             if index.row() < 0:
