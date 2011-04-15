@@ -17,6 +17,7 @@ import weakref
 from mercurial import extensions
 
 from tortoisehg.util import hglib, paths, wconfig
+from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
