@@ -313,7 +313,7 @@ class RepoRegistryView(QDockWidget):
             try:
                 lpath = hglib.fromunicode(path)
                 repo = thgrepo.repository(None, path=lpath)
-                self.model().addRepo(self.selitem, repo)
+                self.tview.model().addRepo(self.selitem, repo)
             except error.RepoError:
                 # NOTE: here we cannot pass parent=self because self
                 # isn't a QWidget. Codes under `if not repo:` should
