@@ -223,7 +223,7 @@ class BugTraqConfigureEntry(QPushButton):
             return
         if len(self.master.value()) == 0:
             return
-        
+
         try:
             setting = self.master.value().split(' ', 1)
             trackerid = setting[0]
@@ -241,7 +241,7 @@ class BugTraqConfigureEntry(QPushButton):
                               _('Failed to load issue tracker: \'%s\': %s. '
                                 % (name, e)),
                               parent=self)
-    
+
     ## common APIs for all edit widgets
     def setValue(self, curvalue):
         if self.master == None:
