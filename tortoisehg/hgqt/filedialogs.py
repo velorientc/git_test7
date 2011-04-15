@@ -416,11 +416,13 @@ class FileDiffDialog(_AbstractFileDialog):
         self.actionReload.triggered.connect(self.reload)
         self.actionReload.setIcon(qtlib.geticon('view-refresh'))
 
-        self.actionNextDiff = QAction(qtlib.geticon('go-down'), 'Next diff', self)
+        self.actionNextDiff = QAction(qtlib.geticon('go-down'),
+                                      _('Next diff'), self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
 
-        self.actionPrevDiff = QAction(qtlib.geticon('go-up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(qtlib.geticon('go-up'),
+                                      _('Previous diff'), self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
 
