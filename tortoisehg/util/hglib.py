@@ -34,6 +34,7 @@ _extensions_blacklist = ('color', 'pager', 'progress')
 
 from tortoisehg.util import paths
 from tortoisehg.util.hgversion import hgversion
+from tortoisehg.util.i18n import _, ngettext
 
 def tounicode(s):
     """
@@ -284,7 +285,6 @@ def validateextensions(enabledexts):
     Returns the dict {name: message} of extensions expected to be disabled.
     message is 'utf-8'-encoded string.
     """
-    from tortoisehg.util.i18n import _  # avoid cyclic dependency
     exts = {}
     if os.name != 'posix':
         exts['inotify'] = _('inotify is not supported on this platform')
@@ -500,8 +500,33 @@ def displaytime(date):
 def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
+agescales = [((lambda n: ngettext("%d year", "%d years", n)), 3600 * 24 * 365),
+             ((lambda n: ngettext("%d month", "%d months", n)), 3600 * 24 * 30),
+             ((lambda n: ngettext("%d week", "%d weeks", n)), 3600 * 24 * 7),
+             ((lambda n: ngettext("%d day", "%d days", n)), 3600 * 24),
+             ((lambda n: ngettext("%d hour", "%d hours", n)), 3600),
+             ((lambda n: ngettext("%d minute", "%d minutes", n)), 60),
+             ((lambda n: ngettext("%d second", "%d seconds", n)), 1)]
+
 def age(date):
-    return templatefilters.age(date)
+    '''turn a (timestamp, tzoff) tuple into an age string.'''
+    # This is i18n-ed version of mercurial.templatefilters.age().
+
+    now = time.time()
+    then = date[0]
+    if then > now:
+        return _('in the future')
+
+    delta = int(now - then)
+    if delta == 0:
+        return _('now')
+    if delta > agescales[0][1] * 2:
+        return util.shortdate(date)
+
+    for t, s in agescales:
+        n = delta // s
+        if n >= 2 or s == 1:
+            return _('%s ago') % (t(n) % n)
 
 def username(user):
     author = templatefilters.person(user)
