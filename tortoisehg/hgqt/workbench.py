@@ -10,9 +10,8 @@ Main Qt4 application for TortoiseHg
 
 import os
 import sys
-
+from mercurial import ui
 from mercurial.error import RepoError
-
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt import repomodel, thgrepo, cmdui, qtlib
@@ -40,10 +39,10 @@ class Workbench(QMainWindow):
 
     def __init__(self):
         QMainWindow.__init__(self)
+        self.ui = ui.ui()
 
         self.setupUi()
         self.setWindowTitle(_('TortoiseHg Workbench'))
-
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
@@ -502,8 +501,9 @@ class Workbench(QMainWindow):
         self.updateToolBarActions()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
-
-        if tw.count() < 2:
+        if ((tw.count() == 0) or
+            ((tw.count() == 1) and
+             not self.ui.configbool('tortoisehg', 'forcerepotab', False))):
             tw.tabBar().hide()
         else:
             tw.tabBar().show()

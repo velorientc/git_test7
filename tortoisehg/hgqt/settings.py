@@ -385,6 +385,8 @@ INFO = (
         _('Specify the number of spaces that tabs expand to in various '
           'TortoiseHg windows. '
           'Default: 0, Not expanded')),
+    _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolCombo,
+        _('Always show repo tabs, even for a single repo. Default: False')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
