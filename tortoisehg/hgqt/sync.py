@@ -1386,7 +1386,7 @@ class OptionsDialog(QDialog):
         layout.addRow(self.forcecb, None)
 
         self.subrepocb = QCheckBox(
-            _('Recurse into subrepositories (--subrepos)'))
+            _('Recurse into subrepositories') + u' (--subrepos)')
         self.subrepocb.setChecked(opts.get('subrepos', False))
         layout.addRow(self.subrepocb, None)
 

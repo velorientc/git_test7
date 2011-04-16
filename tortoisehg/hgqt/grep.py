@@ -66,7 +66,7 @@ class SearchWidget(QWidget):
         history = QRadioButton(_('All History'))
         singlematch = QCheckBox(_('Report only the first match per file'))
         follow = QCheckBox(_('Follow copies and renames'))
-        recurse = QCheckBox(_('Recurse into subrepos'))
+        recurse = QCheckBox(_('Recurse into subrepositories'))
         revle = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(working, 0, 0)
