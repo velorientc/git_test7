@@ -108,7 +108,7 @@ class HgRepoListModel(QAbstractTableModel):
             'Tags':     self.gettags,
             'Branch':   self.getbranch,
             'Filename': lambda ctx, gnode: gnode.extra[0],
-            'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
+            'Age':      lambda ctx, gnode: hglib.age(ctx.date()).decode('utf-8'),
             'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
             'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
             'Changes':  self.getchanges,

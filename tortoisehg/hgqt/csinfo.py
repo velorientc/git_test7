@@ -155,7 +155,7 @@ class SummaryInfo(object):
             elif item == 'age':
                 date = ctx.date()
                 if date:
-                    return hglib.age(date)
+                    return hglib.age(date).decode('utf-8')
                 return None
             elif item == 'rawbranch':
                 return ctx.branch() or None
