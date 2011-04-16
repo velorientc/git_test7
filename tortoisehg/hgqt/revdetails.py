@@ -415,6 +415,13 @@ class RevDetailsWidget(QWidget):
             else:
                 self.filecontextmenu = contextmenu
 
+        if len(self.filelist.getSelectedFiles()) > 1 and not itemissubrepo:
+            singlefileactions = False
+        else:
+            singlefileactions = True
+        self._actions['navigate'].setEnabled(singlefileactions)
+        self._actions['diffnavigate'].setEnabled(singlefileactions)
+
         if actionlist:
             contextmenu.exec_(self.filelist.mapToGlobal(point))
 
