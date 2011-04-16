@@ -6,13 +6,13 @@ Clone a repository
 
 To clone a repository you have to run the clone dialog.
 From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
-or type :command:`thg clone`. 
+or type :command:`thg clone`.
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
 
 	Clone Dialog
-	
+
 :guilabel:`Source`
 	It is the path (or URL) of the repository that will be cloned. Use
 	the :guilabel:`Browse...` to choose a local folder.
