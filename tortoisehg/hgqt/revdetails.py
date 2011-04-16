@@ -342,7 +342,7 @@ class RevDetailsWidget(QWidget):
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
-            filename = self.filelist.currentFile()
+            filename = self.filelist.getSelectedFiles()[0]
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 dlg = dlgclass(self.repo, filename,
