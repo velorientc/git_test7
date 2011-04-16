@@ -42,8 +42,12 @@ Under the :guilabel:`Options` expander you will find:
 :guilabel:`Use proxy server`
 	To use the proxy server configured in :menuselection:`TortoiseHg... --> Global Settings --> Proxy`.
 	This is enabled only if a proxy is configured.
+:guilabel:`Do not verify host certificate`
+	Skip checking server certificate for https:// url (ignoring web.cacerts config).
 :guilabel:`Remote command`
 	Specify a Mercurial command to run on the remote side.
+:guilabel:`Hg command`
+    This field displays the command that will be executed by the dialog.
 
 From command line
 -----------------
