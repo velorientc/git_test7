@@ -62,7 +62,7 @@ by setting the registry key defined in
 repository.  You can double-click on this file to load the key into your
 registry.
 
-Another option is to exit the :command:`ThgTaskbar` system tray
+Another option is to exit the :command:`TortoiseHgOverlayServer` system tray
 application and start it from the command line.  It will emit some debug
 information to the console.
 
