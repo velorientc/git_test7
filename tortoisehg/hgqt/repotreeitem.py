@@ -7,12 +7,11 @@
 
 import sys, os
 
-from mercurial import node, error
+from mercurial import node
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
-from tortoisehg.hgqt.settings import SettingsDialog
+from tortoisehg.hgqt import qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -118,14 +117,8 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
-    def open(self, reuse=False):
-        pass
-
-    def openAll(self):
-        pass
-
-    def showFirstTabOrOpen(self, workbench=None):
-        pass
+    def isRepo(self):
+        return False
 
     def details(self):
         return ''
@@ -137,35 +130,38 @@ class RepoTreeItem(object):
                 return ri
         return None
 
-    def okToDelete(self, parentWidget):
+    def okToDelete(self):
         return True
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, model, repo=None, parent=None):
+    def __init__(self, model, root=None, parent=None):
         RepoTreeItem.__init__(self, model, parent)
-        self._repo = repo
-        self._root = repo and repo.root or ''  # local str
-        self._shortname = repo and repo.shortname or ''  # unicode
-        self._basenode = repo and repo[0].node() or node.nullid
+        self._root = root or ''
+        self._shortname = u''
+        self._basenode = node.nullid
+
+    def isRepo(self):
+        return True
 
     def rootpath(self):
         return self._root
 
     def shortname(self):
-        if self._repo:
-            return self._repo.shortname
-        elif self._shortname:
+        if self._shortname:
             return self._shortname
         else:
             return hglib.tounicode(os.path.basename(self._root))
 
     def basenode(self):
         """Return node id of revision 0"""
-        if self._repo:
-            return self._repo[0].node()
-        else:
-            return self._basenode or node.nullid
+        return self._basenode
+
+    def setBaseNode(self, basenode):
+        self._basenode = basenode
+
+    def setShortName(self, uname):
+        self._shortname = uname
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -201,32 +197,6 @@ class RepoItem(RepoTreeItem):
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
-
-    def open(self, reuse=False):
-        self.model.openrepofunc(self._root, reuse)
-
-    def showFirstTabOrOpen(self, workbench=None):
-        workbench.showRepo(hglib.tounicode(self._root))
-
-    def startSettings(self, parent):
-        try:
-            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                 root=self._root)
-            self.ensureRepoLoaded()
-            dlg.exec_()
-        except error.RepoError:
-            pass
-        finally:
-            dlg.deleteLater()
-
-    def ensureRepoLoaded(self):
-        """load repo object if necessary
-
-        Until repo loaded, it uses cached shortname for less overhead.
-        """
-        if self._repo:
-            return
-        self._repo = thgrepo.repository(path=self._root)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
@@ -267,11 +237,10 @@ class RepoGroupItem(RepoTreeItem):
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-            | Qt.ItemIsEditable)
+            | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
 
-    def openAll(self):
-        for c in self.childs:
-            c.open(reuse=True)
+    def childRoots(self):
+        return [c._root for c in self.childs]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
@@ -282,18 +251,14 @@ class RepoGroupItem(RepoTreeItem):
         self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
 
-    def okToDelete(self, parentWidget):
-        labels = [(QMessageBox.Yes, _('&Delete')),
-                  (QMessageBox.No, _('Cancel'))]
-        return qtlib.QuestionMsgBox(
-            _('Confirm Delete'),
-            _("Delete Group '%s' and all its entries?") % self.name,
-            labels=labels, parent=parentWidget)
+    def okToDelete(self):
+        return False
 
 
 class AllRepoGroupItem(RepoTreeItem):
     def __init__(self, model, parent=None):
         RepoTreeItem.__init__(self, model, parent)
+        self.name = _('default')
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -303,7 +268,7 @@ class AllRepoGroupItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            return QVariant(_('default'))
+            return QVariant(self.name)
         return QVariant()
 
     def setData(self, column, value):
@@ -313,7 +278,8 @@ class AllRepoGroupItem(RepoTreeItem):
         return ['add', 'newGroup']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+        return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            | Qt.ItemIsDragEnabled)
 
     def dump(self, xw):
         RepoTreeItem.dump(self, xw)
