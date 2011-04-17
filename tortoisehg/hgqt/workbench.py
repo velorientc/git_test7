@@ -604,6 +604,8 @@ class Workbench(QMainWindow):
         rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
+        rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
+        rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
 
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, rw.title())
@@ -612,7 +614,7 @@ class Workbench(QMainWindow):
             lambda title: tw.setTabText(tw.indexOf(rw), title))
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
-        self.reporegistry.addRepo(repo)
+        self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
 

@@ -11,7 +11,7 @@ from mercurial import node
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -117,6 +117,9 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
+    def isRepo(self):
+        return False
+
     def details(self):
         return ''
 
@@ -132,30 +135,33 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, model, repo=None, parent=None):
+    def __init__(self, model, root=None, parent=None):
         RepoTreeItem.__init__(self, model, parent)
-        self._repo = repo
-        self._root = repo and repo.root or ''  # local str
-        self._shortname = repo and repo.shortname or ''  # unicode
-        self._basenode = repo and repo[0].node() or node.nullid
+        self._root = root or ''
+        self._shortname = u''
+        self._basenode = node.nullid
+
+    def isRepo(self):
+        return True
 
     def rootpath(self):
         return self._root
 
     def shortname(self):
-        if self._repo:
-            return self._repo.shortname
-        elif self._shortname:
+        if self._shortname:
             return self._shortname
         else:
             return hglib.tounicode(os.path.basename(self._root))
 
     def basenode(self):
         """Return node id of revision 0"""
-        if self._repo:
-            return self._repo[0].node()
-        else:
-            return self._basenode or node.nullid
+        return self._basenode
+
+    def setBaseNode(self, basenode):
+        self._basenode = basenode
+
+    def setShortName(self, uname):
+        self._shortname = uname
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -191,15 +197,6 @@ class RepoItem(RepoTreeItem):
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
-
-    def ensureRepoLoaded(self):
-        """load repo object if necessary
-
-        Until repo loaded, it uses cached shortname for less overhead.
-        """
-        if self._repo:
-            return
-        self._repo = thgrepo.repository(path=self._root)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)

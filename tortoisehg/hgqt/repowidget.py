@@ -52,6 +52,9 @@ class RepoWidget(QWidget):
 
     showIcon = pyqtSignal(QIcon)
 
+    shortNameChanged = pyqtSignal(QString, QString)
+    baseNodeChanged = pyqtSignal(QString, object)
+
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
@@ -69,6 +72,8 @@ class RepoWidget(QWidget):
         self.busyIcons = []
         self.namedTabs = {}
         self.repolen = len(repo)
+        self.shortname = None
+        self.basenode = None
         self.destroyed.connect(self.repo.thginvalidate)
 
         if repo.parents()[0].rev() == -1:
@@ -616,6 +621,14 @@ class RepoWidget(QWidget):
         'initial batch of revisions loaded'
         self.repoview.goto(self._reload_rev) # emits revisionSelected
         self.repoview.resizeColumns()
+        if self.repo.shortname != self.shortname:
+            self.shortname = self.repo.shortname
+            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
+                                       self.shortname)
+        if len(self.repo) and self.repo[0].node() != self.basenode:
+            self.basenode = self.repo[0].node()
+            self.baseNodeChanged.emit(hglib.tounicode(self.repo.root),
+                                      self.basenode)
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
@@ -774,6 +787,10 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.reload()
         self.titleChanged.emit(self.title())
         self.updateTaskTabs()
+        if self.repo.shortname != self.shortname:
+            self.shortname = self.repo.shortname
+            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
+                                       self.shortname)
 
     def updateTaskTabs(self):
         val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()

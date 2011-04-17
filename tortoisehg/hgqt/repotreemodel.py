@@ -213,7 +213,7 @@ class RepoTreeModel(QAbstractItemModel):
     def allreposIndex(self):
         return self.createIndex(0, 0, self.allrepos)
 
-    def addRepo(self, group, repo, row=-1):
+    def addRepo(self, group, root, row=-1):
         grp = group
         if grp == None:
             grp = self.allreposIndex()
@@ -221,7 +221,7 @@ class RepoTreeModel(QAbstractItemModel):
         if row < 0:
             row = rgi.childCount()
         self.beginInsertRows(grp, row, row)
-        rgi.insertChild(row, RepoItem(self, repo))
+        rgi.insertChild(row, RepoItem(self, root))
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):

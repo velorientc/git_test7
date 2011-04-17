@@ -11,7 +11,7 @@ from mercurial import error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings, thgrepo
+from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -25,9 +25,8 @@ def settingsfilename():
 
 class RepoTreeView(QTreeView):
     showMessage = pyqtSignal(QString)
-    openRepo = pyqtSignal(QString, bool)
     menuRequested = pyqtSignal(object, object)
-    addRepo = pyqtSignal(object, QModelIndex, int)
+    openRepo = pyqtSignal(QString, bool)
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
@@ -106,10 +105,8 @@ class RepoTreeView(QTreeView):
                 accept = False
                 for u in data.urls():
                     root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
-                    if root:
-                        repo = thgrepo.repository(None,
-                                                  path=hglib.fromunicode(root))
-                        self.addRepo.emit(repo, group, row)
+                    if root and not self.model().getRepoItem(root):
+                        self.model().addRepo(group, root, row)
                         accept = True
                 if accept:
                     event.setDropAction(Qt.LinkAction)
@@ -135,7 +132,7 @@ class RepoTreeView(QTreeView):
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
-            if self.selitem and self.selitem.internalPointer().details():
+            if self.selitem and self.selitem.internalPointer().isRepo():
                 self.showFirstTabOrOpen()
         else:
             super(RepoTreeView, self).keyPressEvent(event)
@@ -145,7 +142,7 @@ class RepoTreeView(QTreeView):
             self.showMessage.emit('')
 
     def mouseDoubleClickEvent(self, event):
-        if self.selitem and self.selitem.internalPointer().details():
+        if self.selitem and self.selitem.internalPointer().isRepo():
             self.showFirstTabOrOpen()
         else:
             super(RepoTreeView, self).mouseDoubleClickEvent(event)
@@ -164,8 +161,6 @@ class RepoTreeView(QTreeView):
 
     def showFirstTabOrOpen(self):
         'Enter or double click events, show existing or open a new repowidget'
-        if not self.selitem:
-            return
         root = self.selitem.internalPointer().rootpath()
         self.openRepo.emit(hglib.tounicode(root), True)
 
@@ -198,9 +193,8 @@ class RepoRegistryView(QDockWidget):
         tv.setColumnHidden(1, True)
 
         tv.showMessage.connect(self.showMessage)
-        tv.openRepo.connect(self.openRepo)
         tv.menuRequested.connect(self.onMenuRequest)
-        tv.addRepo.connect(self.addRepo)
+        tv.openRepo.connect(self.openRepo)
 
         self.createActions()
         QTimer.singleShot(0, self.expand)
@@ -208,15 +202,12 @@ class RepoRegistryView(QDockWidget):
     def expand(self):
         self.tview.expandToDepth(0)
 
-    def addRepo(self, repo, group=None, row=-1):
-        'workbench has opened a new repowidget, ensure its in the registry'
+    def addRepo(self, root):
+        'workbench has opened a new repowidget, ensure it is in the registry'
         m = self.tview.model()
-        it = m.getRepoItem(repo.root)
+        it = m.getRepoItem(root)
         if it == None:
-            m.addRepo(group, repo, row)
-        else:
-            # ensure the registry item has a thgrepo instance
-            it.ensureRepoLoaded()
+            m.addRepo(None, root, -1)
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
@@ -310,18 +301,15 @@ class RepoRegistryView(QDockWidget):
         path = FD.getExistingDirectory(caption=caption,
                                        options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
-            try:
-                lpath = hglib.fromunicode(path)
-                repo = thgrepo.repository(None, path=lpath)
-                self.tview.model().addRepo(self.selitem, repo)
-            except error.RepoError:
-                # NOTE: here we cannot pass parent=self because self
-                # isn't a QWidget. Codes under `if not repo:` should
-                # be handled by a widget, not by a model.
-                qtlib.WarningMsgBox(
-                    _('Failed to add repository'),
-                    _('%s is not a valid repository') % path)
-                return
+            root = paths.find_root(hglib.fromunicode(path))
+            if root and not self.tview.model().getRepoItem(root):
+                try:
+                    self.tview.model().addRepo(self.selitem, root)
+                except error.RepoError:
+                    qtlib.WarningMsgBox(
+                        _('Failed to add repository'),
+                        _('%s is not a valid repository') % path, parent=self)
+                    return
 
     def startSettings(self):
         root = self.selitem.internalPointer().rootpath()
@@ -360,3 +348,15 @@ class RepoRegistryView(QDockWidget):
         m.removeRows(row, 1, parent)
         self.tview.selectionChanged(None, None)
 
+    @pyqtSlot(QString, QString)
+    def shortNameChanged(self, uroot, uname):
+        it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setShortName(uname)
+            self.tview.model().layoutChanged.emit()
+
+    @pyqtSlot(QString, object)
+    def baseNodeChanged(self, uroot, basenode):
+        it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setBaseNode(basenode)
