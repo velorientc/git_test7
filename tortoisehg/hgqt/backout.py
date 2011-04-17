@@ -5,275 +5,560 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-from mercurial import merge as mergemod
+from mercurial import hg, merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
 from tortoisehg.hgqt import commit, qscilib, thgrepo
 
-keep = i18n.keepgettext()
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
-class BackoutDialog(QDialog):
+class BackoutDialog(QWizard):
 
-    def __init__(self, repo, rev='tip', parent=None, opts={}):
+    def __init__(self, rev, repo, parent):
         super(BackoutDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+
+        self.backoutrev = rev
+        self.parentbackout = False
+
+        self.setWindowTitle(_('Backout - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-revert'))
+        self.setOption(QWizard.NoBackButtonOnStartPage, True)
+        self.setOption(QWizard.NoBackButtonOnLastPage, True)
+        self.setOption(QWizard.IndependentPages, True)
+
+        self.addPage(SummaryPage(repo, self))
+        self.addPage(BackoutPage(repo, self))
+        self.addPage(CommitPage(repo, self))
+        self.addPage(ResultPage(repo, self))
+        self.currentIdChanged.connect(self.pageChanged)
+
+        self.resize(QSize(700, 489).expandedTo(self.minimumSizeHint()))
+
+        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.configChanged.connect(self.configChanged)
+
+    def repositoryChanged(self):
+        self.currentPage().repositoryChanged()
+
+    def configChanged(self):
+        self.currentPage().configChanged()
+
+    def pageChanged(self, id):
+        if id != -1:
+            self.currentPage().currentPage()
+
+    def reject(self):
+        if self.currentPage().canExit():
+            super(BackoutDialog, self).reject()
+
+
+class BasePage(QWizardPage):
+    def __init__(self, repo, parent):
+        super(BasePage, self).__init__(parent)
         self.repo = repo
 
-        # main layout box
-        box = QVBoxLayout()
-        box.setSpacing(8)
-        box.setContentsMargins(*(6,)*4)
+    def validatePage(self):
+        'user pressed NEXT button, can we proceed?'
+        return True
 
-        ## target revision
-        target_sep = qtlib.LabeledSeparator(_('Target changeset'))
-        box.addWidget(target_sep)
+    def isComplete(self):
+        'should NEXT button be sensitive?'
+        return True
 
-        style = csinfo.panelstyle(selectable=True)
-        self.targetinfo = csinfo.create(self.repo, rev, style, withupdate=True)
-        box.addWidget(self.targetinfo)
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        pass
 
-        ## backout message
-        msg_sep = qtlib.LabeledSeparator(_('Backout commit message'))
-        box.addWidget(msg_sep)
+    def configChanged(self):
+        'repository has detected a change to config files'
+        pass
 
-        revhex = self.targetinfo.get_data('revid')
-        self.msgset = keep._('Backed out changeset: ')
-        self.msgset['id'] += revhex
-        self.msgset['str'] += revhex
+    def currentPage(self):
+        pass
 
-        self.msgTextEdit = commit.MessageEntry(self)
-        self.msgTextEdit.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.msgTextEdit.refresh(repo)
-        self.msgTextEdit.loadSettings(QSettings(), 'backout/message')
-        self.msgTextEdit.setText(self.msgset['str'])
-        box.addWidget(self.msgTextEdit, 2)
+    def canExit(self):
+        return True
 
-        ## options
-        opt_sep = qtlib.LabeledSeparator(_('Options'))
-        box.addWidget(opt_sep)
 
-        obox = QVBoxLayout()
-        obox.setSpacing(3)
-        box.addLayout(obox)
+class SummaryPage(BasePage):
 
-        self.engChk = QCheckBox(_('Use English backout message'))
-        self.engChk.toggled.connect(self.eng_toggled)
-        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
-        self.engChk.setChecked(engmsg)
+    def __init__(self, repo, parent):
+        super(SummaryPage, self).__init__(repo, parent)
+        self.clean = False
+        self.th = None
 
-        obox.addWidget(self.engChk)
-        self.mergeChk = QCheckBox(_('Commit backout before merging with '
-                                     'current working parent'))
-        self.mergeChk.toggled.connect(self.merge_toggled)
-        self.mergeChk.setChecked(bool(opts.get('merge')))
-        self.msgTextEdit.setEnabled(False)
-        obox.addWidget(self.mergeChk)
+    def initializePage(self):
+        if self.layout():
+            return
+        self.setTitle(_('Prepare to backout'))
+        self.setSubTitle(_('Verify backout revision and ensure your working '
+                           'directory is clean.'))
+        self.setLayout(QVBoxLayout())
 
-        self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
-                                           'where possible'))
-        self.autoresolve_chk.setChecked(
+        repo = self.repo
+        try:
+            bctx = repo[self.wizard().backoutrev]
+            pctx = repo['.']
+        except error.RepoLookupError:
+            qtlib.InfoMsgBox(_('Unable to backout'),
+                             _('Backout revision not found'))
+            QTimer.singleShot(0, self.wizard().close)
+
+        if pctx == bctx:
+            lbl = _('Backing out a parent revision is a single step operation')
+            self.layout().addWidget(QLabel(u'<b>%s</b>' % lbl))
+            self.wizard().parentbackout = True
+
+        op1, op2 = repo.dirstate.parents()
+        a = repo.changelog.ancestor(op1, bctx.node())
+        if a != bctx.node():
+            qtlib.InfoMsgBox(_('Unable to backout'),
+                             _('Cannot backout change on a different branch'))
+            QTimer.singleShot(0, self.wizard().close)
+
+        ## backout revision
+        style = csinfo.panelstyle(contents=csinfo.PANEL_DEFAULT)
+        create = csinfo.factory(repo, None, style, withupdate=True)
+        sep = qtlib.LabeledSeparator(_('Backout revision'))
+        self.layout().addWidget(sep)
+        backoutCsInfo = create(bctx.rev())
+        self.layout().addWidget(backoutCsInfo)
+
+        ## current revision
+        contents = ('ishead',) + csinfo.PANEL_DEFAULT
+        style = csinfo.panelstyle(contents=contents)
+        def markup_func(widget, item, value):
+            if item == 'ishead' and value is False:
+                text = _('Not a head, backout will create a new head!')
+                return qtlib.markup(text, fg='red', weight='bold')
+            raise csinfo.UnknownItem(item)
+        custom = csinfo.custom(markup=markup_func)
+        create = csinfo.factory(repo, custom, style, withupdate=True)
+
+        sep = qtlib.LabeledSeparator(_('Current local revision'))
+        self.layout().addWidget(sep)
+        localCsInfo = create(pctx.rev())
+        self.layout().addWidget(localCsInfo)
+        self.localCsInfo = localCsInfo
+
+        ## working directory status
+        sep = qtlib.LabeledSeparator(_('Working directory status'))
+        self.layout().addWidget(sep)
+
+        self.groups = qtlib.WidgetGroups()
+
+        wdbox = QHBoxLayout()
+        self.layout().addLayout(wdbox)
+        self.wd_status = qtlib.StatusLabel()
+        self.wd_status.set_status(_('Checking...'))
+        wdbox.addWidget(self.wd_status)
+        wd_prog = QProgressBar()
+        wd_prog.setMaximum(0)
+        wd_prog.setTextVisible(False)
+        self.groups.add(wd_prog, 'prog')
+        wdbox.addWidget(wd_prog, 1)
+
+        text = _('Before backout, you must <a href="commit"><b>commit</b></a>, '
+                 '<a href="shelve"><b>shelve</b></a> to patch, '
+                 'or <a href="discard"><b>discard</b></a> changes.')
+        wd_text = QLabel(text)
+        wd_text.setWordWrap(True)
+        wd_text.linkActivated.connect(self.onLinkActivated)
+        self.wd_text = wd_text
+        self.groups.add(wd_text, 'dirty')
+        self.layout().addWidget(wd_text)
+
+        ## auto-resolve
+        autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                      'where possible'))
+        autoresolve_chk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
-        obox.addWidget(self.autoresolve_chk)
+        self.registerField('autoresolve', autoresolve_chk)
+        self.layout().addWidget(autoresolve_chk)
+        self.autoresolve_chk = autoresolve_chk
+        self.groups.set_visible(False, 'dirty')
 
-        if repo[revhex] == repo.parents()[0]:
-            # backing out the working parent is a one-step process
-            self.msgTextEdit.setEnabled(True)
-            self.mergeChk.setVisible(False)
-            self.autoresolve_chk.setVisible(False)
-            self.backoutParent = True
+    def isComplete(self):
+        'should Next button be sensitive?'
+        return self.clean
+
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        pctx = self.repo['.']
+        self.localCsInfo.update(pctx)
+        self.wizard().localrev = str(pctx.rev())
+
+    def canExit(self):
+        'can backout tool be closed?'
+        if self.th is not None and self.th.isRunning():
+            self.th.cancel()
+            self.th.wait()
+        return True
+
+    def currentPage(self):
+        self.refresh()
+
+    def refresh(self):
+        if self.th is None:
+            self.th = CheckThread(self.repo, self)
+            self.th.finished.connect(self.threadFinished)
+        if self.th.isRunning():
+            return
+        self.groups.set_visible(True, 'prog')
+        self.th.start()
+
+    def threadFinished(self):
+        self.groups.set_visible(False, 'prog')
+        if self.th.canceled:
+            return
+        dirty, parents = self.th.results
+        self.clean = not dirty
+        if dirty:
+            self.groups.set_visible(True, 'dirty')
+            self.wd_status.set_status(_('<b>Uncommitted local changes '
+                                        'are detected</b>'), 'thg-warning')
         else:
-            self.backoutParent = False
+            self.groups.set_visible(False, 'dirty')
+            self.wd_status.set_status(_('Clean'), True)
+        self.completeChanged.emit()
+
+    @pyqtSlot(QString)
+    def onLinkActivated(self, cmd):
+        cmd = hglib.fromunicode(cmd)
+        repo = self.repo
+        if cmd == 'commit':
+            dlg = commit.CommitDialog([], dict(root=repo.root), self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.refresh()
+        elif cmd == 'shelve':
+            from tortoisehg.hgqt import shelve
+            dlg = shelve.ShelveDialog(repo, self.wizard())
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.refresh()
+        elif cmd.startswith('discard'):
+            if cmd != 'discard:noconfirm':
+                labels = [(QMessageBox.Yes, _('&Discard')),
+                          (QMessageBox.No, _('Cancel'))]
+                if not qtlib.QuestionMsgBox(_('Confirm Discard'),
+                         _('Discard outstanding changes to working directory?'),
+                         labels=labels, parent=self):
+                    return
+            def finished(ret):
+                repo.decrementBusyCount()
+                self.refresh()
+            cmdline = ['update', '--clean', '--repository', repo.root,
+                       '--rev', '.']
+            self.runner = cmdui.Runner(True, self)
+            self.runner.commandFinished.connect(finished)
+            repo.incrementBusyCount()
+            self.runner.run(cmdline)
+        elif cmd == 'view':
+            dlg = status.StatusDialog([], {}, repo.root, self)
+            dlg.exec_()
+            self.refresh()
+        else:
+            raise 'unknown command: %s' % cmd
+
+
+class BackoutPage(BasePage):
+    def __init__(self, repo, parent):
+        super(BackoutPage, self).__init__(repo, parent)
+        self.backoutcomplete = False
+
+        self.setTitle(_('Backing out, then merging...'))
+        self.setSubTitle(_('All conflicting files will be marked unresolved.'))
+        self.setLayout(QVBoxLayout())
+
+        self.cmd = cmdui.Widget(True, False, self)
+        self.cmd.commandFinished.connect(self.onCommandFinished)
+        self.cmd.setShowOutput(True)
+        self.layout().addWidget(self.cmd)
 
         self.reslabel = QLabel()
-        self.reslabel.linkActivated.connect(self.link_activated)
-        box.addWidget(self.reslabel)
+        self.reslabel.linkActivated.connect(self.onLinkActivated)
+        self.reslabel.setWordWrap(True)
+        self.layout().addWidget(self.reslabel)
 
-        ## command widget
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandStarted.connect(self.command_started)
-        self.cmd.commandFinished.connect(self.command_finished)
-        self.cmd.commandCanceling.connect(self.command_canceling)
-        box.addWidget(self.cmd, 1)
+        self.autonext = QCheckBox(_('Automatically advance to next page '
+                                    'when backout and merge are complete.'))
+        checked = QSettings().value('backout/autoadvance', False).toBool()
+        self.autonext.setChecked(checked)
+        self.autonext.toggled.connect(self.tryAutoAdvance)
+        self.layout().addWidget(self.autonext)
 
-        ## bottom buttons
-        buttons = QDialogButtonBox()
-        self.cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancelBtn.clicked.connect(self.cancel_clicked)
-        self.closeBtn = buttons.addButton(QDialogButtonBox.Close)
-        self.closeBtn.clicked.connect(self.reject)
-        self.backoutBtn = buttons.addButton(_('&Backout'),
-                                             QDialogButtonBox.ActionRole)
-        self.backoutBtn.clicked.connect(self.backout)
-        self.detailBtn = buttons.addButton(_('Detail'),
-                                            QDialogButtonBox.ResetRole)
-        self.detailBtn.setAutoDefault(False)
-        self.detailBtn.setCheckable(True)
-        self.detailBtn.toggled.connect(self.detail_toggled)
-        box.addWidget(buttons)
-
-        # dialog setting
-        self.setLayout(box)
-        self.setMinimumWidth(480)
-        self.setMaximumHeight(800)
-        self.resize(0, 340)
-        self.setWindowTitle(_("Backout '%s' - %s") % (revhex,
-                            self.repo.displayname))
-
-        # prepare to show
-        self.cmd.setHidden(True)
-        self.cancelBtn.setHidden(True)
-        self.detailBtn.setHidden(True)
-        self.msgTextEdit.setFocus()
-        self.msgTextEdit.moveCursorToEnd()
-
-    ### Private Methods ###
-
-    def merge_toggled(self, checked):
-        self.msgTextEdit.setEnabled(checked)
-
-    def eng_toggled(self, checked):
-        msg = self.msgTextEdit.text()
-        origmsg = (checked and self.msgset['str'] or self.msgset['id'])
-        if msg != origmsg:
-            if not qtlib.QuestionMsgBox(_('Confirm Discard Message'),
-                         _('Discard current backout message?'), parent=self):
-                self.engChk.blockSignals(True)
-                self.engChk.setChecked(not checked)
-                self.engChk.blockSignals(False)
-                return
-        newmsg = (checked and self.msgset['id'] or self.msgset['str'])
-        self.msgTextEdit.setText(newmsg)
-
-    def backout(self):
-        # prepare command line
-        revhex = self.targetinfo.get_data('revid')
-        cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
-        cmdline += ['--tool=internal:' +
-                    (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
-        if self.backoutParent:
-            msg = self.msgTextEdit.text()
-            cmdline += ['--message='+hglib.fromunicode(msg)]
-            commandlines = [cmdline]
-            pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
-            if pushafter:
-                cmd = ['push', '--repository', self.repo.root, pushafter]
-                commandlines.append(cmd)
-        elif self.mergeChk.isChecked():
-            cmdline += ['--merge']
-            msg = self.msgTextEdit.text()
-            cmdline += ['--message', hglib.fromunicode(msg)]
-            commandlines = [cmdline]
-
-        # start backing out
-        self.cmdline = cmdline
+    def currentPage(self):
+        if self.wizard().parentbackout:
+            self.wizard().next()
+            return
+        cmdline = ['--repository', self.repo.root, 'backout']
+        tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
+        cmdline += ['--tool=internal:' + tool]
+        cmdline += ['--rev', str(self.wizard().backoutrev)]
         self.repo.incrementBusyCount()
-        self.cmd.run(*commandlines)
+        self.cmd.core.clearOutput()
+        self.cmd.run(cmdline)
 
-    def commit(self):
-        cmdline = ['commit', '--repository', self.repo.root]
-        msg = self.msgTextEdit.text()
-        cmdline += ['--message='+hglib.fromunicode(msg)]
-        self.cmdline = cmdline
+    def isComplete(self):
+        'should Next button be sensitive?'
+        if not self.backoutcomplete:
+            return False
+        count = 0
+        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if status == 'u':
+                count += 1
+        if count:
+            # if autoresolve is enabled, we know these were real conflicts
+            self.reslabel.setText(_('%d files have <b>merge conflicts</b> '
+                                    'that must be <a href="resolve">'
+                                    '<b>resolved</b></a>') % count)
+            return False
+        else:
+            self.reslabel.setText(_('No merge conflicts, ready to commit'))
+            return True
+
+    def tryAutoAdvance(self, checked):
+        if checked and self.isComplete():
+            self.wizard().next()
+
+    def cleanupPage(self):
+        QSettings().setValue('backout/autoadvance', self.autonext.isChecked())
+
+    def onCommandFinished(self, ret):
+        self.repo.decrementBusyCount()
+        if ret in (0, 1):
+            self.backoutcomplete = True
+            if self.autonext.isChecked():
+                self.tryAutoAdvance(True)
+            self.completeChanged.emit()
+
+    @pyqtSlot(QString)
+    def onLinkActivated(self, cmd):
+        if cmd == 'resolve':
+            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            if self.autonext.isChecked():
+                self.tryAutoAdvance(True)
+            self.completeChanged.emit()
+
+
+class CommitPage(BasePage):
+
+    def __init__(self, repo, parent):
+        super(CommitPage, self).__init__(repo, parent)
+        self.commitComplete = False
+
+        self.setTitle(_('Commit backout and merge results'))
+        self.setLayout(QVBoxLayout())
+        self.setCommitPage(True)
+
+        # csinfo
+        def label_func(widget, item, ctx):
+            if item == 'rev':
+                return _('Revision:')
+            elif item == 'parents':
+                return _('Parents')
+            raise csinfo.UnknownItem()
+        def data_func(widget, item, ctx):
+            if item == 'rev':
+                return _('Working Directory'), str(ctx)
+            elif item == 'parents':
+                parents = []
+                cbranch = ctx.branch()
+                for pctx in ctx.parents():
+                    branch = None
+                    if hasattr(pctx, 'branch') and pctx.branch() != cbranch:
+                        branch = pctx.branch()
+                    parents.append((str(pctx.rev()), str(pctx), branch, pctx))
+                return parents
+            raise csinfo.UnknownItem()
+        def markup_func(widget, item, value):
+            if item == 'rev':
+                text, rev = value
+                if self.wizard() and self.wizard().parentbackout:
+                    return '%s (%s)' % (text, rev)
+                else:
+                    return '<a href="view">%s</a> (%s)' % (text, rev)
+            elif item == 'parents':
+                def branch_markup(branch):
+                    opts = dict(fg='black', bg='#aaffaa')
+                    return qtlib.markup(' %s ' % branch, **opts)
+                csets = []
+                for rnum, rid, branch, pctx in value:
+                    line = '%s (%s)' % (rnum, rid)
+                    if branch:
+                        line = '%s %s' % (line, branch_markup(branch))
+                    msg = widget.info.get_data('summary', widget,
+                                               pctx, widget.custom)
+                    if msg:
+                        line = '%s %s' % (line, msg)
+                    csets.append(line)
+                return csets
+            raise csinfo.UnknownItem()
+        custom = csinfo.custom(label=label_func, data=data_func,
+                               markup=markup_func)
+        contents = ('rev', 'user', 'dateage', 'branch', 'parents')
+        style = csinfo.panelstyle(contents=contents, margin=6)
+
+        # merged files
+        rev_sep = qtlib.LabeledSeparator(_('Working Directory (merged)'))
+        self.layout().addWidget(rev_sep)
+        bkCsInfo = csinfo.create(repo, None, style, custom=custom,
+                                 withupdate=True)
+        bkCsInfo.linkActivated.connect(self.onLinkActivated)
+        self.layout().addWidget(bkCsInfo)
+
+        # commit message area
+        msg_sep = qtlib.LabeledSeparator(_('Commit message'))
+        self.layout().addWidget(msg_sep)
+        msgEntry = commit.MessageEntry(self)
+        msgEntry.installEventFilter(qscilib.KeyPressInterceptor(self))
+        msgEntry.refresh(repo)
+        msgEntry.loadSettings(QSettings(), 'backout/message')
+
+        msgEntry.textChanged.connect(self.completeChanged)
+        self.layout().addWidget(msgEntry)
+        self.msgEntry = msgEntry
+
+        self.cmd = cmdui.Widget(True, False, self)
+        self.cmd.commandFinished.connect(self.onCommandFinished)
+        self.cmd.setShowOutput(False)
+        self.layout().addWidget(self.cmd)
+
+        def tryperform():
+            if self.isComplete():
+                self.wizard().next()
+        actionEnter = QAction('alt-enter', self)
+        actionEnter.setShortcuts([Qt.CTRL+Qt.Key_Return, Qt.CTRL+Qt.Key_Enter])
+        actionEnter.triggered.connect(tryperform)
+        self.addAction(actionEnter)
+
+        self.skiplast = QCheckBox(_('Skip final confirmation page, '
+                                    'close after commit.'))
+        checked = QSettings().value('backout/skiplast', False).toBool()
+        self.skiplast.setChecked(checked)
+        self.layout().addWidget(self.skiplast)
+
+    def refresh(self):
+        pass
+
+    def cleanupPage(self):
+        s = QSettings()
+        s.setValue('backout/skiplast', self.skiplast.isChecked())
+        self.msgEntry.saveSettings(s, 'backout/message')
+
+    def currentPage(self):
+        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        msgset = i18n.keepgettext()._('Backed out changeset: ')
+        msg = engmsg and msgset['id'] or msgset['str']
+        self.msgEntry.setText(msg + str(self.repo[self.wizard().backoutrev]))
+        self.msgEntry.moveCursorToEnd()
+
+    @pyqtSlot(QString)
+    def onLinkActivated(self, cmd):
+        if cmd == 'view':
+            dlg = status.StatusDialog([], {}, self.repo.root, self)
+            dlg.exec_()
+            self.refresh()
+
+    def isComplete(self):
+        return len(self.msgEntry.text()) > 0
+
+    def validatePage(self):
+        if self.commitComplete:
+            # commit succeeded, repositoryChanged() called wizard().next()
+            if self.skiplast.isChecked():
+                self.wizard().close()
+            return True
+        if self.cmd.core.running():
+            return False
+
+        if self.wizard().parentbackout:
+            self.setTitle(_('Backing out and committing...'))
+            self.setSubTitle(_('Please wait while making backout.'))
+            message = hglib.fromunicode(self.msgEntry.text())
+            cmdline = ['backout', '--verbose', '--message', message, '--rev',
+                       str(self.wizard().backoutrev),
+                       '--repository', self.repo.root]
+        else:
+            self.setTitle(_('Committing...'))
+            self.setSubTitle(_('Please wait while committing merged files.'))
+            message = hglib.fromunicode(self.msgEntry.text())
+            cmdline = ['commit', '--verbose', '--message', message,
+                       '--repository', self.repo.root]
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
             cmd = ['push', '--repository', self.repo.root, pushafter]
             commandlines.append(cmd)
+
         self.repo.incrementBusyCount()
+        self.cmd.setShowOutput(True)
         self.cmd.run(*commandlines)
+        return False
 
-    ### Signal Handlers ###
-
-    def cancel_clicked(self):
-        self.cmd.cancel()
-
-    def detail_toggled(self, checked):
-        self.cmd.setShowOutput(checked)
-
-    def command_started(self):
-        self.cmd.setShown(True)
-        self.mergeChk.setVisible(False)
-        self.closeBtn.setHidden(True)
-        self.cancelBtn.setShown(True)
-        self.detailBtn.setShown(True)
-        self.backoutBtn.setEnabled(False)
-
-    def command_canceling(self):
-        self.cancelBtn.setDisabled(True)
-
-    def command_finished(self, ret):
+    def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
-        self.cancelBtn.setHidden(True)
+        if ret == 0:
+            self.commitComplete = True
+            self.wizard().next()
 
-        # If the action wasn't successful, display the output and we're done
-        if ret not in (0, 1):
-            self.detailBtn.setChecked(True)
-            self.closeBtn.setShown(True)
-            self.closeBtn.setAutoDefault(True)
-            self.closeBtn.setFocus()
-        else:
-            finished = True
-            #If we backed out our parent, there is no second commit step
-            if self.cmdline[0] == 'backout' and not self.backoutParent:
-                 finished = False
-                 self.msgTextEdit.setEnabled(True)
-                 self.backoutBtn.setEnabled(True)
-                 self.backoutBtn.setText(_('Commit', 'action button'))
-                 self.backoutBtn.clicked.disconnect(self.backout)
-                 self.backoutBtn.clicked.connect(self.commit)
-                 self.checkResolve()
 
-            if finished:
-                if not self.cmd.outputShown():
-                    self.accept()
-                else:
-                    self.closeBtn.clicked.disconnect(self.reject)
-                    self.closeBtn.clicked.connect(self.accept)
-                    self.closeBtn.setHidden(False)
+class ResultPage(BasePage):
+    def __init__(self, repo, parent):
+        super(ResultPage, self).__init__(repo, parent)
+        self.setTitle(_('Finished'))
+        self.setFinalPage(True)
 
-    def checkResolve(self):
+        self.setLayout(QVBoxLayout())
+        sep = qtlib.LabeledSeparator(_('Backout changeset'))
+        self.layout().addWidget(sep)
+        bkCsInfo = csinfo.create(self.repo, 'tip', withupdate=True)
+        self.layout().addWidget(bkCsInfo)
+        self.bkCsInfo = bkCsInfo
+        self.layout().addStretch(1)
+
+    def currentPage(self):
+        self.bkCsInfo.update(self.repo['tip'])
+        self.wizard().setOption(QWizard.NoCancelButton, True)
+
+
+class CheckThread(QThread):
+    def __init__(self, repo, parent):
+        QThread.__init__(self, parent)
+        self.repo = hg.repository(repo.ui, repo.root)
+        self.results = (False, 1)
+        self.canceled = False
+
+    def run(self):
+        self.repo.dirstate.invalidate()
+        unresolved = False
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if self.canceled:
+                return
             if status == 'u':
-                txt = _('Backout generated merge <b>conflicts</b> that must '
-                        'be <a href="resolve"><b>resolved</b></a>')
-                self.backoutBtn.setEnabled(False)
+                unresolved = True
                 break
-        else:
-            self.backoutBtn.setEnabled(True)
-            txt = _('You may commit the backed out changes after '
-                    '<a href="status"><b>verifying</b></a> them')
-        self.reslabel.setText(txt)
+        wctx = self.repo[None]
+        dirty = bool(wctx.dirty()) or unresolved
+        self.results = (dirty, len(wctx.parents()))
 
-    @pyqtSlot(QString)
-    def link_activated(self, cmd):
-        if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.checkResolve()
-        elif cmd == 'status':
-            dlg = status.StatusDialog([], {}, self.repo.root, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.checkResolve()
+    def cancel(self):
+        self.canceled = True
 
-    def accept(self):
-        self.msgTextEdit.saveSettings(QSettings(), 'backout/message')
-        super(BackoutDialog, self).accept()
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
-    kargs = {'opts': opts}
     if opts.get('rev'):
-        kargs['rev'] = opts.get('rev')
+        rev = opts.get('rev')
     elif len(pats) == 1:
-        kargs['rev'] = pats[0]
-    return BackoutDialog(repo, **kargs)
+        rev = pats[0]
+    return BackoutDialog(rev, repo, None)
