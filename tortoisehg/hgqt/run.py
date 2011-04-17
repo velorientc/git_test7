@@ -777,7 +777,7 @@ def help_(ui, name=None, with_version=False, **opts):
         # description
         doc = i[0].__doc__
         if not doc:
-            doc = _("(No help text available)")
+            doc = _("(no help text available)")
         if ui.quiet:
             doc = doc.splitlines(0)[0]
         ui.write("\n%s\n" % doc.rstrip())
@@ -842,7 +842,7 @@ def help_(ui, name=None, with_version=False, **opts):
 
         # description
         if not doc:
-            doc = _("(No help text available)")
+            doc = _("(no help text available)")
         if hasattr(doc, '__call__'):
             doc = doc()
 
