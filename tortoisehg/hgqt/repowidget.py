@@ -985,7 +985,7 @@ class RepoWidget(QWidget):
         fixed   = lambda ap, wd, tags: not (ap or wd)
         applied = lambda ap, wd, tags: ap
         qgoto   = lambda ap, wd, tags: ('qparent' in tags) or \
-                                       (ap and ('qtip' not in tags))
+                                       (ap)
 
         exs = self.repo.extensions()
 
@@ -1047,7 +1047,7 @@ class RepoWidget(QWidget):
 
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modify history'))
-            entry(submenu, 'mq', qgoto, _('QGoto'), 'hg-qgoto',
+            entry(submenu, 'mq', qgoto, _('Unapply patch (QGoto parent)'), 'hg-qgoto',
                   self.qgotoRevision)
             entry(submenu, 'mq', fixed, _('Import to MQ'), 'qimport',
                   self.qimportRevision)
@@ -1189,7 +1189,7 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         acts = []
         for name, cb, icon in (
-            (_('QGoto'), self.qgotoRevision, 'hg-qgoto'),
+            (_('Apply patch (QGoto)'), self.qgotoRevision, 'hg-qgoto'),
             (_('QPush --move'), self.qpushMoveRevision, 'hg-qpush'),
             (_('Fold patches...'), qfoldact, 'hg-qfold'),
             (_('Delete patches...'), qdeleteact, 'hg-qdelete'),
@@ -1399,14 +1399,30 @@ class RepoWidget(QWidget):
 
     def qgotoRevision(self):
         """Make REV the top applied patch"""
+        def qpopAll(repo):
+            cmdline = ['qpop', '--all', '--repository', repo.root]
+            self.runCommand(cmdline
+            )
         ctx = self.repo.changectx(self.rev)
-        if 'qparent' in ctx.tags():
-            cmdline = ['qpop', '--all', '--repository', self.repo.root]
-            self.runCommand(cmdline)
-        else:
+        if 'qparent'in ctx.tags():
+            return qpopAll(self.repo)
+        try:
+            applied = ctx.thgmqappliedpatch()
+            mqpatch = True
+        except:
+            applied = True
+            mqpatch = False
+        
+        if mqpatch and applied and 'qparent' in ctx.p1().tags():
+            return qpopAll(self.repo)
+        
+        if not applied:
             patchname = self.repo.changectx(self.rev).thgmqpatchname()
-            self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-            self.mqDemand.forward('qgotoRevision', patchname)
+        else:
+            thgp1 = self.repo.changectx(self.repo.changectx(self.rev).p1().node())
+            patchname = thgp1.thgmqpatchname()
+        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+        self.mqDemand.forward('qgotoRevision', patchname)
 
     def qpushMoveRevision(self):
         """Make REV the top applied patch"""
