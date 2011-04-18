@@ -188,16 +188,16 @@ class Workbench(QMainWindow):
             if toolbar:
                 getattr(self, '%stbar' % toolbar).addSeparator()
 
-        newaction(_("&Open Repository..."), self.openRepository,
-                  shortcut='Open', menu='file')
-        newaction(_("&Close Repository"), self.closeRepository,
-                  shortcut='Close', enabled='repoopen', menu='file')
-        newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
         newaction(_("Clone Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
+        newseparator(menu='file')
+        newaction(_("&Open Repository..."), self.openRepository,
+                  shortcut='Open', menu='file')
+        newaction(_("&Close Repository"), self.closeRepository,
+                  shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
