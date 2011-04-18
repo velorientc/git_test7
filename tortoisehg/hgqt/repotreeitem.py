@@ -255,34 +255,17 @@ class RepoGroupItem(RepoTreeItem):
         return False
 
 
-class AllRepoGroupItem(RepoTreeItem):
+class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, model, parent=None):
         RepoTreeItem.__init__(self, model, parent)
         self.name = _('default')
 
-    def data(self, column, role):
-        if role == Qt.DecorationRole:
-            if column == 0:
-                s = QApplication.style()
-                ico = s.standardIcon(QStyle.SP_DirIcon)
-                return QVariant(ico)
-            return QVariant()
-        if column == 0:
-            return QVariant(self.name)
-        return QVariant()
-
-    def setData(self, column, value):
-        return False
-
     def menulist(self):
-        return ['add', 'newGroup']
-
-    def flags(self):
-        return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-            | Qt.ItemIsDragEnabled)
-
-    def dump(self, xw):
-        RepoTreeItem.dump(self, xw)
+        return ['openAll', 'add', None, 'newGroup', None, 'rename']
 
     def undump(self, xr):
+        a = xr.attributes()
+        name = a.value('', 'name').toString()
+        if name:
+            self.name = name
         RepoTreeItem.undump(self, xr)
