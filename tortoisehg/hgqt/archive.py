@@ -235,10 +235,10 @@ class ArchiveDialog(QDialog):
                     'label': _('Gzip tar archives')}
         elif self.uzipradio.isChecked():
             return {'type': 'uzip', 'ext': '.zip',
-                    'label': ('Uncompressed zip archives')}
+                    'label': _('Zip archives')}
         elif self.zipradio.isChecked():
             return {'type': 'zip', 'ext': '.zip',
-                    'label': _('Compressed zip archives')}
+                    'label': _('Zip archives')}
         return {'type': 'files', 'ext': '', 'label': _('Directory of files')}
 
     def update_path(self):
