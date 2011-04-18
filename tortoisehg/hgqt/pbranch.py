@@ -45,11 +45,11 @@ class PatchBranchWidget(QWidget):
         repo.workingBranchChanged.connect(self.workingBranchChanged)
 
         # Build child widgets
-        
+
         def BuildChildWidgets():
             vbox = QVBoxLayout()
             vbox.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(vbox)        
+            self.setLayout(vbox)
             vbox.addWidget(Toolbar(), 1)
             vbox.addWidget(BelowToolbar(), 1)
 
@@ -58,39 +58,39 @@ class PatchBranchWidget(QWidget):
             tb.setEnabled(True)
             tb.setObjectName("toolBar_patchbranch")
             tb.setFloatable(False)
-    
+
             self.actionPMerge = a = QWidgetAction(self)
             a.setIcon(geticon("hg-merge"))
             a.setToolTip(_('Merge all pending dependencies'))
             tb.addAction(self.actionPMerge)
             self.actionPMerge.triggered.connect(self.pmerge_clicked)
-    
+
             self.actionBackport = a = QWidgetAction(self)
             a.setIcon(geticon("go-previous"))
             a.setToolTip(_('Backout current patch branch'))
             #tb.addAction(self.actionBackport)
             #self.actionBackport.triggered.connect(self.pbackout_clicked)
-    
+
             self.actionReapply = a = QWidgetAction(self)
             a.setIcon(geticon("go-next"))
             a.setToolTip(_('Backport part of a changeset to a dependency'))
             #tb.addAction(self.actionReapply)
             #self.actionReapply.triggered.connect(self.reapply_clicked)
-    
+
             self.actionPNew = a = QWidgetAction(self)
             a.setIcon(geticon("fileadd")) #STOCK_NEW
             a.setToolTip(_('Start a new patch branch'))
             tb.addAction(self.actionPNew)
             self.actionPNew.triggered.connect(self.pnew_clicked)
-    
+
             self.actionEditPGraph = a = QWidgetAction(self)
             a.setIcon(geticon("edit-file")) #STOCK_EDIT
             a.setToolTip(_('Edit patch dependency graph'))
             tb.addAction(self.actionEditPGraph)
             self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
-            
+
             return tb
-        
+
         def BelowToolbar():
             w = QSplitter(self)
             w.addWidget(PatchList())
@@ -122,7 +122,7 @@ class PatchBranchWidget(QWidget):
             self.patchDiffMessage = QLabel()
             self.patchDiffMessage.setAlignment(Qt.AlignCenter)
             return self.patchDiffMessage
-        
+
         def PatchDiffDetails():
             # pdiff view of selected patc
             self.patchdiff = revdetails.RevDetailsWidget(self.repo)
@@ -316,11 +316,11 @@ class PatchBranchWidget(QWidget):
             return mgr.patchdesc(patch_name)
         except:
             return None
-        
+
     def pdiff(self, patch_name):
         """
         [pbranch] Execute 'pdiff --tips' command.
-        
+
         :param patch_name: Name of patch-branch
         :retv: list of lines of generated patch
         """
@@ -400,7 +400,7 @@ class PatchBranchWidget(QWidget):
         col = model._columns.index('Name')
         patchIndex = model.createIndex(index.row(), col)
         return str(model.data(patchIndex).toString())
-    
+
     def updatePatchCache(self, patchname):
         # TODO: Parameters should include rev, as one patch may have several heads
         # rev should be appended to filename and used by pdiff
@@ -430,7 +430,7 @@ class PatchBranchWidget(QWidget):
                 pf.close()
 
         return patchfile
-        
+
 
     def update_sensitivity(self):
         """ Update the sensitivity of entire UI """
@@ -480,7 +480,7 @@ class PatchBranchWidget(QWidget):
             menu.exec_(pos)
 
     # Signal handlers
-    
+
     def patchBranchSelected(self, index):
         patchname = self.patchFromIndex(index)
         if self.is_patch(patchname):
