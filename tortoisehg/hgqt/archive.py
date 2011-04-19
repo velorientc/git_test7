@@ -134,11 +134,11 @@ class ArchiveDialog(QDialog):
         tags.reverse()
         for t in tags:
             self.rev_combo.addItem(t)
-        self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
         if self.initrev:
             text = str(self.initrev)
             if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
                 self.rev_combo.insertItems(0, [text])
+        self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
         self.rev_combo.setCurrentIndex(0)
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.dest_edit.setText(self.repo.root)
@@ -235,10 +235,10 @@ class ArchiveDialog(QDialog):
                     'label': _('Gzip tar archives')}
         elif self.uzipradio.isChecked():
             return {'type': 'uzip', 'ext': '.zip',
-                    'label': ('Uncompressed zip archives')}
+                    'label': _('Zip archives')}
         elif self.zipradio.isChecked():
             return {'type': 'zip', 'ext': '.zip',
-                    'label': _('Compressed zip archives')}
+                    'label': _('Zip archives')}
         return {'type': 'files', 'ext': '', 'label': _('Directory of files')}
 
     def update_path(self):
