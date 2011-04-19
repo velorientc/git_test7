@@ -398,6 +398,12 @@ class PatchBranchWidget(QWidget):
 
     # Signal handlers
 
+    def closeEvent(self, event):
+        self.repo.configChanged.disconnect(self.configChanged)
+        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
+        self.repo.workingBranchChanged.disconnect(self.workingBranchChanged)
+        super(PatchBranchWidget, self).closeEvent(event)
+
     def contextMenuEvent(self, event):
         if self.patchlist.geometry().contains(event.pos()):
             self.show_patch_cmenu(event.globalPos())
