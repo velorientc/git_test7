@@ -190,6 +190,10 @@ class ShelveDialog(QDialog):
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
 
+    def done(self, ret):
+        self.repo.repositoryChanged.disconnect(self.refreshCombos)
+        super(ShelveDialog, self).done(ret)
+
     @pyqtSlot()
     def moveFileRight(self):
         if self.combob.currentIndex() == -1:
