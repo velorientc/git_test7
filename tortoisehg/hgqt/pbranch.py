@@ -7,17 +7,19 @@
 
 import os
 import time
+import errno
 
 from mercurial import extensions, ui, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, update
+from tortoisehg.hgqt import qtlib, cmdui, update, revdetails
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+PATCHCACHEPATH = 'thgpbcache'
 nullvariant = QVariant()
 
 class PatchBranchWidget(QWidget):
@@ -43,60 +45,90 @@ class PatchBranchWidget(QWidget):
         repo.workingBranchChanged.connect(self.workingBranchChanged)
 
         # Build child widgets
+        
+        def BuildChildWidgets():
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(vbox)        
+            vbox.addWidget(Toolbar(), 1)
+            vbox.addWidget(BelowToolbar(), 1)
 
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(vbox)
+        def Toolbar():
+            tb = QToolBar(_("Patch Branch Toolbar"), self)
+            tb.setEnabled(True)
+            tb.setObjectName("toolBar_patchbranch")
+            tb.setFloatable(False)
+    
+            self.actionPMerge = a = QWidgetAction(self)
+            a.setIcon(geticon("hg-merge"))
+            a.setToolTip(_('Merge all pending dependencies'))
+            tb.addAction(self.actionPMerge)
+            self.actionPMerge.triggered.connect(self.pmerge_clicked)
+    
+            self.actionBackport = a = QWidgetAction(self)
+            a.setIcon(geticon("go-previous"))
+            a.setToolTip(_('Backout current patch branch'))
+            #tb.addAction(self.actionBackport)
+            #self.actionBackport.triggered.connect(self.pbackout_clicked)
+    
+            self.actionReapply = a = QWidgetAction(self)
+            a.setIcon(geticon("go-next"))
+            a.setToolTip(_('Backport part of a changeset to a dependency'))
+            #tb.addAction(self.actionReapply)
+            #self.actionReapply.triggered.connect(self.reapply_clicked)
+    
+            self.actionPNew = a = QWidgetAction(self)
+            a.setIcon(geticon("fileadd")) #STOCK_NEW
+            a.setToolTip(_('Start a new patch branch'))
+            tb.addAction(self.actionPNew)
+            self.actionPNew.triggered.connect(self.pnew_clicked)
+    
+            self.actionEditPGraph = a = QWidgetAction(self)
+            a.setIcon(geticon("edit-file")) #STOCK_EDIT
+            a.setToolTip(_('Edit patch dependency graph'))
+            tb.addAction(self.actionEditPGraph)
+            self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
+            
+            return tb
+        
+        def BelowToolbar():
+            w = QSplitter(self)
+            w.addWidget(PatchList())
+            w.addWidget(PatchDiff())
+            return w
 
-        # Toolbar
-        self.toolBar_patchbranch = tb = QToolBar(_("Patch Branch Toolbar"), self)
-        tb.setEnabled(True)
-        tb.setObjectName("toolBar_patchbranch")
-        tb.setFloatable(False)
+        def PatchList():
+            self.patchlistmodel = PatchBranchModel(self.compute_model(),
+                                                   self.repo.changectx('.').branch(),
+                                                   self)
+            self.patchlist = QTableView(self)
+            self.patchlist.setModel(self.patchlistmodel)
+            self.patchlist.setShowGrid(False)
+            self.patchlist.verticalHeader().setDefaultSectionSize(20)
+            self.patchlist.horizontalHeader().setHighlightSections(False)
+            self.patchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.patchlist.clicked.connect(self.patchBranchSelected)
+            return self.patchlist
 
-        self.actionPMerge = a = QWidgetAction(self)
-        a.setIcon(geticon("hg-merge"))
-        a.setToolTip(_('Merge all pending dependencies'))
-        tb.addAction(self.actionPMerge)
-        self.actionPMerge.triggered.connect(self.pmerge_clicked)
+        def PatchDiff():
+            # pdiff view to the right of pgraph
+            self.patchDiffStack = QStackedWidget()
+            self.patchDiffStack.addWidget(PatchDiffMessage())
+            self.patchDiffStack.addWidget(PatchDiffDetails())
+            return self.patchDiffStack
 
-        self.actionBackport = a = QWidgetAction(self)
-        a.setIcon(geticon("go-previous"))
-        a.setToolTip(_('Backout current patch branch'))
-        #tb.addAction(self.actionBackport)
-        #self.actionBackport.triggered.connect(self.pbackout_clicked)
+        def PatchDiffMessage():
+            # message if no patch is selected
+            self.patchDiffMessage = QLabel()
+            self.patchDiffMessage.setAlignment(Qt.AlignCenter)
+            return self.patchDiffMessage
+        
+        def PatchDiffDetails():
+            # pdiff view of selected patc
+            self.patchdiff = revdetails.RevDetailsWidget(self.repo)
+            return self.patchdiff
 
-        self.actionReapply = a = QWidgetAction(self)
-        a.setIcon(geticon("go-next"))
-        a.setToolTip(_('Backport part of a changeset to a dependency'))
-        #tb.addAction(self.actionReapply)
-        #self.actionReapply.triggered.connect(self.reapply_clicked)
-
-       	self.actionPNew = a = QWidgetAction(self)
-        a.setIcon(geticon("fileadd")) #STOCK_NEW
-        a.setToolTip(_('Start a new patch branch'))
-        tb.addAction(self.actionPNew)
-        self.actionPNew.triggered.connect(self.pnew_clicked)
-
-        self.actionEditPGraph = a = QWidgetAction(self)
-        a.setIcon(geticon("edit-file")) #STOCK_EDIT
-        a.setToolTip(_('Edit patch dependency graph'))
-        tb.addAction(self.actionEditPGraph)
-        self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
-
-        vbox.addWidget(self.toolBar_patchbranch, 1)
-
-        # Patch list
-        self.patchlistmodel = PatchBranchModel(self.compute_model(),
-                                               self.repo.changectx('.').branch(),
-                                               self)
-        self.patchlist = QTableView(self)
-        self.patchlist.setModel(self.patchlistmodel)
-        self.patchlist.setShowGrid(False)
-        self.patchlist.verticalHeader().setDefaultSectionSize(20)
-        self.patchlist.horizontalHeader().setHighlightSections(False)
-        self.patchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
-        vbox.addWidget(self.patchlist, 1)
+        BuildChildWidgets()
 
         # Command output
         self.runner = cmdui.Runner(False, self)
@@ -284,6 +316,18 @@ class PatchBranchWidget(QWidget):
             return mgr.patchdesc(patch_name)
         except:
             return None
+        
+    def pdiff(self, patch_name):
+        """
+        [pbranch] Execute 'pdiff --tips' command.
+        
+        :param patch_name: Name of patch-branch
+        :retv: list of lines of generated patch
+        """
+        opts = {}
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        graph = mgr.graphattips()
+        return graph.diff(patch_name, None, opts)
 
     def pnew_ui(self):
         """
@@ -349,6 +393,45 @@ class PatchBranchWidget(QWidget):
 
     ### internal functions ###
 
+    def patchFromIndex(self, index):
+        if not index.isValid():
+            return
+        model = self.patchlistmodel
+        col = model._columns.index('Name')
+        patchIndex = model.createIndex(index.row(), col)
+        return str(model.data(patchIndex).toString())
+    
+    def updatePatchCache(self, patchname):
+        # TODO: Parameters should include rev, as one patch may have several heads
+        # rev should be appended to filename and used by pdiff
+        assert(len(patchname)>0)
+        cachepath = self.repo.join(PATCHCACHEPATH)
+        # TODO: Fix this - it looks ugly
+        try:
+            os.mkdir(cachepath)
+        except OSError, err:
+            if err.errno != errno.EEXIST:
+                raise
+        # TODO: Convert filename if any funny characters are present
+        patchfile = os.path.join(cachepath, patchname)
+        dirstate = self.repo.join('dirstate')
+        try:
+            patch_age = os.path.getmtime(patchfile) - os.path.getmtime(dirstate)
+        except:
+            patch_age = -1
+
+        if patch_age < 0:
+            pf = open(patchfile, 'wb')
+            try:
+                pf.writelines(self.pdiff(patchname))
+            #  except (util.Abort, error.RepoError), e:
+            #      # Do something with str(e)
+            finally:
+                pf.close()
+
+        return patchfile
+        
+
     def update_sensitivity(self):
         """ Update the sensitivity of entire UI """
         in_pbranch = True #TODO
@@ -397,6 +480,16 @@ class PatchBranchWidget(QWidget):
             menu.exec_(pos)
 
     # Signal handlers
+    
+    def patchBranchSelected(self, index):
+        patchname = self.patchFromIndex(index)
+        if self.is_patch(patchname):
+            patchfile = self.updatePatchCache(patchname)
+            self.patchdiff.onRevisionSelected(patchfile)
+            self.patchDiffStack.setCurrentWidget(self.patchdiff)
+        else:
+            self.patchDiffMessage.setText(_('No patch branch selected'))
+            self.patchDiffStack.setCurrentWidget(self.patchDiffMessage)
 
     def closeEvent(self, event):
         self.repo.configChanged.disconnect(self.configChanged)
