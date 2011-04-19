@@ -206,6 +206,7 @@ class QReorderDialog(QDialog):
 
     def closeEvent(self, event):
         self._writesettings()
+        self.repo.repositoryChanged.disconnect(self.refresh)
         super(QReorderDialog, self).closeEvent(event)
 
     def _readsettings(self):
