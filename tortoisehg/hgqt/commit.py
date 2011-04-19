@@ -943,6 +943,13 @@ class CommitDialog(QDialog):
         self.commit.msgte.setFocus()
         QShortcut(QKeySequence.Refresh, self, self.refresh)
 
+    def done(self, ret):
+        self.commit.repo.configChanged.disconnect(self.commit.configChanged)
+        self.commit.repo.repositoryChanged.disconnect(self.commit.repositoryChanged)
+        self.commit.repo.workingBranchChanged.disconnect(self.commit.workingBranchChanged)
+        self.commit.repo.repositoryChanged.disconnect(self.updateUndo)
+        super(CommitDialog, self).done(ret)
+
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
         if link.startswith('subrepo:'):
