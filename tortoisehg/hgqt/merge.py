@@ -68,6 +68,11 @@ class MergeDialog(QWizard):
         page.reject()
         super(MergeDialog, self).reject()
 
+    def done(self, ret):
+        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
+        self.repo.configChanged.disconnect(self.configChanged)
+        super(MergeDialog, self).done(ret)
+
 MAIN_PANE    = 0
 PERFORM_PANE = 1
 
