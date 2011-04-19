@@ -215,6 +215,11 @@ class MQWidget(QWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
+    def closeEvent(self, event):
+        self.repo.configChanged.disconnect(self.onConfigChanged)
+        self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
+        super(PatchBranchWidget, self).closeEvent(event)
+
     def getUserOptions(self, *optionlist):
         out = []
         for opt in optionlist:
