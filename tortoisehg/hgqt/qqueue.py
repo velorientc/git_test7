@@ -321,13 +321,10 @@ class QQueueDialog(QDialog):
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
-    def accept(self):
+    def done(self, ret):
         self._writesettings()
-        QDialog.accept(self)
-
-    def close(self, event):
-        self._writesettings()
-        QDialog.close(self)
+        self.repo.repositoryChanged.disconnect(self.reload)
+        super(QQueueDialog, self).done(ret)
 
     def _readsettings(self):
         s = QSettings()
