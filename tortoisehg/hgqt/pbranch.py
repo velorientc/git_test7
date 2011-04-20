@@ -256,7 +256,10 @@ class PatchBranchWidget(QWidget):
         opts = {}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         graph = mgr.graphforopts(opts)
+        graph_cur = mgr.graphforopts({'tips': True})
         heads = self.repo.branchheads(patch_name)
+        if graph_cur.isinner(patch_name) and not graph.isinner(patch_name):
+            status.append(_('will be closed'))
         if len(heads) > 1:
             status.append(_('needs merge of %i heads\n') % len(heads))
         for dep, through in graph.pendingmerges(patch_name):
