@@ -39,6 +39,8 @@ Under the :guilabel:`Options` expander you will find:
 	To use uncompressed transfer (fast over LAN).
 :guilabel:`Include patch queue`
 	To also clone an MQ patch repository along with the main repository.
+	It is possible to provide a patch queue name that differs from the
+	default one.
 :guilabel:`Use proxy server`
 	To use the proxy server configured in :menuselection:`TortoiseHg... --> Global Settings --> Proxy`.
 	This is enabled only if a proxy is configured.

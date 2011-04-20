@@ -7,7 +7,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, string
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -101,19 +101,28 @@ class CloneDialog(QDialog):
         optbox.setSpacing(6)
         grid.addLayout(optbox, 2, 1, 1, 2)
 
-        def chktext(chklabel, stretch=None):
+        def chktext(chklabel, btnlabel=None, btnslot=None, stretch=None):
             hbox = QHBoxLayout()
             hbox.setSpacing(0)
             optbox.addLayout(hbox)
             chk = QCheckBox(chklabel)
             text = QLineEdit(enabled=False)
-            chk.toggled.connect(
-                 lambda e: self.toggle_enabled(e, text))
             hbox.addWidget(chk)
             hbox.addWidget(text)
             if stretch is not None:
                 hbox.addStretch(stretch)
-            return chk, text
+            if btnlabel:
+                btn = QPushButton(btnlabel)
+                btn.setEnabled(False)
+                btn.setAutoDefault = False
+                btn.clicked.connect(btnslot)
+                hbox.addWidget(btn)
+                chk.toggled.connect(
+                    lambda e: self.toggle_enabled(e, text, target2=btn))
+                return chk, text, btn
+            else:
+                chk.toggled.connect(lambda e: self.toggle_enabled(e, text))
+                return chk, text
 
         self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
                                               stretch=40)
@@ -121,11 +130,13 @@ class CloneDialog(QDialog):
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))
         self.uncomp_chk = QCheckBox(_('Use uncompressed transfer'))
-        self.qclone_chk = QCheckBox(_('Include patch queue'))
         optbox.addWidget(self.noupdate_chk)
         optbox.addWidget(self.pproto_chk)
         optbox.addWidget(self.uncomp_chk)
-        optbox.addWidget(self.qclone_chk)
+
+        self.qclone_chk, self.qclone_txt,self.qclone_btn = \
+                chktext(_('Include patch queue'), btnlabel=_('Browse...'),
+                        btnslot=self.onBrowseQclone)
 
         self.proxy_chk = QCheckBox(_('Use proxy server'))
         optbox.addWidget(self.proxy_chk)
@@ -149,6 +160,7 @@ class CloneDialog(QDialog):
         self.hgcmd_txt.setReadOnly(True)
         grid.addWidget(self.hgcmd_lbl, 3, 0)
         grid.addWidget(self.hgcmd_txt, 3, 1)
+        self.hgcmd_txt.setMinimumWidth(400)
 
         ## command widget
         self.cmd = cmdui.Widget(True, True, self)
@@ -191,6 +203,7 @@ class CloneDialog(QDialog):
         self.pproto_chk.toggled.connect(self.composeCommand)
         self.uncomp_chk.toggled.connect(self.composeCommand)
         self.qclone_chk.toggled.connect(self.composeCommand)
+        self.qclone_txt.textChanged.connect(self.composeCommand)
         self.proxy_chk.toggled.connect(self.composeCommand)
         self.insecure_chk.toggled.connect(self.composeCommand)
         self.remote_chk.toggled.connect(self.composeCommand)
@@ -243,7 +256,13 @@ class CloneDialog(QDialog):
         rev = hglib.fromunicode(self.rev_text.text().trimmed())
         startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
         if self.qclone_chk.isChecked():
+            qclonedir = hglib.fromunicode(self.qclone_txt.text().trimmed())
+            if qclonedir == '':
+                qclonedir = '.hg\patches'
+                self.qclone_txt.setText(qclonedir)
             cmdline = ['qclone']
+            if not qclonedir in ['.hg\patches', '.hg/patches', '']:
+                cmdline += ['--patches', qclonedir]
         else:
             cmdline = ['clone']
         if self.noupdate_chk.isChecked():
@@ -364,10 +383,12 @@ class CloneDialog(QDialog):
 
     ### Signal Handlers ###
 
-    def toggle_enabled(self, checked, target):
+    def toggle_enabled(self, checked, target, target2=None):
         target.setEnabled(checked)
         if checked:
             target.setFocus()
+        if target2:
+            target2.setEnabled(checked)
         self.composeCommand()
 
     def detail_toggled(self, checked):
@@ -391,6 +412,25 @@ class CloneDialog(QDialog):
         if path:
             self.dest_combo.setEditText(QDir.toNativeSeparators(path))
             self.dest_combo.setFocus()
+        self.composeCommand()
+
+    def onBrowseQclone(self):
+        FD = QFileDialog
+        caption = _("Select patch folder")
+        upath = FD.getExistingDirectory(self, caption, \
+            self.qclone_txt.text(), QFileDialog.ShowDirsOnly)
+        if upath:
+            path = hglib.fromunicode(upath).replace('/', os.sep)
+            src = hglib.fromunicode(self.src_combo.currentText())
+            if not path.startswith(src):
+                qtlib.ErrorMsgBox('TortoiseHg QClone',
+                    _('The selected patch folder is not'
+                      ' under the source repository.'),
+                    '<p>src = %s</p><p>path = %s</p>' % (src, path))
+                return
+            path = path.replace(src + os.sep, '')
+            self.qclone_txt.setText(QDir.toNativeSeparators(hglib.tounicode(path)))
+            self.qclone_txt.setFocus()
         self.composeCommand()
 
     def command_started(self):
