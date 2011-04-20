@@ -526,6 +526,8 @@ class PatchBranchWidget(QWidget):
     def edit_pgraph_clicked(self):
         opts = {} # TODO: How to find user ID
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        if not mgr.hasgraphdesc():
+            self.pbranch.writefile(mgr.graphdescpath(), '')
         oldtext = mgr.graphdesc()
         # run editor in the repository root
         olddir = os.getcwd()
