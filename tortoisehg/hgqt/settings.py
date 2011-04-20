@@ -374,7 +374,8 @@ INFO = (
     _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
         _('Close the commit tool after every successful '
           'commit.  Default: False')),
-    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', genEditCombo,
+    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', (genEditCombo,
+         ['default-push', 'default']),
         _('Attempt to push to specified URL or alias after each successful '
           'commit.  Default: No push')),
     _fi(_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
