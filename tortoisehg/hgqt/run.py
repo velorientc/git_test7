@@ -1036,6 +1036,7 @@ table = {
         _('thg strip [-f] [-n] [[-r] REV]')),
     "^rebase": (rebase,
         [('', 'keep', False, _('keep original changesets')),
+         ('', 'keepbranches', False, _('keep original branch names')),
          ('', 'detach', False, _('force detaching of source from its original '
                                 'branch')),
          ('s', 'source', '',
