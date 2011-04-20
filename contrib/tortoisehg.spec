@@ -67,7 +67,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
 ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/%{name}_logo.svg
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop --vendor %{name}
 
 %find_lang %{name}
 
@@ -80,7 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.txt doc/build/html/
 %{_bindir}/thg
 %{python_sitelib}/tortoisehg/
+%if "%{?pythonver}" > "2.4"
 %{python_sitelib}/tortoisehg-*.egg-info
+%endif
 %{_datadir}/pixmaps/tortoisehg/
 %{_datadir}/pixmaps/%{name}_logo.svg
 %{_datadir}/applications/%{name}.desktop

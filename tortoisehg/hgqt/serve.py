@@ -133,11 +133,12 @@ class ServeDialog(QDialog):
         origtimeout = socket.getdefaulttimeout()
         socket.setdefaulttimeout(TIMEOUT)
         try:
-            conn.request('GET', '/')
-            res = conn.getresponse()
-            res.read()
-        except (socket.error, httplib.HTTPException):
-            pass
+            try:
+                conn.request('GET', '/')
+                res = conn.getresponse()
+                res.read()
+            except (socket.error, httplib.HTTPException):
+                pass
         finally:
             socket.setdefaulttimeout(origtimeout)
             conn.close()

@@ -506,11 +506,12 @@ class SyncWidget(QWidget):
         if shell:
             cwd = os.getcwd()
             try:
-                os.chdir(folder)
-                QProcess.startDetached(shell)
-            except EnvironmentError, e:
-                qtlib.InfoMsgBox(_('Repository not found'),
-                                 hglib.tounicode(str(e)))
+                try:
+                    os.chdir(folder)
+                    QProcess.startDetached(shell)
+                except EnvironmentError, e:
+                    qtlib.InfoMsgBox(_('Repository not found'),
+                                     hglib.tounicode(str(e)))
             finally:
                 os.chdir(cwd)
         else:

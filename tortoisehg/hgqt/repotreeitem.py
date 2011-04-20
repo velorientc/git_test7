@@ -210,12 +210,13 @@ class RepoItem(RepoTreeItem):
 
     def startSettings(self, parent):
         try:
-            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                 root=self._root)
-            self.ensureRepoLoaded()
-            dlg.exec_()
-        except error.RepoError:
-            pass
+            try:
+                dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
+                                     root=self._root)
+                self.ensureRepoLoaded()
+                dlg.exec_()
+            except error.RepoError:
+                pass
         finally:
             dlg.deleteLater()
 

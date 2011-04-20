@@ -397,12 +397,13 @@ class _QtRunner(QObject):
     def excepthandler(self):
         'Display exception info; run in main (GUI) thread'
         try:
-            self._showexceptiondialog()
-        except:
-            # make sure to quit mainloop first, so that it never leave
-            # zombie process.
-            self._mainapp.exit(1)
-            self._printexception()
+            try:
+                self._showexceptiondialog()
+            except:
+                # make sure to quit mainloop first, so that it never leave
+                # zombie process.
+                self._mainapp.exit(1)
+                self._printexception()
         finally:
             self.errors = []
 

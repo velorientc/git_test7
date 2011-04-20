@@ -354,12 +354,13 @@ class _AnnotateThread(QThread):
         assert self.currentThread() != qApp.thread()
         self._threadid = self.currentThreadId()
         try:
-            data = []
-            for (fctx, line), _text in self._fctx.annotate(True, True):
-                data.append((fctx, line))
-            self.data = data
-        except KeyboardInterrupt:
-            pass
+            try:
+                data = []
+                for (fctx, line), _text in self._fctx.annotate(True, True):
+                    data.append((fctx, line))
+                self.data = data
+            except KeyboardInterrupt:
+                pass
         finally:
             self._threadid = None
             del self._fctx

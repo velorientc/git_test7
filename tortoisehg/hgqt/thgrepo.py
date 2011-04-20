@@ -614,5 +614,8 @@ def relatedRepositories(repoid):
         for e in repotreemodel.iterRepoItemFromXml(f):
             if e.basenode() == repoid:
                 yield e.rootpath(), e.shortname()
-    finally:
+    except:
+        f.close()
+        raise
+    else:
         f.close()
