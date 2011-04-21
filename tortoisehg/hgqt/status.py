@@ -26,8 +26,6 @@ from PyQt4.QtGui import *
 #  Chunk selection, tri-state checkboxes for commit
 # Maybe, Maybe Not
 #  Investigate folding/nesting of files
-#  Toolbar
-#  double-click visual diffs
 
 COL_PATH = 0
 COL_STATUS = 1
