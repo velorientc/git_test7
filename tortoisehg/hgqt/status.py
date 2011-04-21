@@ -734,29 +734,30 @@ def statusMessage(status, mst, upath):
 
 class StatusType(object):
     preferredOrder = 'MAR!?ICS'
-    def __init__(self, name, icon, desc, uilabel):
+    def __init__(self, name, icon, desc, uilabel, trname):
         self.name = name
         self.icon = icon
         self.desc = desc
         self.uilabel = uilabel
+        self.trname = trname
 
 statusTypes = {
     'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
-                     'status.modified'),
+                     'status.modified', _('modified')),
     'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
-                     'status.added'),
+                     'status.added', _('added')),
     'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
-                     'status.removed'),
+                     'status.removed', _('removed')),
     '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
-                     'status.unknown'),
+                     'status.unknown', _('unknown')),
     '!' : StatusType('deleted', 'menudelete.ico', _('%s is missing!'),
-                     'status.deleted'),
+                     'status.deleted', _('deleted')),
     'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
-                     'status.ignored'),
+                     'status.ignored', _('ignored')),
     'C' : StatusType('clean', '', _('%s is not modified (clean)'),
-                     'status.clean'),
+                     'status.clean', _('clean')),
     'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
-                     'status.subrepo'),
+                     'status.subrepo', _('subrepo')),
 }
 
 
@@ -782,7 +783,7 @@ class StatusFilterButton(QToolButton):
         menu = QMenu(self)
         for c in self._TYPES:
             st = statusTypes[c]
-            a = menu.addAction('%s %s' % (c, st.name))
+            a = menu.addAction('%s %s' % (c, st.trname))
             a.setCheckable(True)
             a.setChecked(c in text)
             a.toggled.connect(self._update)
