@@ -473,7 +473,8 @@ class PatchBranchWidget(QWidget):
         #    append(_('&New'), self.pnew_activated)
         if not is_current:
             append(_('&Goto (update workdir)'), self.goto_activated)
-        #if is_patch:
+        if is_patch:
+            append(_('&Merge'), self.merge_activated)
         #    append(_('&Edit message'), self.edit_message_activated)
         #    append(_('&Rename'), self.rename_activated)
         #    append(_('&Delete'), self.delete_activated)
@@ -569,6 +570,9 @@ class PatchBranchWidget(QWidget):
         dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
+
+    def merge_activated(self):
+        self.pmerge(self.selected_patch())
 
     def delete_activated(self):
         assert False
