@@ -19,7 +19,7 @@ from tortoisehg.util import hglib, settings, paths, i18n
 from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd
 
 try:
-    from tortoisehg.hgtk import bugtraq
+    from tortoisehg.util import bugtraq
     bugtraq.get_issue_plugins_with_names()
 except ImportError:
     bugtraq = None
