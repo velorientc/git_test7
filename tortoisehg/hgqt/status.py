@@ -496,6 +496,7 @@ class WctxModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         nchecked = {}
+        excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
@@ -508,21 +509,21 @@ class WctxModel(QAbstractTableModel):
             return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
         if opts['modified']:
             for m in wctx.modified():
-                nchecked[m] = checked.get(m, True)
+                nchecked[m] = checked.get(m, m not in excludes)
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                nchecked[a] = checked.get(a, True)
+                nchecked[a] = checked.get(a, a not in excludes)
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                nchecked[r] = checked.get(r, True)
+                nchecked[r] = checked.get(r, r not in excludes)
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                nchecked[d] = checked.get(d, False)
+                nchecked[d] = checked.get(d, d not in excludes)
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown():

@@ -188,6 +188,7 @@ class CommitWidget(QWidget):
 
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        self.stwidget.opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
