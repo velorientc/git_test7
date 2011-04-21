@@ -7,12 +7,11 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
-from mercurial import context, merge, commands, subrepo
-from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo, cmdui, fileview
+from mercurial import hg, util, cmdutil, error, context, merge
+
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff, cmdui, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -49,15 +48,13 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
 
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QWidget.__init__(self, parent)
 
-        root = paths.find_root(root)
-        assert(root)
-        self.repo = thgrepo.repository(ui.ui(), path=root)
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
+        self.repo = repo
         self.pats = pats
         self.refthread = None
 
@@ -826,13 +823,13 @@ class StatusFilterButton(QToolButton):
 
 class StatusDialog(QDialog):
     'Standalone status browser'
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(pats, opts, root, self)
+        self.stwidget = StatusWidget(repo, pats, opts, self)
         layout.addWidget(self.stwidget, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -854,11 +851,10 @@ class StatusDialog(QDialog):
         if link.startswith('subrepo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, ui.ui(), root=link[8:])
+            qtrun(commit.run, self.commit.repo.ui, root=link[8:])
         if link.startswith('shelve:'):
-            repo = self.commit.repo
             from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self)
+            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()
@@ -891,4 +887,4 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return StatusDialog(pats, opts)
+    return StatusDialog(repo, pats, opts)

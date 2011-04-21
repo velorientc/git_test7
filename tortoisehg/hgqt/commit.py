@@ -164,33 +164,33 @@ class CommitWidget(QWidget):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, pats, opts, root=None, embedded=False, parent=None):
+    def __init__(self, repo, pats, opts, embedded=False, parent=None):
         QWidget.__init__(self, parent=parent)
 
+        repo.configChanged.connect(self.configChanged)
+        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        self.repo = repo
+
+        opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
+        opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
+        opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
+        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
         self.opts = opts # user, date
-        self.stwidget = status.StatusWidget(pats, opts, root, self)
+
+        self.stwidget = status.StatusWidget(repo, pats, opts, self)
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
-        self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(not embedded, self)
         self.runner.setTitle(_('Commit', 'window title'))
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
-
-        repo.configChanged.connect(self.configChanged)
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
-
-        self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
-        self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
-        self.opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
-        self.opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
-        self.stwidget.opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
@@ -936,7 +936,7 @@ class DetailsDialog(QDialog):
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
 
-    def __init__(self, pats, opts, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-commit'))
@@ -949,7 +949,7 @@ class CommitDialog(QDialog):
         layout.setSpacing(0)
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, opts.get('root'), False, self)
+        commit = CommitWidget(repo, pats, opts, False, self)
         layout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -976,11 +976,11 @@ class CommitDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadSettings(s, 'committool')
-        commit.repo.repositoryChanged.connect(self.updateUndo)
+        repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
-        self.setWindowTitle(_('%s - commit') % commit.repo.displayname)
+        self.setWindowTitle(_('%s - commit') % repo.displayname)
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
@@ -1043,4 +1043,4 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return CommitDialog(pats, opts)
+    return CommitDialog(repo, pats, opts)

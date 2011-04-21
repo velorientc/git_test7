@@ -241,7 +241,7 @@ class RepoWidget(QWidget):
 
     def createCommitWidget(self):
         pats, opts = {}, {}
-        cw = CommitWidget(pats, opts, self.repo.root, True, self)
+        cw = CommitWidget(self.repo, pats, opts, True, self)
 
         b = QPushButton(_('Commit', 'action button'))
         b.setAutoDefault(True)

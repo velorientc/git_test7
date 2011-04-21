@@ -18,7 +18,7 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
+from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib, thgrepo
 from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport
 from tortoisehg.hgqt.qtlib import geticon
 
@@ -560,7 +560,8 @@ class MQWidget(QWidget):
     @pyqtSlot()
     def qinitOrCommit(self):
         if os.path.isdir(self.repo.mq.join('.hg')):
-            dlg = commit.CommitDialog([], dict(root=self.repo.mq.path), self)
+            mqrepo = thgrepo.repository(None, self.repo.mq.path)
+            dlg = commit.CommitDialog(mqrepo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.reload()
@@ -996,6 +997,5 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return MQWidget(repo, None, **opts)

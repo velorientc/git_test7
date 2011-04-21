@@ -232,7 +232,7 @@ class SummaryPage(BasePage):
         cmd = hglib.fromunicode(cmd)
         repo = self.repo
         if cmd == 'commit':
-            dlg = commit.CommitDialog([], dict(root=repo.root), self)
+            dlg = commit.CommitDialog(repo, [], {}, self.wizard())
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()
@@ -260,7 +260,7 @@ class SummaryPage(BasePage):
             repo.incrementBusyCount()
             self.runner.run(cmdline)
         elif cmd == 'view':
-            dlg = status.StatusDialog([], {}, repo.root, self)
+            dlg = status.StatusDialog(repo, [], {}, self)
             dlg.exec_()
             self.refresh()
         else:
@@ -464,7 +464,7 @@ class CommitPage(BasePage):
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
         if cmd == 'view':
-            dlg = status.StatusDialog([], {}, self.repo.root, self)
+            dlg = status.StatusDialog(self.repo, [], {}, self)
             dlg.exec_()
             self.refresh()
 

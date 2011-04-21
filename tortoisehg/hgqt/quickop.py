@@ -70,7 +70,7 @@ class QuickOpDialog(QDialog):
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
-        stwidget = status.StatusWidget(pats, opts, repo.root, self)
+        stwidget = status.StatusWidget(repo, pats, opts, self)
         layout.addWidget(stwidget, 1)
 
         if self.command == 'revert':
