@@ -837,7 +837,7 @@ class StatusDialog(QDialog):
             from tortoisehg.hgqt import commit
             qtrun(commit.run, ui.ui(), root=link[8:])
         if link.startswith('shelve:'):
-            repo = self.commit.repo
+            repo = self.stwidget.repo
             from tortoisehg.hgqt import shelve
             dlg = shelve.ShelveDialog(repo, self)
             dlg.finished.connect(dlg.deleteLater)
