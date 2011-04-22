@@ -653,9 +653,12 @@ class RepoWidget(QWidget):
 
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
-        self.repo.thginvalidate()
-        self.rebuildGraph()
-        self.reloadTaskTab()
+        try:
+            self.repo.thginvalidate()
+            self.rebuildGraph()
+            self.reloadTaskTab()
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
 
     def rebuildGraph(self):
         'Called by repositoryChanged signals, and during reload'
@@ -811,9 +814,12 @@ class RepoWidget(QWidget):
             return False
         s = QSettings()
         if self.isVisible():
-            repoid = str(self.repo[0])
-            s.setValue('repowidget/splitter-'+repoid,
-                       self.repotabs_splitter.saveState())
+            try:
+                repoid = str(self.repo[0])
+                s.setValue('repowidget/splitter-'+repoid,
+                           self.repotabs_splitter.saveState())
+            except EnvironmentError:
+                pass
         self.revDetailsWidget.saveSettings(s)
         self.commitDemand.forward('saveSettings', s, 'workbench')
         self.manifestDemand.forward('saveSettings', s, 'workbench')
