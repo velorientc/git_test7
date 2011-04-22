@@ -21,7 +21,7 @@ import traceback
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import mercurial.ui as _ui
+import mercurial.ui as uimod
 from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.hgqt.i18n import agettext as _
@@ -35,37 +35,44 @@ try:
 except ImportError:
     config_nofork = None
 
-try:
-    import win32con
-    openflags = win32con.CREATE_NO_WINDOW
-except ImportError:
-    openflags = 0
-
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve rejects log'''
 
 def dispatch(args):
     """run the command specified in args"""
     try:
-        u = _ui.ui()
+        u = uimod.ui()
         if '--traceback' in args:
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
         return _runcatch(u, args)
-    except SystemExit:
-        pass
-    except KeyboardInterrupt:
-        print _('\nCaught keyboard interrupt, aborting.\n')
-    except:
-        if '--debugger' in args:
-            pdb.post_mortem(sys.exc_info()[2])
-        error = traceback.format_exc()
+    except error.ParseError, e:
+        from tortoisehg.hgqt.bugreport import ExceptionMsgBox
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = error
+        opts['values'] = e
+        opts['error'] = traceback.format_exc()
+        opts['nofork'] = True
+        errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
+                      '<a href="#edit:%(arg1)s">edit</a> your config')
+        main = QApplication(sys.argv)
+        dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts,
+                              parent=None)
+        dlg.exec_()
+    except SystemExit:
+        pass
+    except Exception, e:
+        # generic errors before the QApplication is started
+        if '--debugger' in args:
+            pdb.post_mortem(sys.exc_info()[2])
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = traceback.format_exc()
         opts['nofork'] = True
         return qtrun(bugrun, u, **opts)
+    except KeyboardInterrupt:
+        print _('\nCaught keyboard interrupt, aborting.\n')
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
@@ -87,7 +94,7 @@ def portable_fork(ui, opts):
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
-                     creationflags=openflags,
+                     creationflags=qtlib.openflags,
                      shell=True)
     sys.exit(0)
 
@@ -179,7 +186,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise error.ParseError(None, inst)
+        raise error.CommandError(None, inst)
 
     if args:
         alias, args = args[0], args[1:]
@@ -203,7 +210,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise error.ParseError(cmd, inst)
+        raise error.CommandError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -228,19 +235,19 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except error.ParseError, inst:
-        if inst.args[0]:
-            ui.status(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
-            help_(ui, inst.args[0])
-        else:
-            ui.status(_("thg: %s\n") % inst.args[1])
-            help_(ui, 'shortlist')
     except error.AmbiguousCommand, inst:
         ui.status(_("thg: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
     except error.UnknownCommand, inst:
         ui.status(_("thg: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
+    except error.CommandError, inst:
+        if inst.args[0]:
+            ui.status(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
+            help_(ui, inst.args[0])
+        else:
+            ui.status(_("thg: %s\n") % inst.args[1])
+            help_(ui, 'shortlist')
     except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
 
@@ -302,7 +309,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
         try:
             return cmdfunc()
         except error.SignatureError:
-            raise error.ParseError(cmd, _("invalid arguments"))
+            raise error.CommandError(cmd, _("invalid arguments"))
 
     if options['profile']:
         format = ui.config('profiling', 'format', default='text')
@@ -364,6 +371,8 @@ class _QtRunner(QObject):
         error.RepoLookupError: _('Try refreshing your repository.'),
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
+        error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
+        error.LockUnavailable: _('Repository is locked'),
         }
 
     def __init__(self):
@@ -416,8 +425,13 @@ class _QtRunner(QObject):
         etype, evalue = self.errors[0][:2]
         if len(self.errors) == 1 and etype in self._recoverableexc:
             opts['values'] = evalue
+            errstr = self._recoverableexc[etype]
+            if etype == error.Abort and evalue.hint:
+                errstr = u''.join([errstr, u'<br><b>', _('hint:'),
+                                   u'</b> %(arg1)s'])
+                opts['values'] = [str(evalue), evalue.hint]
             dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                  self._recoverableexc[etype], opts,
+                                  errstr, opts,
                                   parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
             if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
@@ -553,6 +567,11 @@ def postreview(ui, *pats, **opts):
     from tortoisehg.hgqt.postreview import run
     return qtrun(run, ui, *pats, **opts)
 
+def rupdate(ui, *pats, **opts):
+    """update a remote repository"""
+    from tortoisehg.hgqt.rupdate import run
+    return qtrun(run, ui, *pats, **opts)
+
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run
@@ -685,7 +704,7 @@ def bisect(ui, *pats, **opts):
 
 def annotate(ui, *pats, **opts):
     """annotate dialog"""
-    from tortoisehg.hgqt.annotate import run
+    from tortoisehg.hgqt.manifestdialog import run
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
         return

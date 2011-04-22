@@ -18,9 +18,9 @@ from PyQt4.QtGui import *
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, annotate, status, thgrepo
-from tortoisehg.hgqt import visdiff, wctxactions, revert
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
+from tortoisehg.hgqt import visdiff, revert
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 class ManifestDialog(QMainWindow):
@@ -29,6 +29,7 @@ class ManifestDialog(QMainWindow):
     """
 
     finished = pyqtSignal(int)
+    linkActivated = pyqtSignal(QString)
 
     def __init__(self, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
@@ -39,19 +40,13 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget = ManifestWidget(repo, rev)
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
-        self._manifest_widget.editSelected.connect(self._openInEditor)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
-        self._searchbar = qscilib.SearchToolBar()
-        connectsearchbar(self._manifest_widget, self._searchbar)
-        self.addToolBar(self._searchbar)
-        QShortcut(QKeySequence.Find, self,
-            lambda: self._searchbar.setFocus(Qt.OtherFocusReason))
-
         self.setStatusBar(QStatusBar())
-        self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
+        self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
+        self._manifest_widget.linkActivated.connect(self.linkActivated)
 
         self._readsettings()
         self._updatewindowtitle()
@@ -81,7 +76,7 @@ class ManifestDialog(QMainWindow):
 
     def setSearchPattern(self, text):
         """Set search pattern [unicode]"""
-        self._searchbar.setPattern(text)
+        self._manifest_widget._fileview.searchbar.setPattern(text)
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
@@ -93,7 +88,7 @@ class ManifestDialog(QMainWindow):
     def _openInEditor(self, path, rev, line):
         """Open editor to show the specified file"""
         _openineditor(self._repo, path, rev, line,
-                      pattern=self._searchbar.pattern(), parent=self)
+                      pattern=self._fileview.searchbar.pattern(), parent=self)
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
@@ -104,24 +99,23 @@ class ManifestWidget(QWidget):
     pathChanged = pyqtSignal(unicode)
     """Emitted (path) when the current file path changed"""
 
-    revisionHint = pyqtSignal(unicode)
+    showMessage = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
-
-    searchRequested = pyqtSignal(unicode)
-    """Emitted (pattern) when user request to search content"""
-
-    editSelected = pyqtSignal(unicode, object, int)
-    """Emitted (path, rev, line) when user requests to open editor"""
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
-    contextmenu = None
+    linkActivated = pyqtSignal(QString)
+    """Emitted (path) when user clicks on link"""
+
+    filecontextmenu = None
+    subrepocontextmenu = None
 
     def __init__(self, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._repo = repo
         self._rev = rev
+        self._selectedrev = rev
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
@@ -145,24 +139,21 @@ class ManifestWidget(QWidget):
         self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
+        self._treeview.doubleClicked.connect(self.onDoubleClick)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
         navlayoutw = QWidget()
         navlayoutw.setLayout(navlayout)
 
-        self._contentview = QStackedWidget()
         self._splitter.addWidget(navlayoutw)
-        self._splitter.addWidget(self._contentview)
         self._splitter.setStretchFactor(0, 1)
-        self._splitter.setStretchFactor(1, 3)
 
-        self._nullcontent = QWidget()
-        self._contentview.addWidget(self._nullcontent)
-        self._fileview = annotate.AnnotateView(self._repo)
-        self._fileview.sourceChanged.connect(self.setSource)
-        self._contentview.addWidget(self._fileview)
-        for name in ('revisionHint', 'searchRequested', 'editSelected',
-                     'grepRequested'):
+        self._fileview = fileview.HgFileView(self._repo, self)
+        self._splitter.addWidget(self._fileview)
+        self._splitter.setStretchFactor(1, 3)
+        self._fileview.revisionSelected.connect(self.setRev)
+        self._fileview.linkActivated.connect(self.linkActivated)
+        for name in ('showMessage', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
     def loadSettings(self, qs, prefix):
@@ -177,20 +168,8 @@ class ManifestWidget(QWidget):
 
     def _initactions(self):
         self._statusfilter = status.StatusFilterButton(
-          statustext='MAC', text=_('Status'))
+          statustext='MASC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
-
-        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
-        self._action_annotate_mode.toggled.connect(
-            self._fileview.setAnnotationEnabled)
-        self._action_annotate_mode.setEnabled(self.rev is not None)
-        self._toolbar.addAction(self._action_annotate_mode)
-
-        if hasattr(self, '_searchbar'):
-            self._action_find = self._searchbar.toggleViewAction()
-            self._action_find.setIcon(qtlib.geticon('edit-find'))
-            self._action_find.setShortcut(QKeySequence.Find)
-            self._toolbar.addAction(self._action_find)
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
@@ -210,6 +189,17 @@ class ManifestWidget(QWidget):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
+              'Alt+Ctrl+O', _('Open the selected subrepository'),
+              self.opensubrepo),
+            ('explore', _('Explore subrepository'), 'system-file-manager',
+              'Alt+Ctrl+E',
+              _('Open the selected subrepository in a file browser'),
+              self.explore),
+            ('terminal', _('Open terminal in subrepository'),
+              'utilities-terminal', 'Alt+Ctrl+T', 
+              _('Open a shell terminal in the selected subrepository root'),
+              self.terminal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -252,26 +242,24 @@ class ManifestWidget(QWidget):
         if self.path is None:
             return
         if self.rev is None:
-            files = [self._repo.wjoin(self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, [self.path], parent=self)
         else:
             base, _ = visdiff.snapshot(self._repo, [self.path],
                                        self._repo[self.rev])
             files = [os.path.join(base, self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, files, parent=self)
 
     def editlocal(self):
         if self.path is None:
             return
-        path = self._repo.wjoin(self.path)
-        wctxactions.edit(self, self._repo.ui, self._repo, [path])
+        qtlib.editfiles(self._repo, [self.path], parent=self)
 
     def revertfile(self):
         if self.path is None:
             return
         if self.rev is None:
             rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, self.path, self.rev, self)
+        dlg = revert.RevertDialog(self._repo, [self.path], self.rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
@@ -289,17 +277,70 @@ class ManifestWidget(QWidget):
         dlg.raise_()
         dlg.activateWindow()
 
+    def opensubrepo(self):
+        path = self._repo.wjoin(self.path)
+        if os.path.isdir(path):
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+
+    def explore(self):
+        root = self._repo.wjoin(self.path)
+        if os.path.isdir(root):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+
+    def terminal(self):
+        root = self._repo.wjoin(self.path)
+        if os.path.isdir(root):
+            qtlib.openshell(root)
+
+    def showEvent(self, event):
+        QWidget.showEvent(self, event)
+        if self._selectedrev != self._rev:
+            # If the selected revision is not the same as the current revision
+            # we must "reload" the manifest contents with the selected revision
+            self.setRev(self._selectedrev)
+
+    #@pyqtSlot(QModelIndex)
+    def onDoubleClick(self, index):
+        itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
+        if itemissubrepo:
+            self.opensubrepo()
+        else:
+            self.vdiff()
+
     def menuRequest(self, point):
         point = self.mapToGlobal(point)
-        if not self.contextmenu:
-            self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']:
+
+        currentindex = self._treeview.currentIndex()
+        itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
+
+        # Subrepos and regular items have different context menus
+        if itemissubrepo:
+            contextmenu = self.subrepocontextmenu
+            actionlist = ['opensubrepo', 'explore', 'terminal']
+        else:
+            contextmenu = self.filecontextmenu
+            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+                        'navigate', 'diffnavigate']
+
+        if not contextmenu:
+            contextmenu = QMenu(self)
+            for act in actionlist:
                 if act:
-                    self.contextmenu.addAction(self._actions[act])
+                    contextmenu.addAction(self._actions[act])
                 else:
-                    self.contextmenu.addSeparator()
-        self.contextmenu.exec_(point)
+                    contextmenu.addSeparator()
+
+            if itemissubrepo:
+                self.subrepocontextmenu = contextmenu
+            else:
+                self.filecontextmenu = contextmenu
+
+        if actionlist:
+            contextmenu.exec_(point)
 
     @property
     def toolbar(self):
@@ -357,10 +398,29 @@ class ManifestWidget(QWidget):
         """Return current revision"""
         return self._rev
 
+    def selectRev(self, rev):
+        """
+        Select the revision that must be set when the dialog is shown again
+        """
+        self._selectedrev = rev
+
+    @pyqtSlot(int)
     @pyqtSlot(object)
     def setRev(self, rev):
         """Change revision to show"""
-        self.setSource(self.path, rev)
+        self._selectedrev = rev
+        if rev == self._rev:
+            return
+        self._rev = rev
+        path = self.path
+        self._setupmodel()
+        ctx = self._repo[rev]
+        if path and path in ctx:
+            # recover file selection after reloading the model
+            self.setPath(path)
+            self._fileview.setContext(ctx)
+            self._fileview.displayFile(self.path, self.status)
+        # update sensitivity of actions
         real = type(rev) is int
         self._actions['ldiff'].setEnabled(real)
         for act in ['diff', 'edit']:
@@ -371,67 +431,61 @@ class ManifestWidget(QWidget):
     @pyqtSlot(unicode, object, int)
     def setSource(self, path, rev, line=None):
         """Change path and revision to show at once"""
-        revchanged = self._rev != rev
-        if revchanged:
+        if self._rev != rev:
             self._rev = rev
             self._setupmodel()
-        self.setPath(path)
-        if self.path in self._repo[rev]:
-            self._fileview.setSource(path, rev, line)
-        if revchanged:
-            # annotate working copy is not supported
-            self._action_annotate_mode.setEnabled(rev is not None)
             self.revChanged.emit(rev)
+        if path != self.path:
+            self.setPath(path)
+            ctx = self._repo[rev]
+            if self.path in ctx:
+                self._fileview.displayFile(path, self.status)
+                if line:
+                    self._fileview.showLine(int(line) - 1)
+            else:
+                self._fileview.clearDisplay()
 
     @property
     def path(self):
         """Return currently selected path"""
         return self._treemodel.filePath(self._treeview.currentIndex())
 
+    @property
+    def status(self):
+        """Return currently selected path"""
+        return self._treemodel.fileStatus(self._treeview.currentIndex())
+
     @pyqtSlot(unicode)
     def setPath(self, path):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
-
+    
+    def displayFile(self):
+        ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
+        if ctx is None:
+            ctx = self._repo[self._rev]
+        else:
+            ctx._repo.tabwidth = self._repo.tabwidth
+            ctx._repo.maxdiff = self._repo.maxdiff
+        self._fileview.setContext(ctx)
+        self._fileview.displayFile(path, self.status)
+    
     @pyqtSlot()
     def _updatecontent(self):
-        if hglib.fromunicode(self.path) not in self._repo[self._rev]:
-            self._contentview.setCurrentWidget(self._nullcontent)
-            return
-
-        self._contentview.setCurrentWidget(self._fileview)
-        self._fileview.setSource(self.path, self._rev)
+        if True:
+            self.displayFile()
+        else:
+            self._fileview.setContext(self._repo[self._rev])
+            self._fileview.displayFile(self.path, self.status)
 
     @pyqtSlot()
     def _emitPathChanged(self):
         self.pathChanged.emit(self.path)
 
-class ManifestTaskWidget(ManifestWidget):
-    """Manifest widget designed for task tab"""
-
-    def __init__(self, repo, rev, parent):
-        super(ManifestTaskWidget, self).__init__(repo, rev, parent)
-        self.editSelected.connect(self._openInEditor)
-
-    @util.propertycache
-    def _searchbar(self):
-        searchbar = qscilib.SearchToolBar(hidable=True)
-        searchbar.hide()
-        self.layout().addWidget(searchbar)
-        connectsearchbar(self, searchbar)
-        return searchbar
-
-    @pyqtSlot(unicode, object, int)
-    def _openInEditor(self, path, rev, line):
-        """Open editor to show the specified file"""
-        _openineditor(self._repo, path, rev, line,
-                      pattern=self._searchbar.pattern(), parent=self)
-
 def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
-    manifestwidget.searchRequested.connect(searchbar.search)
 
 def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
     """Open editor to show the specified file [unicode]"""
@@ -439,7 +493,7 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
     pattern = hglib.fromunicode(pattern)
     base = visdiff.snapshot(repo, [path], repo[rev])[0]
     files = [os.path.join(base, path)]
-    wctxactions.edit(parent, repo.ui, repo, files, line, pattern)
+    qtlib.editfiles(repo, files, line, pattern, parent=self)
 
 
 def run(ui, *pats, **opts):
@@ -449,9 +503,18 @@ def run(ui, *pats, **opts):
     # set initial state after dialog visible
     def init():
         try:
-            path = hglib.canonpaths(pats)[0]
+            if pats:
+                path = hglib.canonpaths(pats)[0]
+            elif 'canonpath' in opts:
+                path = opts['canonpath']
+            else:
+                return
             line = opts.get('line') and int(opts['line']) or None
             dlg.setSource(path, opts.get('rev'), line)
+            if opts.get('pattern'):
+                dlg.setSearchPattern(opts['pattern'])
+            if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
+                dlg._manifest_widget._fileview.actionAnnMode.trigger()
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
