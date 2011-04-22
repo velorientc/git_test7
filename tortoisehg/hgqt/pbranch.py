@@ -192,6 +192,7 @@ class PatchBranchWidget(QWidget):
         opts = {'tips': True}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         graph = mgr.graphforopts(opts)
+        target_graph = mgr.graphforopts({})
         if not self.show_internal_branches:
             graph = mgr.patchonlygraph(graph)
         names = None
@@ -212,7 +213,11 @@ class PatchBranchWidget(QWidget):
             else:
                 node_column = len(dep_list)
             node_color = patch_status[name] and '#ff0000' or 0
-            node_status = (name == cur_branch) and 4 or 0
+            node_status = nodestatus_NORMAL
+            if graph.ispatch(name) and not target_graph.ispatch(name):
+                node_status = nodestatus_CLOSED
+            if name == cur_branch:
+                node_status = node_status | nodestatus_CURRENT
             node = PatchGraphNodeAttributes(node_column, node_color, node_status)
 
             # Find next dependency list
@@ -611,6 +616,12 @@ class PatchGraphNode(object):
         self.msg_esc = msg # u''.join(msg) # escaped summary (utf-8)
 
 
+nodestatus_CURRENT = 4
+nodestatus_NORMAL = 0
+nodestatus_PATCH = 1
+nodestatus_CLOSED = 2
+nodestatus_shapemask = 3
+
 class PatchGraphNodeAttributes(object):
     """
     Simple class to encapsulate attributes about a node in the patch branch graph.
@@ -718,8 +729,8 @@ class PatchBranchModel(QAbstractTableModel):
         """
         Return a QPixmap for the patch graph for the current row
 
-        :ctx: Data for current row = branch
-        :gnode: Node in patch branch graph
+        :ctx: Data for current row = branch (not used)
+        :gnode: PatchGraphNode in patch branch graph
 
         :returns: QPixmap of pgraph for ctx
         """
@@ -790,6 +801,11 @@ class PatchBranchModel(QAbstractTableModel):
                           2 * r, 2 * r)
             painter.drawEllipse(rect)
 
+        def closesymbol(s, offset = 0):
+            rect_ = QRectF(centre_x - 1.5 * s, centre_y - 0.5 * s, 3 * s, s)
+            rect_.adjust(-offset, -offset, offset, offset)
+            painter.drawRect(rect_)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
@@ -798,14 +814,21 @@ class PatchBranchModel(QAbstractTableModel):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
-        if False and ctx.thg_patchbranch():  # diamonds for patches
-            if ctx.thg_wdbranch():
+        nodeshape = gnode.node.status & nodestatus_shapemask
+        if nodeshape ==  nodestatus_PATCH:  # diamonds for patches
+            if gnode.node.status & nodestatus_CURRENT:
                 painter.setBrush(white)
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
+        elif nodeshape == nodestatus_CLOSED:
+            if gnode.node.status & nodestatus_CURRENT:
+                painter.setBrush(white)
+                closesymbol(0.5 * radius, 2 * pen.widthF())
+            painter.setBrush(fillcolor)
+            closesymbol(0.5 * radius)
         else:  # circles for normal branches
-            if gnode.patchname == self.wd_branch:
+            if gnode.node.status & nodestatus_CURRENT:
                 painter.setBrush(white)
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
