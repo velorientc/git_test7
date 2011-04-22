@@ -166,7 +166,7 @@ class Msgfmt:
                 # Now we are in a msgid section, output previous section
                 elif l.startswith('msgid') and not l.startswith('msgid_plural'):
                     if section == STR:
-                        add(msgid, msgstr, fuzzy)
+                        self.add(msgid, msgstr, fuzzy)
                     section = ID
                     l = l[5:]
                     msgid = msgstr = ''

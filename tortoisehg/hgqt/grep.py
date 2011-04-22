@@ -40,7 +40,7 @@ class SearchWidget(QWidget):
         hbox.setMargin(2)
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
-            le.setPlaceholderText('### regular expression search pattern ###')
+            le.setPlaceholderText(_('### regular expression search pattern ###'))
         else:
             lbl = QLabel(_('Regexp:'))
             lbl.setBuddy(le)

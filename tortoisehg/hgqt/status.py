@@ -95,7 +95,7 @@ class StatusWidget(QWidget):
         tb.clicked.connect(self.refreshWctx)
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
-            le.setPlaceholderText('### filter text ###')
+            le.setPlaceholderText(_('### filter text ###'))
         else:
             lbl = QLabel(_('Filter:'))
             hbox.addWidget(lbl)
