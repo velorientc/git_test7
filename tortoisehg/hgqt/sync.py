@@ -1128,8 +1128,8 @@ class SecureDialog(QDialog):
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
-            le.setPlaceholderText('### host certificate fingerprint ###')
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
+            le.setPlaceholderText(_('### host certificate fingerprint ###'))
         hbox.addWidget(le)
         try:
             import ssl # Python 2.6 or backport for 2.5
