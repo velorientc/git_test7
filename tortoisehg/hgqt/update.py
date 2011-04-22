@@ -221,7 +221,7 @@ class UpdateDialog(QDialog):
                     clean = isclean()
 
                 msg = _('Detected uncommitted local changes in working tree.\n'
-                        'Please select to continue:\n\n')
+                        'Please select to continue:\n')
                 data = {'discard': (_('&Discard'),
                                     _('Discard - discard local changes, no backup')),
                         'shelve': (_('&Shelve'),
@@ -229,21 +229,23 @@ class UpdateDialog(QDialog):
                         'merge': (_('&Merge'),
                                   _('Merge - allow to merge with local changes')),}
 
-                opts = [data['discard']]
+                opts = ['discard']
                 if not ismergedchange():
-                    opts.append(data['shelve'])
+                    opts.append('shelve')
                 if islocalmerge(cur, node, clean):
-                    opts.append(data['merge'])
+                    opts.append('merge')
 
-                msg += '\n'.join([desc for label, desc in opts if desc])
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
-                                  msg, QMessageBox.Cancel, self)
+                                  '', QMessageBox.Cancel, self)
                 buttons = {}
-                for name in ('discard', 'shelve', 'merge'):
+                for name in opts:
                     label, desc = data[name]
+                    msg += '\n'
+                    msg += desc
                     buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                dlg.setText(msg)
                 dlg.exec_()
-                return buttons, dlg.clickedButton()
+                return buttons, dlg.clickedButton(), opts
 
             # If merge-by-default, we want to merge whenever possible,
             # without prompting user (similar to command-line behavior)
@@ -252,16 +254,16 @@ class UpdateDialog(QDialog):
             if clean:
                 cmdline.append('--check')
             elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                buttons, clicked = confirmupdate(clean)
+                buttons, clicked, options = confirmupdate(clean)
                 if buttons['discard'] == clicked:
                     cmdline.append('--clean')
-                elif buttons['shelve'] == clicked:
+                elif 'shelve' in options and buttons['shelve'] == clicked:
                     from tortoisehg.hgqt import shelve
                     dlg = shelve.ShelveDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
-                elif buttons['merge'] == clicked:
+                elif 'merge' in options and buttons['merge'] == clicked:
                     pass # no args
                 else:
                     return
