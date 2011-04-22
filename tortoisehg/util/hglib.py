@@ -477,13 +477,13 @@ def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
 agescales = [
-    ((lambda n: ngettext("%d year ago", "%d years ago", n)), 3600 * 24 * 365),
-    ((lambda n: ngettext("%d month ago", "%d months ago", n)), 3600 * 24 * 30),
-    ((lambda n: ngettext("%d week ago", "%d weeks ago", n)), 3600 * 24 * 7),
-    ((lambda n: ngettext("%d day ago", "%d days ago", n)), 3600 * 24),
-    ((lambda n: ngettext("%d hour ago", "%d hours ago", n)), 3600),
-    ((lambda n: ngettext("%d minute ago", "%d minutes ago", n)), 60),
-    ((lambda n: ngettext("%d second ago", "%d seconds ago", n)), 1),
+    ((lambda n: ngettext("%d year", "%d years", n)), 3600 * 24 * 365),
+    ((lambda n: ngettext("%d month", "%d months", n)), 3600 * 24 * 30),
+    ((lambda n: ngettext("%d week", "%d weeks", n)), 3600 * 24 * 7),
+    ((lambda n: ngettext("%d day", "%d days", n)), 3600 * 24),
+    ((lambda n: ngettext("%d hour", "%d hours", n)), 3600),
+    ((lambda n: ngettext("%d minute", "%d minutes", n)), 60),
+    ((lambda n: ngettext("%d second", "%d seconds", n)), 1),
     ]
 
 def age(date):
