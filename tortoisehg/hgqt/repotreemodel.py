@@ -5,9 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import error
-
-from tortoisehg.hgqt import thgrepo, qtlib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
@@ -22,6 +19,8 @@ extractXmlElementName = 'reporegextract'
 reporegistryXmlElementName = 'reporegistry'
 
 repoRegMimeType = 'application/thg-reporegistry'
+repoRegGroupMimeType = 'application/thg-reporegistrygroup'
+repoExternalMimeType = 'text/uri-list'
 
 
 def writeXml(target, item, rootElementName):
@@ -60,10 +59,9 @@ def iterRepoItemFromXml(source, model=None):
             yield undumpObject(xr, model)
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, openrepofunc, filename=None, parent=None):
-        QAbstractItemModel.__init__(self, parent)
 
-        self.openrepofunc = openrepofunc
+    def __init__(self, filename, parent):
+        QAbstractItemModel.__init__(self, parent)
 
         root = None
         all = None
@@ -162,7 +160,8 @@ class RepoTreeModel(QAbstractItemModel):
         return res
 
     def mimeTypes(self):
-        return QStringList(repoRegMimeType)
+        return QStringList([repoRegMimeType, repoRegGroupMimeType,
+                            repoExternalMimeType])
 
     def mimeData(self, indexes):
         i = indexes[0]
@@ -170,14 +169,24 @@ class RepoTreeModel(QAbstractItemModel):
         buf = QByteArray()
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
-        d.setData(repoRegMimeType, buf)
-        d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
+        if isinstance(item, RepoItem):
+            d.setData(repoRegMimeType, buf)
+            d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
+        else:
+            d.setData(repoRegGroupMimeType, buf)
+            d.setText(QString(item.name))
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
-        d = str(data.data(repoRegMimeType))
-        itemread = readXml(d, extractXmlElementName, self)
         group = parent.internalPointer()
+        if data.hasUrls():
+            d = str(data.data(repoRegMimeType))
+        else:
+            row = parent.row()
+            group = self.rootItem
+            parent = QModelIndex()
+            d = str(data.data(repoRegGroupMimeType))
+        itemread = readXml(d, extractXmlElementName, self)
         if group is None:
             return False
         if row < 0:
@@ -195,7 +204,7 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         item = index.internalPointer()
         if item.setData(index.column(), value):
-            self.emit(SIGNAL('dataChanged(index, index)'), index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 
@@ -204,33 +213,15 @@ class RepoTreeModel(QAbstractItemModel):
     def allreposIndex(self):
         return self.createIndex(0, 0, self.allrepos)
 
-    def addRepo(self, group, repo):
-        if not repo:
-            caption = _('Select repository directory to add')
-            FD = QFileDialog
-            path = FD.getExistingDirectory(caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
-            if path:
-                try:
-                    lpath = hglib.fromunicode(path)
-                    repo = thgrepo.repository(None, path=lpath)
-                except error.RepoError:
-                    # NOTE: here we cannot pass parent=self because self
-                    # isn't a QWidget. Codes under `if not repo:` should
-                    # be handled by a widget, not by a model.
-                    qtlib.WarningMsgBox(
-                        _('Failed to add repository'),
-                        _('%s is not a valid repository') % path)
-                    return
-            else:
-                return
+    def addRepo(self, group, root, row=-1):
         grp = group
         if grp == None:
             grp = self.allreposIndex()
         rgi = grp.internalPointer()
-        cc = rgi.childCount()
-        self.beginInsertRows(grp, cc, cc + 1)
-        rgi.appendChild(RepoItem(self, repo))
+        if row < 0:
+            row = rgi.childCount()
+        self.beginInsertRows(grp, row, row)
+        rgi.insertChild(row, RepoItem(self, root))
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
@@ -248,3 +239,11 @@ class RepoTreeModel(QAbstractItemModel):
         f.open(QIODevice.WriteOnly)
         writeXml(f, self.rootItem, reporegistryXmlElementName)
         f.close()
+
+    def depth(self, index):
+        count = 1
+        while True:
+            index = index.parent()
+            if index.row() < 0:
+                return count
+            count += 1

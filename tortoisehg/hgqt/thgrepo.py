@@ -40,16 +40,16 @@ def repository(_ui=None, path='', create=False, bundle=None):
         if _ui is None:
             _ui = uimod.ui()
         repo = bundlerepo.bundlerepository(_ui, path, bundle)
-        repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
+        repo._pyqtobj = ThgRepoWrapper(repo)
         return repo
     if create or path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path, create)
-            repo._pyqtobj = ThgRepoWrapper(repo)
             repo.__class__ = _extendrepo(repo)
+            repo._pyqtobj = ThgRepoWrapper(repo)
             _repocache[path] = repo
             return repo
         except EnvironmentError:
@@ -65,6 +65,7 @@ class ThgRepoWrapper(QObject):
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
     repositoryDestroyed = pyqtSignal()
+    workingDirectoryChanged = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
     def __init__(self, repo):
@@ -73,35 +74,67 @@ class ThgRepoWrapper(QObject):
         self.busycount = 0
         repo.configChanged = self.configChanged
         repo.repositoryChanged = self.repositoryChanged
-        repo.workingBranchChanged = self.workingBranchChanged
         repo.repositoryDestroyed = self.repositoryDestroyed
+        repo.workingDirectoryChanged = self.workingDirectoryChanged
+        repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
-        try:
-            freq = repo.ui.config('tortoisehg', 'pollfreq', '500')
-            freq = max(100, int(freq))
-        except:
-            freq = 500
         if isinstance(repo, bundlerepo.bundlerepository):
-            dbgoutput('not starting timer for bundle repository')
+            dbgoutput('not watching F/S events for bundle repository')
         else:
-            self._timerevent = self.startTimer(freq)
+            self.watcher = QFileSystemWatcher(self)
+            self.watcher.addPath(repo.path)
+            self.watcher.directoryChanged.connect(self.onDirChange)
+            self.watcher.fileChanged.connect(self.onFileChange)
+            self.addMissingPaths()
 
-    def timerEvent(self, event):
+    @pyqtSlot(QString)
+    def onDirChange(self, directory):
+        'Catch any writes to .hg/ folder, most importantly lock files'
+        self.pollStatus()
+        self.addMissingPaths()
+
+    @pyqtSlot(QString)
+    def onFileChange(self, file):
+        'Catch writes or deletions of files we are interested in'
+        self.pollStatus()
+        self.addMissingPaths()
+
+    def addMissingPaths(self):
+        'Add files to watcher that may have been added or replaced'
+        existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
+        files = [unicode(f) for f in self.watcher.files()]
+        for f in existing:
+            if hglib.tounicode(f) not in files:
+                dbgoutput('add file to watcher:', f)
+                self.watcher.addPath(f)
+        _, files = self.repo.uifiles()
+        for f in files:
+            if f and os.path.exists(f) and hglib.tounicode(f) not in files:
+                dbgoutput('add ui file to watcher:', f)
+                self.watcher.addPath(f)
+
+    def pollStatus(self):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
-            self.killTimer(self._timerevent)
+            # disable watcher by removing all watched paths
+            dirs = self.watcher.directories()
+            if dirs:
+                self.watcher.removePaths(dirs)
+            files = self.watcher.files()
+            if files:
+                self.watcher.removePaths(files)
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
-        elif self.busycount == 0:
-            self.pollStatus()
-        else:
-            dbgoutput('no poll, busy', self.busycount)
-
-    def pollStatus(self):
-        if not os.path.exists(self.repo.path) or self.locked():
+            return
+        if self.busycount > 0:
+            dbgoutput('busy, aborting')
+            return
+        if self.locked():
+            dbgoutput('locked, aborting')
             return
         if self._checkdirstate():
+            dbgoutput('dirstate changed, exiting')
             return
         self._checkrepotime()
         self._checkuimtime()
@@ -131,8 +164,7 @@ class ThgRepoWrapper(QObject):
         except EnvironmentError:
             return None
 
-    def _getrepomtime(self):
-        'Return the last modification time for the repo'
+    def _getwatchedfiles(self):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
         watchedfiles.append(self.repo.join('localtags'))
         watchedfiles.append(self.repo.join('bookmarks'))
@@ -141,9 +173,13 @@ class ThgRepoWrapper(QObject):
             watchedfiles.append(self.repo.mq.join('series'))
             watchedfiles.append(self.repo.mq.join('guards'))
             watchedfiles.append(self.repo.join('patches.queue'))
+        return watchedfiles
+
+    def _getrepomtime(self):
+        'Return the last modification time for the repo'
         try:
-            mtime = [os.path.getmtime(wf) for wf in watchedfiles \
-                     if os.path.isfile(wf)]
+            existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
+            mtime = [os.path.getmtime(wf) for wf in existing]
             if mtime:
                 return max(mtime)
         except EnvironmentError:
@@ -213,7 +249,7 @@ class ThgRepoWrapper(QObject):
         except (EnvironmentError, ValueError):
             pass
 
-_uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
+_uiprops = '''_uifiles _uimtime postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
 
@@ -286,18 +322,6 @@ def _extendrepo(repo):
                 return n[8:]
             else:
                 return n
-
-        @propertycache
-        def _shell(self):
-            s = self.ui.config('tortoisehg', 'shell')
-            if s:
-                return s
-            if sys.platform == 'darwin':
-                return None # Terminal.App does not support open-to-folder
-            elif os.name == 'nt':
-                return 'cmd.exe'
-            else:
-                return 'xterm'
 
         @propertycache
         def _uifiles(self):
@@ -422,10 +446,6 @@ def _extendrepo(repo):
             for branchname, nodes in self.branchmap().iteritems():
                 heads.extend(nodes)
             return heads
-
-        def shell(self):
-            'Returns terminal shell configured for this repo'
-            return self._shell
 
         def uifiles(self):
             'Returns latest mtime and complete list of config files'

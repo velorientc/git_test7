@@ -14,6 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
+from mercurial.subrepo import hgsubrepo
 from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib, status, visdiff
 
@@ -26,13 +27,14 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev, statusfilter='MAC', parent=None):
+    def __init__(self, repo, rev, statusfilter='MASC', parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
         self._rev = rev
+        self._subinfo = {}
 
-        assert util.all(c in 'MARC' for c in statusfilter)
+        assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
 
     def data(self, index, role=Qt.DisplayRole):
@@ -54,6 +56,20 @@ class ManifestModel(QAbstractItemModel):
             return ''
 
         return index.internalPointer().path
+
+    def fileSubrepoCtx(self, index):
+        """Return the subrepo context of the specified index"""
+        path = self.filePath(index)
+        return self.fileSubrepoCtxFromPath(path)
+    
+    def fileSubrepoCtxFromPath(self, path):
+        """Return the subrepo context of the specified file"""
+        if not path:
+            return None, path
+        for subpath in sorted(self._subinfo.keys())[::-1]:
+            if path.startswith(subpath):
+                return self._subinfo[subpath], path[len(subpath)+1:]
+        return None, path
 
     def fileIcon(self, index):
         ic = QApplication.style().standardIcon(
@@ -79,7 +95,11 @@ class ManifestModel(QAbstractItemModel):
         if not index.isValid():
             return True  # root entry must be a directory
         e = index.internalPointer()
-        return len(e) != 0
+        if e.status == 'S':
+            # Consider subrepos as dirs as well
+            return True
+        else:
+            return len(e) != 0
 
     def mimeData(self, indexes):
         def preparefiles():
@@ -155,9 +175,9 @@ class ManifestModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def setStatusFilter(self, status):
-        """Filter file tree by change status 'MARC'"""
+        """Filter file tree by change status 'MARSC'"""
         status = str(status)
-        assert util.all(c in 'MARC' for c in status)
+        assert util.all(c in 'MARSC' for c in status)
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status
@@ -178,14 +198,8 @@ class ManifestModel(QAbstractItemModel):
 
     def _buildrootentry(self):
         """Rebuild the tree of files and directories"""
-        roote = _Entry()
-        ctx = self._repo[self._rev]
 
-        status = dict(zip(('M', 'A', 'R'),
-                          (set(a) for a in self._repo.status(ctx.parents()[0],
-                                                             ctx)[:3])))
-        uncleanpaths = status['M'] | status['A'] | status['R']
-        def pathinstatus(path):
+        def pathinstatus(path, status, uncleanpaths):
             """Test path is included by the status filter"""
             if util.any(c in self._statusfilter and path in e
                         for c, e in status.iteritems()):
@@ -194,24 +208,94 @@ class ManifestModel(QAbstractItemModel):
                 return True
             return False
 
-        for path in itertools.chain(ctx.manifest(), status['R']):
-            if not pathinstatus(path):
-                continue
+        def getctxtreeinfo(ctx, repo):
+            """
+            Get the context information that is relevant to populating the tree
+            """
+            status = dict(zip(('M', 'A', 'R'),
+                      (set(a) for a in self._repo.status(ctx.parents()[0],
+                                                             ctx)[:3])))
+            uncleanpaths = status['M'] | status['A'] | status['R']
+            files = itertools.chain(ctx.manifest(), status['R'])
+            return status, uncleanpaths, files
 
-            e = roote
-            for p in hglib.tounicode(path).split('/'):
+        def addfilestotree(treeroot, files, status, uncleanpaths):
+            """Add files to the tree according to their state"""
+            for path in files:
+                if not pathinstatus(path, status, uncleanpaths):
+                    continue
+
+                e = treeroot
+                for p in hglib.tounicode(path).split('/'):
+                    if not p in e:
+                        e.addchild(p)
+                    e = e[p]
+
+                for st, filesofst in status.iteritems():
+                    if path in filesofst:
+                        e.setstatus(st)
+                        break
+                else:
+                    e.setstatus('C')
+
+        # Add subrepos to the tree
+        def addrepocontentstotree(roote, ctx, toproot=''):
+            subpaths = ctx.substate.keys()
+            for path in subpaths:
+                if not 'S' in self._statusfilter:
+                    break
+                e = roote
+                pathelements = hglib.tounicode(path).split('/')
+                for p in pathelements[:-1]:
+                    if not p in e:
+                        e.addchild(p)
+                    e = e[p]
+
+                p = pathelements[-1]
                 if not p in e:
                     e.addchild(p)
                 e = e[p]
+                e.setstatus('S')
 
-            for st, files in status.iteritems():
-                if path in files:
-                    # TODO: what if added & removed at once?
-                    e.setstatus(st)
-                    break
-            else:
-                e.setstatus('C')
+                # If the subrepo exists in the working directory
+                # and it is a mercurial subrepo,
+                # add the files that it contains to the tree as well, according
+                # to the status filter
+                abspath = os.path.join(ctx._repo.root, path)
+                if os.path.isdir(abspath):
+                    # Add subrepo files to the tree
+                    srev = ctx.substate[path][1]
+                    sub = ctx.sub(path)
+                    if srev and isinstance(sub, hgsubrepo):
+                        srepo = sub._repo
+                        sctx = srepo[srev]
 
+                        # Add the subrepo info to the _subinfo dictionary:
+                        # The value is the subrepo context, while the key is
+                        # the path of the subrepo relative to the topmost repo
+                        if toproot:
+                            # Note that we cannot use os.path.join() because we
+                            # need path items to be separated by "/"
+                            toprelpath = '/'.join([toproot, path])
+                        else:
+                            toprelpath = path
+                        self._subinfo[toprelpath] = sctx
+                        
+                        # Add the subrepo contents to the tree
+                        e = addrepocontentstotree(e, sctx, toprelpath)
+
+            # Add regular files to the tree
+            status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
+
+            addfilestotree(roote, files, status, uncleanpaths)
+            return roote
+
+        # Clear the _subinfo
+        self._subinfo = {}
+        roote = _Entry()
+        ctx = self._repo[self._rev]
+
+        addrepocontentstotree(roote, ctx)
         roote.sort()
 
         self.beginResetModel()
@@ -258,7 +342,7 @@ class _Entry(object):
         return self._status
 
     def setstatus(self, status):
-        assert status in 'MARC'
+        assert status in 'MARSC'
         self._status = status
 
     def __len__(self):

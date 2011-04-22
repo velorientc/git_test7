@@ -12,16 +12,7 @@ import shlex
 import time
 import inspect
 
-from mercurial import demandimport
-demandimport.disable()
-try:
-    # hg >= 1.7
-    from mercurial.cmdutil import updatedir
-except ImportError:
-    # hg <= 1.6
-    from mercurial.patch import updatedir
-demandimport.enable()
-
+from mercurial.cmdutil import updatedir
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
 
@@ -439,21 +430,6 @@ def difftools(ui):
     return tools
 
 
-_funcre = re.compile('\w')
-def getchunkfunction(data, linenum):
-    """Return the function containing the chunk at linenum.
-
-    Stolen from mercurial/mdiff.py.
-    """
-    # Walk backwards starting from the line before the chunk
-    # to find a line starting with an alphanumeric char.
-    for x in xrange(int(linenum) - 2, -1, -1):
-        t = data[x].rstrip()
-        if _funcre.match(t):
-            return ' ' + t[:40]
-    return None
-
-
 def hgcmd_toq(q, label, args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
@@ -501,13 +477,13 @@ def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
 agescales = [
-    ((lambda n: ngettext("%d year ago", "%d years ago", n)), 3600 * 24 * 365),
-    ((lambda n: ngettext("%d month ago", "%d months ago", n)), 3600 * 24 * 30),
-    ((lambda n: ngettext("%d week ago", "%d weeks ago", n)), 3600 * 24 * 7),
-    ((lambda n: ngettext("%d day ago", "%d days ago", n)), 3600 * 24),
-    ((lambda n: ngettext("%d hour ago", "%d hours ago", n)), 3600),
-    ((lambda n: ngettext("%d minute ago", "%d minutes ago", n)), 60),
-    ((lambda n: ngettext("%d second ago", "%d seconds ago", n)), 1),
+    ((lambda n: ngettext("%d year", "%d years", n)), 3600 * 24 * 365),
+    ((lambda n: ngettext("%d month", "%d months", n)), 3600 * 24 * 30),
+    ((lambda n: ngettext("%d week", "%d weeks", n)), 3600 * 24 * 7),
+    ((lambda n: ngettext("%d day", "%d days", n)), 3600 * 24),
+    ((lambda n: ngettext("%d hour", "%d hours", n)), 3600),
+    ((lambda n: ngettext("%d minute", "%d minutes", n)), 60),
+    ((lambda n: ngettext("%d second", "%d seconds", n)), 1),
     ]
 
 def age(date):
@@ -596,20 +572,6 @@ def is_rev_current(repo, rev):
 
     return rev == parents[0].node()
 
-def is_descriptor(obj, attr):
-    """
-    Returns True if obj.attr is a descriptor - ie, accessing
-    the attribute will actually invoke the '__get__' method of
-    some object.
-
-    Returns False if obj.attr exists, but is not a descriptor,
-    and None if obj.attr was not found at all.
-    """
-    for cls in inspect.getmro(obj.__class__):
-        if attr in cls.__dict__:
-            return hasattr(cls.__dict__[attr], '__get__')
-    return None
-
 def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
            opts=None):
     '''
@@ -624,3 +586,38 @@ def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
     except AttributeError:
         from mercurial import patch
         return patch.export(repo, revs, template, fp, switch_parent, opts)
+
+def getDeepestSubrepoContainingFile(wfile, ctx):
+    """
+    Given a filename and context, get the deepest subrepo that contains the file
+    
+    Also return the corresponding subrepo context and the filename relative to
+    its containing subrepo
+    """ 
+    if wfile in ctx.manifest():
+        return '', wfile, ctx
+    for wsub in ctx.substate:
+        if wfile.startswith(wsub):
+            srev = ctx.substate[wsub][1]
+            stype = ctx.substate[wsub][2]
+            if stype != 'hg':
+                continue
+            if not os.path.exists(ctx._repo.wjoin(wsub)):
+                # Maybe the repository does not exist in the working copy?
+                continue
+            try:
+                sctx = ctx.sub(wsub)._repo[srev]
+            except:
+                # The selected revision does not exist in the working copy
+                continue 
+            wfileinsub =  wfile[len(wsub)+1:]
+            if wfileinsub in sctx.substate or wfileinsub in sctx.manifest():
+                return wsub, wfileinsub, sctx
+            else:
+                wsubsub, wfileinsub, sctx = \
+                    getDeepestSubrepoContainingFile(wfileinsub, sctx)
+                if wsubsub is None:
+                    return None, wfile, ctx
+                else:
+                    return os.path.join(wsub, wsubsub), wfileinsub, sctx
+    return None, wfile, ctx
