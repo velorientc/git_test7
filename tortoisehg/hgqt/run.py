@@ -60,6 +60,8 @@ def dispatch(args):
         dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts,
                               parent=None)
         dlg.exec_()
+    except SystemExit:
+        pass
     except Exception, e:
         # generic errors before the QApplication is started
         if '--debugger' in args:
@@ -69,8 +71,6 @@ def dispatch(args):
         opts['error'] = traceback.format_exc()
         opts['nofork'] = True
         return qtrun(bugrun, u, **opts)
-    except SystemExit:
-        pass
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
 
