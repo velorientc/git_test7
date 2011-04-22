@@ -14,7 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport
+from mercurial import hg, ui, url, scmutil, util, error, demandimport
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
@@ -1212,7 +1212,7 @@ are expanded in the filename.'''))
         qtlib.openhelpcontents('sync.html#security')
 
     def accept(self):
-        path = util.user_rcpath()
+        path = scmutil.user_rcpath()
         fn, cfg = qtlib.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
