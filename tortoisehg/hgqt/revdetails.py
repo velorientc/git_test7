@@ -210,6 +210,7 @@ class RevDetailsWidget(QWidget):
 
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo, self)
+        self.filelistmodel.showMessage.connect(self.showMessage)
 
     def setupModels(self):
         self.create_models()

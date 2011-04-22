@@ -29,6 +29,7 @@ class HgFileListModel(QAbstractTableModel):
     """
 
     contextChanged = pyqtSignal(object)
+    showMessage = pyqtSignal(QString)
 
     def __init__(self, repo, parent):
         """
@@ -154,11 +155,14 @@ class HgFileListModel(QAbstractTableModel):
 
     def loadFiles(self):
         self._files = []
-        self._files = self._buildDesc(0)
-        if bool(self._ctx.p2()):
-            _paths = [x['path'] for x in self._files]
-            _files = self._buildDesc(1)
-            self._files += [x for x in _files if x['path'] not in _paths]
+        try:
+            self._files = self._buildDesc(0)
+            if bool(self._ctx.p2()):
+                _paths = [x['path'] for x in self._files]
+                _files = self._buildDesc(1)
+                self._files += [x for x in _files if x['path'] not in _paths]
+        except EnvironmentError, e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
     def data(self, index, role):
