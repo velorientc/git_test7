@@ -291,7 +291,7 @@ def markup(msg, **styles):
     msg = hglib.tounicode(msg)
     msg = Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
-    return '<span style="%s">%s</span>' % (style, msg)
+    return u'<span style="%s">%s</span>' % (style, msg)
 
 def descriptionhtmlizer(ui):
     """Return a function to mark up ctx.description() as an HTML
