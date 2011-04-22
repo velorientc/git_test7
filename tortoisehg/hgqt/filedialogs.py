@@ -394,11 +394,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.tableView_revisions_left.resizeColumns()
         self.tableView_revisions_right.resizeColumns()
         if self._show_rev is not None:
-            rev = self._show_rev
+            self.goto(self._show_rev)
             self._show_rev = None
-        else:
-            rev = self.filerevmodel.graph[0].rev
-        self.goto(rev)
+        elif len(self.filerevmodel.graph):
+            self.goto(self.filerevmodel.graph[0].rev)
 
     def revisionSelected(self, rev):
         if rev is None or rev not in self.filerevmodel.graph.nodesdict:
