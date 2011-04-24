@@ -450,6 +450,7 @@ class _QtRunner(QObject):
             self._mainapp.setOrganizationName('TortoiseHg')
             self._mainapp.setOrganizationDomain('tortoisehg.org')
             self._mainapp.setApplicationVersion(thgversion.version())
+            self._installtranslator()
             qtlib.setup_font_substitutions()
             qtlib.fix_application_font()
             qtlib.configstyles(ui)
@@ -482,6 +483,13 @@ class _QtRunner(QObject):
             return self._mainapp.exec_()
         finally:
             self._mainapp = None
+
+    def _installtranslator(self):
+        if not i18n.language:
+            return
+        t = QTranslator(self._mainapp)
+        t.load('qt_' + i18n.language, qtlib.gettranslationpath())
+        self._mainapp.installTranslator(t)
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
         dlg = dlgfunc(ui, *args, **opts)

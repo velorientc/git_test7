@@ -392,6 +392,10 @@ def getfont(name):
     assert name in _fontdefaults
     return _fontcache[name]
 
+def gettranslationpath():
+    """Return path to Qt's translation file (.qm)"""
+    return QLibraryInfo.location(QLibraryInfo.TranslationsPath)
+
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
                  labels=[], parent=None, defaultbutton=None):
     msg = QMessageBox(parent)
