@@ -258,7 +258,10 @@ class CommitWidget(QWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
-        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit).setContext(
+                  Qt.WidgetWithChildrenShortcut)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.commit).setContext(
+                  Qt.WidgetWithChildrenShortcut)
 
     @pyqtSlot(QString, QString)
     def fileDisplayed(self, wfile, contents):
