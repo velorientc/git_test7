@@ -48,6 +48,7 @@ class EmailDialog(QDialog):
         self._updateforms()
         self._readsettings()
         QShortcut(QKeySequence('CTRL+Return'), self, self.accept)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
 
     def closeEvent(self, event):
         self._writesettings()
