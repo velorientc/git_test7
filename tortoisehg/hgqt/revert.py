@@ -17,20 +17,27 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 
 class RevertDialog(QDialog):
-    def __init__(self, repo, wfile, rev, parent):
+    def __init__(self, repo, wfiles, rev, parent):
         super(RevertDialog, self).__init__(parent)
         self.setWindowTitle(_('Revert - %s') % repo.displayname)
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
-        self.wfile = repo.wjoin(wfile)
+        self.wfiles = [ repo.wjoin(wfile) for wfile in wfiles ]
         self.rev = str(rev)
 
         self.setLayout(QVBoxLayout())
 
-        lbl = QLabel(_('<b>Revert %s to its contents at revision %d?</b>') % (
-            wfile, rev))
+        if len(wfile) == 1:
+            lblText = _('<b>Revert %s to its contents'
+                        ' at revision %d?</b>') % (
+                      wfiles[0], rev)
+        else:
+            lblText = _('<b>Revert %d files to their contents'
+                        ' at revision %d?</b>') % (
+                      len(wfiles), rev)
+        lbl = QLabel(lblText)
         self.layout().addWidget(lbl)
 
         self.allchk = QCheckBox(_('Revert all files to this revision'))
@@ -57,7 +64,8 @@ class RevertDialog(QDialog):
                 return
             cmdline = ['revert', '--repository', self.repo.root, '--all']
         else:
-            cmdline = ['revert', '--repository', self.repo.root, self.wfile]
+            cmdline = ['revert', '--repository', self.repo.root]
+            cmdline.extend(self.wfiles)
         cmdline += ['--rev', self.rev]
         self.bbox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.cmd.run(cmdline)

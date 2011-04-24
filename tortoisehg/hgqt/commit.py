@@ -7,14 +7,14 @@
 
 import os
 
-from mercurial import ui, util, error
+from mercurial import ui, scmutil, util, error
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, wconfig
+from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 
 # Technical Debt for CommitWidget
@@ -164,31 +164,33 @@ class CommitWidget(QWidget):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, pats, opts, root=None, embedded=False, parent=None):
+    def __init__(self, repo, pats, opts, embedded=False, parent=None):
         QWidget.__init__(self, parent=parent)
 
+        repo.configChanged.connect(self.configChanged)
+        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        self.repo = repo
+
+        opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
+        opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
+        opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
+        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
         self.opts = opts # user, date
-        self.stwidget = status.StatusWidget(pats, opts, root, self)
+
+        self.stwidget = status.StatusWidget(repo, pats, opts, self)
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
-        self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(not embedded, self)
         self.runner.setTitle(_('Commit', 'window title'))
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
-
-        repo.configChanged.connect(self.configChanged)
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
-
-        self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
-        self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
-        self.stwidget.opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
@@ -220,6 +222,25 @@ class CommitWidget(QWidget):
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
         tbar.setIconSize(QSize(16,16))
+
+        if self.opts['bugtraqplugin'] != None:
+            self.bugtraq = self.createBugTracker()
+            try:
+                parameters = self.opts['bugtraqparameters']
+                linktext = self.bugtraq.get_link_text(parameters)
+            except Exception, e:
+                tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
+                qtlib.ErrorMsgBox(_('Issue Tracker'),
+                                  _('Failed to load issue tracker \'%s\': %s'
+                                    % (tracker, e)),
+                                  parent=self)
+                self.bugtraq = None
+            else:
+                # connect UI because we have a valid bug tracker
+                self.commitComplete.connect(self.bugTrackerPostCommit)
+                tbar.addAction(linktext).triggered.connect(
+                    self.getBugTrackerCommitMessage)
+
         self.stopAction = tbar.addAction(_('Stop'))
         self.stopAction.triggered.connect(self.stop)
         self.stopAction.setIcon(qtlib.geticon('process-stop'))
@@ -296,6 +317,26 @@ class CommitWidget(QWidget):
     def apiPrepFinished(self):
         'QsciAPIs has finished parsing displayed file'
         self.msgte.lexer().setAPIs(self._apis)
+
+    def bugTrackerPostCommit(self):
+        # commit already happened, get last message in history
+        message = self.lastmessage
+        error = self.bugtraq.on_commit_finished(message)
+        if error != None and len(error) > 0:
+            qtlib.ErrorMsgBox(_('Issue Tracker'), error, parent=self)
+        # recreate bug tracker to get new COM object for next commit
+        self.bugtraq = self.createBugTracker()
+
+    def createBugTracker(self):
+        bugtraqid = self.opts['bugtraqplugin'].split(' ', 1)[0]
+        result = bugtraq.BugTraq(bugtraqid)
+        return result
+
+    def getBugTrackerCommitMessage(self):
+        parameters = self.opts['bugtraqparameters']
+        message = self.getMessage()
+        newMessage = self.bugtraq.get_commit_message(parameters, message)
+        self.setMessage(newMessage)
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
@@ -630,6 +671,8 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            # capture last message for BugTraq plugin
+            self.lastmessage = self.getMessage()
             self.branchop = None
             umsg = self.msgte.text()
             if umsg:
@@ -774,7 +817,7 @@ class DetailsDialog(QDialog):
         self.saveToPath([fn])
 
     def saveGlobal(self):
-        self.saveToPath(util.user_rcpath())
+        self.saveToPath(scmutil.user_rcpath())
 
     def saveToPath(self, path):
         fn, cfg = qtlib.loadIniFile(path, self)
@@ -893,7 +936,7 @@ class DetailsDialog(QDialog):
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
 
-    def __init__(self, pats, opts, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-commit'))
@@ -906,7 +949,7 @@ class CommitDialog(QDialog):
         layout.setSpacing(0)
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, opts.get('root'), False, self)
+        commit = CommitWidget(repo, pats, opts, False, self)
         layout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -933,11 +976,11 @@ class CommitDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadSettings(s, 'committool')
-        commit.repo.repositoryChanged.connect(self.updateUndo)
+        repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
-        self.setWindowTitle(_('%s - commit') % commit.repo.displayname)
+        self.setWindowTitle(_('%s - commit') % repo.displayname)
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
@@ -1000,4 +1043,4 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return CommitDialog(pats, opts)
+    return CommitDialog(repo, pats, opts)
