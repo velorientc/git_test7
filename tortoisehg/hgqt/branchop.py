@@ -89,6 +89,7 @@ class BranchOpDialog(QDialog):
         self.bb = bb
         self.branchCombo = branchCombo
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def accept(self):

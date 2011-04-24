@@ -46,6 +46,10 @@ class RepoTreeView(QTreeView):
         self.setDropIndicatorShown(True)
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        QShortcut('Return', self, self.showFirstTabOrOpen).setContext(
+                  Qt.WidgetShortcut)
+        QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(
+                  Qt.WidgetShortcut)
 
     def contextMenuEvent(self, event):
         if not self.selitem:
@@ -130,13 +134,6 @@ class RepoTreeView(QTreeView):
             return
         super(RepoTreeView, self).mouseMoveEvent(event)
 
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
-            if self.selitem and self.selitem.internalPointer().isRepo():
-                self.showFirstTabOrOpen()
-        else:
-            super(RepoTreeView, self).keyPressEvent(event)
-
     def leaveEvent(self, event):
         if self.msg != '':
             self.showMessage.emit('')
@@ -145,6 +142,7 @@ class RepoTreeView(QTreeView):
         if self.selitem and self.selitem.internalPointer().isRepo():
             self.showFirstTabOrOpen()
         else:
+            # a double-click on non-repo rows opens an editor
             super(RepoTreeView, self).mouseDoubleClickEvent(event)
 
     def selectionChanged(self, selected, deselected):
@@ -161,8 +159,9 @@ class RepoTreeView(QTreeView):
 
     def showFirstTabOrOpen(self):
         'Enter or double click events, show existing or open a new repowidget'
-        root = self.selitem.internalPointer().rootpath()
-        self.openRepo.emit(hglib.tounicode(root), True)
+        if self.selitem and self.selitem.internalPointer().isRepo():
+            root = self.selitem.internalPointer().rootpath()
+            self.openRepo.emit(hglib.tounicode(root), True)
 
 
 class RepoRegistryView(QDockWidget):
