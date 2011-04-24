@@ -1,0 +1,19 @@
+GNOME desktop integration
+=========================
+
+.. module:: nautilus
+	:synopsis: GNOME desktop integration
+
+TortoiseHg umožňuje integraci konzoly s pracovní plochou GNOME prostřednictvím pluginu nautilus-python. Pokud jste instaloval TortoiseHg z instalačního paketu, pak nejspíš máte tuto extenzi již nastavenou. Pokud ne, pročtěte si pokyny na našich stránkách Wiki.
+
+Protože extenze nautilu nemá své vlastní GUI pro správu překryvných ikon a kontextových menu, podporuje povýšení příkazů do nejvyššího menu. Je zapotřebí upravit soubor :file:`~/hgrc` a přidat řádky, jako jsou tyto::
+
+	[tortoisehg]
+	promoteditems = commit, log, synch
+
+.. figure:: figures/nautilus.png
+	:alt: Nautilus screenshot
+
+	GNOME/Nautilus screenshot
+
+.. vim: noet ts=4

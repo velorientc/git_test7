@@ -11,26 +11,26 @@ Stderr je zachycen v bufferu, který je prohlížen při ukončení programu. Je
 
 Máte-li elementární znalost Pythonu, můžete také použít::
 
-    hgtk --debugger <command>
+    thg --debugger <command>
 
-Chcete-li vyřadit dělení nástroje hgtk, můžete buď zadat proměnnou prostředí **THG_HGTK_SPAWN**, nebo přidat parametr k CLI příkazu '--nofork'.
+Chcete-li vyřadit dělení nástrojem thg, můžete buď zadat proměnnou prostředí **THG_HGTK_SPAWN**, nebo přidat parametr k CLI příkazu '--nofork'.
 
 
 Windows
 ~~~~~~~
 
-Pro Průzkumník repozitáře lze např. uvnitř pracovního adresáře zadat v okně :command:`cmd.exe`::
+Pro odstranění závad např. ve Verpánku, zadejte tyto příkazy do konzoly `cmd.exe`, nacédované do repozitáře::
 
     set THGDEBUG=1
-    hgtk --nofork log
+    thg --nofork log
 
 Linux/MacOSX
 ~~~~~~~~~~~~
 
-Totéž::
+Podobně jako ve Windows::
     
     export THGDEBUG=1
-    hgtk --nofork log
+    thg --nofork log
 
 
 
@@ -42,8 +42,7 @@ Způsob odladění závisí na platformě.
 Windows
 ~~~~~~~
 
-Viz také http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
-kde jsou informace o spuštění a testování extenzí shellu ve Windows.
+Viz také `Debugging with the shell <http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx>`_ kde jsou informace o spuštění a testování extenzí shellu ve Windows.
 
 Nástroj :command:`DbgView` ze sady SysInternals odchytí chybovou zprávu
  z extenze shellu.  Shell ovšem ladící informace neemituje implicitně. Je nutné to povolit editací klíče registru, definovaného v 

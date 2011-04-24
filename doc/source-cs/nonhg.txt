@@ -8,6 +8,7 @@ Použití s jinými systémy VCS
 
 Tato kapitola popisuje tři nejoblíbenější extenze Mercurialu pro spolupráci s *cizími* systémy VCS. Viz také `Konverze repozitáře <http://mercurial.selenic.com/wiki/RepositoryConversion>`_.
 
+.. _perfarce-perforce:
 
 Perfarce (Perforce) 
 ===================
@@ -23,46 +24,46 @@ způsobí operace na jmenované klientské specifikaci p4 na serveru p4. Klients
 
 Extenze přepisuje pět vestavěných příkazů Mercurialu.
 
-odchozí::
+outgoing (odchozí)::
 
-	Jestliže název cílového repozitáře začíná s p4:// potom jsou oznámeny soubory ovlivněné revizemi lokálního repozitáře, nikoliv repozitáře v lokaci p4.
+	Začíná-li název destinace repozitáře p4://, potom jsou vybrány soubory ovlivněné revizemi lokálního repozitáře, nikoliv repozitáře v lokaci p4.
 
-push::
+push (poslat)::
 
-	Jestliže název cílového repozitáře začíná p4://, potom jsou exportovány změny z lokálního repozitáře do lokace p4. Není-li určena žádná revize, potom jsou odeslány všechny změny od posledního výpisu změn p4. V obou případech jsou všechny revize, které mají být odeslány, shrnuty v jediném výpisu změn p4. 
+	Začíná-li název destinace repozitáře p4://, potom jsou exportovány změny z lokálního repozitáře do lokace p4. Není-li určena žádná revize, potom jsou odeslány všechny změny od posledního výpisu změn p4. V obou případech jsou všechny revize, které mají být odeslány, shrnuty v jediném výpisu změn p4. 
+    Volitelně je výsledný changelist předán serveru p4 na základě opce --submit pro push nebo na základě nastavení **perfarce.submit** na True. Je-li **perfarce.keep** nastaveno na False potom se po úspěšném předání souborů smaže pracovní prostor p4.
 
-Volitelně je výsledný changelist předán serveru p4 na základě volby --submit pro push nebo na základě nastavení **perfarce.submit** na True. Je-li **perfarce.keep** nastaveno na False potom se po úspěšném předání souborů smaže pracovní prostor p4.
+pull (stáhnout)::
 
-pull::
+	Začíná-li název zdrojového repozitáře p4://, potom jsou změny importovány z depotu p4, přičemž se automaticky slučují changelisty podané příkazem hg push. Je-li **perfarce.keep** nastaveno na False, potom se po úspěšném importu souborů smaže pracovní prostor p4; v opačném případě je pracovní prostor p4 novými soubory aktualizován.
 
-	Začíná-li jméno zdrojového repozitáře *p4://*, potom jsou změny importovány z depotu, přičemž se automaticky slučují changelisty podané příkazem hg push. Je-li **perfarce.keep** nastaveno na False, potom se po úspěšném importu souborů smaže pracovní prostor p4; v opačném případě je pracovní prostor p4 novými soubory aktualizován.
+incoming (příchozí)::
 
-příchozí::
-
-	Začíná-li název zdrojového repozitáře *p4://*, potom jsou oznámeny změny v depotu p4, které dosud nejsou v lokálním repozitáři.
+	Začíná-li název zdrojového repozitáře p4://, potom jsou oznámeny změny v depotu p4, které dosud nejsou v lokálním repozitáři.
 
 clone::
 
-	Začíná-li název zdrojového repozitáře *p4://*, potom se vytvoří cílový repozitář a přetáhnou se do něho všechny změny z depotu p4.
+	Začíná-li název zdrojového repozitáře p4://, potom se vytvoří cílový repozitář a přetáhnou se do něho všechny změny z depotu p4.
+
+Nastavení konfigurační opce **perfarce.tags** určí, zda se perfarce pokusí importovat popisky (labels) Perforce jako tagy Mercurialu.	
 
 *Integrace TortoiseHg*
 
-Je-li umožněna extenze perfarce, přidá se volba :guilabel:`start revision` do nástroje *klonovat* a nabídka :guilabel:`Perforce` do Průzkumníka repozitáře. Nabídka má dvě položky:
+Je-li umožněna extenze perfarce, přidá se volba :guilabel:`start revision` do nástroje *klonovat* a tlačítko :guilabel:`P4` do synchronizační lišty.
 
-identity::
+Tlačítko nástrojové lišty provádí operace "p4pending". Vyhledá nevyřízené (pending) seznamy změn (changelists) Perforce, které byly poslány (pushed) do vašeho klienta Perforce ale nebyly postoupeny (submitted) nebo staženy (pulled) zpět. Otevře se dialogové okno se seznamem nevyřízených změn, které můžeme buď postoupit (submit) nebo vrátit zpět (revert). Když se proceduře Perforce úkon submit nepodaří, protože vaše soubory jsou zastaralé, musíte zrušit (revert) seznam změn (changelist), provést pull z Perforce, sloučit a provést push znovu.
 
-	Nalezne poslední (tip) revizi (v Perforce označována jako changelist) a vybere ji v okně Průzkumníka.
-
-pending::
-
-	Nalezne *nevyřízené* revize Perforce, které byly příkazem push poslány do naší klientské extenze Perforce ale nebyly ani zapsány do repozitáře, ani staženy zpět. V této situaci se otevře dialog, ve kterém můžeme nepřevzaté (pending) revize převzít nebo odmítnout.
 
 *Instalace*
 
-Perfarce se dodává společně s instalátorem TortoiseHg 1.0 pro Windows takže jej snadno umožníme přidáním záznamu do souboru Mercurial.ini nebo do konfiguračního souboru hgrc repozitáře::
+Perfarce se dodává společně s instalátory TortoiseHg 1.0 pro Windows takže jej snadno zavedeme přidáním záznamu do souboru Mercurial.ini nebo do konfiguračního souboru hgrc repozitáře::
 
 	[extensions]
 	perfarce=
+	
+.. note::
+	Je známo, že extenze perfarce nepracuje spolu s extenzí hgsubversion, takže pokud zamýšlíte používat obě, měly by být povoleny lokálně pro ty repozitáře, které je potřebují.
+	
  
 hgsubversion (SVN)
 ==================
@@ -79,21 +80,21 @@ Instalační programy TotroiseHg pro Window obsahují pojítka python-svn, potř
 
 	hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git
 
-Potom umožníme extenzi v našem souboru Mercurail.ini uvedením názvu vyhrazené složky::
+Potom povolíme extenzi v našem souboru Mercurail.ini uvedením názvu vyhrazené složky::
 
 	[extensions]
 	hgsubversion = C:\hgsvn\hgsubversion
 
 Funkčnost instalace si ověříme zadáním :command:`hg help hgsubversion`
 
-Podrobnosti nalezneme na stránkách wiki pro hgsubversion.
+Podrobnosti nalezneme na stránkách wiki pro hgsubversion. Doporučujeme verzi minimálnfě 1.2.1 s Mercurialem 1.8.
 
 .. warning::
    Při klonování serveru Subversion se vřele doporučuje klonovat jenom několik prvních revizí a zbytek přetáhnout (pull). Vyskytne-li se chyba při klonování, bývá smazán celý neúplný klon. Akce pull je mnohem shovívavější. 
 
 *Integrace TortoiseHg*
 
-Importované changesety ze Subversion se v Průzkumníku repozitáře zobrazí s původními čísly v Subversion.
+Importované changesety ze Subversion se ve Verpánku zobrazí s původními čísly v Subversion.
 
 hg-git (git)
 ============ 
@@ -110,7 +111,7 @@ Instalační programy TotroiseHg pro Window obsahují pojítka python-git (ozna�
 
 	hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git
 
-Potom umožnit hggit a bookmarks v souboru Mercurial.ini::
+Potom povolit hggit a bookmarks v souboru Mercurial.ini::
 
 	[extensions]
 	bookmarks =

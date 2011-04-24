@@ -8,9 +8,9 @@ Nastavení parametrů
 .. figure:: figures/settings.png
     :alt: Settings dialog
 
-	Okno Konfigurace uživatele
-
-Dialog nastavení se používá pro konfiguraci jak TortoiseHg, tak DVCS Mercurialu, protože TortoiseHg je vlastně uživatelská obálka programu Mercurial.
+..	
+	
+Dialog **Settings** se používá pro konfiguraci jak TortoiseHg, tak DVCS Mercurialu, protože TortoiseHg je vlastně uživatelská obálka programu Mercurial.
 
 Konfigurace Mercurialu ve Windows má tři úrovně.
 
@@ -23,8 +23,8 @@ Konfigurace Mercurialu ve Windows má tři úrovně.
 3) Nastavení pro repozitář v souboru   :file:`repo-root\\.hg\\hgrc`.
    Tento soubor je čten jako poslední a má tudíž nejvyšší prioritu.
 
-Nastavení pro počítač může být přepsáno při aktualizaci, takže se doporučuje provádět změny jen v souborech :file:`..username\\mercurial.ini` a/nebo :file:`.hg\\hgrc`.  
-V TortoiseHg je toto doporučení vynuceno tím, že se používají jen dvě úrovně nastavení:
+Nastavení pro počítač může být přepsáno při aktualizaci programu, takže se doporučuje provádět změny jen v souborech :file:`..username\\mercurial.ini` a/nebo :file:`.hg\\hgrc`.  
+V TortoiseHg je toto doporučení posíleno tím, že se používají jen dvě úrovně nastavení:
 
 Globální nastavení uživatele
 	edituje nastavení pro uživatele :file:`..username\\mercurial.ini`
@@ -33,7 +33,7 @@ Nastavení repozitáře
 
 Mezi těmito režimy lze přepínat ve výběrovém tlačítku vlevo nahoře. Vlastní nastavení lze provést buď ve vybraném dialogovém okně nebo editací uvedených souborů.
 
-Většina uživatelů TortoiseHg si všechny nastavitelné parametry uloží v globálním nastavení a soubor hgrc v repozitáři použije pro uložení cest (aliasy pro vzdálené repozitáře). Vězme, že soubory pro tato nastavení neexistují dříve, než poprvé použijeme dialog Nastavení.
+Většina uživatelů TortoiseHg si všechny nastavitelné parametry uloží v globálním nastavení a soubor hgrc v repozitáři použije pro uložení cest (aliasy pro vzdálené repozitáře) a konfiguraci webu. Vězme, že soubory pro tato nastavení neexistují dříve, než poprvé použijeme dialog Nastavení.
 
 
 Záložky
@@ -41,7 +41,7 @@ Záložky
 
 Nástroj pro konfiguraci programu se skládá ze záložek.
 
-Každá záložka přibližně odpovídá jedné sekci v konfiguračním souboru. Některé sekce však byly kvůli přehlednosti rozdělený do více záložek. 
+Každá záložka přibližně odpovídá jedné sekci vašeho konfiguračního souboru :file:`Mercurial.ini`. Některé sekce však byly kvůli přehlednosti rozděleny do více záložek. 
 
 Všechny záložky kromě :guilabel:`Sync` mají stejný formát - sloupec nastavitelných parametrů s rozbalovacími seznamy možných hodnot. Názvy parametrů jsou doplněny skrytými popisy parametru a jeho možných hodnot.
 Popis aktuálně editovaného parametru se rovněž objeví v textovém rámečku dole.
@@ -91,31 +91,13 @@ TortoiseHg
 :guilabel:`Kontrola pravopisu:`
 	Implicitní jazyk pro kontrolu pravopisu. Není-li specifikováno, použije se jazyk systému. Příklady: en, en_GB, en_US. Kontrola pravopisu vyžaduje aplikaci gtkspell, která je přístupná jen na počítačích 'Gnome'.
 
-.. module:: commit.settings
-	:synopsis: Dialog used to set commit specific preferences
-
-Commit
-------
-
-:guilabel:`Jméno uživatele:`
-	Jméno spojené s komity.
-:guilabel:`Délka souhrnného řádku:`
-	Maximální délka souhrnného řádku průvodní zprávy komitu.
-	Aplikace vydá varování při překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného dalšího textu prázdným řádkem. Implicitní nastavení je 0 (nevynuceno). 
-:guilabel:`Délka řádku zprávy:`
-	Délka zalomení řádku průvodní zprávy komitu. Je-li délka zadána, lze použít vyskakovací menu pro formátování zprávy a objeví se varování při překročení zadané délky. Implicitní nastavení je 0 (nevynuceno).
-:guilabel:`Push po komitu:`
-	Aplikace se pokusí poslat (push) revizi k nastavenému repozitáři po každém úspěšném komitu. Implicitně je False.
-:guilabel:`Seznam auto-include:`
-	Čárkami rozdělený seznam souborů, které jsou automaticky vloženy do každého komitu. Zamýšleno pouze jako nastavení repozitáře. Implicitní nastavení je None.
-:guilabel:`Seznam auto-exclude:`
-	Čárkami rozdělený seznam souborů, které jsou automaticky vypuštěny z výběru při otevření dialogů status, commit a shelve. Implicitní nastavení je None.
 
 
-.. module:: changelog.settings
-	:synopsis: Dialog used to set changelog specific preferences
 
-Changelog
+.. module:: workbench.settings
+	:synopsis: Dialog used to set workbench specific preferences
+
+Workbench
 ---------
 
 :guilabel:`Zabarvení podle autora:`
@@ -135,30 +117,43 @@ Changelog
 
 :guilabel:`Skrýt tagy:`
 	Seznam mezerami oddělených tagů, které se nebudou zobrazovat. Užitečný příklad: zadejte 'qbase qparent qtip' pro skrytí standardních tagů, vkládaných extenzí MQ. Implicitní nastavení je None.
-	
-.. module:: synchronize.settings
-	:synopsis: Dialog used to set synchronize specific preferences
-
-Sync
-----
-
-Na záložce :guilabel:`Sync` můžeme ukládat adresy URL (cesty) přidružených repozitářů. Tato informace se většinou ukládá do konfiguračního souboru repozitáře. Mercurial má dvě speciální jména cest, které lze pro některé operace nastavit jako implicitní cíle.
-
-* *default* - implicitní URL ze kterého lze stahovat (pull), obvykle je to zdroj našeho klonu
-* *default-push* - implicitní cíl pro operaci 'push' při použití příkazového řádku
-
-:guilabel:`Operace po akci pull:`
-	Nastavená operace se provede bezprostředně po úspěšné akci 'pull'. Volba :guilabel:`update` se rovná :command:`pull --update`, volba :guilabel:`fetch`
-	se rovná extenzi fetch, volba :guilabel:`rebase` se rovná pořadí
-	:command:`pull --rebase`.  Implicitní nastavení je none.
-
-:guilabel:`Cesty ke vzdáleným repozitářům`
-	V tomto panelu lze nastavit náhradní označení pro repizitáře, se kterými se často synchronizujeme. Mercurial přidá automaticky označení *default* ke zdroji klonu. Všechna označení nastavených cest se objeví v rozbalovacím seznamu dialogu Synchronizovat a lze je použít jako zkratku na příkazovém řádku.
  
+:guilabel:`Operace po akci pull` 
+	Operace, které se provedou přímo po úspěšném provedení akce pull. Hodnota 'update' odpovídá pull --update, 'fetch' je extenze fetch, 'rebase' odpovídá pull --rebase. Implicitní nastavení je None.
+	
 
+
+
+.. module:: commit.settings
+	:synopsis: Dialog used to set commit specific preferences
+	
+Commit
+------
+
+:guilabel:`Jméno uživatele:`
+	Jméno spojené s komity.
+:guilabel:`Délka souhrnného řádku:`
+	Maximální délka souhrnného řádku průvodní zprávy komitu.
+	Aplikace vydá varování při překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného dalšího textu prázdným řádkem. Implicitní nastavení je 0 (nevynuceno). 
+:guilabel:`Délka souhrnného řádku:`
+	Délka zalomení řádku průvodní zprávy komitu. Je-li délka zadána, lze použít vyskakovací menu pro formátování zprávy a objeví se varování při překročení zadané délky. Implicitní nastavení je 0 (nevynuceno).
+:guilabel:`Po komitu zavřít`
+	Ukončit proceduru commit po každém úspěšném komitu. Implicitní nastavení je False.
+:guilabel:`Push po komitu:`
+	Aplikace se pokusí poslat (push) revizi k nastavenému repozitáři po každém úspěšném komitu. Implicitně je False.
+:guilabel:`Seznam auto-include:`
+	Čárkami rozdělený seznam souborů, které jsou automaticky vloženy do každého komitu. Zamýšleno pouze jako nastavení repozitáře. Implicitní nastavení je None.
+:guilabel:`Seznam auto-exclude:`
+	Čárkami rozdělený seznam souborů, které jsou automaticky vypuštěny z výběru při otevření dialogů status, commit a shelve. Implicitní nastavení je None.
+:guilabel:`Průvodní texty anglicky`
+    Generovat anglickou zprávu, i když jsou proměnné prostředí LANGUAGE nebo LANG nastaveny na neanglický jazyk. Toto nastavení je používáno procedurami Merge, Tag a Backout. Implicitní nastavení je False.
+
+
+
+	
 .. module:: web.settings
 	:synopsis: Dialog used to set web server specific preferences
-
+	
 Web
 ---
 
@@ -273,6 +268,9 @@ Diff
 :guilabel:`Formát Git:`
 	Použít rozšířený git formát záhlaví diffu. Implicitně je False.
 
+:guilabel:`MQ Git Format`
+    If set to 'keep', mq will obey the (diff) section configuration while preserving existing git patches upon qrefresh. If set to 'yes' ot 'no', mq will override the (diff) section and always generate git or regular patches, possibly losing data in the second case.
+
 :guilabel:`Bez datumu:`
 	Do záhlaví diffů nezahrnovat data modifikací. Implicitně je False.
 
@@ -292,37 +290,60 @@ Diff
 	Úprava stylu zabarvení diffových řádků v prohlížeči changesetů. Implicitně: foreground.
 
 
-Font
-----
+Fonty
+-----
 
-:guilabel:`Implicitní fonty motivu`
-	Použít výchozí fonty založené na aktuálním motivu GTK
+:guilabel:`Message Font:`
+	Font průvodních zpráv komitu. Implicitně: monospace 10
+
+:guilabel:`Diff Font:`
+	Font pro zobrazení textových rozdílů. Implicitně: monospace 10.
 	
-:guilabel:`Nastavené fonty:`
-	Vybrat nastavené fonty z rozbalovací nabídky. Tyto sady fontů vyjadřuji odlišnosti různých jazyků či prostředí.
+:guilabel:`List Font:`
+	Font seznamu souborů . Implicitně: sans 9.
 	
-:guilabel:`Uživatelské fonty:`
-	Určit jména fontů a velikostí individuálně pro jednotlivá místa použití.
-:guilabel:`Komentář komitu:`
-	Font je používán v prohlížeči changesetů a při zápisu komitu. Implicitně: monospace 10.
-:guilabel:`Text diffu:`
-	Font je používán pro zápis diffů v nástrojích status a commit. Implicitně: monospace 10.
-:guilabel:`Seznam souborů:`
-	Font je používán v seznamu souborů v nástrojích status a commit. Implicitně: sans 9.
-:guilabel:`Výstup příkazu:`
-	Font je používán v oknech s výstupem příkazů. Implicitně: monospace 10.
+:guilabel:`ChangeLog Font`
+	Font pro zobrazení dat v changelogu. Implicitně: monospace 10.
+	
+:guilabel:`Output Font:`
+	Font textu v panelu Output Log. Implicitně: sans 8.
+	
 
+Extenze
+-------
 
-Extension
----------
+Aktivační seznam extenzí.
 
-Záložka obsahuje seznam volitelných extenzí. Podrobnosti neuvedeny.
+Sledování problémů
+------------------
 
+:guilabel:`Regex problému`
+	Definuje regex shody pro vyhledávání čísel problému.
 
-Sporná témata
--------------
+:guilabel:`Přípojení k problému`
+	Definuje příkaz, který má být spuštěn po zjištění čísla problému.
 
-Popis záložky neuveden
+	
+Review Board
+------------
+
+:guilabel:`Server`
+	Path to review board example "http://demo.reviewboard.org"
+
+:guilabel:`Uživatel`
+	User name to authenticate with review board.	
+	
+:guilabel:`Heslo`
+	Password to authenticate with review board.
+
+:guilabel:`Server Repository ID`
+	The default repository id for this repo on the review board server	
+
+:guilabel:`Target Groups`
+	A comma separated list of target groups.
+
+:guilabel:`Target People`
+	A comma separated list of target people.
 
 	
 Klávesová navigace
@@ -337,11 +358,11 @@ Spuštění z příkazového řádku
 
 ::
 
-	hgtk repoconfig
+	thg repoconfig
 
 pro nastavení repozitáře (:file:`.hg/hgrc` file) nebo ::
 
-	hgtk userconfig
+	thg userconfig
 
 pro uživatelskou konfiguraci (:file:`Mercurial.ini` file).
 

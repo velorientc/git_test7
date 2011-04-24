@@ -1,21 +1,22 @@
-*********************
+********************
 TortoiseHg prakticky
-*********************
+********************
 
 .. toctree::
-    :maxdepth: 3
-    
-    common
-    explorer
-    init
-    clone
-    commit
-    shelve
-    changelog
-    datamine
-    synchronize
-    serve
-    guess
-    ignore
+	:maxdepth: 3
+	
+	common
+	explorer
+	nautilus
+	workbench
+	init
+	clone
+	commit
+	shelve
+	sync
+	serve
+	guess
+	ignore
+	archive
 
 .. vim: noet ts=4

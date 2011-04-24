@@ -1,131 +1,86 @@
 Almárka
-========
+=======
 
 .. module:: shelve.dialog
     :synopsis: Dialog used to perform shelve/unshelve operations
 
-Účelem tohoto nástroje je umožnit uživateli **odložit** (shelve) vybrané změny z pracovního adresáře, uložit je uvnitř repozitáře ve speciálním oprávkovém souboru (patch file) a později je opět **vyjmout** (unshelve). Úložný prostor uvnitř repozitáře je označován jako shelf, neboli almárka.
+Nástroj **shelve** dovede přesouvat změny mezi pracovním adresářem a oprávkami v almárce (shelf patches). Byla-li povolena extenze MQ, umí také přesouvat změny **do** i **z** neaplikovaných oprávek.
+
+Nástroj shelve spustíme ve Verpánku výběrem :guilabel:`Repository > Shelve...`, (by a toolbar button on working file viewers) nebo příkazem :command:`thg shelve`
+
+.. note::
+	Vřele doporučujeme nastavit konfiguraci EOL oprávky na "auto", pokud používáte nástroj shelve pro textové soubory s DOS EOLn.
 
 .. figure:: figures/shelve.png
 	:alt: Shelve dialog
 
 	Dialogové okno Shelve
+	
+Vlastnosti
+----------
 
-Stručný popis jednotlivých tlačítek:
+Nástroj shelve má tři nástrojové lišty. Levou a pravou pro dva panely vedle sebe a centrální lištu pro příkazy 'Refresh' a vytvoření nové almárky (New Shelf). Levá lišta je zrcadlovým obrazem pravé, obě nabízejí stejné funkce v obráceném pořadí.
 
-	:guilabel:`Shelve` 
-		Odložit vybrané diffy v zatržených souborech (do almárky).
-	:guilabel:`Unshelve`
-		Vrátit odložené změny zpět do pracovního adresáře.
-	:guilabel:`VDiff`
-		Vizuální porovnání vybraných souborů
-	:guilabel:`Vrátit`
-		Vrátit vybrané soubory k poslednímu verzovanému stavu. Při slučování je možné určit návrat k vybranému rodiči. 
-	:guilabel:`Přidat`
-		Přidat vybrané soubory, které měly status neznámého (?) nebo ignorovaného (I) souboru).
-	:guilabel:`Přesunout`
-		Přemístit vybrané soubory do určeného cílového adresáře verzovaným způsobem.
-	:guilabel:`Odebrat`
-		Smazat vybrané neverzované soubory a/nebo odebrat (označit jako smazané) všechny verzované soubory.
-	:guilabel:`Zapomenout`
-		Zapomenout vybrané verzované soubory.
-	:guilabel:`Obnovit`
-		Znovu načíst stav pracovního adresáře. Procedura se snaží zachovat výběr souborů i jejich výběrový status.
+Levá lišta obsahuje tyto akce:
 
-Pole pro seznam souborů má čtyři sloupce stejně jako v nástroji Commit. Význam jednotlivých záhlaví - viz 4.5.1 nad poznámkou.
+	:guilabel:`Smazat vybrané porce (chunks)` 
+		Odstranit nebo zrušit všechny vybrané (přepnuté) porce v aktuálně vybraném souboru.
+	:guilabel:`Přesunout všechny soubory vpravo`
+		Přesunout všechny změny ve všech souborech do oprávky, vybrané v pravém panelu.
+	:guilabel:`Přesunout vybraný soubor vpravo`
+		Přesunout všechny změny ve vybraném souboru do oprávky, vybrané v pravém panelu.
+	:guilabel:`Editovat vybraný soubor`
+		Při procházení pracovním adresářem toto tlačítko umožní editaci vybraného souboru. Případně editaci aktuálně zobrazeného oprávkového souboru.
+	:guilabel:`Přesunout vybrané porce vpravo`
+		Přesunout všechny vybrané (přepnuté) porce do oprávky, vybrané v pravém panelu.
 
-Záložky
--------
+Střední lišta má dvě akce:
+		
+	:guilabel:`Refresh`
+		Obnoví rozbalovací seznamy oprávek a zobrazení pracovní kopie.
+	:guilabel:`New Shelf`
+		Vytvoří nový almárkový soubor. Musíte zadat název i když je k disposici rozumná implicitní hodnota.
 
-Diffový panel nástroje Shelve má čtyři záložky:
-	1) Text diffu - ukazuje diff aktuálně vybraného souboru
-	2) Výběr porce - umožňuje vybírat z porcí diffů  vybraného souboru
-	3) Náhled almárky - zobrazuje všechny vybrané změny. Tento náhled ukazuje změny, které budou odebrány z pracovního adresáře a odloženy v almárce.
-	4) Obsah almárky - aktuální obsah almárky.
+Pravá nástrojová lišta umožní přesun změn z oprávek, vybraných na levé straně do oprávek, vybraných na pravé straně, nebo přesun pracovní kopie, byla-li vybrána na pravé straně.
+		
 
-
-Odkládání změn
+Panely oprávek
 --------------
 
-Stejně jako procedura Commit, používá i procedura Shelve vestavěný kód pro výběr porcí u zadaných souborů pro odložení do almárky. Stiskneme-li tlačítko Shelve, jsou vybrané změny odstraněny z pracovního adresáře a umístěny do oprávkového souboru. Pokud almárka již změny obsahuje, musíme rozhodnout, zda má být soubor přepsán anebo zda mají být změny sloučeny. Obsahuje-li almárka nějaké změny, je aktivní tlačítko "Vyjmout".
+Levý a pravý panel oprávek jsou identické, kromě toho, že změny pracovní kopie jsou přístupné jenom v levém panelu. Vybíratelné porce jsou zobrazeny pouze tehdy, obsahuje-li soubor text a je-li v modifikovaném stavu. Přidané nebo odstraněné soubory mohou být odloženy (shelved) ale jejich části nelze individuálně vybrat.
 
-Vracení odložených změn
------------------------
-
-Při stisku tlačítka Unshelve jsou odložené změny znovu použity v pracovním adresáři.
+Tlačítko :guilabel:`Clear` vyprázdní aktuálně vybranou cestu nebo vrátí (revert) celou pracovní kopii. Tlačítko :guilabel:`Delete` smaže aktuálně vybranou oprávku almárky.
 
 .. note::
-	Vrácené změny se projeví jako úpravy pracovního adresáře po použití tlačítka Obnovit.
+	Tlačítko :guilabel:`Delete` není sensitivní, je-li vybrána oprávka MQ. Oprávky MQ se smažou prostřednictvím 'qdelete' s použitím kontextového menu Verpánku nebo widgetu Patch Queue. 
 
-V čem se odložení liší od předání?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Při dvojím poklepu na souboru v seznamu dostanete kontextové menu s příkazy:
 
-Odložené změny jsou fyzicky odstraněny z pracovního adresáře dokud je opět nevrátíme. To znamená, že můžeme rozvíjet a testovat svůj projekt při nepřítomnosti odložených změn. To je bezpečnější, než vybírání změn při rozvíjení projektu.
+	:guilabel:`Visual Diff`
+		Otevřít vybraný soubor ve vašem nastaveném nástroji pro zobrazení diffů. Povoleno jen pro soubory pracovní kopie.
+	:guilabel:`Edit Local`
+		Otevřít verzi pracovní kopie vybraného souboru.		
+	:guilabel:`Revert to Revision`
+		Vrátit všechny změny vybraného souboru. Povoleno jen pro soubory pracovní kopie.
+		
 
-Odložením dokončených úseků projektu si také můžeme zajistit, že se nám tyto části nebudou křížit s odlaďováním či jinými prováděnými změnami.  
+Trashcan
+--------
 
-Výhrada: Odložené změny jsou uloženy v oprávce (patch), která vychází z obsahu aktuálního pracovního adresáře. Není žádná záruka že oprávku bude možné později znovu použít, pokud by odložené změny kolidovaly se změnami, provedenými v pracovním adresáři po úkonu Odložit.
+Nástroj shelve zachází s vašimi zdrojovými a oprávkovými soubory velmi konzervativně. Předtím, než modifikuje kterýkoliv soubor, provede zálohování do :file:`.hg/Trashcan`. Tato nádoba na odpadky může být vyprázdněna s použitím nástroje Verpánku :guilabel:`Repository > Purge`.
 
-V čem se odložení liší od MQ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Almárku lze považovat za nepojmenovanou oprávku MQ, která není nikdy přeměněna na changeset.
-Nástroj Shelve může být užitečný při údržbě fronty oprávek.
-Úkon "shelve" může vzít změny z jedné oprávky a použít je u jiné nebo u oprávky úplně nové.
-
-Například:
-	1) Provedeme push do oprávky, kterou bychom rádi rozdělili
-	2) Otevřeme nástroj pro odkládání změn, kde můžeme vybrat poslední změny oprávky
-	3) Vypustíme z výběru porce, které chceme ponechat v oprávce a stiskneme :guilabel:`Shelve`
-	4) Obnovíme poslední (top) oprávku příkazem :command:`hg qrefresh`, nebo použijeme nástroj pro komit
-	5) Provedeme push nebo pop (?) do oprávky pro níž chceme použít odložené změny
-	6) Otevřeme nástroj pro odkládání změn a stiskneme :guilabel:`Unshelve`
-	7) Obnovíme poslední oprávku (opakujeme krok 4)
-
-Nelze odložit soubory přidané, odstraněné nebo přejmenované, ale extenze MQ to umí.
-
-V čem se odložení liší od procedury attic?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Extenze attic je sada nástrojů pro práci s "almárkou". Toto rozšíření umožňuje mít několik pojmenovaných *odstávek*, které mohou být odládány a vraceny nezávisle na sobě.
-
-Klávesová navigace
--------------------
-
-:guilabel:`Ctrl-C`
-    v panelu se záložkami zkopíruje aktuálně zvýrazněné (nikoliv vybrané, jen zvýrazněné) porce diffů do schránky. Tyto mohou být vlepeny do textového zásobníku za účelem vytvoření libovolné oprávky založené na  změnách v pracovním adresáři.
- 
-Kód, který kopíruje porce (hunks) do schránky, rozezná záhlaví diffů. Obsah schránky může vždy tvořit platnou oprávku (patch).
-
-
-Nastavitelné atributy v kofiguraci repozitáře
----------------------------------------------
-
-* :menuselection:`TortoiseHg -> Diff. panel dole`
-* :menuselection:`TortoiseHg -> Šířka záložky`
-* :menuselection:`TortoiseHg -> Max velikost diffu`
 
 Spuštění z příkazového řádku
--------------------------------------
+----------------------------
+::
 
-Dialogové okno akce Shelve (Odložit) se otevře jedním z následujících příkazů::
+	thg shelve
 
-	hgtk shelve
+	aliases: unshelve
 
-	hgtk unshelve
+	shelve tool
 
-	globální možnosti viz "hgtk -v help shelve" 
-	
+	use "thg -v help shelve" to show global options
 
-Přístup k funkci *shelve* v samotném Mercurialu si otevřeme úpravou konfiguračního souboru Mercurial.ini::
-
-	[extensions]
-	tortoisehg.util.hgshelve=
-
-Příkazy :command:`shelve` a :command:`unshelve` lze potom zadávát s příkazem **hg**.
-
-.. warning::
-	Extenze win32text může působit potíže při výběru porcí. 
-	Toto je již vyřešeno ve verzích Mercurial 1.3 a TortoiseHg 0.8, ale vyžaduje to řádné nastavení. Viz `issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
 
 .. vim: noet ts=4
