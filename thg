@@ -43,6 +43,7 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('icons_rc')
+demandimport.ignore.append('translations_rc')
 demandimport.enable()
 from mercurial import ui as uimod, util
 from tortoisehg.util.hgversion import hgversion, checkhgversion
