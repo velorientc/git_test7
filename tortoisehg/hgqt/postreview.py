@@ -102,6 +102,7 @@ class PostReviewDialog(QDialog):
         self.review_thread.finished.connect(self.errorPrompt)
         self.review_thread.start()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
 
     @pyqtSlot()
     def passwordPrompt(self):
