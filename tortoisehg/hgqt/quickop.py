@@ -112,6 +112,7 @@ class QuickOpDialog(QDialog):
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
         QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
