@@ -45,6 +45,8 @@ class RepoTreeView(QTreeView):
 
         self.createActions()
         self.setHeaderHidden(True)
+        QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(Qt.WidgetShortcut)
+        QShortcut('Return', self, self.showFirstTabOrOpen).setContext(Qt.WidgetShortcut)
 
     def contextMenuEvent(self, event):
         if not self.selitem:
@@ -72,11 +74,6 @@ class RepoTreeView(QTreeView):
         self.workbench.showMessage(self.msg)
         super(RepoTreeView, self).mouseMoveEvent(event)
 
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
-            self.showFirstTabOrOpen()
-        else:
-            super(RepoTreeView, self).keyPressEvent(event)
     def leaveEvent(self, event):
         if self.msg != '':
             self.workbench.showMessage('')
