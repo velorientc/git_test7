@@ -30,7 +30,7 @@ def _defaultlanguage():
 
 def setlanguage(lang=None):
     """Change translation catalog to the specified language"""
-    global t
+    global t, language
     if not lang:
         lang = _defaultlanguage()
     opts = {}
@@ -38,6 +38,7 @@ def setlanguage(lang=None):
         opts['languages'] = (lang,)
     t = gettext.translation('tortoisehg', paths.get_locale_path(),
                             fallback=True, **opts)
+    language = lang or locale.getdefaultlocale(_localeenvs)[0]
 setlanguage()
 
 def availablelanguages():
