@@ -148,8 +148,6 @@ class SyncWidget(QWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
-        style = QApplication.style()
-
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(hbox)
@@ -201,6 +199,7 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 4)
 
+        style = QApplication.style()
         self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
         self.savebutton.setToolTip(_('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
