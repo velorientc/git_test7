@@ -151,6 +151,16 @@ class SyncWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(hbox)
+        self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
+        hbox.addWidget(lbl)
+        self.optionslabel = QLabel()
+        self.optionslabel.setAcceptDrops(False)
+        hbox.addWidget(self.optionslabel)
+        hbox.addStretch()
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(hbox)
         hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
         self.urllabel = QLabel()
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -323,6 +333,7 @@ class SyncWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
+            self.refreshUrl()
 
     def reload(self):
         # Refresh configured paths
@@ -386,6 +397,16 @@ class SyncWidget(QWidget):
         for w in self.HostAndPortWidgets:
             w.setDisabled(schemeIndex == 0)
         self.securebutton.setHidden(schemeIndex != 3)
+
+        opts = []
+        for opt, value in self.opts.iteritems():
+            if value is True:
+                opts.append('--'+opt)
+            elif value:
+                opts.append('--'+opt+'='+value)
+        self.optionslabel.setText(' '.join(opts))
+        self.optionslabel.setVisible(bool(opts))
+        self.optionshdrlabel.setVisible(bool(opts))
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
