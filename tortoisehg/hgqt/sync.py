@@ -159,7 +159,15 @@ class SyncWidget(QWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
-        style = QApplication.style()
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(hbox)
+        self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
+        hbox.addWidget(lbl)
+        self.optionslabel = QLabel()
+        self.optionslabel.setAcceptDrops(False)
+        hbox.addWidget(self.optionslabel)
+        hbox.addStretch()
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -216,6 +224,7 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.pathentry)
 
+        style = QApplication.style()
         a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
                           _('Save'))
         a.setToolTip(_('Save current URL under an alias'))
@@ -340,6 +349,7 @@ class SyncWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
+            self.refreshUrl()
 
     def reload(self):
         # Refresh configured paths
@@ -403,6 +413,16 @@ class SyncWidget(QWidget):
         for w in self.HostAndPortWidgets:
             w.setDisabled(schemeIndex == 0)
         self.securebutton.setVisible(schemeIndex == 3)
+
+        opts = []
+        for opt, value in self.opts.iteritems():
+            if value is True:
+                opts.append('--'+opt)
+            elif value:
+                opts.append('--'+opt+'='+value)
+        self.optionslabel.setText(' '.join(opts))
+        self.optionslabel.setVisible(bool(opts))
+        self.optionshdrlabel.setVisible(bool(opts))
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
