@@ -395,7 +395,7 @@ class SyncWidget(QWidget):
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
-            w.setDisabled(schemeIndex == 0)
+            w.setHidden(schemeIndex == 0)
         self.securebutton.setHidden(schemeIndex != 3)
 
         opts = []
