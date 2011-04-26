@@ -12,7 +12,6 @@ import shlex
 import time
 import inspect
 
-from mercurial.cmdutil import updatedir
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
 from mercurial import scmutil
