@@ -6,11 +6,9 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import re
 import sys
 import shlex
 import time
-import inspect
 
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
