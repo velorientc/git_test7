@@ -162,6 +162,9 @@ class ServeDialog(QDialog):
         """Port number of the web server"""
         return int(self._qui.port_edit.value())
 
+    def setport(self, port):
+        self._qui.port_edit.setValue(port)
+
     def keyPressEvent(self, event):
         if self.isstarted() and event.key() == Qt.Key_Escape:
             self.stop()
@@ -246,6 +249,17 @@ def run(ui, *pats, **opts):
     repopath = opts.get('root') or paths.find_root()
     webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
     dlg = ServeDialog(webconf=_newwebconf(repopath, webconfpath))
+
+    lui = ui.copy()
+    if webconfpath:
+        lui.readconfig(webconfpath)
+    elif repopath:
+        lui.readconfig(os.path.join(repopath, '.hg', 'hgrc'), repopath)
+    try:
+        dlg.setport(int(lui.config('web', 'port', '8000')))
+    except ValueError:
+        pass
+
     if repopath or webconfpath:
         dlg.start()
     return dlg
