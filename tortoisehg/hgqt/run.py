@@ -22,7 +22,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 import mercurial.ui as uimod
-from mercurial import hg, scmutil, util, fancyopts, cmdutil, extensions, error
+from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib, i18n
@@ -168,7 +168,7 @@ def get_files_from_listfile():
     files = []
     for f in lines:
         try:
-            cpath = scmutil.canonpath(root, cwd, f)
+            cpath = hglib.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
         except util.Abort:
             continue

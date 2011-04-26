@@ -12,7 +12,16 @@ import time
 
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
-from mercurial import scmutil
+from mercurial import demandimport
+
+demandimport.disable()
+try:
+    # hg >= 1.9
+    from mercurial.scmutil import canonpath, user_rcpath
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.util import canonpath, user_rcpath
+demandimport.enable()
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -321,13 +330,13 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(scmutil.canonpath(root, cwd, f))
+            canonpats.append(canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(scmutil.canonpath(root, cwd, f[len(cwd+os.sep):]))
+                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)

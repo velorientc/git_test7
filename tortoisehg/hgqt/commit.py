@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, scmutil, util, error
+from mercurial import ui, util, error
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -820,7 +820,7 @@ class DetailsDialog(QDialog):
         self.saveToPath([fn])
 
     def saveGlobal(self):
-        self.saveToPath(scmutil.user_rcpath())
+        self.saveToPath(hglib.user_rcpath())
 
     def saveToPath(self, path):
         fn, cfg = qtlib.loadIniFile(path, self)
