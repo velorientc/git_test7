@@ -7,12 +7,11 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
-from mercurial import context, merge, commands, subrepo
-from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo, cmdui, fileview
+from mercurial import hg, util, cmdutil, error, context, merge
+
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff, cmdui, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -49,15 +48,13 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
 
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QWidget.__init__(self, parent)
 
-        root = paths.find_root(root)
-        assert(root)
-        self.repo = thgrepo.repository(ui.ui(), path=root)
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
+        self.repo = repo
         self.pats = pats
         self.refthread = None
 
@@ -119,6 +116,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
+        self.actions = wctxactions.WctxActions(self.repo, self)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -150,11 +148,12 @@ class StatusWidget(QWidget):
         hcbox.addStretch(1)
         hcbox.addWidget(self.countlbl)
 
-        tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
         tv.clicked.connect(self.onRowClicked)
+        tv.doubleClicked.connect(self.onRowDoubleClicked)
+        tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
         def statusTypeTrigger(status):
@@ -205,6 +204,12 @@ class StatusWidget(QWidget):
     def saveSettings(self, qs, prefix):
         self.fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/state', self.split.saveState())
+
+    @pyqtSlot(QPoint, object)
+    def onMenuRequest(self, point, selected):
+        menu = self.actions.makeMenu(selected)
+        if menu.exec_(point):
+            self.refreshWctx()
 
     def refreshWctx(self):
         if self.refthread:
@@ -286,9 +291,11 @@ class StatusWidget(QWidget):
                     curidx = tm.index(i, 0)
         else:
             selmodel.select(curidx, flags)
-        selmodel.currentChanged.connect(self.currentChanged)
+        selmodel.currentChanged.connect(self.onCurrentChange)
+        selmodel.selectionChanged.connect(self.onSelectionChange)
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
+        self.onSelectionChange(None, None)
 
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex)
@@ -296,6 +303,16 @@ class StatusWidget(QWidget):
         'tree view emitted a clicked signal, index guarunteed valid'
         if index.column() == COL_PATH:
             self.tv.model().toggleRow(index)
+
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QModelIndex)
+    def onRowDoubleClicked(self, index):
+        'tree view emitted a doubleClicked signal, index guarunteed valid'
+        path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+        if status in 'MAR!':
+            self.actions.allactions[0].trigger()
+        elif status == 'S':
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
 
     @pyqtSlot(QString)
     def setFilter(self, match):
@@ -332,8 +349,17 @@ class StatusWidget(QWidget):
             return []
 
     # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QItemSelection, QItemSelection)
+    def onSelectionChange(self, selected, deselected):
+        selrows = []
+        for index in self.tv.selectedRows():
+            path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+            selrows.append((set(status+mst.lower()), path))
+        self.actions.updateActionSensitivity(selrows)
+
+    # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex, QModelIndex)
-    def currentChanged(self, index, old):
+    def onCurrentChange(self, index, old):
         'Connected to treeview "currentChanged" signal'
         row = index.model().getRow(index)
         if row is None:
@@ -341,7 +367,7 @@ class StatusWidget(QWidget):
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
         self.fileview.setContext(self.repo[None])
-        self.fileview.displayFile(wfile, status=status)
+        self.fileview.displayFile(wfile, status)
 
 
 class StatusThread(QThread):
@@ -405,7 +431,7 @@ class StatusThread(QThread):
 
 
 class WctxFileTree(QTreeView):
-    menuAction = pyqtSignal()
+    menuRequest = pyqtSignal(QPoint, object)
 
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
@@ -434,15 +460,7 @@ class WctxFileTree(QTreeView):
         if event.key() == 32:
             for index in self.selectedRows():
                 self.model().toggleRow(index)
-        if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
-            selfiles = []
-            for index in self.selectedRows():
-                selfiles.append(self.model().getRow(index)[COL_PATH])
-            dlg = visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
-            if dlg:
-                dlg.exec_()
-        else:
-            return super(WctxFileTree, self).keyPressEvent(event)
+        return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
         urls = []
@@ -476,10 +494,8 @@ class WctxFileTree(QTreeView):
         for index in self.selectedRows():
             path, status, mst, u, ext, sz = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
-        point = self.mapToGlobal(point)
-        action = wctxactions.wctxactions(self, point, self.repo, selrows)
-        if action:
-            self.menuAction.emit()
+        if selrows:
+            self.menuRequest.emit(self.viewport().mapToGlobal(point), selrows)
 
     def selectedRows(self):
         if self.selectionModel():
@@ -766,7 +782,7 @@ class StatusFilterButton(QToolButton):
     statusChanged = pyqtSignal(str)
 
     def __init__(self, statustext, types=None, parent=None, **kwargs):
-        self._TYPES = 'MARC'
+        self._TYPES = 'MARSC'
         if types is not None:
             self._TYPES = types
         #if 'text' not in kwargs:
@@ -808,13 +824,13 @@ class StatusFilterButton(QToolButton):
 
 class StatusDialog(QDialog):
     'Standalone status browser'
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(pats, opts, root, self)
+        self.stwidget = StatusWidget(repo, pats, opts, self)
         layout.addWidget(self.stwidget, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -836,11 +852,10 @@ class StatusDialog(QDialog):
         if link.startswith('subrepo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, ui.ui(), root=link[8:])
+            qtrun(commit.run, self.commit.repo.ui, root=link[8:])
         if link.startswith('shelve:'):
-            repo = self.stwidget.repo
             from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self)
+            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()
@@ -873,4 +888,4 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return StatusDialog(pats, opts)
+    return StatusDialog(repo, pats, opts)
