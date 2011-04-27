@@ -1040,6 +1040,8 @@ class RepoWidget(QWidget):
               self.emailRevision)
         entry(submenu, None, isrev, _('Archive...'), 'hg-archive',
               self.archiveRevision)
+        entry(submenu, None, isrev, _('Bundle rev to tip...'), 'menurelocate',
+              self.bundleRevisions)
         entry(submenu, None, isctx, _('Copy patch'), 'copy-patch',
               self.copyPatch)
         entry(menu)
@@ -1103,6 +1105,10 @@ class RepoWidget(QWidget):
             l = dagrange()
             if l:
                 run.email(self.repo.ui, rev=l, repo=self.repo)
+        def bundleDagRange():
+            l = dagrange()
+            if l:
+                self.bundleRevisions(base=l[0], tip=l[-1])
         def bisectNormal():
             revA, revB = self.menuselection
             opts = {'good':str(revA), 'bad':str(revB)}
@@ -1138,6 +1144,7 @@ class RepoWidget(QWidget):
                 (_('Email Selected...'), emailPair, 'mail-forward'),
                 (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
+                (_('Bundle DAG Range...'), bundleDagRange, 'menurelocate'),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
                 (_('Compress History...'), compressDlg, 'hg-compress')
@@ -1353,6 +1360,34 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
         dlg.exec_()
+
+    def bundleRevisions(self, base=None, tip=None):
+        root = self.repo.root
+        if not base:
+            base = self.rev
+        data = dict(name=os.path.basename(root), base=base)
+        if tip is None:
+            filename = '%(name)s_%(base)s_to_tip.hg' % data
+        else:
+            data.update(rev=tip)
+            filename = '%(name)s_%(base)s_to_%(rev)s.hg' % data
+
+        file = QFileDialog.getSaveFileName(self, _('Write bundle'),
+                           hglib.tounicode(os.path.join(root, filename)))
+        if not file:
+            return
+
+        cmdline = ['bundle', '--verbose', '--repository', root]
+        parents = [r.rev() == -1 and 'null' or str(r.rev())
+                   for r in self.repo[base].parents()]
+        for p in parents:
+            cmdline.extend(['--base', p])
+        if tip:
+            cmdline.extend(['--rev', str(tip)])
+        else:
+            cmdline.extend(['--rev', 'heads(descendants(%s))' % base])
+        cmdline.append(hglib.fromunicode(file))
+        self.runCommand(cmdline)
 
     def copyPatch(self):
         from mercurial import commands, ui
