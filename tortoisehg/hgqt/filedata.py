@@ -273,6 +273,7 @@ class FileData(object):
                     self.flabel += _(' <i>(is unversioned)</i>')
                 if os.path.getsize(absfile) > maxdiff:
                     self.error = mde
+                    return
                 else:
                     data = util.posixfile(absfile, 'r').read()
             else:
