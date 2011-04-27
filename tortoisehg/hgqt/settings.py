@@ -9,7 +9,7 @@ import os
 
 from mercurial import ui, util, error
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
@@ -198,6 +198,66 @@ class SettingsCheckBox(QCheckBox):
         return self.value() != self.curvalue
 
 
+class BugTraqConfigureEntry(QPushButton):
+    def __init__(self, parent=None, **opts):
+        QPushButton.__init__(self, parent, toolTip=opts['tooltip'])
+
+        self.opts = opts
+        self.curvalue = None
+        self.options = None
+
+        self.tracker = None
+        self.master = None
+        self.setText(opts['label'])
+        self.clicked.connect(self.on_clicked)
+
+    def on_clicked(self, checked):
+        parameters = self.options
+        self.options = self.tracker.show_options_dialog(parameters)
+
+    def master_updated(self):
+        self.setEnabled(False)
+        if self.master == None:
+            return
+        if self.master.value() == None:
+            return
+        if len(self.master.value()) == 0:
+            return
+
+        try:
+            setting = self.master.value().split(' ', 1)
+            trackerid = setting[0]
+            name = setting[1]
+            self.tracker = bugtraq.BugTraq(trackerid)
+        except:
+            # failed to load bugtraq module or parse the setting:
+            # swallow the error and leave the widget disabled
+            return
+
+        try:
+            self.setEnabled(self.tracker.has_options())
+        except Exception, e:
+            qtlib.ErrorMsgBox(_('Issue Tracker'),
+                              _('Failed to load issue tracker: \'%s\': %s. '
+                                % (name, e)),
+                              parent=self)
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        if self.master == None:
+            self.master = self.opts['master']
+            self.master.currentIndexChanged.connect(self.master_updated)
+        self.master_updated()
+        self.curvalue = curvalue
+        self.options = curvalue
+
+    def value(self):
+        return self.options
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -234,6 +294,22 @@ def genDeferredCombo(opts, func):
 def genFontEdit(opts):
     return FontEntry(**opts)
 
+def genBugTraqEdit(opts):
+    return BugTraqConfigureEntry(**opts)
+
+def findIssueTrackerPlugins():
+    plugins = bugtraq.get_issue_plugins_with_names()
+    names = [("%s %s" % (key[0], key[1])) for key in plugins]
+    return names
+
+def issuePluginVisible():
+    try:
+        # quick test to see if we're able to load the bugtraq module
+        test = bugtraq.BugTraq('')
+        return True
+    except:
+        return False
+
 def findDiffTools():
     return hglib.difftools(ui.ui())
 
@@ -247,16 +323,26 @@ def genCheckBox(opts):
 class _fi(object):
     """Information of each field"""
     __slots__ = ('label', 'cpath', 'values', 'tooltip',
-                 'restartneeded', 'globalonly')
+                 'restartneeded', 'globalonly',
+                 'master', 'visible')
 
     def __init__(self, label, cpath, values, tooltip,
-                 restartneeded=False, globalonly=False):
+                 restartneeded=False, globalonly=False,
+                 master=None, visible=None):
         self.label = label
         self.cpath = cpath
         self.values = values
         self.tooltip = tooltip
         self.restartneeded = restartneeded
         self.globalonly = globalonly
+        self.master = master
+        self.visible = visible
+
+    def isVisible(self):
+        if self.visible == None:
+            return True
+        else:
+            return self.visible()
 
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
@@ -284,7 +370,8 @@ INFO = (
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
-        _('Specify your preferred terminal shell application')),
+        _('Specify your preferred terminal shell application'),
+        globalonly=True),
     _fi(_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
         _('Space separated list of shell operations you would like '
           'to be performed immediately, without user interaction. '
@@ -298,13 +385,12 @@ INFO = (
         _('Specify the number of spaces that tabs expand to in various '
           'TortoiseHg windows. '
           'Default: 0, Not expanded')),
+    _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolCombo,
+        _('Always show repo tabs, even for a single repo. Default: False')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
-    _fi(_('Capture stderr'), 'tortoisehg.stderrcapt', genBoolCombo,
-        _('Redirect stderr to a buffer which is parsed at the end of '
-          'the process for runtime errors. Default: True')),
     _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
         _('When running from the command line, fork a background '
           'process to run graphical dialogs.  Default: True')),
@@ -555,6 +641,13 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Issue Tracker Plugin'), 'tortoisehg.issue.bugtraqplugin',
+        (genDeferredCombo, findIssueTrackerPlugins),
+        _('Configures a COM IBugTraqProvider or IBugTrackProvider2 issue '
+          'tracking plugin.'), visible=issuePluginVisible),
+    _fi(_('Configure Issue Tracker'), 'tortoisehg.issue.bugtraqparameters', genBugTraqEdit,
+        _('Configure the selected COM Bug Tracker plugin.'),
+        master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
@@ -610,7 +703,7 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        utab = SettingsForm(rcpath=util.user_rcpath(), focus=focus)
+        utab = SettingsForm(rcpath=hglib.user_rcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
@@ -729,13 +822,13 @@ class SettingsForm(QWidget):
         tophbox.addWidget(reload)
 
         bothbox = QHBoxLayout()
-        layout.addLayout(bothbox)
+        layout.addLayout(bothbox, stretch=8)
         pageList = QListWidget()
         pageList.setResizeMode(QListView.Fixed)
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
-        pageList.currentRowChanged.connect(stack.setCurrentIndex)
+        pageList.currentRowChanged.connect(self.activatePage)
 
         self.pages = {}
         self.stack = stack
@@ -743,7 +836,7 @@ class SettingsForm(QWidget):
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
-        layout.addWidget(desctext)
+        layout.addWidget(desctext, stretch=2)
         self.desctext = desctext
 
         self.settings = QSettings()
@@ -758,10 +851,25 @@ class SettingsForm(QWidget):
                 icon.addPixmap(style.standardPixmap(meta['icon']))
             item = QListWidgetItem(icon, meta['label'])
             pageList.addItem(item)
-            self.addPage(meta['name'])
 
         self.refresh()
         self.focusField(focus or 'ui.merge')
+
+    def activatePage(self, index):
+        item = self.pageList.currentItem()
+        for data in INFO:
+            if item.text() == data[0]['label']:
+                meta, info = data
+                break
+
+        pagename = meta['name']
+        if self.pages.has_key(pagename):
+            page = self.pages[pagename]
+        else:
+            page = self.createPage(pagename, info)
+            self.refreshPage(page)
+        frame = page[2][0].parentWidget()
+        self.stack.setCurrentWidget(frame)
 
     def editClicked(self):
         'Open internal editor in stacked widget'
@@ -784,36 +892,40 @@ class SettingsForm(QWidget):
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))
-        for name, info, widgets in self.pages.values():
-            if name == 'extensions':
-                extsmentioned = False
-                for row, w in enumerate(widgets):
-                    key = w.opts['label']
-                    for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
-                        val = self.readCPath('extensions.' + fullkey)
-                        if val != None:
-                            break
-                    if val == None:
-                        curvalue = False
-                    elif len(val) and val[0] == '!':
-                        curvalue = False
-                        extsmentioned = True
-                    else:
-                        curvalue = True
-                        extsmentioned = True
-                    w.setValue(curvalue)
-                    if val == None:
-                        w.opts['cpath'] = 'extensions.' + key
-                    else:
-                        w.opts['cpath'] = 'extensions.' + fullkey
-                if not extsmentioned:
-                    # make sure widgets are shown properly,
-                    # even when no extensions mentioned in the config file
-                    self.validateextensions()
-            else:
-                for row, e in enumerate(info):
-                    curvalue = self.readCPath(e.cpath)
-                    widgets[row].setValue(curvalue)
+        for page in self.pages.values():
+            self.refreshPage(page)
+
+    def refreshPage(self, page):
+        name, info, widgets = page
+        if name == 'extensions':
+            extsmentioned = False
+            for row, w in enumerate(widgets):
+                key = w.opts['label']
+                for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
+                    val = self.readCPath('extensions.' + fullkey)
+                    if val != None:
+                        break
+                if val == None:
+                    curvalue = False
+                elif len(val) and val[0] == '!':
+                    curvalue = False
+                    extsmentioned = True
+                else:
+                    curvalue = True
+                    extsmentioned = True
+                w.setValue(curvalue)
+                if val == None:
+                    w.opts['cpath'] = 'extensions.' + key
+                else:
+                    w.opts['cpath'] = 'extensions.' + fullkey
+            if not extsmentioned:
+                # make sure widgets are shown properly,
+                # even when no extensions mentioned in the config file
+                self.validateextensions()
+        else:
+            for row, e in enumerate(info):
+                curvalue = self.readCPath(e.cpath)
+                widgets[row].setValue(curvalue)
 
     def isDirty(self):
         if self.readonly:
@@ -853,7 +965,7 @@ class SettingsForm(QWidget):
 
         for e in info:
             opts = {'label': e.label, 'cpath': e.cpath, 'tooltip': e.tooltip,
-                    'settings':self.settings}
+                    'master': e.master, 'settings':self.settings}
             if isinstance(e.values, tuple):
                 func = e.values[0]
                 w = func(opts, e.values[1])
@@ -862,12 +974,20 @@ class SettingsForm(QWidget):
                 w = func(opts)
             w.installEventFilter(self)
             if e.globalonly:
-                w.setEnabled(self.rcpath == util.user_rcpath())
+                w.setEnabled(self.rcpath == hglib.user_rcpath())
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)
-            form.addRow(lbl, w)
             widgets.append(w)
+            if e.isVisible():
+                form.addRow(lbl, w)
+
+        # assign the master to widgets that have a master
+        for w in widgets:
+            if w.opts['master'] != None:
+                for dep in widgets:
+                    if dep.opts['cpath'] == w.opts['master']:
+                        w.opts['master'] = dep
         return widgets
 
     def fillExtensionsFrame(self):
@@ -900,17 +1020,14 @@ class SettingsForm(QWidget):
             return True  # tooltip is shown in self.desctext
         return False
 
-    def addPage(self, name):
-        for data in INFO:
-            if name == data[0]['name']:
-                meta, info = data
-                break
+    def createPage(self, name, info):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
+        return self.pages[name]
 
     def readCPath(self, cpath):
         'Retrieve a value from the parsed config file'

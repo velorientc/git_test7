@@ -6,13 +6,13 @@ Clone a repository
 
 To clone a repository you have to run the clone dialog.
 From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
-or type :command:`thg clone`. 
+or type :command:`thg clone`.
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
 
 	Clone Dialog
-	
+
 :guilabel:`Source`
 	It is the path (or URL) of the repository that will be cloned. Use
 	the :guilabel:`Browse...` to choose a local folder.
@@ -39,11 +39,17 @@ Under the :guilabel:`Options` expander you will find:
 	To use uncompressed transfer (fast over LAN).
 :guilabel:`Include patch queue`
 	To also clone an MQ patch repository along with the main repository.
+	It is possible to provide a patch queue name that differs from the
+	default one.
 :guilabel:`Use proxy server`
 	To use the proxy server configured in :menuselection:`TortoiseHg... --> Global Settings --> Proxy`.
 	This is enabled only if a proxy is configured.
+:guilabel:`Do not verify host certificate`
+	Skip checking server certificate for https:// url (ignoring web.cacerts config).
 :guilabel:`Remote command`
 	Specify a Mercurial command to run on the remote side.
+:guilabel:`Hg command`
+    This field displays the command that will be executed by the dialog.
 
 From command line
 -----------------
