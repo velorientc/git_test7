@@ -158,7 +158,7 @@ class InitDialog(QDialog):
                 os.makedirs(dest)
             except:
                 qtlib.ErrorMsgBox(_('Error executing init'),
-                        _('Cannot create folder %s' % udest))
+                        _('Cannot create folder %s') % udest)
                 return False
 
         _ui = ui.ui()
