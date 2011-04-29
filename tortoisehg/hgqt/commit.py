@@ -217,6 +217,9 @@ class CommitWidget(QWidget):
         self.updateRecentMessages()
 
         self.branchbutton = tbar.addAction(_('Branch: '))
+        font = self.branchbutton.font()
+        font.setBold(True)
+        self.branchbutton.setFont(font)
         self.branchbutton.triggered.connect(self.branchOp)
         self.branchop = None
 
