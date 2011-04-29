@@ -46,8 +46,8 @@ class RenameDialog(QDialog):
                       'from folder<p>%s</p>' % cwd))
             return ('', '')
         try:
-            fname = util.canonpath(self.root, cwd, pats[0])
-            target = util.canonpath(self.root, cwd, pats[1])
+            fname = hglib.canonpath(self.root, cwd, pats[0])
+            target = hglib.canonpath(self.root, cwd, pats[1])
         except:
             pass
         os.chdir(self.root)
@@ -278,7 +278,7 @@ class RenameDialog(QDialog):
 
         cmdline, vcl = self.compose_command(src, dest)
         self.show_command((cmdline, vcl))
-        new_name = util.canonpath(self.root, self.root, new_name)
+        new_name = hglib.canonpath(self.root, self.root, new_name)
         if self.isCaseFoldingOnWin():
             # We do the rename ourselves if it's a pure casefolding
             # action on Windows. Because there is no way to make Hg
