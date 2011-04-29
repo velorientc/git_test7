@@ -113,7 +113,8 @@ def snapshot(repo, files, ctx):
         f.write(data)
         f.close()
         if ctx.rev() is None:
-            fns_and_mtime.append((dest, repo.wjoin(fn), os.path.getmtime(dest)))
+            fns_and_mtime.append((dest, repo.wjoin(fn), 
+                                  os.lstat(dest).st_mtime))
         else:
             # Make file read/only, to indicate it's static (archival) nature
             os.chmod(dest, stat.S_IREAD)
@@ -334,7 +335,7 @@ def visualdiff(ui, repo, pats, opts):
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
             try:
-                if os.path.getmtime(copy_fn) != mtime:
+                if os.lstat(copy_fn).st_mtime != mtime:
                     ui.debug('file changed while diffing. '
                             'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
                     util.copyfile(copy_fn, working_fn)
