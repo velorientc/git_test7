@@ -327,10 +327,13 @@ def visualdiff(ui, repo, pats, opts):
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
-            if os.path.getmtime(copy_fn) != mtime:
-                ui.debug('file changed while diffing. '
-                         'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
-                util.copyfile(copy_fn, working_fn)
+            try:
+                if os.path.getmtime(copy_fn) != mtime:
+                    ui.debug('file changed while diffing. '
+                            'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
+                    util.copyfile(copy_fn, working_fn)
+            except EnvironmentError:
+                pass # Ignore I/O errors or missing files
 
     def dodiffwrapper():
         try:
