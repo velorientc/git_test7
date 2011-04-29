@@ -316,7 +316,9 @@ class StatusWidget(QWidget):
 
     @pyqtSlot(QString)
     def setFilter(self, match):
-        self.tv.model().setFilter(match)
+        model = self.tv.model()
+        if model:
+            model.setFilter(match)
 
     def updateCheckCount(self):
         text = _('Checked count: %d') % len(self.getChecked())
