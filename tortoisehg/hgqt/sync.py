@@ -29,9 +29,9 @@ def parseurl(path):
         p = path[len('ssh://'):]
         user, passwd = None, None
         if p.find('@') != -1:
-            user, p = tuple(p.split('@'))
+            user, p = tuple(p.split('@', 1))
             if user.find(':') != -1:
-                user, passwd = tuple(user.split(':'))
+                user, passwd = tuple(user.rsplit(':', 1))
         m = re.match(r'([^:/]+)(:(\d+))?(/(.*))?$', p)
         if m:
             host = m.group(1)
