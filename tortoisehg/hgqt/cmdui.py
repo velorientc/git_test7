@@ -403,6 +403,17 @@ class _LogWidgetForConsole(LogWidget):
         self.setCursorPosition(self.lines() - 1, len(self._prompt))
         self.setReadOnly(False)
 
+        # make sure the prompt line is visible. Because QsciScintilla may
+        # delay line wrapping, setCursorPosition() doesn't always scrolls
+        # to the correct position.
+        # http://www.scintilla.org/ScintillaDoc.html#LineWrapping
+        self.SCN_PAINTED.connect(self._scrollCaretOnPainted)
+
+    @pyqtSlot()
+    def _scrollCaretOnPainted(self):
+        self.SCN_PAINTED.disconnect(self._scrollCaretOnPainted)
+        self.SendScintilla(self.SCI_SCROLLCARET)
+
     @pyqtSlot()
     def closePrompt(self):
         """Disable user input"""
