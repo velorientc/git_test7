@@ -105,9 +105,9 @@ class RenameDialog(QDialog):
         self.cancel_btn.setHidden(True)
 
         # connecting slots
-        self.src_txt.textEdited.connect(self.src_dest_edited)
+        self.src_txt.textChanged.connect(self.src_dest_edited)
         self.src_btn.clicked.connect(self.src_btn_clicked)
-        self.dest_txt.textEdited.connect(self.src_dest_edited)
+        self.dest_txt.textChanged.connect(self.src_dest_edited)
         self.dest_btn.clicked.connect(self.dest_btn_clicked)
         self.copy_chk.toggled.connect(self.copy_chk_toggled)
         self.rename_btn.clicked.connect(self.rename)
