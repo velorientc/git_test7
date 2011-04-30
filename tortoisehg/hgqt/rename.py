@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
 from tortoisehg.util import hglib, paths
 
 class RenameDialog(QDialog):
@@ -71,6 +71,11 @@ class RenameDialog(QDialog):
         self.dest_txt = QLineEdit(dest)
         self.dest_btn = QPushButton(_('Browse...'))
         self.copy_chk = QCheckBox(_('Copy source -> destination'))
+
+        comp = manifestmodel.ManifestCompleter(self)
+        comp.setModel(manifestmodel.ManifestModel(self.repo, parent=comp))
+        self.src_txt.setCompleter(comp)
+        self.dest_txt.setCompleter(comp)
 
         # some extras
         self.dummy_lbl = QLabel('')
