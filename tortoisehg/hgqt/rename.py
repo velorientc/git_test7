@@ -11,7 +11,7 @@ import os, sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, util, error
+from mercurial import util, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo
@@ -25,10 +25,8 @@ class RenameDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, ui, pats, parent=None, **opts):
-        super(RenameDialog, self).__init__(parent=None)
+        super(RenameDialog, self).__init__(parent)
         self.iscopy = (opts.get('alias') == 'copy')
-        src = ''
-        dest = ''
         src, dest = self.init_data(ui, pats)
         self.init_view(src, dest)
 
@@ -197,7 +195,6 @@ class RenameDialog(QDialog):
                 caption = _('Select Destination Folder')
         FD = QFileDialog
         if os.path.isfile(curr):
-            filter = 'All Files (*.*)'
             filename = FD.getOpenFileName(parent=self, caption=caption,
                     options=FD.ReadOnly)
             response = hglib.fromunicode(filename)
@@ -211,7 +208,6 @@ class RenameDialog(QDialog):
                 self.src_txt.setText(response)
             else:
                 self.dest_txt.setText(response)
-            self.compose_command(self.get_src(), self.get_dest())
 
     def copy_chk_toggled(self):
         self.setRenameCopy()
