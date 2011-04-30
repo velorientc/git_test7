@@ -65,11 +65,11 @@ class RenameDialog(QDialog):
         self.src_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.src_txt = QLineEdit(src)
         self.src_txt.setMinimumWidth(300)
-        self.src_btn = QPushButton(_('Browse'))
+        self.src_btn = QPushButton(_('Browse...'))
         self.dest_lbl = QLabel(_('Destination:'))
         self.dest_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.dest_txt = QLineEdit(dest)
-        self.dest_btn = QPushButton(_('Browse'))
+        self.dest_btn = QPushButton(_('Browse...'))
         self.copy_chk = QCheckBox(_('Copy source -> destination'))
 
         # some extras
