@@ -73,6 +73,9 @@ static const MenuDescription CMenuMenuDescList[] =
     {"about",       L"About TortoiseHg",
                     L"Show About Dialog",
                     "menuabout.ico", 0},
+    {"annotate",    L"Annotate Files",
+                    L"Changeset information per file line",
+                    "menublame.ico", 0},
     {"vdiff",       L"Visual Diff",
                     L"View changes using GUI diff tool",
                     "TortoiseMerge.ico", 0},
@@ -111,7 +114,7 @@ static const char* const RepoNoFilesMenu =
 static const char* const RepoFilesMenu =
     "commit status vdiff sep"
     " add revert rename forget remove sep"
-    " log sep"
+    " log annotate sep"
     " about"
 ;
 
