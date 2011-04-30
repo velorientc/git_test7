@@ -231,12 +231,10 @@ class RenameDialog(QDialog):
             cmdline.append('-A')
         cmdline.append(src)
         cmdline.append(dest)
-        vcmdline = ' '.join(['hg'] + cmdline)
-        return (cmdline, vcmdline)
+        return cmdline
 
-    def show_command(self, clinfo):
-        cl, vcl = clinfo
-        self.hgcmd_txt.setText(vcl)
+    def show_command(self, cmdline):
+        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
 
     def rename(self):
         """execute the rename"""
@@ -273,8 +271,8 @@ class RenameDialog(QDialog):
             if not res:
                 return
 
-        cmdline, vcl = self.compose_command(src, dest)
-        self.show_command((cmdline, vcl))
+        cmdline = self.compose_command(src, dest)
+        self.show_command(cmdline)
         new_name = util.canonpath(self.root, self.root, new_name)
         if self.isCaseFoldingOnWin():
             # We do the rename ourselves if it's a pure casefolding
