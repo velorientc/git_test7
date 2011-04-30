@@ -27,6 +27,7 @@ class RenameDialog(QDialog):
     def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent)
         self.iscopy = (opts.get('alias') == 'copy')
+        # pats: local; src, dest: unicode
         src, dest = self.init_data(ui, pats)
         self.init_view(src, dest)
 
@@ -49,11 +50,11 @@ class RenameDialog(QDialog):
         except:
             pass
         os.chdir(self.root)
-        fname = util.normpath(fname)
+        fname = hglib.tounicode(util.normpath(fname))
         if target:
             target = hglib.tounicode(util.normpath(target))
         else:
-            target = hglib.tounicode(fname)
+            target = fname
         return (fname, target)
 
     def init_view(self, src, dest):
@@ -196,19 +197,21 @@ class RenameDialog(QDialog):
                 caption = _('Select Destination Folder')
         FD = QFileDialog
         if os.path.isfile(curr):
-            filename = FD.getOpenFileName(parent=self, caption=caption,
+            path = FD.getOpenFileName(parent=self, caption=caption,
                     options=FD.ReadOnly)
-            response = hglib.fromunicode(filename)
         else:
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
-            response = hglib.fromunicode(path)
-        if response:
-            response = os.path.relpath(response, start=self.root)
+        if path:
+            path = util.normpath(unicode(path))
+            pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+            if not path.startswith(pathprefix):
+                return
+            relpath = path[len(pathprefix):]
             if mode == 'src':
-                self.src_txt.setText(response)
+                self.src_txt.setText(relpath)
             else:
-                self.dest_txt.setText(response)
+                self.dest_txt.setText(relpath)
 
     def copy_chk_toggled(self):
         self.setRenameCopy()
@@ -234,7 +237,7 @@ class RenameDialog(QDialog):
         return cmdline
 
     def show_command(self, cmdline):
-        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
+        self.hgcmd_txt.setText(hglib.tounicode('hg ' + ' '.join(cmdline)))
 
     def rename(self):
         """execute the rename"""
@@ -242,10 +245,6 @@ class RenameDialog(QDialog):
         # check inputs
         src = self.get_src()
         dest = self.get_dest()
-        curr_name = os.path.relpath(src, start=self.root)
-        self.src_txt.setText(curr_name)
-        new_name = os.path.relpath(dest, start=self.root)
-        self.dest_txt.setText(new_name)
         if not os.path.exists(src):
             qtlib.WarningMsgBox(self.msgTitle, _('Source does not exists.'))
             return
@@ -273,7 +272,6 @@ class RenameDialog(QDialog):
 
         cmdline = self.compose_command(src, dest)
         self.show_command(cmdline)
-        new_name = util.canonpath(self.root, self.root, new_name)
         if self.isCaseFoldingOnWin():
             # We do the rename ourselves if it's a pure casefolding
             # action on Windows. Because there is no way to make Hg
@@ -284,7 +282,7 @@ class RenameDialog(QDialog):
                 return
             else:
                 try:
-                    targetdir = os.path.dirname(new_name) or '.'
+                    targetdir = os.path.dirname(dest)
                     if not os.path.isdir(targetdir):
                         os.makedirs(targetdir)
                     os.rename(fullsrc, fulldest)
