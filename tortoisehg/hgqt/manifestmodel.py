@@ -26,7 +26,7 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev, statusfilter='MAC', parent=None):
+    def __init__(self, repo, rev=None, statusfilter='MAC', parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
@@ -45,7 +45,7 @@ class ManifestModel(QAbstractItemModel):
             return self.fileStatus(index)
 
         e = index.internalPointer()
-        if role == Qt.DisplayRole:
+        if role in (Qt.DisplayRole, Qt.EditRole):
             return e.name
 
     def filePath(self, index):
@@ -288,3 +288,27 @@ class _Entry(object):
         self._nameindex.sort(
             key=lambda s: '%s%s' % (self[s] and 'D' or 'F', s),
             reverse=reverse)
+
+class ManifestCompleter(QCompleter):
+    """QCompleter for ManifestModel"""
+
+    def splitPath(self, path):
+        """
+        >>> c = ManifestCompleter()
+        >>> c.splitPath(QString('foo/bar'))
+        [u'foo', u'bar']
+
+        trailing slash appends extra '', so that QCompleter can descend to
+        next level:
+        >>> c.splitPath(QString('foo/'))
+        [u'foo', u'']
+        """
+        return unicode(path).split('/')
+
+    def pathFromIndex(self, index):
+        if not index.isValid():
+            return ''
+        m = self.model()
+        if not m:
+            return ''
+        return m.filePath(index)
