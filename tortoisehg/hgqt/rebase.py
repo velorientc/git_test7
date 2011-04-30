@@ -108,6 +108,8 @@ class RebaseDialog(QDialog):
             self.cmd.setShowOutput(True)
         else:
             self.showMessage.emit(_('Checking...'))
+            self.abortbtn.setEnabled(False)
+            self.rebasebtn.setEnabled(False)
             QTimer.singleShot(0, self.checkStatus)
 
         self.setMinimumWidth(480)
