@@ -21,6 +21,12 @@ try:
 except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.util import canonpath, user_rcpath
+try:
+    # hg >= 1.9
+    from mercurial.util import localpath
+except ImportError:
+    # hg <= 1.8
+    from mercurial.hg import localpath
 demandimport.enable()
 
 _encoding = encoding.encoding
