@@ -175,7 +175,7 @@ class InitDialog(QDialog):
                     _('Unable to create new repository'),
                     hglib.tounicode(str(inst)))
             return False
-        except util.Abort, inst:
+        except util.Abort, e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))
