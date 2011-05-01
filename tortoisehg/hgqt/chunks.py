@@ -174,26 +174,25 @@ class ChunksWidget(QWidget):
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
+            buf = cStringIO.StringIO()
             try:
                 if ctx._ph.comments:
-                    fp.write('\n'.join(ctx._ph.comments))
-                    fp.write('\n\n')
+                    buf.write('\n'.join(ctx._ph.comments))
+                    buf.write('\n\n')
                 needsnewline = False
                 for wfile in ctx._fileorder:
                     if wfile == self.currentFile:
                         if revertall:
                             continue
-                        chunks[0].write(fp)
+                        chunks[0].write(buf)
                         for chunk in kchunks:
-                            chunk.write(fp)
-                        if not chunks[-1].selected:
-                            needsnewline = True
+                            chunk.write(buf)
                     else:
-                        if needsnewline:
-                            fp.write('\n')
-                            needsnewline = False
+                        if buf.tell() and buf.getvalue()[-1] != '\n':
+                            buf.write('\n')
                         for chunk in ctx._files[wfile]:
-                            chunk.write(fp)
+                            chunk.write(buf)
+                fp.write(buf.getvalue())
                 fp.rename()
             finally:
                 del fp
