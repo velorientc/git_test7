@@ -170,6 +170,8 @@ class BackoutDialog(QDialog):
             msg = self.msgTextEdit.text()
             cmdline += ['--message', hglib.fromunicode(msg)]
             commandlines = [cmdline]
+        else:
+            commandlines = [cmdline]
 
         # start backing out
         self.cmdline = cmdline
