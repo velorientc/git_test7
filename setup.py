@@ -79,6 +79,8 @@ class update_pot(Command):
             'contrib/win32',
             'tortoisehg',
             'tortoisehg/hgqt',
+            'tortoisehg/hgtk',
+            'tortoisehg/hgtk/logview',
             'tortoisehg/util',
             'tortoisehg/thgutil/iniparse',
             ]
