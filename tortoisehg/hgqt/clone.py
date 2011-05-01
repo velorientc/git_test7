@@ -134,7 +134,7 @@ class CloneDialog(QDialog):
         optbox.addWidget(self.pproto_chk)
         optbox.addWidget(self.uncomp_chk)
 
-        self.qclone_chk, self.qclone_txt,self.qclone_btn = \
+        self.qclone_chk, self.qclone_txt, self.qclone_btn = \
                 chktext(_('Include patch queue'), btnlabel=_('Browse...'),
                         btnslot=self.onBrowseQclone)
 
@@ -439,6 +439,7 @@ class CloneDialog(QDialog):
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
+        self.setChoicesActive(False)
 
     def command_finished(self, ret):
         self.ret = ret
@@ -451,6 +452,7 @@ class CloneDialog(QDialog):
             self.cancel_btn.setHidden(True)
         else:
             self.accept()
+        self.setChoicesActive(True)
 
         if not ret:
             # Let the workbench know that a repository has been successfully
@@ -469,6 +471,46 @@ class CloneDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
+
+    def setChoicesActive(self, mode):
+        if mode:
+            self.src_combo.setEnabled(True)
+            self.src_btn.setEnabled(True)
+            self.dest_combo.setEnabled(True)
+            self.dest_btn.setEnabled(True)
+            self.rev_chk.setEnabled(True)
+            self.rev_text.setEnabled(self.rev_chk.isChecked())
+            self.noupdate_chk.setEnabled(True)
+            self.pproto_chk.setEnabled(True)
+            self.uncomp_chk.setEnabled(True)
+            self.qclone_chk.setEnabled(True)
+            self.qclone_txt.setEnabled(self.qclone_chk.isChecked())
+            self.qclone_btn.setEnabled(self.qclone_chk.isChecked())
+            self.proxy_chk.setEnabled(True)
+            self.insecure_chk.setEnabled(True)
+            self.remote_chk.setEnabled(True)
+            self.remote_text.setEnabled(self.remote_chk.isChecked())
+            self.startrev_chk.setEnabled(True)
+            self.startrev_text.setEnabled(self.startrev_chk.isChecked())
+        else:
+            self.src_combo.setDisabled(True)
+            self.src_btn.setDisabled(True)
+            self.dest_combo.setDisabled(True)
+            self.dest_btn.setDisabled(True)
+            self.rev_chk.setDisabled(True)
+            self.rev_text.setDisabled(True)
+            self.noupdate_chk.setDisabled(True)
+            self.pproto_chk.setDisabled(True)
+            self.uncomp_chk.setDisabled(True)
+            self.qclone_chk.setDisabled(True)
+            self.qclone_txt.setDisabled(True)
+            self.qclone_btn.setDisabled(True)
+            self.proxy_chk.setDisabled(True)
+            self.insecure_chk.setDisabled(True)
+            self.remote_chk.setDisabled(True)
+            self.remote_text.setDisabled(True)
+            self.startrev_chk.setDisabled(True)
+            self.startrev_text.setDisabled(True)
 
 def run(ui, *pats, **opts):
     return CloneDialog(pats, opts)
