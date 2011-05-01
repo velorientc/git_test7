@@ -34,6 +34,12 @@ try:
 except ImportError:
     # hg <= 1.8
     from mercurial.url import hidepassword
+try:
+    # hg >= 1.9
+    from mercurial.util import removeauth
+except ImportError:
+    # hg <= 1.8
+    from mercurial.url import removeauth
 demandimport.enable()
 
 _encoding = encoding.encoding
@@ -610,10 +616,10 @@ def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
 def getDeepestSubrepoContainingFile(wfile, ctx):
     """
     Given a filename and context, get the deepest subrepo that contains the file
-    
+
     Also return the corresponding subrepo context and the filename relative to
     its containing subrepo
-    """ 
+    """
     if wfile in ctx.manifest():
         return '', wfile, ctx
     for wsub in ctx.substate:
@@ -629,7 +635,7 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
                 sctx = ctx.sub(wsub)._repo[srev]
             except:
                 # The selected revision does not exist in the working copy
-                continue 
+                continue
             wfileinsub =  wfile[len(wsub)+1:]
             if wfileinsub in sctx.substate or wfileinsub in sctx.manifest():
                 return wsub, wfileinsub, sctx

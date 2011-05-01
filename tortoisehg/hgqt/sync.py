@@ -626,7 +626,7 @@ class SyncWidget(QWidget):
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
             if user:
-                cleanurl = url.removeauth(cururl)
+                cleanurl = hglib.removeauth(cururl)
                 res = url.readauthforuri(self.repo.ui, cleanurl)
                 if res:
                     group, auth = res
@@ -1033,7 +1033,7 @@ class SaveDialog(QDialog):
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
         if (user or passwd) and scheme in ('http', 'https'):
-            cleanurl = url.removeauth(origurl)
+            cleanurl = hglib.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
@@ -1116,7 +1116,7 @@ class SecureDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        cleanurl = url.removeauth(origurl)
+        cleanurl = hglib.removeauth(origurl)
         res = url.readauthforuri(repo.ui, cleanurl)
         if res:
             self.alias, auth = res
