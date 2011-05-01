@@ -38,7 +38,6 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;bugzilla =
 ;children =
 ;churn =
-; Warning: the color extension is not recommended for Windows
 ;color =
 ;convert =
 ;extdiff =
@@ -54,7 +53,6 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;mq =
 ;notify =
 ;pager =
-;parentrevspec =
 ;patchbomb =
 ;progress =
 ;purge =
