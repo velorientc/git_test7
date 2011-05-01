@@ -230,6 +230,7 @@ class CloneDialog(QDialog):
                     _('Error creating destination folder'),
                     _('Please specify a different path.'))
                     return False
+                self.prev_dest = None
 
         if srcQ:
             l = list(self.shist)
