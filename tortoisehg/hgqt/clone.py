@@ -351,6 +351,7 @@ class CloneDialog(QDialog):
         self.cmd.setShown(True)
         self.clone_btn.setHidden(True)
         self.close_btn.setHidden(True)
+        self.cancel_btn.setEnabled(True)
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
 
