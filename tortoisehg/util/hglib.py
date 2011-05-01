@@ -9,6 +9,7 @@ import os
 import sys
 import shlex
 import time
+import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
@@ -640,3 +641,24 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
                 else:
                     return os.path.join(wsub, wsubsub), wfileinsub, sctx
     return None, wfile, ctx
+
+def netlocsplit(netloc):
+    '''split [user[:passwd]@]host[:port] into 4-tuple.'''
+
+    a = netloc.find('@')
+    if a == -1:
+        user, passwd = None, None
+    else:
+        userpass, netloc = netloc[:a], netloc[a + 1:]
+        c = userpass.find(':')
+        if c == -1:
+            user, passwd = urllib.unquote(userpass), None
+        else:
+            user = urllib.unquote(userpass[:c])
+            passwd = urllib.unquote(userpass[c + 1:])
+    c = netloc.find(':')
+    if c == -1:
+        host, port = netloc, None
+    else:
+        host, port = netloc[:c], netloc[c + 1:]
+    return host, port, user, passwd

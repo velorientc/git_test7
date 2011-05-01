@@ -43,7 +43,7 @@ def parseurl(path):
     elif path.startswith('http://') or path.startswith('https://'):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
-        host, port, user, passwd = url.netlocsplit(netloc)
+        host, port, user, passwd = hglib.netlocsplit(netloc)
         if folder.startswith('/'):
             folder = folder[1:]
     else:
