@@ -30,16 +30,10 @@ except ImportError:
     from mercurial.hg import localpath
 try:
     # hg >= 1.9
-    from mercurial.util import hidepassword
+    from mercurial.util import hidepassword, removeauth
 except ImportError:
     # hg <= 1.8
-    from mercurial.url import hidepassword
-try:
-    # hg >= 1.9
-    from mercurial.util import removeauth
-except ImportError:
-    # hg <= 1.8
-    from mercurial.url import removeauth
+    from mercurial.url import hidepassword, removeauth
 demandimport.enable()
 
 _encoding = encoding.encoding
