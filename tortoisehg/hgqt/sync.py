@@ -1346,7 +1346,7 @@ class PathsModel(QAbstractTableModel):
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
         for alias, path in pathlist:
-            safepath = url.hidepassword(path)
+            safepath = hglib.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
             self.rows.append([ualias, usafepath, path])

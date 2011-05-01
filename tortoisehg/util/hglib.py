@@ -10,7 +10,7 @@ import sys
 import shlex
 import time
 
-from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
+from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
 from mercurial import demandimport
 
@@ -27,6 +27,12 @@ try:
 except ImportError:
     # hg <= 1.8
     from mercurial.hg import localpath
+try:
+    # hg >= 1.9
+    from mercurial.util import hidepassword
+except ImportError:
+    # hg <= 1.8
+    from mercurial.url import hidepassword
 demandimport.enable()
 
 _encoding = encoding.encoding
@@ -564,7 +570,7 @@ def validate_synch_path(path, repo):
     for alias, path_aux in repo.ui.configitems('paths'):
         if path == alias:
             return_path = path_aux
-        elif path == url.hidepassword(path_aux):
+        elif path == hidepassword(path_aux):
             return_path = path_aux
     return return_path
 
