@@ -183,6 +183,8 @@ class ShelveDialog(QDialog):
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.layout().addWidget(self.statusbar)
+        self.showMessage(_('Backup copies of modified files can be found '
+                           'in .hg/Trashcan/'))
 
         self.refreshCombos()
         repo.repositoryChanged.connect(self.refreshCombos)
