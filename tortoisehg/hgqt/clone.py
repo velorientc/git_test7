@@ -321,6 +321,7 @@ class CloneDialog(QDialog):
                     _('Error creating destination folder'),
                     _('Please specify a different path.'))
                     return False
+                self.prev_dest = None
 
         if srcQ:
             l = list(self.shist)
@@ -437,6 +438,7 @@ class CloneDialog(QDialog):
         self.cmd.setShown(True)
         self.clone_btn.setHidden(True)
         self.close_btn.setHidden(True)
+        self.cancel_btn.setEnabled(True)
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
         self.setChoicesActive(False)

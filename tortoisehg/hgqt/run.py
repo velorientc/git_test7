@@ -715,7 +715,10 @@ def annotate(ui, *pats, **opts):
     from tortoisehg.hgqt.manifestdialog import run
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
-        return
+        if pats:
+            pats = pats[0:]
+        else:
+            return
     return qtrun(run, ui, *pats, **opts)
 
 def init(ui, *pats, **opts):
