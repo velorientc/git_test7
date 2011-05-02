@@ -7,6 +7,7 @@
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import thgrepo
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
 from repotreeitem import RepoItem, RepoTreeItem
@@ -222,6 +223,17 @@ class RepoTreeModel(QAbstractItemModel):
             row = rgi.childCount()
         self.beginInsertRows(grp, row, row)
         rgi.insertChild(row, RepoItem(self, root))
+        def addSubrepos(ri, repo):
+            for subpath in repo['.'].substate:
+                # For now we only support showing mercurial subrepos
+                if repo['.'].substate[subpath][2] == 'hg':
+                    sctx = repo['.'].sub(subpath)
+                    ri.insertChild(row,
+                         RepoItem(self, sctx._repo.root))
+                    addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
+        from mercurial import ui, hg
+        repo = hg.repository(ui.ui(), root)
+        addSubrepos(rgi.child(rgi.childCount()-1), repo)
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
