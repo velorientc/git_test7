@@ -9,14 +9,14 @@
 import binascii
 import os
 
-from mercurial import util, revset, error, patch
+from mercurial import revset, error, patch
 
-from tortoisehg.util import shlib, hglib
+from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox
-from tortoisehg.hgqt.qtlib import CustomPrompt, DemandWidget
+from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
@@ -478,7 +478,7 @@ class RepoWidget(QWidget):
                 if filename:
                     filepaths.append(p)
                     os.unlink(filename)
-            except Exception, e:
+            except Exception:
                 pass
         return filepaths
 
@@ -1390,7 +1390,6 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def copyPatch(self):
-        from mercurial import commands, ui
         _ui = self.repo.ui
         _ui.pushbuffer()
         try:
@@ -1468,7 +1467,7 @@ class RepoWidget(QWidget):
     def qpushMoveRevision(self):
         """Make REV the top applied patch"""
         ctx = self.repo.changectx(self.rev)
-        patchname = self.repo.changectx(self.rev).thgmqpatchname()
+        patchname = ctx.thgmqpatchname()
         cmdline = ['qpush', '--move', str(patchname),
                    '--repository', self.repo.root]
         self.runCommand(cmdline)
