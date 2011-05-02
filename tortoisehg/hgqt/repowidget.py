@@ -1452,10 +1452,10 @@ class RepoWidget(QWidget):
         except:
             applied = True
             mqpatch = False
-        
+
         if mqpatch and applied and 'qparent' in ctx.p1().tags():
             return qpopAll(self.repo)
-        
+
         if not applied:
             patchname = self.repo.changectx(self.rev).thgmqpatchname()
         else:
