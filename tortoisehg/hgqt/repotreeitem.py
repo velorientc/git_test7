@@ -8,10 +8,12 @@
 import sys, os
 
 from mercurial import node
+from mercurial import ui, hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -189,7 +191,6 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
-        RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
         a = xr.attributes()
@@ -197,6 +198,18 @@ class RepoItem(RepoTreeItem):
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
+
+        def addSubrepos(ri):
+            repo = hg.repository(ui.ui(), ri.rootpath())
+            for subpath in repo['.'].substate:
+                # For now we only support showing mercurial subrepos
+                if repo['.'].substate[subpath][2] == 'hg':
+                    sctx = repo['.'].sub(subpath)
+                    ri.appendChild(RepoItem(self.model, sctx._repo.root))
+                    if ri.childCount():
+                        addSubrepos(ri.child(ri.childCount()-1))
+
+        addSubrepos(self)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
