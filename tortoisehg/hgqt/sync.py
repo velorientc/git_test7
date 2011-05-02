@@ -21,8 +21,6 @@ from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
-_schemes = ['local', 'ssh', 'http', 'https']
-
 def parseurl(path):
     if path.startswith('ssh://'):
         scheme = 'ssh'
@@ -40,7 +38,7 @@ def parseurl(path):
         else:
             qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
             host, port, folder = '', '', ''
-    elif path.startswith('http://') or path.startswith('https://'):
+    elif path.startswith(('http://', 'https://', 'svn+https://')):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
         host, port, user, passwd = hglib.netlocsplit(netloc)
@@ -72,6 +70,10 @@ class SyncWidget(QWidget):
         layout.setSpacing(4)
         self.setLayout(layout)
         self.setAcceptDrops(True)
+
+        self._schemes = ['local', 'ssh', 'http', 'https']
+        if 'hgsubversion' in repo.extensions():
+            self._schemes.append('svn+https')
 
         self.repo = repo
         self.finishfunc = None
@@ -178,7 +180,7 @@ class SyncWidget(QWidget):
         tbar.setIconSize(QSize(16, 16))
         hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
-        for s in _schemes:
+        for s in self._schemes:
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
         tbar.addWidget(self.schemecombo)
@@ -403,7 +405,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
             w.setDisabled(schemeIndex == 0)
-        self.securebutton.setVisible(schemeIndex == 3)
+        self.securebutton.setVisible(schemeIndex >= 3)
 
         opts = []
         for opt, value in self.opts.iteritems():
@@ -416,7 +418,7 @@ class SyncWidget(QWidget):
         self.optionshdrlabel.setVisible(bool(opts))
 
     def currentUrl(self, hidepw):
-        scheme = _schemes[self.schemecombo.currentIndex()]
+        scheme = self._schemes[self.schemecombo.currentIndex()]
         if scheme == 'local':
             return hglib.fromunicode(self.pathentry.text())
         else:
@@ -450,7 +452,7 @@ class SyncWidget(QWidget):
         except TypeError:
             return
         self.updateInProgress = True
-        for i, val in enumerate(_schemes):
+        for i, val in enumerate(self._schemes):
             if scheme == val:
                 self.schemecombo.setCurrentIndex(i)
                 break
