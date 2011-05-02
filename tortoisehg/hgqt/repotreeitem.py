@@ -8,7 +8,7 @@
 import sys, os
 
 from mercurial import node
-from mercurial import ui, hg
+from mercurial import ui, hg, util, error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -23,6 +23,7 @@ xmlClassMap = {
       'allgroup': 'AllRepoGroupItem',
       'group': 'RepoGroupItem',
       'repo': 'RepoItem',
+      'subrepo': 'SubrepoItem',
       'treeitem': 'RepoTreeItem',
     }
 
@@ -142,6 +143,7 @@ class RepoItem(RepoTreeItem):
         self._root = root or ''
         self._shortname = u''
         self._basenode = node.nullid
+        self._repotype = 'hg'
 
     def isRepo(self):
         return True
@@ -155,6 +157,9 @@ class RepoItem(RepoTreeItem):
         else:
             return hglib.tounicode(os.path.basename(self._root))
 
+    def repotype(self):
+        return self._repotype
+    
     def basenode(self):
         """Return node id of revision 0"""
         return self._basenode
@@ -199,17 +204,20 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-        def addSubrepos(ri):
-            repo = hg.repository(ui.ui(), ri.rootpath())
-            for subpath in repo['.'].substate:
+        def addSubrepos(ri, repo):
+            wctx = repo['.']
+            for subpath in wctx.substate:
                 # For now we only support showing mercurial subrepos
-                if repo['.'].substate[subpath][2] == 'hg':
-                    sctx = repo['.'].sub(subpath)
-                    ri.appendChild(RepoItem(self.model, sctx._repo.root))
+                subtype = wctx.substate[subpath][2]
+                sctx = wctx.sub(subpath)
+                ri.appendChild(
+                    SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
+                if subtype == 'hg':
+                    # Only recurse into mercurial subrepos
                     if ri.childCount():
-                        addSubrepos(ri.child(ri.childCount()-1))
+                        addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
 
-        addSubrepos(self)
+        addSubrepos(self, hg.repository(ui.ui(), self.rootpath()))
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
@@ -218,6 +226,61 @@ class RepoItem(RepoTreeItem):
         if reporoot == self._root:
             return self
         return None
+
+
+def _overlaidicon(base, overlay):
+    """Generate overlaid icon"""
+    # TODO: This was copied from manifestmodel.py
+    # TODO: generalize this function as a utility
+    pixmap = base.pixmap(16, 16)
+    painter = QPainter(pixmap)
+    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
+    del painter
+    return QIcon(pixmap)
+
+
+class SubrepoItem(RepoItem):
+    _subrepoType2IcoMap = {
+          'hg': 'hg',
+          'git': 'thg-git-subrepo',
+          'svn': 'thg-svn-subrepo',
+    }
+    
+    def __init__(self, model, repo=None, parent=None, parentrepo=None, 
+            subtype='hg'):
+        RepoItem.__init__(self, model, repo, parent)
+        self._parentrepo = parentrepo
+        self._repotype = subtype
+        if self._repotype != 'hg':
+            # Make sure that we cannot drag non hg subrepos
+            # To do so we disable the dumpObject method for non hg subrepos
+            def doNothing(dummy):
+                pass
+            self.dumpObject = doNothing
+            
+            # Limit the context menu to those actions that are valid for non
+            # mercurial subrepos
+            def nonHgMenulist():
+                return ['remove', None, 'explore', 'terminal']
+            self.menulist = nonHgMenulist
+            
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+            if column == 0:
+                subiconame = SubrepoItem._subrepoType2IcoMap.get(self._repotype, None)
+                if subiconame is None:
+                    # Unknown (or generic) subrepo type
+                    ico = qtlib.geticon('thg-subrepo')
+                else:
+                    # Overlay the "subrepo icon" on top of the selected subrepo
+                    # type icon
+                    ico = qtlib.geticon(subiconame)
+                    ico = _overlaidicon(ico, qtlib.geticon('thg-subrepo'))
+                return QVariant(ico)
+            return QVariant()
+        else:
+            return super(SubrepoItem, self).data(column, role)
 
 
 class RepoGroupItem(RepoTreeItem):

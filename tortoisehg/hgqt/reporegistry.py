@@ -16,6 +16,9 @@ from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import qtlib
+
+
 def settingsfilename():
     """Return path to thg-reporegistry.xml as unicode"""
     s = QSettings()
@@ -140,7 +143,15 @@ class RepoTreeView(QTreeView):
 
     def mouseDoubleClickEvent(self, event):
         if self.selitem and self.selitem.internalPointer().isRepo():
-            self.showFirstTabOrOpen()
+            # We can only open mercurial repositories and subrepositories
+            repotype = self.selitem.internalPointer().repotype()
+            if repotype == 'hg':
+                self.showFirstTabOrOpen()
+            else:
+                qtlib.WarningMsgBox(
+                    _('Unsupported repository type (%s)') % repotype,
+                    _('Cannot open non mercurial repositories or subrepositories'),
+                    parent=self)
         else:
             # a double-click on non-repo rows opens an editor
             super(RepoTreeView, self).mouseDoubleClickEvent(event)
@@ -324,7 +335,14 @@ class RepoRegistryView(QDockWidget):
     def open(self):
         'open context menu action, open repowidget unconditionally'
         root = self.selitem.internalPointer().rootpath()
-        self.openRepo.emit(hglib.tounicode(root), False)
+        repotype = self.selitem.internalPointer().repotype()
+        if repotype == 'hg':
+            self.openRepo.emit(hglib.tounicode(root), False)
+        else:
+            qtlib.WarningMsgBox(
+                _('Unsupported repository type (%s)') % repotype,
+                _('Cannot open non mercurial repositories or subrepositories'),
+                parent=self)
 
     def startRename(self):
         self.tview.edit(self.selitem)

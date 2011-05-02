@@ -10,7 +10,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import thgrepo
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem
+from repotreeitem import RepoItem, SubrepoItem, RepoTreeItem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -188,6 +188,8 @@ class RepoTreeModel(QAbstractItemModel):
             parent = QModelIndex()
             d = str(data.data(repoRegGroupMimeType))
         itemread = readXml(d, extractXmlElementName, self)
+        if itemread is None:
+            return False
         if group is None:
             return False
         if row < 0:
@@ -224,13 +226,18 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(grp, row, row)
         rgi.insertChild(row, RepoItem(self, root))
         def addSubrepos(ri, repo):
-            for subpath in repo['.'].substate:
+            wctx = repo['.']
+            for subpath in wctx.substate:
                 # For now we only support showing mercurial subrepos
-                if repo['.'].substate[subpath][2] == 'hg':
-                    sctx = repo['.'].sub(subpath)
-                    ri.insertChild(row,
-                         RepoItem(self, sctx._repo.root))
-                    addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
+                subtype = wctx.substate[subpath][2]
+                sctx = wctx.sub(subpath)
+                ri.insertChild(row,
+                    SubrepoItem(self, sctx._repo.root, subtype=subtype))
+                if subtype == 'hg':
+                    # Only recurse into mercurial subrepos
+                    if ri.childCount():
+                        addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
+                
         from mercurial import ui, hg
         repo = hg.repository(ui.ui(), root)
         addSubrepos(rgi.child(rgi.childCount()-1), repo)
