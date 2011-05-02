@@ -5,8 +5,11 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+from mercurial import ui, hg, util, error
+
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt import thgrepo
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
@@ -226,22 +229,45 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(grp, row, row)
         rgi.insertChild(row, RepoItem(self, root))
         def addSubrepos(ri, repo):
-            wctx = repo['.']
-            for subpath in wctx.substate:
-                # For now we only support showing mercurial subrepos
-                subtype = wctx.substate[subpath][2]
-                sctx = wctx.sub(subpath)
-                ri.insertChild(row,
-                    SubrepoItem(self, sctx._repo.root, subtype=subtype))
-                if subtype == 'hg':
-                    # Only recurse into mercurial subrepos
-                    if ri.childCount():
-                        addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
+            invalidRepoList = []
+            try:
+                wctx = repo['.']
+                for subpath in wctx.substate:
+                    # For now we only support showing mercurial subrepos
+                    subtype = wctx.substate[subpath][2]
+                    sctx = wctx.sub(subpath)
+                    ri.insertChild(row,
+                        SubrepoItem(self, sctx._repo.root, subtype=subtype))
+                    if subtype == 'hg':
+                        # Only recurse into mercurial subrepos
+                        if ri.childCount():
+                            invalidRepoList += \
+                                addSubrepos(
+                                    ri.child(ri.childCount()-1), sctx._repo)
+            except (EnvironmentError, error.RepoError, util.Abort), e:
+                # Add the repo to the list of repos/subrepos 
+                # that could not be open
+                invalidRepoList.append(repo.root)
                 
-        from mercurial import ui, hg
+            return invalidRepoList
+        
         repo = hg.repository(ui.ui(), root)
-        addSubrepos(rgi.child(rgi.childCount()-1), repo)
+        invalidRepoList = \
+            addSubrepos(rgi.child(rgi.childCount()-1), repo)
         self.endInsertRows()
+            
+        if invalidRepoList:
+            if invalidRepoList[0] == root:
+                qtlib.WarningMsgBox(_('Could not get subrepository list'),
+                    _('It was not possible to get the subrepository list for '
+                    'the repository in:<br><br><i>%s</i>') % root)
+            else:
+                qtlib.WarningMsgBox(_('Could not open some subrepositories'),
+                    _('It was not possible to fully load the subrepository list '
+                    'for the repository in:<br><br><i>%s</i><br><br>'
+                    'The following subrepositories could not be accessed:'
+                    '<br><br><i>%s</i>') %
+                    (root, "<br>".join(invalidRepoList)))
 
     def getRepoItem(self, reporoot):
         return self.rootItem.getRepoItem(reporoot)

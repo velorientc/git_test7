@@ -205,19 +205,44 @@ class RepoItem(RepoTreeItem):
         RepoTreeItem.undump(self, xr)
 
         def addSubrepos(ri, repo):
-            wctx = repo['.']
-            for subpath in wctx.substate:
-                # For now we only support showing mercurial subrepos
-                subtype = wctx.substate[subpath][2]
-                sctx = wctx.sub(subpath)
-                ri.appendChild(
-                    SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
-                if subtype == 'hg':
-                    # Only recurse into mercurial subrepos
-                    if ri.childCount():
-                        addSubrepos(ri.child(ri.childCount()-1), sctx._repo)
+            invalidRepoList = []
+            try:
+                wctx = repo['.']
+                for subpath in wctx.substate:
+                    # For now we only support showing mercurial subrepos
+                    subtype = wctx.substate[subpath][2]
+                    sctx = wctx.sub(subpath)
+                    ri.appendChild(
+                        SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
+                    if subtype == 'hg':
+                        # Only recurse into mercurial subrepos
+                        if ri.childCount():
+                            invalidRepoList += \
+                                addSubrepos(
+                                    ri.child(ri.childCount()-1), sctx._repo)
+            except (EnvironmentError, error.RepoError, util.Abort), e:
+                # Add the repo to the list of repos/subrepos 
+                # that could not be open
+                invalidRepoList.append(repo.root)
+                
+            return invalidRepoList
 
-        addSubrepos(self, hg.repository(ui.ui(), self.rootpath()))
+        root = self.rootpath()
+        invalidRepoList = \
+            addSubrepos(self, hg.repository(ui.ui(), root))
+            
+        if invalidRepoList:
+            if invalidRepoList[0] == root:
+                qtlib.WarningMsgBox(_('Could not get subrepository list'),
+                    _('It was not possible to get the subrepository list for '
+                    'the repository in:<br><br><i>%s</i>') % root)
+            else:
+                qtlib.WarningMsgBox(_('Could not open some subrepositories'),
+                    _('It was not possible to fully load the subrepository list '
+                    'for the repository in:<br><br><i>%s</i><br><br>'
+                    'The following subrepositories could not be accessed:'
+                    '<br><br><i>%s</i>') %
+                    (root, "<br>".join(invalidRepoList)))
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
