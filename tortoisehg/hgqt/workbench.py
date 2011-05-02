@@ -184,8 +184,12 @@ class Workbench(QMainWindow):
 
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file')
-        newaction(_("&Close Repository"), self.closeRepository,
+        closerepo = newaction(_("&Close Repository"), self.closeRepository,
                   shortcut='Close', enabled='repoopen', menu='file')
+        if os.name == 'nt':
+            sc = closerepo.shortcuts()
+            sc.append(keysequence('Ctrl+W'))
+            closerepo.setShortcuts(sc)
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
