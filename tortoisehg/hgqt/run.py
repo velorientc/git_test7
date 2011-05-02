@@ -22,10 +22,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 import mercurial.ui as uimod
-from mercurial import hg, util, fancyopts, cmdutil, extensions, error
+from mercurial import util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.hgqt.i18n import agettext as _
-from tortoisehg.util import hglib, paths, shlib, i18n
+from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.bugreport import run as bugrun
@@ -131,7 +131,7 @@ def get_lines_from_listfile(filename, isutf8):
           _linesutf8 = lines
         else:
           _lines = lines
-    except IOError, e:
+    except IOError:
         sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
 
 def get_files_from_listfile():
@@ -477,7 +477,7 @@ class _QtRunner(QObject):
                     # dialog windows.  Since thgrepo instances are cached, this
                     # is not wasted.
                     from tortoisehg.hgqt import thgrepo
-                    repo = thgrepo.repository(ui, opts['repository'])
+                    thgrepo.repository(ui, opts['repository'])
                 except error.RepoError, e:
                     qtlib.WarningMsgBox(_('Repository Error'),
                                         hglib.tounicode(str(e)))
