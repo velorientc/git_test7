@@ -270,7 +270,7 @@ class CloneDialog(QDialog):
             if os.listdir(dest):
                 # cur dir has files, specify no dest, let hg take
                 # basename
-                dest = None
+                dest = ''
             else:
                 dest = '.'
         else:
