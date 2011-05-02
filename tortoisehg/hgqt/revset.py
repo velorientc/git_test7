@@ -390,6 +390,8 @@ class RevsetThread(QThread):
             else:
                 msg = e.args[0]
             self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
+        except TypeError:
+            raise
         except Exception, e:
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
 
