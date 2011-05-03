@@ -144,10 +144,18 @@ class RepoItem(RepoTreeItem):
         self._shortname = u''
         self._basenode = node.nullid
         self._repotype = 'hg'
+        # The _valid property is used to display a "warning" icon for repos
+        # that cannot be open
+        # If root is set we assume that the repo is valid (an actual validity
+        # test would require calling hg.repository() which is expensive)
+        # Regardless, self._valid may be set to False if self.undump() fails
+        if self._root:
+            self._valid = True
+        else:
+            self._valid = False
 
     def isRepo(self):
         return True
-
     def rootpath(self):
         return self._root
 
@@ -174,6 +182,8 @@ class RepoItem(RepoTreeItem):
         if role == Qt.DecorationRole:
             if column == 0:
                 ico = qtlib.geticon('hg')
+                if not self._valid:
+                    ico = _overlaidicon(ico, qtlib.geticon('dialog-warning'))
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -196,8 +206,8 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
-
     def undump(self, xr):
+        self._valid = False # Will be set to True if everything goes fine
         a = xr.attributes()
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         self._shortname = unicode(a.value('', 'shortname').toString())
@@ -252,7 +262,8 @@ class RepoItem(RepoTreeItem):
                     'The following subrepositories could not be accessed:'
                     '<br><br><i>%s</i>') %
                     (root, "<br>".join(invalidRepoList)))
-
+        else:
+            self._valid = True
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
