@@ -1390,6 +1390,7 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def copyPatch(self):
+        from mercurial import commands
         _ui = self.repo.ui
         _ui.pushbuffer()
         try:
