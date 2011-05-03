@@ -352,10 +352,9 @@ class RepoGroupItem(RepoTreeItem):
             self.name = value.toString()
             return True
         return False
-
     def menulist(self):
-        return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove']
-
+        return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
+            None, 'reloadRegistry']
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
@@ -380,10 +379,9 @@ class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, model, parent=None):
         RepoTreeItem.__init__(self, model, parent)
         self.name = _('default')
-
     def menulist(self):
-        return ['openAll', 'add', None, 'newGroup', None, 'rename']
-
+        return ['openAll', 'add', None, 'newGroup', None, 'rename',
+            None, 'reloadRegistry']
     def undump(self, xr):
         a = xr.attributes()
         name = a.value('', 'name').toString()

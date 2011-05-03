@@ -208,10 +208,13 @@ class RepoRegistryView(QDockWidget):
 
         self.createActions()
         QTimer.singleShot(0, self.expand)
+    def reloadModel(self):
+        self.tview.setModel(
+            repotreemodel.RepoTreeModel(settingsfilename(), self))
+        self.expand()
 
     def expand(self):
         self.tview.expandToDepth(0)
-
     def addRepo(self, root):
         'workbench has opened a new repowidget, ensure it is in the registry'
         m = self.tview.model()
@@ -228,9 +231,10 @@ class RepoRegistryView(QDockWidget):
 
     def close(self):
         self.tview.model().write(settingsfilename())
-
     def _action_defs(self):
-        a = [("open", _("Open"), 'thg-repository-open',
+        a = [("reloadRegistry", _("Refresh repository list"), 'view-refresh',
+                _("Refresh the Repository Registry list"), self.reloadModel),
+             ("open", _("Open"), 'thg-repository-open',
                 _("Open the repository in a new tab"), self.open),
              ("openAll", _("Open All"), 'thg-repository-open',
                 _("Open all repositories in new tabs"), self.openAll),
