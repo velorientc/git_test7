@@ -64,9 +64,11 @@ def iterRepoItemFromXml(source, model=None):
 
 class RepoTreeModel(QAbstractItemModel):
 
-    def __init__(self, filename, parent):
+    def __init__(self, filename, parent, showSubrepos=True):
         QAbstractItemModel.__init__(self, parent)
-
+        
+        self.showSubrepos=showSubrepos
+        
         root = None
         all = None
 
@@ -228,6 +230,11 @@ class RepoTreeModel(QAbstractItemModel):
             row = rgi.childCount()
         self.beginInsertRows(grp, row, row)
         rgi.insertChild(row, RepoItem(self, root))
+        
+        if not self.showSubrepos:
+            self.endInsertRows()
+            return
+        
         def addSubrepos(ri, repo):
             invalidRepoList = []
             try:

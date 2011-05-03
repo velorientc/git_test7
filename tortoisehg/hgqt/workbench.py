@@ -219,6 +219,10 @@ class Workbench(QMainWindow):
         newaction(_("Show Paths"), self.reporegistry.showPaths,
                   checkable=True, menu='view')
 
+        self.actionShowSubrepos = \
+            newaction(_("Show Subrepos on Registry"), self.reporegistry.setShowSubrepos,
+                  checkable=True, menu='view')
+
         a = self.log.toggleViewAction()
         a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
@@ -744,6 +748,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
         s.setValue(wb + 'showPaths', self.actionShowPaths.isChecked())
+        s.setValue(wb + 'showSubrepos', self.actionShowSubrepos.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
         if self.actionSaveRepos.isChecked():
@@ -765,6 +770,8 @@ class Workbench(QMainWindow):
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
+        ssr = s.value(wb + 'showSubrepos', defaultValue=QVariant(True)).toBool()
+        QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):

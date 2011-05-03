@@ -206,64 +206,67 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
+        
     def undump(self, xr):
-        self._valid = False # Will be set to True if everything goes fine
+        self._valid = True
         a = xr.attributes()
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-        def addSubrepos(ri, repo):
-            invalidRepoList = []
+        if self.model.showSubrepos:
+            def addSubrepos(ri, repo):
+                invalidRepoList = []
+                try:
+                    wctx = repo['.']
+                    for subpath in wctx.substate:
+                        # For now we only support showing mercurial subrepos
+                        subtype = wctx.substate[subpath][2]
+                        sctx = wctx.sub(subpath)
+                        ri.appendChild(
+                            SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
+                        if subtype == 'hg':
+                            # Only recurse into mercurial subrepos
+                            if ri.childCount():
+                                invalidRepoList += \
+                                    addSubrepos(
+                                        ri.child(ri.childCount()-1), sctx._repo)
+                except (EnvironmentError, error.RepoError, util.Abort), e:
+                    # Add the repo to the list of repos/subrepos
+                    # that could not be open
+                    invalidRepoList.append(repo.root)
+    
+                return invalidRepoList
+
+            root = self.rootpath()
             try:
-                wctx = repo['.']
-                for subpath in wctx.substate:
-                    # For now we only support showing mercurial subrepos
-                    subtype = wctx.substate[subpath][2]
-                    sctx = wctx.sub(subpath)
-                    ri.appendChild(
-                        SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
-                    if subtype == 'hg':
-                        # Only recurse into mercurial subrepos
-                        if ri.childCount():
-                            invalidRepoList += \
-                                addSubrepos(
-                                    ri.child(ri.childCount()-1), sctx._repo)
+                repo = hg.repository(ui.ui(), root)
             except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Add the repo to the list of repos/subrepos
-                # that could not be open
-                invalidRepoList.append(repo.root)
+                # Do not try to show the list of subrepos when the top repository
+                # could not be open
+                # TODO: Mark the repo with a "warning" icon or similar to indicate
+                #       that the repository cannot be open
+                self._valid = False
+                return
 
-            return invalidRepoList
+            invalidRepoList = \
+                addSubrepos(self, repo)
+    
+            if invalidRepoList:
+                self._valid = False
+                if invalidRepoList[0] == root:
+                    qtlib.WarningMsgBox(_('Could not get subrepository list'),
+                        _('It was not possible to get the subrepository list for '
+                        'the repository in:<br><br><i>%s</i>') % root)
+                else:
+                    qtlib.WarningMsgBox(_('Could not open some subrepositories'),
+                        _('It was not possible to fully load the subrepository list '
+                        'for the repository in:<br><br><i>%s</i><br><br>'
+                        'The following subrepositories could not be accessed:'
+                        '<br><br><i>%s</i>') %
+                        (root, "<br>".join(invalidRepoList)))
 
-        root = self.rootpath()
-        try:
-            repo = hg.repository(ui.ui(), root)
-        except (EnvironmentError, error.RepoError, util.Abort), e:
-            # Do not try to show the list of subrepos when the top repository
-            # could not be open
-            # TODO: Mark the repo with a "warning" icon or similar to indicate
-            #       that the repository cannot be open
-            return
-
-        invalidRepoList = \
-            addSubrepos(self, repo)
-
-        if invalidRepoList:
-            if invalidRepoList[0] == root:
-                qtlib.WarningMsgBox(_('Could not get subrepository list'),
-                    _('It was not possible to get the subrepository list for '
-                    'the repository in:<br><br><i>%s</i>') % root)
-            else:
-                qtlib.WarningMsgBox(_('Could not open some subrepositories'),
-                    _('It was not possible to fully load the subrepository list '
-                    'for the repository in:<br><br><i>%s</i><br><br>'
-                    'The following subrepositories could not be accessed:'
-                    '<br><br><i>%s</i>') %
-                    (root, "<br>".join(invalidRepoList)))
-        else:
-            self._valid = True
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
