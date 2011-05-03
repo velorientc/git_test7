@@ -159,7 +159,7 @@ class RepoItem(RepoTreeItem):
 
     def repotype(self):
         return self._repotype
-    
+
     def basenode(self):
         """Return node id of revision 0"""
         return self._basenode
@@ -221,16 +221,25 @@ class RepoItem(RepoTreeItem):
                                 addSubrepos(
                                     ri.child(ri.childCount()-1), sctx._repo)
             except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Add the repo to the list of repos/subrepos 
+                # Add the repo to the list of repos/subrepos
                 # that could not be open
                 invalidRepoList.append(repo.root)
-                
+
             return invalidRepoList
 
         root = self.rootpath()
+        try:
+            repo = hg.repository(ui.ui(), root)
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            # Do not try to show the list of subrepos when the top repository
+            # could not be open
+            # TODO: Mark the repo with a "warning" icon or similar to indicate
+            #       that the repository cannot be open
+            return
+
         invalidRepoList = \
-            addSubrepos(self, hg.repository(ui.ui(), root))
-            
+            addSubrepos(self, repo)
+
         if invalidRepoList:
             if invalidRepoList[0] == root:
                 qtlib.WarningMsgBox(_('Could not get subrepository list'),
@@ -271,8 +280,8 @@ class SubrepoItem(RepoItem):
           'git': 'thg-git-subrepo',
           'svn': 'thg-svn-subrepo',
     }
-    
-    def __init__(self, model, repo=None, parent=None, parentrepo=None, 
+
+    def __init__(self, model, repo=None, parent=None, parentrepo=None,
             subtype='hg'):
         RepoItem.__init__(self, model, repo, parent)
         self._parentrepo = parentrepo
@@ -283,13 +292,13 @@ class SubrepoItem(RepoItem):
             def doNothing(dummy):
                 pass
             self.dumpObject = doNothing
-            
+
             # Limit the context menu to those actions that are valid for non
             # mercurial subrepos
             def nonHgMenulist():
                 return ['remove', None, 'explore', 'terminal']
             self.menulist = nonHgMenulist
-            
+
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:

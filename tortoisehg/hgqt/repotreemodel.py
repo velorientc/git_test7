@@ -245,17 +245,23 @@ class RepoTreeModel(QAbstractItemModel):
                                 addSubrepos(
                                     ri.child(ri.childCount()-1), sctx._repo)
             except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Add the repo to the list of repos/subrepos 
+                # Add the repo to the list of repos/subrepos
                 # that could not be open
                 invalidRepoList.append(repo.root)
-                
+
             return invalidRepoList
-        
-        repo = hg.repository(ui.ui(), root)
-        invalidRepoList = \
-            addSubrepos(rgi.child(rgi.childCount()-1), repo)
+
+        try:
+            repo = hg.repository(ui.ui(), root)
+            invalidRepoList = \
+                addSubrepos(rgi.child(rgi.childCount()-1), repo)
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            # TODO: Mark the repo with a "warning" icon or similar to indicate
+            #       that the repository cannot be open
+            invalidRepoList = [root]
+
         self.endInsertRows()
-            
+
         if invalidRepoList:
             if invalidRepoList[0] == root:
                 qtlib.WarningMsgBox(_('Could not get subrepository list'),
