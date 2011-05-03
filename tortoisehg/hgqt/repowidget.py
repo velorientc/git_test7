@@ -1400,6 +1400,8 @@ class RepoWidget(QWidget):
                 commands.export(_ui, self.repo, self.rev, output=Writable())
             else:
                 commands.diff(_ui, self.repo)
+        except NameError:
+            raise
         except Exception, e:
             _ui.popbuffer()
             self.showMessage(hglib.tounicode(str(e)))
