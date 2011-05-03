@@ -103,8 +103,17 @@ class UpdateDialog(QDialog):
         optbox.addWidget(self.showlog_chk)
 
         self.discard_chk.setChecked(bool(opts.get('clean')))
+
+        #### Persisted Options
+        self.merge_chk.setChecked(
+            QSettings().value('update/merge', False).toBool())
+        
         self.autoresolve_chk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+            repo.ui.configbool('tortoisehg', 'autoresolve', False) or
+                QSettings().value('update/autoresolve', False).toBool())
+        
+        self.showlog_chk.setChecked(
+            QSettings().value('update/showlog', False).toBool())
 
         ## command widget
         self.cmd = cmdui.Widget(True, True, self)
@@ -154,7 +163,20 @@ class UpdateDialog(QDialog):
         if not self.update_btn.isEnabled():
             self.rev_combo.lineEdit().selectAll()  # need to change rev
 
+        # expand options if a hidden one is checked
+        self.show_options(self.hiddenSettingIsChecked())
+
     ### Private Methods ###
+    def hiddenSettingIsChecked(self):
+        if self.merge_chk.isChecked() or self.autoresolve_chk.isChecked() or self.showlog_chk.isChecked():
+            return True
+        else:
+            return False
+
+    def saveSettings(self):
+        QSettings().setValue('update/merge', self.merge_chk.isChecked())
+        QSettings().setValue('update/autoresolve', self.autoresolve_chk.isChecked())
+        QSettings().setValue('update/showlog', self.showlog_chk.isChecked())
 
     def update_info(self):
         self.p1_info.update(self.ctxs[0].node())
@@ -179,6 +201,7 @@ class UpdateDialog(QDialog):
             self.update_btn.setDisabled(True)
 
     def update(self):
+        self.saveSettings()
         cmdline = ['update', '--repository', self.repo.root, '--verbose']
         cmdline += ['--config', 'ui.merge=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
