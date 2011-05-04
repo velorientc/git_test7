@@ -1126,6 +1126,10 @@ class SecureDialog(QDialog):
             self.alias, auth = host, {}
         self.repo = repo
         self.host = host
+        if cleanurl.startswith('svn+https://'):
+            self.schemes = 'svn+https'
+        else:
+            self.schemes = None
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(QLabel(_('<b>Host:</b> %s') % uhost))
@@ -1262,6 +1266,7 @@ are expanded in the filename.'''))
         setorclear('auth', self.alias+'.password', password)
         setorclear('auth', self.alias+'.key', key)
         setorclear('auth', self.alias+'.cert', chain)
+        setorclear('auth', self.alias+'.schemes', self.schemes)
 
         self.repo.incrementBusyCount()
         try:
