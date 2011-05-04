@@ -152,9 +152,13 @@ class BackoutDialog(QDialog):
         self.msgTextEdit.setText(newmsg)
 
     def backout(self):
+        user = qtlib.getCurrentUsername(self, self.repo)
+        if not user:
+            return
         # prepare command line
         revhex = self.targetinfo.get_data('revid')
-        cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
+        cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root,
+                   '--user', user]
         cmdline += ['--tool=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         if self.backoutParent:
