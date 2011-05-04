@@ -260,7 +260,11 @@ class TagDialog(QDialog):
             else:
                 self.set_status(_("Tag '%s' has been added") % tagu, True)
 
-        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev)]
+        user = qtlib.getCurrentUsername(self, self.repo)
+        if not user:
+            return
+        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev),
+               '--user', user]
         if local:
             cmd.append('--local')
         else:
