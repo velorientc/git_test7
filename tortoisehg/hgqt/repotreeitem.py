@@ -10,7 +10,7 @@ import sys, os
 from mercurial import node
 from mercurial import ui, hg, util, error
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt import thgrepo
@@ -215,7 +215,10 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-        if self.model and self.model.showSubrepos:
+        if self.model \
+                and (self.model.showSubrepos \
+                or (not self.model.showNetworkSubrepos
+                    and paths.netdrive_status(self._root))):
             def addSubrepos(ri, repo):
                 invalidRepoList = []
                 try:

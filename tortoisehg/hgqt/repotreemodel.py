@@ -7,10 +7,11 @@
 
 from mercurial import ui, hg, util, error
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt import thgrepo
+
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
 from repotreeitem import RepoItem, SubrepoItem, RepoTreeItem
@@ -64,10 +65,12 @@ def iterRepoItemFromXml(source, model=None):
 
 class RepoTreeModel(QAbstractItemModel):
 
-    def __init__(self, filename, parent, showSubrepos=True):
+    def __init__(self, filename, parent, showSubrepos=True,
+            showNetworkSubrepos=True):
         QAbstractItemModel.__init__(self, parent)
 
-        self.showSubrepos=showSubrepos
+        self.showSubrepos = showSubrepos
+        self.showNetworkSubrepos = showNetworkSubrepos
 
         root = None
         all = None
@@ -231,7 +234,8 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(grp, row, row)
         rgi.insertChild(row, RepoItem(self, root))
 
-        if not self.showSubrepos:
+        if not self.showSubrepos \
+                or (not self.showNetworkSubrepos and paths.netdrive_status(root)):
             self.endInsertRows()
             return
 

@@ -180,10 +180,12 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
 
-    def __init__(self, parent, showSubrepos=True):
+    def __init__(self, parent, showSubrepos=True, showNetworkSubrepos=True):
         QDockWidget.__init__(self, parent)
 
         self.showSubrepos = showSubrepos
+        self.showNetworkSubrepos = showNetworkSubrepos
+
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
@@ -197,7 +199,8 @@ class RepoRegistryView(QDockWidget):
         self.contextmenu = QMenu(self)
         self.tview = tv = RepoTreeView(self)
         tv.setModel(repotreemodel.RepoTreeModel(settingsfilename(), self,
-            showSubrepos=self.showSubrepos))
+            showSubrepos=self.showSubrepos,
+            showNetworkSubrepos=self.showNetworkSubrepos))
         mainframe.layout().addWidget(tv)
 
         tv.setIndentation(10)
@@ -215,10 +218,14 @@ class RepoRegistryView(QDockWidget):
         self.showSubrepos = show
         self.reloadModel()
 
+    def setShowNetworkSubrepos(self, show):
+        self.showNetworkSubrepos = show
+        self.reloadModel()
+
     def reloadModel(self):
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
-                self.showSubrepos))
+                self.showSubrepos, self.showNetworkSubrepos))
         self.expand()
 
     def expand(self):
