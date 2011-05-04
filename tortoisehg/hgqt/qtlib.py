@@ -14,7 +14,7 @@ import tempfile
 import re
 import weakref
 
-from mercurial import extensions
+from mercurial import extensions, error
 
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
@@ -792,3 +792,30 @@ class DemandWidget(QWidget):
 
     def __getattr__(self, name):
         return getattr(self._widget, name)
+
+def getCurrentUsername(widget, repo, opts=None):
+    if opts:
+        # 1. Override has highest priority
+        user = opts.get('user')
+        if user:
+            return user
+
+    # 2. Read from repository
+    try:
+        return repo.ui.username()
+    except error.Abort:
+        pass
+
+    # 3. Get a username from the user
+    QMessageBox.information(widget, _('Please enter a username'),
+                _('You must identify yourself to Mercurial'),
+                QMessageBox.Ok)
+    from tortoisehg.hgqt.settings import SettingsDialog
+    dlg = SettingsDialog(False, focus='ui.username')
+    dlg.exec_()
+    repo.invalidateui()
+    try:
+        return repo.ui.username()
+    except error.Abort:
+        return None
+

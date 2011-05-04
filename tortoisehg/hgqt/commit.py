@@ -475,31 +475,6 @@ class CommitWidget(QWidget):
         self.userhist.insert(0, user)
         self.userhist = self.userhist[:10]
 
-    def getCurrentUsername(self):
-        # 1. Override has highest priority
-        user = self.opts.get('user')
-        if user:
-            return user
-
-        # 2. Read from repository
-        try:
-            return self.repo.ui.username()
-        except error.Abort:
-            pass
-
-        # 3. Get a username from the user
-        QMessageBox.information(self, _('Please enter a username'),
-                    _('You must identify yourself to Mercurial'),
-                    QMessageBox.Ok)
-        from tortoisehg.hgqt.settings import SettingsDialog
-        dlg = SettingsDialog(False, focus='ui.username')
-        dlg.exec_()
-        self.repo.invalidateui()
-        try:
-            return self.repo.ui.username()
-        except error.Abort:
-            return None
-
     def commit(self):
         repo = self.repo
         msg = self.getMessage()
@@ -558,7 +533,7 @@ class CommitWidget(QWidget):
         if len(repo.parents()) > 1:
             files = []
 
-        user = self.getCurrentUsername()
+        user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
             return
         self.addUsernameToHistory(user)
