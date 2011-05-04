@@ -70,13 +70,43 @@ class rUpdateDialog(UpdateDialog):
         self.optbox.addWidget(self.force_chk)
         self.optbox.addWidget(self.showlog_chk)
 
+        #### Persisted Options
+        self.push_chk.setChecked(
+            QSettings().value('rupdate/push', False).toBool())
+        
+        self.newbranch_chk.setChecked(
+            QSettings().value('rupdate/newbranch', False).toBool())
+
+        self.showlog_chk.setChecked(
+            QSettings().value('rupdate/showlog', False).toBool())
+
         # prepare to show
         self.push_chk.setHidden(True)
         self.newbranch_chk.setHidden(True)
         self.force_chk.setHidden(True)
+        self.showlog_chk.setHidden(True)
         self.update_info()
 
+        # expand options if a hidden one is checked
+        self.show_options(self.hiddenSettingIsChecked())
+
     ### Private Methods ###
+
+    def hiddenSettingIsChecked(self):
+        # This might be called from the super class before all options are built.
+        # So, we need to check to make sure these options exist first.
+        if (getattr(self, "push_chk", None) and self.push_chk.isChecked()
+            ) or (getattr(self, "newbranch_chk", None) and self.newbranch_chk.isChecked()
+            ) or (getattr(self, "force_chk", None) and self.force_chk.isChecked()
+            ) or (getattr(self, "showlog_chk", None) and self.showlog_chk.isChecked()):
+            return True
+        else:
+            return False
+
+    def saveSettings(self):
+        QSettings().setValue('rupdate/push', self.push_chk.isChecked())
+        QSettings().setValue('rupdate/newbranch', self.newbranch_chk.isChecked())
+        QSettings().setValue('rupdate/showlog', self.showlog_chk.isChecked())
 
     def update_info(self):
         super(rUpdateDialog, self).update_info()
@@ -85,6 +115,7 @@ class rUpdateDialog(UpdateDialog):
         self.update_btn.setDisabled(False)
 
     def update(self):
+        self.saveSettings()
         cmdline = ['rupdate']
 
         if self.discard_chk.isChecked():
@@ -112,10 +143,11 @@ class rUpdateDialog(UpdateDialog):
     ### Signal Handlers ###
 
     def show_options(self, visible):
-        self.push_chk.setShown(visible)
-        self.newbranch_chk.setShown(visible)
-        self.force_chk.setShown(visible)
-        self.showlog_chk.setShown(visible)
+        # Like hiddenSettingIsChecked(), need to make sure these options exist first.
+        if getattr(self, "push_chk", None): self.push_chk.setShown(visible)
+        if getattr(self, "newbranch_chk", None): self.newbranch_chk.setShown(visible)
+        if getattr(self, "force_chk", None): self.force_chk.setShown(visible)
+        if getattr(self, "showlog_chk", None): self.showlog_chk.setShown(visible)
 
     def command_started(self):
         super(rUpdateDialog, self).command_started()
