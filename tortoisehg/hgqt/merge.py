@@ -694,9 +694,13 @@ class CommitPage(BasePage):
 
         # merges must be committed without specifying file list
         repo = self.wizard().repo
+        user = qtlib.getCurrentUsername(self, repo)
+        if not user:
+            return
+
         message = hglib.fromunicode(self.msg_text.text())
         cmdline = ['commit', '--verbose', '--message', message,
-                   '--repository', repo.root]
+                   '--repository', repo.root, '--user', user]
         commandlines = [cmdline]
         pushafter = repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
