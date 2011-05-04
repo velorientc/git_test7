@@ -127,9 +127,9 @@ class ThgRepoWrapper(QObject):
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
             return
-        if self.busycount > 0:
-            dbgoutput('busy, aborting')
-            return
+        #if self.busycount > 0:
+        #    dbgoutput('busy, aborting')
+        #    return
         if self.locked():
             dbgoutput('locked, aborting')
             return
