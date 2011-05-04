@@ -14,14 +14,12 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error
+from mercurial import hg, ui, url, util, error, demandimport
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
-
-_schemes = ['local', 'ssh', 'http', 'https']
 
 def parseurl(path):
     if path.startswith('ssh://'):
@@ -40,10 +38,10 @@ def parseurl(path):
         else:
             qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
             host, port, folder = '', '', ''
-    elif path.startswith('http://') or path.startswith('https://'):
+    elif path.startswith(('http://', 'https://', 'svn+https://')):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
-        host, port, user, passwd = url.netlocsplit(netloc)
+        host, port, user, passwd = hglib.netlocsplit(netloc)
         if folder.startswith('/'):
             folder = folder[1:]
     else:
@@ -61,6 +59,8 @@ class SyncWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    showBusyIcon = pyqtSignal(QString)
+    hideBusyIcon = pyqtSignal(QString)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -70,6 +70,10 @@ class SyncWidget(QWidget):
         layout.setSpacing(4)
         self.setLayout(layout)
         self.setAcceptDrops(True)
+
+        self._schemes = ['local', 'ssh', 'http', 'https']
+        if 'hgsubversion' in repo.extensions():
+            self._schemes.append('svn+https')
 
         self.repo = repo
         self.finishfunc = None
@@ -172,47 +176,52 @@ class SyncWidget(QWidget):
         hbox.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(hbox)
 
+        self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
+        tbar.setIconSize(QSize(16, 16))
+        hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
-        for s in _schemes:
+        for s in self._schemes:
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.schemecombo)
+        tbar.addWidget(self.schemecombo)
 
-        self.securebutton = QPushButton(qtlib.geticon('thg-password'), '')
-        self.securebutton.setToolTip(
-            _('Manage HTTPS connection security and user authentication'))
-        hbox.addWidget(self.securebutton)
+        a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
+        a.setToolTip(_('Manage HTTPS connection security and user authentication'))
+        self.securebutton = a
 
+        fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
         self.hostentry.setToolTip(_('Hostname'))
         self.hostentry.setAcceptDrops(False)
+        self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.hostentry, 1)
+        tbar.addWidget(self.hostentry)
+
         self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
-        fontm = QFontMetrics(self.font())
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.portentry)
+        tbar.addWidget(self.portentry)
         self.HostAndPortWidgets.append(self.portentry)
         w = QLabel('/')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
         self.pathentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.pathentry, 4)
+        tbar.addWidget(self.pathentry)
 
         style = QApplication.style()
-        self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
-        self.savebutton.setToolTip(_('Save current URL under an alias'))
-        hbox.addWidget(self.savebutton)
+        a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
+                          _('Save'))
+        a.setToolTip(_('Save current URL under an alias'))
+        self.savebutton = a
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -247,8 +256,8 @@ class SyncWidget(QWidget):
 
         self.layout().addLayout(hbox, 1)
 
-        self.savebutton.clicked.connect(self.saveclicked)
-        self.securebutton.clicked.connect(self.secureclicked)
+        self.savebutton.triggered.connect(self.saveclicked)
+        self.securebutton.triggered.connect(self.secureclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
@@ -356,7 +365,7 @@ class SyncWidget(QWidget):
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if hg.islocal(path):
-                known.add(os.path.abspath(hg.localpath(path)).lower())
+                known.add(os.path.abspath(hglib.localpath(path)).lower())
             else:
                 known.add(path)
         related = {}
@@ -378,7 +387,7 @@ class SyncWidget(QWidget):
                 ui = tempui
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
-                    abs = os.path.abspath(hg.localpath(path)).lower()
+                    abs = os.path.abspath(hglib.localpath(path)).lower()
                 else:
                     abs = path
                 if abs not in known:
@@ -395,8 +404,8 @@ class SyncWidget(QWidget):
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
-            w.setHidden(schemeIndex == 0)
-        self.securebutton.setHidden(schemeIndex != 3)
+            w.setDisabled(schemeIndex == 0)
+        self.securebutton.setVisible(schemeIndex >= 3)
 
         opts = []
         for opt, value in self.opts.iteritems():
@@ -409,7 +418,7 @@ class SyncWidget(QWidget):
         self.optionshdrlabel.setVisible(bool(opts))
 
     def currentUrl(self, hidepw):
-        scheme = _schemes[self.schemecombo.currentIndex()]
+        scheme = self._schemes[self.schemecombo.currentIndex()]
         if scheme == 'local':
             return hglib.fromunicode(self.pathentry.text())
         else:
@@ -443,7 +452,7 @@ class SyncWidget(QWidget):
         except TypeError:
             return
         self.updateInProgress = True
-        for i, val in enumerate(_schemes):
+        for i, val in enumerate(self._schemes):
             if scheme == val:
                 self.schemecombo.setCurrentIndex(i)
                 break
@@ -522,21 +531,8 @@ class SyncWidget(QWidget):
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        shell = self.repo.shell()
-        if shell:
-            cwd = os.getcwd()
-            try:
-                try:
-                    os.chdir(folder)
-                    QProcess.startDetached(shell)
-                except EnvironmentError, e:
-                    qtlib.InfoMsgBox(_('Repository not found'),
-                                     hglib.tounicode(str(e)))
-            finally:
-                os.chdir(cwd)
-        else:
-            qtlib.InfoMsgBox(_('No shell configured'),
-                        _('A terminal shell must be configured'))
+        qtlib.openshell(folder)
+
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
             _('Delete %s from your repo configuration file?') % self.menualias,
@@ -583,11 +579,14 @@ class SyncWidget(QWidget):
         for b in self.opbuttons:
             b.setEnabled(False)
         self.stopAction.setEnabled(True)
-        if not self.embedded:
+        if self.embedded:
+            self.showBusyIcon.emit('thg-sync')
+        else:
             self.cmd.setShowOutput(True)
             self.cmd.setVisible(True)
 
     def commandFinished(self, ret):
+        self.hideBusyIcon.emit('thg-sync')
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
             b.setEnabled(True)
@@ -629,7 +628,7 @@ class SyncWidget(QWidget):
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
             if user:
-                cleanurl = url.removeauth(cururl)
+                cleanurl = hglib.removeauth(cururl)
                 res = url.readauthforuri(self.repo.ui, cleanurl)
                 if res:
                     group, auth = res
@@ -1036,7 +1035,7 @@ class SaveDialog(QDialog):
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
         if (user or passwd) and scheme in ('http', 'https'):
-            cleanurl = url.removeauth(origurl)
+            cleanurl = hglib.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
@@ -1119,7 +1118,7 @@ class SecureDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        cleanurl = url.removeauth(origurl)
+        cleanurl = hglib.removeauth(origurl)
         res = url.readauthforuri(repo.ui, cleanurl)
         if res:
             self.alias, auth = res
@@ -1226,7 +1225,7 @@ are expanded in the filename.'''))
         qtlib.openhelpcontents('sync.html#security')
 
     def accept(self):
-        path = util.user_rcpath()
+        path = hglib.user_rcpath()
         fn, cfg = qtlib.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
@@ -1349,7 +1348,7 @@ class PathsModel(QAbstractTableModel):
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
         for alias, path in pathlist:
-            safepath = url.hidepassword(path)
+            safepath = hglib.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
             self.rows.append([ualias, usafepath, path])
