@@ -206,7 +206,7 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
-        
+
     def undump(self, xr):
         self._valid = True
         a = xr.attributes()
@@ -236,7 +236,7 @@ class RepoItem(RepoTreeItem):
                     # Add the repo to the list of repos/subrepos
                     # that could not be open
                     invalidRepoList.append(repo.root)
-    
+
                 return invalidRepoList
 
             root = self.rootpath()
@@ -252,7 +252,7 @@ class RepoItem(RepoTreeItem):
 
             invalidRepoList = \
                 addSubrepos(self, repo)
-    
+
             if invalidRepoList:
                 self._valid = False
                 if invalidRepoList[0] == root:
