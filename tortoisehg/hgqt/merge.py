@@ -564,12 +564,16 @@ class CommitPage(BasePage):
         if self.cmd.core.running():
             return False
 
+        user = qtlib.getCurrentUsername(self, self.repo)
+        if not user:
+            return False
+
         self.setTitle(_('Committing...'))
         self.setSubTitle(_('Please wait while committing merged files.'))
 
         message = hglib.fromunicode(self.msgEntry.text())
         cmdline = ['commit', '--verbose', '--message', message,
-                   '--repository', self.repo.root]
+                   '--repository', self.repo.root, '--user', user]
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
