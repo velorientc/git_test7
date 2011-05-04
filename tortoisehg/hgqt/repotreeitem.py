@@ -215,7 +215,7 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-        if self.model.showSubrepos:
+        if self.model and self.model.showSubrepos:
             def addSubrepos(ri, repo):
                 invalidRepoList = []
                 try:
