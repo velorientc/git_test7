@@ -447,6 +447,28 @@ class CommitPage(BasePage):
         self.skiplast.setChecked(checked)
         self.layout().addWidget(self.skiplast)
 
+        def eng_toggled(checked):
+            if self.isComplete():
+                oldmsg = self.msgEntry.text()
+                msgset = i18n.keepgettext()._('Backed out changeset: ')
+                msg = checked and msgset['id'] or msgset['str']
+                if oldmsg and oldmsg != msg:
+                    if not qtlib.QuestionMsgBox(_('Confirm Discard Message'),
+                         _('Discard current backout message?'), parent=self):
+                        self.engChk.blockSignals(True)
+                        self.engChk.setChecked(not checked)
+                        self.engChk.blockSignals(False)
+                        return
+                self.msgEntry.setText(msg
+                                     + str(self.repo[self.wizard().backoutrev]))
+                self.msgEntry.moveCursorToEnd()
+
+        self.engChk = QCheckBox(_('Use English backout message'))
+        self.engChk.toggled.connect(eng_toggled)
+        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        self.engChk.setChecked(engmsg)
+        self.layout().addWidget(self.engChk)
+
     def refresh(self):
         pass
 
