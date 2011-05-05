@@ -120,8 +120,8 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.repoview = repoview.HgRepoView(self.repo, 'fileLogDialog',
-                                            self.splitter)
+        cs = ('fileLogDialog', _('File History Log Columns'))
+        self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -146,7 +146,9 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionForward)
 
     def setupModels(self):
-        self.filerevmodel = filerevmodel.FileRevModel(self.repo, parent=self)
+        self.filerevmodel = filerevmodel.FileRevModel(self.repo,
+                                         self.repoview.colselect[0],
+                                         parent=self)
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.onRevisionSelected)
         self.repoview.revisionActivated.connect(self.onRevisionActivated)
@@ -315,10 +317,12 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
-        self.tableView_revisions_left = repoview.HgRepoView(self.repo,
-                                                   'fileDiffDialogLeft', self)
+        cs = ('fileDiffDialogLeft', _('File Differences Log Columns'))
+        self.tableView_revisions_left = repoview.HgRepoView(self.repo, cs[0],
+                                                            cs, self)
         self.tableView_revisions_right = repoview.HgRepoView(self.repo,
-                                                    'fileDiffDialogRight', self)
+                                                             'fileDiffDialogRight',
+                                                             cs, self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
         self.frame = QFrame()
@@ -406,7 +410,9 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = filerevmodel.FileRevModel(self.repo, self.filename, parent=self)
+        self.filerevmodel = filerevmodel.FileRevModel(self.repo,
+                                         self.tableView_revisions_left.colselect[0],
+                                         self.filename, parent=self)
         self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)

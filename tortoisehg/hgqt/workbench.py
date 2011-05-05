@@ -14,7 +14,7 @@ from mercurial import ui
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import repomodel, thgrepo, cmdui, qtlib
+from tortoisehg.hgqt import thgrepo, cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -639,8 +639,8 @@ class Workbench(QMainWindow):
     def setHistoryColumns(self, *args):
         """Display the column selection dialog"""
         w = self.repoTabsWidget.currentWidget()
-        dlg = ColumnSelectDialog(repomodel.ALLCOLUMNS,
-                                 w and w.repoview.model()._columns)
+        dlg = ColumnSelectDialog('workbench', _('Workbench'),
+                                 w and w.repoview.model() or None)
         if dlg.exec_() == QDialog.Accepted:
             if w:
                 w.repoview.model().updateColumns()

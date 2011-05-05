@@ -132,7 +132,8 @@ class RepoWidget(QWidget):
 
         self.layout().addWidget(self.repotabs_splitter)
 
-        self.repoview = view = HgRepoView(self.repo, 'repoWidget', self)
+        cs = ('workbench', _('Workbench Log Columns'))
+        self.repoview = view = HgRepoView(self.repo, 'repoWidget', cs, self)
         view.revisionClicked.connect(self.onRevisionClicked)
         view.revisionSelected.connect(self.onRevisionSelected)
         view.revisionAltClicked.connect(self.onRevisionSelected)
@@ -606,7 +607,8 @@ class RepoWidget(QWidget):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
         branch = hglib.fromunicode(self.ubranch)
-        self.repomodel = HgRepoListModel(self.repo, branch, self.revset,
+        self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
+                                         branch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
@@ -779,7 +781,9 @@ class RepoWidget(QWidget):
                 self.rebuildGraph()
             except (error.RevlogError, error.RepoError), e:
                 self.showMessage(hglib.tounicode(str(e)))
-                self.repomodel = HgRepoListModel(None, None, None, False, self)
+                self.repomodel = HgRepoListModel(None,
+                                                 self.repoview.colselect[0],
+                                                 None, None, False, self)
                 self.repoview.setModel(self.repomodel)
         else:
             self.dirty = True
