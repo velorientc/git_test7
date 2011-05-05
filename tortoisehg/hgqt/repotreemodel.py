@@ -293,8 +293,6 @@ class RepoTreeModel(QAbstractItemModel):
             count += 1
 
     def loadSubrepos(self, root):
-        globalInvalidRepoList = []
-        globalInvalidSubrepoList = []
         warningmsg = ''
         for c in getRepoItemList(root):
             if self.showNetworkSubrepos \
@@ -313,21 +311,6 @@ class RepoTreeModel(QAbstractItemModel):
                         warningmsg += "</ul>"
 
         # If some repos or subrepos could not be loaded, show a warning message
-        if False:
-            warningmsg = ''
-            if globalInvalidRepoList:
-                warningmsg = _('Some repos could not be fully loaded:')
-                warningmsg += "<ul><li>"
-                warningmsg += "<li>".join(globalInvalidRepoList)
-                warningmsg += "</ul><br>"
-
-            if globalInvalidSubrepoList:
-                if warningmsg:
-                    warningmsg += "<br>"
-                warningmsg = _('Some subrepos could not be loaded:')
-                warningmsg += "<br>"
-                warningmsg += "<br>".join(globalInvalidSubrepoList)
-
         if warningmsg:
             warningmsg = _('Some repos could not be fully loaded:') + \
                 "<ul>" + warningmsg + '</ul>'
