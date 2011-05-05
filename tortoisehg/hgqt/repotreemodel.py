@@ -38,7 +38,7 @@ def writeXml(target, item, rootElementName):
     xw.writeEndElement()
     xw.writeEndDocument()
 
-def readXml(source, rootElementName, model):
+def readXml(source, rootElementName):
     itemread = None
     xr = QXmlStreamReader(source)
     if xr.readNextStartElement():
@@ -50,18 +50,18 @@ def readXml(source, rootElementName, model):
     if xr.hasError():
         print str(xr.errorString())
     if xr.readNextStartElement():
-        itemread = undumpObject(xr, model)
+        itemread = undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
         print str(xr.errorString())
     return itemread
 
-def iterRepoItemFromXml(source, model=None):
+def iterRepoItemFromXml(source):
     xr = QXmlStreamReader(source)
     while not xr.atEnd():
         t = xr.readNext()
         if t == QXmlStreamReader.StartElement and xr.name() == 'repo':
-            yield undumpObject(xr, model)
+            yield undumpObject(xr)
 
 def getRepoItemList(root):
     repoItemList = []
@@ -90,7 +90,7 @@ class RepoTreeModel(QAbstractItemModel):
         if filename:
             f = QFile(filename)
             if f.open(QIODevice.ReadOnly):
-                root = readXml(f, reporegistryXmlElementName, self)
+                root = readXml(f, reporegistryXmlElementName)
                 f.close()
                 if root:
                     for c in root.childs:
@@ -210,7 +210,7 @@ class RepoTreeModel(QAbstractItemModel):
             group = self.rootItem
             parent = QModelIndex()
             d = str(data.data(repoRegGroupMimeType))
-        itemread = readXml(d, extractXmlElementName, self)
+        itemread = readXml(d, extractXmlElementName)
         if itemread is None:
             return False
         if group is None:
@@ -247,7 +247,7 @@ class RepoTreeModel(QAbstractItemModel):
         if row < 0:
             row = rgi.childCount()
         self.beginInsertRows(grp, row, row)
-        ri = RepoItem(self, root)
+        ri = RepoItem(root)
         rgi.insertChild(row, ri)
 
         if not self.showSubrepos \

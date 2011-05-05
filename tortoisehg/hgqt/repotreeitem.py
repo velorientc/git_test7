@@ -38,17 +38,16 @@ def classToXml(classname):
             inverseXmlClassMap[v] = k
     return inverseXmlClassMap[classname]
 
-def undumpObject(xr, model):
+def undumpObject(xr):
     classname = xmlToClass(str(xr.name().toString()))
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    obj = class_(model)
+    obj = class_()
     obj.undump(xr)
     return obj
 
 
 class RepoTreeItem(object):
-    def __init__(self, model, parent=None):
-        self.model = model
+    def __init__(self, parent=None):
         self._parent = parent
         self.childs = []
         self._row = 0
@@ -110,7 +109,7 @@ class RepoTreeItem(object):
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
-                item = undumpObject(xr, self.model)
+                item = undumpObject(xr)
                 self.appendChild(item)
             elif xr.isEndElement():
                 break
@@ -138,8 +137,8 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, model, root=None, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
+    def __init__(self, root=None, parent=None):
+        RepoTreeItem.__init__(self, parent)
         self._root = root or ''
         self._shortname = u''
         self._basenode = node.nullid
@@ -235,7 +234,7 @@ class RepoItem(RepoTreeItem):
                 abssubpath = repo.wjoin(subpath)
                 subtype = wctx.substate[subpath][2]
                 sriIsValid = os.path.isdir(abssubpath)
-                sri = SubrepoItem(self.model, abssubpath, subtype=subtype)
+                sri = SubrepoItem(abssubpath, subtype=subtype)
                 sri._valid = False
                 self.appendChild(sri)
 
@@ -281,9 +280,8 @@ class SubrepoItem(RepoItem):
           'svn': 'thg-svn-subrepo',
     }
 
-    def __init__(self, model, repo=None, parent=None, parentrepo=None,
-            subtype='hg'):
-        RepoItem.__init__(self, model, repo, parent)
+    def __init__(self, repo=None, parent=None, parentrepo=None, subtype='hg'):
+        RepoItem.__init__(self, repo, parent)
         self._parentrepo = parentrepo
         self._repotype = subtype
         if self._repotype != 'hg':
@@ -322,8 +320,8 @@ class SubrepoItem(RepoItem):
 
 
 class RepoGroupItem(RepoTreeItem):
-    def __init__(self, model, name=None, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
+    def __init__(self, name=None, parent=None):
+        RepoTreeItem.__init__(self, parent)
         if name:
             self.name = name
         else:
@@ -369,8 +367,8 @@ class RepoGroupItem(RepoTreeItem):
 
 
 class AllRepoGroupItem(RepoGroupItem):
-    def __init__(self, model, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
+    def __init__(self, parent=None):
+        RepoTreeItem.__init__(self, parent)
         self.name = _('default')
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
