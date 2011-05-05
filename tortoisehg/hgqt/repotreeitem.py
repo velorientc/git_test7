@@ -10,10 +10,9 @@ import sys, os
 from mercurial import node
 from mercurial import ui, hg, util, error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt import thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

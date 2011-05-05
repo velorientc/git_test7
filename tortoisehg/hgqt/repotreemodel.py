@@ -5,16 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import ui, hg, util, error
-
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt import thgrepo
-
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, SubrepoItem, RepoTreeItem
+from repotreeitem import RepoItem, RepoTreeItem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
