@@ -311,6 +311,10 @@ class SubrepoItem(RepoItem):
                     # type icon
                     ico = qtlib.geticon(subiconame)
                     ico = _overlaidicon(ico, qtlib.geticon('thg-subrepo'))
+
+                if not self._valid:
+                    ico = _overlaidicon(ico, qtlib.geticon('dialog-warning'))
+
                 return QVariant(ico)
             return QVariant()
         else:
