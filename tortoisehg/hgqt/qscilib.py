@@ -270,6 +270,9 @@ class Scintilla(QsciScintilla):
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
 
+        if len(match) == 0:
+            return
+
         # NOTE: pat and target text are *not* unicode because scintilla
         # requires positions in byte. For accuracy, it should do pattern
         # match in unicode, then calculating byte length of substring::
