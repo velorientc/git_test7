@@ -63,6 +63,18 @@ def iterRepoItemFromXml(source, model=None):
         if t == QXmlStreamReader.StartElement and xr.name() == 'repo':
             yield undumpObject(xr, model)
 
+def getRepoItemList(root):
+    repoItemList = []
+    if not isinstance(root, RepoTreeItem):
+        return repoItemList
+    for c in root.childs:
+        if isinstance(c, RepoItem):
+            repoItemList.append(c)
+        else:
+            repoItemList += getRepoItemList(c)
+    return repoItemList
+
+
 class RepoTreeModel(QAbstractItemModel):
 
     def __init__(self, filename, parent, showSubrepos=True,
@@ -85,6 +97,9 @@ class RepoTreeModel(QAbstractItemModel):
                         if isinstance(c, AllRepoGroupItem):
                             all = c
                             break
+
+                    if self.showSubrepos:
+                        self.loadSubrepos(root)
 
         if not root:
             root = RepoTreeItem(self)
@@ -232,44 +247,15 @@ class RepoTreeModel(QAbstractItemModel):
         if row < 0:
             row = rgi.childCount()
         self.beginInsertRows(grp, row, row)
-        rgi.insertChild(row, RepoItem(self, root))
+        ri = RepoItem(self, root)
+        rgi.insertChild(row, ri)
 
         if not self.showSubrepos \
                 or (not self.showNetworkSubrepos and paths.netdrive_status(root)):
             self.endInsertRows()
             return
 
-        def addSubrepos(ri, repo):
-            invalidRepoList = []
-            try:
-                wctx = repo['.']
-                for subpath in wctx.substate:
-                    # For now we only support showing mercurial subrepos
-                    subtype = wctx.substate[subpath][2]
-                    sctx = wctx.sub(subpath)
-                    ri.insertChild(row,
-                        SubrepoItem(self, sctx._repo.root, subtype=subtype))
-                    if subtype == 'hg':
-                        # Only recurse into mercurial subrepos
-                        if ri.childCount():
-                            invalidRepoList += \
-                                addSubrepos(
-                                    ri.child(ri.childCount()-1), sctx._repo)
-            except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Add the repo to the list of repos/subrepos
-                # that could not be open
-                invalidRepoList.append(repo.root)
-
-            return invalidRepoList
-
-        try:
-            repo = hg.repository(ui.ui(), root)
-            invalidRepoList = \
-                addSubrepos(rgi.child(rgi.childCount()-1), repo)
-        except (EnvironmentError, error.RepoError, util.Abort), e:
-            # TODO: Mark the repo with a "warning" icon or similar to indicate
-            #       that the repository cannot be open
-            invalidRepoList = [root]
+        invalidRepoList = ri.appendSubrepos()
 
         self.endInsertRows()
 
@@ -280,10 +266,11 @@ class RepoTreeModel(QAbstractItemModel):
                     'the repository in:<br><br><i>%s</i>') % root)
             else:
                 qtlib.WarningMsgBox(_('Could not open some subrepositories'),
-                    _('It was not possible to fully load the subrepository list '
-                    'for the repository in:<br><br><i>%s</i><br><br>'
-                    'The following subrepositories could not be accessed:'
-                    '<br><br><i>%s</i>') %
+                    _('It was not possible to fully load the subrepository '
+                    'list for the repository in:<br><br><i>%s</i><br><br>'
+                    'The following subrepositories may be missing, broken or '
+                    'on an inconsistent state and cannot be accessed:'
+                    '<br><br><i>%s</i>')  %
                     (root, "<br>".join(invalidRepoList)))
 
     def getRepoItem(self, reporoot):
@@ -309,3 +296,48 @@ class RepoTreeModel(QAbstractItemModel):
             if index.row() < 0:
                 return count
             count += 1
+
+    def loadSubrepos(self, root):
+        globalInvalidRepoList = []
+        globalInvalidSubrepoList = []
+        warningmsg = ''
+        for c in getRepoItemList(root):
+            if self.showNetworkSubrepos \
+                    or not paths.netdrive_status(c.rootpath()):
+
+                invalidRepoList = c.appendSubrepos()
+
+                if invalidRepoList:
+                    # The top repo or some of its subrepos could not be loaded
+                    warningmsg += "<li>" + c.rootpath()
+                    if invalidRepoList[0] == c.rootpath():
+                        invalidRepoList = invalidRepoList[1:]
+                    if invalidRepoList:
+                        warningmsg += "<ul><li>"
+                        warningmsg += "<li>".join(invalidRepoList)
+                        warningmsg += "</ul>"
+
+        # If some repos or subrepos could not be loaded, show a warning message
+        if False:
+            warningmsg = ''
+            if globalInvalidRepoList:
+                warningmsg = _('Some repos could not be fully loaded:')
+                warningmsg += "<ul><li>"
+                warningmsg += "<li>".join(globalInvalidRepoList)
+                warningmsg += "</ul><br>"
+
+            if globalInvalidSubrepoList:
+                if warningmsg:
+                    warningmsg += "<br>"
+                warningmsg = _('Some subrepos could not be loaded:')
+                warningmsg += "<br>"
+                warningmsg += "<br>".join(globalInvalidSubrepoList)
+
+        if warningmsg:
+            warningmsg = _('Some repos could not be fully loaded:') + \
+                "<ul>" + warningmsg + '</ul>'
+            QTimer.singleShot(0, \
+                lambda: qtlib.WarningMsgBox(
+                            _('Missing or invalid repos or subrepos '
+                            'on the repository registry'),
+                            warningmsg))

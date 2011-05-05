@@ -215,61 +215,6 @@ class RepoItem(RepoTreeItem):
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
-        if self.model \
-                and (self.model.showSubrepos \
-                or (not self.model.showNetworkSubrepos
-                    and paths.netdrive_status(self._root))):
-            def addSubrepos(ri, repo):
-                invalidRepoList = []
-                try:
-                    wctx = repo['.']
-                    for subpath in wctx.substate:
-                        # For now we only support showing mercurial subrepos
-                        subtype = wctx.substate[subpath][2]
-                        sctx = wctx.sub(subpath)
-                        ri.appendChild(
-                            SubrepoItem(self.model, sctx._repo.root, subtype=subtype))
-                        if subtype == 'hg':
-                            # Only recurse into mercurial subrepos
-                            if ri.childCount():
-                                invalidRepoList += \
-                                    addSubrepos(
-                                        ri.child(ri.childCount()-1), sctx._repo)
-                except (EnvironmentError, error.RepoError, util.Abort), e:
-                    # Add the repo to the list of repos/subrepos
-                    # that could not be open
-                    invalidRepoList.append(repo.root)
-
-                return invalidRepoList
-
-            root = self.rootpath()
-            try:
-                repo = hg.repository(ui.ui(), root)
-            except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Do not try to show the list of subrepos when the top repository
-                # could not be open
-                # TODO: Mark the repo with a "warning" icon or similar to indicate
-                #       that the repository cannot be open
-                self._valid = False
-                return
-
-            invalidRepoList = \
-                addSubrepos(self, repo)
-
-            if invalidRepoList:
-                self._valid = False
-                if invalidRepoList[0] == root:
-                    qtlib.WarningMsgBox(_('Could not get subrepository list'),
-                        _('It was not possible to get the subrepository list for '
-                        'the repository in:<br><br><i>%s</i>') % root)
-                else:
-                    qtlib.WarningMsgBox(_('Could not open some subrepositories'),
-                        _('It was not possible to fully load the subrepository list '
-                        'for the repository in:<br><br><i>%s</i><br><br>'
-                        'The following subrepositories could not be accessed:'
-                        '<br><br><i>%s</i>') %
-                        (root, "<br>".join(invalidRepoList)))
-
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
@@ -278,6 +223,44 @@ class RepoItem(RepoTreeItem):
             return self
         return None
 
+    def appendSubrepos(self, repo=None):
+        invalidRepoList = []
+        try:
+            sri = None
+            if repo is None:
+                repo = hg.repository(ui.ui(), self._root)
+            wctx = repo['.']
+            for subpath in wctx.substate:
+                sri = None
+                abssubpath = repo.wjoin(subpath)
+                subtype = wctx.substate[subpath][2]
+                sriIsValid = os.path.isdir(abssubpath)
+                sri = SubrepoItem(self.model, abssubpath, subtype=subtype)
+                sri._valid = False
+                self.appendChild(sri)
+
+                if not sriIsValid:
+                    self._valid = False
+                    sri._valid = False
+                    invalidRepoList.append(repo.wjoin(subpath))
+                    return invalidRepoList
+                    continue
+
+                if subtype == 'hg':
+                    # Only recurse into mercurial subrepos
+                    sctx = wctx.sub(subpath)
+                    invalidRepoList += \
+                        sri.appendSubrepos(sctx._repo)
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            # Add the repo to the list of repos/subrepos
+            # that could not be open
+            self._valid = False
+            if sri:
+                sri._valid = False
+                invalidRepoList.append(abssubpath)
+            invalidRepoList.append(self._root)
+
+        return invalidRepoList
 
 def _overlaidicon(base, overlay):
     """Generate overlaid icon"""
