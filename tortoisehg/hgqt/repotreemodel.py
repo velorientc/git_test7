@@ -60,15 +60,12 @@ def iterRepoItemFromXml(source):
             yield undumpObject(xr)
 
 def getRepoItemList(root):
-    repoItemList = []
+    if isinstance(root, RepoItem):
+        return [root]
     if not isinstance(root, RepoTreeItem):
-        return repoItemList
-    for c in root.childs:
-        if isinstance(c, RepoItem):
-            repoItemList.append(c)
-        else:
-            repoItemList += getRepoItemList(c)
-    return repoItemList
+        return []
+    return reduce(lambda a, b: a + b,
+                  (getRepoItemList(c) for c in root.childs), [])
 
 
 class RepoTreeModel(QAbstractItemModel):
@@ -213,6 +210,8 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         if row < 0:
             row = 0
+        if self.showSubrepos:
+            self.loadSubrepos(itemread)
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
