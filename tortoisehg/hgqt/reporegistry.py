@@ -180,7 +180,7 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
 
-    def __init__(self, parent, showSubrepos=True, showNetworkSubrepos=True):
+    def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False):
         QDockWidget.__init__(self, parent)
 
         self.showSubrepos = showSubrepos

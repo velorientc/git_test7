@@ -70,8 +70,8 @@ def getRepoItemList(root):
 
 class RepoTreeModel(QAbstractItemModel):
 
-    def __init__(self, filename, parent, showSubrepos=True,
-            showNetworkSubrepos=True):
+    def __init__(self, filename, parent, showSubrepos=False,
+            showNetworkSubrepos=False):
         QAbstractItemModel.__init__(self, parent)
 
         self.showSubrepos = showSubrepos
