@@ -775,14 +775,34 @@ class Workbench(QMainWindow):
         self.actionSaveRepos.setChecked(save)
         for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
             self._openRepo(path, False)
-        # Allow repo registry to assemble itself before toggling path state
-        sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
-        ssr = s.value(wb + 'showSubrepos', defaultValue=QVariant(True)).toBool()
-        QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
+
+        # Load the repo registry settings. Note that we must allow the
+        # repo registry to assemble itself before toggling its settings
+        # Also the view path setttings should be enabled last, once we have
+        # loaded the repo subrepositories (if needed)
+
+        # Normally, checking the "show subrepos" and the "show network subrepos"
+        # settings will trigger a reload of the repo registry.
+        # To avoid reloading it twice (every time we set one of its view
+        # settings), we tell the setters to avoid reloading the repo tree
+        # model, and then we  manually reload the model
+        ssr = s.value(wb + 'showSubrepos',
+            defaultValue=QVariant(True)).toBool()
         snsr = s.value(wb + 'showNetworkSubrepos',
             defaultValue=QVariant(True)).toBool()
+        self.reporegistry.setShowSubrepos(ssr, False)
+        self.reporegistry.setShowNetworkSubrepos(snsr, False)
+
+        # Note that calling setChecked will NOT reload the model if the new
+        # setting is the same as the one in the repo registry
+        QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
         QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(ssr))
+
+        # Manually reload the model now, to apply the settings
+        self.reporegistry.reloadModel()
+
+        sp = s.value(wb + 'showPaths').toBool()
+        QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):

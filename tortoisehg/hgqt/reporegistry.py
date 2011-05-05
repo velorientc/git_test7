@@ -214,15 +214,17 @@ class RepoRegistryView(QDockWidget):
         self.createActions()
         QTimer.singleShot(0, self.expand)
 
-    def setShowSubrepos(self, show):
+    def setShowSubrepos(self, show, reloadModel=True):
         if self.showSubrepos != show:
             self.showSubrepos = show
-            self.reloadModel()
+            if reloadModel:
+                self.reloadModel()
 
-    def setShowNetworkSubrepos(self, show):
+    def setShowNetworkSubrepos(self, show, reloadModel=True):
         if self.showNetworkSubrepos != show:
             self.showNetworkSubrepos = show
-            self.reloadModel()
+            if reloadModel:
+                self.reloadModel()
 
     def reloadModel(self):
         self.tview.setModel(
