@@ -356,6 +356,7 @@ class CommitPage(BasePage):
         self.commitComplete = False
 
         self.setTitle(_('Commit backout and merge results'))
+        self.setSubTitle(' ')
         self.setLayout(QVBoxLayout())
         self.setCommitPage(True)
 
