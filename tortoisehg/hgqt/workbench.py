@@ -620,6 +620,7 @@ class Workbench(QMainWindow):
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
         rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
         rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
+        rw.repoChanged.connect(self.reporegistry.repoChanged)
 
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, rw.title())

@@ -401,3 +401,15 @@ class RepoRegistryView(QDockWidget):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setBaseNode(basenode)
+
+    @pyqtSlot(QString)
+    def repoChanged(self, uroot):
+        m = self.tview.model()
+        changedrootpath = hglib.fromunicode(uroot).replace("\\", "/")
+        def isAboveOrBelowUroot(testedpath):
+            """Return True if rootpath is contained or contains uroot"""
+            r1 = testedpath.replace("\\", "/") + "/"
+            r2 = changedrootpath + "/"
+            return r1.startswith(r2) or r2.startswith(r1)
+
+        m.loadSubrepos(m.rootItem, isAboveOrBelowUroot)

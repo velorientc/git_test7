@@ -290,10 +290,11 @@ class RepoTreeModel(QAbstractItemModel):
                 return count
             count += 1
 
-    def loadSubrepos(self, root):
-        warningmsg = ''
+    def loadSubrepos(self, root, filterFunc=(lambda r: True)):
         for c in getRepoItemList(root):
-            if self.showNetworkSubrepos \
-                    or not paths.netdrive_status(c.rootpath()):
-
-                invalidRepoList = c.appendSubrepos()
+            if filterFunc(c.rootpath()):
+                if self.showNetworkSubrepos \
+                        or not paths.netdrive_status(c.rootpath()):
+                    self.removeRows(0, c.childCount(),
+                        self.createIndex(c.row(), 0, c))
+                    c.appendSubrepos()

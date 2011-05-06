@@ -197,9 +197,6 @@ class RepoItem(RepoTreeItem):
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
-    def removeRows(self, row, count):
-        return False
-
     def dump(self, xw):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
@@ -252,7 +249,7 @@ class RepoItem(RepoTreeItem):
                     if invalidSubrepoList:
                         self._valid = False
                         invalidRepoList += invalidSubrepoList
-                        
+
         except (EnvironmentError, error.RepoError, util.Abort), e:
             # Add the repo to the list of repos/subrepos
             # that could not be open
@@ -328,7 +325,7 @@ class SubrepoItem(RepoItem):
         else:
             return ['open', 'clone', None, 'explore', 'terminal',
                 None, 'settings']
-            
+
 
 class RepoGroupItem(RepoTreeItem):
     def __init__(self, name=None, parent=None):

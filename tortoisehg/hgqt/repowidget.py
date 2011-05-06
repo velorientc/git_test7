@@ -45,6 +45,8 @@ class RepoWidget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
+    repoChanged = pyqtSignal(QString)
+
     revisionSelected = pyqtSignal(object)
 
     titleChanged = pyqtSignal(unicode)
@@ -827,6 +829,9 @@ class RepoWidget(QWidget):
                 self.repoview.setModel(self.repomodel)
         else:
             self.dirty = True
+
+        # Update the repo registry entries related to the current repo
+        self.repoChanged.emit(hglib.tounicode(self.repo.root))
 
     def configChanged(self):
         'Repository is reporting its config files have changed'
