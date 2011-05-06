@@ -552,7 +552,7 @@ class FileData(object):
             if '\0' in data:
                 self.error = p + _('File is binary.\n')
                 return None
-        except EnvironmentError, e:
+        except (EnvironmentError, util.Abort), e:
             self.error = p + hglib.tounicode(str(e))
             return None
         return fctx, data
