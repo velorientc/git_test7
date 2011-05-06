@@ -783,6 +783,14 @@ class InfoBar(QFrame):
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
 
+class StatusInfoBar(InfoBar):
+    """Show status message"""
+    def __init__(self, message, parent=None):
+        super(StatusInfoBar, self).__init__(parent)
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
 class CommandErrorInfoBar(InfoBar):
     """Show command execution failure (with link to open log window)"""
     infobartype = InfoBar.ERROR

@@ -245,23 +245,41 @@ class RepoWidget(QWidget):
         QDesktopServices.openUrl(QUrl(link))
 
     def setInfoBar(self, cls, *args, **kwargs):
-        """Show the given infobar at top of RepoWidget"""
-        self.clearInfoBar()
+        """Show the given infobar at top of RepoWidget
+
+        If the priority of the current infobar is higher than new one,
+        the request is silently ignored.
+        """
+        cleared = self.clearInfoBar(priority=cls.infobartype)
+        if not cleared:
+            return
         w = cls(*args, **kwargs)
         w.linkActivated.connect(self._openLink)
         self._infobarlayout.insertWidget(0, w)
         return w
 
-    def clearInfoBar(self):
-        """Close current infobar if available"""
+    def clearInfoBar(self, priority=None):
+        """Close current infobar if available; return True if got empty"""
         it = self._infobarlayout.itemAt(0)
-        if it:
+        if not it:
+            return True
+        if priority is None or it.widget().infobartype <= priority:
             it.widget().close()
+            return True
+        else:
+            return False
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label):
         if label == 'ui.error':
             self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
+
+    @pyqtSlot(unicode)
+    def _showMessageOnInfoBar(self, msg):
+        if msg:
+            self.setInfoBar(qtlib.StatusInfoBar, msg)
+        else:
+            self.clearInfoBar(priority=qtlib.StatusInfoBar.infobartype)
 
     def createCommitWidget(self):
         pats, opts = {}, {}
@@ -306,6 +324,7 @@ class RepoWidget(QWidget):
         sw.makeLogVisible.connect(self.makeLogVisible)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
+        sw.showMessage.connect(self._showMessageOnInfoBar)
         sw.incomingBundle.connect(self.setBundle)
         sw.pullCompleted.connect(self.onPullCompleted)
         sw.showBusyIcon.connect(self.onShowBusyIcon)
@@ -674,6 +693,7 @@ class RepoWidget(QWidget):
     def onRevisionSelected(self, rev):
         'View selection changed, could be a reload'
         self.showMessage('')
+        self.clearInfoBar(qtlib.InfoBar.INFO)
         if self.repomodel.graph is None:
             return
         try:
