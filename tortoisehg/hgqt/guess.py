@@ -104,7 +104,7 @@ class DetectRenameDialog(QDialog):
         matchtv.setRootIsDecorated(False)
         matchtv.setModel(MatchModel())
         matchtv.setSortingEnabled(True)
-        matchtv.clicked.connect(self.showDiff)
+        matchtv.selectionModel().selectionChanged.connect(self.showDiff)
         buthbox = QHBoxLayout()
         matchbtn = QPushButton(_('Accept Selected Matches'))
         matchbtn.clicked.connect(self.acceptMatch)
@@ -224,6 +224,10 @@ class DetectRenameDialog(QDialog):
 
     def showDiff(self, index):
         'User selected a row in the candidate tree'
+        indexes = index.indexes()
+        if not indexes:
+            return
+        index = indexes[0]
         ctx = self.repo['.']
         hu = htmlui.htmlui()
         row = self.matchtv.model().getRow(index)
