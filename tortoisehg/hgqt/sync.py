@@ -55,6 +55,7 @@ class SyncWidget(QWidget):
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     pullCompleted = pyqtSignal()
+    pushCompleted = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -849,6 +850,7 @@ class SyncWidget(QWidget):
                                      % urlu)
             if not r:
                 self.showMessage.emit(_('Push to %s aborted') % urlu)
+                self.pushCompleted.emit()
                 return
 
         self.showMessage.emit(_('Pushing to %s...') % urlu)
@@ -857,6 +859,7 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Push to %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
+            self.pushCompleted.emit()
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
         self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))

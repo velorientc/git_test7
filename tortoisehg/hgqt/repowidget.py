@@ -312,6 +312,7 @@ class RepoWidget(QWidget):
         sw.showMessage.connect(self._showMessageOnInfoBar)
         sw.incomingBundle.connect(self.setBundle)
         sw.pullCompleted.connect(self.onPullCompleted)
+        sw.pushCompleted.connect(self.clearRevisionSet)
         sw.showBusyIcon.connect(self.onShowBusyIcon)
         sw.hideBusyIcon.connect(self.onHideBusyIcon)
         sw.refreshTargets(self.rev)
@@ -409,6 +410,7 @@ class RepoWidget(QWidget):
         self.clearBundle()
         self.reload()
 
+    @pyqtSlot()
     def clearRevisionSet(self):
         if not self.revset:
             self.filterbar.hide()
