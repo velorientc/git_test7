@@ -105,24 +105,8 @@ class RepoWidget(QWidget):
         self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
         self.layout().addLayout(self._infobarlayout)
 
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(0)
-        self.layout().addLayout(hbox)
-
-        self.bundleAccept = b = QPushButton(_('Accept'))
-        b.setShown(False)
-        b.setToolTip(_('Pull incoming changesets into your repository'))
-        b.clicked.connect(self.acceptBundle)
-        hbox.addWidget(b)
-        self.bundleReject = b = QPushButton(_('Reject'))
-        b.setToolTip(_('Reject incoming changesets'))
-        b.clicked.connect(self.rejectBundle)
-        b.setShown(False)
-        hbox.addWidget(b)
-
         self.filterbar = RepoFilterBar(self.repo, self)
-        hbox.addWidget(self.filterbar)
+        self.layout().addWidget(self.filterbar)
 
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
@@ -357,12 +341,8 @@ class RepoWidget(QWidget):
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
         self.manifestDemand.forward('setRepo', self.repo)
-        self.bundleAccept.setHidden(False)
-        self.bundleReject.setHidden(False)
         self.filterbar.revsetle.setText('incoming()')
         self.filterbar.setEnableFilter(False)
-        self.filterbar.show()
-        self.toolbarVisibilityChanged.emit()
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
@@ -371,9 +351,18 @@ class RepoWidget(QWidget):
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
 
+        w = self.setInfoBar(qtlib.ConfirmInfoBar,
+                            _('Found incoming changesets'))
+        assert w
+        w.acceptButton.setText(_('Accept'))
+        w.acceptButton.setToolTip(_('Pull incoming changesets into '
+                                    'your repository'))
+        w.rejectButton.setText(_('Reject'))
+        w.rejectButton.setToolTip(_('Reject incoming changesets'))
+        w.accepted.connect(self.acceptBundle)
+        w.rejected.connect(self.rejectBundle)
+
     def clearBundle(self):
-        self.bundleAccept.setHidden(True)
-        self.bundleReject.setHidden(True)
         self.filterbar.setEnableFilter(True)
         self.filterbar.revsetle.setText('')
         self.revset = []

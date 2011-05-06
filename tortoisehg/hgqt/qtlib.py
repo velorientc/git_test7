@@ -750,12 +750,14 @@ class InfoBar(QFrame):
     # type of InfoBar (the number denotes its priority)
     INFO = 1
     ERROR = 2
+    CONFIRM = 3
 
     infobartype = INFO
 
     _colormap = {
         INFO: '#e7f9e0',
         ERROR: '#f9d8d8',
+        CONFIRM: '#fae9b3',
         }
 
     def __init__(self, parent=None):
@@ -805,6 +807,44 @@ class CommandErrorInfoBar(InfoBar):
         self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
         self._loglabel.linkActivated.connect(self.linkActivated)
         self.addRightWidget(self._loglabel)
+
+class ConfirmInfoBar(InfoBar):
+    """Show confirmation message with accept/reject buttons"""
+    accepted = pyqtSignal()
+    rejected = pyqtSignal()
+    infobartype = InfoBar.CONFIRM
+
+    def __init__(self, message, parent=None):
+        super(ConfirmInfoBar, self).__init__(parent)
+
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
+        self._buttons = QDialogButtonBox(self)
+        self._buttons.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.acceptButton = self._buttons.addButton(QDialogButtonBox.Ok)
+        self.rejectButton = self._buttons.addButton(QDialogButtonBox.Cancel)
+        self._buttons.accepted.connect(self._accept)
+        self._buttons.rejected.connect(self._reject)
+        self.addWidget(self._buttons)
+
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.rejected.emit()
+        super(ConfirmInfoBar, self).closeEvent(event)
+
+    @pyqtSlot()
+    def _accept(self):
+        self.accepted.emit()
+        self.hide()
+        self.close()
+
+    @pyqtSlot()
+    def _reject(self):
+        self.rejected.emit()
+        self.hide()
+        self.close()
 
 class WidgetGroups(object):
     """ Support for bulk-updating properties of Qt widgets """
