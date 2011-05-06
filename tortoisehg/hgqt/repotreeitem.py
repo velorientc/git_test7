@@ -234,7 +234,7 @@ class RepoItem(RepoTreeItem):
                 subtype = wctx.substate[subpath][2]
                 sriIsValid = os.path.isdir(abssubpath)
                 sri = SubrepoItem(abssubpath, subtype=subtype)
-                sri._valid = False
+                sri._valid = sriIsValid
                 self.appendChild(sri)
 
                 if not sriIsValid:
@@ -247,8 +247,11 @@ class RepoItem(RepoTreeItem):
                 if subtype == 'hg':
                     # Only recurse into mercurial subrepos
                     sctx = wctx.sub(subpath)
-                    invalidRepoList += \
-                        sri.appendSubrepos(sctx._repo)
+                    invalidSubrepoList = sri.appendSubrepos(sctx._repo)
+                    if invalidSubrepoList:
+                        self._valid = False
+                        invalidRepoList += invalidSubrepoList
+                        
         except (EnvironmentError, error.RepoError, util.Abort), e:
             # Add the repo to the list of repos/subrepos
             # that could not be open

@@ -299,23 +299,3 @@ class RepoTreeModel(QAbstractItemModel):
                     or not paths.netdrive_status(c.rootpath()):
 
                 invalidRepoList = c.appendSubrepos()
-
-                if invalidRepoList:
-                    # The top repo or some of its subrepos could not be loaded
-                    warningmsg += "<li>" + c.rootpath()
-                    if invalidRepoList[0] == c.rootpath():
-                        invalidRepoList = invalidRepoList[1:]
-                    if invalidRepoList:
-                        warningmsg += "<ul><li>"
-                        warningmsg += "<li>".join(invalidRepoList)
-                        warningmsg += "</ul>"
-
-        # If some repos or subrepos could not be loaded, show a warning message
-        if warningmsg:
-            warningmsg = _('Some repos could not be fully loaded:') + \
-                "<ul>" + warningmsg + '</ul>'
-            QTimer.singleShot(0, \
-                lambda: qtlib.WarningMsgBox(
-                            _('Missing or invalid repos or subrepos '
-                            'on the repository registry'),
-                            warningmsg))
