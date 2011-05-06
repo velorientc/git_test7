@@ -302,7 +302,7 @@ class StatusWidget(QWidget):
     def onRowClicked(self, index):
         'tree view emitted a clicked signal, index guarunteed valid'
         if index.column() == COL_PATH:
-            self.tv.model().toggleRow(index)
+            self.tv.model().toggleRows([index])
 
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex)
@@ -460,8 +460,7 @@ class WctxFileTree(QTreeView):
 
     def keyPressEvent(self, event):
         if event.key() == 32:
-            for index in self.selectedRows():
-                self.model().toggleRow(index)
+            self.model().toggleRows(self.selectedRows())
         return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
@@ -644,16 +643,17 @@ class WctxModel(QAbstractTableModel):
         for row in self.rows:
             yield row
 
-    def toggleRow(self, index):
+    def toggleRows(self, indexes):
         'Connected to "activated" signal, emitted by dbl-click or enter'
         if QApplication.keyboardModifiers() & Qt.ControlModifier:
             # ignore Ctrl-Enter events, the user does not want a row
             # toggled just as they are committing.
             return
-        assert index.isValid()
-        fname = self.rows[index.row()][COL_PATH]
         self.layoutAboutToBeChanged.emit()
-        self.checked[fname] = not self.checked[fname]
+        for index in indexes:
+            assert index.isValid()
+            fname = self.rows[index.row()][COL_PATH]
+            self.checked[fname] = not self.checked[fname]
         self.layoutChanged.emit()
         self.checkToggled.emit()
 
