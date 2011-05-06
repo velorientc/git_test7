@@ -735,6 +735,69 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+class InfoBar(QFrame):
+    """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
+
+    You shouldn't reuse InfoBar object after close(). It is automatically
+    deleted.
+
+    Layout::
+
+        |widgets ...                |right widgets ...|x|
+    """
+    linkActivated = pyqtSignal(unicode)
+
+    # type of InfoBar (the number denotes its priority)
+    INFO = 1
+    ERROR = 2
+
+    infobartype = INFO
+
+    _colormap = {
+        INFO: '#e7f9e0',
+        ERROR: '#f9d8d8',
+        }
+
+    def __init__(self, parent=None):
+        super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
+                                      frameShadow=QFrame.Plain)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+        self.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
+        self.setPalette(p)
+
+        self.setLayout(QHBoxLayout())
+        self.layout().setContentsMargins(2, 2, 2, 2)
+
+        self.layout().addStretch()
+        self._closebutton = QPushButton(self, flat=True, autoDefault=False,
+            icon=self.style().standardIcon(QStyle.SP_DockWidgetCloseButton))
+        self._closebutton.clicked.connect(self.close)
+        self.layout().addWidget(self._closebutton)
+
+    def addWidget(self, w):
+        self.layout().insertWidget(self.layout().count() - 2, w)
+
+    def addRightWidget(self, w):
+        self.layout().insertWidget(self.layout().count() - 1, w)
+
+class CommandErrorInfoBar(InfoBar):
+    """Show command execution failure (with link to open log window)"""
+    infobartype = InfoBar.ERROR
+
+    def __init__(self, message, parent=None):
+        super(CommandErrorInfoBar, self).__init__(parent)
+
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
+        self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
+        self._loglabel.linkActivated.connect(self.linkActivated)
+        self.addRightWidget(self._loglabel)
+
 class WidgetGroups(object):
     """ Support for bulk-updating properties of Qt widgets """
 

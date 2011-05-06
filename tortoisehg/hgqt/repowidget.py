@@ -102,6 +102,9 @@ class RepoWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
+        self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
+        self.layout().addLayout(self._infobarlayout)
+
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         hbox.setSpacing(0)
@@ -230,6 +233,7 @@ class RepoWidget(QWidget):
     def _openLink(self, link):
         link = unicode(link)
         handlers = {'cset': self.goto,
+                    'log': lambda a: self.makeLogVisible.emit(True),
                     'subrepo': self.repoLinkClicked.emit,
                     'shelve' : self.shelve}
         if ':' in link:
@@ -239,6 +243,25 @@ class RepoWidget(QWidget):
                 return hdr(param)
 
         QDesktopServices.openUrl(QUrl(link))
+
+    def setInfoBar(self, cls, *args, **kwargs):
+        """Show the given infobar at top of RepoWidget"""
+        self.clearInfoBar()
+        w = cls(*args, **kwargs)
+        w.linkActivated.connect(self._openLink)
+        self._infobarlayout.insertWidget(0, w)
+        return w
+
+    def clearInfoBar(self):
+        """Close current infobar if available"""
+        it = self._infobarlayout.itemAt(0)
+        if it:
+            it.widget().close()
+
+    @pyqtSlot(unicode, unicode)
+    def _showOutputOnInfoBar(self, msg, label):
+        if label == 'ui.error':
+            self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
 
     def createCommitWidget(self):
         pats, opts = {}, {}
@@ -278,6 +301,7 @@ class RepoWidget(QWidget):
     def createSyncWidget(self):
         sw = SyncWidget(self.repo, self)
         sw.output.connect(self.output)
+        sw.output.connect(self._showOutputOnInfoBar)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
