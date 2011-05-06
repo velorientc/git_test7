@@ -312,6 +312,9 @@ class ManifestWidget(QWidget):
             self.vdiff()
 
     def menuRequest(self, point):
+        selmodel = self._treeview.selectionModel()
+        if not selmodel.selectedRows():
+            return
         point = self.mapToGlobal(point)
 
         currentindex = self._treeview.currentIndex()
