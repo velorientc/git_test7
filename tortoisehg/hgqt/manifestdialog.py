@@ -290,6 +290,9 @@ class ManifestWidget(QWidget):
         dlg.activateWindow()
 
     def menuRequest(self, point):
+        selmodel = self._treeview.selectionModel()
+        if not selmodel.selectedRows():
+            return
         point = self.mapToGlobal(point)
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
