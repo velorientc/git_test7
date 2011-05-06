@@ -442,9 +442,14 @@ class RepoWidget(QWidget):
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
-        self.filterbar.show()
-        self.toolbarVisibilityChanged.emit()
         self.setRevisionSet([self.repo[n].rev() for n in nodes])
+
+        w = self.setInfoBar(qtlib.ConfirmInfoBar,
+                            _('%d outgoing changesets') % len(nodes))
+        assert w
+        w.acceptButton.setText(_('Push'))
+        w.accepted.connect(self.push)  # TODO: to the same URL
+        w.rejected.connect(self.clearRevisionSet)
 
     def createGrepWidget(self):
         upats = {}
