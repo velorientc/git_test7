@@ -18,7 +18,8 @@ from mercurial import demandimport
 demandimport.disable()
 try:
     # hg >= 1.9
-    from mercurial.scmutil import canonpath, user_rcpath
+    from mercurial.scmutil import canonpath, userrcpath
+    user_rcpath = userrcpath
 except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.util import canonpath, user_rcpath
