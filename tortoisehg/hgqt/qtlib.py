@@ -15,7 +15,7 @@ import tempfile
 import re
 import weakref
 
-from mercurial import extensions, util
+from mercurial import extensions, error, util
 
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
