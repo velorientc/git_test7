@@ -801,6 +801,7 @@ class Workbench(QMainWindow):
         # Manually reload the model now, to apply the settings
         self.reporegistry.reloadModel()
 
+        # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
 
