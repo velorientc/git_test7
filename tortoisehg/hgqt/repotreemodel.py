@@ -275,7 +275,7 @@ class RepoTreeModel(QAbstractItemModel):
         ri = self.rootItem
         cc = ri.childCount()
         self.beginInsertRows(QModelIndex(), cc, cc + 1)
-        ri.appendChild(RepoGroupItem(self, name, ri))
+        ri.appendChild(RepoGroupItem(name, ri))
         self.endInsertRows()
 
     def write(self, fn):
