@@ -785,6 +785,11 @@ class InfoBar(QFrame):
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close()
+        super(InfoBar, self).keyPressEvent(event)
+
 class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
@@ -828,6 +833,9 @@ class ConfirmInfoBar(InfoBar):
         self._buttons.accepted.connect(self._accept)
         self._buttons.rejected.connect(self._reject)
         self.addWidget(self._buttons)
+
+        # so that acceptButton gets focus by default
+        self.setFocusProxy(self._buttons)
 
     def closeEvent(self, event):
         if self.isVisible():

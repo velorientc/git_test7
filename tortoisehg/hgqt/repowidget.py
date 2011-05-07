@@ -240,6 +240,7 @@ class RepoWidget(QWidget):
         w = cls(*args, **kwargs)
         w.linkActivated.connect(self._openLink)
         self._infobarlayout.insertWidget(0, w)
+        w.setFocus()  # to handle key press by InfoBar
         return w
 
     def clearInfoBar(self, priority=None):
