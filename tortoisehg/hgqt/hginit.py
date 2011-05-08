@@ -106,9 +106,8 @@ class InitDialog(QDialog):
         caption = _('Select Destination Folder')
         path = FD.getExistingDirectory(parent=self, caption=caption,
                 options=FD.ShowDirsOnly | FD.ReadOnly)
-        response = str(path)
-        if response:
-            self.dest_edit.setText(response)
+        if path:
+            self.dest_edit.setText(path)
 
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
