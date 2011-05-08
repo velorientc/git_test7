@@ -215,6 +215,8 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
+        if isinstance(itemread, AllRepoGroupItem):
+            self.allrepos = itemread
         return True
 
     def setData(self, index, value, role):
@@ -232,7 +234,7 @@ class RepoTreeModel(QAbstractItemModel):
     # functions not defined in QAbstractItemModel
 
     def allreposIndex(self):
-        return self.createIndex(0, 0, self.allrepos)
+        return self.createIndex(self.allrepos.row(), 0, self.allrepos)
 
     def addRepo(self, group, root, row=-1):
         grp = group
