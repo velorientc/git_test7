@@ -20,7 +20,6 @@ extractXmlElementName = 'reporegextract'
 reporegistryXmlElementName = 'reporegistry'
 
 repoRegMimeType = 'application/thg-reporegistry'
-repoRegGroupMimeType = 'application/thg-reporegistrygroup'
 repoExternalMimeType = 'text/uri-list'
 
 
@@ -177,8 +176,7 @@ class RepoTreeModel(QAbstractItemModel):
         return res
 
     def mimeTypes(self):
-        return QStringList([repoRegMimeType, repoRegGroupMimeType,
-                            repoExternalMimeType])
+        return QStringList([repoRegMimeType, repoExternalMimeType])
 
     def mimeData(self, indexes):
         i = indexes[0]
@@ -186,23 +184,21 @@ class RepoTreeModel(QAbstractItemModel):
         buf = QByteArray()
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
+        d.setData(repoRegMimeType, buf)
         if isinstance(item, RepoItem):
-            d.setData(repoRegMimeType, buf)
             d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
         else:
-            d.setData(repoRegGroupMimeType, buf)
             d.setText(QString(item.name))
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
         group = parent.internalPointer()
-        if data.hasUrls():
-            d = str(data.data(repoRegMimeType))
-        else:
+        d = str(data.data(repoRegMimeType))
+        if not data.hasUrls():
+            # don't allow nesting of groups
             row = parent.row()
             group = self.rootItem
             parent = QModelIndex()
-            d = str(data.data(repoRegGroupMimeType))
         itemread = readXml(d, extractXmlElementName)
         if itemread is None:
             return False
