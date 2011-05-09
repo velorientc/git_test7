@@ -23,12 +23,6 @@ from tortoisehg.hgqt import qtlib, thgrepo
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-try:
-    import win32con
-    openflags = win32con.CREATE_NO_WINDOW
-except ImportError:
-    openflags = 0
-
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
 _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
 
@@ -130,7 +124,7 @@ def launchtool(cmd, opts, replace, block):
     cmdline = util.quotecommand(cmdline)
     try:
         proc = subprocess.Popen(cmdline, shell=True,
-                                creationflags=openflags,
+                                creationflags=qtlib.openflags,
                                 stderr=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stdin=subprocess.PIPE)

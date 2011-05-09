@@ -81,9 +81,9 @@ class ChangesetList(QWidget):
                 filename = os.path.basename(widget.target)
                 return filename, revid
             raise csinfo.UnknownItem(item)
-        def labelfunc(widget, item):
+        def labelfunc(widget, item, ctx):
             if item in ('item', 'item_l'):
-                if not isinstance(widget.ctx, patchctx):
+                if not isinstance(ctx, patchctx):
                     return _('Revision:')
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
