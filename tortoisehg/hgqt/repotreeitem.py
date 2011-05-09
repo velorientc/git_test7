@@ -233,7 +233,8 @@ class RepoItem(RepoTreeItem):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def getRepoItem(self, reporoot):
-        if reporoot == self._root:
+        if (reporoot == self._root or
+            (os.name == 'nt' and reporoot.lower() == self._root.lower())):
             return self
         return None
 
