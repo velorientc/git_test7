@@ -321,6 +321,14 @@ class SubrepoItem(RepoItem):
         else:
             return super(SubrepoItem, self).data(column, role)
 
+    def menulist(self):
+        print self._parent
+        if isinstance(self._parent, RepoGroupItem):
+            return super(SubrepoItem, self).menulist()
+        else:
+            return ['open', 'clone', None, 'explore', 'terminal',
+                None, 'settings']
+            
 
 class RepoGroupItem(RepoTreeItem):
     def __init__(self, name=None, parent=None):
