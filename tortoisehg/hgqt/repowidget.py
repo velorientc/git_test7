@@ -350,6 +350,8 @@ class RepoWidget(QWidget):
             self.filterbar.hide()
             self.toolbarVisibilityChanged.emit()
             return
+        elif not self.revset:
+            return
         self.revset = []
         if self.revsetfilter:
             self.reload()
