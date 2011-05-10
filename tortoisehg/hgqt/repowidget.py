@@ -412,7 +412,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def clearRevisionSet(self):
-        if not self.revset:
+        if not self.filterbar.revsetle.text():
             self.filterbar.hide()
             self.toolbarVisibilityChanged.emit()
             return
