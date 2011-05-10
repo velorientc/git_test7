@@ -451,7 +451,10 @@ def _extendrepo(repo):
         def thgshelves(self):
             self.shelfdir = sdir = self.join('shelves')
             if os.path.isdir(sdir):
-                return os.listdir(sdir)
+                def getModificationTime(x):
+                    return os.path.getmtime(os.path.join(sdir, x))
+                return sorted(os.listdir(sdir),
+                    key=getModificationTime, reverse=True)
             return []
 
         def thginvalidate(self):
