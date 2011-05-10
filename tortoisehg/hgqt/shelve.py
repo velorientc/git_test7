@@ -372,7 +372,8 @@ class ShelveDialog(QDialog):
     def refreshCombos(self):
         shelvea, shelveb = self.currentPatchA(), self.currentPatchB()
 
-        shelves = self.repo.thgshelves()
+        # Sort shelves from newest to oldest
+        shelves = self.repo.thgshelves()[::-1]
         disp = [_('Shelf: %s') % hglib.tounicode(s) for s in shelves]
 
         patches = self.repo.thgmqunappliedpatches
