@@ -265,6 +265,9 @@ def runcommand(ui, args):
                 path, bundle = s
             cmdoptions['bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
+        if not os.path.exists(path) or not os.path.isdir(path+'/.hg'):
+            print 'abort: %s is not a repository' % path
+            return 1
         os.chdir(path)
     if options['fork']:
         cmdoptions['fork'] = True
