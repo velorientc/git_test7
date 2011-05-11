@@ -125,13 +125,13 @@ class CompressDialog(QDialog):
 
     def commit(self):
         tip, base = self.revs
-        func = revset.match('%s::%s' % (base, tip))
+        func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (base, tip))
         revcount = len(self.repo)
         revs = [c for c in func(self.repo, range(revcount)) if c != base]
         descs = [self.repo[c].description() for c in revs]
         self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
-        dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+        dlg = commit.CommitDialog(self.repo, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.showMessage.emit(_('Compress is complete, old history untouched'))
@@ -141,7 +141,7 @@ class CompressDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'commit':
-            dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+            dlg = commit.CommitDialog(self.repo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkStatus()

@@ -32,44 +32,6 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;
 
 [extensions]
-; extensions shipped with Mercurial by default
-;
-;acl =
-;bugzilla =
-;children =
-;churn =
-; Warning: the color extension is not recommended for Windows
-;color =
-;convert =
-;extdiff =
-;eol =
-;fetch =
-;gpg =
-;graphlog = 
-;hgcia =
-;hgk =
-;highlight = 
-;interhg =
-;keyword =
-;mq =
-;notify =
-;pager =
-;parentrevspec =
-;patchbomb =
-;progress =
-;purge =
-;rebase =
-;record =
-;schemes =
-;transplant =
-;win32mbcs =
-;win32text =
-;zeroconf =
-; Extra extensions bundled with TortoiseHg
-;fold =
-;perfarce =
-;mercurial_keyring =
-
 ; fixfrozenexts is enabled by default.  It allows extension help
 ; to work "out of the box" from binary installers.
 fixfrozenexts =

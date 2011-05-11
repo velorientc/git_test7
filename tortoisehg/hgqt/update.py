@@ -35,15 +35,15 @@ class UpdateDialog(QDialog):
         box.setSpacing(6)
 
         ## main layout grid
-        grid = QGridLayout()
-        grid.setSpacing(6)
-        box.addLayout(grid)
+        self.grid = QGridLayout()
+        self.grid.setSpacing(6)
+        box.addLayout(self.grid)
 
         ### target revision combo
         self.rev_combo = combo = QComboBox()
         combo.setEditable(True)
-        grid.addWidget(QLabel(_('Update to:')), 0, 0)
-        grid.addWidget(combo, 0, 1)
+        self.grid.addWidget(QLabel(_('Update to:')), 0, 0)
+        self.grid.addWidget(combo, 0, 1)
 
         if rev is None:
             rev = self.repo.dirstate.branch()
@@ -65,31 +65,31 @@ class UpdateDialog(QDialog):
         style = csinfo.labelstyle(contents=items, width=350, selectable=True)
         factory = csinfo.factory(self.repo, style=style)
         self.target_info = factory()
-        grid.addWidget(QLabel(_('Target:')), 1, 0, Qt.AlignLeft | Qt.AlignTop)
-        grid.addWidget(self.target_info, 1, 1)
+        self.grid.addWidget(QLabel(_('Target:')), 1, 0, Qt.AlignLeft | Qt.AlignTop)
+        self.grid.addWidget(self.target_info, 1, 1)
 
         ### parent revision info
         self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
             self.p1_info = factory()
-            grid.addWidget(QLabel(_('Parent 1:')), 2, 0, Qt.AlignLeft | Qt.AlignTop)
-            grid.addWidget(self.p1_info, 2, 1)
+            self.grid.addWidget(QLabel(_('Parent 1:')), 2, 0, Qt.AlignLeft | Qt.AlignTop)
+            self.grid.addWidget(self.p1_info, 2, 1)
             self.p2_info = factory()
-            grid.addWidget(QLabel(_('Parent 2:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
-            grid.addWidget(self.p2_info, 3, 1)
+            self.grid.addWidget(QLabel(_('Parent 2:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
+            self.grid.addWidget(self.p2_info, 3, 1)
         else:
             self.p1_info = factory()
-            grid.addWidget(QLabel(_('Parent:')), 2, 0, Qt.AlignLeft | Qt.AlignTop)
-            grid.addWidget(self.p1_info, 2, 1)
+            self.grid.addWidget(QLabel(_('Parent:')), 2, 0, Qt.AlignLeft | Qt.AlignTop)
+            self.grid.addWidget(self.p1_info, 2, 1)
 
         ### options
-        optbox = QVBoxLayout()
-        optbox.setSpacing(6)
+        self.optbox = QVBoxLayout()
+        self.optbox.setSpacing(6)
         expander = qtlib.ExpanderLabel(_('Options:'), False)
         expander.expanded.connect(self.show_options)
-        row = grid.rowCount()
-        grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
-        grid.addLayout(optbox, row, 1)
+        row = self.grid.rowCount()
+        self.grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
+        self.grid.addLayout(self.optbox, row, 1)
 
         self.discard_chk = QCheckBox(_('Discard local changes, no backup '
                                        '(-C/--clean)'))
@@ -97,10 +97,10 @@ class UpdateDialog(QDialog):
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
         self.showlog_chk = QCheckBox(_('Always show command log'))
-        optbox.addWidget(self.discard_chk)
-        optbox.addWidget(self.merge_chk)
-        optbox.addWidget(self.autoresolve_chk)
-        optbox.addWidget(self.showlog_chk)
+        self.optbox.addWidget(self.discard_chk)
+        self.optbox.addWidget(self.merge_chk)
+        self.optbox.addWidget(self.autoresolve_chk)
+        self.optbox.addWidget(self.showlog_chk)
 
         self.discard_chk.setChecked(bool(opts.get('clean')))
 
@@ -244,7 +244,7 @@ class UpdateDialog(QDialog):
                     clean = isclean()
 
                 msg = _('Detected uncommitted local changes in working tree.\n'
-                        'Please select to continue:\n\n')
+                        'Please select to continue:\n')
                 data = {'discard': (_('&Discard'),
                                     _('Discard - discard local changes, no backup')),
                         'shelve': (_('&Shelve'),
@@ -252,21 +252,23 @@ class UpdateDialog(QDialog):
                         'merge': (_('&Merge'),
                                   _('Merge - allow to merge with local changes')),}
 
-                opts = [data['discard']]
+                opts = ['discard']
                 if not ismergedchange():
-                    opts.append(data['shelve'])
+                    opts.append('shelve')
                 if islocalmerge(cur, node, clean):
-                    opts.append(data['merge'])
+                    opts.append('merge')
 
-                msg += '\n'.join([desc for label, desc in opts if desc])
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
-                                  msg, QMessageBox.Cancel, self)
+                                  '', QMessageBox.Cancel, self)
                 buttons = {}
-                for name in ('discard', 'shelve', 'merge'):
+                for name in opts:
                     label, desc = data[name]
+                    msg += '\n'
+                    msg += desc
                     buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                dlg.setText(msg)
                 dlg.exec_()
-                return buttons, dlg.clickedButton()
+                return buttons, dlg.clickedButton(), opts
 
             # If merge-by-default, we want to merge whenever possible,
             # without prompting user (similar to command-line behavior)
@@ -275,16 +277,16 @@ class UpdateDialog(QDialog):
             if clean:
                 cmdline.append('--check')
             elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                buttons, clicked = confirmupdate(clean)
+                buttons, clicked, options = confirmupdate(clean)
                 if buttons['discard'] == clicked:
                     cmdline.append('--clean')
-                elif buttons['shelve'] == clicked:
+                elif 'shelve' in options and buttons['shelve'] == clicked:
                     from tortoisehg.hgqt import shelve
                     dlg = shelve.ShelveDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
-                elif buttons['merge'] == clicked:
+                elif 'merge' in options and buttons['merge'] == clicked:
                     pass # no args
                 else:
                     return

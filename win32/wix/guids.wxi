@@ -30,7 +30,7 @@
   <?define templates.raw.guid = {936139F7-9A73-4685-80D2-F17A2BC42EAD} ?>
   <?define templates.rss.guid = {891DA56F-B02B-456F-8471-FE47024051E7} ?>
   <?define templates.spartan.guid = {C49A4A44-53EB-4C37-AA0B-159070F46E84} ?>
-  <?define templates.static.guid = {ECF8D1EF-910D-4586-9508-86A6236B4FD5} ?>
+  <?define templates.static.guid = {B6C414E5-CD1E-4820-86E7-EEC2386426BE} ?>
 
   <!-- dist.wxs -->
   <?define dist.guid = {9A429564-6BA8-4F18-ACCF-59C586364FFC} ?>
