@@ -13,7 +13,7 @@ import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge, error
-from mercurial import demandimport
+from mercurial import demandimport, revset
 
 demandimport.disable()
 try:
@@ -36,6 +36,14 @@ except ImportError:
     # hg <= 1.8
     from mercurial.url import hidepassword, removeauth
 demandimport.enable()
+
+def revsetmatch(ui, pattern):
+    try:
+        # hg >= 1.9
+        return revset.match(ui, pattern)
+    except TypeError:
+        # hg <= 1.8
+        return revset.match(pattern)
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode

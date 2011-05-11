@@ -1127,7 +1127,7 @@ class RepoWidget(QWidget):
                 B, A = self.menuselection
             else:
                 A, B = self.menuselection
-            func = revset.match(self.repo.ui, '%s::%s' % (A, B))
+            func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (A, B))
             return [c for c in func(self.repo, range(len(self.repo)))]
 
         def exportPair():
