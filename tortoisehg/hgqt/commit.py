@@ -316,6 +316,7 @@ class CommitWidget(QWidget):
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
+        self.stwidget.refreshWctx() # Trigger reload of working context
 
     def configChanged(self):
         'Repository is reporting its config files have changed'
