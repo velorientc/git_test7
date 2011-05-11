@@ -63,8 +63,7 @@ class RepoFilterBar(QToolBar):
         self.clearBtn = QToolButton(self)
         self.clearBtn.setIcon(qtlib.geticon('filedelete'))
         self.clearBtn.setToolTip(_('Clear current query and query text'))
-        self.clearBtn.clicked.connect(le.clear)
-        self.clearBtn.clicked.connect(self.clearRevisionSet)
+        self.clearBtn.clicked.connect(self.onClearButtonClicked)
         self.addWidget(self.clearBtn)
         self.addWidget(combo)
 
@@ -98,6 +97,13 @@ class RepoFilterBar(QToolBar):
 
         self._initbranchfilter()
         self.refresh()
+
+    def onClearButtonClicked(self):
+        if self.revsetcombo.lineEdit().text():
+            self.revsetcombo.lineEdit().clear()
+        else:
+            self.hide()
+        self.clearRevisionSet.emit()
 
     def setEnableFilter(self, enabled):
         'Enable/disable the changing of the current filter'
