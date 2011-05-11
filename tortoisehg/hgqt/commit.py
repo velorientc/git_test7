@@ -616,7 +616,6 @@ class CommitWidget(QWidget):
             self.msgte.clear()
             self.msgte.setModified(False)
             self.commitComplete.emit()
-        self.stwidget.refreshWctx()
 
 class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
