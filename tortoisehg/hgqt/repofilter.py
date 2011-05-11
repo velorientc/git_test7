@@ -51,6 +51,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo = combo = QComboBox()
         combo.setEditable(True)
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
         le.selectionChanged.connect(self.selectionChanged)
@@ -62,8 +63,7 @@ class RepoFilterBar(QToolBar):
         self.clearBtn = QToolButton(self)
         self.clearBtn.setIcon(qtlib.geticon('filedelete'))
         self.clearBtn.setToolTip(_('Clear current query and query text'))
-        self.clearBtn.clicked.connect(le.clear)
-        self.clearBtn.clicked.connect(self.clearRevisionSet)
+        self.clearBtn.clicked.connect(self.onClearButtonClicked)
         self.addWidget(self.clearBtn)
         self.addWidget(combo)
 
@@ -97,6 +97,13 @@ class RepoFilterBar(QToolBar):
 
         self._initbranchfilter()
         self.refresh()
+
+    def onClearButtonClicked(self):
+        if self.revsetcombo.lineEdit().text():
+            self.revsetcombo.lineEdit().clear()
+        else:
+            self.hide()
+        self.clearRevisionSet.emit()
 
     def setEnableFilter(self, enabled):
         'Enable/disable the changing of the current filter'
@@ -207,6 +214,8 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setMenu(self._branchMenu)
 
         self._branchCombo = QComboBox()
+        self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self._branchCombo.setMinimumSize(100,0)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False
 
