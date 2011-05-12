@@ -72,7 +72,7 @@ class ShelveDialog(QDialog):
         ahbox.addWidget(self.clearShelfButtonA)
         ahbox.addWidget(self.delShelfButtonA)
 
-        self.browsea = chunks.ChunksWidget(repo, self)
+        self.browsea = chunks.ChunksWidget(repo, self, True)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
@@ -101,7 +101,7 @@ class ShelveDialog(QDialog):
         bhbox.addWidget(self.clearShelfButtonB)
         bhbox.addWidget(self.delShelfButtonB)
 
-        self.browseb = chunks.ChunksWidget(repo, self)
+        self.browseb = chunks.ChunksWidget(repo, self, True)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
@@ -200,17 +200,17 @@ class ShelveDialog(QDialog):
     def moveFileRight(self):
         if self.combob.currentIndex() == -1:
             self.newShelf(False)
-        file, _ = self.browsea.getSelectedFileAndChunks()
-        chunks = self.browsea.getChunksForFile(file)
-        if self.browseb.mergeChunks(file, chunks):
-            self.browsea.removeFile(file)
+        for file in self.browsea.getSelectedFiles():
+            chunks = self.browsea.getChunksForFile(file)
+            if self.browseb.mergeChunks(file, chunks):
+                self.browsea.removeFile(file)
 
     @pyqtSlot()
     def moveFileLeft(self):
-        file, _ = self.browseb.getSelectedFileAndChunks()
-        chunks = self.browseb.getChunksForFile(file)
-        if self.browsea.mergeChunks(file, chunks):
-            self.browseb.removeFile(file)
+        for file in self.browseb.getSelectedFiles():
+            chunks = self.browseb.getChunksForFile(file)
+            if self.browsea.mergeChunks(file, chunks):
+                self.browseb.removeFile(file)
 
     @pyqtSlot()
     def moveFilesRight(self):

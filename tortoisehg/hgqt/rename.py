@@ -45,8 +45,8 @@ class RenameDialog(QDialog):
                       'from folder<p>%s</p>' % cwd))
             return ('', '')
         try:
-            fname = util.canonpath(self.root, cwd, pats[0])
-            target = util.canonpath(self.root, cwd, pats[1])
+            fname = hglib.canonpath(self.root, cwd, pats[0])
+            target = hglib.canonpath(self.root, cwd, pats[1])
         except:
             pass
         os.chdir(self.root)

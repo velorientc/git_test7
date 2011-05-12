@@ -377,7 +377,7 @@ class RevsetThread(QThread):
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
-            func = revset.match(self.text)
+            func = hglib.revsetmatch(self.repo.ui, self.text)
             l = []
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)
@@ -393,6 +393,8 @@ class RevsetThread(QThread):
             else:
                 msg = e.args[0]
             self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
+        except TypeError:
+            raise
         except Exception, e:
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
 
