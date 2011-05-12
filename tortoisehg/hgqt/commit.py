@@ -251,6 +251,7 @@ class CommitWidget(QWidget):
         self.split.setSizePolicy(sp)
         # Add our widgets to the top of our splitter
         self.split.addWidget(upperframe)
+        self.split.setCollapsible(0, False)
         # Add status widget document frame below our splitter
         # this reparents the docf from the status splitter
         self.split.addWidget(self.stwidget.docf)
