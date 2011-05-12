@@ -84,7 +84,7 @@ class DetectRenameDialog(QDialog):
         copycheck.setToolTip(_('Uncheck to consider all revisioned files '
                                'for copy sources'))
         copycheck.setChecked(True)
-        findrenames = QPushButton(_('Find Rename'))
+        findrenames = QPushButton(_('Find Renames'))
         findrenames.setToolTip(_('Find copy and/or rename sources'))
         findrenames.setEnabled(False)
         findrenames.clicked.connect(self.findRenames)
@@ -92,9 +92,6 @@ class DetectRenameDialog(QDialog):
         buthbox.addStretch(1)
         buthbox.addWidget(findrenames)
         self.findbtn, self.copycheck = findrenames, copycheck
-        def itemselect():
-            self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
-        self.unrevlist.itemSelectionChanged.connect(itemselect)
 
         matchlbl = QLabel(_('<b>Candidate Matches</b>'))
         matchvbox.addWidget(matchlbl)
@@ -106,7 +103,7 @@ class DetectRenameDialog(QDialog):
         matchtv.setSortingEnabled(True)
         matchtv.selectionModel().selectionChanged.connect(self.showDiff)
         buthbox = QHBoxLayout()
-        matchbtn = QPushButton(_('Accept Selected Matches'))
+        matchbtn = QPushButton(_('Accept All Matches'))
         matchbtn.clicked.connect(self.acceptMatch)
         matchbtn.setEnabled(False)
         buthbox.addStretch(1)
@@ -116,7 +113,10 @@ class DetectRenameDialog(QDialog):
         self.matchtv, self.matchbtn = matchtv, matchbtn
         def matchselect(s, d):
             count = len(matchtv.selectedIndexes())
-            self.matchbtn.setEnabled(count > 0)
+            if count:
+                self.matchbtn.setText(_('Accept Selected Matches'))
+            else:
+                self.matchbtn.setText(_('Accept All Matches'))
         selmodel = matchtv.selectionModel()
         selmodel.selectionChanged.connect(matchselect)
 
@@ -163,8 +163,13 @@ class DetectRenameDialog(QDialog):
             item.orig = x
             self.unrevlist.addItem(item)
             self.unrevlist.setItemSelected(item, x in self.pats)
+        if dests:
+            self.findbtn.setEnabled(True)
+        else:
+            self.findbtn.setEnabled(False)
         self.difftb.clear()
         self.pats = []
+        self.matchbtn.setEnabled(len(self.matchtv.model().rows))
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -172,12 +177,16 @@ class DetectRenameDialog(QDialog):
             QMessageBox.information(self, _('Search already in progress'),
                                     _('Cannot start a new search'))
             return
-        ulist = []
-        for item in self.unrevlist.selectedItems():
-            ulist.append(item.orig)
+
+        ulist = [it.orig for it in self.unrevlist.selectedItems()]
         if not ulist:
-            QMessageBox.information(self, _('No rows selected'),
-                                    _('Select one or more rows for search'))
+            # When no files are selected, look for all files
+            ulist = [self.unrevlist.item(n).orig
+                        for n in range(self.unrevlist.count())]
+
+        if not ulist:
+            QMessageBox.information(self, _('No files to find'),
+                _('There are no files that may have been renamed'))
             return
 
         pct = self.simslider.value() / 100.0
@@ -196,7 +205,8 @@ class DetectRenameDialog(QDialog):
         self.stbar.clear()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
-        self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
+        self.findbtn.setEnabled(self.unrevlist.count())
+        self.matchbtn.setEnabled(len(self.matchtv.model().rows))
 
     def rowReceived(self, args):
         self.matchtv.model().appendRow(*args)
@@ -205,8 +215,16 @@ class DetectRenameDialog(QDialog):
         'User pressed "accept match" button'
         remdests = {}
         wctx = self.repo[None]
-        for index in self.matchtv.selectionModel().selectedRows():
-            src, dest, percent = self.matchtv.model().getRow(index)
+        m = self.matchtv.model()
+
+        # If no rows are selected, ask the user if he'd like to accept all renames
+        if self.matchtv.selectionModel().hasSelection():
+            itemList = [row for row in self.matchtv.selectionModel().selectedRows()]
+        else:
+            itemList = m.rows
+
+        for item in itemList:
+            src, dest, percent = item
             if dest in remdests:
                 udest = hglib.tounicode(dest)
                 QMessageBox.warning(self, _('Multiple sources chosen'),
