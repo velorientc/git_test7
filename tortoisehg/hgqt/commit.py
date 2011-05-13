@@ -209,19 +209,19 @@ class CommitWidget(QWidget):
         tbar = QToolBar(_("Commit Dialog Toolbar"), self)
         hbox.addWidget(tbar)
 
-        self.recentMessagesButton = QToolButton(
-            text=_('Copy message'),
-            popupMode=QToolButton.InstantPopup,
-            statusTip=_('Copy one of the recent commit messages'))
-        tbar.addWidget(self.recentMessagesButton)
-        self.updateRecentMessages()
-
         self.branchbutton = tbar.addAction(_('Branch: '))
         font = self.branchbutton.font()
         font.setBold(True)
         self.branchbutton.setFont(font)
         self.branchbutton.triggered.connect(self.branchOp)
         self.branchop = None
+
+        self.recentMessagesButton = QToolButton(
+            text=_('Copy message'),
+            popupMode=QToolButton.InstantPopup,
+            statusTip=_('Copy one of the recent commit messages'))
+        tbar.addWidget(self.recentMessagesButton)
+        self.updateRecentMessages()
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
         tbar.setIconSize(QSize(16,16))
