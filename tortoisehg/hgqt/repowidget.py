@@ -1311,10 +1311,53 @@ class RepoWidget(QWidget):
             return
         epath = os.path.join(hglib.fromunicode(dir),
                              hglib.fromunicode(self.repo.shortname)+'_%r.patch')
+
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
+
+        existingRevisions = []
         for rev in revisions:
+            if os.path.exists(epath % rev):
+                if os.path.isfile(epath % rev):
+                    existingRevisions.append(rev)
+                else:
+                    QMessageBox.warning(self,
+                        _('Cannot export revision'),
+                        (_('Cannot export revision %s into the file named:'
+                        '\n\n%s\n') % (rev, epath % rev)) + \
+                        _('There is already an existing folder '
+                        'with that same name.'))
+                    return
             cmdline.extend(['--rev', str(rev)])
+
+        if existingRevisions:
+            buttonNames = [_("Replace"), _("Append"), _("Abort")]
+
+            warningMessage = \
+                _('There are existing patch files for %d revisions (%s) '
+                'in the selected location (%s).\n\n') \
+                % (len(existingRevisions),
+                    " ,".join([str(rev) for rev in existingRevisions]),
+                    dir)
+
+            warningMessage += \
+                _('What do you want to do?\n') + u'\n' + \
+                u'- ' + _('Replace the existing patch files.\n') + \
+                u'- ' + _('Append the changes to the existing patch files.\n') + \
+                u'- ' + _('Abort the export operation.\n')
+
+            res = qtlib.CustomPrompt(_('Patch files already exist'),
+                warningMessage,
+                self,
+                buttonNames, 0, 2).run()
+
+            if buttonNames[res] == _("Replace"):
+                # Remove the existing patch files
+                for rev in existingRevisions:
+                    os.remove(epath % rev)
+            elif buttonNames[res] == _("Abort"):
+                return
+
         self.runCommand(cmdline)
 
     def visualDiffRevision(self):
