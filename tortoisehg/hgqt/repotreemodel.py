@@ -10,10 +10,12 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem
+from repotreeitem import RepoItem, RepoTreeItem, SubrepoItem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+import os
 
 
 extractXmlElementName = 'reporegextract'
@@ -239,8 +241,15 @@ class RepoTreeModel(QAbstractItemModel):
         rgi = grp.internalPointer()
         if row < 0:
             row = rgi.childCount()
+        
+        # Is the root of the repo that we want to add a subrepo contained
+        # within a repo or subrepo? If so, assume it is an hg subrepo
+        itemIsSubrepo = not paths.find_root(os.path.dirname(root)) is None
         self.beginInsertRows(grp, row, row)
-        ri = RepoItem(root)
+        if itemIsSubrepo:
+            ri = SubrepoItem(root)
+        else:
+            ri = RepoItem(root)
         rgi.insertChild(row, ri)
 
         if not self.showSubrepos \
