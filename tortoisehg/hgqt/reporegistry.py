@@ -46,6 +46,7 @@ class RepoTreeView(QTreeView):
         self.setAcceptDrops(True)
         self.setAutoScroll(True)
         self.setDragDropMode(QAbstractItemView.DragDrop)
+        self.setDefaultDropAction(Qt.MoveAction)
         self.setDropIndicatorShown(True)
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -94,6 +95,27 @@ class RepoTreeView(QTreeView):
 
         return index, group, row
 
+    def startDrag(self, supportedActions):
+        indexes = self.selectedIndexes()
+        # Make sure that all selected items are of the same type
+        if len(indexes) == 0:
+            # Nothing to drag!
+            return
+
+        # Make sure that all items that we are dragging are of the same type
+        firstItem = indexes[0].internalPointer()
+        selectionInstanceType = type(firstItem)
+        for idx in indexes[1:]:
+            if selectionInstanceType != type(idx.internalPointer()):
+                # Cannot drag mixed type items
+                return
+
+        # Each item type may support different drag & drop actions
+        # For instance, suprepo items support Copy actions only
+        supportedActions = firstItem.getSupportedDragDropActions()
+
+        super(RepoTreeView, self).startDrag(supportedActions)
+
     def dropEvent(self, event):
         data = event.mimeData()
         index, group, row = self.dropLocation(event)
@@ -102,10 +124,9 @@ class RepoTreeView(QTreeView):
             if event.source() is self:
                 # Event is an internal move, so pass it to the model
                 col = 0
-                drop = self.model().dropMimeData(data, Qt.MoveAction, row,
+                drop = self.model().dropMimeData(data, event.dropAction(), row,
                                                  col, group)
                 if drop:
-                    event.setDropAction(Qt.MoveAction)
                     event.accept()
             else:
                 # Event is a drop of an external repo

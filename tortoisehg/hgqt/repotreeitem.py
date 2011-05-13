@@ -134,6 +134,9 @@ class RepoTreeItem(object):
     def okToDelete(self):
         return True
 
+    def getSupportedDragDropActions(self):
+        return Qt.MoveAction
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, root=None, parent=None):
@@ -319,12 +322,17 @@ class SubrepoItem(RepoItem):
             return super(SubrepoItem, self).data(column, role)
 
     def menulist(self):
-        print self._parent
         if isinstance(self._parent, RepoGroupItem):
             return super(SubrepoItem, self).menulist()
         else:
             return ['open', 'clone', None, 'explore', 'terminal',
                 None, 'settings']
+
+    def getSupportedDragDropActions(self):
+        if issubclass(type(self.parent()), RepoGroupItem):
+            return Qt.MoveAction
+        else:
+            return Qt.CopyAction
 
 
 class RepoGroupItem(RepoTreeItem):
