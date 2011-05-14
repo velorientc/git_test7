@@ -197,7 +197,7 @@ class RepoItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['open', 'remove', 'clone', None, 'explore', 'terminal',
+        return ['open', 'remove', 'clone', 'addsubrepo', None, 'explore', 'terminal',
                 None, 'settings']
 
     def flags(self):
@@ -317,7 +317,7 @@ class SubrepoItem(RepoItem):
         if isinstance(self._parent, RepoGroupItem):
             return super(SubrepoItem, self).menulist()
         else:
-            return ['open', 'clone', None, 'explore', 'terminal',
+            return ['open', 'clone', 'addsubrepo', None, 'explore', 'terminal',
                 None, 'settings']
 
     def getSupportedDragDropActions(self):

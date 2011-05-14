@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import error
+from mercurial import error, hg, ui, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -355,6 +355,9 @@ class RepoRegistryView(QDockWidget):
                 _("Open a shell terminal in the repository root"), self.terminal),
              ("add", _("Add repository..."), 'hg',
                 _("Add a repository to this group"), self.addNewRepo),
+             ("addsubrepo", _("Add a subrepository..."), 'thg-add-subrepo',
+                _("Convert an existing repository into a subrepository"),
+                self.addSubrepo),
              ]
         return a
 
@@ -423,6 +426,113 @@ class RepoRegistryView(QDockWidget):
                         _('Failed to add repository'),
                         _('%s is not a valid repository') % path, parent=self)
                     return
+
+    def addSubrepo(self):
+        'menu action handler for adding a new subrepository'
+        root = self.selitem.internalPointer().rootpath()
+        caption = _('Select an existing repository to add as a subrepo')
+        FD = QFileDialog
+        path = hglib.fromunicode(FD.getExistingDirectory(caption=caption,
+            directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
+        if path:
+            sroot = paths.find_root(path)
+            if sroot != root and root == paths.find_root(os.path.dirname(path)):
+                # The selected path is the root of a repository that is inside
+                # the selected repository
+                
+                # Use forward slashes for relative subrepo root paths
+                srelroot = sroot[len(root)+1:]
+                srelroot = util.pconvert(srelroot)
+                
+                # Is is already on the selected repository substate list?
+                try:
+                    repo = hg.repository(ui.ui(), root)
+                except:
+                    qtlib.WarningMsgBox(_('Cannot open repository'),
+                        _('The selected repository:<br><br>%s<br><br>'
+                        'cannot be open!') % root, parent=self)
+                    return
+
+                if srelroot in repo['.'].substate:
+                    qtlib.WarningMsgBox(_('Subrepository already exists'),
+                        _('The selected repository:<br><br>%s<br><br>'
+                        'is already a subrepository of:<br><br>%s<br><br>'
+                        'as: "%s"') % (sroot, root, srelroot), parent=self)
+                    return
+                else:
+                    # Already a subrepo!
+                    
+                    # Read the current .hgsub file contents
+                    lines = []
+                    if os.path.exists(repo.wjoin('.hgsub')):
+                        try:
+                            fsub = repo.wopener('.hgsub', 'r')
+                            lines = fsub.readlines()
+                            fsub.close()
+                        except:
+                            qtlib.WarningMsgBox(
+                                _('Failed to add repository'),
+                                _('Cannot open the .hgsub file in:<br><br>%s') \
+                                % root, parent=self)
+                    
+                    # Make sure that the selected subrepo (or one of its 
+                    # subrepos!) is not already on the .hgsub file
+                    def getLineSeparator(line):
+                        """Get the line separator used on a given line"""
+                        # By default assume the default OS line separator 
+                        linesep = os.linesep
+                        lineseptypes = ['\r\n', '\n', '\r']
+                        for sep in lineseptypes:
+                            if line.endswith(sep):
+                                linesep = sep
+                                break
+                        return linesep
+
+                    linesep = ''
+                    for line in lines:
+                        spath = line.split("=")[0].strip()
+                        if not spath:
+                            continue
+                        if not linesep:
+                            linesep = getLineSeparator(line)
+                        spath = util.pconvert(spath)
+                        if line.startswith(srelroot):
+                            qtlib.WarningMsgBox(
+                                _('Failed to add repository'),
+                                _('The .hgsub file already contains the '
+                                'line:<br><br>%s') % line, parent=self)
+                            return
+
+                    # Append the new subrepo to the end of the .hgsub file
+                    lines.append('%s = %s' % (srelroot, srelroot))
+                    lines = [line.strip(linesep) for line in lines]
+                    
+                    # and update the .hgsub file
+                    try:
+                        fsub = repo.wopener('.hgsub', 'w')
+                        fsub.write(linesep.join(lines))
+                        fsub.close()
+                        
+                        qtlib.InfoMsgBox(
+                            _('Subrepo added to .hgsub file'),
+                            _('The selected subrepo:<br><br><i>%s</i><br><br>'
+                            'has been added to the .hgsub file.<br><br>'
+                            'Remember that in order to finish adding the '
+                            'subrepo<br><i>you must still commit</i> the '
+                            '.hgsub file changes.') \
+                            % root, parent=self)
+                    except:
+                        qtlib.WarningMsgBox(
+                            _('Failed to add repository'),
+                            _('Cannot update the .hgsub file in:<br><br>%s') \
+                            % root, parent=self)
+                return
+                
+            qtlib.WarningMsgBox(
+                _('Failed to add repository'),
+                _('"%s" is not a valid repository inside "%s"') % \
+                (path, root), parent=self)
+            return
 
     def startSettings(self):
         root = self.selitem.internalPointer().rootpath()
