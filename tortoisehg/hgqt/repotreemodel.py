@@ -206,6 +206,9 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         if group is None:
             return False
+        # Avoid copying subrepos multiple times
+        if Qt.CopyAction == action and self.getRepoItem(itemread.rootpath()):
+            return False
         if row < 0:
             row = 0
         if self.showSubrepos:
