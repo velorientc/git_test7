@@ -210,7 +210,7 @@ class CommitWidget(QWidget):
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
             popupMode=QToolButton.InstantPopup,
-            statusTip=_('Copy one of the recent commit messages'))
+            toolTip=_('Copy one of the recent commit messages'))
         tbar.addWidget(self.recentMessagesButton)
         self.updateRecentMessages()
 
