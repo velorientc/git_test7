@@ -26,21 +26,27 @@ except (ImportError, AttributeError):
 try:
     # hg >= 1.9
     from mercurial.util import localpath
-except ImportError:
+except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.hg import localpath
 try:
     # hg >= 1.9
     from mercurial.util import hidepassword, removeauth
-except ImportError:
+except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.url import hidepassword, removeauth
 try:
     # hg >= 1.9
     from mercurial.httpconnection import readauthforuri
-except ImportError:
+except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.url import readauthforuri
+try:
+    # hg >= 1.9
+    from mercurial.scmutil import revrange
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.cmdutil import revrange
 demandimport.enable()
 
 def revsetmatch(ui, pattern):
