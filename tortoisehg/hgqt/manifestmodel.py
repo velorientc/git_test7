@@ -81,7 +81,7 @@ class ManifestModel(QAbstractItemModel):
             return ic
         st = status.statusTypes[e.status]
         if st.icon:
-            ic = _overlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
+            ic = qtlib.getoverlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
         return ic
 
     def fileStatus(self, index):
@@ -301,16 +301,6 @@ class ManifestModel(QAbstractItemModel):
         self.beginResetModel()
         self.__rootentry = roote
         self.endResetModel()
-
-def _overlaidicon(base, overlay):
-    """Generate overlaid icon"""
-    # TODO: generalize this function as a utility
-    pixmap = base.pixmap(16, 16)
-    painter = QPainter(pixmap)
-    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
-    del painter
-    return QIcon(pixmap)
 
 class _Entry(object):
     """Each file or directory"""

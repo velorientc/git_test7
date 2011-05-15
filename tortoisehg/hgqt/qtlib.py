@@ -451,6 +451,17 @@ if sys.platform == 'darwin':
 else:
     getmenuicon = geticon
 
+
+def getoverlaidicon(base, overlay):
+    """Generate an overlaid icon"""
+    pixmap = base.pixmap(16, 16)
+    painter = QPainter(pixmap)
+    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
+    del painter
+    return QIcon(pixmap)
+
+
 _pixmapcache = {}
 
 def getpixmap(name, width=16, height=16):

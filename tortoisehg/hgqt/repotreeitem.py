@@ -184,7 +184,7 @@ class RepoItem(RepoTreeItem):
             if column == 0:
                 ico = qtlib.geticon('hg')
                 if not self._valid:
-                    ico = _overlaidicon(ico, qtlib.geticon('dialog-warning'))
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -264,17 +264,6 @@ class RepoItem(RepoTreeItem):
 
         return invalidRepoList
 
-def _overlaidicon(base, overlay):
-    """Generate overlaid icon"""
-    # TODO: This was copied from manifestmodel.py
-    # TODO: generalize this function as a utility
-    pixmap = base.pixmap(16, 16)
-    painter = QPainter(pixmap)
-    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
-    del painter
-    return QIcon(pixmap)
-
 
 class SubrepoItem(RepoItem):
     _subrepoType2IcoMap = {
@@ -311,10 +300,10 @@ class SubrepoItem(RepoItem):
                     # Overlay the "subrepo icon" on top of the selected subrepo
                     # type icon
                     ico = qtlib.geticon(subiconame)
-                    ico = _overlaidicon(ico, qtlib.geticon('thg-subrepo'))
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('thg-subrepo'))
 
                 if not self._valid:
-                    ico = _overlaidicon(ico, qtlib.geticon('dialog-warning'))
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
 
                 return QVariant(ico)
             return QVariant()
