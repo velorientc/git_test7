@@ -630,7 +630,7 @@ class SyncWidget(QWidget):
                 cmdline.append('--insecure')
             if user:
                 cleanurl = hglib.removeauth(cururl)
-                res = url.readauthforuri(self.repo.ui, cleanurl)
+                res = hglib.readauthforuri(self.repo.ui, cleanurl)
                 if res:
                     group, auth = res
                     if auth.get('username'):
@@ -1122,7 +1122,7 @@ class SecureDialog(QDialog):
 
         # if the already user has an [auth] configuration for this URL, use it
         cleanurl = hglib.removeauth(origurl)
-        res = url.readauthforuri(repo.ui, cleanurl)
+        res = hglib.readauthforuri(repo.ui, cleanurl)
         if res:
             self.alias, auth = res
         else:

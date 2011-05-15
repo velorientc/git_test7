@@ -35,6 +35,12 @@ try:
 except ImportError:
     # hg <= 1.8
     from mercurial.url import hidepassword, removeauth
+try:
+    # hg >= 1.9
+    from mercurial.httpconnection import readauthforuri
+except ImportError:
+    # hg <= 1.8
+    from mercurial.url import readauthforuri
 demandimport.enable()
 
 def revsetmatch(ui, pattern):
