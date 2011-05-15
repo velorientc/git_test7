@@ -125,6 +125,7 @@ class FileData(object):
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     subabspath = os.path.join(repo.root, subrelpath)
                     missingsub = not os.path.isdir(subabspath)
+                    incompletesub = False
                     sfromlog = ''
                     def isinitialrevision(rev):
                         return all([el == '0' for el in rev])
@@ -156,17 +157,32 @@ class FileData(object):
                         sstatedesc = 'changed'
 
                         out.append(_('Revision has changed to:') + u'\n\n')
+                        
                         if missingsub:
                             sfromlog = _('changeset: %s') % sfrom + u'\n\n'
                         else:
                             sfromlog = hglib.tounicode(getLog(_ui, srepo, opts))
-                        if sfromlog:
-                            sfromlog = _('From:') + u'\n' + sfromlog
-                        
+                            if not sfromlog:
+                                incompletesub = True
+                                sfromlog = _('changeset: %s') % sfrom + u'\n\n'
+                        sfromlog = _('From:') + u'\n' + sfromlog
+
                     if missingsub:
                         stolog = _('changeset: %s') % sto + '\n\n'
-                        sfromlog += _('Subrepository not found in working directory.') + '\n'
-                        sfromlog += _('Further subrepository revision information cannot be retrieved.') + '\n'
+                        sfromlog += _('Subrepository not found in the working '
+                            'directory.') + '\n'
+                        sfromlog += _('Further subrepository revision '
+                            'information cannot be retrieved.') + '\n'
+                    elif incompletesub:
+                        stolog = _('changeset: %s') % sto + '\n\n'
+                        sfromlog += _('Subrepository is either damaged or '
+                            'missing some revisions') + '\n'
+                        sfromlog += _('Further subrepository revision '
+                            'information cannot be retrieved.') + '\n'
+                        sfromlog += _('You may need to open the missing'
+                            'subrepository and \n'
+                            'manually pull the missing revisions from its '
+                            'source repository.') + '\n'
                     else:
                         opts['rev'] = [sto]
                         stolog = getLog(_ui, srepo, opts)
