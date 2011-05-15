@@ -798,7 +798,7 @@ statusTypes = {
                      'status.ignored', _('ignored')),
     'C' : StatusType('clean', '', _('%s is not modified (clean)'),
                      'status.clean', _('clean')),
-    'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
+    'S' : StatusType('subrepo', 'thg-subrepo.ico', _('%s is a dirty subrepo'),
                      'status.subrepo', _('subrepo')),
 }
 

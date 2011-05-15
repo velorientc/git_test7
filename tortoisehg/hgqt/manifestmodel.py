@@ -32,7 +32,7 @@ class ManifestModel(QAbstractItemModel):
 
         self._repo = repo
         self._rev = rev
-        self._subinfo = {}
+        self._subinfo = {'substate': [], 'ctx': None}
 
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
@@ -68,8 +68,23 @@ class ManifestModel(QAbstractItemModel):
             return None, path
         for subpath in sorted(self._subinfo.keys())[::-1]:
             if path.startswith(subpath):
-                return self._subinfo[subpath], path[len(subpath)+1:]
+                return self._subinfo[subpath]['ctx'], path[len(subpath)+1:]
         return None, path
+
+    def subrepoType(self, index):
+        """Return the subrepo type the specified index"""
+        path = self.filePath(index)
+        return self.subrepoTypeFromPath(path)
+
+    def subrepoTypeFromPath(self, path):
+        """Return the subrepo type of the specified subrepo"""
+        if not path:
+            return None
+        try:
+            substate = self._subinfo[path]
+            return substate['substate'][2]
+        except:
+            return None
 
     def fileIcon(self, index):
         ic = QApplication.style().standardIcon(
@@ -81,7 +96,18 @@ class ManifestModel(QAbstractItemModel):
             return ic
         st = status.statusTypes[e.status]
         if st.icon:
-            ic = qtlib.getoverlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
+            icOverlay = qtlib.geticon(st.icon[:-4])
+            if e.status == 'S':
+                _subrepoType2IcoMap = {
+                  'hg': 'hg',
+                  'git': 'thg-git-subrepo',
+                  'svn': 'thg-svn-subrepo',
+                }
+                stype = self.subrepoType(index)
+                if stype:
+                    ic = qtlib.geticon(_subrepoType2IcoMap[stype])
+            ic = qtlib.getoverlaidicon(ic,
+                icOverlay)  # XXX
         return ic
 
     def fileStatus(self, index):
@@ -264,22 +290,25 @@ class ManifestModel(QAbstractItemModel):
                 abspath = os.path.join(ctx._repo.root, path)
                 if os.path.isdir(abspath):
                     # Add subrepo files to the tree
-                    srev = ctx.substate[path][1]
+                    substate = ctx.substate[path]
+                    # Add the subrepo info to the _subinfo dictionary:
+                    # The value is the subrepo context, while the key is
+                    # the path of the subrepo relative to the topmost repo
+                    if toproot:
+                        # Note that we cannot use os.path.join() because we
+                        # need path items to be separated by "/"
+                        toprelpath = '/'.join([toproot, path])
+                    else:
+                        toprelpath = path
+                    self._subinfo[toprelpath] = \
+                        {'substate': substate, 'ctx': None}
+                    srev = substate[1]
                     sub = ctx.sub(path)
                     if srev and isinstance(sub, hgsubrepo):
                         srepo = sub._repo
                         sctx = srepo[srev]
 
-                        # Add the subrepo info to the _subinfo dictionary:
-                        # The value is the subrepo context, while the key is
-                        # the path of the subrepo relative to the topmost repo
-                        if toproot:
-                            # Note that we cannot use os.path.join() because we
-                            # need path items to be separated by "/"
-                            toprelpath = '/'.join([toproot, path])
-                        else:
-                            toprelpath = path
-                        self._subinfo[toprelpath] = sctx
+                        self._subinfo[toprelpath]['ctx'] = sctx
                         
                         # Add the subrepo contents to the tree
                         e = addrepocontentstotree(e, sctx, toprelpath)
@@ -291,7 +320,7 @@ class ManifestModel(QAbstractItemModel):
             return roote
 
         # Clear the _subinfo
-        self._subinfo = {}
+        self._subinfo = {'substate': [], 'ctx': None}
         roote = _Entry()
         ctx = self._repo[self._rev]
 
