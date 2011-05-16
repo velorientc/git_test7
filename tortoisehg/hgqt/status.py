@@ -56,6 +56,8 @@ class StatusWidget(QWidget):
         self.opts.update(opts)
         self.repo = repo
         self.pats = pats
+        self.pctx = None
+        self.savechecks = True
         self.refthread = None
 
         # determine the user configured status colors
@@ -211,7 +213,11 @@ class StatusWidget(QWidget):
         if menu.exec_(point):
             self.refreshWctx()
 
-    def refreshWctx(self):
+    def setPatchContext(self, pctx):
+        self.pctx = pctx
+        self.savechecks = False
+
+    def refreshWctx(self, synchronous=False):
         if self.refthread:
             return
         self.fileview.clearDisplay()
@@ -234,10 +240,13 @@ class StatusWidget(QWidget):
         self.nonebutton.setEnabled(False)
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
-        self.refthread = StatusThread(self.repo, self.pats, self.opts)
-        self.refthread.finished.connect(self.reloadComplete)
+        self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
+        if not synchronous:
+            self.refthread.finished.connect(self.reloadComplete)
         self.refthread.showMessage.connect(self.showMessage)
         self.refthread.start()
+        if synchronous:
+            self.reloadComplete()
 
     def reloadComplete(self):
         self.refthread.wait()
@@ -263,7 +272,8 @@ class StatusWidget(QWidget):
                                     _('No files found for this operation'),
                                     parent=self)
         ms = merge.mergestate(self.repo)
-        tm = WctxModel(wctx, ms, self.opts, checked, self)
+        tm = WctxModel(wctx, ms, self.pctx, self.savechecks, self.opts,
+                       checked, self)
         tm.checkToggled.connect(self.updateCheckCount)
 
         self.tv.setModel(tm)
@@ -368,7 +378,8 @@ class StatusWidget(QWidget):
             return
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
-        self.fileview.setContext(self.repo[None])
+        pctx = self.pctx and self.pctx.p1() or None
+        self.fileview.setContext(self.repo[None], pctx)
         self.fileview.displayFile(wfile, status)
 
 
@@ -377,9 +388,10 @@ class StatusThread(QThread):
 
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repo, pctx, pats, opts, parent=None):
         super(StatusThread, self).__init__()
         self.repo = hg.repository(repo.ui, repo.root)
+        self.pctx = pctx
         self.pats = pats
         self.opts = opts
         self.wctx = None
@@ -410,6 +422,9 @@ class StatusThread(QThread):
                         patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
+            elif self.pctx:
+                status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
+                wctx = context.workingctx(self.repo, changes=status)
             else:
                 wctx = self.repo[None]
                 wctx.status(**stopts)
@@ -507,7 +522,7 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
 
-    def __init__(self, wctx, ms, opts, checked, parent):
+    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         nchecked = {}
@@ -522,23 +537,32 @@ class WctxModel(QAbstractTableModel):
             except EnvironmentError:
                 pass
             return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
+        if not savechecks:
+            checked = {}
+        if pctx:
+            # Currently, having a patch context means it's a qrefresh, so only
+            # auto-check files in pctx.files()
+            pctxfiles = pctx.files()
+            pctxmatch = lambda f: f in pctxfiles
+        else:
+            pctxmatch = lambda f: True
         if opts['modified']:
             for m in wctx.modified():
-                nchecked[m] = checked.get(m, m not in excludes)
+                nchecked[m] = checked.get(m, m not in excludes and pctxmatch(m))
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                nchecked[a] = checked.get(a, a not in excludes)
+                nchecked[a] = checked.get(a, a not in excludes and pctxmatch(a))
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                nchecked[r] = checked.get(r, r not in excludes)
+                nchecked[r] = checked.get(r, r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                nchecked[d] = checked.get(d, d not in excludes)
+                nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown():
