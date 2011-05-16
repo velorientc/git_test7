@@ -1379,6 +1379,17 @@ class RepoWidget(QWidget):
         # collides with the revisions that are going to be imported
         func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (self.rev, endrev))
         revList = [c for c in func(self.repo, range(len(self.repo)))]
+
+        if endrev and not revList:
+            # There is a qparent but the revision list is empty
+            # This means that the qparent is not a descendant of the
+            # selected revision
+            QMessageBox.warning(self, _('Cannot import selected revision'),
+                _('The selected revision (rev #%d) cannot be imported '
+                'because it is not a descendant of ''qparent'' (rev #%d)') \
+                % (self.rev, self.repo['qparent'].rev()))
+            return
+
         revNameSet = set(['%d.diff' % rev for rev in revList])
         collidingPatchSet = revNameSet.intersection(set(self.repo.mq.series))
 
