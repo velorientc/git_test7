@@ -92,7 +92,12 @@ class RejectsDialog(QDialog):
         self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
         f = QFile(path)
-        f.open(QIODevice.ReadOnly)
+        if not f.open(QIODevice.ReadOnly):
+            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
+                              _("Can't read this file (maybe deleted)"))
+            self.hide()
+            QTimer.singleShot(0, self.reject)
+            return
         earlybytes = f.readData(4096)
         if '\0' in earlybytes:
             qtlib.ErrorMsgBox(_('Unable to merge rejects'),
