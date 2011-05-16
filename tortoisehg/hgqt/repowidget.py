@@ -1374,9 +1374,46 @@ class RepoWidget(QWidget):
             endrev = 'qparent'
         else:
             endrev = ''
-        cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
-                   '--repository', self.repo.root]
-        self.runCommand(cmdline)
+
+        # Check whether there are existing patches in the MQ queue whose name
+        # collides with the revisions that are going to be imported
+        func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (self.rev, endrev))
+        revList = [c for c in func(self.repo, range(len(self.repo)))]
+        revNameSet = set(['%d.diff' % rev for rev in revList])
+        collidingPatchSet = revNameSet.intersection(set(self.repo.mq.series))
+
+        if collidingPatchSet:
+            # We will qimport each revision one by one, starting from the newest
+            # To do so, we will find a valid and unique patch name for each
+            # revision that we must qimport
+            # and then we will import them one by one starting from the newest
+            # one, using these unique names
+            def getUniquePatchName(baseName):
+                patchName = baseName + '.diff'
+                if patchName in collidingPatchSet:
+                    maxRetries = 99
+                    for n in range(1, maxRetries):
+                        patchName = baseName + '_%02d.diff' % n
+                        if not patchName in collidingPatchSet:
+                            break
+                return patchName
+
+            patchNames = {}
+            revList.reverse()
+            for rev in revList:
+                patchNames[rev] = getUniquePatchName(str(rev))
+
+            for rev in revList:
+                cmdline = ['qimport', '--rev', '%s' % rev,
+                           '--repository', self.repo.root,
+                           '--name', patchNames[rev]]
+                self.runCommand(cmdline)
+        else:
+            # There were no collisions with existing patch names, we can
+            # simply qimport the whole revision set in a single go
+            cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
+                       '--repository', self.repo.root]
+            self.runCommand(cmdline)
 
     def qfinishRevision(self):
         """Finish applied patches up to and including selected revision"""
