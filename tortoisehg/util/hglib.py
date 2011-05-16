@@ -298,7 +298,22 @@ def enabledextensions():
 
     shortdesc is in local encoding.
     """
-    return extensions.enabled()[0]
+    ret = extensions.enabled()
+    if type(ret) is tuple:
+        # hg <= 1.8
+        return ret[0]
+    else:
+        # hg <= 1.9
+        return ret
+
+def disabledextensions():
+    ret = extensions.disabled()
+    if type(ret) is tuple:
+        # hg <= 1.8
+        return ret[0] or {}
+    else:
+        # hg <= 1.9
+        return ret or {}
 
 def allextensions():
     """Return the {name: shortdesc} dict of known extensions
@@ -306,7 +321,7 @@ def allextensions():
     shortdesc is in local encoding.
     """
     enabledexts = enabledextensions()
-    disabledexts = extensions.disabled()[0]
+    disabledexts = disabledextensions()
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)
     return exts
