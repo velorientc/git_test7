@@ -612,6 +612,7 @@ class FileData(object):
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     subabspath = os.path.join(repo.root, subrelpath)
                     missingsub = not os.path.isdir(subabspath)
+                    sfromlog = ''
                     def isinitialrevision(rev):
                         return all([el == '0' for el in rev])
                     if isinitialrevision(sfrom):
@@ -632,19 +633,20 @@ class FileData(object):
                     else:
                         sstatedesc = 'changed'
 
-                        out.append(_('Revision has changed from:') + u'\n\n')
+                        out.append(_('Revision has changed to:') + u'\n\n')
                         if missingsub:
-                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
+                            sfromlog = _('changeset: %s') % sfrom + u'\n\n'
                         else:
                             _ui.pushbuffer()
                             commands.log(_ui, srepo, **opts)
-                            out.append(hglib.tounicode(_ui.popbuffer()))
+                            sfromlog = hglib.tounicode(_ui.popbuffer())
+                        if sfromlog:
+                            sfromlog = _('From:') + u'\n' + sfromlog
 
-                        out.append(_('To:') + u'\n')
                     if missingsub:
                         stolog = _('changeset: %s') % sto + '\n\n'
-                        stolog += _('Subrepository not found in working directory.') + '\n'
-                        stolog += _('Further subrepository revision information cannot be retrieved.') + '\n'
+                        sfromlog += _('Subrepository not found in working directory.') + '\n'
+                        sfromlog += _('Further subrepository revision information cannot be retrieved.') + '\n'
                     else:
                         opts['rev'] = [sto]
                         _ui.pushbuffer()
@@ -652,8 +654,11 @@ class FileData(object):
                         stolog = _ui.popbuffer()
 
                     if not stolog:
-                        stolog = _('Initial revision')
+                        stolog = _('Initial revision') + u'\n'
                     out.append(hglib.tounicode(stolog))
+
+                    if sfromlog:
+                        out.append(hglib.tounicode(sfromlog))
 
                     return out, sstatedesc
 
