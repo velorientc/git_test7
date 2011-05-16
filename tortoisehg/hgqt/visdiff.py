@@ -180,7 +180,7 @@ def visualdiff(ui, repo, pats, opts):
             else:
                 ctx1a = p[0]
         else:
-            n1, n2 = cmdutil.revpair(repo, revs)
+            n1, n2 = hglib.revpair(repo, revs)
             ctx1a, ctx2 = repo[n1], repo[n2]
             p = ctx2.parents()
             if not revs and len(p) > 1:
@@ -191,7 +191,7 @@ def visualdiff(ui, repo, pats, opts):
                        _('You likely need to refresh this application'))
         return None
 
-    pats = cmdutil.expandpats(pats)
+    pats = hglib.expandpats(pats)
     m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
