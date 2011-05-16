@@ -157,7 +157,7 @@ class FileData(object):
                         sstatedesc = 'changed'
 
                         out.append(_('Revision has changed to:') + u'\n\n')
-                        
+
                         if missingsub:
                             sfromlog = _('changeset: %s') % sfrom + u'\n\n'
                         else:
@@ -179,9 +179,9 @@ class FileData(object):
                             'missing some revisions') + '\n'
                         sfromlog += _('Further subrepository revision '
                             'information cannot be retrieved.') + '\n'
-                        sfromlog += _('You may need to open the missing'
-                            'subrepository and \n'
-                            'manually pull the missing revisions from its '
+                        sfromlog += _('You may need to open the missing '
+                            'subrepository and manually\n'
+                            'pull the missing revisions from its '
                             'source repository.') + '\n'
                     else:
                         opts['rev'] = [sto]
@@ -190,7 +190,7 @@ class FileData(object):
                     if not stolog:
                         stolog = _('Initial revision') + u'\n'
                     out.append(hglib.tounicode(stolog))
-                    
+
                     if sfromlog:
                         out.append(hglib.tounicode(sfromlog))
 
