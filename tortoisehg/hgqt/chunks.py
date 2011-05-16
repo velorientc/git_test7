@@ -318,7 +318,8 @@ class ChunksWidget(QWidget):
         else:
             repo.thgbackup(repo.wjoin(wfile))
             wasadded = wfile in repo[None].added()
-            commands.revert(repo.ui, repo, repo.wjoin(wfile), no_backup=True)
+            commands.revert(repo.ui, repo, repo.wjoin(wfile), rev='.',
+                            no_backup=True)
             if wasadded:
                 os.unlink(repo.wjoin(wfile))
         self.fileModified.emit()
