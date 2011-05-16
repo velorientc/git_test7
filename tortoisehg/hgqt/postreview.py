@@ -195,8 +195,8 @@ class PostReviewDialog(QDialog):
 
     def initChangesets(self, revs, selected_revs=None):
         def purerevs(revs):
-            return cmdutil.revrange(self.repo,
-                                    iter(str(e) for e in revs))
+            return hglib.revrange(self.repo,
+                                  iter(str(e) for e in revs))
         if selected_revs:
              selectedrevs = purerevs(selected_revs)
         else:

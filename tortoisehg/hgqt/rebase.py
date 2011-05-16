@@ -221,7 +221,7 @@ class RebaseDialog(QDialog):
             dlg.exec_()
             self.checkResolve()
         elif cmd == 'commit':
-            dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+            dlg = commit.CommitDialog(self.repo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.destcsinfo.update(self.repo['.'])

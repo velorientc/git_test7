@@ -10,11 +10,12 @@ import sys
 import atexit
 import shutil
 import stat
+import subprocess
 import tempfile
 import re
 import weakref
 
-from mercurial import extensions, error
+from mercurial import extensions, error, util
 
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
@@ -29,6 +30,12 @@ if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
                      (QT_VERSION_STR, PYQT_VERSION_STR))
     sys.exit()
+
+try:
+    import win32con
+    openflags = win32con.CREATE_NO_WINDOW
+except ImportError:
+    openflags = 0
 
 tmproot = None
 def gettempdir():
@@ -82,6 +89,97 @@ def loadIniFile(rcpath, parent):
 
     return fn, wconfig.readfile(fn)
 
+def editfiles(repo, files, lineno=None, search=None, parent=None):
+    if len(files) == 1:
+        path = repo.wjoin(files[0])
+        cwd = os.path.dirname(path)
+        files = [os.path.basename(path)]
+    else:
+        cwd = repo.root
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    editor = repo.ui.config('tortoisehg', 'editor')
+    assert len(files) == 1 or lineno == None
+    if editor:
+        try:
+            regexp = re.compile('\[([^\]]*)\]')
+            expanded = []
+            pos = 0
+            for m in regexp.finditer(editor):
+                expanded.append(editor[pos:m.start()-1])
+                phrase = editor[m.start()+1:m.end()-1]
+                pos=m.end()+1
+                if '$LINENUM' in phrase:
+                    if lineno is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$LINENUM', str(lineno))
+                elif '$SEARCH' in phrase:
+                    if search is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$SEARCH', search)
+                if '$FILE' in phrase:
+                    phrase = phrase.replace('$FILE', files[0])
+                    files = []
+                expanded.append(phrase)
+            expanded.append(editor[pos:])
+            cmdline = ' '.join(expanded + files)
+        except ValueError, e:
+            # '[' or ']' not found
+            cmdline = ' '.join([editor] + files)
+        except TypeError, e:
+            # variable expansion failed
+            cmdline = ' '.join([editor] + files)
+    else:
+        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
+                 or os.environ.get('EDITOR', 'vi')
+        cmdline = ' '.join([editor] + files)
+    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        res = QMessageBox.critical(parent,
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
+        return
+
+    cmdline = util.quotecommand(cmdline)
+    try:
+        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+                         stderr=None, stdout=None, stdin=None, cwd=cwd)
+    except (OSError, EnvironmentError), e:
+        QMessageBox.warning(parent,
+                _('Editor launch failure'),
+                u'%s : %s' % (hglib.tounicode(cmdline),
+                              hglib.tounicode(str(e))))
+    return False
+
+_user_shell = None
+def openshell(root):
+    global _user_shell
+    if _user_shell:
+        cwd = os.getcwd()
+        try:
+            os.chdir(root)
+            QProcess.startDetached(_user_shell)
+        finally:
+            os.chdir(cwd)
+    else:
+        InfoMsgBox(_('No shell configured'),
+                   _('A terminal shell must be configured'))
+
+def configureshell(ui):
+    global _user_shell
+    _user_shell = ui.config('tortoisehg', 'shell')
+    if _user_shell:
+        return
+    if sys.platform == 'darwin':
+        return # Terminal.App does not support open-to-folder
+    elif os.name == 'nt':
+        _user_shell = 'cmd.exe'
+    else:
+        _user_shell = 'xterm'
+
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style
@@ -112,6 +210,8 @@ _thgstyles = {
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
 
 def configstyles(ui):
+    configureshell(ui)
+
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))
@@ -350,6 +450,17 @@ if sys.platform == 'darwin':
         return QIcon()
 else:
     getmenuicon = geticon
+
+
+def getoverlaidicon(base, overlay):
+    """Generate an overlaid icon"""
+    pixmap = base.pixmap(16, 16)
+    painter = QPainter(pixmap)
+    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
+    del painter
+    return QIcon(pixmap)
+
 
 _pixmapcache = {}
 
@@ -635,6 +746,125 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+class InfoBar(QFrame):
+    """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
+
+    You shouldn't reuse InfoBar object after close(). It is automatically
+    deleted.
+
+    Layout::
+
+        |widgets ...                |right widgets ...|x|
+    """
+    linkActivated = pyqtSignal(unicode)
+
+    # type of InfoBar (the number denotes its priority)
+    INFO = 1
+    ERROR = 2
+    CONFIRM = 3
+
+    infobartype = INFO
+
+    _colormap = {
+        INFO: '#e7f9e0',
+        ERROR: '#f9d8d8',
+        CONFIRM: '#fae9b3',
+        }
+
+    def __init__(self, parent=None):
+        super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
+                                      frameShadow=QFrame.Plain)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+        self.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
+        self.setPalette(p)
+
+        self.setLayout(QHBoxLayout())
+        self.layout().setContentsMargins(2, 2, 2, 2)
+
+        self.layout().addStretch()
+        self._closebutton = QPushButton(self, flat=True, autoDefault=False,
+            icon=self.style().standardIcon(QStyle.SP_DockWidgetCloseButton))
+        self._closebutton.clicked.connect(self.close)
+        self.layout().addWidget(self._closebutton)
+
+    def addWidget(self, w):
+        self.layout().insertWidget(self.layout().count() - 2, w)
+
+    def addRightWidget(self, w):
+        self.layout().insertWidget(self.layout().count() - 1, w)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close()
+        super(InfoBar, self).keyPressEvent(event)
+
+class StatusInfoBar(InfoBar):
+    """Show status message"""
+    def __init__(self, message, parent=None):
+        super(StatusInfoBar, self).__init__(parent)
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
+class CommandErrorInfoBar(InfoBar):
+    """Show command execution failure (with link to open log window)"""
+    infobartype = InfoBar.ERROR
+
+    def __init__(self, message, parent=None):
+        super(CommandErrorInfoBar, self).__init__(parent)
+
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
+        self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
+        self._loglabel.linkActivated.connect(self.linkActivated)
+        self.addRightWidget(self._loglabel)
+
+class ConfirmInfoBar(InfoBar):
+    """Show confirmation message with accept/reject buttons"""
+    accepted = pyqtSignal()
+    rejected = pyqtSignal()
+    infobartype = InfoBar.CONFIRM
+
+    def __init__(self, message, parent=None):
+        super(ConfirmInfoBar, self).__init__(parent)
+
+        self._msglabel = QLabel(message, self,
+                                textInteractionFlags=Qt.TextSelectableByMouse)
+        self.addWidget(self._msglabel)
+
+        self._buttons = QDialogButtonBox(self)
+        self._buttons.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.acceptButton = self._buttons.addButton(QDialogButtonBox.Ok)
+        self.rejectButton = self._buttons.addButton(QDialogButtonBox.Cancel)
+        self._buttons.accepted.connect(self._accept)
+        self._buttons.rejected.connect(self._reject)
+        self.addWidget(self._buttons)
+
+        # so that acceptButton gets focus by default
+        self.setFocusProxy(self._buttons)
+
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.rejected.emit()
+        super(ConfirmInfoBar, self).closeEvent(event)
+
+    @pyqtSlot()
+    def _accept(self):
+        self.accepted.emit()
+        self.hide()
+        self.close()
+
+    @pyqtSlot()
+    def _reject(self):
+        self.rejected.emit()
+        self.hide()
+        self.close()
+
 class WidgetGroups(object):
     """ Support for bulk-updating properties of Qt widgets """
 
@@ -679,83 +909,6 @@ class WidgetGroups(object):
 
     def set_enable(self, *args, **kargs):
         self.set_prop('setEnabled', *args, **kargs)
-
-class SharedWidget(QWidget):
-    """Share a single widget by many parents
-
-    It makes a widget sharable by many parent widgets. When the user shows
-    the widget (showEvent occured), it reparents the stored widget to the
-    latest active widget.
-
-    Any signals connected via SharedWidget are disconnected/connected
-    automatically when owner changes.
-    """
-
-    def __init__(self, widget, parent=None):
-        super(SharedWidget, self).__init__(parent)
-        self._widget = widget
-        self._fakesignals = {}
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(*(0,)*4)
-        self.setLayout(vbox)
-
-    def showEvent(self, event):
-        """Change the parent of the stored widget if necessary"""
-        if self._widget.parent() != self:
-            self._reconnectfakesignals(self._widget.parent())
-            self.layout().addWidget(self._widget)
-        super(SharedWidget, self).showEvent(event)
-
-    def get(self):
-        """Returns the stored widget"""
-        return self._widget
-
-    def __getattr__(self, name):
-        try:
-            if isinstance(getattr(self._widget.__class__, name), pyqtSignal):
-                return self._fakesignal(name)
-        except AttributeError:
-            pass
-        return getattr(self._widget, name)
-
-    class _FakeSignal(object):
-        """Imitate pyqtSignal object to hook signal connection"""
-        def __init__(self):
-            self._connections = []
-
-        def connect(self, slot):
-            self._connections.append(slot)
-            return True
-
-        def disconnect(self, slot):
-            try:
-                self._connections.remove(slot)
-                return True
-            except ValueError:
-                return False
-
-    def _fakesignal(self, name):
-        if name not in self._fakesignals:
-            self._fakesignals[name] = self._FakeSignal()
-        return self._fakesignals[name]
-
-    def _iterfakeconnections(self):
-        for name, fakesig in self._fakesignals.iteritems():
-            for slot in fakesig._connections:
-                yield name, slot
-
-    def _connectfakesignals(self):
-        for name, slot in self._iterfakeconnections():
-            getattr(self._widget, name).connect(slot)
-
-    def _disconnectfakesignals(self):
-        for name, slot in self._iterfakeconnections():
-            getattr(self._widget, name).disconnect(slot)
-
-    def _reconnectfakesignals(self, curowner):
-        if isinstance(curowner, self.__class__):
-            curowner._disconnectfakesignals()
-        self._connectfakesignals()
 
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'

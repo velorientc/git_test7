@@ -20,7 +20,7 @@ import time
 from mercurial import hg, util, patch, cmdutil, extensions
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import shlib, hglib, i18n
+from tortoisehg.util import shlib, hglib, i18n, bugtraq
 
 keep = i18n.keepgettext()
 
@@ -28,7 +28,6 @@ from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 from tortoisehg.hgtk import thgmq, textview
-from tortoisehg.hgtk import bugtraq
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, repo):

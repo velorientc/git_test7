@@ -15,8 +15,10 @@ from tortoisehg.hgqt import csinfo, qtlib
 
 from PyQt4.QtCore import *
 
-def label_func(widget, item):
+def label_func(widget, item, ctx):
     if item == 'cset':
+        if type(ctx.rev()) is str:
+            return _('Patch:')
         return _('Changeset:')
     elif item == 'parents':
         return _('Parent:')

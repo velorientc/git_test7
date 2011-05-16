@@ -49,10 +49,6 @@ COLUMNHEADERS = (
     ('Changes', _('Changes', 'column header')),
     )
 
-COLUMNNAMES = dict(COLUMNHEADERS)
-
-ALLCOLUMNS = [h[0] for h in COLUMNHEADERS]
-
 UNAPPLIED_PATCH_COLOR = '#999999'
 
 def get_color(n, ignore=()):
@@ -74,11 +70,14 @@ class HgRepoListModel(QAbstractTableModel):
     filled = pyqtSignal()
     loaded = pyqtSignal()
 
+    _allcolumns = tuple(h[0] for h in COLUMNHEADERS)
+    _allcolnames = dict(COLUMNHEADERS)
+
     _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
-    def __init__(self, repo, branch, revset, rfilter, parent):
+    def __init__(self, repo, cfgname, branch, revset, rfilter, parent):
         """
         repo is a hg repo instance
         """
@@ -94,6 +93,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbyrevset = rfilter
         self.unicodestar = True
         self.unicodexinabox = True
+        self.cfgname = cfgname
 
         # To be deleted
         self._user_colors = {}
@@ -142,16 +142,16 @@ class HgRepoListModel(QAbstractTableModel):
 
     def updateColumns(self):
         s = QSettings()
-        cols = s.value('workbench/columns').toStringList()
+        cols = s.value(self.cfgname + '/columns').toStringList()
         cols = [str(col) for col in cols]
         # Fixup older names for columns
         if 'Log' in cols:
             cols[cols.index('Log')] = 'Description'
-            s.setValue('workbench/columns', cols)
+            s.setValue(self.cfgname + '/columns', cols)
         if 'ID' in cols:
             cols[cols.index('ID')] = 'Rev'
-            s.setValue('workbench/columns', cols)
-        validcols = [col for col in cols if col in ALLCOLUMNS]
+            s.setValue(self.cfgname + '/columns', cols)
+        validcols = [col for col in cols if col in self._allcolumns]
         if validcols:
             self._columns = tuple(validcols)
             self.invalidateCache()
@@ -474,7 +474,7 @@ class HgRepoListModel(QAbstractTableModel):
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                return QVariant(COLUMNNAMES[self._columns[section]])
+                return QVariant(self._allcolnames[self._columns[section]])
             if role == Qt.TextAlignmentRole:
                 return QVariant(Qt.AlignLeft)
         return nullvariant
