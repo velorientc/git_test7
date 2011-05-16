@@ -392,7 +392,10 @@ class RevDetailsWidget(QWidget):
         if not index.isValid():
             return
         model = self.filelist.model()
-        itemissubrepo = (model.dataFromIndex(index)['status'] == 'S')
+        data = model.dataFromIndex(index)
+        if not data:
+            return
+        itemissubrepo = (data['status'] == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:

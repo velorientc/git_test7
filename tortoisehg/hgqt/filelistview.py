@@ -63,13 +63,13 @@ class HgFileListView(QTableView):
     def currentFile(self):
         index = self.currentIndex()
         return self.model().fileFromIndex(index)
-    
+
     def getSelectedFiles(self):
         model = self.model()
         sf = [model.fileFromIndex(eachIndex)
                 for eachIndex in self.selectedRows()]
-        return sf 
-    
+        return sf
+
     def layoutChanged(self):
         'file model has new contents'
         index = self.currentIndex()
