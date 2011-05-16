@@ -658,9 +658,9 @@ class FileData(object):
                             'missing some revisions') + '\n'
                         sfromlog += _('Further subrepository revision '
                             'information cannot be retrieved.') + '\n'
-                        sfromlog += _('You may need to open the missing'
-                            'subrepository and \n'
-                            'manually pull the missing revisions from its '
+                        sfromlog += _('You may need to open the missing '
+                            'subrepository and manually\n'
+                            'pull the missing revisions from its '
                             'source repository.') + '\n'
                     else:
                         opts['rev'] = [sto]
