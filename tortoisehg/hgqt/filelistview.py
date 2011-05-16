@@ -288,7 +288,10 @@ class HgFileListView(QTableView):
         index = self.currentIndex()
         if not index.isValid():
             return
-        itemissubrepo = (self.model().dataFromIndex(index)['status'] == 'S')
+        data = self.model().dataFromIndex(index)
+        if data is None:
+            return
+        itemissubrepo = (data['status'] == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:
