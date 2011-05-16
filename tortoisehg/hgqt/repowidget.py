@@ -681,6 +681,9 @@ class RepoWidget(QWidget):
     def onRevisionClicked(self, rev):
         'User clicked on a repoview row'
         tw = self.taskTabsWidget
+        manifestidx = self.namedTabs['manifest']
+        if tw.currentIndex() == manifestidx:
+            return # don't switch tabs if we are in manifest mode
         if rev is None:
             # Clicking on working copy switches to commit tab
             tw.setCurrentIndex(self.commitTabIndex)
