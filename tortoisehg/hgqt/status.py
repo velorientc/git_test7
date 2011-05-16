@@ -398,7 +398,7 @@ class StatusThread(QThread):
                 else:
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
-                m = cmdutil.match(self.repo, self.pats)
+                m = hglib.match(self.repo, self.pats)
                 status = self.repo.status(match=m, **stopts)
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):

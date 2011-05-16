@@ -43,10 +43,10 @@ except (ImportError, AttributeError):
     from mercurial.url import readauthforuri
 try:
     # hg >= 1.9
-    from mercurial.scmutil import revrange, expandpats, revpair
+    from mercurial.scmutil import revrange, expandpats, revpair, match, matchall
 except (ImportError, AttributeError):
     # hg <= 1.8
-    from mercurial.cmdutil import revrange, expandpats, revpair
+    from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
 demandimport.enable()
 
 def revsetmatch(ui, pattern):
