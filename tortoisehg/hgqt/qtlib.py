@@ -779,6 +779,7 @@ class InfoBar(QFrame):
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
+        p.setColor(QPalette.WindowText, QColor("black"))
         self.setPalette(p)
 
         self.setLayout(QHBoxLayout())
