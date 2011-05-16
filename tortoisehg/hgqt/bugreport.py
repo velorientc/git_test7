@@ -152,6 +152,8 @@ class ExceptionMsgBox(QDialog):
         bb = QDialogButtonBox(QDialogButtonBox.Close, centerButtons=True)
         bb.rejected.connect(self.reject)
         self.layout().addWidget(bb)
+        desktopgeom = qApp.desktop().availableGeometry()
+        self.resize(desktopgeom.size() * 0.20)
 
     @pyqtSlot(QString)
     def _openlink(self, ref):
@@ -164,6 +166,12 @@ class ExceptionMsgBox(QDialog):
             # A chicken-egg problem here, we need a ui to get your
             # editor in order to repair your ui config file.
             wctxactions.edit(self, ui.ui(), None, [fname], lineno, None)
+        if ref.startswith('#fix:'):
+            from tortoisehg.hgqt import settings
+            errtext = ref[5:].split(' ')[0]
+            sd = settings.SettingsDialog(configrepo=False, focus=errtext,
+                                parent=self, root='')
+            sd.exec_()
 
 def run(ui, *pats, **opts):
     return BugReport(opts)

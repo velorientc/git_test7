@@ -367,6 +367,8 @@ class _QtRunner(QObject):
         error.RepoLookupError: _('Try refreshing your repository.'),
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
+        error.ConfigError: _('Configuration Error: "%(arg0)s", please '
+                             '<a href="#fix:%(arg0)s">fix</a> your config'),
         }
 
     def __init__(self):
