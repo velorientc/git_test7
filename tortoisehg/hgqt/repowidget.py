@@ -515,6 +515,10 @@ class RepoWidget(QWidget):
                 continue
             try:
                 pf = open(p, 'rb')
+                earlybytes = pf.read(4096)
+                if '\0' in earlybytes:
+                    continue
+                pf.seek(0)
                 filename, message, user, date, branch, node, p1, p2 = \
                         patch.extract(self.repo.ui, pf)
                 if filename:
