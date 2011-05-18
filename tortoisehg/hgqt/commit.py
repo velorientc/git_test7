@@ -584,10 +584,11 @@ class CommitWidget(QWidget):
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
-        for fname in self.opts.get('autoinc', '').split(','):
-            fname = fname.strip()
-            if fname:
-                cmdline.extend(['--include', fname])
+        if len(repo.parents()) == 1:
+            for fname in self.opts.get('autoinc', '').split(','):
+                fname = fname.strip()
+                if fname:
+                    cmdline.extend(['--include', fname])
 
         commandlines.append(cmdline)
 
