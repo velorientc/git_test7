@@ -7,12 +7,12 @@
 
 import sys, os
 
-from mercurial import node, error
+from mercurial import node
+from mercurial import ui, hg, util, error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
-from tortoisehg.hgqt.settings import SettingsDialog
+from tortoisehg.hgqt import qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -22,6 +22,7 @@ xmlClassMap = {
       'allgroup': 'AllRepoGroupItem',
       'group': 'RepoGroupItem',
       'repo': 'RepoItem',
+      'subrepo': 'SubrepoItem',
       'treeitem': 'RepoTreeItem',
     }
 
@@ -36,17 +37,16 @@ def classToXml(classname):
             inverseXmlClassMap[v] = k
     return inverseXmlClassMap[classname]
 
-def undumpObject(xr, model):
+def undumpObject(xr):
     classname = xmlToClass(str(xr.name().toString()))
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    obj = class_(model)
+    obj = class_()
     obj.undump(xr)
     return obj
 
 
 class RepoTreeItem(object):
-    def __init__(self, model, parent=None):
-        self.model = model
+    def __init__(self, parent=None):
         self._parent = parent
         self.childs = []
         self._row = 0
@@ -108,7 +108,7 @@ class RepoTreeItem(object):
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
-                item = undumpObject(xr, self.model)
+                item = undumpObject(xr)
                 self.appendChild(item)
             elif xr.isEndElement():
                 break
@@ -118,14 +118,8 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
-    def open(self, reuse=False):
-        pass
-
-    def openAll(self):
-        pass
-
-    def showFirstTabOrOpen(self, workbench=None):
-        pass
+    def isRepo(self):
+        return False
 
     def details(self):
         return ''
@@ -137,40 +131,60 @@ class RepoTreeItem(object):
                 return ri
         return None
 
-    def okToDelete(self, parentWidget):
+    def okToDelete(self):
         return True
+
+    def getSupportedDragDropActions(self):
+        return Qt.MoveAction
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, model, repo=None, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
-        self._repo = repo
-        self._root = repo and repo.root or ''  # local str
-        self._shortname = repo and repo.shortname or ''  # unicode
-        self._basenode = repo and repo[0].node() or node.nullid
+    def __init__(self, root=None, parent=None):
+        RepoTreeItem.__init__(self, parent)
+        self._root = root or ''
+        self._shortname = u''
+        self._basenode = node.nullid
+        self._repotype = 'hg'
+        # The _valid property is used to display a "warning" icon for repos
+        # that cannot be open
+        # If root is set we assume that the repo is valid (an actual validity
+        # test would require calling hg.repository() which is expensive)
+        # Regardless, self._valid may be set to False if self.undump() fails
+        if self._root:
+            self._valid = True
+        else:
+            self._valid = False
 
+    def isRepo(self):
+        return True
     def rootpath(self):
         return self._root
 
     def shortname(self):
-        if self._repo:
-            return self._repo.shortname
-        elif self._shortname:
+        if self._shortname:
             return self._shortname
         else:
             return hglib.tounicode(os.path.basename(self._root))
 
+    def repotype(self):
+        return self._repotype
+
     def basenode(self):
         """Return node id of revision 0"""
-        if self._repo:
-            return self._repo[0].node()
-        else:
-            return self._basenode or node.nullid
+        return self._basenode
+
+    def setBaseNode(self, basenode):
+        self._basenode = basenode
+
+    def setShortName(self, uname):
+        self._shortname = uname
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
                 ico = qtlib.geticon('hg')
+                if not self._valid:
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -186,48 +200,18 @@ class RepoItem(RepoTreeItem):
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
-    def removeRows(self, row, count):
-        return False
-
     def dump(self, xw):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
-        RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
+        self._valid = True
         a = xr.attributes()
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
-
-    def open(self, reuse=False):
-        self.model.openrepofunc(self._root, reuse)
-
-    def showFirstTabOrOpen(self, workbench=None):
-        workbench.showRepo(hglib.tounicode(self._root))
-
-    def startSettings(self, parent):
-        try:
-            try:
-                dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                     root=self._root)
-                self.ensureRepoLoaded()
-                dlg.exec_()
-            except error.RepoError:
-                pass
-        finally:
-            dlg.deleteLater()
-
-    def ensureRepoLoaded(self):
-        """load repo object if necessary
-
-        Until repo loaded, it uses cached shortname for less overhead.
-        """
-        if self._repo:
-            return
-        self._repo = thgrepo.repository(path=self._root)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
@@ -238,10 +222,111 @@ class RepoItem(RepoTreeItem):
             return self
         return None
 
+    def appendSubrepos(self, repo=None):
+        invalidRepoList = []
+        try:
+            sri = None
+            if repo is None:
+                repo = hg.repository(ui.ui(), self._root)
+            wctx = repo['.']
+            for subpath in wctx.substate:
+                sri = None
+                abssubpath = repo.wjoin(subpath)
+                subtype = wctx.substate[subpath][2]
+                sriIsValid = os.path.isdir(abssubpath)
+                sri = SubrepoItem(abssubpath, subtype=subtype)
+                sri._valid = sriIsValid
+                self.appendChild(sri)
+
+                if not sriIsValid:
+                    self._valid = False
+                    sri._valid = False
+                    invalidRepoList.append(repo.wjoin(subpath))
+                    return invalidRepoList
+                    continue
+
+                if subtype == 'hg':
+                    # Only recurse into mercurial subrepos
+                    sctx = wctx.sub(subpath)
+                    invalidSubrepoList = sri.appendSubrepos(sctx._repo)
+                    if invalidSubrepoList:
+                        self._valid = False
+                        invalidRepoList += invalidSubrepoList
+
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            # Add the repo to the list of repos/subrepos
+            # that could not be open
+            self._valid = False
+            if sri:
+                sri._valid = False
+                invalidRepoList.append(abssubpath)
+            invalidRepoList.append(self._root)
+
+        return invalidRepoList
+
+
+class SubrepoItem(RepoItem):
+    _subrepoType2IcoMap = {
+          'hg': 'hg',
+          'git': 'thg-git-subrepo',
+          'svn': 'thg-svn-subrepo',
+    }
+
+    def __init__(self, repo=None, parent=None, parentrepo=None, subtype='hg'):
+        RepoItem.__init__(self, repo, parent)
+        self._parentrepo = parentrepo
+        self._repotype = subtype
+        if self._repotype != 'hg':
+            # Make sure that we cannot drag non hg subrepos
+            # To do so we disable the dumpObject method for non hg subrepos
+            def doNothing(dummy):
+                pass
+            self.dumpObject = doNothing
+
+            # Limit the context menu to those actions that are valid for non
+            # mercurial subrepos
+            def nonHgMenulist():
+                return ['remove', None, 'explore', 'terminal']
+            self.menulist = nonHgMenulist
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+            if column == 0:
+                subiconame = SubrepoItem._subrepoType2IcoMap.get(self._repotype, None)
+                if subiconame is None:
+                    # Unknown (or generic) subrepo type
+                    ico = qtlib.geticon('thg-subrepo')
+                else:
+                    # Overlay the "subrepo icon" on top of the selected subrepo
+                    # type icon
+                    ico = qtlib.geticon(subiconame)
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('thg-subrepo'))
+
+                if not self._valid:
+                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
+
+                return QVariant(ico)
+            return QVariant()
+        else:
+            return super(SubrepoItem, self).data(column, role)
+
+    def menulist(self):
+        if isinstance(self._parent, RepoGroupItem):
+            return super(SubrepoItem, self).menulist()
+        else:
+            return ['open', 'clone', None, 'explore', 'terminal',
+                None, 'settings']
+
+    def getSupportedDragDropActions(self):
+        if issubclass(type(self.parent()), RepoGroupItem):
+            return Qt.MoveAction
+        else:
+            return Qt.CopyAction
+
 
 class RepoGroupItem(RepoTreeItem):
-    def __init__(self, model, name=None, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
+    def __init__(self, name=None, parent=None):
+        RepoTreeItem.__init__(self, parent)
         if name:
             self.name = name
         else:
@@ -263,17 +348,15 @@ class RepoGroupItem(RepoTreeItem):
             self.name = value.toString()
             return True
         return False
-
     def menulist(self):
-        return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove']
-
+        return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
+            None, 'reloadRegistry']
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-            | Qt.ItemIsEditable)
+            | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
 
-    def openAll(self):
-        for c in self.childs:
-            c.open(reuse=True)
+    def childRoots(self):
+        return [c._root for c in self.childs]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
@@ -284,41 +367,20 @@ class RepoGroupItem(RepoTreeItem):
         self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
 
-    def okToDelete(self, parentWidget):
-        labels = [(QMessageBox.Yes, _('&Delete')),
-                  (QMessageBox.No, _('Cancel'))]
-        return qtlib.QuestionMsgBox(
-            _('Confirm Delete'),
-            _("Delete Group '%s' and all its entries?") % self.name,
-            labels=labels, parent=parentWidget)
-
-
-class AllRepoGroupItem(RepoTreeItem):
-    def __init__(self, model, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
-
-    def data(self, column, role):
-        if role == Qt.DecorationRole:
-            if column == 0:
-                s = QApplication.style()
-                ico = s.standardIcon(QStyle.SP_DirIcon)
-                return QVariant(ico)
-            return QVariant()
-        if column == 0:
-            return QVariant(_('default'))
-        return QVariant()
-
-    def setData(self, column, value):
+    def okToDelete(self):
         return False
 
+
+class AllRepoGroupItem(RepoGroupItem):
+    def __init__(self, parent=None):
+        RepoTreeItem.__init__(self, parent)
+        self.name = _('default')
     def menulist(self):
-        return ['add', 'newGroup']
-
-    def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-
-    def dump(self, xw):
-        RepoTreeItem.dump(self, xw)
-
+        return ['openAll', 'add', None, 'newGroup', None, 'rename',
+            None, 'reloadRegistry']
     def undump(self, xr):
+        a = xr.attributes()
+        name = a.value('', 'name').toString()
+        if name:
+            self.name = name
         RepoTreeItem.undump(self, xr)

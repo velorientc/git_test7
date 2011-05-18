@@ -18,12 +18,12 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
-from tortoisehg.hgqt import qqueue, fileview, thgimport
+from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib, thgrepo
+from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport, status
+from tortoisehg.hgqt.qtlib import geticon
 
 # TODO
 # keep original file name in file list item
-# maintain check state through refresh
 # more wctx functions
 
 class MQWidget(QWidget):
@@ -65,11 +65,6 @@ class MQWidget(QWidget):
 
         self.queueFrame = QFrame(splitter)
         self.messageFrame = QFrame(splitter)
-        self.fileview = fileview.HgFileView(repo, splitter)
-
-        self.fileview.showMessage.connect(self.showMessage)
-        self.fileview.setContext(repo[None])
-        self.fileview.shelveToolExited.connect(self.reload)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
@@ -81,36 +76,41 @@ class MQWidget(QWidget):
         qtbarhbox.setSpacing(5)
         layout.addLayout(qtbarhbox, 0)
         qtbarhbox.setContentsMargins(0, 0, 0, 0)
-        self.qpushAllBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qpush-all'))
-        tb.setToolTip(_('Apply all patches'))
-        self.qpushBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qpush'))
-        tb.setToolTip(_('Apply one patch'))
-        self.setGuardsBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qguard'))
-        tb.setToolTip(_('Configure guards for selected patch'))
-        self.qpushMoveBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('thg-qreorder'))
-        tb.setToolTip(_('Apply selected patch next (change queue order)'))
-        self.qdeleteBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qdelete'))
-        tb.setToolTip(_('Delete selected patches'))
-        self.qpopBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qpop'))
-        tb.setToolTip(_('Unapply one patch'))
-        self.qpopAllBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('hg-qpop-all'))
-        tb.setToolTip(_('Unapply all patches'))
-        qtbarhbox.addWidget(self.qpushAllBtn)
-        qtbarhbox.addWidget(self.qpushBtn)
-        qtbarhbox.addStretch(1)
-        qtbarhbox.addWidget(self.setGuardsBtn)
-        qtbarhbox.addWidget(self.qpushMoveBtn)
-        qtbarhbox.addWidget(self.qdeleteBtn)
-        qtbarhbox.addStretch(1)
-        qtbarhbox.addWidget(self.qpopBtn)
-        qtbarhbox.addWidget(self.qpopAllBtn)
+        self.qpushAllAct = a = QAction(
+            geticon('hg-qpush-all'), _('Push all'), self)
+        a.setToolTip(_('Apply all patches'))
+        self.qpushAct = a = QAction(
+            geticon('hg-qpush'), _('Push'), self)
+        a.setToolTip(_('Apply one patch'))
+        self.setGuardsAct = a = QAction(
+            geticon('hg-qguard'), _('Guards'), self)
+        a.setToolTip(_('Configure guards for selected patch'))
+        self.qreorderAct = a = QAction(
+            geticon('hg-qreorder'), _('Reorder patches'), self)
+        a.setToolTip(_('Reorder patches'))
+        self.qdeleteAct = a = QAction(
+            geticon('hg-qdelete'), _('Delete'), self)
+        a.setToolTip(_('Delete selected patches'))
+        self.qpopAct = a = QAction(
+            geticon('hg-qpop'), _('Pop'), self)
+        a.setToolTip(_('Unapply one patch'))
+        self.qpopAllAct = a = QAction(
+            geticon('hg-qpop-all'), _('Pop all'), self)
+        a.setToolTip(_('Unapply all patches'))
+        tbar = QToolBar(_('Patch Queue Actions Toolbar'))
+        tbar.setIconSize(QSize(18, 18))
+        qtbarhbox.addWidget(tbar)
+        tbar.addAction(self.qpushAct)
+        tbar.addAction(self.qpushAllAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qpopAct)
+        tbar.addAction(self.qpopAllAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qreorderAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qdeleteAct)
+        tbar.addSeparator()
+        tbar.addAction(self.setGuardsAct)
 
         self.queueListWidget = QListWidget(self)
         layout.addWidget(self.queueListWidget, 1)
@@ -137,21 +137,28 @@ class MQWidget(QWidget):
         mtbarhbox.setContentsMargins(0, 0, 0, 0)
         self.newCheckBox = QCheckBox(_('New Patch'))
         self.patchNameLE = QLineEdit()
-        self.refreshtb = QToolButton(self)
-        self.refreshtb.clicked.connect(self.refreshFileListWidget)
-        self.refreshtb.setIcon(qtlib.geticon('view-refresh'))
         mtbarhbox.addWidget(self.newCheckBox)
         mtbarhbox.addWidget(self.patchNameLE, 1)
-        mtbarhbox.addWidget(self.refreshtb)
 
         self.messageEditor = commit.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
-        layout.addWidget(self.messageEditor, 1)
 
-        self.fileListWidget = QListWidget(self)
-        self.fileListWidget.currentRowChanged.connect(self.onFileSelected)
-        layout.addWidget(self.fileListWidget, 2)
+        self.stwidget = status.StatusWidget(repo, None, opts, self)
+
+        # The message editor and the file list are separated by
+        # a vertical splitter
+        vsplitter = QSplitter()
+        vsplitter.setOrientation(Qt.Vertical)
+        layout.addWidget(vsplitter)
+        vsplitter.addWidget(self.messageEditor)
+        vsplitter.addWidget(self.stwidget)
+
+        self.fileview = self.stwidget.fileview
+        self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.setContext(repo[None])
+        self.fileview.shelveToolExited.connect(self.reload)
+        splitter.addWidget(self.stwidget.docf)
 
         qrefhbox = QHBoxLayout()
         layout.addLayout(qrefhbox, 0)
@@ -183,13 +190,13 @@ class MQWidget(QWidget):
         self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
         self.queueListWidget.itemActivated.connect(self.onGotoPatch)
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
-        self.qpushAllBtn.clicked.connect(self.onPushAll)
-        self.qpushBtn.clicked.connect(self.onPush)
-        self.qpushMoveBtn.clicked.connect(self.onPushMove)
-        self.qpopAllBtn.clicked.connect(self.onPopAll)
-        self.qpopBtn.clicked.connect(self.onPop)
-        self.setGuardsBtn.clicked.connect(self.onGuardConfigure)
-        self.qdeleteBtn.clicked.connect(self.onDelete)
+        self.qpushAllAct.triggered.connect(self.onPushAll)
+        self.qpushAct.triggered.connect(self.onPush)
+        self.qreorderAct.triggered.connect(self.onQreorder)
+        self.qpopAllAct.triggered.connect(self.onPopAll)
+        self.qpopAct.triggered.connect(self.onPop)
+        self.setGuardsAct.triggered.connect(self.onGuardConfigure)
+        self.qdeleteAct.triggered.connect(self.onDelete)
         self.newCheckBox.toggled.connect(self.onNewModeToggled)
         self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
 
@@ -239,12 +246,10 @@ class MQWidget(QWidget):
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
-        self.fileview.setContext(self.repo[None])
 
     @pyqtSlot()
     def onRepositoryChanged(self):
         'Repository is reporting its changelog has changed'
-        self.fileview.setContext(self.repo[None])
         self.reload()
 
     @pyqtSlot(int)
@@ -257,7 +262,7 @@ class MQWidget(QWidget):
 
     def checkForRejects(self, ret):
         if ret is 0:
-            self.refreshFileListWidget()
+            self.refreshStatus()
             return
         rejre = re.compile('saving rejects to file (.*).rej')
         for m in rejre.finditer(self.cmd.core.rawoutput()):
@@ -271,7 +276,7 @@ class MQWidget(QWidget):
                                     parent=self):
                 dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
                 dlg.exec_()
-        self.refreshFileListWidget()
+        self.refreshStatus()
 
     @pyqtSlot(QString)
     def qqueueActivate(self, uqueue):
@@ -347,6 +352,26 @@ class MQWidget(QWidget):
         self.qtbar.setEnabled(False)
         self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
+
+    def onQreorder(self):
+        if self.cmd.running():
+            return
+        def checkGuardsOrComments():
+            cont = True
+            for p in self.repo.mq.full_series:
+                if '#' in p:
+                    cont = QuestionMsgBox('Confirm qreorder',
+                            _('<p>ATTENTION!<br>'
+                              'Guard or comment found.<br>'
+                              'Reordering patches will destroy them.<br>'
+                              '<br>Continue?</p>'), parent=self,
+                              defaultbutton=QMessageBox.No)
+                    break
+            return cont
+        if checkGuardsOrComments():
+            dlg = qreorder.QReorderDialog(self.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
 
     @pyqtSlot()
     def onGuardConfigure(self):
@@ -443,26 +468,11 @@ class MQWidget(QWidget):
         if row >= 0:
             patch = self.queueListWidget.item(row)._thgpatch
             applied = set([p.name for p in self.repo.mq.applied])
-            self.qdeleteBtn.setEnabled(patch not in applied)
-            self.qpushMoveBtn.setEnabled(patch not in applied)
-            self.setGuardsBtn.setEnabled(True)
+            self.qdeleteAct.setEnabled(patch not in applied)
+            self.setGuardsAct.setEnabled(True)
         else:
-            self.qdeleteBtn.setEnabled(False)
-            self.qpushMoveBtn.setEnabled(False)
-            self.setGuardsBtn.setEnabled(False)
-
-    @pyqtSlot(int)
-    def onFileSelected(self, row):
-        if self.refreshing or row == -1:
-            return
-        text = hglib.fromunicode(self.fileListWidget.item(row).text())
-        status = text[0]
-        filename = text[2:]
-        if self.newCheckBox.isChecked():
-            rev = self.repo['.'].rev()
-        else:
-            rev = self.repo['qtip'].p1().rev()
-        self.fileview.displayFile(filename, rev, status)
+            self.qdeleteAct.setEnabled(False)
+            self.setGuardsAct.setEnabled(False)
 
     @pyqtSlot(int)
     def onMessageSelected(self, row):
@@ -507,16 +517,10 @@ class MQWidget(QWidget):
             cmdline += ['--message=' + hglib.fromunicode(message)]
         cmdline += self.getUserOptions('user', 'currentuser', 'git',
                                        'date', 'currentdate')
-        files = ['--']
-        addrem = []
-        for row in xrange(self.fileListWidget.count()):
-            item = self.fileListWidget.item(row)
-            if item.checkState() == Qt.Checked:
-                text = hglib.fromunicode(item.text())
-                wfile = self.repo.wjoin(text[2:])
-                files.append(wfile)
-                if text[0] in ('!', '?'):
-                    addrem.append(wfile)
+        files = ['--'] + [self.repo.wjoin(hglib.fromunicode(x))
+                          for x in self.stwidget.getChecked()]
+        addrem = [self.repo.wjoin(hglib.fromunicode(x))
+                  for x in self.stwidget.getChecked('!?')]
         if len(files) > 1:
             cmdline += files
         else:
@@ -532,7 +536,8 @@ class MQWidget(QWidget):
     @pyqtSlot()
     def qinitOrCommit(self):
         if os.path.isdir(self.repo.mq.join('.hg')):
-            dlg = commit.CommitDialog([], dict(root=self.repo.mq.path), self)
+            mqrepo = thgrepo.repository(None, self.repo.mq.path)
+            dlg = commit.CommitDialog(mqrepo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.reload()
@@ -559,6 +564,30 @@ class MQWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
 
+    def refreshStatus(self):
+        self.refreshing = True
+        pctx = self.repo.changectx('.')
+
+        # Refresh the wctx in synchronous (blocking) mode, since MQ can fire
+        # multiple refresh requests in rapid succession (e.g. when QNew is
+        # pressed).  The first would launch the background status thread but
+        # the last request (with pctx.tags and newCheckBox set up properly)
+        # would return immediately from stwidget.refreshWctx because refthread
+        # was still running, so the final status display after QNew would not
+        # correctly show the status of the new patch.
+        #
+        # This could be tuned for better performance; the current synchronous
+        # approach is the closest equivalent to the pre-StatusWidget behavior.
+        if 'qtip' in pctx.tags() and not self.newCheckBox.isChecked():
+            # qrefresh (qdiff) diffs
+            self.stwidget.setPatchContext(pctx)
+            self.stwidget.refreshWctx(synchronous=True)
+        elif self.newCheckBox.isChecked():
+            # qnew (working) diffs
+            self.stwidget.setPatchContext(None)
+            self.stwidget.refreshWctx(synchronous=True)
+        self.refreshing = False
+
     def reload(self):
         self.refreshing = True
         self.reselectPatchItem = None
@@ -574,7 +603,7 @@ class MQWidget(QWidget):
             self.refreshing = False
         if self.reselectPatchItem:
             self.queueListWidget.setCurrentItem(self.reselectPatchItem)
-        self.refreshFileListWidget()
+        self.refreshStatus()
 
     def _reload(self):
         ui, repo = self.repo.ui.copy(), self.repo
@@ -650,18 +679,17 @@ class MQWidget(QWidget):
         else:
             self.revisionOrCommitBtn.setText(_('Create MQ repo'))
 
-        self.qpushAllBtn.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushBtn.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushMoveBtn.setEnabled(False)
-        self.qdeleteBtn.setEnabled(False)
-        self.setGuardsBtn.setEnabled(False)
-        self.qpopBtn.setEnabled(bool(applied))
-        self.qpopAllBtn.setEnabled(bool(applied))
+        self.qpushAllAct.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qpushAct.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qdeleteAct.setEnabled(False)
+        self.setGuardsAct.setEnabled(False)
+        self.qpopAct.setEnabled(bool(applied))
+        self.qpopAllAct.setEnabled(bool(applied))
 
         pctx = repo.changectx('.')
         newmode = self.newCheckBox.isChecked()
         if 'qtip' in pctx.tags():
-            self.fileListWidget.setEnabled(True)
+            self.stwidget.tv.setEnabled(True)
             self.messageEditor.setEnabled(True)
             self.msgSelectCombo.setEnabled(True)
             self.qnewOrRefreshBtn.setEnabled(True)
@@ -670,7 +698,7 @@ class MQWidget(QWidget):
                 name = repo.mq.applied[-1].name
                 self.patchNameLE.setText(hglib.tounicode(name))
         else:
-            self.fileListWidget.setEnabled(newmode)
+            self.stwidget.tv.setEnabled(newmode)
             self.messageEditor.setEnabled(newmode)
             self.msgSelectCombo.setEnabled(newmode)
             self.qnewOrRefreshBtn.setEnabled(newmode)
@@ -681,7 +709,7 @@ class MQWidget(QWidget):
 
     def onNewModeToggled(self, isChecked):
         if isChecked:
-            self.fileListWidget.setEnabled(True)
+            self.stwidget.tv.setEnabled(True)
             self.qnewOrRefreshBtn.setText(_('QNew'))
             self.qnewOrRefreshBtn.setEnabled(True)
             self.messageEditor.setEnabled(True)
@@ -700,71 +728,15 @@ class MQWidget(QWidget):
                 name = self.repo.mq.applied[-1].name
                 self.patchNameLE.setText(hglib.tounicode(name))
                 self.qnewOrRefreshBtn.setEnabled(True)
-                self.fileListWidget.setEnabled(True)
+                self.stwidget.tv.setEnabled(True)
             else:
                 self.messageEditor.setEnabled(False)
                 self.qnewOrRefreshBtn.setEnabled(False)
-                self.fileListWidget.setEnabled(False)
+                self.stwidget.tv.setEnabled(False)
                 self.patchNameLE.setText('')
                 self.setMessage('')
             self.patchNameLE.setEnabled(False)
-        self.refreshFileListWidget()
-
-    def refreshFileListWidget(self):
-        self.refreshing = True
-        self.reselectFileItem = None
-        try:
-            try:
-                self._refreshFileListWidget()
-            except Exception, e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
-                if 'THGDEBUG' in os.environ:
-                    import traceback
-                    traceback.print_exc()
-        finally:
-            self.refreshing = False
-        if self.reselectFileItem:
-            self.fileListWidget.setCurrentItem(self.reselectFileItem)
-        elif self.fileListWidget.count():
-            self.fileListWidget.setCurrentRow(0)
-
-    def _refreshFileListWidget(self):
-        def addfiles(mode, files, func):
-            for file in files:
-                item = QListWidgetItem(u'%s %s' % (mode, hglib.tounicode(file)))
-                item.setFlags(flags)
-                item.setCheckState(func(mode, file))
-                self.fileListWidget.addItem(item)
-                if selfile == file:
-                    self.reselectFileItem = item
-        item = self.fileListWidget.currentItem()
-        if item:
-            selfile = hglib.fromunicode(item.text())[2:]
-        else:
-            selfile = None
-        self.fileListWidget.clear()
-        self.fileview.clearDisplay()
-        pctx = self.repo.changectx('.')
-        newmode = self.newCheckBox.isChecked()
-        if not newmode and 'qtip' in pctx.tags():
-            # Show qrefresh (qdiff) diffs
-            st = self.repo.status(pctx.p1().node(), None, unknown=True)[:5]
-            M, A, R, D, U = st
-            checkfunc = lambda stat, file: file in pctx.files() and \
-                                           Qt.Checked or Qt.Unchecked
-        elif newmode:
-            # Show qnew (working) diffs
-            M, A, R, D, U = self.repo[None].status(unknown=True)[:5]
-            checkfunc = lambda stat, file: stat in 'MAR' \
-                                           and Qt.Checked or Qt.Unchecked
-        else:
-            return
-        flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
-        addfiles(u'A', A, checkfunc)
-        addfiles(u'M', M, checkfunc)
-        addfiles(u'R', R, checkfunc)
-        addfiles(u'!', D, checkfunc)
-        addfiles(u'?', U, checkfunc)
+        self.refreshStatus()
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
@@ -969,6 +941,5 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return MQWidget(repo, None, **opts)

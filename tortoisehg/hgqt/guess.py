@@ -55,9 +55,18 @@ class DetectRenameDialog(QDialog):
         hsplit = QSplitter(Qt.Vertical)
         layout.addWidget(hsplit)
         hsplit.addWidget(vsplit)
+        utheader = QHBoxLayout()
+        utvbox.addLayout(utheader)
 
         utlbl = QLabel(_('<b>Unrevisioned Files</b>'))
-        utvbox.addWidget(utlbl)
+        utheader.addWidget(utlbl)
+
+        self.refreshBtn = tb = QToolButton()
+        tb.setToolTip(_('Refresh file list'))
+        tb.setIcon(qtlib.geticon('view-refresh'))
+        tb.clicked.connect(self.refresh)
+        utheader.addWidget(tb)
+
         self.unrevlist = QListWidget()
         self.unrevlist.setSelectionMode(QAbstractItemView.ExtendedSelection)
         utvbox.addWidget(self.unrevlist)

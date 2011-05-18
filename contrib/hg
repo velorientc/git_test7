@@ -30,7 +30,13 @@ except ImportError:
 import mercurial.util
 import mercurial.dispatch
 
+def _setbinary(fp):
+    if hasattr(mercurial.util, 'setbinary'):
+        return mercurial.util.setbinary(fp) # >= 1.9
+    else:
+        return mercurial.util.set_binary(fp)
+
 for fp in (sys.stdin, sys.stdout, sys.stderr):
-    mercurial.util.set_binary(fp)
+    _setbinary(fp)
 
 mercurial.dispatch.run()
