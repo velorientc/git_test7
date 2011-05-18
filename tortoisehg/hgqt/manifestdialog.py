@@ -19,7 +19,7 @@ from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
-from tortoisehg.hgqt import visdiff, revert
+from tortoisehg.hgqt import visdiff, revert, revpanel
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -148,8 +148,17 @@ class ManifestWidget(QWidget):
         self._splitter.addWidget(navlayoutw)
         self._splitter.setStretchFactor(0, 1)
 
+        vbox = QVBoxLayout(spacing=0)
+        vbox.setMargin(0)
+        self.revpanel = revpanel.RevPanelWidget(self._repo)
+        self.revpanel.linkActivated.connect(self.linkActivated)
+        vbox.addWidget(self.revpanel, 0)
         self._fileview = fileview.HgFileView(self._repo, self)
-        self._splitter.addWidget(self._fileview)
+        vbox.addWidget(self._fileview, 0)
+        w = QWidget()
+        w.setLayout(vbox)
+        self._splitter.addWidget(w)
+
         self._splitter.setStretchFactor(1, 3)
         self._fileview.revisionSelected.connect(self.setRev)
         self._fileview.linkActivated.connect(self.linkActivated)
@@ -160,11 +169,14 @@ class ManifestWidget(QWidget):
         prefix += '/manifest'
         self._fileview.loadSettings(qs, prefix+'/fileview')
         self._splitter.restoreState(qs.value(prefix+'/splitter').toByteArray())
+        expanded = qs.value(prefix+'/revpanel.expanded', False).toBool()
+        self.revpanel.set_expanded(expanded)
 
     def saveSettings(self, qs, prefix):
         prefix += '/manifest'
         self._fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/splitter', self._splitter.saveState())
+        qs.setValue(prefix+'/revpanel.expanded', self.revpanel.is_expanded())
 
     def _initactions(self):
         self._statusfilter = status.StatusFilterButton(
@@ -412,6 +424,8 @@ class ManifestWidget(QWidget):
     def setRev(self, rev):
         """Change revision to show"""
         self._selectedrev = rev
+        self.revpanel.set_revision(rev)
+        self.revpanel.update(repo = self._repo)
         if rev == self._rev:
             return
         self._rev = rev
