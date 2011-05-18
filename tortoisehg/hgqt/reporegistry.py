@@ -30,6 +30,7 @@ class RepoTreeView(QTreeView):
     showMessage = pyqtSignal(QString)
     menuRequested = pyqtSignal(object, object)
     openRepo = pyqtSignal(QString, bool)
+    dropAccepted = pyqtSignal()
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
@@ -128,6 +129,7 @@ class RepoTreeView(QTreeView):
                                                  col, group)
                 if drop:
                     event.accept()
+                    self.dropAccepted.emit()
             else:
                 # Event is a drop of an external repo
                 accept = False
@@ -139,6 +141,7 @@ class RepoTreeView(QTreeView):
                 if accept:
                     event.setDropAction(Qt.LinkAction)
                     event.accept()
+                    self.dropAccepted.emit()
         self.setAutoScroll(False)
         self.setState(QAbstractItemView.NoState)
         self.viewport().update()
@@ -204,6 +207,7 @@ class RepoRegistryView(QDockWidget):
     def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False):
         QDockWidget.__init__(self, parent)
 
+        self.watcher = None
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
 
@@ -219,9 +223,12 @@ class RepoRegistryView(QDockWidget):
 
         self.contextmenu = QMenu(self)
         self.tview = tv = RepoTreeView(self)
-        tv.setModel(repotreemodel.RepoTreeModel(settingsfilename(), self,
+
+        sfile = settingsfilename()
+        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
             showSubrepos=self.showSubrepos,
             showNetworkSubrepos=self.showNetworkSubrepos))
+
         mainframe.layout().addWidget(tv)
 
         tv.setIndentation(10)
@@ -231,9 +238,21 @@ class RepoRegistryView(QDockWidget):
         tv.showMessage.connect(self.showMessage)
         tv.menuRequested.connect(self.onMenuRequest)
         tv.openRepo.connect(self.openRepo)
+        tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
         QTimer.singleShot(0, self.expand)
+
+        # Setup a file system watcher to update the reporegistry
+        # anytime it is modified by another thg instance
+        # Note that we must make sure that the settings file exists before
+        # setting thefile watcher
+        if not os.path.exists(sfile):
+            tv.model().write(sfile)
+        self.watcher = QFileSystemWatcher(self)
+        self.watcher.addPath(sfile)
+        self.watcher.fileChanged.connect(self.modifiedSettings)
+        self._pendingReloadModel = False
 
     def setShowSubrepos(self, show, reloadModel=True):
         if self.showSubrepos != show:
@@ -247,20 +266,55 @@ class RepoRegistryView(QDockWidget):
             if reloadModel:
                 self.reloadModel()
 
+    def updateSettingsFile(self):
+        # If there is a settings watcher, we must briefly stop watching the 
+        # settings file while we save it, otherwise we'll get the update signal
+        # that we do not want
+        sfile = settingsfilename()
+        if self.watcher:
+            self.watcher.removePath(sfile)
+        self.tview.model().write(sfile)
+        if self.watcher:
+            self.watcher.addPath(sfile)
+
+    @pyqtSlot()
+    def dropAccepted(self):
+        # Whenever a drag and drop operation is completed, update the settings
+        # file
+        self.updateSettingsFile()
+        
+    @pyqtSlot(QString)
+    def modifiedSettings(self):
+        UPDATE_DELAY = 2 # seconds
+        
+        # Do not update the repo registry more often than 
+        # once every UPDATE_DELAY seconds
+        if not self._pendingReloadModel:
+            # There are no pending updates:
+            # -> schedule and update in UPDATE_DELAY seconds.
+            # If other update notifications arrive from now 
+            # until now + UPDATE_DELAY, they will be ignored and "rolled into" 
+            # the pending update        
+            self._pendingReloadModel = True
+            QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
+
     def reloadModel(self):
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self.showSubrepos, self.showNetworkSubrepos))
         self.expand()
+        self._pendingReloadModel = False
 
     def expand(self):
         self.tview.expandToDepth(0)
+
     def addRepo(self, root):
         'workbench has opened a new repowidget, ensure it is in the registry'
         m = self.tview.model()
         it = m.getRepoItem(root)
         if it == None:
             m.addRepo(None, root, -1)
+            self.updateSettingsFile()
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
@@ -270,7 +324,11 @@ class RepoRegistryView(QDockWidget):
             self.tview.resizeColumnToContents(1)
 
     def close(self):
-        self.tview.model().write(settingsfilename())
+        # We must stop monitoring the settings file and then we can save it
+        sfile = settingsfilename()
+        self.watcher.removePath(sfile)
+        self.tview.model().write(sfile)
+
     def _action_defs(self):
         a = [("reloadRegistry", _("Refresh repository list"), 'view-refresh',
                 _("Refresh the Repository Registry list"), self.reloadModel),
@@ -409,6 +467,7 @@ class RepoRegistryView(QDockWidget):
         parent = s.parent()
         m.removeRows(row, 1, parent)
         self.tview.selectionChanged(None, None)
+        self.updateSettingsFile()
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
@@ -427,6 +486,7 @@ class RepoRegistryView(QDockWidget):
     def repoChanged(self, uroot):
         m = self.tview.model()
         changedrootpath = hglib.fromunicode(uroot).replace("\\", "/")
+
         def isAboveOrBelowUroot(testedpath):
             """Return True if rootpath is contained or contains uroot"""
             r1 = testedpath.replace("\\", "/") + "/"
