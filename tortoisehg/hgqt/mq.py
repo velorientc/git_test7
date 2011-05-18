@@ -64,7 +64,7 @@ class MQWidget(QWidget):
         splitter.setObjectName('splitter')
 
         self.queueFrame = QFrame(splitter)
-        self.messageFrame = QFrame(splitter)
+        self.filesFrame = QFrame(splitter)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
@@ -125,11 +125,11 @@ class MQWidget(QWidget):
         bbarhbox.addWidget(self.revisionOrCommitBtn)
         bbarhbox.addStretch(1)
 
-        # Message Frame
+        # Files Frame
         layout = QVBoxLayout()
         layout.setSpacing(5)
         layout.setContentsMargins(0, 0, 0, 0)
-        self.messageFrame.setLayout(layout)
+        self.filesFrame.setLayout(layout)
 
         mtbarhbox = QHBoxLayout()
         mtbarhbox.setSpacing(8)
@@ -146,19 +146,11 @@ class MQWidget(QWidget):
 
         self.stwidget = status.StatusWidget(repo, None, opts, self)
 
-        # The message editor and the file list are separated by
-        # a vertical splitter
-        vsplitter = QSplitter()
-        vsplitter.setOrientation(Qt.Vertical)
-        layout.addWidget(vsplitter)
-        vsplitter.addWidget(self.messageEditor)
-        vsplitter.addWidget(self.stwidget)
-
         self.fileview = self.stwidget.fileview
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.setContext(repo[None])
         self.fileview.shelveToolExited.connect(self.reload)
-        splitter.addWidget(self.stwidget.docf)
+        layout.addWidget(self.stwidget)
 
         qrefhbox = QHBoxLayout()
         layout.addLayout(qrefhbox, 0)
@@ -175,6 +167,19 @@ class MQWidget(QWidget):
         qrefhbox.addWidget(self.qqueueBtn)
         qrefhbox.addStretch(1)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
+
+        # Message and diff
+        vb2 = QVBoxLayout()
+        vb2.setSpacing(0)
+        vb2.setContentsMargins(0, 0, 0, 0)
+        w = QWidget()
+        w.setLayout(vb2)
+        splitter.addWidget(w)
+        vsplitter = QSplitter()
+        vsplitter.setOrientation(Qt.Vertical)
+        vb2.addWidget(vsplitter)
+        vsplitter.addWidget(self.messageEditor)
+        vsplitter.addWidget(self.stwidget.docf)
 
         # Command runner and connections...
         self.cmd = cmdui.Runner(not parent, self)
