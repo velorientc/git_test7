@@ -377,10 +377,6 @@ INFO = (
           'to be performed immediately, without user interaction. '
           'Commands are "add remove revert forget". '
           'Default: None (leave blank)')),
-    _fi(_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
-        _('The period (in milliseconds) between modification time polling of '
-          'key repository files, looking for changes.  Values under '
-          '100ms are ignored.  Default: 500')),
     _fi(_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various '
           'TortoiseHg windows. '
