@@ -44,6 +44,12 @@ class MQWidget(QWidget):
         layout.setSpacing(4)
         self.setLayout(layout)
 
+        b = QPushButton(_('QRefresh'))
+        f = b.font()
+        f.setWeight(QFont.Bold)
+        b.setFont(f)
+        self.qnewOrRefreshBtn = b
+
         # top toolbar
         tbarhbox = QHBoxLayout()
         tbarhbox.setSpacing(5)
@@ -55,6 +61,7 @@ class MQWidget(QWidget):
         tbarhbox.addWidget(self.queueCombo)
         tbarhbox.addWidget(self.optionsBtn)
         tbarhbox.addWidget(self.msgSelectCombo, 1)
+        tbarhbox.addWidget(self.qnewOrRefreshBtn)
 
         # main area consists of a three-way horizontal splitter
         self.splitter = splitter = QSplitter()
@@ -158,15 +165,7 @@ class MQWidget(QWidget):
         self.qqueueBtn = QPushButton(_('Manage queues'))
         self.qqueueBtn.setMinimumWidth(150)
 
-        b = QPushButton(_('QRefresh'))
-        f = b.font()
-        f.setWeight(QFont.Bold)
-        b.setFont(f)
-        self.qnewOrRefreshBtn = b
-
         qrefhbox.addWidget(self.qqueueBtn)
-        qrefhbox.addStretch(1)
-        qrefhbox.addWidget(self.qnewOrRefreshBtn)
 
         # Message and diff
         vb2 = QVBoxLayout()
