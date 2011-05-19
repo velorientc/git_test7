@@ -628,6 +628,8 @@ class MQWidget(QWidget):
         self.allguards = set()
         items = []
         for idx, patch in enumerate(repo.mq.series):
+            ctx = repo.changectx(patch)
+            desc = ctx.longsummary()
             item = QListWidgetItem(hglib.tounicode(patch))
             if patch in applied: # applied
                 f = item.font()
@@ -647,7 +649,7 @@ class MQWidget(QWidget):
             uname = hglib.tounicode(patch)
             item._thgpatch = patch
             item._thgguards = patchguards
-            item.setToolTip(u'%s: %s' % (uname, uguards))
+            item.setToolTip(u'%s: %s\n%s' % (uname, uguards, desc))
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEditable |
                           Qt.ItemIsEnabled)
