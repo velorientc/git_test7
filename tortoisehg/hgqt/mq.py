@@ -56,6 +56,43 @@ class MQWidget(QWidget):
         tbarhbox = QHBoxLayout()
         tbarhbox.setSpacing(5)
         self.layout().addLayout(tbarhbox, 0)
+
+        self.qpushAllAct = a = QAction(
+            geticon('hg-qpush-all'), _('Push all'), self)
+        a.setToolTip(_('Apply all patches'))
+        self.qpushAct = a = QAction(
+            geticon('hg-qpush'), _('Push'), self)
+        a.setToolTip(_('Apply one patch'))
+        self.setGuardsAct = a = QAction(
+            geticon('hg-qguard'), _('Guards'), self)
+        a.setToolTip(_('Configure guards for selected patch'))
+        self.qreorderAct = a = QAction(
+            geticon('hg-qreorder'), _('Reorder patches'), self)
+        a.setToolTip(_('Reorder patches'))
+        self.qdeleteAct = a = QAction(
+            geticon('hg-qdelete'), _('Delete'), self)
+        a.setToolTip(_('Delete selected patches'))
+        self.qpopAct = a = QAction(
+            geticon('hg-qpop'), _('Pop'), self)
+        a.setToolTip(_('Unapply one patch'))
+        self.qpopAllAct = a = QAction(
+            geticon('hg-qpop-all'), _('Pop all'), self)
+        a.setToolTip(_('Unapply all patches'))
+        self.qtbar = tbar = QToolBar(_('Patch Queue Actions Toolbar'))
+        tbar.setIconSize(QSize(18, 18))
+        tbarhbox.addWidget(tbar)
+        tbar.addAction(self.qpushAct)
+        tbar.addAction(self.qpushAllAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qpopAct)
+        tbar.addAction(self.qpopAllAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qreorderAct)
+        tbar.addSeparator()
+        tbar.addAction(self.qdeleteAct)
+        tbar.addSeparator()
+        tbar.addAction(self.setGuardsAct)
+
         self.queueCombo = QComboBox()
         self.queueCombo.activated['QString'].connect(self.qqueueActivate)
         self.optionsBtn = QPushButton(_('Options'))
@@ -81,46 +118,6 @@ class MQWidget(QWidget):
         layout.setSpacing(5)
         layout.setContentsMargins(0, 0, 0, 0)
         self.queueFrame.setLayout(layout)
-
-        self.qtbar = qtbarhbox = QHBoxLayout()
-        qtbarhbox.setSpacing(5)
-        layout.addLayout(qtbarhbox, 0)
-        qtbarhbox.setContentsMargins(0, 0, 0, 0)
-        self.qpushAllAct = a = QAction(
-            geticon('hg-qpush-all'), _('Push all'), self)
-        a.setToolTip(_('Apply all patches'))
-        self.qpushAct = a = QAction(
-            geticon('hg-qpush'), _('Push'), self)
-        a.setToolTip(_('Apply one patch'))
-        self.setGuardsAct = a = QAction(
-            geticon('hg-qguard'), _('Guards'), self)
-        a.setToolTip(_('Configure guards for selected patch'))
-        self.qreorderAct = a = QAction(
-            geticon('hg-qreorder'), _('Reorder patches'), self)
-        a.setToolTip(_('Reorder patches'))
-        self.qdeleteAct = a = QAction(
-            geticon('hg-qdelete'), _('Delete'), self)
-        a.setToolTip(_('Delete selected patches'))
-        self.qpopAct = a = QAction(
-            geticon('hg-qpop'), _('Pop'), self)
-        a.setToolTip(_('Unapply one patch'))
-        self.qpopAllAct = a = QAction(
-            geticon('hg-qpop-all'), _('Pop all'), self)
-        a.setToolTip(_('Unapply all patches'))
-        tbar = QToolBar(_('Patch Queue Actions Toolbar'))
-        tbar.setIconSize(QSize(18, 18))
-        qtbarhbox.addWidget(tbar)
-        tbar.addAction(self.qpushAct)
-        tbar.addAction(self.qpushAllAct)
-        tbar.addSeparator()
-        tbar.addAction(self.qpopAct)
-        tbar.addAction(self.qpopAllAct)
-        tbar.addSeparator()
-        tbar.addAction(self.qreorderAct)
-        tbar.addSeparator()
-        tbar.addAction(self.qdeleteAct)
-        tbar.addSeparator()
-        tbar.addAction(self.setGuardsAct)
 
         self.queueListWidget = QListWidget(self)
         layout.addWidget(self.queueListWidget, 1)
