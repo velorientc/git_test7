@@ -1025,6 +1025,7 @@ class RepoWidget(QWidget):
         self.unappacts[2].setEnabled('qtip' in self.repo.tags())
         self.unappacts[3].setEnabled(True)
         self.unappacts[4].setEnabled(unapplied > 1)
+        self.unappacts[5].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
 
     def generateSingleMenu(self):
