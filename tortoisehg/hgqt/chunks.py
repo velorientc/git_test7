@@ -168,22 +168,29 @@ class ChunksWidget(QWidget):
         ok = True
         repo = self.repo
         ui.pushbuffer()
-        pfiles = {}
-        curdir = os.getcwd()
         try:
             eolmode = ui.config('patch', 'eol', 'strict')
             if eolmode.lower() not in patch.eolmodes:
                 eolmode = 'strict'
             else:
                 eolmode = eolmode.lower()
-            os.chdir(repo.root)
-            if patch.applydiff(ui, fp, pfiles, eolmode=eolmode) < 0:
+            try:
+                # hg-1.9
+                ret = patch.internalpatch(ui, repo, fp, 1, repo.root, files=None,
+                                          eolmode=eolmode, similarity=0)
+            except TypeError:
+                # hg-1.8
+                pfiles = {}
+                ret = patch.internalpatch(fp, ui, 1, repo.root, pfiles,
+                                          eolmode=eolmode)
+                if updatestate:
+                    cmdutil.updatedir(repo.ui, repo, pfiles)
+            if ret < 0:
                 ok = False
                 self.showMessage.emit(_('Patch failed to apply'))
         except (patch.PatchError, EnvironmentError), err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
-        os.chdir(curdir)
         for line in ui.popbuffer().splitlines():
             if line.endswith(wfile + '.rej'):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
@@ -195,9 +202,6 @@ class ChunksWidget(QWidget):
                     if dlg.exec_() == QDialog.Accepted:
                         ok = True
                     break
-        if updatestate and ok:
-            # Apply operations specified in git diff headers
-            cmdutil.updatedir(repo.ui, repo, pfiles)
         return ok
 
     def editCurrentFile(self):
@@ -215,7 +219,7 @@ class ChunksWidget(QWidget):
             return self.currentFile, [chunks[0]] + dchunks
         else:
             return self.currentFile, []
-        
+
     def getSelectedFiles(self):
         return self.filelist.getSelectedFiles()
 
