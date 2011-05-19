@@ -228,7 +228,8 @@ class DetectRenameDialog(QDialog):
 
         # If no rows are selected, ask the user if he'd like to accept all renames
         if self.matchtv.selectionModel().hasSelection():
-            itemList = [row for row in self.matchtv.selectionModel().selectedRows()]
+            itemList = [self.matchtv.model().getRow(index) \
+                for index in self.matchtv.selectionModel().selectedRows()]
         else:
             itemList = m.rows
 
