@@ -50,6 +50,8 @@ class MQWidget(QWidget):
         b.setFont(f)
         self.qnewOrRefreshBtn = b
 
+        self.qqueueBtn = QPushButton(_('Queues'))
+
         # top toolbar
         tbarhbox = QHBoxLayout()
         tbarhbox.setSpacing(5)
@@ -60,6 +62,7 @@ class MQWidget(QWidget):
         self.msgSelectCombo = PatchMessageCombo(self)
         tbarhbox.addWidget(self.queueCombo)
         tbarhbox.addWidget(self.optionsBtn)
+        tbarhbox.addWidget(self.qqueueBtn)
         tbarhbox.addWidget(self.msgSelectCombo, 1)
         tbarhbox.addWidget(self.qnewOrRefreshBtn)
 
@@ -158,14 +161,6 @@ class MQWidget(QWidget):
         self.fileview.setContext(repo[None])
         self.fileview.shelveToolExited.connect(self.reload)
         layout.addWidget(self.stwidget)
-
-        qrefhbox = QHBoxLayout()
-        layout.addLayout(qrefhbox, 0)
-        qrefhbox.setContentsMargins(0, 0, 0, 0)
-        self.qqueueBtn = QPushButton(_('Manage queues'))
-        self.qqueueBtn.setMinimumWidth(150)
-
-        qrefhbox.addWidget(self.qqueueBtn)
 
         # Message and diff
         vb2 = QVBoxLayout()
