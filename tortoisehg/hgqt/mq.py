@@ -175,7 +175,7 @@ class MQWidget(QWidget):
         w = QWidget()
         w.setLayout(vb2)
         splitter.addWidget(w)
-        vsplitter = QSplitter()
+        self.vsplitter = vsplitter = QSplitter()
         vsplitter.setOrientation(Qt.Vertical)
         vb2.addWidget(vsplitter)
         vsplitter.addWidget(self.messageEditor)
@@ -816,6 +816,7 @@ class MQWidget(QWidget):
         'Load history, etc, from QSettings instance'
         s = QSettings()
         self.splitter.restoreState(s.value('mq/splitter').toByteArray())
+        self.vsplitter.restoreState(s.value('mq/vsplitter').toByteArray())
         userhist = s.value('commit/userhist').toStringList()
         self.opts['userhist'] = [hglib.fromunicode(u) for u in userhist if u]
         self.messageEditor.loadSettings(s, 'mq/editor')
@@ -827,6 +828,7 @@ class MQWidget(QWidget):
         'Save history, etc, in QSettings instance'
         s = QSettings()
         s.setValue('mq/splitter', self.splitter.saveState())
+        s.setValue('mq/vsplitter', self.vsplitter.saveState())
         self.messageEditor.saveSettings(s, 'mq/editor')
         self.fileview.saveSettings(s, 'mq/fileview')
         if not self.parent():
