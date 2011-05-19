@@ -21,7 +21,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
-from tortoisehg.hgqt import qdelete, qreorder, qfold, shelve
+from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -1250,6 +1250,12 @@ class RepoWidget(QWidget):
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()
+        def qrenameact():
+            dlg = qrename.QRenameDialog(self.repo, self.menuselection[0], self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.output.connect(self.output)
+            dlg.makeLogVisible.connect(self.makeLogVisible)
+            dlg.exec_()
 
         menu = QMenu(self)
         acts = []
@@ -1258,7 +1264,8 @@ class RepoWidget(QWidget):
             (_('QPush --move'), self.qpushMoveRevision, 'hg-qpush'),
             (_('Fold patches...'), qfoldact, 'hg-qfold'),
             (_('Delete patches...'), qdeleteact, 'hg-qdelete'),
-            (_('Reorder patches...'), qreorderact, 'hg-qreorder')):
+            (_('Reorder patches...'), qreorderact, 'hg-qreorder'),
+            (_('Rename patch...'), qrenameact, None)):
             act = QAction(name, self)
             act.triggered.connect(cb)
             if icon:
