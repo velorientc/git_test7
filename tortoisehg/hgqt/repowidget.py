@@ -1037,7 +1037,7 @@ class RepoWidget(QWidget):
         # isrev = the changeset has an integer revision number
         # isctx = changectx or workingctx
         # fixed = the changeset is considered permanent
-        # applid = an applied patch
+        # applied = an applied patch
         # qgoto = applied patch or qparent
         isrev   = lambda ap, wd, tags: not wd
         isctx   = lambda ap, wd, tags: True
@@ -1114,6 +1114,8 @@ class RepoWidget(QWidget):
                   self.qimportRevision)
             entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
                   self.qfinishRevision)
+            entry(submenu, 'mq', applied, _('Rename patch'), None,
+                  self.qrename)
             entry(submenu, 'mq')
             entry(submenu, 'rebase', fixed, _('Rebase...'), 'hg-rebase',
                   self.rebaseRevision)
@@ -1251,12 +1253,6 @@ class RepoWidget(QWidget):
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()
-        def qrenameact():
-            dlg = qrename.QRenameDialog(self.repo, self.menuselection[0], self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.output.connect(self.output)
-            dlg.makeLogVisible.connect(self.makeLogVisible)
-            dlg.exec_()
 
         menu = QMenu(self)
         acts = []
@@ -1266,7 +1262,7 @@ class RepoWidget(QWidget):
             (_('Fold patches...'), qfoldact, 'hg-qfold'),
             (_('Delete patches...'), qdeleteact, 'hg-qdelete'),
             (_('Reorder patches...'), qreorderact, 'hg-qreorder'),
-            (_('Rename patch...'), qrenameact, None)):
+            (_('Rename patch...'), self.qrename, None)):
             act = QAction(name, self)
             act.triggered.connect(cb)
             if icon:
@@ -1617,6 +1613,16 @@ class RepoWidget(QWidget):
             patchname = thgp1.thgmqpatchname()
         self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
         self.mqDemand.forward('qgotoRevision', patchname)
+
+    def qrename(self):
+        sel = self.menuselection[0]
+        if not isinstance(sel, str):
+            sel = self.repo.changectx(sel).thgmqpatchname()
+        dlg = qrename.QRenameDialog(self.repo, sel, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.exec_()
 
     def qpushMoveRevision(self):
         """Make REV the top applied patch"""
