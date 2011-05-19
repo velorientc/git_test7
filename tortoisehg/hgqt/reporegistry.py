@@ -485,11 +485,11 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot(QString)
     def repoChanged(self, uroot):
         m = self.tview.model()
-        changedrootpath = hglib.fromunicode(uroot).replace("\\", "/")
+        changedrootpath = hglib.fromunicode(QDir.fromNativeSeparators(uroot))
 
         def isAboveOrBelowUroot(testedpath):
             """Return True if rootpath is contained or contains uroot"""
-            r1 = testedpath.replace("\\", "/") + "/"
+            r1 = hglib.fromunicode(QDir.fromNativeSeparators(testedpath)) + "/"
             r2 = changedrootpath + "/"
             return r1.startswith(r2) or r2.startswith(r1)
 
