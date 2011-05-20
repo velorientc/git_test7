@@ -81,7 +81,7 @@ class htmlui(ui.ui):
             return ''.join(self.style(a, label) for a, label in b)
         return ''.join(a for a, label in b)
 
-    def plain(self):
+    def plain(self, feature=None):
         return True
 
     def getdata(self):

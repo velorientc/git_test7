@@ -42,7 +42,7 @@ class QRenameDialog(QDialog):
         self.cmd = cmdui.Runner(True, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.reject)
+        self.cmd.commandFinished.connect(self.onCommandFinished)
 
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -53,6 +53,11 @@ class QRenameDialog(QDialog):
 
         self.focus = self.le
 
+    @pyqtSlot(int)
+    def onCommandFinished(self, ret):
+        self.repo.decrementBusyCount()
+        self.reject()
+
     def accept(self):
         self.newpatchname = hglib.fromunicode(self.le.text())
         if self.newpatchname != self.oldpatchname:
@@ -62,6 +67,7 @@ class QRenameDialog(QDialog):
                 return
             cmdline = ['qrename', '--repository', self.repo.root, '--',
                        self.oldpatchname, self.newpatchname]
+            self.repo.incrementBusyCount()
             self.cmd.run(cmdline)
         else:
             self.close()
