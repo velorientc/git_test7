@@ -1418,11 +1418,12 @@ class RepoWidget(QWidget):
             for rev in revList:
                 patchNames[rev] = getUniquePatchName(str(rev))
 
+            cmdlines = []
             for rev in revList:
-                cmdline = ['qimport', '--rev', '%s' % rev,
+                cmdlines.append(['qimport', '--rev', '%s' % rev,
                            '--repository', self.repo.root,
-                           '--name', patchNames[rev]]
-                self.runCommand(cmdline)
+                           '--name', patchNames[rev]])
+            self.runCommand(*cmdlines)
         else:
             # There were no collisions with existing patch names, we can
             # simply qimport the whole revision set in a single go
@@ -1458,10 +1459,10 @@ class RepoWidget(QWidget):
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
 
-    def runCommand(self, cmdline):
+    def runCommand(self, *cmdlines):
         if self.runner.core.running():
             InfoMsgBox(_('Unable to start'),
                        _('Previous command is still running'))
             return
         self.repo.incrementBusyCount()
-        self.runner.run(cmdline)
+        self.runner.run(*cmdlines)
