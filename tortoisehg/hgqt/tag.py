@@ -249,9 +249,16 @@ class TagDialog(QDialog):
                 return
             if not message:
                 ctx = self.repo[self.rev]
-                msgset = keep._('Added tag %s for changeset %s')
-                message = (english and msgset['id'] or msgset['str']) \
-                           % (tagu, str(ctx))
+                if exists:
+                    origctx = self.repo[self.repo.tags()[tag]]
+                    msgset = keep._('Moved tag %s to changeset %s' \
+                        ' (from changeset %s)')
+                    message = (english and msgset['id'] or msgset['str']) \
+                       % (tagu, str(ctx), str(origctx))
+                else:
+                    msgset = keep._('Added tag %s for changeset %s')
+                    message = (english and msgset['id'] or msgset['str']) \
+                               % (tagu, str(ctx))
             message = hglib.fromunicode(message)
 
         def finished():

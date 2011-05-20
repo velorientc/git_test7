@@ -17,7 +17,7 @@ import os
 import re
 import tempfile
 
-from mercurial import cmdutil, commands, cmdutil, hg, mdiff, patch, revlog
+from mercurial import commands, cmdutil, hg, mdiff, patch, revlog
 from mercurial import util, fancyopts
 
 from tortoisehg.util.i18n import _
@@ -601,7 +601,7 @@ def unshelve(ui, repo, *pats, **opts):
                     fp.seek(0)
                     pfiles = {}
                     internalpatch(fp, ui, 1, repo.root, files=pfiles)
-                    hglib.updatedir(ui, repo, pfiles)
+                    cmdutil.updatedir(ui, repo, pfiles)
                     patchdone = 1
                 except:
                     if opts['force']:

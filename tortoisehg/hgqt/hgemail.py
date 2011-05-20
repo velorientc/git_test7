@@ -88,8 +88,8 @@ class EmailDialog(QDialog):
 
     def _initchangesets(self, revs):
         def purerevs(revs):
-            return cmdutil.revrange(self._repo,
-                                    iter(str(e) for e in revs))
+            return hglib.revrange(self._repo,
+                                  iter(str(e) for e in revs))
 
         self._changesets = _ChangesetsModel(self._repo,
                                             # TODO: [':'] is inefficient
