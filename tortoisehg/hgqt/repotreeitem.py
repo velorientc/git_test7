@@ -108,8 +108,11 @@ class RepoTreeItem(object):
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
-                item = undumpObject(xr, self.model)
-                self.appendChild(item)
+                try:
+                    item = undumpObject(xr, self.model)
+                    self.appendChild(item)
+                except KeyError:
+                    pass # ignore unknown classes in xml
             elif xr.isEndElement():
                 break
 
