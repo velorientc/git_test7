@@ -1114,7 +1114,7 @@ class RepoWidget(QWidget):
                   self.qimportRevision)
             entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
                   self.qfinishRevision)
-            entry(submenu, 'mq', applied, _('Rename patch'), None,
+            entry(submenu, 'mq', applied, _('Rename patch...'), None,
                   self.qrename)
             entry(submenu, 'mq')
             entry(submenu, 'rebase', fixed, _('Rebase...'), 'hg-rebase',
