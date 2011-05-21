@@ -145,6 +145,7 @@ class RepoTreeView(QTreeView):
         self.setAutoScroll(False)
         self.setState(QAbstractItemView.NoState)
         self.viewport().update()
+        self.setAutoScroll(True)
 
     def mouseMoveEvent(self, event):
         self.msg  = ''
