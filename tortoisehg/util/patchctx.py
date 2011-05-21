@@ -201,7 +201,7 @@ class patchctx(object):
                         files[path] = [chunk]
                         self._fileorder.append(path)
                     files[path].extend(chunk.hunks)
-            except patch.PatchError, e:
+            except (patch.PatchError, AttributeError), e:
                 self._status[2].append(self._parseErrorFileName)
                 files[self._parseErrorFileName] = []
                 self._parseerror = e
