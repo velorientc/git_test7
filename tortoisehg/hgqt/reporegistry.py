@@ -480,24 +480,13 @@ class RepoRegistryView(QDockWidget):
                     
                     # Make sure that the selected subrepo (or one of its 
                     # subrepos!) is not already on the .hgsub file
-                    def getLineSeparator(line):
-                        """Get the line separator used on a given line"""
-                        # By default assume the default OS line separator 
-                        linesep = os.linesep
-                        lineseptypes = ['\r\n', '\n', '\r']
-                        for sep in lineseptypes:
-                            if line.endswith(sep):
-                                linesep = sep
-                                break
-                        return linesep
-
                     linesep = ''
                     for line in lines:
                         spath = line.split("=")[0].strip()
                         if not spath:
                             continue
                         if not linesep:
-                            linesep = getLineSeparator(line)
+                            linesep = hglib.getLineSeparator(line)
                         spath = util.pconvert(spath)
                         if line.startswith(srelroot):
                             qtlib.WarningMsgBox(

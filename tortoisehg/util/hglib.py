@@ -698,3 +698,14 @@ def netlocsplit(netloc):
     else:
         host, port = netloc[:c], netloc[c + 1:]
     return host, port, user, passwd
+
+def getLineSeparator(line):
+    """Get the line separator used on a given line"""
+    # By default assume the default OS line separator 
+    linesep = os.linesep
+    lineseptypes = ['\r\n', '\n', '\r']
+    for sep in lineseptypes:
+        if line.endswith(sep):
+            linesep = sep
+            break
+    return linesep
