@@ -358,6 +358,9 @@ class RepoRegistryView(QDockWidget):
              ("addsubrepo", _("Add a subrepository..."), 'thg-add-subrepo',
                 _("Convert an existing repository into a subrepository"),
                 self.addSubrepo),
+             ("copypath", _("Copy path"), '',
+                _("Copy the root path of the repository to the clipboard"),
+                self.copyPath),
              ]
         return a
 
@@ -556,6 +559,10 @@ class RepoRegistryView(QDockWidget):
                 _('Unsupported repository type (%s)') % repotype,
                 _('Cannot open non mercurial repositories or subrepositories'),
                 parent=self)
+
+    def copyPath(self):
+        clip = QApplication.clipboard()
+        clip.setText(self.selitem.internalPointer().rootpath())
 
     def startRename(self):
         self.tview.edit(self.selitem)
