@@ -13,7 +13,7 @@ from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, QObject
+from PyQt4.QtCore import Qt, QObject, QDir
 from PyQt4.QtGui import *
 
 class WctxActions(QObject):
@@ -41,6 +41,7 @@ class WctxActions(QObject):
         make(_('&Visual Diff'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
+        make(_('Copy path'), copyPath, frozenset('MARC?!I'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
         make(_('&Revert...'), revert, frozenset('MAR!'), 'hg-revert')
@@ -193,6 +194,12 @@ def copyPatch(parent, ui, repo, files):
         return
     output = ui.popbuffer()
     QApplication.clipboard().setText(hglib.tounicode(output))
+
+def copyPath(parent, ui, repo, files):
+    clip = QApplication.clipboard()
+    absfiles = [hglib.fromunicode(QDir.toNativeSeparators(repo.wjoin(fname)))
+         for fname in files]
+    clip.setText(os.linesep.join(absfiles))
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})
