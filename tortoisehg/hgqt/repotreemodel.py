@@ -147,7 +147,8 @@ class RepoTreeModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if role not in (Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole):
+        if role not in (Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole,
+                Qt.FontRole):
             return QVariant()
         item = index.internalPointer()
         return item.data(index.column(), role)
@@ -244,7 +245,7 @@ class RepoTreeModel(QAbstractItemModel):
         rgi = grp.internalPointer()
         if row < 0:
             row = rgi.childCount()
-        
+
         # Is the root of the repo that we want to add a subrepo contained
         # within a repo or subrepo? If so, assume it is an hg subrepo
         itemIsSubrepo = not paths.find_root(os.path.dirname(root)) is None

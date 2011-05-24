@@ -254,6 +254,7 @@ class RepoRegistryView(QDockWidget):
         self.watcher.addPath(sfile)
         self.watcher.fileChanged.connect(self.modifiedSettings)
         self._pendingReloadModel = False
+        self._activeTabRepo = None
 
     def setShowSubrepos(self, show, reloadModel=True):
         if self.showSubrepos != show:
@@ -316,6 +317,22 @@ class RepoRegistryView(QDockWidget):
         if it == None:
             m.addRepo(None, root, -1)
             self.updateSettingsFile()
+
+    def setActiveTabRepo(self, root):
+        """"
+        The selected tab has changed on the workbench
+        Unmark the previously selected tab and mark the new one as selected on
+        the Repo Registry as well
+        """
+        root = hglib.fromunicode(root)
+        if self._activeTabRepo:
+            self._activeTabRepo.setActive(False)
+        m = self.tview.model()
+        it = m.getRepoItem(root)
+        if it:
+            self._activeTabRepo = it
+            it.setActive(True)
+            self.tview.dataChanged(QModelIndex(), QModelIndex())
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)

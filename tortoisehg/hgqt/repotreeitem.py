@@ -157,9 +157,11 @@ class RepoItem(RepoTreeItem):
             self._valid = True
         else:
             self._valid = False
+        self._isActiveTab = False
 
     def isRepo(self):
         return True
+
     def rootpath(self):
         return self._root
 
@@ -190,6 +192,13 @@ class RepoItem(RepoTreeItem):
                     ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
                 return QVariant(ico)
             return QVariant()
+        elif role == Qt.FontRole:
+            if self._isActiveTab:
+                font = QFont()
+                font.setBold(True)
+            else:
+                return QVariant()
+            return QVariant(font)
         if column == 0:
             return QVariant(self.shortname())
         elif column == 1:
@@ -266,6 +275,11 @@ class RepoItem(RepoTreeItem):
             invalidRepoList.append(self._root)
 
         return invalidRepoList
+
+    def setActive(self, sel):
+        # Will be set to true when this item corresponds to the currently
+        # selected tab widget on the workbench
+        self._isActiveTab = sel
 
 
 class SubrepoItem(RepoItem):
