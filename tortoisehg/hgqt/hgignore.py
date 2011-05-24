@@ -28,7 +28,7 @@ class HgignoreDialog(QDialog):
     def __init__(self, repo, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
-        self.setWindowFlags(self.windowFlags() & 
+        self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
@@ -239,7 +239,7 @@ class HgignoreDialog(QDialog):
         self.ignorelist.clear()
 
         uni = hglib.tounicode
-        
+
         self.ignorelist.addItems([uni(l) for l in self.ignorelines])
 
         try:
