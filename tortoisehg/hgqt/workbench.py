@@ -93,6 +93,7 @@ class Workbench(QMainWindow):
         tw.tabBar().setContextMenuPolicy(Qt.CustomContextMenu)
         tw.tabBar().customContextMenuRequested.connect(self.tabBarContextMenuRequest)
         tw.lastClickedTab = -1 # No tab clicked yet
+
         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(1)

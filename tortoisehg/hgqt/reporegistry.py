@@ -268,7 +268,7 @@ class RepoRegistryView(QDockWidget):
                 self.reloadModel()
 
     def updateSettingsFile(self):
-        # If there is a settings watcher, we must briefly stop watching the 
+        # If there is a settings watcher, we must briefly stop watching the
         # settings file while we save it, otherwise we'll get the update signal
         # that we do not want
         sfile = settingsfilename()
@@ -283,19 +283,19 @@ class RepoRegistryView(QDockWidget):
         # Whenever a drag and drop operation is completed, update the settings
         # file
         self.updateSettingsFile()
-        
+
     @pyqtSlot(QString)
     def modifiedSettings(self):
         UPDATE_DELAY = 2 # seconds
-        
-        # Do not update the repo registry more often than 
+
+        # Do not update the repo registry more often than
         # once every UPDATE_DELAY seconds
         if not self._pendingReloadModel:
             # There are no pending updates:
             # -> schedule and update in UPDATE_DELAY seconds.
-            # If other update notifications arrive from now 
-            # until now + UPDATE_DELAY, they will be ignored and "rolled into" 
-            # the pending update        
+            # If other update notifications arrive from now
+            # until now + UPDATE_DELAY, they will be ignored and "rolled into"
+            # the pending update
             self._pendingReloadModel = True
             QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
 
@@ -442,11 +442,11 @@ class RepoRegistryView(QDockWidget):
             if sroot != root and root == paths.find_root(os.path.dirname(path)):
                 # The selected path is the root of a repository that is inside
                 # the selected repository
-                
+
                 # Use forward slashes for relative subrepo root paths
                 srelroot = sroot[len(root)+1:]
                 srelroot = util.pconvert(srelroot)
-                
+
                 # Is is already on the selected repository substate list?
                 try:
                     repo = hg.repository(ui.ui(), root)
@@ -464,7 +464,7 @@ class RepoRegistryView(QDockWidget):
                     return
                 else:
                     # Already a subrepo!
-                    
+
                     # Read the current .hgsub file contents
                     lines = []
                     if os.path.exists(repo.wjoin('.hgsub')):
@@ -477,8 +477,8 @@ class RepoRegistryView(QDockWidget):
                                 _('Failed to add repository'),
                                 _('Cannot open the .hgsub file in:<br><br>%s') \
                                 % root, parent=self)
-                    
-                    # Make sure that the selected subrepo (or one of its 
+
+                    # Make sure that the selected subrepo (or one of its
                     # subrepos!) is not already on the .hgsub file
                     linesep = ''
                     for line in lines:
@@ -498,13 +498,13 @@ class RepoRegistryView(QDockWidget):
                     # Append the new subrepo to the end of the .hgsub file
                     lines.append('%s = %s' % (srelroot, srelroot))
                     lines = [line.strip(linesep) for line in lines]
-                    
+
                     # and update the .hgsub file
                     try:
                         fsub = repo.wopener('.hgsub', 'w')
                         fsub.write(linesep.join(lines))
                         fsub.close()
-                        
+
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'
@@ -519,7 +519,7 @@ class RepoRegistryView(QDockWidget):
                             _('Cannot update the .hgsub file in:<br><br>%s') \
                             % root, parent=self)
                 return
-                
+
             qtlib.WarningMsgBox(
                 _('Failed to add repository'),
                 _('"%s" is not a valid repository inside "%s"') % \
