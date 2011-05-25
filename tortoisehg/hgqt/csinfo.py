@@ -138,7 +138,10 @@ class SummaryInfo(object):
                     return None
                 return hglib.tounicode(value)[:80]
             elif item == 'user':
-                return hglib.tounicode(hglib.user(ctx))
+                user = hglib.user(ctx)
+                if user:
+                    return hglib.tounicode(user)
+                return None
             elif item == 'shortuser':
                 return hglib.tounicode(hglib.username(hglib.user(ctx)))
             elif item == 'dateage':
