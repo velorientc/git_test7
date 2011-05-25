@@ -21,7 +21,7 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 
 FILE_HEADERS = (('Filename', _('Filename', 'column header')),)
-UNUSED_HEADERS = ('Graph', 'Changes')
+UNUSED_HEADERS = ('Changes')
 
 FILE_COLUMNHEADERS = tuple(c for c in COLUMNHEADERS
                            if c[0] not in UNUSED_HEADERS) + FILE_HEADERS
