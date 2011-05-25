@@ -142,6 +142,7 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
+    shortnameChanged = pyqtSignal()
     def __init__(self, root=None, parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root or ''
@@ -182,7 +183,8 @@ class RepoItem(RepoTreeItem):
         self._basenode = basenode
 
     def setShortName(self, uname):
-        self._shortname = uname
+        if uname != self._shortname:
+            self._shortname = uname
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -207,10 +209,11 @@ class RepoItem(RepoTreeItem):
 
     def menulist(self):
         return ['open', 'clone', 'addsubrepo', None, 'explore',
-                'terminal', 'copypath', None, 'remove', None, 'settings']
+                'terminal', 'copypath', None, 'rename', 'remove', None, 'settings']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+        return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+            | Qt.ItemIsEditable)
 
     def dump(self, xw):
         xw.writeAttribute('root', hglib.tounicode(self._root))
@@ -281,6 +284,18 @@ class RepoItem(RepoTreeItem):
         # selected tab widget on the workbench
         self._isActiveTab = sel
 
+    def setData(self, column, value):
+        if column == 0:
+            shortname = hglib.fromunicode(value.toString())
+            abshgrcpath = os.path.join(self.rootpath(), '.hg', 'hgrc')
+            if not hglib.setConfigValue(abshgrcpath, 'web.name', shortname):
+                qtlib.WarningMsgBox(_('Unable to update repository name'),
+                    _('An error occurred while updating the repository hgrc '
+                    'file (%s)' % abshgrcpath))
+                return False
+            return True
+        return False
+
 
 class SubrepoItem(RepoItem):
     _subrepoType2IcoMap = {
@@ -339,6 +354,14 @@ class SubrepoItem(RepoItem):
             return Qt.MoveAction
         else:
             return Qt.CopyAction
+
+    def flags(self):
+        # Only stand-alone subrepo items can be renamed
+        if isinstance(self._parent, RepoGroupItem):
+            return super(SubrepoItem, self).flags()
+        else:
+            return (Qt.ItemIsEnabled | Qt.ItemIsSelectable
+                | Qt.ItemIsDragEnabled)
 
 
 class RepoGroupItem(RepoTreeItem):
