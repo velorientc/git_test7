@@ -207,6 +207,7 @@ class HgignoreDialog(QDialog):
         newfilter = hglib.fromunicode(self.le.text()).strip()
         if newfilter == '':
             return
+        self.le.clear()
         if self.recombo.currentIndex() == 0:
             test = 'glob:' + newfilter
             try:
@@ -226,7 +227,6 @@ class HgignoreDialog(QDialog):
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
-        self.le.clear()
 
     def refresh(self):
         try:
@@ -259,6 +259,9 @@ class HgignoreDialog(QDialog):
             self.lclunknowns = []
             return
 
+        if not self.pats:
+            self.pats = [self.lclunknowns[i.row()]
+                         for i in self.unknownlist.selectedIndexes()]
         self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
@@ -267,6 +270,8 @@ class HgignoreDialog(QDialog):
                 item = self.unknownlist.item(i)
                 self.unknownlist.setItemSelected(item, True)
                 self.unknownlist.setCurrentItem(item)
+                self.le.setText(QString(u))
+        self.pats = []
 
     def writeIgnoreFile(self):
         eol = self.doseoln and '\r\n' or '\n'
