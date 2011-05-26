@@ -466,7 +466,7 @@ class Workbench(QMainWindow):
         root = hglib.fromunicode(root)
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == root:
+            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
                 self.repoTabsWidget.setCurrentIndex(i)
                 return
         self._openRepo(root, False)
