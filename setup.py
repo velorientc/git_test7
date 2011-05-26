@@ -92,6 +92,7 @@ class update_pot(Command):
             for filename in os.listdir(pathname):
                 if filename.endswith('.py'):
                     filelist.append(os.path.join(pathname, filename))
+        filelist.sort()
 
         potfile = 'tortoisehg.pot'
 
