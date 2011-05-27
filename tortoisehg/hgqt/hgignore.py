@@ -198,6 +198,7 @@ class HgignoreDialog(QDialog):
         newfilter = hglib.fromunicode(self.le.text()).strip()
         if newfilter == '':
             return
+        self.le.clear()
         if self.recombo.currentIndex() == 0:
             test = 'glob:' + newfilter
             try:
@@ -217,7 +218,6 @@ class HgignoreDialog(QDialog):
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
-        self.le.clear()
 
     def refresh(self):
         try:
