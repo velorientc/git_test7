@@ -715,7 +715,7 @@ def dispatch(ui, args):
     if hasattr(hgdispatch, 'request'):
         # hg >= 1.9, see mercurial changes 08bfec2ef031, 80c599eee3f3
         req = hgdispatch.request(args, ui)
-        hgdispatch._dispatch(req)
+        return hgdispatch._dispatch(req)
     else:
         # hg <= 1.8
-        hgdispatch._dispatch(ui, args)
+        return hgdispatch._dispatch(ui, args)
