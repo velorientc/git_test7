@@ -68,7 +68,7 @@ def openhelpcontents(url):
                 return
         QDesktopServices.openUrl(QUrl(fullurl))
 
-def loadIniFile(rcpath, parent):
+def loadIniFile(rcpath, parent=None):
     for fn in rcpath:
         if os.path.exists(fn):
             break
