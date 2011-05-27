@@ -21,9 +21,9 @@ from PyQt4.QtGui import *
 
 from mercurial import error, node, merge as mergemod
 
-from tortoisehg.util import hglib, paths 
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
+from tortoisehg.hgqt import cmdui, csinfo, thgrepo, resolve, hgrcutil
 from tortoisehg.hgqt.update import UpdateDialog
 
 class rUpdateDialog(UpdateDialog):
@@ -34,7 +34,7 @@ class rUpdateDialog(UpdateDialog):
         # Get configured paths
         self.paths = {}
         fn = self.repo.join('hgrc')
-        fn, cfg = qtlib.loadIniFile([fn], self)
+        fn, cfg = hgrcutil.loadIniFile([fn], self)
         if 'paths' in cfg:
             for alias in cfg['paths']:
                 self.paths[ alias ] = cfg['paths'][alias]

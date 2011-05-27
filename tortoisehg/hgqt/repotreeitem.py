@@ -12,7 +12,7 @@ from mercurial import ui, hg, util, error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, hgrcutil
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -288,7 +288,7 @@ class RepoItem(RepoTreeItem):
         if column == 0:
             shortname = hglib.fromunicode(value.toString())
             abshgrcpath = os.path.join(self.rootpath(), '.hg', 'hgrc')
-            if not hglib.setConfigValue(abshgrcpath, 'web.name', shortname):
+            if not hgrcutil.setConfigValue(abshgrcpath, 'web.name', shortname):
                 qtlib.WarningMsgBox(_('Unable to update repository name'),
                     _('An error occurred while updating the repository hgrc '
                     'file (%s)' % abshgrcpath))

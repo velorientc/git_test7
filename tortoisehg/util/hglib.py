@@ -16,8 +16,6 @@ from mercurial import encoding, templatefilters, filemerge, error
 from mercurial import demandimport, revset
 from mercurial import dispatch as hgdispatch
 
-from tortoisehg.hgqt import qtlib
-from tortoisehg.util import wconfig
 
 demandimport.disable()
 try:
@@ -722,24 +720,3 @@ def dispatch(ui, args):
     else:
         # hg <= 1.8
         return hgdispatch._dispatch(ui, args)
-
-def setConfigValue(rcfilepath, cfgpath, value):
-    '''
-    rcpfilepath - absolute path to a configuration file
-    cfpath - full path of a configurable, ex 'web.name'
-    value - string value or None. if None, the configurable is removed
-    '''
-    fn, cfg = qtlib.loadIniFile([rcfilepath])
-    if not hasattr(cfg, 'write'):
-        return False
-    if fn is None:
-        return False
-    cfgpath = cfgpath.split('.')
-    if len(cfgpath) < 2:
-        return False
-    cfg.set(cfgpath[0], cfgpath[1], value)
-    try:
-        wconfig.writefile(cfg, fn)
-    except EnvironmentError, e:
-        return False
-    return True

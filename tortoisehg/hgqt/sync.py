@@ -19,7 +19,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
 
 def parseurl(path):
     if path.startswith('ssh://'):
@@ -349,7 +349,7 @@ class SyncWidget(QWidget):
         # Refresh configured paths
         self.paths = {}
         fn = self.repo.join('hgrc')
-        fn, cfg = qtlib.loadIniFile([fn], self)
+        fn, cfg = hgrcutil.loadIniFile([fn], self)
         if 'paths' in cfg:
             for alias in cfg['paths']:
                 self.paths[ alias ] = cfg['paths'][ alias ]
@@ -897,7 +897,7 @@ class SyncWidget(QWidget):
     def removeAlias(self, alias):
         alias = hglib.fromunicode(alias)
         fn = self.repo.join('hgrc')
-        fn, cfg = qtlib.loadIniFile([fn], self)
+        fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to remove URL'),
                    _('Iniparse must be installed.'), parent=self)
@@ -995,7 +995,7 @@ class PostPullDialog(QDialog):
 
     def accept(self):
         path = self.repo.join('hgrc')
-        fn, cfg = qtlib.loadIniFile([path], self)
+        fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
                    _('Iniparse must be installed.'), parent=self)
@@ -1065,7 +1065,7 @@ class SaveDialog(QDialog):
 
     def accept(self):
         fn = self.repo.join('hgrc')
-        fn, cfg = qtlib.loadIniFile([fn], self)
+        fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
                    _('Iniparse must be installed.'), parent=self)
@@ -1233,7 +1233,7 @@ are expanded in the filename.'''))
 
     def accept(self):
         path = hglib.user_rcpath()
-        fn, cfg = qtlib.loadIniFile(path, self)
+        fn, cfg = hgrcutil.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
                    _('Iniparse must be installed.'), parent=self)
