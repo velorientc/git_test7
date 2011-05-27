@@ -12,8 +12,9 @@ import time
 import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
-from mercurial import dispatch, encoding, templatefilters, filemerge, error
+from mercurial import encoding, templatefilters, filemerge, error
 from mercurial import demandimport, revset
+from mercurial import dispatch as hgdispatch
 
 demandimport.disable()
 try:
@@ -512,7 +513,7 @@ def hgcmd_toq(q, label, args):
     u = Qui()
     oldterm = os.environ.get('TERM')
     os.environ['TERM'] = 'dumb'
-    ret = dispatch._dispatch(u, list(args))
+    ret = dispatch(u, list(args))
     if oldterm:
         os.environ['TERM'] = oldterm
     return ret
@@ -709,3 +710,12 @@ def getLineSeparator(line):
             linesep = sep
             break
     return linesep
+
+def dispatch(ui, args):
+    if hasattr(hgdispatch, 'request'):
+        # hg >= 1.9, see mercurial changes 08bfec2ef031, 80c599eee3f3
+        req = hgdispatch.request(args, ui)
+        hgdispatch._dispatch(req)
+    else:
+        # hg <= 1.8
+        hgdispatch._dispatch(ui, args)
