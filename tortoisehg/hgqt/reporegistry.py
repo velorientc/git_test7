@@ -205,12 +205,14 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
 
-    def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False):
+    def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
+            showShortPaths=False):
         QDockWidget.__init__(self, parent)
 
         self.watcher = None
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
+        self.showShortPaths = showShortPaths
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -268,6 +270,13 @@ class RepoRegistryView(QDockWidget):
             if reloadModel:
                 self.reloadModel()
 
+    def setShowShortPaths(self, show):
+        if self.showShortPaths != show:
+            self.showShortPaths = show
+            #self.tview.model().showShortPaths = show
+            self.tview.model().updateCommonPaths(show)
+            self.tview.dataChanged(QModelIndex(), QModelIndex())
+
     def updateSettingsFile(self):
         # If there is a settings watcher, we must briefly stop watching the
         # settings file while we save it, otherwise we'll get the update signal
@@ -278,6 +287,10 @@ class RepoRegistryView(QDockWidget):
         self.tview.model().write(sfile)
         if self.watcher:
             self.watcher.addPath(sfile)
+
+        # Whenver the settings file must be updated, it is also time to ensure
+        # that the commonPaths are up to date
+        QTimer.singleShot(0, self.tview.model().updateCommonPaths)
 
     @pyqtSlot()
     def dropAccepted(self):
@@ -303,7 +316,8 @@ class RepoRegistryView(QDockWidget):
     def reloadModel(self):
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
-                self.showSubrepos, self.showNetworkSubrepos))
+                self.showSubrepos, self.showNetworkSubrepos,
+                self.showShortPaths))
         self.expand()
         self._pendingReloadModel = False
 

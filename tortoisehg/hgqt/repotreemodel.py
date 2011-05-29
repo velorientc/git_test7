@@ -72,11 +72,12 @@ def getRepoItemList(root):
 class RepoTreeModel(QAbstractItemModel):
 
     def __init__(self, filename, parent, showSubrepos=False,
-            showNetworkSubrepos=False):
+            showNetworkSubrepos=False, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
 
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
+        self.showShortPaths = showShortPaths
 
         root = None
         all = None
@@ -102,6 +103,7 @@ class RepoTreeModel(QAbstractItemModel):
 
         self.rootItem = root
         self.allrepos = all
+        self.updateCommonPaths()
 
     # see http://doc.qt.nokia.com/4.6/model-view-model-subclassing.html
 
@@ -311,3 +313,14 @@ class RepoTreeModel(QAbstractItemModel):
                     self.removeRows(0, c.childCount(),
                         self.createIndex(c.row(), 0, c))
                     c.appendSubrepos()
+
+    def updateCommonPaths(self, showShortPaths=None):
+        if not showShortPaths is None:
+            self.showShortPaths = showShortPaths
+        for grp in self.rootItem.childs:
+            if isinstance(grp, RepoGroupItem):
+                if self.showShortPaths:
+                    grp.updateCommonPath()
+                else:
+                    grp.updateCommonPath('')
+

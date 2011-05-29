@@ -204,8 +204,22 @@ class RepoItem(RepoTreeItem):
         if column == 0:
             return QVariant(self.shortname())
         elif column == 1:
-            return QVariant(hglib.tounicode(self._root))
+            return QVariant(self.shortpath())
         return QVariant()
+
+    def getCommonPath(self):
+        return self.parent().getCommonPath()
+
+    def shortpath(self):
+        try:
+            cpath = self.getCommonPath()
+        except:
+            cpath = ''
+        spath = os.path.normpath(self._root)
+        if cpath and spath.startswith(cpath):
+            iShortPathStart = len(cpath) + 1
+            spath = spath[iShortPathStart:]
+        return hglib.tounicode(spath)
 
     def menulist(self):
         return ['open', 'clone', 'addsubrepo', None, 'explore',
@@ -371,6 +385,7 @@ class RepoGroupItem(RepoTreeItem):
             self.name = name
         else:
             self.name = QString()
+        self._commonpath = ''
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -381,6 +396,8 @@ class RepoGroupItem(RepoTreeItem):
             return QVariant()
         if column == 0:
             return QVariant(self.name)
+        elif column == 1:
+            return QVariant(self.getCommonPath())
         return QVariant()
 
     def setData(self, column, value):
@@ -410,11 +427,60 @@ class RepoGroupItem(RepoTreeItem):
     def okToDelete(self):
         return False
 
+    def updateCommonPath(self, cpath=None):
+        """
+        Update or set the group 'common path'
+        
+        When called with no arguments, the group common path is calculated by
+        looking for the common path of all the repos on a repo group
+        
+        When called with an argument, the group common path is set to the input
+        argument. This is commonly used to set the group common path to an empty
+        string, thus disabling the "show short paths" functionality.
+        """
+        if not cpath is None:
+            self._commonpath = cpath
+        elif len(self.childs) == 0:
+            # If a group has no repo items, the common path is empty
+            self._commonpath = ''
+        else:
+            # Calculate the group common path
+            def splitPath(path):
+                path = os.path.normpath(path)
+                return path.split(os.path.sep)[:-1]
+
+            cpath = splitPath(self.childs[0].rootpath())
+
+            for c in self.childs[1:]:
+                if not cpath:
+                    # There is no common path
+                    break
+                # Update the common path to the common path with the current
+                # child
+                childpath = splitPath(c.rootpath())
+                # The common part cannot go beyond the smaller of the current
+                # common path and the current child
+                clen = min(len(cpath), len(childpath))
+                cpath = cpath[:clen]
+                childpath = childpath[:clen]
+                if cpath == childpath:
+                    # Trivial case
+                    continue
+                for n in range(clen):
+                    # From left to right, find the first path part that is not
+                    # the same
+                    if cpath[n] != childpath[n]:
+                        cpath = cpath[:n]
+                        break
+            self._commonpath = os.path.sep.join(cpath)
+        return self._commonpath
+
+    def getCommonPath(self):
+        return self._commonpath
 
 class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, parent=None):
-        RepoTreeItem.__init__(self, parent)
-        self.name = _('default')
+        RepoGroupItem.__init__(self, name=_('default'), parent=parent)
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
             None, 'reloadRegistry']

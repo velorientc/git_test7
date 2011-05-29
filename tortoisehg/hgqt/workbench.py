@@ -244,6 +244,11 @@ class Workbench(QMainWindow):
                 self.reporegistry.setShowNetworkSubrepos,
                   checkable=True, menu='view')
 
+        self.actionShowShortPaths = \
+            newaction(_("Show Short Paths"),
+                self.reporegistry.setShowShortPaths,
+                  checkable=True, menu='view')
+
         a = self.log.toggleViewAction()
         a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
@@ -780,6 +785,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'showSubrepos', self.actionShowSubrepos.isChecked())
         s.setValue(wb + 'showNetworkSubrepos',
             self.actionShowNetworkSubrepos.isChecked())
+        s.setValue(wb + 'showShortPaths', self.actionShowShortPaths.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
         if self.actionSaveRepos.isChecked():
@@ -813,13 +819,17 @@ class Workbench(QMainWindow):
             defaultValue=QVariant(True)).toBool()
         snsr = s.value(wb + 'showNetworkSubrepos',
             defaultValue=QVariant(True)).toBool()
+        ssp = s.value(wb + 'showShortPaths',
+            defaultValue=QVariant(True)).toBool()
         self.reporegistry.setShowSubrepos(ssr, False)
         self.reporegistry.setShowNetworkSubrepos(snsr, False)
+        self.reporegistry.setShowShortPaths(ssp)
 
         # Note that calling setChecked will NOT reload the model if the new
         # setting is the same as the one in the repo registry
         QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
         QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(ssr))
+        QTimer.singleShot(0, lambda: self.actionShowShortPaths.setChecked(ssp))
 
         # Manually reload the model now, to apply the settings
         self.reporegistry.reloadModel()
