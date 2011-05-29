@@ -61,6 +61,12 @@ class HgRepoView(QTableView):
         self.standardDelegate = self.itemDelegate()
         self.htmlDelegate = htmldelegate.HTMLDelegate(self)
 
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.MoveAction)
+        self.setDragEnabled(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 

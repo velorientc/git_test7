@@ -21,6 +21,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt.qreorder import writeSeries
 
 from tortoisehg.hgqt.i18n import _
 
@@ -28,6 +29,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 nullvariant = QVariant()
+
+mqpatchmimetype = 'application/thg-mqunappliedpatch'
 
 # TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
@@ -459,17 +462,56 @@ class HgRepoListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemFlags(0)
-        if not self.revset:
-            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
         row = index.row()
         self.ensureBuilt(row=row)
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
+        dragflags = Qt.ItemFlags(0)
+        if ctx.thgmqunappliedpatch():
+            dragflags = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        if not self.revset:
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled | dragflags
         if ctx.rev() not in self.revset:
             return Qt.ItemFlags(0)
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | dragflags
+
+    def mimeTypes(self):
+        return QStringList([mqpatchmimetype])
+
+    def supportedDropActions(self):
+        return Qt.MoveAction
+
+    def mimeData(self, indexes):
+        data = set()
+        for index in indexes:
+            row = str(index.row())
+            if row not in data:
+                data.add(row)
+        qmd = QMimeData()
+        bytearray = QByteArray(','.join(sorted(data, reverse=True)))
+        qmd.setData(mqpatchmimetype, bytearray)
+        return qmd
+
+    def dropMimeData(self, data, action, row, column, parent):
+        if mqpatchmimetype not in data.formats():
+            return False
+        dragrows = [int(r) for r in str(data.data(mqpatchmimetype)).split(',')]
+        destrow = parent.row() - len([r for r in dragrows if r < parent.row()])
+        if destrow < 0:
+            return False
+        unapplied = self.repo.thgmqunappliedpatches[::-1]
+        applied = [p.name for p in self.repo.mq.applied[::-1]]
+        if max(dragrows) >= len(unapplied):
+            return False
+        dragpatches = [unapplied[d] for d in dragrows]
+        for i in dragrows:
+            unapplied.pop(i)
+        for p in dragpatches:
+            unapplied.insert(destrow, p)
+        writeSeries(self.repo, applied, unapplied)
+        return True
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
