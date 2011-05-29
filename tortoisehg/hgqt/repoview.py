@@ -67,6 +67,8 @@ class HgRepoView(QTableView):
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
+        self.setStyle(HgRepoViewStyle(self.style()))
+
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -309,4 +311,59 @@ class HgRepoView(QTableView):
             self.setColumnWidth(stretch_col, width)
 
         super(HgRepoView, self).resizeEvent(e)
+
+class HgRepoViewStyle(QStyle):
+    "Override a style's drawPrimitive method to customize the drop indicator"
+    def __init__(self, style):
+        style.__class__.__init__(self)
+        self._style = style
+    def drawPrimitive(self, element, option, painter, widget=None):
+        if element == QStyle.PE_IndicatorItemViewItemDrop:
+            # Drop indicators should be painted using the full viewport width
+            vp = widget.viewport().rect()
+            painter.drawRect(vp.x(), option.rect.y(),
+                             vp.width() - 1, option.rect.height())
+        else:
+            self._style.drawPrimitive(element, option, painter, widget)
+    # Delegate all other methods overridden by QProxyStyle to the base class
+    def drawComplexControl(self, *args):
+        return self._style.drawComplexControl(*args)
+    def drawControl(self, *args):
+        return self._style.drawControl(*args)
+    def drawItemPixmap(self, *args):
+        return self._style.drawItemPixmap(*args)
+    def drawItemText(self, *args):
+        return self._style.drawItemText(*args)
+    def generatedIconPixmap(self, *args):
+        return self._style.generatedIconPixmap(*args)
+    def hitTestComplexControl(self, *args):
+        return self._style.hitTestComplexControl(*args)
+    def itemPixmapRect(self, *args):
+        return self._style.itemPixmapRect(*args)
+    def itemTextRect(self, *args):
+        return self._style.itemTextRect(*args)
+    def pixelMetric(self, *args):
+        return self._style.pixelMetric(*args)
+    def polish(self, *args):
+        return self._style.polish(*args)
+    def sizeFromContents(self, *args):
+        return self._style.sizeFromContents(*args)
+    def standardPalette(self):
+        return self._style.standardPalette()
+    def standardPixmap(self, *args):
+        return self._style.standardPixmap(*args)
+    def styleHint(self, *args):
+        return self._style.styleHint(*args)
+    def subControlRect(self, *args):
+        return self._style.subControlRect(*args)
+    def subElementRect(self, *args):
+        return self._style.subElementRect(*args)
+    def unpolish(self, *args):
+        return self._style.unpolish(*args)
+    def event(self, *args):
+        return self._style.event(*args)
+    def layoutSpacingImplementation(self, *args):
+        return self._style.layoutSpacingImplementation(*args)
+    def standardIconImplementation(self, *args):
+        return self._style.standardIconImplementation(*args)
 
