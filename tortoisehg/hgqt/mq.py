@@ -218,7 +218,7 @@ class MQWidget(QWidget):
     def closeEvent(self, event):
         self.repo.configChanged.disconnect(self.onConfigChanged)
         self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
-        super(PatchBranchWidget, self).closeEvent(event)
+        super(MQWidget, self).closeEvent(event)
 
     def getUserOptions(self, *optionlist):
         out = []
