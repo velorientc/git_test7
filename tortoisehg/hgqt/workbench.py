@@ -14,7 +14,7 @@ from mercurial import ui
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import thgrepo, cmdui, qtlib
+from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -51,6 +51,10 @@ class Workbench(QMainWindow):
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
         self.activeRepoChanged.connect(rr.setActiveTabRepo)
+
+        self.mqpatches = p = mq.MQPatchesWidget(self)
+        p.setObjectName('MQPatchesWidget')
+        self.addDockWidget(Qt.LeftDockWidgetArea, p)
 
         self.log = LogDockWidget(self)
         self.log.setObjectName('Log')
@@ -215,6 +219,12 @@ class Workbench(QMainWindow):
         a.setText(_('Show Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
         a.setIcon(qtlib.geticon('thg-reporegistry'))
+        self.docktbar.addAction(a)
+        self.menuView.addAction(a)
+
+        a = self.mqpatches.toggleViewAction()
+        a.setText(_('Show Patches'))
+        a.setIcon(qtlib.geticon('thg-mq'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
@@ -609,7 +619,9 @@ class Workbench(QMainWindow):
             if w.repo:
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
-        self.log.setRepository(w and w.repo or None)
+        repo = w and w.repo or None
+        self.log.setRepository(repo)
+        self.mqpatches.setrepo(repo)
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
