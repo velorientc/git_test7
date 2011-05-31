@@ -688,9 +688,13 @@ class RepoWidget(QWidget):
         manifestidx = self.namedTabs['manifest']
         if tw.currentIndex() == manifestidx:
             return # don't switch tabs if we are in manifest mode
+        ctx = self.repo.changectx(rev)
         if rev is None:
             # Clicking on working copy switches to commit tab
             tw.setCurrentIndex(self.commitTabIndex)
+        elif 'mq' in self.repo.extensions() and 'qtip' in ctx.tags():
+            # Clicking on latest applied patch switches to mq tab
+            tw.setCurrentIndex(self.mqTabIndex)
         else:
             # Clicking on a normal revision switches from commit tab
             tw.setCurrentIndex(self.logTabIndex)
