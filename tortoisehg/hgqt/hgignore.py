@@ -28,7 +28,7 @@ class HgignoreDialog(QDialog):
     def __init__(self, repo, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
-        self.setWindowFlags(self.windowFlags() & 
+        self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
@@ -96,12 +96,14 @@ class HgignoreDialog(QDialog):
 
         ignorelist = QListWidget()
         ivbox.addWidget(ignorelist)
+        ignorelist.setSelectionMode(QAbstractItemView.ExtendedSelection)
         unknownlist = QListWidget()
         uvbox.addWidget(unknownlist)
+        unknownlist.setSelectionMode(QAbstractItemView.ExtendedSelection)
         unknownlist.currentTextChanged.connect(self.setGlobFilter)
         unknownlist.setContextMenuPolicy(Qt.CustomContextMenu)
         unknownlist.customContextMenuRequested.connect(self.menuRequest)
-        lbl = QLabel(_('Backspace or Del to remove a row'))
+        lbl = QLabel(_('Backspace or Del to remove row(s)'))
         ivbox.addWidget(lbl)
 
         # layer 4 - dialog buttons
@@ -128,10 +130,10 @@ class HgignoreDialog(QDialog):
             return False
         elif event.key() not in (Qt.Key_Backspace, Qt.Key_Delete):
             return False
-        row = obj.currentRow()
-        if row < 0:
+        if obj.currentRow() < 0:
             return False
-        self.ignorelines.pop(row)
+        for idx in sorted(obj.selectedIndexes(), reverse=True):
+            self.ignorelines.pop(idx.row())
         self.writeIgnoreFile()
         self.refresh()
         return True
@@ -139,44 +141,51 @@ class HgignoreDialog(QDialog):
     def menuRequest(self, point):
         'context menu request for unknown list'
         point = self.unknownlist.mapToGlobal(point)
-        row = self.unknownlist.currentRow()
-        if row < 0:
+        selected = [self.lclunknowns[i.row()]
+                    for i in sorted(self.unknownlist.selectedIndexes())]
+        if len(selected) == 0:
             return
-        local = self.lclunknowns[row]
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
             self.contextmenu.setTitle(_('Add ignore filter...'))
         else:
             self.contextmenu.clear()
-        filters = [local]
-        base, ext = os.path.splitext(local)
-        if ext:
-            filters.append('*'+ext)
-        dirname = os.path.dirname(local)
-        while dirname:
-            filters.append(dirname)
-            dirname = os.path.dirname(dirname)
+        filters = []
+        if len(selected) == 1:
+            local = selected[0]
+            filters.append([local])
+            dirname = os.path.dirname(local)
+            while dirname:
+                filters.append([dirname])
+                dirname = os.path.dirname(dirname)
+            base, ext = os.path.splitext(local)
+            if ext:
+                filters.append(['*'+ext])
+        else:
+            filters.append(selected)
         for f in filters:
-            a = self.contextmenu.addAction(_('Ignore ') + hglib.tounicode(f))
-            a._pattern = f
-            a.triggered.connect(self.insertFilter)
+            n = len(f) == 1 and f[0] or _('selected files')
+            a = self.contextmenu.addAction(_('Ignore ') + hglib.tounicode(n))
+            a._patterns = f
+            a.triggered.connect(self.insertFilters)
         self.contextmenu.exec_(point)
 
-    def insertFilter(self, pat=False, isregexp=False):
-        if pat is False:
-            pat = self.sender()._pattern
+    def insertFilters(self, pats=False, isregexp=False):
+        if pats is False:
+            pats = self.sender()._patterns
         h = isregexp and 'syntax: regexp' or 'syntax: glob'
         if h in self.ignorelines:
             l = self.ignorelines.index(h)
             for i, line in enumerate(self.ignorelines[l+1:]):
                 if line.startswith('syntax:'):
-                    self.ignorelines.insert(l+i+1, pat)
+                    for pat in pats:
+                        self.ignorelines.insert(l+i+1, pat)
                     break
             else:
-                self.ignorelines.append(pat)
+                self.ignorelines.extend(pats)
         else:
             self.ignorelines.append(h)
-            self.ignorelines.append(pat)
+            self.ignorelines.extend(pats)
         self.writeIgnoreFile()
         self.refresh()
 
@@ -203,7 +212,7 @@ class HgignoreDialog(QDialog):
             test = 'glob:' + newfilter
             try:
                 match.match(self.repo.root, '', [], [test])
-                self.insertFilter(newfilter, False)
+                self.insertFilters([newfilter], False)
             except util.Abort, inst:
                 qtlib.WarningMsgBox(_('Invalid glob expression'), str(inst),
                                     parent=self)
@@ -213,7 +222,7 @@ class HgignoreDialog(QDialog):
             try:
                 match.match(self.repo.root, '', [], [test])
                 re.compile(test)
-                self.insertFilter(newfilter, True)
+                self.insertFilters([newfilter], True)
             except (util.Abort, re.error), inst:
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
@@ -230,7 +239,7 @@ class HgignoreDialog(QDialog):
         self.ignorelist.clear()
 
         uni = hglib.tounicode
-        
+
         self.ignorelist.addItems([uni(l) for l in self.ignorelines])
 
         try:
@@ -250,6 +259,9 @@ class HgignoreDialog(QDialog):
             self.lclunknowns = []
             return
 
+        if not self.pats:
+            self.pats = [self.lclunknowns[i.row()]
+                         for i in self.unknownlist.selectedIndexes()]
         self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
@@ -258,8 +270,8 @@ class HgignoreDialog(QDialog):
                 item = self.unknownlist.item(i)
                 self.unknownlist.setItemSelected(item, True)
                 self.unknownlist.setCurrentItem(item)
-                # single selection only
-                break
+                self.le.setText(QString(u))
+        self.pats = []
 
     def writeIgnoreFile(self):
         eol = self.doseoln and '\r\n' or '\n'

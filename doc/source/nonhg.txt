@@ -137,8 +137,9 @@ hgsubversion version of at least 1.2.1 with Mercurial 1.8.
 
 *TortoiseHg Integration*
 
-Imported Subversion changesets will display the original Subversion
-checkin number in the Repository Explorer browser.
+Imported Subversion changesets will display the original Subversion checkin
+number in the Changeset Info widget in the Revision Details task tab of the
+Workbench.
 
 hg-git (git)
 ============ 

@@ -625,7 +625,8 @@ class MatchTree(QTableView):
         self.selectedRows = saved
 
     def onAnnotateFile(self):
-        from tortoisehg.hgqt import annotate
+        from tortoisehg.hgqt.manifestdialog import run
+        from tortoisehg.hgqt.run import qtrun
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
         for rev, path, line in self.selectedRows:
@@ -639,15 +640,20 @@ class MatchTree(QTableView):
                 root = paths.find_root(abs)
                 if root and abs.startswith(root):
                     path = abs[len(root)+1:]
+                    if rev is None:
+                        rev = repo['.'].rev()
+                    srepo = thgrepo.repository(None, root)
+                    opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
+                            'line': line, 'pattern': pattern}
+                    qtrun(run, ui, **opts)
                 else:
                     continue
             else:
-                root = repo.root
-            dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
-                                          pattern=pattern, parent=self,
-                                          searchwidget=self.parent(),
-                                          root=root)
-            dlg.show()
+                if rev is None:
+                    rev = repo['.'].rev()
+                opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
+                        'line': line, 'pattern': pattern}
+                qtrun(run, ui, **opts)
 
     def onViewChangeset(self):
         for rev, path, line in self.selectedRows:
@@ -655,7 +661,6 @@ class MatchTree(QTableView):
             return
 
     def onViewFile(self):
-        from tortoisehg.hgqt import wctxactions
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
         for rev, path, line in self.selectedRows:
@@ -665,12 +670,11 @@ class MatchTree(QTableView):
             else:
                 seen.add(path)
             if rev is None:
-                files = [repo.wjoin(path)]
-                wctxactions.edit(self, ui, repo, files, line, pattern)
+                qtlib.editfiles(repo, [path], line, pattern, self)
             else:
                 base, _ = visdiff.snapshot(repo, [path], repo[rev])
                 files = [os.path.join(base, path)]
-                wctxactions.edit(self, ui, repo, files, line, pattern)
+                qtlib.editfiles(repo, files, line, pattern, self)
 
     def onVisualDiff(self):
         rows = self.selectedRows[:]

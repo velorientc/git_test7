@@ -174,7 +174,7 @@ class HgThread(thread2.Thread):
             for k, v in self.ui.configitems('defaults'):
                 self.ui.setconfig('defaults', k, '')
             l = 'control'
-            ret = hglib.dispatch._dispatch(self.ui, self.args)
+            ret = hglib.dispatch(self.ui, self.args)
             if ret:
                 self.ui.write(_('[command returned code %d ') % int(ret), label=l)
             else:

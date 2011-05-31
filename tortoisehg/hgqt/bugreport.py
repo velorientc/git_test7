@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import extensions, ui
+from mercurial import extensions
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
 
@@ -147,6 +147,7 @@ class ExceptionMsgBox(QDialog):
         self._textlabel = QLabel(text, wordWrap=True,
                                  textInteractionFlags=labelflags)
         self._textlabel.linkActivated.connect(self._openlink)
+        self._textlabel.setWordWrap(False)
         self.layout().addWidget(self._textlabel)
 
         bb = QDialogButtonBox(QDialogButtonBox.Close, centerButtons=True)
@@ -161,11 +162,20 @@ class ExceptionMsgBox(QDialog):
         if ref == '#bugreport':
             return BugReport(self._opts, self).exec_()
         if ref.startswith('#edit:'):
-            from tortoisehg.hgqt import wctxactions
             fname, lineno = ref[6:].rsplit(':', 1)
-            # A chicken-egg problem here, we need a ui to get your
-            # editor in order to repair your ui config file.
-            wctxactions.edit(self, ui.ui(), None, [fname], lineno, None)
+            try:
+                # A chicken-egg problem here, we need a ui to get your
+                # editor in order to repair your ui config file.
+                from mercurial import ui as uimod
+                from tortoisehg.hgqt import qtlib
+                class FakeRepo(object):
+                    def __init__(self):
+                        self.root = os.getcwd()
+                        self.ui = uimod.ui()
+                fake = FakeRepo()
+                qtlib.editfiles(fake, [fname], lineno, parent=self)
+            except Exception, e:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(fname))
         if ref.startswith('#fix:'):
             from tortoisehg.hgqt import settings
             errtext = ref[5:].split(' ')[0]

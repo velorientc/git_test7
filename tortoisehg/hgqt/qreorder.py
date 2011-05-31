@@ -184,21 +184,11 @@ class QReorderDialog(QDialog):
 
     def accept(self):
         self._writesettings()
-        try:
-            self.repo.incrementBusyCount()
-            lines = []
-            for i in xrange(self.alw.count()-1, -1, -1):
-                item = self.alw.item(i)
-                lines.append(item.patchname)
-            for i in xrange(self.ulw.count()-1, -1, -1):
-                item = self.ulw.item(i)
-                lines.append(item.patchname)
-            if lines:
-                fp = self.repo.mq.opener('series', 'wb')
-                fp.write('\n'.join(lines))
-                fp.close()
-        finally:
-            self.repo.decrementBusyCount()
+        applied = [self.alw.item(x).patchname
+                   for x in xrange(self.alw.count())]
+        unapplied = [self.ulw.item(x).patchname
+                     for x in xrange(self.ulw.count())]
+        writeSeries(self.repo, applied, unapplied)
         QDialog.accept(self)
 
     def reject(self):
@@ -216,6 +206,19 @@ class QReorderDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('qreorder/geom', self.saveGeometry())
+
+def writeSeries(repo, applied, unapplied):
+    try:
+        repo.incrementBusyCount()
+        # The series file stores the oldest unapplied patch at the bottom, and
+        # the first applied patch at the top
+        lines = reversed(unapplied + applied)
+        if lines:
+            fp = repo.mq.opener('series', 'wb')
+            fp.write('\n'.join(lines))
+            fp.close()
+    finally:
+        repo.decrementBusyCount()
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(None, paths.find_root())

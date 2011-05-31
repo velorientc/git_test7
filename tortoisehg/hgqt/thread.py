@@ -15,7 +15,7 @@ import errno
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util, error, dispatch
+from mercurial import util, error
 from mercurial import ui as uimod
 
 from tortoisehg.util import thread2, hglib
@@ -271,7 +271,7 @@ class CmdThread(QThread):
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
             self.ret = 255
-            self.ret = dispatch._dispatch(ui, self.cmdline) or 0
+            self.ret = hglib.dispatch(ui, self.cmdline) or 0
         except util.Abort, e:
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:

@@ -18,6 +18,7 @@ if hasattr(sys, "frozen"):
     sys.stderr = BlackHole()
 
 import os
+import errno
 import time
 import threading
 import cStringIO
@@ -366,8 +367,8 @@ def remove(args):
                 if not e.startswith('@@noicons'):
                     unlink(tfn)
             except (IOError, OSError), e:
-                logger.msg("Error while trying to remove %s (%s)" % (tfn, e))
-                pass
+                if e.errno != errno.ENOENT:
+                    logger.msg("Error while trying to remove %s (%s)" % (tfn, e))
         if notifypaths:
             shlib.shell_notify(list(notifypaths))
 

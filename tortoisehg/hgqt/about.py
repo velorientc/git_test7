@@ -27,9 +27,6 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super(AboutDialog, self).__init__(parent)
 
-        self.updateInfo = {}
-        self.uthread = None
-
         self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('About'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
