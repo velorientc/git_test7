@@ -110,12 +110,22 @@ class StatusWidget(QWidget):
         self.statusfilter = StatusFilterButton(
             statustext=st, types=StatusType.preferredOrder)
 
+        self.checkAllTT = _('Check all files')
+        self.checkNoneTT = _('Uncheck all files')
+        self.checkAllNoneBtn = QToolButton()
+        self.checkAllNoneBtn.setCheckable(True)
+        self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+        self.checkAllNoneBtn.setIcon(qtlib.geticon('status-check'))
+        self.checkAllNoneBtn.clicked.connect(self.checkAllNone)
+
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
         hbox.addWidget(self.filelistToolbar)
         self.filelistToolbar.addWidget(le)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.statusfilter)
+        self.filelistToolbar.addSeparator()
+        self.filelistToolbar.addWidget(self.checkAllNoneBtn)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self.repo, self)
@@ -133,22 +143,6 @@ class StatusWidget(QWidget):
             cpb = QPushButton(_('Remove filter, show root'))
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
-
-        self.countlbl = QLabel()
-        self.allbutton = QToolButton()
-        self.allbutton.setText(_('All', 'files'))
-        self.allbutton.setToolTip(_('Check all files'))
-        self.allbutton.clicked.connect(self.checkAll)
-        self.nonebutton = QToolButton()
-        self.nonebutton.setText(_('None', 'files'))
-        self.nonebutton.setToolTip(_('Uncheck all files'))
-        self.nonebutton.clicked.connect(self.checkNone)
-        hcbox = QHBoxLayout()
-        vbox.addLayout(hcbox)
-        hcbox.addWidget(self.allbutton)
-        hcbox.addWidget(self.nonebutton)
-        hcbox.addStretch(1)
-        hcbox.addWidget(self.countlbl)
 
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
@@ -193,6 +187,14 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
 
+    def checkAllNone(self):
+        if self.checkAllNoneBtn.isChecked():
+            self.checkAll()
+            self.checkAllNoneBtn.setToolTip(self.checkNoneTT)
+        else:
+            self.checkNone()
+            self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+
     def getTitle(self):
         if self.pats:
             return _('%s - status (selection filtered)') % self.repo.displayname
@@ -236,8 +238,7 @@ class StatusWidget(QWidget):
         else:
             self.reselection = None
 
-        self.allbutton.setEnabled(False)
-        self.nonebutton.setEnabled(False)
+        self.checkAllNoneBtn.setEnabled(False)
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
@@ -250,8 +251,7 @@ class StatusWidget(QWidget):
 
     def reloadComplete(self):
         self.refthread.wait()
-        self.allbutton.setEnabled(True)
-        self.nonebutton.setEnabled(True)
+        self.checkAllNoneBtn.setEnabled(True)
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
         if self.refthread.wctx is not None:
@@ -331,8 +331,9 @@ class StatusWidget(QWidget):
             model.setFilter(match)
 
     def updateCheckCount(self):
-        text = _('Checked count: %d') % len(self.getChecked())
-        self.countlbl.setText(text)
+        model = self.tv.model()
+        if model:
+            model.checkCount = len(self.getChecked())
 
     def checkAll(self):
         model = self.tv.model()
@@ -524,6 +525,7 @@ class WctxModel(QAbstractTableModel):
 
     def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent):
         QAbstractTableModel.__init__(self, parent)
+        self.checkCount = 0
         rows = []
         nchecked = {}
         excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
@@ -621,6 +623,8 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
             elif role == Qt.DisplayRole:
                 return QVariant("")
+            elif role == Qt.ToolTipRole:
+                return QVariant(_('Checked count: %d') % self.checkCount)
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         elif role == Qt.TextColorRole:
