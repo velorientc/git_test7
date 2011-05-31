@@ -558,13 +558,13 @@ def get_revision_desc(fctx, curpath=None):
     rev = fctx.linkrev()
     # If the source path matches the current path, don't bother including it.
     if curpath and curpath == fctx.path():
-        source = ''
+        source = u''
     else:
-        source = '(%s)' % fctx.path()
-    date = age(fctx.date())
-    l = tounicode(fctx.description()).replace('\0', '').splitlines()
+        source = u'(%s)' % tounicode(fctx.path())
+    date = tounicode(age(fctx.date()))
+    l = tounicode(fctx.description()).splitlines()
     summary = l and l[0] or ''
-    return '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
+    return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
 def validate_synch_path(path, repo):
     '''
