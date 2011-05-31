@@ -306,12 +306,13 @@ class ManifestModel(QAbstractItemModel):
                     sub = ctx.sub(path)
                     if srev and isinstance(sub, hgsubrepo):
                         srepo = sub._repo
-                        sctx = srepo[srev]
-
-                        self._subinfo[toprelpath]['ctx'] = sctx
-                        
-                        # Add the subrepo contents to the tree
-                        e = addrepocontentstotree(e, sctx, toprelpath)
+                        if srev in srepo:
+                            sctx = srepo[srev]
+    
+                            self._subinfo[toprelpath]['ctx'] = sctx
+                            
+                            # Add the subrepo contents to the tree
+                            e = addrepocontentstotree(e, sctx, toprelpath)
 
             # Add regular files to the tree
             status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
