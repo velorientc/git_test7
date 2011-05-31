@@ -17,6 +17,7 @@ import pdb
 import sys
 import subprocess
 import traceback
+import zlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -372,6 +373,7 @@ class _QtRunner(QObject):
     # It doesn't check the hierarchy of exception classes for simplicity.
     _recoverableexc = {
         error.RepoLookupError: _('Try refreshing your repository.'),
+        zlib.error:            _('Try refreshing your repository.'),
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
         error.ConfigError: _('Configuration Error: "%(arg0)s",<br>Please '
