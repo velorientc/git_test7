@@ -461,9 +461,10 @@ class HgRepoListModel(QAbstractTableModel):
             return Qt.ItemFlags(0)
         if not self.revset:
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled
-
         row = index.row()
         self.ensureBuilt(row=row)
+        if row >= len(self.graph):
+            return Qt.ItemFlags(0)
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
