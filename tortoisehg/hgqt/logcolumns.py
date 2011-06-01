@@ -29,7 +29,8 @@ class ColumnSelectDialog(QDialog):
             s = QSettings()
             cols = s.value('workbench/columns').toStringList()
             if cols:
-                self.curcolumns = [c for c in cols if c in all]
+                self.curcolumns = [hglib.fromunicode(c)
+                                   for c in cols if c in all]
             else:
                 self.curcolumns = all
         self.disabled = [c for c in all if c not in self.curcolumns]
