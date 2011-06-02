@@ -462,9 +462,10 @@ class HgRepoListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemFlags(0)
-
         row = index.row()
         self.ensureBuilt(row=row)
+        if row >= len(self.graph):
+            return Qt.ItemFlags(0)
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 

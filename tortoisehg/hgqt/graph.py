@@ -275,7 +275,7 @@ class Graph(object):
             # build as many graph nodes as required to answer the
             # requested idx
             self.build_nodes(idx)
-        if idx > len(self):
+        if idx >= len(self):
             return self.nodes[-1]
         return self.nodes[idx]
 
