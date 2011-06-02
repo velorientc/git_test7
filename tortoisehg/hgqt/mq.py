@@ -148,13 +148,6 @@ class MQPatchesWidget(QDockWidget):
             self.repo.repositoryChanged.connect(self.onRepositoryChanged)
         QTimer.singleShot(0, self.reload)       
 
-    def closeEvent(self, event):
-        if self.repo:
-            self.repo.configChanged.disconnect(self.onConfigChanged)
-            self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
-            self.repo = None
-        super(MQPatchesWidget, self).closeEvent(event)
-
     def getUserOptions(self, *optionlist):
         out = []
         for opt in optionlist:
