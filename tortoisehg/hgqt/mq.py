@@ -146,7 +146,7 @@ class MQPatchesWidget(QDockWidget):
             self.repo = repo
             self.repo.configChanged.connect(self.onConfigChanged)
             self.repo.repositoryChanged.connect(self.onRepositoryChanged)
-        QTimer.singleShot(0, self.reload)       
+        QTimer.singleShot(0, self.reload)
 
     def getUserOptions(self, *optionlist):
         out = []
