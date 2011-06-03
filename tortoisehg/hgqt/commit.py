@@ -597,10 +597,10 @@ class CommitWidget(QWidget):
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
+        self.progress.emit(*cmdui.startProgress(_('Commit', 'start progress'), ''))
         self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
         self.stopAction.setEnabled(True)
-        self.progress.emit(*cmdui.startProgress(_('Commit', 'start progress'), ''))
 
     def stop(self):
         self.runner.cancel()
@@ -961,8 +961,11 @@ class CommitDialog(QDialog):
     def postcommit(self):
         repo = self.commit.stwidget.repo
         if repo.ui.configbool('tortoisehg', 'closeci'):
-            self.reject()
-            return
+            if self.commit.canExit():
+                self.reject()
+            else:
+                self.commit.stwidget.refthread.wait()
+                QTimer.singleShot(0, self.reject)
 
     def accept(self):
         self.commit.commit()
