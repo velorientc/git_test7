@@ -223,7 +223,7 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         a = self.mqpatches.toggleViewAction()
-        a.setText(_('Show Patches'))
+        a.setText(_('Show Patch Queue'))
         a.setIcon(qtlib.geticon('thg-mq'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
@@ -269,7 +269,7 @@ class Workbench(QMainWindow):
         addtaskview('hg-log', _("Revision &Details"), 'log')
         addtaskview('hg-commit', _('&Commit'), 'commit')
         self.actionSelectTaskMQ = \
-                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
+                addtaskview('thg-qrefresh', _('MQ Patch'), 'mq')
         addtaskview('thg-sync', _('S&ynchronize'), 'sync')
         addtaskview('hg-annotate', _('&Manifest'), 'manifest')
         addtaskview('hg-grep', _('&Search'), 'grep')

@@ -42,7 +42,7 @@ class MQPatchesWidget(QDockWidget):
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
-        self.setWindowTitle(_('Patches'))
+        self.setWindowTitle(_('Patch Queue'))
 
         w = QWidget()
         mainlayout = QVBoxLayout()
