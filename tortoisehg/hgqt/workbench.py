@@ -54,6 +54,7 @@ class Workbench(QMainWindow):
 
         self.mqpatches = p = mq.MQPatchesWidget(self)
         p.setObjectName('MQPatchesWidget')
+        p.showMessage.connect(self.showMessage)
         p.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, p)
 
