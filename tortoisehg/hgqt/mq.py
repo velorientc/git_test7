@@ -430,6 +430,7 @@ class MQPatchesWidget(QDockWidget):
             self.setGuardsAct.setEnabled(False)
             self.qpopAct.setEnabled(False)
             self.qpopAllAct.setEnabled(False)
+            self.qreorderAct.setEnabled(False)
             return
 
         ui, repo = self.repo.ui.copy(), self.repo
