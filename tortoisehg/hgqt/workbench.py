@@ -621,6 +621,8 @@ class Workbench(QMainWindow):
             if w.repo:
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
+        else:
+            self.activeRepoChanged.emit("")
         repo = w and w.repo or None
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
