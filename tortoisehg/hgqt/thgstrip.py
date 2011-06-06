@@ -71,7 +71,7 @@ class StripDialog(QDialog):
             combo.addItem(hglib.tounicode(tag))
 
         ### preview box, contained in scroll area, contains preview grid
-        self.cslist = cslist.ChangesetList()
+        self.cslist = cslist.ChangesetList(self.repo)
         self.cslistrow = cslistrow = 2
         self.cslistcol = cslistcol = 1
         grid.addWidget(self.cslist, cslistrow, cslistcol,
@@ -166,7 +166,7 @@ class StripDialog(QDialog):
         striprevs.append(rev)
         striprevs.sort()
         self.cslist.clear()
-        self.cslist.update(self.repo, striprevs)
+        self.cslist.update(striprevs)
         return True
 
     def preview(self):

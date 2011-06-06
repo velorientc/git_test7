@@ -20,10 +20,10 @@ _SPACING = 6
 
 class ChangesetList(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, repo=None, parent=None):
         super(ChangesetList, self).__init__()
 
-        self.currepo = None
+        self.currepo = repo
         self.curitems = None
         self.curfactory = None
         self.showitems = None
@@ -67,8 +67,7 @@ class ChangesetList(QWidget):
         self.scrollarea.setWidget(self.scrollbox)
 
         # signal handlers
-        self.compactchk.toggled.connect(lambda *a: self.update(self.currepo,
-                                                               self.curitems))
+        self.compactchk.toggled.connect(lambda *a: self.update(self.curitems))
 
         # csetinfo
         def datafunc(widget, item, ctx):
@@ -134,11 +133,10 @@ class ChangesetList(QWidget):
             text = _('Displaying %(count)d of %(total)d items') % num
         self.statuslabel.setText(text)
 
-    def update(self, repo, items, uselimit=True):
+    def update(self, items, uselimit=True):
         """Update the item list.
 
         Public arguments:
-        repo: Repository used to get changeset information.
         items: List of revision numbers and/or patch file paths.
                You can pass a mixed list. The order will be respected.
         uselimit: If True, some of items will be shown.
@@ -148,13 +146,12 @@ class ChangesetList(QWidget):
         """
         # setup
         self.clear()
-        self.curfactory = csinfo.factory(repo, self.custom)
+        self.curfactory = csinfo.factory(self.currepo, self.custom)
 
         # initialize variables
-        self.currepo = repo
         self.curitems = items
 
-        if not items or not repo:
+        if not items or not self.currepo:
             self.updatestatus()
             return False
 
