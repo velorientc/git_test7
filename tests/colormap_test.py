@@ -66,6 +66,14 @@ def test_age_calc():
     for d in (0, SECS_PER_DAY, 365 * SECS_PER_DAY):
         assert_equals('#ffd4d4', cm.get_color(fakectx(0, d), d + age))
 
+def test_negative_age_calc():
+    cm = colormap.AnnotateColorSaturation()
+    assert_equals('#ffaaaa', cm.get_color(fakectx(0, 0), 0), '0 days old')
+    assert_equals('#ffaaaa', cm.get_color(fakectx(0, 50 * SECS_PER_DAY), 0),
+                  '-50 days old (should not raise ZeroDivisionError)')
+    assert_equals('#ffaaaa', cm.get_color(fakectx(0, 100 * SECS_PER_DAY), 0),
+                  '-100 days old')
+
 def test_makeannotatepalette_latest_wins():
     userstep = sys.maxint / 16
     filectxs = [fakectx(0 * userstep, 0), fakectx(1 * userstep, 1),
