@@ -250,6 +250,8 @@ class ImportDialog(QDialog):
             os.pathsep.join(hglib.tounicode(p) for p in paths))
 
     def thgimport(self):
+        if self.cslist.curitems is None:
+            return
         idx = self.targetcombo.currentIndex()
         if idx == 1:
             # import to shelf
