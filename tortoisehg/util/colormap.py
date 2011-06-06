@@ -102,7 +102,7 @@ class AnnotateColorSaturation(object):
         return _rescale(angle, 360.0 / self._maxhues)
 
     def get_color(self, ctx, now):
-        days = _days(ctx, now)
+        days = max(_days(ctx, now), 0.0)
         saturation = 255/((days/50) + 1)
         if self._maxsaturations:
             saturation = _rescaleceil(saturation, 255. / self._maxsaturations)
