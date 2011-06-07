@@ -89,7 +89,7 @@ class CSSLexerSelector(_FilenameLexerSelector):
     _lexer = Qsci.QsciLexerCSS
 
 class XMLLexerSelector(_FilenameLexerSelector):
-    extensions = ('.xhtml', '.xml')
+    extensions = ('.xhtml', '.xml', '.csproj', 'app.config', 'web.config')
     _lexer = Qsci.QsciLexerXML
 
 class HTMLLexerSelector(_FilenameLexerSelector):
@@ -127,6 +127,10 @@ class JavaLexerSelector(_FilenameLexerSelector):
 class TeXLexerSelector(_FilenameLexerSelector):
     extensions = ('.tex', '.latex',)
     _lexer = Qsci.QsciLexerTeX
+
+class CSharpLexerSelector(_FilenameLexerSelector):
+    extensions = ('.cs')
+    _lexer = Qsci.QsciLexerCSharp
 
 class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
