@@ -588,4 +588,6 @@ def run(ui, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
+    else:
+        rev = 'tip'
     return BackoutDialog(rev, repo, None)
