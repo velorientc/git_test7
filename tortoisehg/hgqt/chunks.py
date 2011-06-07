@@ -176,7 +176,7 @@ class ChunksWidget(QWidget):
                 eolmode = eolmode.lower()
             try:
                 # hg-1.9
-                ret = patch.internalpatch(ui, repo, fp, 1, repo.root, files=None,
+                ret = patch.internalpatch(ui, repo, fp, 1, files=None,
                                           eolmode=eolmode, similarity=0)
             except TypeError:
                 # hg-1.8
