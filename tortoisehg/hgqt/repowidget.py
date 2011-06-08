@@ -1108,7 +1108,7 @@ class RepoWidget(QWidget):
         entry(menu)
 
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
-              self.transplantRevision)
+              self.transplantRevisions)
 
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modify history'))
@@ -1421,10 +1421,6 @@ class RepoWidget(QWidget):
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
-
-    def transplantRevision(self):
-        cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
-        self.runCommand(cmdline)
 
     def transplantRevisions(self):
         cmdline = ['transplant', '--repository', self.repo.root]
