@@ -210,7 +210,7 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                  _('Editor launch failure'),
-                 _('%s : %s') % (cmd, str(e)))
+                 _('%s : %s') % (cmdline, hglib.tounicode(str(e))))
     return False
 
 
