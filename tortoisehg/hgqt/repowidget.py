@@ -164,8 +164,8 @@ class RepoWidget(QWidget):
 
         if 'mq' in self.repo.extensions():
             self.mqDemand = w = DemandWidget('createMQWidget', self)
-            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue", "tab tooltip"))
+            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-qrefresh'), '')
+            tt.setTabToolTip(idx, _("MQ Patch", "tab tooltip"))
             self.namedTabs['mq'] = idx
         else:
             self.mqTabIndex = -1
