@@ -27,16 +27,6 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;ssh = C:\cygwin\bin\ssh
 
 ;
-; For more information about mercurial extensions, start here
-; http://www.selenic.com/mercurial/wiki/index.cgi/UsingExtensions
-;
-
-[extensions]
-; fixfrozenexts is enabled by default.  It allows extension help
-; to work "out of the box" from binary installers.
-fixfrozenexts =
-
-;
 ; Define external diff commands, for hg command line use only
 ;
 [extdiff]
