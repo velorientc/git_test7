@@ -686,6 +686,7 @@ class CommitPage(BasePage):
 
     def ready(self):
         self.setTitle(_('Commit merged files'))
+        self.setSubTitle(' ')
         self.msg_text.moveCursorToEnd()
 
     def perform(self):
@@ -760,6 +761,7 @@ class ResultPage(QWizardPage):
         super(ResultPage, self).__init__(parent)
 
         self.setTitle(_('Finished'))
+        self.setSubTitle(' ')
 
     ### Override Method ###
 
