@@ -370,7 +370,13 @@ INFO = (
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
-        _('Specify your preferred terminal shell application'),
+        _('Specify the command to launch your preferred terminal shell '
+          'application. If the value includes the string %(reponame)s, the '
+          'name of the repository will be substituted in place of '
+          '%(reponame)s. (restart needed)<br>'
+          'Default, Windows: cmd.exe /K title %(reponame)s<br>'
+          'Default, OS X: not set<br>'
+          'Default, other: xterm -T "%(reponame)s"'),
         globalonly=True),
     _fi(_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
         _('Space separated list of shell operations you would like '

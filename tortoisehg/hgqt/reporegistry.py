@@ -427,8 +427,8 @@ class RepoRegistryView(QDockWidget):
         QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
     def terminal(self):
-        root = self.selitem.internalPointer().rootpath()
-        qtlib.openshell(root)
+        repoitem = self.selitem.internalPointer()
+        qtlib.openshell(repoitem.rootpath(), repoitem.shortname())
 
     def addNewRepo(self):
         'menu action handler for adding a new repository'

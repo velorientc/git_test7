@@ -409,7 +409,7 @@ class RevDetailsWidget(QWidget):
     def terminal(self):
         root = self.repo.wjoin(self.filelist.currentFile())
         if os.path.isdir(root):
-            qtlib.openshell(root)
+            qtlib.openshell(root, self.filelist.currentFile())
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):

@@ -306,7 +306,7 @@ class ManifestWidget(QWidget):
     def terminal(self):
         root = self._repo.wjoin(self.path)
         if os.path.isdir(root):
-            qtlib.openshell(root)
+            qtlib.openshell(root, self.path)
 
     def showEvent(self, event):
         QWidget.showEvent(self, event)

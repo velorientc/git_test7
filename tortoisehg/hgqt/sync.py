@@ -532,7 +532,7 @@ class SyncWidget(QWidget):
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        qtlib.openshell(folder)
+        qtlib.openshell(folder, 'repo ' + folder)
 
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),

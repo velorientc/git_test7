@@ -863,7 +863,7 @@ class Workbench(QMainWindow):
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            qtlib.openshell(w.repo.root)
+            qtlib.openshell(w.repo.root, w.repo.displayname)
 
     def editSettings(self):
         tw = self.repoTabsWidget

@@ -134,13 +134,14 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     return False
 
 _user_shell = None
-def openshell(root):
+def openshell(root, reponame):
     global _user_shell
     if _user_shell:
         cwd = os.getcwd()
         try:
+            shellcmd = _user_shell % {'reponame': reponame}
             os.chdir(root)
-            QProcess.startDetached(_user_shell)
+            QProcess.startDetached(shellcmd)
         finally:
             os.chdir(cwd)
     else:
@@ -155,9 +156,9 @@ def configureshell(ui):
     if sys.platform == 'darwin':
         return # Terminal.App does not support open-to-folder
     elif os.name == 'nt':
-        _user_shell = 'cmd.exe'
+        _user_shell = 'cmd.exe /K title %(reponame)s'
     else:
-        _user_shell = 'xterm'
+        _user_shell = 'xterm -T "%(reponame)s"'
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
