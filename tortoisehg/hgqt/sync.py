@@ -50,7 +50,7 @@ def parseurl(path):
         scheme = 'local'
     return user, host, port, folder, passwd, scheme
 
-class SyncWidget(QWidget):
+class SyncWidget(QWidget, qtlib.TaskWidget):
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)

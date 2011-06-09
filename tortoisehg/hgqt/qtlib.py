@@ -891,6 +891,11 @@ class WidgetGroups(object):
     def set_enable(self, *args, **kargs):
         self.set_prop('setEnabled', *args, **kargs)
 
+class TaskWidget(object):
+    def canswitch(self):
+        """Return True if the widget allows to switch away from it"""
+        return True
+
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
 
@@ -923,6 +928,12 @@ class DemandWidget(QWidget):
             self._widget = func()
             self.layout().addWidget(self._widget)
         return self._widget
+
+    def canswitch(self):
+        """Return True if the widget allows to switch away from it"""
+        if self._widget is None:
+            return True
+        return self._widget.canswitch()
 
     def __getattr__(self, name):
         return getattr(self._widget, name)

@@ -90,7 +90,7 @@ class ManifestDialog(QMainWindow):
         _openineditor(self._repo, path, rev, line,
                       pattern=self._fileview.searchbar.pattern(), parent=self)
 
-class ManifestWidget(QWidget):
+class ManifestWidget(QWidget, qtlib.TaskWidget):
     """Display file tree and contents at the specified revision"""
 
     revChanged = pyqtSignal(object)
@@ -110,6 +110,9 @@ class ManifestWidget(QWidget):
 
     filecontextmenu = None
     subrepocontextmenu = None
+
+    def canswitch(self):
+        return False
 
     def __init__(self, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)

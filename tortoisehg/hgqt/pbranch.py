@@ -22,7 +22,7 @@ from PyQt4.QtGui import *
 PATCHCACHEPATH = 'thgpbcache'
 nullvariant = QVariant()
 
-class PatchBranchWidget(QWidget):
+class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     '''
     A widget that show the patch graph and provide actions
     for the pbranch extension

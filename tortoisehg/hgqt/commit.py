@@ -154,7 +154,7 @@ class MessageEntry(qscilib.Scintilla):
         else:
             super(MessageEntry, self).keyPressEvent(event)
 
-class CommitWidget(QWidget):
+class CommitWidget(QWidget, qtlib.TaskWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     commitButtonEnable = pyqtSignal(bool)
     linkActivated = pyqtSignal(QString)

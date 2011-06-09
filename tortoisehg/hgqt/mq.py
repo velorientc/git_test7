@@ -533,7 +533,7 @@ class MQPatchesWidget(QDockWidget):
             return super(MQPatchesWidget, self).keyPressEvent(event)
 
 
-class MQWidget(QWidget):
+class MQWidget(QWidget, qtlib.TaskWidget):
     showMessage = pyqtSignal(unicode)
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)

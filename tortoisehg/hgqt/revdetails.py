@@ -23,7 +23,7 @@ from tortoisehg.hgqt import thgrepo, qtlib, qscilib, visdiff, revert
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class RevDetailsWidget(QWidget):
+class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
     showMessage = pyqtSignal(QString)
     linkActivated = pyqtSignal(unicode)

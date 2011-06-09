@@ -20,7 +20,7 @@ from PyQt4.QtGui import *
 # This widget can be embedded in any application that would like to
 # provide search features
 
-class SearchWidget(QWidget):
+class SearchWidget(QWidget, qtlib.TaskWidget):
     '''Working copy and repository search widget'''
     showMessage = pyqtSignal(QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
