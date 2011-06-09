@@ -436,6 +436,7 @@ class CommitPage(BasePage):
         super(CommitPage, self).__init__(repo, parent)
 
         self.setTitle(_('Commit merge results'))
+        self.setSubTitle(' ')
         self.setLayout(QVBoxLayout())
         self.setCommitPage(True)
 
@@ -598,6 +599,7 @@ class ResultPage(BasePage):
     def __init__(self, repo, parent):
         super(ResultPage, self).__init__(repo, parent)
         self.setTitle(_('Finished'))
+        self.setSubTitle(' ')
         self.setFinalPage(True)
 
         self.setLayout(QVBoxLayout())
