@@ -340,7 +340,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     def pnew_ui(self):
         """
         Create new patch.
-        Propmt user for new patch name. Patch is created
+        Prompt user for new patch name. Patch is created
         on current branch.
         """
         parent =  None
@@ -392,7 +392,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     def is_patch(self, branch_name):
         """ return True if branch is a patch. This excludes root branches
         and internal diff base branches (for patches with multiple
-        dependencies. """
+        dependencies). """
         return self.has_pbranch() and self.pgraph().ispatch(branch_name)
 
     def cur_branch(self):
