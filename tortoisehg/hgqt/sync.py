@@ -281,6 +281,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.setUrl('')
             self.curalias = None
 
+    def canswitch(self):
+        return not self.targetcheckbox.isChecked()
+
     def refreshStatusTips(self):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
