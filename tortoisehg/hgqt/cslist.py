@@ -62,7 +62,7 @@ class ChangesetList(QWidget):
         self.scrollbox = QWidget()
         self.csvbox = QVBoxLayout()
         self.csvbox.setSpacing(_SPACING)
-        self.csvbox.setSizeConstraint(QLayout.SetMinAndMaxSize)
+        self.csvbox.setSizeConstraint(QLayout.SetMaximumSize)
         self.scrollbox.setLayout(self.csvbox)
         self.scrollarea.setWidget(self.scrollbox)
 
