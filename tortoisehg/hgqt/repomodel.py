@@ -288,11 +288,19 @@ class HgRepoListModel(QAbstractTableModel):
         w = self.col2x(gnode.cols) + 10
         h = self.rowheight
 
-        dot_y = h / 2
-
         pix = QPixmap(w, h)
         pix.fill(QColor(0,0,0,0))
         painter = QPainter(pix)
+        try:
+            self._drawgraphctx(painter, pix, ctx, gnode)
+        finally:
+            painter.end()
+        return QVariant(pix)
+
+    def _drawgraphctx(self, painter, pix, ctx, gnode):
+        h = pix.height()
+        dot_y = h / 2
+
         painter.setRenderHint(QPainter.Antialiasing)
 
         pen = QPen(Qt.blue)
@@ -378,9 +386,6 @@ class HgRepoListModel(QAbstractTableModel):
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
             circle(0.5 * radius)
-
-        painter.end()
-        return QVariant(pix)
 
     def invalidateCache(self):
         self._cache = []
