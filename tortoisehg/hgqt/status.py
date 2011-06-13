@@ -565,15 +565,15 @@ class WctxModel(QAbstractTableModel):
                 nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
-            for u in wctx.unknown():
+            for u in wctx.unknown() or []:
                 nchecked[u] = checked.get(u, False)
                 rows.append(mkrow(u, '?'))
         if opts['ignored']:
-            for i in wctx.ignored():
+            for i in wctx.ignored() or []:
                 nchecked[i] = checked.get(i, False)
                 rows.append(mkrow(i, 'I'))
         if opts['clean']:
-            for c in wctx.clean():
+            for c in wctx.clean() or []:
                 nchecked[c] = checked.get(c, False)
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
