@@ -372,7 +372,7 @@ class CloneDialog(QDialog):
         cmdline = self.composeCommand()
 
         # do not make the same clone twice (see #514)
-        if dest == self.prev_dest and os.path.exists(dest):
+        if dest == self.prev_dest and os.path.exists(dest) and self.ret == 0:
             qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
                   _('Please enter a new destination path.'))
             self.dest_combo.setFocus()
