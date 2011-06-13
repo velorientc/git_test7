@@ -45,11 +45,8 @@ demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('icons_rc')
 demandimport.ignore.append('translations_rc')
 demandimport.enable()
-from mercurial import ui as uimod, util
-from tortoisehg.util.hgversion import hgversion, checkhgversion
-import cStringIO
-import traceback
 
+# Verify we can reach TortoiseHg sources first
 try:
     import tortoisehg.hgqt.run
 except ImportError, e:
@@ -59,50 +56,18 @@ except ImportError, e:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-ui = uimod.ui()
-capt = ui.configbool('tortoisehg', 'stderrcapt', True)
-
-errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
-          'NotImplementedError')
-
-err = checkhgversion(hgversion)
-if err:
+# Verify we have an acceptable version of Mercurial
+from tortoisehg.util.hgversion import hgversion, checkhgversion
+errmsg = checkhgversion(hgversion)
+if errmsg:
     from tortoisehg.hgqt.bugreport import run
     from tortoisehg.hgqt.run import qtrun
     opts = {}
     opts['cmd'] = ' '.join(sys.argv[1:])
-    opts['error'] = '\n' + err + '\n'
+    opts['error'] = '\n' + errmsg + '\n'
     opts['nofork'] = True
     qtrun(run, ui, **opts)
     sys.exit(1)
 
-if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
-    sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
-else:
-    mystderr = cStringIO.StringIO()
-    origstderr = sys.stderr
-    sys.stderr = mystderr
-    ret = 0
-    try:
-        ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
-        sys.stderr = origstderr
-        mystderr.seek(0)
-        for l in mystderr.readlines():
-            if l.startswith(errors):
-                from tortoisehg.hgqt.bugreport import run
-                from tortoisehg.hgqt.run import qtrun
-                error = 'Recoverable runtime error (stderr):\n'
-                error += mystderr.getvalue()
-                opts = {}
-                opts['cmd'] = ' '.join(sys.argv[1:])
-                opts['error'] = error
-                opts['nofork'] = True
-                qtrun(run, ui, **opts)
-                break
-        sys.exit(ret)
-    except:
-        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
-            sys.stderr = origstderr
-            traceback.print_exc()
-        else:
-            raise SystemExit(ret)
+ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
+sys.exit(ret)

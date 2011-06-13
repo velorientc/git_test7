@@ -6,24 +6,58 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import re
 import sys
 import shlex
 import time
-import inspect
+import urllib
 
-from mercurial import demandimport
+from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
+from mercurial import encoding, templatefilters, filemerge, error
+from mercurial import demandimport, revset
+from mercurial import dispatch as hgdispatch
+
+
 demandimport.disable()
 try:
-    # hg >= 1.7
-    from mercurial.cmdutil import updatedir
-except ImportError:
-    # hg <= 1.6
-    from mercurial.patch import updatedir
+    # hg >= 1.9
+    from mercurial.scmutil import canonpath, userrcpath
+    user_rcpath = userrcpath
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.util import canonpath, user_rcpath
+try:
+    # hg >= 1.9
+    from mercurial.util import localpath
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.hg import localpath
+try:
+    # hg >= 1.9
+    from mercurial.util import hidepassword, removeauth
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.url import hidepassword, removeauth
+try:
+    # hg >= 1.9
+    from mercurial.httpconnection import readauthforuri
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.url import readauthforuri
+try:
+    # hg >= 1.9
+    from mercurial.scmutil import revrange, expandpats, revpair, match, matchall
+except (ImportError, AttributeError):
+    # hg <= 1.8
+    from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
 demandimport.enable()
 
-from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
-from mercurial import dispatch, encoding, templatefilters, filemerge, error
+def revsetmatch(ui, pattern):
+    try:
+        # hg >= 1.9
+        return revset.match(ui, pattern)
+    except TypeError:
+        # hg <= 1.8
+        return revset.match(pattern)
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -266,7 +300,22 @@ def enabledextensions():
 
     shortdesc is in local encoding.
     """
-    return extensions.enabled()[0]
+    ret = extensions.enabled()
+    if type(ret) is tuple:
+        # hg <= 1.8
+        return ret[0]
+    else:
+        # hg <= 1.9
+        return ret
+
+def disabledextensions():
+    ret = extensions.disabled()
+    if type(ret) is tuple:
+        # hg <= 1.8
+        return ret[0] or {}
+    else:
+        # hg <= 1.9
+        return ret or {}
 
 def allextensions():
     """Return the {name: shortdesc} dict of known extensions
@@ -274,7 +323,7 @@ def allextensions():
     shortdesc is in local encoding.
     """
     enabledexts = enabledextensions()
-    disabledexts = extensions.disabled()[0]
+    disabledexts = disabledextensions()
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)
     return exts
@@ -332,13 +381,13 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(util.canonpath(root, cwd, f))
+            canonpats.append(canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(util.canonpath(root, cwd, f[len(cwd+os.sep):]))
+                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)
@@ -439,21 +488,6 @@ def difftools(ui):
     return tools
 
 
-_funcre = re.compile('\w')
-def getchunkfunction(data, linenum):
-    """Return the function containing the chunk at linenum.
-
-    Stolen from mercurial/mdiff.py.
-    """
-    # Walk backwards starting from the line before the chunk
-    # to find a line starting with an alphanumeric char.
-    for x in xrange(int(linenum) - 2, -1, -1):
-        t = data[x].rstrip()
-        if _funcre.match(t):
-            return ' ' + t[:40]
-    return None
-
-
 def hgcmd_toq(q, label, args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
@@ -480,7 +514,7 @@ def hgcmd_toq(q, label, args):
     u = Qui()
     oldterm = os.environ.get('TERM')
     os.environ['TERM'] = 'dumb'
-    ret = dispatch._dispatch(u, list(args))
+    ret = dispatch(u, list(args))
     if oldterm:
         os.environ['TERM'] = oldterm
     return ret
@@ -575,7 +609,7 @@ def validate_synch_path(path, repo):
     for alias, path_aux in repo.ui.configitems('paths'):
         if path == alias:
             return_path = path_aux
-        elif path == url.hidepassword(path_aux):
+        elif path == hidepassword(path_aux):
             return_path = path_aux
     return return_path
 
@@ -596,20 +630,6 @@ def is_rev_current(repo, rev):
 
     return rev == parents[0].node()
 
-def is_descriptor(obj, attr):
-    """
-    Returns True if obj.attr is a descriptor - ie, accessing
-    the attribute will actually invoke the '__get__' method of
-    some object.
-
-    Returns False if obj.attr exists, but is not a descriptor,
-    and None if obj.attr was not found at all.
-    """
-    for cls in inspect.getmro(obj.__class__):
-        if attr in cls.__dict__:
-            return hasattr(cls.__dict__[attr], '__get__')
-    return None
-
 def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
            opts=None):
     '''
@@ -624,3 +644,79 @@ def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
     except AttributeError:
         from mercurial import patch
         return patch.export(repo, revs, template, fp, switch_parent, opts)
+
+def getDeepestSubrepoContainingFile(wfile, ctx):
+    """
+    Given a filename and context, get the deepest subrepo that contains the file
+
+    Also return the corresponding subrepo context and the filename relative to
+    its containing subrepo
+    """
+    if wfile in ctx.manifest():
+        return '', wfile, ctx
+    for wsub in ctx.substate:
+        if wfile.startswith(wsub):
+            srev = ctx.substate[wsub][1]
+            stype = ctx.substate[wsub][2]
+            if stype != 'hg':
+                continue
+            if not os.path.exists(ctx._repo.wjoin(wsub)):
+                # Maybe the repository does not exist in the working copy?
+                continue
+            try:
+                sctx = ctx.sub(wsub)._repo[srev]
+            except:
+                # The selected revision does not exist in the working copy
+                continue
+            wfileinsub =  wfile[len(wsub)+1:]
+            if wfileinsub in sctx.substate or wfileinsub in sctx.manifest():
+                return wsub, wfileinsub, sctx
+            else:
+                wsubsub, wfileinsub, sctx = \
+                    getDeepestSubrepoContainingFile(wfileinsub, sctx)
+                if wsubsub is None:
+                    return None, wfile, ctx
+                else:
+                    return os.path.join(wsub, wsubsub), wfileinsub, sctx
+    return None, wfile, ctx
+
+def netlocsplit(netloc):
+    '''split [user[:passwd]@]host[:port] into 4-tuple.'''
+
+    a = netloc.find('@')
+    if a == -1:
+        user, passwd = None, None
+    else:
+        userpass, netloc = netloc[:a], netloc[a + 1:]
+        c = userpass.find(':')
+        if c == -1:
+            user, passwd = urllib.unquote(userpass), None
+        else:
+            user = urllib.unquote(userpass[:c])
+            passwd = urllib.unquote(userpass[c + 1:])
+    c = netloc.find(':')
+    if c == -1:
+        host, port = netloc, None
+    else:
+        host, port = netloc[:c], netloc[c + 1:]
+    return host, port, user, passwd
+
+def getLineSeparator(line):
+    """Get the line separator used on a given line"""
+    # By default assume the default OS line separator 
+    linesep = os.linesep
+    lineseptypes = ['\r\n', '\n', '\r']
+    for sep in lineseptypes:
+        if line.endswith(sep):
+            linesep = sep
+            break
+    return linesep
+
+def dispatch(ui, args):
+    if hasattr(hgdispatch, 'request'):
+        # hg >= 1.9, see mercurial changes 08bfec2ef031, 80c599eee3f3
+        req = hgdispatch.request(args, ui)
+        return hgdispatch._dispatch(req)
+    else:
+        # hg <= 1.8
+        return hgdispatch._dispatch(ui, args)

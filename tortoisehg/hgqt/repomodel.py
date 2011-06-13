@@ -21,6 +21,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt.qreorder import writeSeries
 
 from tortoisehg.hgqt.i18n import _
 
@@ -28,6 +29,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 nullvariant = QVariant()
+
+mqpatchmimetype = 'application/thg-mqunappliedpatch'
 
 # TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
@@ -48,10 +51,6 @@ COLUMNHEADERS = (
     ('UTCTime', _('UTC Time', 'column header')),
     ('Changes', _('Changes', 'column header')),
     )
-
-COLUMNNAMES = dict(COLUMNHEADERS)
-
-ALLCOLUMNS = [h[0] for h in COLUMNHEADERS]
 
 UNAPPLIED_PATCH_COLOR = '#999999'
 
@@ -74,11 +73,14 @@ class HgRepoListModel(QAbstractTableModel):
     filled = pyqtSignal()
     loaded = pyqtSignal()
 
+    _allcolumns = tuple(h[0] for h in COLUMNHEADERS)
+    _allcolnames = dict(COLUMNHEADERS)
+
     _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
-    def __init__(self, repo, branch, revset, rfilter, parent):
+    def __init__(self, repo, cfgname, branch, revset, rfilter, parent):
         """
         repo is a hg repo instance
         """
@@ -94,6 +96,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbyrevset = rfilter
         self.unicodestar = True
         self.unicodexinabox = True
+        self.cfgname = cfgname
 
         # To be deleted
         self._user_colors = {}
@@ -142,16 +145,16 @@ class HgRepoListModel(QAbstractTableModel):
 
     def updateColumns(self):
         s = QSettings()
-        cols = s.value('workbench/columns').toStringList()
+        cols = s.value(self.cfgname + '/columns').toStringList()
         cols = [str(col) for col in cols]
         # Fixup older names for columns
         if 'Log' in cols:
             cols[cols.index('Log')] = 'Description'
-            s.setValue('workbench/columns', cols)
+            s.setValue(self.cfgname + '/columns', cols)
         if 'ID' in cols:
             cols[cols.index('ID')] = 'Rev'
-            s.setValue('workbench/columns', cols)
-        validcols = [col for col in cols if col in ALLCOLUMNS]
+            s.setValue(self.cfgname + '/columns', cols)
+        validcols = [col for col in cols if col in self._allcolumns]
         if validcols:
             self._columns = tuple(validcols)
             self.invalidateCache()
@@ -285,11 +288,19 @@ class HgRepoListModel(QAbstractTableModel):
         w = self.col2x(gnode.cols) + 10
         h = self.rowheight
 
-        dot_y = h / 2
-
         pix = QPixmap(w, h)
         pix.fill(QColor(0,0,0,0))
         painter = QPainter(pix)
+        try:
+            self._drawgraphctx(painter, pix, ctx, gnode)
+        finally:
+            painter.end()
+        return QVariant(pix)
+
+    def _drawgraphctx(self, painter, pix, ctx, gnode):
+        h = pix.height()
+        dot_y = h / 2
+
         painter.setRenderHint(QPainter.Antialiasing)
 
         pen = QPen(Qt.blue)
@@ -376,9 +387,6 @@ class HgRepoListModel(QAbstractTableModel):
             painter.setBrush(fillcolor)
             circle(0.5 * radius)
 
-        painter.end()
-        return QVariant(pix)
-
     def invalidateCache(self):
         self._cache = []
         for a in ('_roleoffsets',):
@@ -459,8 +467,6 @@ class HgRepoListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemFlags(0)
-        if not self.revset:
-            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
         row = index.row()
         self.ensureBuilt(row=row)
         if row >= len(self.graph):
@@ -468,14 +474,55 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
+        dragflags = Qt.ItemFlags(0)
+        if ctx.thgmqunappliedpatch():
+            dragflags = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        if not self.revset:
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled | dragflags
         if ctx.rev() not in self.revset:
             return Qt.ItemFlags(0)
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | dragflags
+
+    def mimeTypes(self):
+        return QStringList([mqpatchmimetype])
+
+    def supportedDropActions(self):
+        return Qt.MoveAction
+
+    def mimeData(self, indexes):
+        data = set()
+        for index in indexes:
+            row = str(index.row())
+            if row not in data:
+                data.add(row)
+        qmd = QMimeData()
+        bytearray = QByteArray(','.join(sorted(data, reverse=True)))
+        qmd.setData(mqpatchmimetype, bytearray)
+        return qmd
+
+    def dropMimeData(self, data, action, row, column, parent):
+        if mqpatchmimetype not in data.formats():
+            return False
+        dragrows = [int(r) for r in str(data.data(mqpatchmimetype)).split(',')]
+        destrow = parent.row() - len([r for r in dragrows if r < parent.row()])
+        if destrow < 0:
+            return False
+        unapplied = self.repo.thgmqunappliedpatches[::-1]
+        applied = [p.name for p in self.repo.mq.applied[::-1]]
+        if max(dragrows) >= len(unapplied):
+            return False
+        dragpatches = [unapplied[d] for d in dragrows]
+        for i in dragrows:
+            unapplied.pop(i)
+        for p in dragpatches:
+            unapplied.insert(destrow, p)
+        writeSeries(self.repo, applied, unapplied)
+        return True
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                return QVariant(COLUMNNAMES[self._columns[section]])
+                return QVariant(self._allcolnames[self._columns[section]])
             if role == Qt.TextAlignmentRole:
                 return QVariant(Qt.AlignLeft)
         return nullvariant

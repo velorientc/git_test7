@@ -138,7 +138,10 @@ class SummaryInfo(object):
                     return None
                 return hglib.tounicode(value)[:80]
             elif item == 'user':
-                return hglib.tounicode(hglib.user(ctx))
+                user = hglib.user(ctx)
+                if user:
+                    return hglib.tounicode(user)
+                return None
             elif item == 'shortuser':
                 return hglib.tounicode(hglib.username(hglib.user(ctx)))
             elif item == 'dateage':
@@ -223,7 +226,7 @@ class SummaryInfo(object):
                 raise UnknownItem(item)
         if 'label' in custom and not kargs.get('usepreset', False):
             try:
-                return custom['label'](widget, item)
+                return custom['label'](widget, item, ctx)
             except UnknownItem:
                 pass
         try:

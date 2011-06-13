@@ -19,9 +19,15 @@ from mercurial import error
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import htmldelegate
+from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+class HgRepoViewHeader(QHeaderView):
+    menuRequested = pyqtSignal(QPoint)
+    def contextMenuEvent(self, event):
+        self.menuRequested.emit(event.globalPos())
 
 class HgRepoView(QTableView):
 
@@ -32,22 +38,36 @@ class HgRepoView(QTableView):
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo, cfgname, parent=None):
+    def __init__(self, repo, cfgname, colselect, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.current_rev = -1
         self.resized = False
         self.cfgname = cfgname
+        self.colselect = colselect
         self.setShowGrid(False)
 
         vh = self.verticalHeader()
         vh.hide()
         vh.setDefaultSectionSize(20)
 
-        self.horizontalHeader().setHighlightSections(False)
+        header = HgRepoViewHeader(Qt.Horizontal, self)
+        header.setHighlightSections(False)
+        header.menuRequested.connect(self.headerMenuRequest)
+        self.setHorizontalHeader(header)
+
+        self.createActions()
 
         self.standardDelegate = self.itemDelegate()
         self.htmlDelegate = htmldelegate.HTMLDelegate(self)
+
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.MoveAction)
+        self.setDragEnabled(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+
+        self.setStyle(HgRepoViewStyle(self.style()))
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -69,6 +89,23 @@ class HgRepoView(QTableView):
 
     def contextMenuEvent(self, event):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
+
+    def createActions(self):
+        menu = QMenu(self)
+        act = QAction(_('Choose log columns...'), self)
+        act.triggered.connect(self.setHistoryColumns)
+        menu.addAction(act)
+        self.headermenu = menu
+
+    def headerMenuRequest(self, point):
+        self.headermenu.exec_(point)
+
+    def setHistoryColumns(self):
+        dlg = ColumnSelectDialog(self.colselect[0], self.colselect[1],
+                                 self.model())
+        if dlg.exec_() == QDialog.Accepted:
+            self.model().updateColumns()
+            self.resizeColumns()
 
     def setModel(self, model):
         QTableView.setModel(self, model)
@@ -128,6 +165,12 @@ class HgRepoView(QTableView):
 
         key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         col_widths = [int(w) for w in QSettings().value(key).toStringList()]
+
+        if len(model._columns) <> len(col_widths):
+            # If the columns and widths don't match, use the calculated
+            # widths as they will probably be a better fit (likely because
+            # columns were changed without updating the widths)
+            col_widths = []
 
         for c in range(model.columnCount(QModelIndex())):
             if c < len(col_widths) and col_widths[c] > 0:
@@ -268,4 +311,59 @@ class HgRepoView(QTableView):
             self.setColumnWidth(stretch_col, width)
 
         super(HgRepoView, self).resizeEvent(e)
+
+class HgRepoViewStyle(QStyle):
+    "Override a style's drawPrimitive method to customize the drop indicator"
+    def __init__(self, style):
+        style.__class__.__init__(self)
+        self._style = style
+    def drawPrimitive(self, element, option, painter, widget=None):
+        if element == QStyle.PE_IndicatorItemViewItemDrop:
+            # Drop indicators should be painted using the full viewport width
+            vp = widget.viewport().rect()
+            painter.drawRect(vp.x(), option.rect.y(),
+                             vp.width() - 1, option.rect.height())
+        else:
+            self._style.drawPrimitive(element, option, painter, widget)
+    # Delegate all other methods overridden by QProxyStyle to the base class
+    def drawComplexControl(self, *args):
+        return self._style.drawComplexControl(*args)
+    def drawControl(self, *args):
+        return self._style.drawControl(*args)
+    def drawItemPixmap(self, *args):
+        return self._style.drawItemPixmap(*args)
+    def drawItemText(self, *args):
+        return self._style.drawItemText(*args)
+    def generatedIconPixmap(self, *args):
+        return self._style.generatedIconPixmap(*args)
+    def hitTestComplexControl(self, *args):
+        return self._style.hitTestComplexControl(*args)
+    def itemPixmapRect(self, *args):
+        return self._style.itemPixmapRect(*args)
+    def itemTextRect(self, *args):
+        return self._style.itemTextRect(*args)
+    def pixelMetric(self, *args):
+        return self._style.pixelMetric(*args)
+    def polish(self, *args):
+        return self._style.polish(*args)
+    def sizeFromContents(self, *args):
+        return self._style.sizeFromContents(*args)
+    def standardPalette(self):
+        return self._style.standardPalette()
+    def standardPixmap(self, *args):
+        return self._style.standardPixmap(*args)
+    def styleHint(self, *args):
+        return self._style.styleHint(*args)
+    def subControlRect(self, *args):
+        return self._style.subControlRect(*args)
+    def subElementRect(self, *args):
+        return self._style.subElementRect(*args)
+    def unpolish(self, *args):
+        return self._style.unpolish(*args)
+    def event(self, *args):
+        return self._style.event(*args)
+    def layoutSpacingImplementation(self, *args):
+        return self._style.layoutSpacingImplementation(*args)
+    def standardIconImplementation(self, *args):
+        return self._style.standardIconImplementation(*args)
 

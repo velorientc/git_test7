@@ -7,12 +7,11 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
-from mercurial import context, merge, commands, subrepo
-from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo, cmdui, fileview
+from mercurial import hg, util, cmdutil, error, context, merge
+
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff, cmdui, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -49,16 +48,16 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
 
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QWidget.__init__(self, parent)
 
-        root = paths.find_root(root)
-        assert(root)
-        self.repo = thgrepo.repository(ui.ui(), path=root)
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
+        self.repo = repo
         self.pats = pats
+        self.pctx = None
+        self.savechecks = True
         self.refthread = None
 
         # determine the user configured status colors
@@ -91,7 +90,7 @@ class StatusWidget(QWidget):
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setMargin(4)
-        hbox.setContentsMargins (5, 0, 0, 0)
+        hbox.setContentsMargins(2, 0, 0, 0)
         self.refreshBtn = tb = QToolButton()
         tb.setToolTip(_('Refresh file list'))
         tb.setIcon(qtlib.geticon('view-refresh'))
@@ -111,14 +110,23 @@ class StatusWidget(QWidget):
         self.statusfilter = StatusFilterButton(
             statustext=st, types=StatusType.preferredOrder)
 
+        self.checkAllTT = _('Check all files')
+        self.checkNoneTT = _('Uncheck all files')
+        self.checkAllNoneBtn = QCheckBox()
+        self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+        self.checkAllNoneBtn.stateChanged.connect(self.checkAllNone)
+
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
         hbox.addWidget(self.filelistToolbar)
+        self.filelistToolbar.addWidget(self.checkAllNoneBtn)
+        self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(le)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
+        self.actions = wctxactions.WctxActions(self.repo, self)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -134,27 +142,12 @@ class StatusWidget(QWidget):
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
 
-        self.countlbl = QLabel()
-        self.allbutton = QToolButton()
-        self.allbutton.setText(_('All', 'files'))
-        self.allbutton.setToolTip(_('Check all files'))
-        self.allbutton.clicked.connect(self.checkAll)
-        self.nonebutton = QToolButton()
-        self.nonebutton.setText(_('None', 'files'))
-        self.nonebutton.setToolTip(_('Uncheck all files'))
-        self.nonebutton.clicked.connect(self.checkNone)
-        hcbox = QHBoxLayout()
-        vbox.addLayout(hcbox)
-        hcbox.addWidget(self.allbutton)
-        hcbox.addWidget(self.nonebutton)
-        hcbox.addStretch(1)
-        hcbox.addWidget(self.countlbl)
-
-        tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
         tv.clicked.connect(self.onRowClicked)
+        tv.doubleClicked.connect(self.onRowDoubleClicked)
+        tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
         def statusTypeTrigger(status):
@@ -192,6 +185,14 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
 
+    def checkAllNone(self):
+        if self.checkAllNoneBtn.isChecked():
+            self.checkAll()
+            self.checkAllNoneBtn.setToolTip(self.checkNoneTT)
+        else:
+            self.checkNone()
+            self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+
     def getTitle(self):
         if self.pats:
             return _('%s - status (selection filtered)') % self.repo.displayname
@@ -206,7 +207,17 @@ class StatusWidget(QWidget):
         self.fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/state', self.split.saveState())
 
-    def refreshWctx(self):
+    @pyqtSlot(QPoint, object)
+    def onMenuRequest(self, point, selected):
+        menu = self.actions.makeMenu(selected)
+        if menu.exec_(point):
+            self.refreshWctx()
+
+    def setPatchContext(self, pctx):
+        self.pctx = pctx
+        self.savechecks = False
+
+    def refreshWctx(self, synchronous=False):
         if self.refthread:
             return
         self.fileview.clearDisplay()
@@ -225,19 +236,20 @@ class StatusWidget(QWidget):
         else:
             self.reselection = None
 
-        self.allbutton.setEnabled(False)
-        self.nonebutton.setEnabled(False)
+        self.checkAllNoneBtn.setEnabled(False)
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
-        self.refthread = StatusThread(self.repo, self.pats, self.opts)
-        self.refthread.finished.connect(self.reloadComplete)
+        self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
+        if not synchronous:
+            self.refthread.finished.connect(self.reloadComplete)
         self.refthread.showMessage.connect(self.showMessage)
         self.refthread.start()
+        if synchronous:
+            self.reloadComplete()
 
     def reloadComplete(self):
         self.refthread.wait()
-        self.allbutton.setEnabled(True)
-        self.nonebutton.setEnabled(True)
+        self.checkAllNoneBtn.setEnabled(True)
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
         if self.refthread.wctx is not None:
@@ -258,7 +270,8 @@ class StatusWidget(QWidget):
                                     _('No files found for this operation'),
                                     parent=self)
         ms = merge.mergestate(self.repo)
-        tm = WctxModel(wctx, ms, self.opts, checked, self)
+        tm = WctxModel(wctx, ms, self.pctx, self.savechecks, self.opts,
+                       checked, self)
         tm.checkToggled.connect(self.updateCheckCount)
 
         self.tv.setModel(tm)
@@ -286,9 +299,11 @@ class StatusWidget(QWidget):
                     curidx = tm.index(i, 0)
         else:
             selmodel.select(curidx, flags)
-        selmodel.currentChanged.connect(self.currentChanged)
+        selmodel.currentChanged.connect(self.onCurrentChange)
+        selmodel.selectionChanged.connect(self.onSelectionChange)
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
+        self.onSelectionChange(None, None)
 
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex)
@@ -297,13 +312,26 @@ class StatusWidget(QWidget):
         if index.column() == COL_PATH:
             self.tv.model().toggleRows([index])
 
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QModelIndex)
+    def onRowDoubleClicked(self, index):
+        'tree view emitted a doubleClicked signal, index guarunteed valid'
+        path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+        if status in 'MAR!':
+            self.actions.allactions[0].trigger()
+        elif status == 'S':
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+
     @pyqtSlot(QString)
     def setFilter(self, match):
-        self.tv.model().setFilter(match)
+        model = self.tv.model()
+        if model:
+            model.setFilter(match)
 
     def updateCheckCount(self):
-        text = _('Checked count: %d') % len(self.getChecked())
-        self.countlbl.setText(text)
+        model = self.tv.model()
+        if model:
+            model.checkCount = len(self.getChecked())
 
     def checkAll(self):
         model = self.tv.model()
@@ -332,16 +360,26 @@ class StatusWidget(QWidget):
             return []
 
     # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QItemSelection, QItemSelection)
+    def onSelectionChange(self, selected, deselected):
+        selrows = []
+        for index in self.tv.selectedRows():
+            path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+            selrows.append((set(status+mst.lower()), path))
+        self.actions.updateActionSensitivity(selrows)
+
+    # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex, QModelIndex)
-    def currentChanged(self, index, old):
+    def onCurrentChange(self, index, old):
         'Connected to treeview "currentChanged" signal'
         row = index.model().getRow(index)
         if row is None:
             return
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
-        self.fileview.setContext(self.repo[None])
-        self.fileview.displayFile(wfile, status=status)
+        pctx = self.pctx and self.pctx.p1() or None
+        self.fileview.setContext(self.repo[None], pctx)
+        self.fileview.displayFile(wfile, status)
 
 
 class StatusThread(QThread):
@@ -349,9 +387,10 @@ class StatusThread(QThread):
 
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repo, pctx, pats, opts, parent=None):
         super(StatusThread, self).__init__()
         self.repo = hg.repository(repo.ui, repo.root)
+        self.pctx = pctx
         self.pats = pats
         self.opts = opts
         self.wctx = None
@@ -370,7 +409,7 @@ class StatusThread(QThread):
                 else:
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
-                m = cmdutil.match(self.repo, self.pats)
+                m = hglib.match(self.repo, self.pats)
                 status = self.repo.status(match=m, **stopts)
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
@@ -382,6 +421,9 @@ class StatusThread(QThread):
                         patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
+            elif self.pctx:
+                status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
+                wctx = context.workingctx(self.repo, changes=status)
             else:
                 wctx = self.repo[None]
                 wctx.status(**stopts)
@@ -405,7 +447,7 @@ class StatusThread(QThread):
 
 
 class WctxFileTree(QTreeView):
-    menuAction = pyqtSignal()
+    menuRequest = pyqtSignal(QPoint, object)
 
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
@@ -433,15 +475,7 @@ class WctxFileTree(QTreeView):
     def keyPressEvent(self, event):
         if event.key() == 32:
             self.model().toggleRows(self.selectedRows())
-        if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
-            selfiles = []
-            for index in self.selectedRows():
-                selfiles.append(self.model().getRow(index)[COL_PATH])
-            dlg = visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
-            if dlg:
-                dlg.exec_()
-        else:
-            return super(WctxFileTree, self).keyPressEvent(event)
+        return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
         urls = []
@@ -475,10 +509,8 @@ class WctxFileTree(QTreeView):
         for index in self.selectedRows():
             path, status, mst, u, ext, sz = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
-        point = self.mapToGlobal(point)
-        action = wctxactions.wctxactions(self, point, self.repo, selrows)
-        if action:
-            self.menuAction.emit()
+        if selrows:
+            self.menuRequest.emit(self.viewport().mapToGlobal(point), selrows)
 
     def selectedRows(self):
         if self.selectionModel():
@@ -489,8 +521,9 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
 
-    def __init__(self, wctx, ms, opts, checked, parent):
+    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent):
         QAbstractTableModel.__init__(self, parent)
+        self.checkCount = 0
         rows = []
         nchecked = {}
         excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
@@ -504,23 +537,32 @@ class WctxModel(QAbstractTableModel):
             except EnvironmentError:
                 pass
             return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
+        if not savechecks:
+            checked = {}
+        if pctx:
+            # Currently, having a patch context means it's a qrefresh, so only
+            # auto-check files in pctx.files()
+            pctxfiles = pctx.files()
+            pctxmatch = lambda f: f in pctxfiles
+        else:
+            pctxmatch = lambda f: True
         if opts['modified']:
             for m in wctx.modified():
-                nchecked[m] = checked.get(m, m not in excludes)
+                nchecked[m] = checked.get(m, m not in excludes and pctxmatch(m))
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                nchecked[a] = checked.get(a, a not in excludes)
+                nchecked[a] = checked.get(a, a not in excludes and pctxmatch(a))
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                nchecked[r] = checked.get(r, r not in excludes)
+                nchecked[r] = checked.get(r, r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                nchecked[d] = checked.get(d, d not in excludes)
+                nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown() or []:
@@ -579,6 +621,8 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
             elif role == Qt.DisplayRole:
                 return QVariant("")
+            elif role == Qt.ToolTipRole:
+                return QVariant(_('Checked count: %d') % self.checkCount)
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         elif role == Qt.TextColorRole:
@@ -756,7 +800,7 @@ statusTypes = {
                      'status.ignored', _('ignored')),
     'C' : StatusType('clean', '', _('%s is not modified (clean)'),
                      'status.clean', _('clean')),
-    'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
+    'S' : StatusType('subrepo', 'thg-subrepo.ico', _('%s is a dirty subrepo'),
                      'status.subrepo', _('subrepo')),
 }
 
@@ -766,7 +810,7 @@ class StatusFilterButton(QToolButton):
     statusChanged = pyqtSignal(str)
 
     def __init__(self, statustext, types=None, parent=None, **kwargs):
-        self._TYPES = 'MARC'
+        self._TYPES = 'MARSC'
         if types is not None:
             self._TYPES = types
         #if 'text' not in kwargs:
@@ -808,13 +852,13 @@ class StatusFilterButton(QToolButton):
 
 class StatusDialog(QDialog):
     'Standalone status browser'
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, repo, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(pats, opts, root, self)
+        self.stwidget = StatusWidget(repo, pats, opts, self)
         layout.addWidget(self.stwidget, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -836,11 +880,10 @@ class StatusDialog(QDialog):
         if link.startswith('subrepo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, ui.ui(), root=link[8:])
+            qtrun(commit.run, self.commit.repo.ui, root=link[8:])
         if link.startswith('shelve:'):
-            repo = self.stwidget.repo
             from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self)
+            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()
@@ -873,4 +916,4 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return StatusDialog(pats, opts)
+    return StatusDialog(repo, pats, opts)

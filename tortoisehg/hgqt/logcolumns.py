@@ -16,18 +16,26 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 class ColumnSelectDialog(QDialog):
-    def __init__(self, all, curcolumns=None, parent=None):
+    def __init__(self, cfgname, name, model, parent=None):
         QDialog.__init__(self, parent)
+        if model:
+            all = model._allcolumns
+            colnames = model._allcolnames
+            self.curcolumns = model._columns
+        else:
+            all = repomodel.HgRepoListModel._allcolumns
+            colnames = repomodel.HgRepoListModel._allcolnames
+            self.curcolumns = None
 
-        self.setWindowTitle(_('Workbench Log Columns'))
+        self.setWindowTitle(name)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
         self.setMinimumSize(250, 265)
 
-        self.curcolumns = curcolumns
+        self.cfgname = cfgname
         if not self.curcolumns:
             s = QSettings()
-            cols = s.value('workbench/columns').toStringList()
+            cols = s.value(self.cfgname + '/columns').toStringList()
             if cols:
                 self.curcolumns = [hglib.fromunicode(c)
                                    for c in cols if c in all]
@@ -42,7 +50,7 @@ class ColumnSelectDialog(QDialog):
         list = QListWidget()
         # enabled cols are listed in sorted order
         for c in self.curcolumns:
-            item = QListWidgetItem(repomodel.COLUMNNAMES[c])
+            item = QListWidgetItem(colnames[c])
             item.columnid = c
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEnabled |
@@ -52,7 +60,7 @@ class ColumnSelectDialog(QDialog):
             list.addItem(item)
         # disabled cols are listed last
         for c in self.disabled:
-            item = QListWidgetItem(repomodel.COLUMNNAMES[c])
+            item = QListWidgetItem(colnames[c])
             item.columnid = c
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEnabled |
@@ -82,11 +90,11 @@ class ColumnSelectDialog(QDialog):
             item = self.list.item(i)
             if item.checkState() == Qt.Checked:
                 cols.append(item.columnid)
-        s.setValue('workbench/columns', cols)
+        s.setValue(self.cfgname + '/columns', cols)
         QDialog.accept(self)
 
     def reject(self):
         QDialog.reject(self)
 
 def run(ui, *pats, **opts):
-    return ColumnSelectDialog(repomodel.ALLCOLUMNS)
+    return ColumnSelectDialog('workbench', _('Workbench'), None)

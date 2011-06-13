@@ -36,7 +36,7 @@ class PerforcePending(QDialog):
         clcombo = QComboBox()
         layout.addWidget(clcombo)
 
-        self.cslist = cslist.ChangesetList()
+        self.cslist = cslist.ChangesetList(self.repo)
         layout.addWidget(self.cslist)
 
         self.cmd = cmdui.Runner(False, self)
@@ -78,7 +78,7 @@ class PerforcePending(QDialog):
         except (error.Abort, error.RepoLookupError), e:
             revs = []
         self.cslist.clear()
-        self.cslist.update(self.repo, revs)
+        self.cslist.update(revs)
         sensitive = not curcl.endswith('(submitted)')
         self.bb.button(QDialogButtonBox.Ok).setEnabled(sensitive)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(sensitive)

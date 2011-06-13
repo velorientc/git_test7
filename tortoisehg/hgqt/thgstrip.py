@@ -18,6 +18,9 @@ from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
 class StripDialog(QDialog):
     """Dialog to strip changesets"""
 
+    showBusyIcon = pyqtSignal(QString)
+    hideBusyIcon = pyqtSignal(QString)
+
     def __init__(self, repo=None, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -68,7 +71,7 @@ class StripDialog(QDialog):
             combo.addItem(hglib.tounicode(tag))
 
         ### preview box, contained in scroll area, contains preview grid
-        self.cslist = cslist.ChangesetList()
+        self.cslist = cslist.ChangesetList(self.repo)
         self.cslistrow = cslistrow = 2
         self.cslistcol = cslistcol = 1
         grid.addWidget(self.cslist, cslistrow, cslistcol,
@@ -163,7 +166,7 @@ class StripDialog(QDialog):
         striprevs.append(rev)
         striprevs.sort()
         self.cslist.clear()
-        self.cslist.update(self.repo, striprevs)
+        self.cslist.update(striprevs)
         return True
 
     def preview(self):
@@ -235,8 +238,10 @@ class StripDialog(QDialog):
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
+        self.showBusyIcon.emit('hg-remove')
 
     def command_finished(self, ret):
+        self.hideBusyIcon.emit('hg-remove')
         self.repo.decrementBusyCount()
         if ret is not 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)

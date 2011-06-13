@@ -23,12 +23,6 @@ from tortoisehg.hgqt import qtlib, thgrepo
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-try:
-    import win32con
-    openflags = win32con.CREATE_NO_WINDOW
-except ImportError:
-    openflags = 0
-
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
 _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
 
@@ -138,7 +132,7 @@ def launchtool(cmd, opts, replace, block):
     cmdline = util.quotecommand(cmdline)
     try:
         proc = subprocess.Popen(cmdline, shell=True,
-                                creationflags=openflags,
+                                creationflags=qtlib.openflags,
                                 stderr=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stdin=subprocess.PIPE)
@@ -194,7 +188,7 @@ def visualdiff(ui, repo, pats, opts):
             else:
                 ctx1a = p[0]
         else:
-            n1, n2 = cmdutil.revpair(repo, revs)
+            n1, n2 = hglib.revpair(repo, revs)
             ctx1a, ctx2 = repo[n1], repo[n2]
             p = ctx2.parents()
             if not revs and len(p) > 1:
@@ -205,7 +199,7 @@ def visualdiff(ui, repo, pats, opts):
                        _('You likely need to refresh this application'))
         return None
 
-    pats = cmdutil.expandpats(pats)
+    pats = hglib.expandpats(pats)
     m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])

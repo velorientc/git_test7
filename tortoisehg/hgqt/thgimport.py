@@ -71,7 +71,7 @@ class ImportDialog(QDialog):
         grid.addWidget(self.p0chk, 2, 1, Qt.AlignLeft)
 
         ### patch list
-        self.cslist = cslist.ChangesetList()
+        self.cslist = cslist.ChangesetList(self.repo)
         self.cslistrow = cslistrow = 4
         self.cslistcol = cslistcol = 1
         grid.addWidget(self.cslist, cslistrow, cslistcol,
@@ -145,7 +145,7 @@ class ImportDialog(QDialog):
 
     def checkStatus(self):
         def activated():
-            dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+            dlg = commit.CommitDialog(self.repo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkStatus()
@@ -221,8 +221,7 @@ class ImportDialog(QDialog):
             self.cslist.clear()
             self.import_btn.setDisabled(True)
         else:
-            self.cslist.update(self.repo,
-                               [os.path.abspath(p) for p in patches])
+            self.cslist.update([os.path.abspath(p) for p in patches])
             self.import_btn.setEnabled(True)
         self.updatestatus()
 

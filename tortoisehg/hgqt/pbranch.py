@@ -7,20 +7,22 @@
 
 import os
 import time
+import errno
 
 from mercurial import extensions, ui, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, update
+from tortoisehg.hgqt import qtlib, cmdui, update, revdetails
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+PATCHCACHEPATH = 'thgpbcache'
 nullvariant = QVariant()
 
-class PatchBranchWidget(QWidget):
+class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     '''
     A widget that show the patch graph and provide actions
     for the pbranch extension
@@ -44,59 +46,89 @@ class PatchBranchWidget(QWidget):
 
         # Build child widgets
 
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(vbox)
+        def BuildChildWidgets():
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(vbox)
+            vbox.addWidget(Toolbar(), 1)
+            vbox.addWidget(BelowToolbar(), 1)
 
-        # Toolbar
-        self.toolBar_patchbranch = tb = QToolBar(_("Patch Branch Toolbar"), self)
-        tb.setEnabled(True)
-        tb.setObjectName("toolBar_patchbranch")
-        tb.setFloatable(False)
+        def Toolbar():
+            tb = QToolBar(_("Patch Branch Toolbar"), self)
+            tb.setEnabled(True)
+            tb.setObjectName("toolBar_patchbranch")
+            tb.setFloatable(False)
 
-        self.actionPMerge = a = QWidgetAction(self)
-        a.setIcon(geticon("hg-merge"))
-        a.setToolTip(_('Merge all pending dependencies'))
-        tb.addAction(self.actionPMerge)
-        self.actionPMerge.triggered.connect(self.pmerge_clicked)
+            self.actionPMerge = a = QWidgetAction(self)
+            a.setIcon(geticon("hg-merge"))
+            a.setToolTip(_('Merge all pending dependencies'))
+            tb.addAction(self.actionPMerge)
+            self.actionPMerge.triggered.connect(self.pmerge_clicked)
 
-        self.actionBackport = a = QWidgetAction(self)
-        a.setIcon(geticon("go-previous"))
-        a.setToolTip(_('Backout current patch branch'))
-        #tb.addAction(self.actionBackport)
-        #self.actionBackport.triggered.connect(self.pbackout_clicked)
+            self.actionBackport = a = QWidgetAction(self)
+            a.setIcon(geticon("go-previous"))
+            a.setToolTip(_('Backout current patch branch'))
+            #tb.addAction(self.actionBackport)
+            #self.actionBackport.triggered.connect(self.pbackout_clicked)
 
-        self.actionReapply = a = QWidgetAction(self)
-        a.setIcon(geticon("go-next"))
-        a.setToolTip(_('Backport part of a changeset to a dependency'))
-        #tb.addAction(self.actionReapply)
-        #self.actionReapply.triggered.connect(self.reapply_clicked)
+            self.actionReapply = a = QWidgetAction(self)
+            a.setIcon(geticon("go-next"))
+            a.setToolTip(_('Backport part of a changeset to a dependency'))
+            #tb.addAction(self.actionReapply)
+            #self.actionReapply.triggered.connect(self.reapply_clicked)
 
-       	self.actionPNew = a = QWidgetAction(self)
-        a.setIcon(geticon("fileadd")) #STOCK_NEW
-        a.setToolTip(_('Start a new patch branch'))
-        tb.addAction(self.actionPNew)
-        self.actionPNew.triggered.connect(self.pnew_clicked)
+            self.actionPNew = a = QWidgetAction(self)
+            a.setIcon(geticon("fileadd")) #STOCK_NEW
+            a.setToolTip(_('Start a new patch branch'))
+            tb.addAction(self.actionPNew)
+            self.actionPNew.triggered.connect(self.pnew_clicked)
 
-        self.actionEditPGraph = a = QWidgetAction(self)
-        a.setIcon(geticon("edit-file")) #STOCK_EDIT
-        a.setToolTip(_('Edit patch dependency graph'))
-        tb.addAction(self.actionEditPGraph)
-        self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
+            self.actionEditPGraph = a = QWidgetAction(self)
+            a.setIcon(geticon("edit-file")) #STOCK_EDIT
+            a.setToolTip(_('Edit patch dependency graph'))
+            tb.addAction(self.actionEditPGraph)
+            self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
 
-        vbox.addWidget(self.toolBar_patchbranch, 1)
+            return tb
 
-        # Patch list
-        self.patchlistmodel = PatchBranchModel(self.compute_model(),
-                                               self.repo.changectx('.').branch(),
-                                               self)
-        self.patchlist = QTableView(self)
-        self.patchlist.setModel(self.patchlistmodel)
-        self.patchlist.setShowGrid(False)
-        self.patchlist.verticalHeader().setDefaultSectionSize(20)
-        self.patchlist.horizontalHeader().setHighlightSections(False)
-        self.patchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
-        vbox.addWidget(self.patchlist, 1)
+        def BelowToolbar():
+            w = QSplitter(self)
+            w.addWidget(PatchList())
+            w.addWidget(PatchDiff())
+            return w
+
+        def PatchList():
+            self.patchlistmodel = PatchBranchModel(self.compute_model(),
+                                                   self.repo.changectx('.').branch(),
+                                                   self)
+            self.patchlist = QTableView(self)
+            self.patchlist.setModel(self.patchlistmodel)
+            self.patchlist.setShowGrid(False)
+            self.patchlist.verticalHeader().setDefaultSectionSize(20)
+            self.patchlist.horizontalHeader().setHighlightSections(False)
+            self.patchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.patchlist.clicked.connect(self.patchBranchSelected)
+            return self.patchlist
+
+        def PatchDiff():
+            # pdiff view to the right of pgraph
+            self.patchDiffStack = QStackedWidget()
+            self.patchDiffStack.addWidget(PatchDiffMessage())
+            self.patchDiffStack.addWidget(PatchDiffDetails())
+            return self.patchDiffStack
+
+        def PatchDiffMessage():
+            # message if no patch is selected
+            self.patchDiffMessage = QLabel()
+            self.patchDiffMessage.setAlignment(Qt.AlignCenter)
+            return self.patchDiffMessage
+
+        def PatchDiffDetails():
+            # pdiff view of selected patc
+            self.patchdiff = revdetails.RevDetailsWidget(self.repo, self)
+            return self.patchdiff
+
+        BuildChildWidgets()
 
         # Command output
         self.runner = cmdui.Runner(False, self)
@@ -160,6 +192,7 @@ class PatchBranchWidget(QWidget):
         opts = {'tips': True}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         graph = mgr.graphforopts(opts)
+        target_graph = mgr.graphforopts({})
         if not self.show_internal_branches:
             graph = mgr.patchonlygraph(graph)
         names = None
@@ -180,7 +213,11 @@ class PatchBranchWidget(QWidget):
             else:
                 node_column = len(dep_list)
             node_color = patch_status[name] and '#ff0000' or 0
-            node_status = (name == cur_branch) and 4 or 0
+            node_status = nodestatus_NORMAL
+            if graph.ispatch(name) and not target_graph.ispatch(name):
+                node_status = nodestatus_CLOSED
+            if name == cur_branch:
+                node_status = node_status | nodestatus_CURRENT
             node = PatchGraphNodeAttributes(node_column, node_color, node_status)
 
             # Find next dependency list
@@ -288,10 +325,22 @@ class PatchBranchWidget(QWidget):
         except:
             return None
 
+    def pdiff(self, patch_name):
+        """
+        [pbranch] Execute 'pdiff --tips' command.
+
+        :param patch_name: Name of patch-branch
+        :retv: list of lines of generated patch
+        """
+        opts = {}
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        graph = mgr.graphattips()
+        return graph.diff(patch_name, None, opts)
+
     def pnew_ui(self):
         """
         Create new patch.
-        Propmt user for new patch name. Patch is created
+        Prompt user for new patch name. Patch is created
         on current branch.
         """
         parent =  None
@@ -343,7 +392,7 @@ class PatchBranchWidget(QWidget):
     def is_patch(self, branch_name):
         """ return True if branch is a patch. This excludes root branches
         and internal diff base branches (for patches with multiple
-        dependencies. """
+        dependencies). """
         return self.has_pbranch() and self.pgraph().ispatch(branch_name)
 
     def cur_branch(self):
@@ -351,6 +400,45 @@ class PatchBranchWidget(QWidget):
         return self.repo.dirstate.branch()
 
     ### internal functions ###
+
+    def patchFromIndex(self, index):
+        if not index.isValid():
+            return
+        model = self.patchlistmodel
+        col = model._columns.index('Name')
+        patchIndex = model.createIndex(index.row(), col)
+        return str(model.data(patchIndex).toString())
+
+    def updatePatchCache(self, patchname):
+        # TODO: Parameters should include rev, as one patch may have several heads
+        # rev should be appended to filename and used by pdiff
+        assert(len(patchname)>0)
+        cachepath = self.repo.join(PATCHCACHEPATH)
+        # TODO: Fix this - it looks ugly
+        try:
+            os.mkdir(cachepath)
+        except OSError, err:
+            if err.errno != errno.EEXIST:
+                raise
+        # TODO: Convert filename if any funny characters are present
+        patchfile = os.path.join(cachepath, patchname)
+        dirstate = self.repo.join('dirstate')
+        try:
+            patch_age = os.path.getmtime(patchfile) - os.path.getmtime(dirstate)
+        except:
+            patch_age = -1
+
+        if patch_age < 0:
+            pf = open(patchfile, 'wb')
+            try:
+                pf.writelines(self.pdiff(patchname))
+            #  except (util.Abort, error.RepoError), e:
+            #      # Do something with str(e)
+            finally:
+                pf.close()
+
+        return patchfile
+
 
     def update_sensitivity(self):
         """ Update the sensitivity of entire UI """
@@ -390,7 +478,8 @@ class PatchBranchWidget(QWidget):
         #    append(_('&New'), self.pnew_activated)
         if not is_current:
             append(_('&Goto (update workdir)'), self.goto_activated)
-        #if is_patch:
+        if is_patch:
+            append(_('&Merge'), self.merge_activated)
         #    append(_('&Edit message'), self.edit_message_activated)
         #    append(_('&Rename'), self.rename_activated)
         #    append(_('&Delete'), self.delete_activated)
@@ -400,6 +489,16 @@ class PatchBranchWidget(QWidget):
             menu.exec_(pos)
 
     # Signal handlers
+
+    def patchBranchSelected(self, index):
+        patchname = self.patchFromIndex(index)
+        if self.is_patch(patchname):
+            patchfile = self.updatePatchCache(patchname)
+            self.patchdiff.onRevisionSelected(patchfile)
+            self.patchDiffStack.setCurrentWidget(self.patchdiff)
+        else:
+            self.patchDiffMessage.setText(_('No patch branch selected'))
+            self.patchDiffStack.setCurrentWidget(self.patchDiffMessage)
 
     def closeEvent(self, event):
         self.repo.configChanged.disconnect(self.configChanged)
@@ -433,6 +532,8 @@ class PatchBranchWidget(QWidget):
     def edit_pgraph_clicked(self):
         opts = {} # TODO: How to find user ID
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        if not mgr.hasgraphdesc():
+            self.pbranch.writefile(mgr.graphdescpath(), '')
         oldtext = mgr.graphdesc()
         # run editor in the repository root
         olddir = os.getcwd()
@@ -475,6 +576,9 @@ class PatchBranchWidget(QWidget):
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
+    def merge_activated(self):
+        self.pmerge(self.selected_patch())
+
     def delete_activated(self):
         assert False
 
@@ -511,6 +615,12 @@ class PatchGraphNode(object):
         self.message = msg
         self.msg_esc = msg # u''.join(msg) # escaped summary (utf-8)
 
+
+nodestatus_CURRENT = 4
+nodestatus_NORMAL = 0
+nodestatus_PATCH = 1
+nodestatus_CLOSED = 2
+nodestatus_shapemask = 3
 
 class PatchGraphNodeAttributes(object):
     """
@@ -619,8 +729,8 @@ class PatchBranchModel(QAbstractTableModel):
         """
         Return a QPixmap for the patch graph for the current row
 
-        :ctx: Data for current row = branch
-        :gnode: Node in patch branch graph
+        :ctx: Data for current row = branch (not used)
+        :gnode: PatchGraphNode in patch branch graph
 
         :returns: QPixmap of pgraph for ctx
         """
@@ -691,6 +801,11 @@ class PatchBranchModel(QAbstractTableModel):
                           2 * r, 2 * r)
             painter.drawEllipse(rect)
 
+        def closesymbol(s, offset = 0):
+            rect_ = QRectF(centre_x - 1.5 * s, centre_y - 0.5 * s, 3 * s, s)
+            rect_.adjust(-offset, -offset, offset, offset)
+            painter.drawRect(rect_)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
@@ -699,14 +814,21 @@ class PatchBranchModel(QAbstractTableModel):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
-        if False and ctx.thg_patchbranch():  # diamonds for patches
-            if ctx.thg_wdbranch():
+        nodeshape = gnode.node.status & nodestatus_shapemask
+        if nodeshape ==  nodestatus_PATCH:  # diamonds for patches
+            if gnode.node.status & nodestatus_CURRENT:
                 painter.setBrush(white)
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
+        elif nodeshape == nodestatus_CLOSED:
+            if gnode.node.status & nodestatus_CURRENT:
+                painter.setBrush(white)
+                closesymbol(0.5 * radius, 2 * pen.widthF())
+            painter.setBrush(fillcolor)
+            closesymbol(0.5 * radius)
         else:  # circles for normal branches
-            if gnode.patchname == self.wd_branch:
+            if gnode.node.status & nodestatus_CURRENT:
                 painter.setBrush(white)
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
