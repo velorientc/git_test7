@@ -288,9 +288,9 @@ class CloneDialog(QDialog):
         dest = self.getDest()
         if self.insecure_chk.isChecked() and src.startswith('https://'):
             cmdline.append('--insecure')
+        cmdline.append('--')
         cmdline.append(src)
         if dest:
-            cmdline.append('--')
             cmdline.append(dest)
         self.hgcmd_txt.setText(hglib.tounicode(' '.join(['hg'] + cmdline)))
         return cmdline
