@@ -306,7 +306,7 @@ def _extendrepo(repo):
             if MQ not in use.'''
             if not hasattr(self, 'mq'): return []
 
-            self.mq.parse_series()
+            self.mq.parseseries()
             return self.mq.series[:]
 
         @property

@@ -279,7 +279,7 @@ class MQPatchesWidget(QDockWidget):
             return
         def checkGuardsOrComments():
             cont = True
-            for p in self.repo.mq.full_series:
+            for p in self.repo.mq.fullseries:
                 if '#' in p:
                     cont = QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'
@@ -450,7 +450,7 @@ class MQPatchesWidget(QDockWidget):
                 f = item.font()
                 f.setItalic(True)
                 item.setFont(f)
-            patchguards = repo.mq.series_guards[idx]
+            patchguards = repo.mq.seriesguards[idx]
             if patchguards:
                 for guard in patchguards:
                     self.allguards.add(guard[1:])
@@ -741,7 +741,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             return
         def checkGuardsOrComments():
             cont = True
-            for p in self.repo.mq.full_series:
+            for p in self.repo.mq.fullseries:
                 if '#' in p:
                     cont = QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'

@@ -218,7 +218,7 @@ class QQueueDialog(QDialog):
         self.pl.clear()
         patches = []
         if q == self.repo.thgactivemqname:
-            patches = self.repo.mq.full_series
+            patches = self.repo.mq.fullseries
         else:
             if q == 'patches':
                 sf = '/.hg/patches/series'

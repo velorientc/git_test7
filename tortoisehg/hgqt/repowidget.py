@@ -1015,7 +1015,7 @@ class RepoWidget(QWidget):
         q = self.repo.mq
         ispushable = False
         unapplied = 0
-        for i in xrange(q.series_end(), len(q.series)):
+        for i in xrange(q.seriesend(), len(q.series)):
             pushable, reason = q.pushable(i)
             if pushable:
                 if unapplied == 0:
@@ -1237,7 +1237,7 @@ class RepoWidget(QWidget):
         def qreorderact():
             def checkGuardsOrComments():
                 cont = True
-                for p in self.repo.mq.full_series:
+                for p in self.repo.mq.fullseries:
                     if '#' in p:
                         cont = QuestionMsgBox('Confirm qreorder',
                                 _('<p>ATTENTION!<br>'

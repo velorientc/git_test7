@@ -46,7 +46,7 @@ class QFoldDialog(QDialog):
 
         self.repo = repo
         q = self.repo.mq
-        q.parse_series()
+        q.parseseries()
         self.patches = [p for p in q.series if p in patches]
 
         class PatchListWidget(QListWidget):
