@@ -453,8 +453,8 @@ INFO = (
 
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
-        _('Name associated with commits.  The common format is<br>'
-          '"Full Name &lt;email@example.com&gt;"')),
+        _('Name associated with commits.  The common format is:<br>'
+          'Full Name &lt;email@example.com&gt;')),
     _fi(_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
        _('Suggested length of commit message lines. A red vertical '
          'line will mark this length.  CTRL-E will reflow the current '
