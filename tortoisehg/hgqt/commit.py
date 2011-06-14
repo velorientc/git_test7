@@ -942,12 +942,12 @@ class CommitDialog(QDialog):
         commit.linkActivated.connect(self.linkActivated)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
+        bb = QDialogButtonBox(BB.Ok|BB.Close|BB.Discard)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
-        bb.button(BB.Cancel).setDefault(False)
+        bb.button(BB.Close).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
         self.commitButton = bb.button(BB.Ok)
