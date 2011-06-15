@@ -327,7 +327,7 @@ class RepoRegistryView(QDockWidget):
     def addRepo(self, root):
         'workbench has opened a new repowidget, ensure it is in the registry'
         m = self.tview.model()
-        it = m.getRepoItem(root)
+        it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
             m.addRepo(None, root, -1)
             self.updateSettingsFile()

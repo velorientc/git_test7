@@ -127,9 +127,9 @@ class RepoTreeItem(object):
     def details(self):
         return ''
 
-    def getRepoItem(self, reporoot):
+    def getRepoItem(self, reporoot, lookForSubrepos=False):
         for c in self.childs:
-            ri = c.getRepoItem(reporoot)
+            ri = c.getRepoItem(reporoot, lookForSubrepos=lookForSubrepos)
             if ri:
                 return ri
         return None
@@ -245,10 +245,12 @@ class RepoItem(RepoTreeItem):
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
-    def getRepoItem(self, reporoot):
+    def getRepoItem(self, reporoot, lookForSubrepos=False):
         reporoot = os.path.normcase(reporoot)
         if (reporoot == os.path.normcase(self._root)):
             return self
+        if lookForSubrepos:
+            return super(RepoItem, self).getRepoItem(reporoot, lookForSubrepos)
         return None
 
     def appendSubrepos(self, repo=None):
