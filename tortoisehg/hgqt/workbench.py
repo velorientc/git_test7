@@ -121,6 +121,7 @@ class Workbench(QMainWindow):
 
         self.menuFile = self.menubar.addMenu(_("&File"))
         self.menuView = self.menubar.addMenu(_("&View"))
+        self.menuViewregistryopts = QMenu(_('Workbench Toolbars'), self)
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
@@ -230,31 +231,33 @@ class Workbench(QMainWindow):
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
-        self.actionShowPaths = \
-        newaction(_("Show Paths"), self.reporegistry.showPaths,
-                  checkable=True, menu='view')
-
-        self.actionShowSubrepos = \
-            newaction(_("Show Subrepos on Registry"),
-                self.reporegistry.setShowSubrepos,
-                  checkable=True, menu='view')
-
-        self.actionShowNetworkSubrepos = \
-            newaction(_("Show Subrepos for remote repositories"),
-                self.reporegistry.setShowNetworkSubrepos,
-                  checkable=True, menu='view')
-
-        self.actionShowShortPaths = \
-            newaction(_("Show Short Paths"),
-                self.reporegistry.setShowShortPaths,
-                  checkable=True, menu='view')
-
         a = self.log.toggleViewAction()
         a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
         a.setIcon(qtlib.geticon('thg-console'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
+
+        newseparator(menu='view')
+        self.menuViewregistryopts = self.menuView.addMenu('Repository Registry Options')
+        self.actionShowPaths = \
+        newaction(_("Show Paths"), self.reporegistry.showPaths,
+                  checkable=True, menu='viewregistryopts')
+
+        self.actionShowSubrepos = \
+            newaction(_("Show Subrepos on Registry"),
+                self.reporegistry.setShowSubrepos,
+                  checkable=True, menu='viewregistryopts')
+
+        self.actionShowNetworkSubrepos = \
+            newaction(_("Show Subrepos for remote repositories"),
+                self.reporegistry.setShowNetworkSubrepos,
+                  checkable=True, menu='viewregistryopts')
+
+        self.actionShowShortPaths = \
+            newaction(_("Show Short Paths"),
+                self.reporegistry.setShowShortPaths,
+                  checkable=True, menu='viewregistryopts')
 
         newseparator(menu='view')
         newaction(_("Choose Log Columns..."), self.setHistoryColumns,
