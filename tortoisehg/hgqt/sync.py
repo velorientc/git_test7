@@ -119,7 +119,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
              'hg-outgoing', self.outclicked)
         self.pushAction = \
         newaction(_('Push outgoing changesets to remote repository'),
-             'hg-push', self.pushclicked)
+             'hg-push', lambda: self.pushclicked(True))
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
@@ -674,11 +674,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             self.outclicked()
 
-    def push(self):
+    def push(self, confirm):
         if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
-            self.pushclicked()
+            self.pushclicked(confirm)
 
     def pullBundle(self, bundle, rev):
         'accept bundle changesets'
@@ -844,10 +844,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Perforce pending...'))
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
-    def pushclicked(self):
+    def pushclicked(self, confirm):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
-        if not hg.islocal(self.currentUrl(False)):
+        if (not hg.islocal(self.currentUrl(False)) and confirm
+            and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
                                      % urlu)

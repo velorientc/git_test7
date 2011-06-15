@@ -452,7 +452,7 @@ class RepoWidget(QWidget):
                             _('%d outgoing changesets') % len(nodes))
         assert w
         w.acceptButton.setText(_('Push'))
-        w.accepted.connect(self.push)  # TODO: to the same URL
+        w.accepted.connect(lambda: self.push(False))  # TODO: to the same URL
         w.rejected.connect(self.clearRevisionSet)
 
     def createGrepWidget(self):
@@ -946,8 +946,13 @@ class RepoWidget(QWidget):
     def outgoing(self):
         self.syncDemand.get().outgoing()
 
-    def push(self):
-        self.syncDemand.get().push()
+    def push(self, confirm=True):
+        """Call sync push.
+
+        If confirm is False, the user will not be prompted for
+        confirmation. If confirm is True, the prompt might be used.
+        """
+        self.syncDemand.get().push(confirm)
 
     ##
     ## Repoview context menu
