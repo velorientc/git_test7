@@ -60,7 +60,7 @@ class MessageEntry(qscilib.Scintilla):
 
     def menuRequested(self, point):
         line = self.lineAt(point)
-        point = self.mapToGlobal(point)
+        point = self.viewport().mapToGlobal(point)
 
         def apply():
             line = 0

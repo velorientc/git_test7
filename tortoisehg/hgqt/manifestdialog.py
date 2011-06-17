@@ -330,7 +330,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         selmodel = self._treeview.selectionModel()
         if not selmodel.selectedRows():
             return
-        point = self.mapToGlobal(point)
+        point = self._treeview.viewport().mapToGlobal(point)
 
         currentindex = self._treeview.currentIndex()
         itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')

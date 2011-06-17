@@ -140,7 +140,7 @@ class HgignoreDialog(QDialog):
 
     def menuRequest(self, point):
         'context menu request for unknown list'
-        point = self.unknownlist.mapToGlobal(point)
+        point = self.unknownlist.viewport().mapToGlobal(point)
         selected = [self.lclunknowns[i.row()]
                     for i in sorted(self.unknownlist.selectedIndexes())]
         if len(selected) == 0:

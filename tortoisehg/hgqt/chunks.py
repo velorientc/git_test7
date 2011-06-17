@@ -114,7 +114,7 @@ class ChunksWidget(QWidget):
             for act in actionlist:
                 menu.addAction(self._actions[act])
             self.contextmenu = menu
-        self.contextmenu.exec_(self.filelist.mapToGlobal(point))
+        self.contextmenu.exec_(self.filelist.viewport().mapToGlobal(point))
 
     def vdiff(self):
         filenames = self.getSelectedFiles()
@@ -568,7 +568,7 @@ class DiffBrowser(QFrame):
         self.clearDisplay()
 
     def menuRequested(self, point):
-        point = self.sci.mapToGlobal(point)
+        point = self.sci.viewport().mapToGlobal(point)
         return self.sci.createStandardContextMenu().exec_(point)
 
     def loadSettings(self, qs, prefix):

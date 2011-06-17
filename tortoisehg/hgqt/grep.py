@@ -599,7 +599,7 @@ class MatchTree(QTableView):
     def menuRequest(self, point):
         if not self.selectionModel().selectedRows():
             return
-        point = self.mapToGlobal(point)
+        point = self.viewport().mapToGlobal(point)
         self.contextmenu.exec_(point)
 
     def onSelectionChanged(self, selected, deselected):

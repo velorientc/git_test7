@@ -461,7 +461,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._actions['diffnavigate'].setEnabled(singlefileactions)
 
         if actionlist:
-            contextmenu.exec_(self.filelist.mapToGlobal(point))
+            contextmenu.exec_(self.filelist.viewport().mapToGlobal(point))
 
     def saveSettings(self, s):
         wb = "RevDetailsWidget/"

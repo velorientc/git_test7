@@ -546,7 +546,7 @@ class HgFileView(QFrame):
     def menuRequest(self, point):
         menu = self.sci.createStandardContextMenu()
         line = self.sci.lineAt(point)
-        point = self.sci.mapToGlobal(point)
+        point = self.sci.viewport().mapToGlobal(point)
 
         selection = self.sci.selectedText()
         def sreq(**opts):
