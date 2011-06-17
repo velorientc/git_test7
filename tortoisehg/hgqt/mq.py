@@ -26,6 +26,59 @@ from tortoisehg.hgqt.qtlib import geticon
 # keep original file name in file list item
 # more wctx functions
 
+def defaultNewPatchName(repo):
+    t = time.strftime('%Y-%m-%d_%H-%M-%S')
+    return t + '_r%d+.diff' % repo['.'].rev()
+
+def getPatchNameLineEdit():
+    patchNameLE = QLineEdit()
+    if hasattr(patchNameLE, 'setPlaceholderText'): # Qt >= 4.7
+        patchNameLE.setPlaceholderText(_('### patch name ###'))
+    return patchNameLE
+
+def getUserOptions(opts, *optionlist):
+    out = []
+    for opt in optionlist:
+        if opt not in opts:
+            continue
+        val = opts[opt]
+        if val is False:
+            continue
+        elif val is True:
+            out.append('--' + opt)
+        else:
+            out.append('--' + opt)
+            out.append(val)
+    return out
+
+def mqNewRefreshCommand(repo, isnew, stwidget, pnwidget, message, opts, olist):
+    if isnew:
+        name = hglib.fromunicode(pnwidget.text())
+        if not name:
+            qtlib.ErrorMsgBox(_('Patch Name Required'),
+                              _('You must enter a patch name'))
+            pnwidget.setFocus()
+            return
+        cmdline = ['qnew', '--repository', repo.root, name]
+    else:
+        cmdline = ['qrefresh', '--repository', repo.root]
+    if message:
+        cmdline += ['--message=' + hglib.fromunicode(message)]
+    cmdline += getUserOptions(opts, *olist)
+    files = ['--'] + [repo.wjoin(hglib.fromunicode(x))
+                      for x in stwidget.getChecked()]
+    addrem = [repo.wjoin(hglib.fromunicode(x))
+              for x in stwidget.getChecked('!?')]
+    if len(files) > 1:
+        cmdline += files
+    else:
+        cmdline += ['--exclude', repo.root]
+    if addrem:
+        cmdlines = [ ['addremove', '-R', repo.root] + addrem, cmdline]
+    else:
+        cmdlines = [cmdline]
+    return cmdlines
+
 class MQPatchesWidget(QDockWidget):
     showMessage = pyqtSignal(unicode)
     output = pyqtSignal(QString, QString)
@@ -597,7 +650,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         layout.addLayout(mtbarhbox, 0)
         mtbarhbox.setContentsMargins(0, 0, 0, 0)
         self.newCheckBox = QCheckBox(_('New Patch'))
-        self.patchNameLE = QLineEdit()
+        self.patchNameLE = getPatchNameLineEdit()
         mtbarhbox.addWidget(self.newCheckBox)
         mtbarhbox.addWidget(self.patchNameLE, 1)
 
@@ -644,9 +697,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
         self.setAcceptDrops(True)
 
-        if hasattr(self.patchNameLE, 'setPlaceholderText'): # Qt >= 4.7
-            self.patchNameLE.setPlaceholderText(_('### patch name ###'))
-
         if parent:
             self.layout().setContentsMargins(2, 2, 2, 2)
         else:
@@ -668,19 +718,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         super(MQWidget, self).closeEvent(event)
 
     def getUserOptions(self, *optionlist):
-        out = []
-        for opt in optionlist:
-            if opt not in self.opts:
-                continue
-            val = self.opts[opt]
-            if val is False:
-                continue
-            elif val is True:
-                out.append('--' + opt)
-            else:
-                out.append('--' + opt)
-                out.append(val)
-        return out
+        return getUserOptions(self.opts, *optionlist)
 
     @pyqtSlot()
     def onConfigChanged(self):
@@ -803,36 +841,13 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot()
     def onQNewOrQRefresh(self):
-        def finished(ret):
-            self.newCheckBox.setChecked(False)
         if self.newCheckBox.isChecked():
-            name = hglib.fromunicode(self.patchNameLE.text())
-            if not name:
-                qtlib.ErrorMsgBox(_('Patch Name Required'),
-                                  _('You must enter a patch name'))
-                self.patchNameLE.setFocus()
-                return
-            cmdline = ['qnew', '--repository', self.repo.root, name]
-            self.finishfunc = finished
-        else:
-            cmdline = ['qrefresh', '--repository', self.repo.root]
-        message = self.messageEditor.text()
-        if message:
-            cmdline += ['--message=' + hglib.fromunicode(message)]
-        cmdline += self.getUserOptions('user', 'currentuser', 'git',
-                                       'date', 'currentdate')
-        files = ['--'] + [self.repo.wjoin(hglib.fromunicode(x))
-                          for x in self.stwidget.getChecked()]
-        addrem = [self.repo.wjoin(hglib.fromunicode(x))
-                  for x in self.stwidget.getChecked('!?')]
-        if len(files) > 1:
-            cmdline += files
-        else:
-            cmdline += ['--exclude', self.repo.root]
-        if addrem:
-            cmdlines = [ ['addremove', '-R', self.repo.root] + addrem, cmdline]
-        else:
-            cmdlines = [cmdline]
+            self.finishfunc = lambda ret: self.newCheckBox.setChecked(False)
+        optionlist = ('user', 'currentuser', 'git', 'date', 'currentdate')
+        cmdlines = mqNewRefreshCommand(self.repo, self.newCheckBox.isChecked(),
+                                       self.stwidget, self.patchNameLE,
+                                       self.messageEditor.text(), self.opts,
+                                       optionlist)
         self.repo.incrementBusyCount()
         self.cmd.run(*cmdlines)
 
@@ -962,8 +977,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.messageEditor.setEnabled(True)
             self.patchNameLE.setEnabled(True)
             self.patchNameLE.setFocus()
-            self.patchNameLE.setText(time.strftime('%Y-%m-%d_%H-%M-%S') + \
-                 '_r%d+.diff' % self.repo['.'].rev())
+            self.patchNameLE.setText(defaultNewPatchName(self.repo))
             self.patchNameLE.selectAll()
             self.setMessage('')
         else:
