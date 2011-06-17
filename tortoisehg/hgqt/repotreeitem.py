@@ -246,8 +246,8 @@ class RepoItem(RepoTreeItem):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def getRepoItem(self, reporoot):
-        if (reporoot == self._root or
-            (os.name == 'nt' and reporoot.lower() == self._root.lower())):
+        reporoot = os.path.normcase(reporoot)
+        if (reporoot == os.path.normcase(self._root)):
             return self
         return None
 
@@ -430,10 +430,10 @@ class RepoGroupItem(RepoTreeItem):
     def updateCommonPath(self, cpath=None):
         """
         Update or set the group 'common path'
-        
+
         When called with no arguments, the group common path is calculated by
         looking for the common path of all the repos on a repo group
-        
+
         When called with an argument, the group common path is set to the input
         argument. This is commonly used to set the group common path to an empty
         string, thus disabling the "show short paths" functionality.
