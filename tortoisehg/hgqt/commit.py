@@ -415,13 +415,67 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.mqtb.setText(curraction._text)
         self.lastAction = curraction._name
 
+    def getBranchCommandLine(self, branchName, repo):
+        '''
+        Create the command line to change or create the selected branch unless
+        it is the selected branch
+        
+        Verify whether a branch exists on a repo. If it doesn't ask the user
+        to confirm that it wants to create the branch. If it does and it is not
+        the current branch as the user whether it wants to change to that branch.
+        Depending on the user input, create the command line which will perform
+        the selected action
+        '''
+        # This function is used both by commit() and mqPerformAction()
+        commandlines = []
+        newbranch = False
+        branch = hglib.fromunicode(self.branchop)
+        if branch in repo.branchtags():
+            # response: 0=Yes, 1=No, 2=Cancel
+            if branch in [p.branch() for p in repo.parents()]:
+                resp = 0
+            else:
+                rev = repo[branch].rev()
+                resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
+                    _('Named branch "%s" already exists, '
+                      'last used in revision %d\n'
+                      ) % (self.branchop, rev),
+                    self,
+                    (_('Restart &Branch'),
+                     _('&Commit to current branch'),
+                     _('Cancel')), 2, 2).run()
+        else:
+            resp = qtlib.CustomPrompt(_('Confirm New Branch'),
+                _('Create new named branch "%s" with this commit?\n'
+                  ) % self.branchop,
+                self,
+                (_('Create &Branch'),
+                 _('&Commit to current branch'),
+                 _('Cancel')), 2, 2).run()
+        if resp == 0:
+            newbranch = True
+            commandlines.append(['branch', '--repository', repo.root,
+                                 '--force', branch])
+        elif resp == 2:
+            return None, False
+        return commandlines, newbranch
+    
     @pyqtSlot()
     def mqPerformAction(self):
         curraction = self.mqgroup.checkedAction()
         if curraction._name == 'commit':
             return self.commit()
+
+        # Check if we need to change branch first
+        commandlines = []
+        if self.branchop:
+            commandlines, newbranch = self.getBranchCommandLine(self.branchop, 
+                                                                self.repo)
+            if commandlines is None:
+                return
         olist = ('user', 'date')
-        cmdlines = mq.mqNewRefreshCommand(self.repo, curraction._name == 'qnew',
+        cmdlines = commandlines + mq.mqNewRefreshCommand(self.repo,
+                                          curraction._name == 'qnew',
                                           self.stwidget, self.pnedit,
                                           self.msgte.text(), self.opts, olist)
         self.repo.incrementBusyCount()
@@ -702,34 +756,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         elif self.branchop == False:
             brcmd = ['--close-branch']
         else:
-            branch = hglib.fromunicode(self.branchop)
-            if branch in repo.branchtags():
-                # response: 0=Yes, 1=No, 2=Cancel
-                if branch in [p.branch() for p in repo.parents()]:
-                    resp = 0
-                else:
-                    rev = repo[branch].rev()
-                    resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
-                        _('Named branch "%s" already exists, '
-                          'last used in revision %d\n'
-                          ) % (self.branchop, rev),
-                        self,
-                        (_('Restart &Branch'),
-                         _('&Commit to current branch'),
-                         _('Cancel')), 2, 2).run()
-            else:
-                resp = qtlib.CustomPrompt(_('Confirm New Branch'),
-                    _('Create new named branch "%s" with this commit?\n'
-                      ) % self.branchop,
-                    self,
-                    (_('Create &Branch'),
-                     _('&Commit to current branch'),
-                     _('Cancel')), 2, 2).run()
-            if resp == 0:
-                newbranch = True
-                commandlines.append(['branch', '--repository', repo.root,
-                                     '--force', branch])
-            elif resp == 2:
+            commandlines, newbranch = self.getBranchCommandLine(self.branchop,
+                                                                self.repo)
+            if commandlines is None:
                 return
         files = self.stwidget.getChecked('MAR?!S')
         if not (files or brcmd or newbranch):
