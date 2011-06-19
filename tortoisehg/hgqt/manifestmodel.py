@@ -32,7 +32,7 @@ class ManifestModel(QAbstractItemModel):
 
         self._repo = repo
         self._rev = rev
-        self._subinfo = {'substate': [], 'ctx': None}
+        self._subinfo = {}
 
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
@@ -326,7 +326,7 @@ class ManifestModel(QAbstractItemModel):
             return roote
 
         # Clear the _subinfo
-        self._subinfo = {'substate': [], 'ctx': None}
+        self._subinfo = {}
         roote = _Entry()
         ctx = self._repo[self._rev]
 
