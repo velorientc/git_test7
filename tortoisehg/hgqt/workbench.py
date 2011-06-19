@@ -66,8 +66,8 @@ class Workbench(QMainWindow):
 
         self._setupActions()
 
-        self.repoTabChanged()
         self.restoreSettings()
+        self.repoTabChanged()
         self.setAcceptDrops(True)
         if os.name == 'nt':
             # Allow CTRL+Q to close Workbench on Windows
@@ -85,7 +85,7 @@ class Workbench(QMainWindow):
         # Create the actions that will be displayed on the context menu
         self.createActions()
         self.lastClosedRepoRootList = []
-
+        
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
