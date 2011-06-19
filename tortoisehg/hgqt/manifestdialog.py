@@ -492,11 +492,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     
     @pyqtSlot()
     def _updatecontent(self):
-        if True:
-            self.displayFile()
-        else:
-            self._fileview.setContext(self._repo[self._rev])
-            self._fileview.displayFile(self.path, self.status)
+        self.displayFile()
 
     @pyqtSlot()
     def _emitPathChanged(self):
