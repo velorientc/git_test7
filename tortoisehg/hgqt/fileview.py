@@ -307,7 +307,7 @@ class HgFileView(QFrame):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
             status = hglib.fromunicode(status)
-        if self._filename == filename:
+        if filename and self._filename == filename:
             # Get the last visible line to restore it after reloading the editor
             lastScrollPosition = self.sci.firstVisibleLine()
         else:
