@@ -67,12 +67,7 @@ class ManifestModel(QAbstractItemModel):
         if not path:
             return None, path
         for subpath in sorted(self._subinfo.keys())[::-1]:
-            if path == subpath:
-                # When we call this method with a subrepo path, we do not want
-                # to get the subrepo context stored in _subinfo,
-                # but its _parents_ context
-                continue
-            if path.startswith(subpath):
+            if path.startswith(subpath + '/'):
                 return self._subinfo[subpath]['ctx'], path[len(subpath)+1:]
         return None, path
 
@@ -305,6 +300,7 @@ class ManifestModel(QAbstractItemModel):
                         toprelpath = '/'.join([toproot, path])
                     else:
                         toprelpath = path
+                    toprelpath = util.pconvert(toprelpath)
                     self._subinfo[toprelpath] = \
                         {'substate': substate, 'ctx': None}
                     srev = substate[1]
