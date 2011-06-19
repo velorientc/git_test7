@@ -120,8 +120,25 @@ class FileData(object):
                     out = []
                     def getLog(_ui, srepo, opts):
                         _ui.pushbuffer()
-                        commands.log(_ui, srepo, **opts)
-                        return _ui.popbuffer()
+                        try:
+                            commands.log(_ui, srepo, **opts)
+                            logOutput = _ui.popbuffer()
+                        except error.ParseError, e:
+                            # Some mercurial versions have a bug that results in
+                            # saving a subrepo node id in the .hgsubstate file
+                            # which ends with a "+" character. If that is the
+                            # case, add a warning to the output, but try to
+                            # get the revision information anyway
+                            logOutput = ''
+                            for n, rev in enumerate(opts['rev']):
+                                if rev.endswith('+'):
+                                    logOutput += _('[WARNING] Invalid subrepo '
+                                        'revision ID:\n\t%s\n\n') % rev
+                                    opts['rev'][n] = rev[:-1]
+                            commands.log(_ui, srepo, **opts)
+                            logOutput += _ui.popbuffer()
+                        return logOutput
+                    
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     subabspath = os.path.join(repo.root, subrelpath)
                     missingsub = not os.path.isdir(subabspath)
