@@ -225,6 +225,7 @@ class HgFileView(QFrame):
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
         mode = action._mode
+        self._lostMode = mode
         if mode != self._mode:
             self._mode = mode
             self.actionNextDiff.setEnabled(False)
