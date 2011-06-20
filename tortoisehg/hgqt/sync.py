@@ -131,6 +131,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.opbuttons.append(a)
             tb.addAction(a)
         tb.addSeparator()
+        newaction(_('Unbundle'),
+             'hg-unbundle', self.unbundle)
+        tb.addSeparator()
         self.stopAction = a = QAction(self)
         a.setToolTip(_('Stop current operation'))
         a.setIcon(qtlib.geticon('process-stop'))
@@ -896,6 +899,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                     '--template', '{node}\n']
         self.run(cmdline, ('force', 'branch', 'rev'))
+
+    def unbundle(self):
+        caption = _("Select bundle file")
+        _FILE_FILTER = "%s" % _("Bundle files (*.hg)")
+        bundlefile = QFileDialog.getOpenFileName(parent=self, caption=caption,
+                                    directory=self.repo.root,
+                                    filter=_FILE_FILTER)
+        if bundlefile:
+            self.pathentry.setText(bundlefile)
+            self.inclicked()
 
     @pyqtSlot(QString)
     def removeAlias(self, alias):
