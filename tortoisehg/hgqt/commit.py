@@ -302,10 +302,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
-        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit).setContext(
-                  Qt.WidgetWithChildrenShortcut)
-        QShortcut(QKeySequence('Ctrl+Enter'), self, self.commit).setContext(
-                  Qt.WidgetWithChildrenShortcut)
+        if not self.hasmqbutton:
+            QShortcut(QKeySequence('Ctrl+Return'), self,
+                      self.commit).setContext(Qt.WidgetWithChildrenShortcut)
+            QShortcut(QKeySequence('Ctrl+Enter'), self,
+                      self.commit).setContext(Qt.WidgetWithChildrenShortcut)
 
     def mqSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
@@ -370,6 +371,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         mqtb.clicked.connect(self.mqPerformAction)
         self.mqButtonEnable.connect(mqtb.setEnabled)
         self.mqSetAction()
+        sc = QShortcut(QKeySequence('Ctrl+Return'), self, self.mqPerformAction)
+        sc.setContext(Qt.WidgetWithChildrenShortcut)
+        sc = QShortcut(QKeySequence('Ctrl+Enter'), self, self.mqPerformAction)
+        sc.setContext(Qt.WidgetWithChildrenShortcut)
         return mqtb
 
     @pyqtSlot(bool)

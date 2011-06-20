@@ -692,6 +692,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.msgSelectCombo.activated.connect(self.onMessageSelected)
         self.newCheckBox.toggled.connect(self.onNewModeToggled)
         self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.onQNewOrQRefresh)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
