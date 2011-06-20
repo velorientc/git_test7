@@ -236,6 +236,7 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
             self._branchCombo.addItem(branch)
+            self._branchCombo.setItemData(self._branchCombo.count() - 1, branch, Qt.ToolTipRole)
         self._branchLabel.setEnabled(self.filterEnabled and len(branches) > 1)
         self._branchCombo.setEnabled(self.filterEnabled and len(branches) > 1)
         self._branchReloading = False
