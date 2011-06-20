@@ -679,7 +679,8 @@ class AnnotateView(qscilib.Scintilla):
             pass
 
     def _updateannotation(self, ctx, filename):
-        assert ctx.rev() is not None
+        if ctx.rev() is None:
+            return
         wsub, filename, ctx = hglib.getDeepestSubrepoContainingFile(filename, ctx)
         assert filename in ctx
         self.ctx = ctx
