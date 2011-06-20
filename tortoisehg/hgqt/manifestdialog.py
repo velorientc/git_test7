@@ -433,6 +433,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             return
         self._rev = rev
         path = self.path
+        self.revChanged.emit(rev)
         self._setupmodel()
         ctx = self._repo[rev]
         if path and path in ctx:
