@@ -907,7 +907,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                     directory=self.repo.root,
                                     filter=_FILE_FILTER)
         if bundlefile:
+            # Select the "Local" scheme
+            self.schemecombo.setCurrentIndex(0)
+            # Set the pull source to the selected bundle file
             self.pathentry.setText(bundlefile)
+            # Execute the incomming command, which will show the revisions in
+            # the bundle, and let the user accept or reject them
             self.inclicked()
 
     @pyqtSlot(QString)
