@@ -201,7 +201,7 @@ def get_states(upath, repo=None):
     tc1 = GetTickCount()
 
     try:
-        matcher = hglib.match(repo, [pdir])
+        matcher = hglib.match(repo[None], [pdir])
         repostate = repo.status(match=matcher, ignored=True,
                         clean=True, unknown=True)
     except util.Abort, inst:
