@@ -568,10 +568,17 @@ class RepoRegistryView(QDockWidget):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
 
-    def open(self):
+    def open(self, root=None):
         'open context menu action, open repowidget unconditionally'
-        root = self.selitem.internalPointer().rootpath()
-        repotype = self.selitem.internalPointer().repotype()
+        if root is None:
+            root = self.selitem.internalPointer().rootpath()
+            repotype = self.selitem.internalPointer().repotype()
+        else:
+            root = hglib.fromunicode(root)
+            if os.path.exists(os.path.join(root, '.hg')):
+                repotype = 'hg'
+            else:
+                repotype = 'unknown'
         if repotype == 'hg':
             self.openRepo.emit(hglib.tounicode(root), False)
         else:
