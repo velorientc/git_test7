@@ -29,6 +29,7 @@ def getSubrepoIcoDict():
       'hg': 'hg',
       'git': 'thg-git-subrepo',
       'svn': 'thg-svn-subrepo',
+      'hgsubversion': 'thg-svn-subrepo',
       'empty': 'hg'
     }
     icOverlay = geticon('thg-subrepo')
