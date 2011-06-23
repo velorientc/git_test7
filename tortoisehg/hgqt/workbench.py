@@ -239,7 +239,7 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu('Repository Registry Options')
+        self.menuViewregistryopts = self.menuView.addMenu(_('Repository Registry Options'))
         self.actionShowPaths = \
         newaction(_("Show Paths"), self.reporegistry.showPaths,
                   checkable=True, menu='viewregistryopts')
