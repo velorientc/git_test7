@@ -44,7 +44,7 @@ class HgFileListModel(QAbstractTableModel):
     Model used for listing (modified) files of a given Hg revision
     """
     showMessage = pyqtSignal(QString)
-    
+
     def __init__(self, parent):
         QAbstractTableModel.__init__(self, parent)
         self._boldfont = parent.font()
