@@ -342,7 +342,7 @@ class RepoRegistryView(QDockWidget):
         if self._activeTabRepo:
             self._activeTabRepo.setActive(False)
         m = self.tview.model()
-        it = m.getRepoItem(root)
+        it = m.getRepoItem(root, lookForSubrepos=True)
         if it:
             self._activeTabRepo = it
             it.setActive(True)
