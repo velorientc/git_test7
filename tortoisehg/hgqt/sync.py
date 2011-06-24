@@ -677,11 +677,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             self.outclicked()
 
-    def push(self, confirm):
+    def push(self, confirm, rev=None, branch=None):
         if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
-            self.pushclicked(confirm)
+            self.pushclicked(confirm, rev, branch)
 
     def pullBundle(self, bundle, rev):
         'accept bundle changesets'
@@ -847,7 +847,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Perforce pending...'))
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
-    def pushclicked(self, confirm):
+    def pushclicked(self, confirm, rev=None, branch=None):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         if (not hg.islocal(self.currentUrl(False)) and confirm
@@ -869,6 +869,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.pushCompleted.emit()
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
+        if rev:
+            cmdline.extend(['--rev', str(rev)])
+        if branch:
+            cmdline.extend(['--branch', branch])
         self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
 
     def postpullclicked(self):

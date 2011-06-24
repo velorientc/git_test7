@@ -1076,6 +1076,14 @@ class RepoWidget(QWidget):
         entry(menu, None, isrev, _('Update...'), 'hg-update',
               self.updateToRevision)
         entry(menu)
+        submenu = menu.addMenu(_('Push'))
+        entry(submenu, None, isrev, _('Push all'), 'hg-push',
+              self.pushToRevision)
+        entry(submenu, None, isrev, _('Push to here'), '',
+              self.pushToRevision)
+        entry(submenu, None, isrev, _('Push selected branch'), '',
+              self.pushBranch)
+        entry(menu)
         entry(menu, None, isctx, _('Visual diff...'), 'visualdiff',
               self.visualDiffRevision)
         entry(menu, None, isrev, _('Diff to local...'), 'ldiff',
@@ -1428,6 +1436,18 @@ class RepoWidget(QWidget):
         dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
+
+    def pushAll(self):
+        self.syncDemand.forward('push', True)
+
+    def pushToRevision(self):
+        # Do not ask for confirmation
+        self.syncDemand.forward('push', False, rev=self.rev)
+
+    def pushBranch(self):
+        # Do not ask for confirmation
+        self.syncDemand.forward('push', False,
+            branch=self.repo[self.rev].branch())
 
     def manifestRevision(self):
         run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
