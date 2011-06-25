@@ -414,7 +414,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 self.lastCommitMsg = self.msgte.text()
             self.setMessage(hglib.tounicode(pctx.description()))
         else:
-            self.setMessage(self.lastCommitMsg)
+            if self.lastAction == 'qref':
+                self.setMessage(self.lastCommitMsg)
         if refreshwctx:
             self.stwidget.refreshWctx()
         self.mqtb.setText(curraction._text)
@@ -858,6 +859,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.branchop = None
             umsg = self.msgte.text()
             if self.currentAction != 'qref':
+                self.lastCommitMsg = ''
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
                     self.lastmessage = self.getMessage()
