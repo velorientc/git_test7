@@ -214,8 +214,11 @@ class StatusWidget(QWidget):
             self.refreshWctx()
 
     def setPatchContext(self, pctx):
+        if pctx != self.pctx:
+            self.savechecks = False
+        else:
+            self.savechecks = True
         self.pctx = pctx
-        self.savechecks = False
 
     def refreshWctx(self, synchronous=False):
         if self.refthread:
