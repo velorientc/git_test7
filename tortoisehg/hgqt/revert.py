@@ -24,7 +24,7 @@ class RevertDialog(QDialog):
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
-        self.wfiles = [ repo.wjoin(wfile) for wfile in wfiles ]
+        self.wfiles = [repo.wjoin(wfile) for wfile in wfiles]
         self.rev = str(rev)
 
         self.setLayout(QVBoxLayout())
@@ -32,7 +32,7 @@ class RevertDialog(QDialog):
         if len(wfile) == 1:
             lblText = _('<b>Revert %s to its contents'
                         ' at revision %d?</b>') % (
-                      wfiles[0], rev)
+                      hglib.tounicode(wfiles[0]), rev)
         else:
             lblText = _('<b>Revert %d files to their contents'
                         ' at revision %d?</b>') % (
