@@ -166,13 +166,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, pats, opts, embedded=False, parent=None):
+    def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
         QWidget.__init__(self, parent=parent)
 
         repo.configChanged.connect(self.configChanged)
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.workingBranchChanged.connect(self.workingBranchChanged)
         self.repo = repo
+        self._rev = rev
         self.lastAction = None
         self.lastCommitMsg = ''
         self.currentAction = None
@@ -308,6 +309,46 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             QShortcut(QKeySequence('Ctrl+Enter'), self,
                       self.commit).setContext(Qt.WidgetWithChildrenShortcut)
 
+    @property
+    def rev(self):
+        """Return current revision"""
+        return self._rev
+
+    def selectRev(self, rev):
+        """
+        Select the revision that must be set when the dialog is shown again
+        """
+        self._rev = rev
+
+    @pyqtSlot(int)
+    @pyqtSlot(object)
+    def setRev(self, rev):
+        """Change revision to show"""
+        self.selectRev(rev)
+        if self.hasmqbutton:
+            preferredActionName = self._getPreferredActionName()
+            curractionName = self.mqgroup.checkedAction()._name
+            if curractionName != preferredActionName:
+                self.mqSetAction(refresh=True,
+                    actionName=preferredActionName)
+
+    def _getPreferredActionName(self):
+        """Select the preferred action, depending on the selected revision"""
+        if not self.hasmqbutton:
+            return 'commit'
+        else:
+            pctx = self.repo.changectx('.')
+            ispatch = 'qtip' in pctx.tags()
+            if not ispatch:
+                # Set the button to Commit
+                return 'commit'
+            elif self.rev is None:
+                # Set the button to QNew
+                return 'qnew'
+            else:
+                # Set the button to QRefresh
+                return 'qref'
+
     def mqSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
         notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
@@ -364,13 +405,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             action._enablefunc = a[3]
             action.triggered.connect(menurefresh)
             action.setCheckable(True)
-            if a[3] and a[3](self.repo):
-                action.setChecked(True)
             mqmenu.addAction(action)
         mqtb.setMenu(mqmenu)
         mqtb.clicked.connect(self.mqPerformAction)
         self.mqButtonEnable.connect(mqtb.setEnabled)
-        self.mqSetAction()
+        self.mqSetAction(actionName=self._getPreferredActionName())
         sc = QShortcut(QKeySequence('Ctrl+Return'), self, self.mqPerformAction)
         sc.setContext(Qt.WidgetWithChildrenShortcut)
         sc = QShortcut(QKeySequence('Ctrl+Enter'), self, self.mqPerformAction)
@@ -378,7 +417,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         return mqtb
 
     @pyqtSlot(bool)
-    def mqSetAction(self, refresh=False):
+    def mqSetAction(self, refresh=False, actionName=None):
+        if actionName:
+            selectedAction = \
+                [act for act in self.mqgroup.actions() \
+                    if act._name == actionName][0]
+            selectedAction.setChecked(True)
         curraction = self.mqgroup.checkedAction()
         oldpctx = self.stwidget.pctx
         pctx = self.repo.changectx('.')
@@ -425,7 +469,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         '''
         Create the command line to change or create the selected branch unless
         it is the selected branch
-        
+
         Verify whether a branch exists on a repo. If it doesn't ask the user
         to confirm that it wants to create the branch. If it does and it is not
         the current branch as the user whether it wants to change to that branch.
@@ -465,7 +509,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         elif resp == 2:
             return None, False
         return commandlines, newbranch
-    
+
     @pyqtSlot()
     def mqPerformAction(self):
         curraction = self.mqgroup.checkedAction()
@@ -475,7 +519,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # Check if we need to change branch first
         commandlines = []
         if self.branchop:
-            commandlines, newbranch = self.getBranchCommandLine(self.branchop, 
+            commandlines, newbranch = self.getBranchCommandLine(self.branchop,
                                                                 self.repo)
             if commandlines is None:
                 return

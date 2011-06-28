@@ -271,7 +271,7 @@ class RepoWidget(QWidget):
 
     def createCommitWidget(self):
         pats, opts = {}, {}
-        cw = CommitWidget(self.repo, pats, opts, True, self)
+        cw = CommitWidget(self.repo, pats, opts, True, self, rev=self.rev)
 
         if cw.hasmqbutton:
             cw.buttonHBox.addWidget(cw.mqSetupButton())
@@ -710,14 +710,17 @@ class RepoWidget(QWidget):
         try:
             self.revDetailsWidget.onRevisionSelected(rev)
             self.revisionSelected.emit(rev)
-            if type(rev) != str: # unapplied patch
+            if type(rev) != str:
+                # Regular patch or working directory
                 if self.manifestDemand.isHidden():
                     self.manifestDemand.forward('selectRev', rev)
                 else:
                     self.manifestDemand.forward('setRev', rev)
                 self.grepDemand.forward('setRevision', rev)
                 self.syncDemand.forward('refreshTargets', rev)
+                self.commitDemand.forward('setRev', rev)
             else:
+                # unapplied patch
                 if self.manifestDemand.isHidden():
                     self.manifestDemand.forward('selectRev', None)
                 else:
