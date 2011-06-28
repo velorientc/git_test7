@@ -70,6 +70,7 @@ class RepoWidget(QWidget):
         self.revsetfilter = False
         self.ubranch = u''
         self.bundle = None
+        self.outgoingMode = False
         self.revset = []
         self.busyIcons = []
         self.namedTabs = {}
@@ -418,6 +419,7 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def clearRevisionSet(self):
         self.toolbarVisibilityChanged.emit()
+        self.outgoingMode = False
         if not self.revset:
             return
         self.revset = []
@@ -510,7 +512,7 @@ class RepoWidget(QWidget):
         self.generateUnappliedPatchMenu()
         self.generateMultipleSelectionMenu()
         self.generateBundleMenu()
-
+        self.generateOutgoingMenu()
     def detectPatches(self, paths):
         filepaths = []
         for p in paths:
@@ -942,10 +944,9 @@ class RepoWidget(QWidget):
 
     def pull(self):
         self.syncDemand.get().pull()
-
     def outgoing(self):
         self.syncDemand.get().outgoing()
-
+        self.outgoingMode = True
     def push(self, confirm=True):
         """Call sync push.
 
@@ -953,7 +954,7 @@ class RepoWidget(QWidget):
         confirmation. If confirm is True, the prompt might be used.
         """
         self.syncDemand.get().push(confirm)
-
+        self.outgoingMode = False
     ##
     ## Repoview context menu
     ##
@@ -972,6 +973,10 @@ class RepoWidget(QWidget):
             if len(selection) == 1:
                 self.bundlemenu.exec_(point)
             return
+        if self.outgoingMode:
+            if len(selection) == 1:
+                self.outgoingcmenu.exec_(point)
+                return
 
         self.menuselection = selection
         allunapp = False
@@ -1036,10 +1041,8 @@ class RepoWidget(QWidget):
         self.unappacts[4].setEnabled(unapplied > 1)
         self.unappacts[5].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
-
-    def generateSingleMenu(self):
+    def generateSingleMenu(self, mode=None):
         items = []
-
         # This menu will never be opened for an unapplied patch, they
         # have their own menu.
         #
@@ -1070,19 +1073,18 @@ class RepoWidget(QWidget):
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
-
         menu = QMenu(self)
-
+        if mode == 'outgoing':
+            submenu = menu.addMenu(_('Push'))
+            entry(submenu, None, isrev, _('Push all'), 'hg-push',
+                  self.pushToRevision)
+            entry(submenu, None, isrev, _('Push to here'), '',
+                  self.pushToRevision)
+            entry(submenu, None, isrev, _('Push selected branch'), '',
+                  self.pushBranch)
+            entry(menu)
         entry(menu, None, isrev, _('Update...'), 'hg-update',
               self.updateToRevision)
-        entry(menu)
-        submenu = menu.addMenu(_('Push'))
-        entry(submenu, None, isrev, _('Push all'), 'hg-push',
-              self.pushToRevision)
-        entry(submenu, None, isrev, _('Push to here'), '',
-              self.pushToRevision)
-        entry(submenu, None, isrev, _('Push selected branch'), '',
-              self.pushBranch)
         entry(menu)
         entry(menu, None, isctx, _('Visual diff...'), 'visualdiff',
               self.visualDiffRevision)
@@ -1145,10 +1147,12 @@ class RepoWidget(QWidget):
 
         entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
               self.rupdate)
-
-        self.singlecmenu = menu
-        self.singlecmenuitems = items
-
+        if mode == 'outgoing':
+            self.outgoingcmenu = menu
+            self.outgoingcmenuitems = items
+        else:
+            self.singlecmenu = menu
+            self.singlecmenuitems = items
     def generatePairMenu(self):
         def dagrange():
             revA, revB = self.menuselection
@@ -1355,6 +1359,8 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             menu.addAction(a)
         self.bundlemenu = menu
+    def generateOutgoingMenu(self):
+        self.generateSingleMenu(mode='outgoing')
 
     def exportRevisions(self, revisions):
         if not revisions:
