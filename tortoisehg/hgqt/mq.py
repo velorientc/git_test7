@@ -111,10 +111,10 @@ class MQPatchesWidget(QDockWidget):
         mainlayout.addWidget(w)
 
         self.qpushAllAct = a = QAction(
-            geticon('hg-qpush-all'), _('Push all'), self)
+            geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
         a.setToolTip(_('Apply all patches'))
         self.qpushAct = a = QAction(
-            geticon('hg-qpush'), _('Push'), self)
+            geticon('hg-qpush'), _('Push', 'MQ QPush'), self)
         a.setToolTip(_('Apply one patch'))
         self.setGuardsAct = a = QAction(
             geticon('hg-qguard'), _('Guards'), self)
