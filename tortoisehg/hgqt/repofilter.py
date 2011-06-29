@@ -205,6 +205,9 @@ class RepoFilterBar(QToolBar):
             text=_('Branch'), popupMode=QToolButton.InstantPopup,
             statusTip=_('Display graph the named branch only'))
         self._branchMenu = QMenu(self._branchLabel)
+        self._abranchAction = self._branchMenu.addAction(
+            _('Display only active branches'), self.refresh)
+        self._abranchAction.setCheckable(True)
         self._cbranchAction = self._branchMenu.addAction(
             _('Display closed branches'), self.refresh)
         self._cbranchAction.setCheckable(True)
@@ -226,7 +229,11 @@ class RepoFilterBar(QToolBar):
         """Update the list of branches"""
         curbranch = self.branch()
 
-        if self._cbranchAction.isChecked():
+        if self._abranchAction.isChecked():
+            branches = sorted(set([self._repo[n].branch()
+                for n in self._repo.heads()
+                if not self._repo[n].extra().get('close')]))
+        elif self._cbranchAction.isChecked():
             branches = sorted(self._repo.branchtags().keys())
         else:
             branches = self._repo.namedbranches
