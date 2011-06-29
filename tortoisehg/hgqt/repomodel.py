@@ -588,7 +588,7 @@ class HgRepoListModel(QAbstractTableModel):
                 msg = '*** ' + _('Working Directory') + ' ***'
 
             for pctx in ctx.parents():
-                if pctx.node() not in self.repo._branchheads:
+                if self.repo._branchheads and pctx.node() not in self.repo._branchheads:
                     text = _('Not a head revision!')
                     msg += " " + qtlib.markup(text, fg='red', weight='bold')
 
