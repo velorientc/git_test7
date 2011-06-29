@@ -438,7 +438,7 @@ class _QtRunner(QObject):
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
             dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                  errstr, opts,
+                                  hglib.tounicode(errstr), opts,
                                   parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
             if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
