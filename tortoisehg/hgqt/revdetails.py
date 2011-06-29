@@ -200,6 +200,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             _('Toggle display of all files and the direction they were merged'))
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
+        self.actionShowAllMerge.setEnabled(False)
         self.filelisttbar.addAction(self.actionShowAllMerge)
 
         self.actionNextLine = QAction('Next line', self)
