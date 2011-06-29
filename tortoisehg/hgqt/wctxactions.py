@@ -341,5 +341,6 @@ def resolve(parent, ui, repo, files):
 
 def resolve_with(tool, repo, files):
     opts = {'tool': tool}
-    commands.resolve(repo.ui, repo, *files, **opts)
+    paths = [repo.wjoin(f) for f in files]
+    commands.resolve(repo.ui, repo, *paths, **opts)
     return True
