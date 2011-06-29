@@ -207,12 +207,15 @@ class FileLogDialog(_AbstractFileDialog):
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffFileToLocal)
             menu.addSeparator()
-            a = menu.addAction(_('Revert to revision...'))
-            a.setIcon(qtlib.getmenuicon('hg-revert'))
-            a.triggered.connect(self.onRevertFileToRevision)
             a = menu.addAction(_('View at revision...'))
             a.setIcon(qtlib.getmenuicon('view-at-revision'))
             a.triggered.connect(self.onViewFileAtRevision)
+            a = menu.addAction(_('Edit local'))
+            a.setIcon(qtlib.getmenuicon('edit-file'))
+            a.triggered.connect(self.onEditLocal)
+            a = menu.addAction(_('Revert to revision...'))
+            a.setIcon(qtlib.getmenuicon('hg-revert'))
+            a.triggered.connect(self.onRevertFileToRevision)
         self.selection = selection
         self.menu.exec_(point)
 
@@ -248,6 +251,12 @@ class FileLogDialog(_AbstractFileDialog):
             dlg.exec_()
             dlg.deleteLater()
 
+    def onEditLocal(self):
+        filenames = [self.filename]
+        if not filenames:
+            return
+        qtlib.editfiles(self.repo, filenames, parent=self)
+
     def onRevertFileToRevision(self):
         rev = self.selection[0]
         if rev is None:
@@ -259,7 +268,6 @@ class FileLogDialog(_AbstractFileDialog):
         if dlg:
             dlg.exec_()
             dlg.deleteLater()
-
 
     def onViewFileAtRevision(self):
         rev = self.selection[0]
