@@ -35,7 +35,7 @@ mqpatchmimetype = 'application/thg-mqunappliedpatch'
 # TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "cyan", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
-           "darkcyan", "gray", "yellow", ]
+           "darkcyan", "gray", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
 COLUMNHEADERS = (
