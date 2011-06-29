@@ -17,12 +17,13 @@
 Qt4 dialogs to display hg revisions of a file
 """
 
+import os
 import difflib
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
-from tortoisehg.hgqt import fileview, repoview, revpanel
+from tortoisehg.hgqt import fileview, repoview, revpanel, revert
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -205,6 +206,13 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('Diff file to local...'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffFileToLocal)
+            menu.addSeparator()
+            a = menu.addAction(_('Revert to revision...'))
+            a.setIcon(qtlib.getmenuicon('hg-revert'))
+            a.triggered.connect(self.onRevertFileToRevision)
+            a = menu.addAction(_('View at revision...'))
+            a.setIcon(qtlib.getmenuicon('view-at-revision'))
+            a.triggered.connect(self.onViewFileAtRevision)
         self.selection = selection
         self.menu.exec_(point)
 
@@ -239,6 +247,33 @@ class FileLogDialog(_AbstractFileDialog):
         if dlg:
             dlg.exec_()
             dlg.deleteLater()
+
+    def onRevertFileToRevision(self):
+        rev = self.selection[0]
+        if rev is None:
+            rev = self.repo['.'].rev()
+        fileSelection = [self.filerevmodel.graph.filename(rev)]
+        if len(fileSelection) == 0:
+            return
+        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+
+    def onViewFileAtRevision(self):
+        rev = self.selection[0]
+        filenames = [self.filerevmodel.graph.filename(rev)]
+        if not filenames:
+            return
+        if rev is None:
+            qtlib.editfiles(self.repo, filenames, parent=self)
+        else:
+            base, _ = visdiff.snapshot(self.repo, filenames, self.repo[rev])
+            files = [os.path.join(base, filename)
+                     for filename in filenames]
+            qtlib.editfiles(self.repo, files, parent=self)
+
 
     @pyqtSlot(QString)
     def onLinkActivated(self, link):
