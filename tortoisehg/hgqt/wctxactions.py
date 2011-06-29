@@ -180,7 +180,7 @@ class WctxActions(QObject):
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
-    repo[None].remove([deleted], unlink=False) # !->R
+    repo[None].forget([deleted]) # !->R
 
 def copyPatch(parent, ui, repo, files):
     ui.pushbuffer()

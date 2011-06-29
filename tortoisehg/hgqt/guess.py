@@ -244,7 +244,7 @@ class DetectRenameDialog(QDialog):
             remdests[dest] = src
         for dest, src in remdests.iteritems():
             if not os.path.exists(self.repo.wjoin(src)):
-                wctx.remove([src]) # !->R
+                wctx.forget([src]) # !->R
             wctx.copy(src, dest)
             self.matchtv.model().remove(dest)
         self.matchAccepted.emit()
