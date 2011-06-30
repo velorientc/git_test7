@@ -58,6 +58,8 @@ class rUpdateDialog(UpdateDialog):
         self.grid.addWidget(pcombo, 0, 1)
 
         ### Options
+        self.discard_chk.setText(_('Discard remote changes, no backup '
+                                       '(-C/--clean)'))
         self.push_chk = QCheckBox(_('Perform a push before updating'
                                         ' (-p/--push)'))
         self.newbranch_chk = QCheckBox(_('Allow pushing new branches'
