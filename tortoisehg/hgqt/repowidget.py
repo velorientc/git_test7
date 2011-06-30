@@ -1522,7 +1522,7 @@ class RepoWidget(QWidget):
 
     def bundleRevisions(self, base=None, tip=None):
         root = self.repo.root
-        if not base:
+        if base is None or base is False:
             base = self.rev
         data = dict(name=os.path.basename(root), base=base)
         if tip is None:
