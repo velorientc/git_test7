@@ -282,7 +282,6 @@ class FileLogDialog(_AbstractFileDialog):
                      for filename in filenames]
             qtlib.editfiles(self.repo, files, parent=self)
 
-
     @pyqtSlot(QString)
     def onLinkActivated(self, link):
         link = unicode(link)
@@ -320,6 +319,7 @@ class FileDiffDialog(_AbstractFileDialog):
     def __init__(self, repo, filename, repoviewer=None):
         super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
         self._readSettings()
+        self.menu = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -459,6 +459,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)
+        self.tableView_revisions_left.menuRequested.connect(self.viewMenuRequest)
+        self.tableView_revisions_right.menuRequested.connect(self.viewMenuRequest)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -659,3 +661,99 @@ class FileDiffDialog(_AbstractFileDialog):
         self.tableView_revisions_left.saveSettings()
         self.tableView_revisions_right.saveSettings()
         super(FileDiffDialog, self).reload()
+
+    @pyqtSlot(QPoint, object)
+    def viewMenuRequest(self, point, selection):
+        'User requested a context menu in repo view widget'
+        if not selection:
+            return
+        if self.menu is None:
+            self.menu = menu = QMenu(self)
+            a = menu.addAction(_('Visual diff...'))
+            a.setIcon(qtlib.getmenuicon('visualdiff'))
+            a.triggered.connect(self.onVisualDiff)
+            a = menu.addAction(_('Diff to local...'))
+            a.setIcon(qtlib.getmenuicon('ldiff'))
+            a.triggered.connect(self.onVisualDiffToLocal)
+            menu.addSeparator()
+            a = menu.addAction(_('Visual diff file...'))
+            a.setIcon(qtlib.getmenuicon('visualdiff'))
+            a.triggered.connect(self.onVisualDiffFile)
+            a = menu.addAction(_('Diff file to local...'))
+            a.setIcon(qtlib.getmenuicon('ldiff'))
+            a.triggered.connect(self.onVisualDiffFileToLocal)
+            menu.addSeparator()
+            a = menu.addAction(_('View at revision...'))
+            a.setIcon(qtlib.getmenuicon('view-at-revision'))
+            a.triggered.connect(self.onViewFileAtRevision)
+            a = menu.addAction(_('Edit local'))
+            a.setIcon(qtlib.getmenuicon('edit-file'))
+            a.triggered.connect(self.onEditLocal)
+            a = menu.addAction(_('Revert to revision...'))
+            a.setIcon(qtlib.getmenuicon('hg-revert'))
+            a.triggered.connect(self.onRevertFileToRevision)
+        self.selection = selection
+        self.menu.exec_(point)
+
+    def onVisualDiff(self):
+        opts = dict(change=self.selection[0])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffToLocal(self):
+        opts = dict(rev=['rev(%d)' % self.selection[0]])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffFile(self):
+        rev = self.selection[0]
+        paths = [self.filerevmodel.graph.filename(rev)]
+        opts = dict(change=self.selection[0])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffFileToLocal(self):
+        rev = self.selection[0]
+        paths = [self.filerevmodel.graph.filename(rev)]
+        opts = dict(rev=['rev(%d)' % rev])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onEditLocal(self):
+        filenames = [self.filename]
+        if not filenames:
+            return
+        qtlib.editfiles(self.repo, filenames, parent=self)
+
+    def onRevertFileToRevision(self):
+        rev = self.selection[0]
+        if rev is None:
+            rev = self.repo['.'].rev()
+        fileSelection = [self.filerevmodel.graph.filename(rev)]
+        if len(fileSelection) == 0:
+            return
+        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onViewFileAtRevision(self):
+        rev = self.selection[0]
+        filenames = [self.filerevmodel.graph.filename(rev)]
+        if not filenames:
+            return
+        if rev is None:
+            qtlib.editfiles(self.repo, filenames, parent=self)
+        else:
+            base, _ = visdiff.snapshot(self.repo, filenames, self.repo[rev])
+            files = [os.path.join(base, filename)
+                     for filename in filenames]
+            qtlib.editfiles(self.repo, files, parent=self)
