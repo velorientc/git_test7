@@ -79,10 +79,31 @@ class RepoWidget(QWidget):
         self.basenode = None
         self.destroyed.connect(self.repo.thginvalidate)
 
+        # Determine the "initial revision" that must be shown when
+        # opening the repo.
+        # The "initial revision" can be selected via the settings, and it can
+        # have 3 possible values:
+        # - "current":    Select the current (i.e. working dir parent) revision
+        # - "tip":        Select tip of the repository
+        # - "workingdir": Select the working directory pseudo-revision
+        initialRevision= \
+            self.repo.ui.config('tortoisehg', 'initialrevision', 'current').lower()
+
+        initialRevisionDict = {
+            'current': '.',
+            'tip': 'tip',
+            'workingdir': None
+        }
+        if initialRevision in initialRevisionDict:
+            default_rev = initialRevisionDict[initialRevision]
+        else:
+            # By default we'll select the current (i.e. working dir parent) revision
+            default_rev = '.'
+
         if repo.parents()[0].rev() == -1:
             self._reload_rev = 'tip'
         else:
-            self._reload_rev = '.'
+            self._reload_rev = default_rev
         self.currentMessage = ''
         self.dirty = False
 
@@ -96,6 +117,30 @@ class RepoWidget(QWidget):
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.onCommandFinished)
+
+        # Select the widget chosen by the user
+        defaultWidget = \
+            self.repo.ui.config(
+                'tortoisehg', 'defaultwidget', 'revdetails').lower()
+        widgetDict = {
+            'revdetails': self.logTabIndex,
+            'commit': self.commitTabIndex,
+            'mq': self.mqTabIndex,
+            'sync': self.syncTabIndex,
+            'manifest': self.manifestTabIndex,
+            'search': self.grepTabIndex
+        }
+        if initialRevision == 'workingdir':
+            # Do not allow selecting the revision details widget when the
+            # selected revision is the working directory pseudo-revision
+            widgetDict['revdetails'] = self.commitTabIndex
+
+        if defaultWidget in widgetDict:
+            widgetIndex = widgetDict[defaultWidget]
+            # Note: if the mq extension is not enabled, self.mqTabIndex will
+            #       be negative
+            if widgetIndex > 0:
+                self.taskTabsWidget.setCurrentIndex(widgetIndex)
 
     def setupUi(self):
         SP = QSizePolicy

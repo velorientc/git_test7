@@ -410,6 +410,17 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
+    _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
+        ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
+        _('Select the initial widget that will be shown when opening a '
+        'repository. '
+        'Default: revdetails')),
+    _fi(_('Initial revision'), 'tortoisehg.initialrevision', (genDefaultCombo,
+        ['current', 'tip', 'workingdir']),
+        _('Select the initial revision that will be selected when opening a '
+        'repository.  You can select the "current" (i.e. the working directory '
+        'parent), the current "tip" or the working directory ("workingdir"). '
+        'Default: current')),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '
