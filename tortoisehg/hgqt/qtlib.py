@@ -58,7 +58,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.org/manual/2.0/' + url
+        fullurl = 'http://tortoisehg.org/manual/2.1/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
