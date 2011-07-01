@@ -265,7 +265,8 @@ class ShelveDialog(QDialog):
                 qtlib.ErrorMsgBox(_('File already exists'),
                                   _('A shelf file of that name already exists'))
                 return
-            self.repo.opener(fn, 'wb').write('')
+            f = open(shelfpath, "wb")
+            f.close()
             self.showMessage(_('New shelf created'))
             self.refreshCombos()
             if shelfpath in self.shelves:
