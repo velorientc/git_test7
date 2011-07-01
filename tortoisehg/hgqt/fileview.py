@@ -682,7 +682,10 @@ class AnnotateView(qscilib.Scintilla):
         if ctx.rev() is None:
             return
         wsub, filename, ctx = hglib.getDeepestSubrepoContainingFile(filename, ctx)
-        assert filename in ctx
+        if wsub is None:
+            # The file was not found in the repo context or its subrepos
+            # This may happen for files that have been removed
+            return
         self.ctx = ctx
         self.annfile = filename
         self._thread.abort()
