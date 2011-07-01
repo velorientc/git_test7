@@ -47,7 +47,8 @@ def get_locale_path():
 if os.name == 'nt':
     import _winreg
     import win32net
-    USE_OK  = 0     # network drive status
+    import win32api
+    import win32file
 
     def find_in_path(pgmname):
         "return first executable found in search path"
@@ -71,6 +72,20 @@ if os.name == 'nt':
             except:
                 pass
         return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+    def is_on_fixed_drive(path):
+        if hasattr(os.path, 'splitunc'):
+            unc, rest = os.path.splitunc(drive)
+            if unc:
+                # All UNC paths (\\host\mount) are considered not-fixed
+                return False
+        drive, remain = os.path.splitdrive(path)
+        if drive:
+            return win32file.GetDriveType(drive) == win32file.DRIVE_FIXED
+        else:
+            return False
+
+    USE_OK  = 0     # network drive status
 
     def netdrive_status(drive):
         """
@@ -112,3 +127,7 @@ else: # Not Windows
         or False if <drive> is not a network drive
         """
         return False
+
+    def is_on_fixed_drive(path):
+        return True
+
