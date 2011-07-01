@@ -325,6 +325,8 @@ class FileData(object):
         if status in ('M', 'A'):
             res = self.checkMaxDiff(ctx, wfile, maxdiff)
             if res is None:
+                if status == 'A':
+                    self.flabel += _(' <i>(was added)</i>')
                 return
             fctx, newdata = res
             self.contents = newdata
