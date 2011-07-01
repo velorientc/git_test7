@@ -296,7 +296,7 @@ class RepoRegistryView(QDockWidget):
     def dropAccepted(self):
         # Whenever a drag and drop operation is completed, update the settings
         # file
-        self.updateSettingsFile()
+        QTimer.singleShot(0, self.updateSettingsFile)
 
     @pyqtSlot(QString)
     def modifiedSettings(self):
