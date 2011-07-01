@@ -470,8 +470,10 @@ def _extendrepo(repo):
             if os.path.isdir(sdir):
                 def getModificationTime(x):
                     return os.path.getmtime(os.path.join(sdir, x))
-                return sorted(os.listdir(sdir),
+                shelves = sorted(os.listdir(sdir),
                     key=getModificationTime, reverse=True)
+                return [s for s in shelves if \
+                           os.path.isfile(os.path.join(self.shelfdir, s))]
             return []
 
         def thginvalidate(self):
