@@ -387,11 +387,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 # repositories already opened keep their ui instances in sync
                 repo = thgrepo._repocache[root]
                 ui = repo.ui
-            else:
+            elif paths.is_on_fixed_drive(root):
                 # directly read the repository's configuration file
                 tempui = self.repo.ui.copy()
                 tempui.readconfig(os.path.join(root, '.hg', 'hgrc'))
                 ui = tempui
+            else:
+                continue
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
                     abs = os.path.abspath(hglib.localpath(path)).lower()
