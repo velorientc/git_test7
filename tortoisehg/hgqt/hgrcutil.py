@@ -7,6 +7,7 @@
 
 import os
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import wconfig
 

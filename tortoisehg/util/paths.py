@@ -75,7 +75,7 @@ if os.name == 'nt':
 
     def is_on_fixed_drive(path):
         if hasattr(os.path, 'splitunc'):
-            unc, rest = os.path.splitunc(drive)
+            unc, rest = os.path.splitunc(path)
             if unc:
                 # All UNC paths (\\host\mount) are considered not-fixed
                 return False
