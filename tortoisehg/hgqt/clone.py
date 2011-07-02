@@ -246,6 +246,8 @@ class CloneDialog(QDialog):
         self.proxy_chk.setVisible(visible)
         self.insecure_chk.setVisible(visible)
         self.qclone_chk.setVisible(visible)
+        self.qclone_txt.setVisible(visible)
+        self.qclone_btn.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
         self.startrev_chk.setVisible(visible and self.startrev_available())
