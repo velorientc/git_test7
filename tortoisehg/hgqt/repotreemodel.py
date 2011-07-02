@@ -54,10 +54,11 @@ def readXml(source, rootElementName):
     return itemread
 
 def iterRepoItemFromXml(source):
+    'Used by thgrepo.relatedRepositories to scan the XML file'
     xr = QXmlStreamReader(source)
     while not xr.atEnd():
         t = xr.readNext()
-        if t == QXmlStreamReader.StartElement and xr.name() == 'repo':
+        if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
             yield undumpObject(xr)
 
 def getRepoItemList(root, includeSubRepos=False):
