@@ -17,7 +17,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, url, util, error, demandimport
 from mercurial import merge as mergemod
 
-from tortoisehg.util import hglib, wconfig
+from tortoisehg.util import hglib, wconfig, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
 
@@ -1487,6 +1487,5 @@ class OptionsDialog(QDialog):
 
 
 def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
     return SyncWidget(repo, None, **opts)
