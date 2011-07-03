@@ -45,9 +45,19 @@ STDMETHODIMP CShellExtOverlay::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */
 
     std::string path = WideToMultibyte(lowerpath.c_str());
 
-    if (GetRegistryConfig("LocalDisksOnly", cval) != 0 && cval != "0"
-            && PathIsNetworkPath(path.c_str()))
-        return S_FALSE;
+    if (GetRegistryConfig("LocalDisksOnly", cval) != 0 && cval != "0")
+    {
+        if (::PathIsNetworkPath(path.c_str()))
+            return S_FALSE;
+
+        if (path.size() > 2 && path[1] == ':')
+        {
+            std::string t = "C:\\";
+            t[0] = path[0];
+            if (::GetDriveType(t.c_str()) == 4)
+                return S_FALSE;
+        }
+    }
 
     char filterStatus = 0;
     if (myTortoiseClass == 'A')
