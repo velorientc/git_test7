@@ -60,13 +60,14 @@ except ImportError, e:
 from tortoisehg.util.hgversion import hgversion, checkhgversion
 errmsg = checkhgversion(hgversion)
 if errmsg:
+    from mercurial import ui
     from tortoisehg.hgqt.bugreport import run
     from tortoisehg.hgqt.run import qtrun
     opts = {}
     opts['cmd'] = ' '.join(sys.argv[1:])
     opts['error'] = '\n' + errmsg + '\n'
     opts['nofork'] = True
-    qtrun(run, ui, **opts)
+    qtrun(run, ui.ui(), **opts)
     sys.exit(1)
 
 ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
