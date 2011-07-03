@@ -490,8 +490,7 @@ class HgFileView(QFrame):
             if self._fd:
                 self._fd = None
                 self._diffs = []
-                self._linestoprocess = \
-                    hglib.fromunicode(self.sci.text()).splitlines()
+                self._linestoprocess = unicode(self.sci.text()).splitlines()
                 self._firstlinetoprocess = 0
                 self._opcodes = True
             # Process linesPerBlock lines at a time
