@@ -542,6 +542,7 @@ class ResultPage(BasePage):
     def __init__(self, repo, parent):
         super(ResultPage, self).__init__(repo, parent)
         self.setTitle(_('Finished'))
+        self.setSubTitle(' ')
         self.setFinalPage(True)
 
         self.setLayout(QVBoxLayout())
