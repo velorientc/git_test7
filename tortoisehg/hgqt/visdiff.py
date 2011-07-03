@@ -308,7 +308,8 @@ def visualdiff(ui, repo, pats, opts):
             nullfile = os.path.join(qtlib.gettempdir(), 'empty')
             fp = open(nullfile, 'w')
             fp.close()
-            return _nonexistant+label, nullfile
+            return (hglib.fromunicode(_nonexistant, 'replace') + label,
+                    nullfile)
 
         # If only one change, diff the files instead of the directories
         # Handle bogus modifies correctly by checking if the files exist
@@ -544,7 +545,7 @@ class FileSelectionDialog(QDialog):
                 nullfile = os.path.join(qtlib.gettempdir(), 'empty')
                 fp = open(nullfile, 'w')
                 fp.close()
-                return _nonexistant, nullfile
+                return hglib.fromunicode(_nonexistant, 'replace'), nullfile
 
         local, file1a = getfile(ctx1a, dir1a, fname, source)
         if ctx1b:
