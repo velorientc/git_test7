@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 #include "StringUtils.h"
 
@@ -36,7 +36,7 @@ std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
         CodePage, 0, wide.c_str(), static_cast<int>(wide.length()),
         NULL, 0, NULL, NULL
     );
-    
+
     std::vector<CHAR> narrow(ret + 1);
 
     ret = WideCharToMultiByte(
@@ -49,11 +49,11 @@ std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
 }
 
 
-// Convert multibyte string to Unicode string 
+// Convert multibyte string to Unicode string
 std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage)
 {
     int ret = MultiByteToWideChar(
-        CodePage, 0, multibyte.c_str(), 
+        CodePage, 0, multibyte.c_str(),
         static_cast<int>(multibyte.length()), 0, 0
     );
 

@@ -12,7 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 import sys, math
 
 def _days(ctx, now):
@@ -94,7 +94,7 @@ class AnnotateColorSaturation(object):
 
     def saturate_v(self, saturation, hv):
         return int(255 - (saturation/3*(1-hv)))
-    
+
     def committer_angle(self, committer):
         angle = float(abs(hash(committer))) / sys.maxint * 360.0
         if self._maxhues is None:
