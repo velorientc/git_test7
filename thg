@@ -70,5 +70,36 @@ if errmsg:
     qtrun(run, ui.ui(), **opts)
     sys.exit(1)
 
-ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
-sys.exit(ret)
+if 'THGDEBUG' in os.environ or '--profile' in sys.argv:
+    sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
+else:
+    import cStringIO
+    mystderr = cStringIO.StringIO()
+    origstderr = sys.stderr
+    sys.stderr = mystderr
+    ret = 0
+    try:
+        ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
+        sys.stderr = origstderr
+        stderrout = mystderr.getvalue()
+        errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
+                  'NotImplementedError')
+        for l in stderrout.splitlines():
+            if l.startswith(errors):
+                from mercurial import ui
+                from tortoisehg.hgqt.bugreport import run
+                from tortoisehg.hgqt.run import qtrun
+                opts = {}
+                opts['cmd'] = ' '.join(sys.argv[1:])
+                opts['error'] = 'Recoverable error (stderr):\n' + stderrout
+                opts['nofork'] = True
+                qtrun(run, ui.ui(), **opts)
+                break
+        sys.exit(ret)
+    except:
+        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
+            import traceback
+            sys.stderr = origstderr
+            traceback.print_exc()
+        else:
+            raise SystemExit(ret)
