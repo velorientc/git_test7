@@ -476,6 +476,12 @@ def _extendrepo(repo):
                            os.path.isfile(os.path.join(self.shelfdir, s))]
             return []
 
+        def makeshelf(self, patch):
+            if not os.path.exists(self.shelfdir):
+                os.mkdir(self.shelfdir)
+            f = open(os.path.join(self.shelfdir, patch), "wb")
+            f.close()
+
         def thginvalidate(self):
             'Should be called when mtime of repo store/dirstate are changed'
             self.dirstate.invalidate()
