@@ -24,6 +24,7 @@ class BackoutDialog(QWizard):
 
         self.backoutrev = rev
         self.parentbackout = False
+        self.backoutmergeparentrev = None
 
         self.setWindowTitle(_('Backout - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-revert'))
@@ -145,6 +146,49 @@ class SummaryPage(BasePage):
         localCsInfo = create(pctx.rev())
         self.layout().addWidget(localCsInfo)
         self.localCsInfo = localCsInfo
+
+        ## Merge revision backout handling
+        if len(bctx.parents()) > 1:
+            # Show two radio buttons letting the user which merge revision
+            # parent to backout to
+            p1rev = bctx.p1().rev()
+            p2rev = bctx.p2().rev()
+
+            def setBackoutMergeParentRev(rev):
+                self.wizard().backoutmergeparentrev = rev
+
+            setBackoutMergeParentRev(p1rev)
+
+            sep = qtlib.LabeledSeparator(_('Merge parent to backout to'))
+            self.layout().addWidget(sep)
+            self.layout().addWidget(QLabel(
+                _('To backout a <b>merge</b> revision you must select which '
+                'parent to backout to '
+                '(i.e. whose changes will be <i>kept</i>)')))
+
+            self.actionFirstParent = QRadioButton(
+                _('First Parent: revision %s (%s)') \
+                % (p1rev, str(bctx.p1())), self)
+            self.actionFirstParent.setCheckable(True)
+            self.actionFirstParent.setChecked(True)
+            self.actionFirstParent.setShortcut('CTRL+1')
+            self.actionFirstParent.setToolTip(
+                _('Backout to the first parent of the merge revision'))
+            self.actionFirstParent.clicked.connect(
+                lambda: setBackoutMergeParentRev(p1rev))
+
+            self.actionSecondParent = QRadioButton(
+                _('Second Parent: revision %s (%s)')
+                % (p2rev, str(bctx.p2())), self)
+            self.actionSecondParent.setCheckable(True)
+            self.actionSecondParent.setShortcut('CTRL+2')
+            self.actionSecondParent.setToolTip(
+                _('Backout to the second parent of the merge revision'))
+            self.actionSecondParent.clicked.connect(
+                lambda: setBackoutMergeParentRev(p2rev))
+
+            self.layout().addWidget(self.actionFirstParent)
+            self.layout().addWidget(self.actionSecondParent)
 
         ## working directory status
         sep = qtlib.LabeledSeparator(_('Working directory status'))
@@ -302,6 +346,8 @@ class BackoutPage(BasePage):
         tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
         cmdline += ['--tool=internal:' + tool]
         cmdline += ['--rev', str(self.wizard().backoutrev)]
+        if self.wizard().backoutmergeparentrev:
+            cmdline += ['--parent', str(self.wizard().backoutmergeparentrev)]
         self.repo.incrementBusyCount()
         self.cmd.core.clearOutput()
         self.cmd.run(cmdline)
@@ -451,7 +497,11 @@ class CommitPage(BasePage):
         def eng_toggled(checked):
             if self.isComplete():
                 oldmsg = self.msgEntry.text()
-                msgset = i18n.keepgettext()._('Backed out changeset: ')
+                if self.wizard().backoutmergeparentrev:
+                    msgset = i18n.keepgettext()._(
+                        'Backed out merge changeset: ')
+                else:
+                    msgset = i18n.keepgettext()._('Backed out changeset: ')
                 msg = checked and msgset['id'] or msgset['str']
                 if oldmsg and oldmsg != msg:
                     if not qtlib.QuestionMsgBox(_('Confirm Discard Message'),
@@ -480,9 +530,25 @@ class CommitPage(BasePage):
 
     def currentPage(self):
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
-        msgset = i18n.keepgettext()._('Backed out changeset: ')
+        mergeparentrev = self.wizard().backoutmergeparentrev
+        if mergeparentrev:
+            msgset = i18n.keepgettext()._(
+                'Backed out merge changeset: ')
+        else:
+            msgset = i18n.keepgettext()._('Backed out changeset: ')
         msg = engmsg and msgset['id'] or msgset['str']
-        self.msgEntry.setText(msg + str(self.repo[self.wizard().backoutrev]))
+        msg += str(self.repo[self.wizard().backoutrev])
+        if mergeparentrev:
+            msg += '\n\n'
+            bctx = self.repo[self.wizard().backoutrev]
+            isp1 = (bctx.p1().rev() == mergeparentrev)
+            if isp1:
+                msg += _('Backed out merge revision '
+                    'to its first parent (%s)') % str(bctx.p1())
+            else:
+                msg += _('Backed out merge revision '
+                    'to its second parent (%s)') % str(bctx.p2())
+        self.msgEntry.setText(msg)
         self.msgEntry.moveCursorToEnd()
 
     @pyqtSlot(QString)
@@ -515,6 +581,8 @@ class CommitPage(BasePage):
             cmdline = ['backout', '--verbose', '--message', message, '--rev',
                        str(self.wizard().backoutrev), '--user', user,
                        '--repository', self.repo.root]
+            if self.wizard().backoutmergeparentrev:
+                cmdline += ['--parent', str(self.wizard().backoutmergeparentrev)]
         else:
             self.setTitle(_('Committing...'))
             self.setSubTitle(_('Please wait while committing merged files.'))
