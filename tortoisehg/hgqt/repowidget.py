@@ -1413,11 +1413,12 @@ class RepoWidget(QWidget):
     def exportRevisions(self, revisions):
         if not revisions:
             revisions = [self.rev]
-        dir = QFileDialog.getExistingDirectory(self, _('Export patch'),
+        udir = QFileDialog.getExistingDirectory(self, _('Export patch'),
                                                hglib.tounicode(self.repo.root))
-        if not dir:
+        if not udir:
             return
-        epath = os.path.join(hglib.fromunicode(dir),
+        strdir = hglib.fromunicode(udir)
+        epath = os.path.join(strdir,
                              hglib.fromunicode(self.repo.shortname)+'_%r.patch')
 
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
@@ -1446,7 +1447,7 @@ class RepoWidget(QWidget):
                 'in the selected location (%s).\n\n') \
                 % (len(existingRevisions),
                     " ,".join([str(rev) for rev in existingRevisions]),
-                    dir)
+                    udir)
 
             warningMessage += \
                 _('What do you want to do?\n') + u'\n' + \
@@ -1467,6 +1468,29 @@ class RepoWidget(QWidget):
                 return
 
         self.runCommand(cmdline)
+
+        if len(revisions) == 1:
+            # Show a message box with a link to the export folder and to the
+            # exported file
+            rev = revisions[0]
+            patchfilename = os.path.normpath(epath % rev)
+            patchdirname = os.path.normpath(strdir)
+            patchshortname = os.path.basename(patchfilename)
+            qtlib.InfoMsgBox(_('Patch exported'),
+                _('Revision #%d (%s) was exported to:<p>'
+                '<a href="file:///%s">%s</a>%s'
+                '<a href="file:///%s">%s</a>') \
+                % (rev, str(self.repo[rev]),
+                patchdirname, patchdirname, os.path.sep,
+                patchfilename, patchshortname))
+        else:
+            # Show a message box with a link to the export folder
+            qtlib.InfoMsgBox(_('Patches exported'),
+                _('%d patches were exported to:<p>'
+                '<a href="file:///%s">%s</a>') \
+                % (len(revisions),
+                strdir,
+                strdir))
 
     def visualDiffRevision(self):
         opts = dict(change=self.rev)
