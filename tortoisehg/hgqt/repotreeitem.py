@@ -309,6 +309,7 @@ class RepoItem(RepoTreeItem):
                     _('An error occurred while updating the repository hgrc '
                     'file (%s)' % abshgrcpath))
                 return False
+            self.setShortName(shortname)
             return True
         return False
 
@@ -407,9 +408,11 @@ class RepoGroupItem(RepoTreeItem):
             self.name = value.toString()
             return True
         return False
+
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
             None, 'reloadRegistry']
+
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
@@ -483,9 +486,11 @@ class RepoGroupItem(RepoTreeItem):
 class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, parent=None):
         RepoGroupItem.__init__(self, name=_('default'), parent=parent)
+
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
             None, 'reloadRegistry']
+
     def undump(self, xr):
         a = xr.attributes()
         name = a.value('', 'name').toString()
