@@ -10,7 +10,7 @@ from mercurial import hg, merge as mergemod
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
-from tortoisehg.hgqt import commit, qscilib, thgrepo
+from tortoisehg.hgqt import qscilib, thgrepo, messageentry
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -232,6 +232,7 @@ class SummaryPage(BasePage):
         cmd = hglib.fromunicode(cmd)
         repo = self.repo
         if cmd == 'commit':
+            from tortoisehg.hgqt import commit
             dlg = commit.CommitDialog(repo, [], {}, self.wizard())
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
@@ -419,7 +420,7 @@ class CommitPage(BasePage):
         # commit message area
         msg_sep = qtlib.LabeledSeparator(_('Commit message'))
         self.layout().addWidget(msg_sep)
-        msgEntry = commit.MessageEntry(self)
+        msgEntry = messageentry.MessageEntry(self)
         msgEntry.installEventFilter(qscilib.KeyPressInterceptor(self))
         msgEntry.refresh(repo)
         msgEntry.loadSettings(QSettings(), 'backout/message')
