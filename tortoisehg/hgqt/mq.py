@@ -18,8 +18,8 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib, thgrepo
-from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport, status
+from tortoisehg.hgqt import qtlib, cmdui, rejects, qscilib, thgrepo, status
+from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport, messageentry
 from tortoisehg.hgqt.qtlib import geticon
 
 # TODO
@@ -654,7 +654,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         mtbarhbox.addWidget(self.newCheckBox)
         mtbarhbox.addWidget(self.patchNameLE, 1)
 
-        self.messageEditor = commit.MessageEntry(self)
+        self.messageEditor = messageentry.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
 
@@ -856,6 +856,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def qinitOrCommit(self):
         if os.path.isdir(self.repo.mq.join('.hg')):
+            from tortoisehg.hgqt import commit
             mqrepo = thgrepo.repository(None, self.repo.mq.path)
             dlg = commit.CommitDialog(mqrepo, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
