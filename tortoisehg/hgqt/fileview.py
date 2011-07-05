@@ -29,7 +29,7 @@ AnnMode = 3
 class HgFileView(QFrame):
     "file diff, content, and annotation viewer"
 
-    diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@$")
+    diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@")
 
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
