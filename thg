@@ -77,6 +77,9 @@ else:
     mystderr = cStringIO.StringIO()
     origstderr = sys.stderr
     sys.stderr = mystderr
+    sys.stdout = cStringIO.StringIO()
+    sys.__stdout__ = sys.stdout
+    sys.__stderr__ = sys.stderr
     ret = 0
     try:
         ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
