@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-07-01 16:15-0300\n"
-"PO-Revision-Date: 2011-03-01 23:06+0000\n"
-"Last-Translator: Tim <Unknown>\n"
+"PO-Revision-Date: 2011-07-04 19:24+0000\n"
+"Last-Translator: Tonnis Oosterhoff <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-07-01 19:37+0000\n"
-"X-Generator: Launchpad (build 13333)\n"
+"X-Launchpad-Export-Date: 2011-07-05 04:35+0000\n"
+"X-Generator: Launchpad (build 13168)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -194,7 +194,7 @@ msgstr "Gzip tar archieven"
 
 #: tortoisehg/hgqt/archive.py:238 tortoisehg/hgqt/archive.py:241
 msgid "Zip archives"
-msgstr ""
+msgstr "Zip archieven"
 
 #: tortoisehg/hgqt/archive.py:316 tortoisehg/hgqt/archive.py:334
 msgid "Duplicate Name"
@@ -370,7 +370,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:412 tortoisehg/hgqt/merge.py:489
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Werkmap (samengevoegd)"
 
 #: tortoisehg/hgqt/backout.py:420 tortoisehg/hgqt/merge.py:497
 msgid "Commit message"

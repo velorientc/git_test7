@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-07-01 16:15-0300\n"
-"PO-Revision-Date: 2011-06-28 15:36+0000\n"
+"PO-Revision-Date: 2011-07-05 21:33+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-07-01 19:36+0000\n"
-"X-Generator: Launchpad (build 13333)\n"
+"X-Launchpad-Export-Date: 2011-07-06 04:43+0000\n"
+"X-Generator: Launchpad (build 13168)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1530,15 +1530,15 @@ msgstr "Datei mit der lokalen Version vergleichen..."
 
 #: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:686
 msgid "View at revision..."
-msgstr ""
+msgstr "Anzeigen der Revision..."
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:689
 msgid "Edit local"
-msgstr ""
+msgstr "Lokale Version bearbeiten"
 
 #: tortoisehg/hgqt/filedialogs.py:216 tortoisehg/hgqt/filedialogs.py:692
 msgid "Revert to revision..."
-msgstr ""
+msgstr "Zurückrollen zur Revision..."
 
 #: tortoisehg/hgqt/filedialogs.py:363
 msgid "File Differences Log Columns"
@@ -2476,7 +2476,7 @@ msgstr "Flickenschlange"
 #: tortoisehg/hgqt/mq.py:114
 msgctxt "MQ QPush"
 msgid "Push all"
-msgstr ""
+msgstr "Alle verteilen"
 
 #: tortoisehg/hgqt/mq.py:115 tortoisehg/hgtk/thgmq.py:125
 msgid "Apply all patches"
@@ -2485,7 +2485,7 @@ msgstr "Alle Flicken anwenden"
 #: tortoisehg/hgqt/mq.py:117
 msgctxt "MQ QPush"
 msgid "Push"
-msgstr ""
+msgstr "Verteilen"
 
 #: tortoisehg/hgqt/mq.py:118
 msgid "Apply one patch"
@@ -3238,7 +3238,7 @@ msgstr "%s - hg %s"
 
 #: tortoisehg/hgqt/quickop.py:78 tortoisehg/hgtk/quickop.py:133
 msgid "Do not save backup files (*.orig)"
-msgstr "Sicherheitskopien (*.orig) nicht speichern"
+msgstr "Sicherungskopien (*.orig) nicht speichern"
 
 #: tortoisehg/hgqt/quickop.py:134 tortoisehg/hgtk/quickop.py:261
 msgid "No files selected"
@@ -3537,7 +3537,7 @@ msgstr "Nur den benannten Zweig grafisch darstellen"
 
 #: tortoisehg/hgqt/repofilter.py:209
 msgid "Display only active branches"
-msgstr ""
+msgstr "Nur aktive Zweige anzeigen"
 
 #: tortoisehg/hgqt/repofilter.py:212
 msgid "Display closed branches"
@@ -5267,7 +5267,7 @@ msgstr "thg status [Parameter] [Datei]"
 
 #: tortoisehg/hgqt/run.py:1070 tortoisehg/hgqt/run.py:1101
 msgid "discard uncommitted changes (no backup)"
-msgstr "Nicht übernommene Änderungen (ohne Kopie) verwerfen"
+msgstr "Nicht übernommene Änderungen (ungesichert) verwerfen"
 
 #: tortoisehg/hgqt/run.py:1071
 msgid "do not back up stripped revisions"
@@ -5413,7 +5413,7 @@ msgstr "Ort:"
 
 #: tortoisehg/hgqt/rupdate.py:61
 msgid "Discard remote changes, no backup (-C/--clean)"
-msgstr ""
+msgstr "Entfernte Änderungen ungesichert verwerfen (-C/--clean)"
 
 #: tortoisehg/hgqt/rupdate.py:63
 msgid "Perform a push before updating (-p/--push)"
@@ -5652,13 +5652,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:413
 msgid "Default widget"
-msgstr ""
+msgstr "Vorgabebereich"
 
 #: tortoisehg/hgqt/settings.py:415
 msgid ""
 "Select the initial widget that will be shown when opening a repository. "
 "Default: revdetails"
 msgstr ""
+"Wählen SIe den Bereich, der standardmäßig beim Öffnen eines Projektarchivs "
+"angezeigt werden soll. Vorgabe: revdetails"
 
 #: tortoisehg/hgqt/settings.py:420
 msgid ""
@@ -5666,6 +5668,10 @@ msgid ""
 " You can select the \"current\" (i.e. the working directory parent), the "
 "current \"tip\" or the working directory (\"workingdir\"). Default: current"
 msgstr ""
+"Wählen Sie die Revision, die standardmäßig beim Öffnen eines Projektarchivs "
+"ausgewählt werden soll. Sie können die aktuelle wählen (current, bezeichnet "
+"den Vorgänger der Arbeitskopie), die Spitze des Archivs (tip) oder die "
+"Arbeitskopieversion (workingdir). Vorgabe: current"
 
 #: tortoisehg/hgqt/settings.py:424 tortoisehg/hgtk/thgconfig.py:130
 msgid "Author Coloring"
@@ -6674,8 +6680,7 @@ msgstr "Alle Dateien nach links verschieben"
 
 #: tortoisehg/hgqt/shelve.py:186
 msgid "Backup copies of modified files can be found in .hg/Trashcan/"
-msgstr ""
-"Sicherheitskopien der geänderten Dateien finden sich in .hg/Trashcan/"
+msgstr "Sicherungskopien der geänderten Dateien finden sich in .hg/Trashcan/"
 
 #: tortoisehg/hgqt/shelve.py:192
 #, python-format
@@ -7784,7 +7789,7 @@ msgstr "Vorgänger 2:"
 
 #: tortoisehg/hgqt/update.py:94 tortoisehg/hgtk/update.py:98
 msgid "Discard local changes, no backup (-C/--clean)"
-msgstr "Lokale Änderungen ohne Sicherung abräumen (-C/--clean)"
+msgstr "Lokale Änderungen ungesichert abräumen (-C/--clean)"
 
 #: tortoisehg/hgqt/update.py:96 tortoisehg/hgtk/update.py:104
 msgid "Always merge (when possible)"
@@ -7821,7 +7826,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:249 tortoisehg/hgtk/update.py:234
 msgid "Discard - discard local changes, no backup"
-msgstr "Verwerfen - lokale Änderungen ungesichert vewerfen"
+msgstr "Verwerfen - lokale Änderungen ungesichert verwerfen"
 
 #: tortoisehg/hgqt/update.py:250 tortoisehg/hgtk/update.py:235
 msgid "&Shelve"
@@ -12745,15 +12750,15 @@ msgstr "Kopierend er Datei %s gescheitert\n"
 #: tortoisehg/util/hgshelve.py:433
 #, python-format
 msgid "removing backup file : %r\n"
-msgstr "Entferne Sicherungsdatei: %r\n"
+msgstr "Entferne Sicherungskopie: %r\n"
 
 #: tortoisehg/util/hgshelve.py:437
 msgid "delete of shelve backup failed"
-msgstr "Entfernen des Stauraum-Kopie gescheitert"
+msgstr "Entfernen des Stauraum-Sicherung gescheitert"
 
 #: tortoisehg/util/hgshelve.py:440
 msgid "bad shelve backup directory name"
-msgstr "Name des Stauraum-Sicherungsverzeichnis ungeeignet"
+msgstr "Verzeichnisname für die Stauraum-Sicherung ungeeignet"
 
 #: tortoisehg/util/hgshelve.py:470
 msgid "shelve can only be run interactively"
@@ -12795,7 +12800,7 @@ msgstr "Nichts auszuräumen\n"
 
 #: tortoisehg/util/hgshelve.py:593
 msgid "unshelve backup aborted\n"
-msgstr "Kopieren des Stauraums abgebrochen\n"
+msgstr "Sicherung des Stauraums abgebrochen\n"
 
 #: tortoisehg/util/hgshelve.py:597
 msgid "applying shelved patch\n"
@@ -12803,7 +12808,7 @@ msgstr "Wende gestauten Flicken an\n"
 
 #: tortoisehg/util/hgshelve.py:610
 msgid "restoring backup files\n"
-msgstr "Sicherungskopien widerherstellen\n"
+msgstr "stelle Dateien aus der Sicherung wieder her\n"
 
 #: tortoisehg/util/hgshelve.py:619
 msgid "removing shelved patches\n"
