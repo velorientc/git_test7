@@ -17,6 +17,8 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
 from tortoisehg.util import hglib, paths
 
+# TODO: this dialog should take a repo argument, not ui
+
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
 
