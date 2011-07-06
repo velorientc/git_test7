@@ -163,6 +163,7 @@ class ArchiveDialog(QDialog):
         self.arch_btn.clicked.connect(self.archive)
         self.detail_btn.clicked.connect(self.detail_clicked)
         self.close_btn.clicked.connect(self.close)
+        self.cancel_btn.clicked.connect(self.cancel_clicked)
 
         # dialog setting
         self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
@@ -350,7 +351,7 @@ class ArchiveDialog(QDialog):
         else:
             self.cmd.setShowOutput(True)
 
-    def cancel_clicked():
+    def cancel_clicked(self):
         self.cmd.cancel()
 
     def command_started(self):
