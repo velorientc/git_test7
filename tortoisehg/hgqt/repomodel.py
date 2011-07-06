@@ -645,10 +645,10 @@ class HgRepoListModel(QAbstractTableModel):
             effects = qtlib.geteffect(style)
             text = qtlib.applyeffects(' %s ' % len(files), effects)
             changes.append(text)
-        if M:
-            addtotal(M, 'log.modified')
         if A:
             addtotal(A, 'log.added')
+        if M:
+            addtotal(M, 'log.modified')
         if R:
             addtotal(R, 'log.removed')
         return ''.join(changes)
