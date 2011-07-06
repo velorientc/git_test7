@@ -313,7 +313,7 @@ class ArchiveDialog(QDialog):
                 if os.path.isfile(dest):
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                             _('The destination "%s" already exists as '
-                              'a file!' % dest))
+                              'a file!') % dest)
                     return False
                 elif os.listdir(dest):
                     if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
@@ -331,7 +331,7 @@ class ArchiveDialog(QDialog):
                 else:
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                           _('The destination "%s" already exists as '
-                            'a folder!' % dest))
+                            'a folder!') % dest)
                     return False
 
         # prepare command line
