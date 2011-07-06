@@ -332,13 +332,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
-    def applyTargetOption(self, cmdline):
-        if self.embedded and self.targetcheckbox.isChecked():
-            idx = self.targetcombo.currentIndex()
-            if idx != -1 and idx < len(self.targetargs):
-                cmdline += self.targetargs[idx]
-        return cmdline
-
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
@@ -619,7 +612,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 cmdline.append(val)
 
         if 'rev' in details and '--rev' not in cmdline:
-            cmdline = self.applyTargetOption(cmdline)
+            if self.embedded and self.targetcheckbox.isChecked():
+                idx = self.targetcombo.currentIndex()
+                if idx != -1 and idx < len(self.targetargs):
+                    args = self.targetargs[idx]
+                    if args[0][2:] not in details:
+                        args[0] = '--rev'
+                    cmdline += args
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
         if self.opts.get('debug'):
@@ -774,7 +773,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--update', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
-        self.run(cmdline, ('force', 'branch', 'rev'))
+        self.run(cmdline, ('force', 'branch', 'rev', 'bookmark'))
 
     def outclicked(self):
         url = self.currentUrl(True)
@@ -875,7 +874,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.extend(['--rev', str(rev)])
         if branch:
             cmdline.extend(['--branch', branch])
-        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
+        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev', 'bookmark'))
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
