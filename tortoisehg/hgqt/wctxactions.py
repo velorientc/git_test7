@@ -113,24 +113,26 @@ class WctxActions(QObject):
         t, path = selrows[0]
         wctx = self.repo[None]
         if t & frozenset('?') and wctx.deleted():
-            rmenu = QMenu(_('Was renamed from'))
+            rmenu = QMenu(_('Was renamed from'), self.parent())
             for d in wctx.deleted()[:15]:
                 def mkaction(deleted):
                     a = rmenu.addAction(hglib.tounicode(deleted))
                     a.triggered.connect(lambda: renamefromto(repo, deleted, path))
                 mkaction(d)
+            menu.addSeparator()
             menu.addMenu(rmenu)
 
         # Add restart merge actions for resolved files
         if alltypes & frozenset('u'):
             f = make(_('Restart Merge...'), resolve, frozenset('u'))
             files = [f for t, f in selrows if 'u' in t]
-            rmenu = QMenu(_('Restart merge with'))
+            rmenu = QMenu(_('Restart merge with'), self.parent())
             for tool in hglib.mergetools(repo.ui):
                 def mkaction(rtool):
                     a = rmenu.addAction(hglib.tounicode(rtool))
                     a.triggered.connect(lambda: resolve_with(rtool, repo, files))
                 mkaction(tool)
+            menu.addSeparator()
             menu.addMenu(rmenu)
         return menu
 
