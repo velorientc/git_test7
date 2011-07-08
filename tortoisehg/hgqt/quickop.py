@@ -45,10 +45,13 @@ class QuickOpDialog(QDialog):
         self.setWindowIcon(qtlib.geticon(ICONS[command]))
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)
         self.setLayout(layout)
 
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(5, 5, 5, 0)
+        layout.addLayout(toplayout)
+        
         hbox = QHBoxLayout()
         lbl = QLabel(LABELS[command][0])
         slbl = QLabel()
@@ -56,7 +59,7 @@ class QuickOpDialog(QDialog):
         hbox.addStretch(1)
         hbox.addWidget(slbl)
         self.status_label = slbl
-        layout.addLayout(hbox)
+        toplayout.addLayout(hbox)
 
         types = { 'add'    : 'I?',
                   'forget' : 'MAR!C',
@@ -71,16 +74,15 @@ class QuickOpDialog(QDialog):
 
         opts['checkall'] = True # pre-check all matching files
         stwidget = status.StatusWidget(repo, pats, opts, self)
-        layout.addWidget(stwidget, 1)
+        toplayout.addWidget(stwidget, 1)
 
         if self.command == 'revert':
             ## no backup checkbox
             chk = QCheckBox(_('Do not save backup files (*.orig)'))
             self.chk = chk
-            layout.addWidget(chk)
+            toplayout.addWidget(chk)
 
         self.statusbar = cmdui.ThgStatusBar(self)
-        self.statusbar.setSizeGripEnabled(False)
         stwidget.showMessage.connect(self.statusbar.showMessage)
 
         self.cmd = cmd = cmdui.Runner(True, self)
@@ -94,15 +96,10 @@ class QuickOpDialog(QDialog):
         bb.rejected.connect(self.reject)
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText(LABELS[command][1])
-        layout.addWidget(bb)
+        toplayout.addWidget(bb)
         self.bb = bb
 
-        hbox = QHBoxLayout()
-        hbox.setMargin(0)
-        hbox.setContentsMargins(*(0,)*4)
-        hbox.addWidget(self.statusbar)
-        hbox.addWidget(self.bb)
-        layout.addLayout(hbox)
+        layout.addWidget(self.statusbar)
 
         s = QSettings()
         stwidget.loadSettings(s, 'quickop')
