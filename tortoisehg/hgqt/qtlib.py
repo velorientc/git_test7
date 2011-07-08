@@ -188,6 +188,7 @@ _thgstyles = {
 }
 
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
+tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
     configureshell(ui)

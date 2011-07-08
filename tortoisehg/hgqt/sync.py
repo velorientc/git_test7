@@ -96,6 +96,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.resize(850, 550)
 
         tb = QToolBar(self)
+        tb.setStyleSheet(qtlib.tbstylesheet)
         self.layout().addWidget(tb)
         self.opbuttons = []
 
@@ -181,6 +182,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         layout.addLayout(hbox)
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
+        tbar.setStyleSheet(qtlib.tbstylesheet)
         tbar.setIconSize(QSize(16, 16))
         hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
