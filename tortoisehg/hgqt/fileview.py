@@ -97,7 +97,6 @@ class HgFileView(QFrame):
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
 
-        self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
