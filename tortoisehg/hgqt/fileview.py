@@ -44,7 +44,6 @@ class HgFileView(QFrame):
         QFrame.__init__(self, parent)
         framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
-        framelayout.setSpacing(0)
 
         l = QHBoxLayout()
         l.setContentsMargins(0,0,0,0)
