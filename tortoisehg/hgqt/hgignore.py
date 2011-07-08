@@ -78,16 +78,14 @@ class HgignoreDialog(QDialog):
         split = QSplitter()
         vbox.addWidget(split, 1)
 
-        ignoregb = QFrame()
-        ignoregb.setFrameStyle(QFrame.Panel|QFrame.Raised)
+        ignoregb = QGroupBox()
         ivbox = QVBoxLayout()
         ignoregb.setLayout(ivbox)
         lbl = QLabel(_('<b>Ignore Filter</b>'))
         ivbox.addWidget(lbl)
         split.addWidget(ignoregb)
 
-        unknowngb = QFrame()
-        unknowngb.setFrameStyle(QFrame.Panel|QFrame.Raised)
+        unknowngb = QGroupBox()
         uvbox = QVBoxLayout()
         unknowngb.setLayout(uvbox)
         lbl = QLabel(_('<b>Untracked Files</b>'))
