@@ -61,6 +61,7 @@ class HgFileView(QFrame):
 
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
         self.diffToolbar.setIconSize(QSize(16,16))
+        self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.diffToolbar)
 
         self.filenamelabel = w = QLabel()
