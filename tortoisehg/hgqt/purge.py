@@ -27,45 +27,53 @@ class PurgeDialog(QDialog):
         QDialog.__init__(self, parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.setLayout(QVBoxLayout())
+        layout = QVBoxLayout()
+        layout.setMargin(0)
+        layout.setSpacing(0)
+        self.setLayout(layout)
+        
+        toplayout = QVBoxLayout()
+        toplayout.setMargin(10)
+        toplayout.setSpacing(5)
+        layout.addLayout(toplayout)
 
         cb = QCheckBox(_('No unknown files found'))
         cb.setChecked(False)
         cb.setEnabled(False)
-        self.layout().addWidget(cb)
+        toplayout.addWidget(cb)
         self.ucb = cb
 
         cb = QCheckBox(_('No ignored files found'))
         cb.setChecked(False)
         cb.setEnabled(False)
-        self.layout().addWidget(cb)
+        toplayout.addWidget(cb)
         self.icb = cb
 
         cb = QCheckBox(_('No trash files found'))
         cb.setChecked(False)
         cb.setEnabled(False)
-        self.layout().addWidget(cb)
+        toplayout.addWidget(cb)
         self.tcb = cb
 
         self.foldercb = QCheckBox(_('Delete empty folders'))
         self.foldercb.setChecked(True)
-        self.layout().addWidget(self.foldercb)
+        toplayout.addWidget(self.foldercb)
         self.hgfilecb = QCheckBox(_('Preserve files beginning with .hg'))
         self.hgfilecb.setChecked(True)
-        self.layout().addWidget(self.hgfilecb)
-
-        self.stbar = cmdui.ThgStatusBar(self)
-        self.stbar.setSizeGripEnabled(False)
-        self.progress.connect(self.stbar.progress)
-        self.showMessage.connect(self.stbar.showMessage)
-        self.layout().addWidget(self.stbar)
+        toplayout.addWidget(self.hgfilecb)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         self.bb = bb
-        self.layout().addWidget(bb)
+        toplayout.addStretch()
+        toplayout.addWidget(bb)
+
+        self.stbar = cmdui.ThgStatusBar(self)
+        self.progress.connect(self.stbar.progress)
+        self.showMessage.connect(self.stbar.showMessage)
+        layout.addWidget(self.stbar)
 
         self.setWindowTitle(_('%s - purge') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-purge'))
