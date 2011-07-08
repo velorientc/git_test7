@@ -76,11 +76,12 @@ class QuickOpDialog(QDialog):
         stwidget = status.StatusWidget(repo, pats, opts, self)
         toplayout.addWidget(stwidget, 1)
 
+        hbox = QHBoxLayout()
         if self.command == 'revert':
             ## no backup checkbox
             chk = QCheckBox(_('Do not save backup files (*.orig)'))
             self.chk = chk
-            toplayout.addWidget(chk)
+            hbox.addWidget(chk)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         stwidget.showMessage.connect(self.statusbar.showMessage)
@@ -96,7 +97,9 @@ class QuickOpDialog(QDialog):
         bb.rejected.connect(self.reject)
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText(LABELS[command][1])
-        toplayout.addWidget(bb)
+        hbox.addStretch()
+        hbox.addWidget(bb)
+        toplayout.addLayout(hbox)
         self.bb = bb
 
         layout.addWidget(self.statusbar)
