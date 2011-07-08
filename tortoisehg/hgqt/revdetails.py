@@ -179,6 +179,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.revpanel.linkActivated.connect(self.linkActivated)
 
         panelframevbox.addWidget(self.revpanel)
+        panelframevbox.addSpacing(5)
         panelframevbox.addWidget(self.messagesplitter)
 
     def forwardFont(self, font):
