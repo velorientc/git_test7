@@ -194,10 +194,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
         tbar.addWidget(self.schemecombo)
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
         a.setToolTip(_('Manage HTTPS connection security and user authentication'))
         self.securebutton = a
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
@@ -206,10 +208,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.hostentry)
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
         tbar.addWidget(w)
+        tbar.addWidget(qtlib.Spacer(2, 2))
         self.HostAndPortWidgets.append(w)
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
@@ -217,15 +221,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.portentry)
+        tbar.addWidget(qtlib.Spacer(2, 2))
         self.HostAndPortWidgets.append(self.portentry)
         w = QLabel('/')
         tbar.addWidget(w)
+        tbar.addWidget(qtlib.Spacer(2, 2))
         self.HostAndPortWidgets.append(w)
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
         self.pathentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.pathentry)
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         style = QApplication.style()
         a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
