@@ -41,6 +41,7 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
+        self._manifest_widget.setContentsMargins(10, 10, 10, 10)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
