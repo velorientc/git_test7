@@ -35,6 +35,15 @@ COL_SIZE = 5
 
 _colors = {}
 
+class Spacer(QWidget):
+    def __init__(self, width, height, parent=None):
+        QWidget.__init__(self, parent)
+        self.width = width
+        self.height = height
+        
+    def sizeHint(self):
+        return QSize(self.width, self.height)
+
 class StatusWidget(QWidget):
     '''Working copy status widget
        SIGNALS:
@@ -90,7 +99,7 @@ class StatusWidget(QWidget):
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setMargin(4)
-        hbox.setContentsMargins(2, 0, 0, 0)
+        hbox.setContentsMargins(0, 0, 0, 0)
         self.refreshBtn = tb = QToolButton()
         tb.setToolTip(_('Refresh file list'))
         tb.setIcon(qtlib.geticon('view-refresh'))
@@ -119,6 +128,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
         hbox.addWidget(self.filelistToolbar)
+        self.filelistToolbar.addWidget(Spacer(2, 2))
         self.filelistToolbar.addWidget(self.checkAllNoneBtn)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(le)
