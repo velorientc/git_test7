@@ -194,6 +194,7 @@ class RepoWidget(QWidget):
         self.updateTaskTabs()
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo, self)
+        self.revDetailsWidget.filelisttbar.setStyleSheet(qtlib.tbstylesheet)
         w.linkActivated.connect(self._openLink)
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)

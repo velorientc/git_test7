@@ -108,6 +108,7 @@ class ShelveDialog(QDialog):
         bvbox.addWidget(self.browseb)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
+        self.lefttbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addWidget(self.lefttbar)
         self.deletea = a = QAction(_('Delete selected chunks'), self)
         self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
@@ -130,6 +131,7 @@ class ShelveDialog(QDialog):
         self.lefttbar.addAction(self.chunksright)
 
         self.rbar = QToolBar(_('Refresh Toolbar'), objectName='rbar')
+        self.rbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addStretch(1)
         self.tbarhbox.addWidget(self.rbar)
         self.refreshAction = a = QAction(_('Refresh'), self)
@@ -143,6 +145,7 @@ class ShelveDialog(QDialog):
         self.rbar.addAction(self.actionNew)
 
         self.righttbar = QToolBar(_('Right Toolbar'), objectName='righttbar')
+        self.righttbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addStretch(1)
         self.tbarhbox.addWidget(self.righttbar)
         self.chunksleft = a = QAction(_('Move selected chunks left'), self)
