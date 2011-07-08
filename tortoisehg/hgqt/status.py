@@ -853,10 +853,13 @@ class StatusDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 6, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(10, 10, 10, 0);
         self.stwidget = StatusWidget(repo, pats, opts, self)
-        layout.addWidget(self.stwidget, 1)
+        toplayout.addWidget(self.stwidget, 1)
+        layout.addLayout(toplayout)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         layout.addWidget(self.statusbar)
