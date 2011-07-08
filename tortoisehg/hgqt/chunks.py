@@ -538,10 +538,10 @@ class DiffBrowser(QFrame):
         w.setWordWrap(True)
         w.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(w)
+        self.layout().addSpacing(2)
         w.hide()
 
         self.sci = qscilib.Scintilla(self)
-        self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
