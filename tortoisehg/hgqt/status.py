@@ -35,15 +35,6 @@ COL_SIZE = 5
 
 _colors = {}
 
-class Spacer(QWidget):
-    def __init__(self, width, height, parent=None):
-        QWidget.__init__(self, parent)
-        self.width = width
-        self.height = height
-        
-    def sizeHint(self):
-        return QSize(self.width, self.height)
-
 class StatusWidget(QWidget):
     '''Working copy status widget
        SIGNALS:
@@ -128,7 +119,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
         hbox.addWidget(self.filelistToolbar)
-        self.filelistToolbar.addWidget(Spacer(2, 2))
+        self.filelistToolbar.addWidget(qtlib.Spacer(2, 2))
         self.filelistToolbar.addWidget(self.checkAllNoneBtn)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(le)

@@ -939,6 +939,17 @@ class DemandWidget(QWidget):
     def __getattr__(self, name):
         return getattr(self._widget, name)
 
+class Spacer(QWidget):
+    """Spacer to separate controls in a toolbar"""
+    
+    def __init__(self, width, height, parent=None):
+        QWidget.__init__(self, parent)
+        self.width = width
+        self.height = height
+        
+    def sizeHint(self):
+        return QSize(self.width, self.height)
+
 def getCurrentUsername(widget, repo, opts=None):
     if opts:
         # 1. Override has highest priority
