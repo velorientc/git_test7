@@ -1048,13 +1048,15 @@ class CommitDialog(QDialog):
         self.opts = opts
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(5, 5, 5, 0)
+        layout.addLayout(toplayout)
+        
         commit = CommitWidget(repo, pats, opts, False, self)
-        layout.addWidget(commit, 1)
+        toplayout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         commit.showMessage.connect(self.statusbar.showMessage)
@@ -1074,11 +1076,7 @@ class CommitDialog(QDialog):
         self.commitButton.setText(_('Commit', 'action button'))
         self.bb = bb
 
-        bblayout = QHBoxLayout()
-        bblayout.addSpacing(5)
-        bblayout.addWidget(self.bb)
-        bblayout.addSpacing(5)
-        layout.addLayout(bblayout)
+        toplayout.addWidget(self.bb)
         layout.addWidget(self.statusbar)
 
         s = QSettings()
