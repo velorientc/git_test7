@@ -87,6 +87,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         hbox.setMargin(0)
         hbox.setContentsMargins(*(0,)*4)
         tbar = QToolBar(_("Commit Dialog Toolbar"), self)
+        tbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(tbar)
 
         self.branchbutton = tbar.addAction(_('Branch: '))
