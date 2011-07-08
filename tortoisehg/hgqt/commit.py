@@ -56,7 +56,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
-        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
+        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
         self.opts = opts # user, date
 
         self.stwidget = status.StatusWidget(repo, pats, opts, self)
