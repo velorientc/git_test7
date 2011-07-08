@@ -147,7 +147,7 @@ class RepoWidget(QWidget):
 
         self.repotabs_splitter = QSplitter(orientation=Qt.Vertical)
         self.setLayout(QVBoxLayout())
-        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setContentsMargins(5, 5, 5, 5)
         self.layout().setSpacing(0)
 
         self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
