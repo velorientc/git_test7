@@ -514,7 +514,7 @@ class HgFileView(QFrame):
                 self._opcodes = diff.get_opcodes()
                 self._fd = None
                 self._diffs = []
-            else if isinstance(self._opcodes, bool):
+            elif isinstance(self._opcodes, bool):
                 # catch self._mode changes while this thread is active
                 self._opcodes = []
 
