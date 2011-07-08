@@ -118,6 +118,7 @@ class StatusWidget(QWidget):
 
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
+        self.filelistToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.filelistToolbar)
         self.filelistToolbar.addWidget(qtlib.Spacer(2, 2))
         self.filelistToolbar.addWidget(self.checkAllNoneBtn)
