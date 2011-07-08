@@ -202,8 +202,9 @@ class RepoFilterBar(QToolBar):
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
-            text=_('Branch'), popupMode=QToolButton.InstantPopup,
+            text=_('Branch'), popupMode=QToolButton.MenuButtonPopup,
             statusTip=_('Display graph the named branch only'))
+        self._branchLabel.clicked.connect(self._branchLabel.showMenu)
         self._branchMenu = QMenu(self._branchLabel)
         self._abranchAction = self._branchMenu.addAction(
             _('Display only active branches'), self.refresh)

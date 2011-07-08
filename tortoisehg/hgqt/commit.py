@@ -99,8 +99,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
-            popupMode=QToolButton.InstantPopup,
+            popupMode=QToolButton.MenuButtonPopup,
             toolTip=_('Copy one of the recent commit messages'))
+        self.recentMessagesButton.clicked.connect(self.recentMessagesButton.showMenu)
         tbar.addWidget(self.recentMessagesButton)
         self.updateRecentMessages()
 

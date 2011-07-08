@@ -812,10 +812,11 @@ class StatusFilterButton(QToolButton):
         #if 'text' not in kwargs:
         #    kwargs['text'] = _('Status')
         super(StatusFilterButton, self).__init__(
-            parent, popupMode=QToolButton.InstantPopup,
+            parent, popupMode=QToolButton.MenuButtonPopup,
             icon=qtlib.geticon('hg-status'),
             toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
+        self.clicked.connect(self.showMenu)
         self._initactions(statustext)
 
     def _initactions(self, text):
@@ -845,7 +846,7 @@ class StatusFilterButton(QToolButton):
         assert util.all(c in self._TYPES for c in text)
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
-
+                        
 class StatusDialog(QDialog):
     'Standalone status browser'
     def __init__(self, repo, pats, opts, parent=None):
