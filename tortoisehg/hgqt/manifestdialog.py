@@ -139,6 +139,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         navlayout.setContentsMargins(0, 0, 0, 0)
         self._toolbar = QToolBar()
         self._toolbar.setIconSize(QSize(16,16))
+        self._toolbar.setStyleSheet(qtlib.tbstylesheet)
         self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
