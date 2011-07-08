@@ -514,6 +514,9 @@ class HgFileView(QFrame):
                 self._opcodes = diff.get_opcodes()
                 self._fd = None
                 self._diffs = []
+            else if isinstance(self._opcodes, bool):
+                # catch self._mode changes while this thread is active
+                self._opcodes = []
 
             for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
                 if tag == 'replace':
