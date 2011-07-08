@@ -157,9 +157,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
+        bottomlayout = QVBoxLayout()
+        bottomlayout.setContentsMargins(5, 5, 5, 5)
+        layout.addLayout(bottomlayout)
+        
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
         hbox.addWidget(lbl)
         self.optionslabel = QLabel()
@@ -169,7 +173,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
         self.urllabel = QLabel()
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -179,7 +183,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
         tbar.setStyleSheet(qtlib.tbstylesheet)
@@ -260,7 +264,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         pathsbox.addWidget(self.reltv)
         hbox.addWidget(pathsframe)
 
-        self.layout().addLayout(hbox, 1)
+        bottomlayout.addLayout(hbox, 1)
 
         self.savebutton.triggered.connect(self.saveclicked)
         self.securebutton.triggered.connect(self.secureclicked)
@@ -274,7 +278,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.output.connect(self.output)
         cmd.progress.connect(self.progress)
 
-        layout.addWidget(cmd)
+        bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
 
