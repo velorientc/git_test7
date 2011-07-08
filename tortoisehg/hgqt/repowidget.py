@@ -463,6 +463,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def clearRevisionSet(self):
+        self.filterbar.revsetle.clear()
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
         if not self.revset:
@@ -821,7 +822,7 @@ class RepoWidget(QWidget):
                                    'cleared'))
             elif self.revset:
                 self.revset = []
-                self.filterbar.revsetle.setText('')
+                self.filterbar.revsetle.clear()
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)
