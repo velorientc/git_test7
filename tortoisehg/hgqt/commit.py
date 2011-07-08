@@ -1074,7 +1074,11 @@ class CommitDialog(QDialog):
         self.commitButton.setText(_('Commit', 'action button'))
         self.bb = bb
 
-        layout.addWidget(self.bb)
+        bblayout = QHBoxLayout()
+        bblayout.addSpacing(5)
+        bblayout.addWidget(self.bb)
+        bblayout.addSpacing(5)
+        layout.addLayout(bblayout)
         layout.addWidget(self.statusbar)
 
         s = QSettings()
