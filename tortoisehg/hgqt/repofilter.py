@@ -65,7 +65,9 @@ class RepoFilterBar(QToolBar):
         self.clearBtn.setToolTip(_('Clear current query and query text'))
         self.clearBtn.clicked.connect(self.onClearButtonClicked)
         self.addWidget(self.clearBtn)
+        self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(combo)
+        self.addWidget(qtlib.Spacer(2, 2))
 
         self.searchBtn = QToolButton(self)
         self.searchBtn.setIcon(qtlib.geticon('view-filter'))
@@ -224,6 +226,7 @@ class RepoFilterBar(QToolBar):
         self._branchReloading = False
 
         self.addWidget(self._branchLabel)
+        self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(self._branchCombo)
 
     def _updatebranchfilter(self):
