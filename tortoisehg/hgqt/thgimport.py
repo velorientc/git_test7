@@ -101,6 +101,7 @@ class ImportDialog(QDialog):
         box.addWidget(self.cmd)
 
         self.stlabel = QLabel(_('Checking working directory status...'))
+        self.stlabel.linkActivated.connect(self.commitActivated)
         box.addWidget(self.stlabel)
         QTimer.singleShot(0, self.checkStatus)
 
@@ -143,12 +144,13 @@ class ImportDialog(QDialog):
 
     ### Private Methods ###
 
+    def commitActivated(self):
+        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+        self.checkStatus()
+
     def checkStatus(self):
-        def activated():
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.checkStatus()
         self.repo.dirstate.invalidate()
         wctx = self.repo[None]
         M, A, R = wctx.status()[:3]
@@ -156,7 +158,6 @@ class ImportDialog(QDialog):
             text = _('Working directory is not clean!  '
                      '<a href="view">View changes...</a>')
             self.stlabel.setText(text)
-            self.stlabel.linkActivated.connect(activated)
         else:
             self.stlabel.clear()
 
