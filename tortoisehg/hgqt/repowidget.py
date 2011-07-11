@@ -947,20 +947,20 @@ class RepoWidget(QWidget):
         QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
 
     def okToContinue(self):
-        if not self.commitDemand.forward('canExit', default=True):
+        if not self.commitDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
             self.showMessage(_('Commit tab cannot exit'))
             return False
-        if not self.syncDemand.forward('canExit', default=True):
+        if not self.syncDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
         if 'mq' in self.repo.extensions():
-            if not self.mqDemand.forward('canExit', default=True):
+            if not self.mqDemand.canExit():
                 self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
                 self.showMessage(_('MQ tab cannot exit'))
                 return False
-        if not self.grepDemand.forward('canExit', default=True):
+        if not self.grepDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
             return False

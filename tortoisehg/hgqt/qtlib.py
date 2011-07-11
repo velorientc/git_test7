@@ -897,6 +897,9 @@ class TaskWidget(object):
         """Return True if the widget allows to switch away from it"""
         return True
 
+    def canExit(self):
+        return True
+
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
 
@@ -919,8 +922,8 @@ class DemandWidget(QWidget):
 
     def forward(self, funcname, *args, **opts):
         if self._widget:
-            return getattr(self._widget, funcname)(*args)
-        return opts.get('default')
+            return getattr(self._widget, funcname)(*args, **opts)
+        return None
 
     def get(self):
         """Returns the stored widget"""
@@ -936,17 +939,22 @@ class DemandWidget(QWidget):
             return True
         return self._widget.canswitch()
 
+    def canExit(self):
+        if self._widget is None:
+            return True
+        return self._widget.canExit()
+
     def __getattr__(self, name):
         return getattr(self._widget, name)
 
 class Spacer(QWidget):
     """Spacer to separate controls in a toolbar"""
-    
+
     def __init__(self, width, height, parent=None):
         QWidget.__init__(self, parent)
         self.width = width
         self.height = height
-        
+
     def sizeHint(self):
         return QSize(self.width, self.height)
 
