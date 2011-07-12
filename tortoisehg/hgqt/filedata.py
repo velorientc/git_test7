@@ -138,7 +138,7 @@ class FileData(object):
                             commands.log(_ui, srepo, **opts)
                             logOutput += _ui.popbuffer()
                         return logOutput
-                    
+
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     subabspath = os.path.join(repo.root, subrelpath)
                     missingsub = not os.path.isdir(subabspath)
@@ -271,7 +271,8 @@ class FileData(object):
                     'new':   _('(is a new sub-repository)'),
                     'removed':   _('(is a removed sub-repository)'),
                     'changed and dirty':   _('(is a changed and dirty sub-repository)'),
-                    'new and dirty':   _('(is a new and dirty sub-repository)')
+                    'new and dirty':   _('(is a new and dirty sub-repository)'),
+                    'removed and dirty':   _('(is a removed sub-repository)')
                 }[sstatedesc]
                 self.flabel += ' <i>' + lbl + '</i>'
                 if sactual:
