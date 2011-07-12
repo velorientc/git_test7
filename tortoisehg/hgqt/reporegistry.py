@@ -463,10 +463,10 @@ class RepoRegistryView(QDockWidget):
 
     def addSubrepo(self):
         'menu action handler for adding a new subrepository'
-        root = self.selitem.internalPointer().rootpath()
+        root = hglib.tounicode(self.selitem.internalPointer().rootpath())
         caption = _('Select an existing repository to add as a subrepo')
         FD = QFileDialog
-        path = hglib.fromunicode(FD.getExistingDirectory(caption=caption,
+        path = unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
             sroot = paths.find_root(path)
@@ -480,14 +480,14 @@ class RepoRegistryView(QDockWidget):
 
                 # Is is already on the selected repository substate list?
                 try:
-                    repo = hg.repository(ui.ui(), root)
+                    repo = hg.repository(ui.ui(), hglib.fromunicode(root))
                 except:
                     qtlib.WarningMsgBox(_('Cannot open repository'),
                         _('The selected repository:<br><br>%s<br><br>'
                         'cannot be open!') % root, parent=self)
                     return
 
-                if srelroot in repo['.'].substate:
+                if hglib.fromunicode(srelroot) in repo['.'].substate:
                     qtlib.WarningMsgBox(_('Subrepository already exists'),
                         _('The selected repository:<br><br>%s<br><br>'
                         'is already a subrepository of:<br><br>%s<br><br>'
@@ -513,6 +513,7 @@ class RepoRegistryView(QDockWidget):
                     # subrepos!) is not already on the .hgsub file
                     linesep = ''
                     for line in lines:
+                        line = hglib.tounicode(line)
                         spath = line.split("=")[0].strip()
                         if not spath:
                             continue
@@ -527,7 +528,8 @@ class RepoRegistryView(QDockWidget):
                             return
 
                     # Append the new subrepo to the end of the .hgsub file
-                    lines.append('%s = %s' % (srelroot, srelroot))
+                    lines.append(hglib.fromunicode('%s = %s'
+                                                   % (srelroot, srelroot)))
                     lines = [line.strip(linesep) for line in lines]
 
                     # and update the .hgsub file
