@@ -144,7 +144,7 @@ class WctxActions(QObject):
         files = [wfile for t, wfile in self.selrows if t & action._filetypes]
 
         hu = htmlui.htmlui()
-        name = func.__name__.title()
+        name = hglib.tounicode(func.__name__.title())
         notify = False
         cwd = os.getcwd()
         try:
@@ -155,11 +155,9 @@ class WctxActions(QObject):
                 notify = func(parent, hu, repo, files)
                 o, e = hu.getdata()
                 if e:
-                    QMessageBox.warning(parent, name + _(' errors'),
-                                        hglib.tounicode(str(e)))
+                    QMessageBox.warning(parent, name + _(' errors'), e)
                 elif o:
-                    QMessageBox.information(parent, name + _(' output'),
-                                            hglib.tounicode(str(o)))
+                    QMessageBox.information(parent, name + _(' output'), o)
                 elif notify:
                     wfiles = [repo.wjoin(x) for x in files]
                     shlib.shell_notify(wfiles)
