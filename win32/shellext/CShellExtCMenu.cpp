@@ -986,15 +986,13 @@ CShellExtCMenu::~CShellExtCMenu()
 
 STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
+    return ::InterlockedIncrement(&m_cRef);
 }
 
 
 STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
+    if(::InterlockedDecrement(&m_cRef))
         return m_cRef;
     delete this;
     return 0L;

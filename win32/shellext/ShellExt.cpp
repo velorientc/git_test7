@@ -155,13 +155,11 @@ LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 
 void CShellExt::IncDllRef()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    g_cRefThisDll++;
+    ::InterlockedIncrement(&g_cRefThisDll);
 }
 
 
 void CShellExt::DecDllRef()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    g_cRefThisDll--;
+    ::InterlockedDecrement(&g_cRefThisDll);
 }

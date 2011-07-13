@@ -90,15 +90,13 @@ CShellExtOverlay::~CShellExtOverlay()
 
 STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
+    return ::InterlockedIncrement(&m_cRef);
 }
 
 
 STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
+    if(::InterlockedDecrement(&m_cRef))
         return m_cRef;
     delete this;
     return 0L;
