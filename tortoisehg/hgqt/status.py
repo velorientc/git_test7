@@ -11,7 +11,7 @@ from mercurial import hg, util, cmdutil, error, context, merge
 
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff, cmdui, fileview
+from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
