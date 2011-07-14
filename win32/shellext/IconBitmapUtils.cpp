@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "IconBitmapUtils.h"
 #include "SysInfo.h"
-#include "registry.h"
 
 IconBitmapUtils::IconBitmapUtils()
     : hUxTheme(NULL)
