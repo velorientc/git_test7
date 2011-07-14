@@ -435,7 +435,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 for tokentype, value in lexer.get_tokens(contents):
                     if tokentype in Token.Name and len(value) > 4:
                         tokens.add(value)
-            except ClassNotFound:
+            except ClassNotFound, TypeError:
                 pass
         except ImportError:
             pass
