@@ -20,12 +20,9 @@
 #define CLSID_TortoiseHgModified     TOLSTR2(THG_CLSID_TortoiseHgModified)
 #define CLSID_TortoiseHgUnversioned  TOLSTR2(THG_CLSID_TortoiseHgUnversioned)
 
-
-UINT g_cRefThisDll = 0;
-HINSTANCE g_hmodThisDll = NULL;
-
-CRITICAL_SECTION g_critical_section;
-
+CRITICAL_SECTION CShellExt::cs_;
+HMODULE CShellExt::hModule_ = NULL;
+UINT CShellExt::cRef_ = 0;
 
 typedef struct
 {
@@ -40,20 +37,19 @@ VOID _LoadResources();
 VOID _UnloadResources();
 
 
-extern "C" 
-int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
+BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
     if (dwReason == DLL_PROCESS_ATTACH)
     {
         TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
-        g_hmodThisDll = hInstance;
-        ::InitializeCriticalSection(&g_critical_section);
+        CShellExt::hModule_ = hInstance;
+        ::InitializeCriticalSection(CShellExt::GetCriticalSection());
         _LoadResources();
     }
     else if (dwReason == DLL_PROCESS_DETACH)
     {
         TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
-        ::DeleteCriticalSection(&g_critical_section);
+        ::DeleteCriticalSection(CShellExt::GetCriticalSection());
         _UnloadResources();
     }
 
@@ -64,7 +60,7 @@ int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 STDAPI DllCanUnloadNow(void)
 {
     TDEBUG_TRACE("DllCanUnloadNow");
-    return (g_cRefThisDll == 0 ? S_OK : S_FALSE);
+    return (CShellExt::GetRefCount() == 0 ? S_OK : S_FALSE);
 }
 
 
@@ -144,22 +140,4 @@ VOID _LoadResources(VOID)
 
 VOID _UnloadResources(VOID)
 {
-}
-
-
-LPCRITICAL_SECTION CShellExt::GetCriticalSection()
-{
-    return &g_critical_section;
-}
-
-
-void CShellExt::IncDllRef()
-{
-    ::InterlockedIncrement(&g_cRefThisDll);
-}
-
-
-void CShellExt::DecDllRef()
-{
-    ::InterlockedDecrement(&g_cRefThisDll);
 }
