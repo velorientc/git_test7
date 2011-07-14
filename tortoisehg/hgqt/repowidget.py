@@ -451,12 +451,14 @@ class RepoWidget(QWidget):
                 self._reload_rev = self.revset[0]
 
     def acceptBundle(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle, None)
+        if self.bundle:
+            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+            self.syncDemand.pullBundle(self.bundle, None)
 
     def pullBundleToRev(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle, self.rev)
+        if self.bundle:
+            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+            self.syncDemand.pullBundle(self.bundle, self.rev)
 
     def rejectBundle(self):
         self.clearBundle()
