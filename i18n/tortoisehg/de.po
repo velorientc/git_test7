@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-07-11 12:32-0300\n"
-"PO-Revision-Date: 2011-07-08 18:49+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"PO-Revision-Date: 2011-07-12 15:49+0000\n"
+"Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-07-12 04:42+0000\n"
+"X-Launchpad-Export-Date: 2011-07-13 04:38+0000\n"
 "X-Generator: Launchpad (build 13168)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -289,31 +289,34 @@ msgstr "Aktuelle lokale Revision"
 
 #: tortoisehg/hgqt/backout.py:162
 msgid "Merge parent to backout to"
-msgstr ""
+msgstr "Zurücksetzen auf diesen zusammengeführten Vorgänger"
 
 #: tortoisehg/hgqt/backout.py:165
 msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
 msgstr ""
+"Um eine <b>Verschmelzungs</b>revision zurückzurollen, müssen Sie auswählen, "
+"auf welchen der Vorgänger zurückgerollt werden soll (also, wessen Änderungen "
+"<i>beibehalten</i> werden)"
 
 #: tortoisehg/hgqt/backout.py:170
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "Erster Vorgänger: Revision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:176
 msgid "Backout to the first parent of the merge revision"
-msgstr ""
+msgstr "Zurücksetzen auf den ersten Vorgänger der zusammengeführten Version"
 
 #: tortoisehg/hgqt/backout.py:181
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Zweiter Vorgänger: Revision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:186
 msgid "Backout to the second parent of the merge revision"
-msgstr ""
+msgstr "Zurücksetzen auf den zweiten Vorgänger der zusammengeführten Version"
 
 #: tortoisehg/hgqt/backout.py:194 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
@@ -428,7 +431,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:502 tortoisehg/hgqt/backout.py:536
 msgid "Backed out merge changeset: "
-msgstr ""
+msgstr "Zurückgezogene Zusammenführungs-Änderungsliste: "
 
 #: tortoisehg/hgqt/backout.py:504 tortoisehg/hgqt/backout.py:538
 #: tortoisehg/hgtk/backout.py:41
@@ -453,11 +456,15 @@ msgstr "Englische Rücksetzkommentare verwenden"
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
 msgstr ""
+"Die Verschmelzungsrevision wurde auf ihren ersten Vorgänger (%s) "
+"zurückgerollt"
 
 #: tortoisehg/hgqt/backout.py:549
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
 msgstr ""
+"Die Verschmelzungsrevision wurde auf ihren zweiten Vorgänger (%s) "
+"zurückgerollt"
 
 #: tortoisehg/hgqt/backout.py:578
 msgid "Backing out and committing..."
@@ -6892,7 +6899,7 @@ msgstr ", Verschmelzung unaufgelöst"
 #: tortoisehg/hgqt/status.py:785
 #, python-format
 msgid "%s is modified"
-msgstr "%s ist geöndert"
+msgstr "%s ist geändert"
 
 #: tortoisehg/hgqt/status.py:786 tortoisehg/hgtk/quickop.py:163
 msgid "modified"
@@ -7498,7 +7505,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:1461
 msgid "Temporarily disable configured HTTP proxy"
-msgstr "Den hinterlegten HTTP-Proxy vorläufig deaktiveren"
+msgstr "Den hinterlegten HTTP-Proxy vorläufig deaktivieren"
 
 #: tortoisehg/hgqt/sync.py:1468
 msgid "Emit debugging output (--debug)"
