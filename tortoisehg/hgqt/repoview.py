@@ -280,6 +280,7 @@ class HgRepoView(QTableView):
             idx = self.model().indexFromRev(rev)
             if idx is not None:
                 self.setCurrentIndex(idx)
+                self.scrollTo(idx)
 
     def saveSettings(self, s = None):
         if not s:
