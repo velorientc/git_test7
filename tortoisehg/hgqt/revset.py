@@ -147,55 +147,55 @@ class RevisionSetQuery(QDialog):
         cgb = QGroupBox(_('Common sets'))
         cgb.setLayout(QVBoxLayout())
         cgb.layout().setContentsMargins(*(2,)*4)
-        def setCommonHelp(item):
-            self.stbar.showMessage(self.clw._help[self.clw.row(item)])
+        def setCommonHelp(row):
+            self.stbar.showMessage(self.clw._help[row])
         self.clw = QListWidget(self)
         self.clw.addItems([x for x, y in _common])
         self.clw._help = [y for x, y in _common]
-        self.clw.itemClicked.connect(setCommonHelp)
+        self.clw.currentRowChanged.connect(setCommonHelp)
         cgb.layout().addWidget(self.clw)
         hbox.addWidget(cgb)
 
         fgb = QGroupBox(_('File pattern sets'))
         fgb.setLayout(QVBoxLayout())
         fgb.layout().setContentsMargins(*(2,)*4)
-        def setFileHelp(item):
-            self.stbar.showMessage(self.flw._help[self.flw.row(item)])
+        def setFileHelp(row):
+            self.stbar.showMessage(self.flw._help[row])
         self.flw = QListWidget(self)
         self.flw.addItems([x for x, y in _filepatterns])
         self.flw._help = [y for x, y in _filepatterns]
-        self.flw.itemClicked.connect(setFileHelp)
+        self.flw.currentRowChanged.connect(setFileHelp)
         fgb.layout().addWidget(self.flw)
         hbox.addWidget(fgb)
 
         agb = QGroupBox(_('Set Ancestry'))
         agb.setLayout(QVBoxLayout())
         agb.layout().setContentsMargins(*(2,)*4)
-        def setAncHelp(item):
-            self.stbar.showMessage(self.alw._help[self.alw.row(item)])
+        def setAncHelp(row):
+            self.stbar.showMessage(self.alw._help[row])
         self.alw = QListWidget(self)
         self.alw.addItems([x for x, y in _ancestry])
         self.alw._help = [y for x, y in _ancestry]
-        self.alw.itemClicked.connect(setAncHelp)
+        self.alw.currentRowChanged.connect(setAncHelp)
         agb.layout().addWidget(self.alw)
         hbox.addWidget(agb)
 
         lgb = QGroupBox(_('Set Logic'))
         lgb.setLayout(QVBoxLayout())
         lgb.layout().setContentsMargins(*(2,)*4)
-        def setManipHelp(item):
-            self.stbar.showMessage(self.llw._help[self.llw.row(item)])
+        def setManipHelp(row):
+            self.stbar.showMessage(self.llw._help[row])
         self.llw = QListWidget(self)
         self.llw.addItems([x for x, y in _logical])
         self.llw._help = [y for x, y in _logical]
-        self.llw.itemClicked.connect(setManipHelp)
+        self.llw.currentRowChanged.connect(setManipHelp)
         lgb.layout().addWidget(self.llw)
         hbox.addWidget(lgb)
 
         # Clicking on one listwidget should clear selection of the others
         listwidgets = (self.clw, self.flw, self.alw, self.llw)
         for w in listwidgets:
-            w.itemClicked.connect(self.itemClicked)
+            w.currentItemChanged.connect(self.currentItemChanged)
             #w.itemActivated.connect(self.returnPressed)
             for w2 in listwidgets:
                 if w is not w2:
@@ -255,10 +255,12 @@ class RevisionSetQuery(QDialog):
         self.entry.setFocus()
 
 
-    def itemClicked(self, item):
+    def currentItemChanged(self, current, previous):
+        if current is None:
+            return
         self.entry.beginUndoAction()
         text = self.entry.text()
-        itext, ilen = item.text(), len(item.text())
+        itext, ilen = current.text(), len(current.text())
         if self.entry.hasSelectedText():
             # replace selection
             lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
