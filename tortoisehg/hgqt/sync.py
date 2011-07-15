@@ -63,7 +63,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repo, parent, addmargin=False, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -157,9 +157,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
+        bottomlayout = QVBoxLayout()
+        if addmargin:
+            bottomlayout.setContentsMargins(5, 5, 5, 5)
+        else:
+            bottomlayout.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(bottomlayout)
+        
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
         hbox.addWidget(lbl)
         self.optionslabel = QLabel()
@@ -169,7 +176,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
         self.urllabel = QLabel()
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -179,7 +186,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
         tbar.setStyleSheet(qtlib.tbstylesheet)
@@ -267,7 +274,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         pathsbox.addWidget(self.reltv)
         hbox.addWidget(pathsframe)
 
-        self.layout().addLayout(hbox, 1)
+        bottomlayout.addLayout(hbox, 1)
 
         self.savebutton.triggered.connect(self.saveclicked)
         self.securebutton.triggered.connect(self.secureclicked)
@@ -281,7 +288,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.output.connect(self.output)
         cmd.progress.connect(self.progress)
 
-        layout.addWidget(cmd)
+        bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
 
@@ -1496,4 +1503,4 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return SyncWidget(repo, None, **opts)
+    return SyncWidget(repo, None, addmargin=True, **opts)
