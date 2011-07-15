@@ -77,6 +77,7 @@ class ThgStatusBar(QStatusBar):
         self.lbl = QLabel()
         self.lbl.linkActivated.connect(self.linkActivated)
         self.addWidget(self.lbl)
+        self.setStyleSheet('QStatusBar::item { border: none }')
 
     @pyqtSlot(unicode)
     def showMessage(self, ustr):
