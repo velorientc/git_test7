@@ -728,7 +728,7 @@ class Dialog(QDialog):
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
-        vbox.setContentsMargins(*(1,)*4)
+        vbox.setContentsMargins(5, 5, 5, 5)
 
         # command output area
         vbox.addWidget(self.core.outputLog, 1)
