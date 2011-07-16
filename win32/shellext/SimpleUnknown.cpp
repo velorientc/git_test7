@@ -18,8 +18,8 @@
 #include "SimpleUnknown.h"
 
 CSimpleUnknown::CSimpleUnknown()
+  : cRef_(0)
 {
-    cRef_ = 0;
     AddInterface(IID_IUnknown, this);
 }
 
