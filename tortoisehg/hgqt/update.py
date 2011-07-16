@@ -107,11 +107,11 @@ class UpdateDialog(QDialog):
         #### Persisted Options
         self.merge_chk.setChecked(
             QSettings().value('update/merge', False).toBool())
-        
+
         self.autoresolve_chk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False) or
                 QSettings().value('update/autoresolve', False).toBool())
-        
+
         self.showlog_chk.setChecked(
             QSettings().value('update/showlog', False).toBool())
 
