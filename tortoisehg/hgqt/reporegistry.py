@@ -31,6 +31,7 @@ class RepoTreeView(QTreeView):
     menuRequested = pyqtSignal(object, object)
     openRepo = pyqtSignal(QString, bool)
     dropAccepted = pyqtSignal()
+    updateSettingsFile = pyqtSignal()
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
@@ -54,6 +55,10 @@ class RepoTreeView(QTreeView):
         QShortcut('Return', self, self.showFirstTabOrOpen).setContext(
                   Qt.WidgetShortcut)
         QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(
+                  Qt.WidgetShortcut)
+        QShortcut('Delete', self, self.removeSelected).setContext(
+                  Qt.WidgetShortcut)
+        QShortcut('F2', self, self.renameSelected).setContext(
                   Qt.WidgetShortcut)
 
     def contextMenuEvent(self, event):
@@ -199,6 +204,27 @@ class RepoTreeView(QTreeView):
             root = self.selitem.internalPointer().rootpath()
             self.openRepo.emit(hglib.tounicode(root), True)
 
+    def removeSelected(self):
+        'remove selected repository'
+        s = self.selitem
+        item = s.internalPointer()
+        if not item.okToDelete():
+            labels = [(QMessageBox.Yes, _('&Delete')),
+                      (QMessageBox.No, _('Cancel'))]
+            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
+                                    _("Delete Group '%s' and all its entries?")%
+                                    item.name, labels=labels, parent=self):
+                return
+        m = self.model()
+        row = s.row()
+        parent = s.parent()
+        m.removeRows(row, 1, parent)
+        self.selectionChanged(None, None)
+        self.updateSettingsFile.emit()
+
+    def renameSelected(self):
+        'rename selected repository'
+        self.edit(self.selitem)
 
 class RepoRegistryView(QDockWidget):
 
@@ -241,6 +267,7 @@ class RepoRegistryView(QDockWidget):
         tv.showMessage.connect(self.showMessage)
         tv.menuRequested.connect(self.onMenuRequest)
         tv.openRepo.connect(self.openRepo)
+        tv.updateSettingsFile.connect(self.updateSettingsFile)
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
@@ -593,28 +620,14 @@ class RepoRegistryView(QDockWidget):
         clip.setText(self.selitem.internalPointer().rootpath())
 
     def startRename(self):
-        self.tview.edit(self.selitem)
+        self.tview.renameSelected()
 
     def newGroup(self):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
-        s = self.selitem
-        item = s.internalPointer()
-        if not item.okToDelete():
-            labels = [(QMessageBox.Yes, _('&Delete')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
-                                    _("Delete Group '%s' and all its entries?")%
-                                    item.name, labels=labels, parent=self):
-                return
-        m = self.tview.model()
-        row = s.row()
-        parent = s.parent()
-        m.removeRows(row, 1, parent)
-        self.tview.selectionChanged(None, None)
-        self.updateSettingsFile()
-
+        self.tview.removeSelected()
+	
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
