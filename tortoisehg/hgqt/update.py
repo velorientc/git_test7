@@ -143,8 +143,8 @@ class UpdateDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.rev_combo.editTextChanged.connect(lambda *a: self.update_info())
-        self.discard_chk.toggled.connect(lambda *a: self.update_info())
+        self.rev_combo.editTextChanged.connect(self.update_info)
+        self.discard_chk.toggled.connect(self.update_info)
 
         # dialog setting
         self.setLayout(box)
@@ -178,7 +178,7 @@ class UpdateDialog(QDialog):
         QSettings().setValue('update/autoresolve', self.autoresolve_chk.isChecked())
         QSettings().setValue('update/showlog', self.showlog_chk.isChecked())
 
-    def update_info(self):
+    def update_info(self, *args):
         self.p1_info.update(self.ctxs[0].node())
         merge = len(self.ctxs) == 2
         if merge:
