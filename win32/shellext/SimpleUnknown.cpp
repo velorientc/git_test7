@@ -19,29 +19,18 @@
 
 CSimpleUnknown::CSimpleUnknown()
 {
-    entries_ = NULL;
     cRef_ = 0;
     AddInterface(IID_IUnknown, this);
 }
 
 CSimpleUnknown::~CSimpleUnknown()
 {
-    Entry* entry = entries_;
-    while (entry != NULL)
-    {
-        Entry* nextentry = entry->next;
-        delete entry;
-        entry = nextentry;
-    }
 }
 
 void CSimpleUnknown::AddInterface(REFIID riid, LPUNKNOWN punk)
 {
-    Entry* newentry = new Entry;
-    newentry->iid = riid;
-    newentry->punk = punk;
-    newentry->next = entries_;
-    entries_ = newentry;
+    Entry e(riid, punk);
+    entries_.push_back(e);
 }
 
 STDMETHODIMP CSimpleUnknown::QueryInterface(REFIID riid, LPVOID FAR* ppv)
@@ -49,12 +38,12 @@ STDMETHODIMP CSimpleUnknown::QueryInterface(REFIID riid, LPVOID FAR* ppv)
     if (ppv == NULL)
         return E_POINTER;
 
-    for (Entry* entry = entries_; entry != NULL; entry = entry->next)
+    for (EntriesT::const_iterator i = entries_.begin(); i != entries_.end(); ++i)
     {
-        if (entry->iid == riid)
+        if (i->iid == riid)
         {
-            entry->punk->AddRef();
-            *ppv = entry->punk;
+            i->punk->AddRef();
+            *ppv = i->punk;
             return S_OK;
         }
     }

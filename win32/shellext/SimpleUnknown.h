@@ -16,6 +16,8 @@
 #ifndef _SIMPLEUNKNOWN_H_
 #define _SIMPLEUNKNOWN_H_
 
+#include <vector>
+
 #define DECLARE_UNKNOWN() \
     STDMETHOD(QueryInterface)(REFIID riid, LPVOID FAR* ppv); \
     STDMETHOD_(ULONG, AddRef)(); \
@@ -42,11 +44,14 @@ class CSimpleUnknown : public IUnknown
 {
     struct Entry
     {
+        Entry(IID iid, LPUNKNOWN punk): iid(iid), punk(punk) {}
         IID iid;
         LPUNKNOWN punk;
-        Entry* next;
     };
-    Entry* entries_;
+
+    typedef std::vector<Entry> EntriesT;
+
+    EntriesT entries_;
     UINT cRef_;
     
 protected:
