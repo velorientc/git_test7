@@ -91,16 +91,20 @@ class UpdateDialog(QDialog):
         self.grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
         self.grid.addLayout(self.optbox, row, 1)
 
+        self.verbose_chk = QCheckBox(_('List updated files (--verbose)'))
         self.discard_chk = QCheckBox(_('Discard local changes, no backup '
                                        '(-C/--clean)'))
         self.merge_chk = QCheckBox(_('Always merge (when possible)'))
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
         self.showlog_chk = QCheckBox(_('Always show command log'))
+        self.optbox.addWidget(self.verbose_chk)
         self.optbox.addWidget(self.discard_chk)
         self.optbox.addWidget(self.merge_chk)
         self.optbox.addWidget(self.autoresolve_chk)
         self.optbox.addWidget(self.showlog_chk)
+
+        s = QSettings()
 
         self.discard_chk.setChecked(bool(opts.get('clean')))
 
@@ -110,10 +114,10 @@ class UpdateDialog(QDialog):
 
         self.autoresolve_chk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False) or
-                QSettings().value('update/autoresolve', False).toBool())
+                s.value('update/autoresolve', False).toBool())
 
-        self.showlog_chk.setChecked(
-            QSettings().value('update/showlog', False).toBool())
+        self.showlog_chk.setChecked(s.value('update/showlog', False).toBool())
+        self.verbose_chk.setChecked(s.value('update/verbose', False).toBool())
 
         ## command widget
         self.cmd = cmdui.Widget(True, True, self)
@@ -174,6 +178,7 @@ class UpdateDialog(QDialog):
             return False
 
     def saveSettings(self):
+        QSettings().setValue('update/verbose', self.verbose_chk.isChecked())
         QSettings().setValue('update/merge', self.merge_chk.isChecked())
         QSettings().setValue('update/autoresolve', self.autoresolve_chk.isChecked())
         QSettings().setValue('update/showlog', self.showlog_chk.isChecked())
@@ -202,7 +207,9 @@ class UpdateDialog(QDialog):
 
     def update(self):
         self.saveSettings()
-        cmdline = ['update', '--repository', self.repo.root, '--verbose']
+        cmdline = ['update', '--repository', self.repo.root]
+        if self.verbose_chk.isChecked():
+            cmdline += ['--verbose']
         cmdline += ['--config', 'ui.merge=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         rev = hglib.fromunicode(self.rev_combo.currentText())
