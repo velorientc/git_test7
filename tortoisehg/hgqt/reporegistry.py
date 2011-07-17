@@ -204,6 +204,7 @@ class RepoRegistryView(QDockWidget):
 
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
+    removeRepo = pyqtSignal(QString)
 
     def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
             showShortPaths=False):
@@ -614,6 +615,9 @@ class RepoRegistryView(QDockWidget):
         m.removeRows(row, 1, parent)
         self.tview.selectionChanged(None, None)
         self.updateSettingsFile()
+        root = s.internalPointer().rootpath()
+        root = hglib.tounicode(root)
+        self.removeRepo.emit(root)
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
