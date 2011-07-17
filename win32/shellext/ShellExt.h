@@ -4,10 +4,17 @@
 
 class CShellExt
 {
+    static CRITICAL_SECTION cs_;
+    static HMODULE hModule_;
+    static UINT cRef_;
+
 public:
-    static LPCRITICAL_SECTION GetCriticalSection();
-    static void IncDllRef();
-    static void DecDllRef();
+    static LPCRITICAL_SECTION GetCriticalSection() { return &cs_; }
+    static UINT GetRefCount() { return cRef_; }
+    static void IncDllRef() { ::InterlockedIncrement(&cRef_); }
+    static void DecDllRef() { ::InterlockedDecrement(&cRef_); }
+
+    friend BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID);
 };
 
 

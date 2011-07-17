@@ -13,7 +13,6 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         CShellExtOverlay.obj \
         TortoiseIconBitmap.obj \
         IconBitmapUtils.obj \
-        Registry.obj \
         ShellExt.obj \
         StringUtils.obj \
         SysInfo.obj \
@@ -23,7 +22,8 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         DirectoryStatus.obj \
         Thgstatus.obj \
         QueryDirstate.obj \
-        ThgVersion.obj
+        ThgVersion.obj \
+        SimpleUnknown.obj
 
 OBJECTS_TERMINATE = Thgstatus.obj \
         RegistryConfig.obj \

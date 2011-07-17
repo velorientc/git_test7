@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 
+#include "SimpleUnknown.h"
+
 struct MenuDescription
 {
     std::string name;
@@ -19,7 +21,7 @@ typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
 
 
-class CShellExtCMenu: public IContextMenu3, IShellExtInit
+class CShellExtCMenu: public CSimpleUnknown, IContextMenu3, IShellExtInit
 {
 
 protected:
@@ -43,10 +45,7 @@ public:
     explicit CShellExtCMenu(const char dummy);
     ~CShellExtCMenu();
 
-    // IUnknown
-    STDMETHODIMP QueryInterface(REFIID riid, LPVOID FAR *ppv);
-    STDMETHODIMP_(ULONG) AddRef();
-    STDMETHODIMP_(ULONG) Release();
+    DECLARE_UNKNOWN()
 
     // IContextMenu3
     STDMETHODIMP QueryContextMenu(

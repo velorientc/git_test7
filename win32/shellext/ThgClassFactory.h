@@ -46,15 +46,13 @@ public:
 
     STDMETHODIMP_(ULONG) AddRef()
     {
-        ThgCriticalSection cs(CShellExt::GetCriticalSection());
-        return ++m_cRef;
+        return ::InterlockedIncrement(&m_cRef);
     }
 
 
     STDMETHODIMP_(ULONG) Release()
     {
-        ThgCriticalSection cs(CShellExt::GetCriticalSection());
-        if (--m_cRef)
+        if (::InterlockedDecrement(&m_cRef))
             return m_cRef;
 
         delete this;

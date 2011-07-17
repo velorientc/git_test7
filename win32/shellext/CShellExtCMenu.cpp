@@ -973,8 +973,11 @@ STDMETHODIMP CShellExtCMenu::Initialize(
 
 CShellExtCMenu::CShellExtCMenu(const char dummy)
 {
-    m_cRef = 0L;
-    CShellExt::IncDllRef();    
+    CShellExt::IncDllRef();
+    ADDIFACE(IShellExtInit);
+    ADDIFACE(IContextMenu);
+    ADDIFACE(IContextMenu2);
+    ADDIFACE(IContextMenu3);
 }
 
 
@@ -983,53 +986,4 @@ CShellExtCMenu::~CShellExtCMenu()
     CShellExt::DecDllRef();
 }
 
-
-STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
-        return m_cRef;
-    delete this;
-    return 0L;
-}
-
-
-STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{    
-    if (ppv == 0)
-        return E_POINTER;
-
-    *ppv = NULL;
-
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
-    {
-        *ppv = (LPSHELLEXTINIT) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu))
-    {
-        *ppv = (LPCONTEXTMENU) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu2))
-    {
-        *ppv = (IContextMenu2*) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu3))
-    {
-        *ppv = (IContextMenu3*) this;
-    }
-    
-    if (*ppv)
-    {
-        AddRef();
-        return S_OK;
-    }
-
-    return E_NOINTERFACE;
-}
+IMPLEMENT_UNKNOWN(CShellExtCMenu)

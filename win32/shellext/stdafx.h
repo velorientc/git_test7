@@ -13,6 +13,7 @@
 #include <windowsx.h>
 #include <shlobj.h>
 #include <assert.h>
+#include <tchar.h>
 #include <string>
 
 #include "ThgDebug.h"

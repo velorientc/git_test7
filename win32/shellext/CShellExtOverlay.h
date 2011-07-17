@@ -1,20 +1,17 @@
 #ifndef _CShellExtOverlay_h_
 #define _CShellExtOverlay_h_
 
+#include "SimpleUnknown.h"
 
-class CShellExtOverlay: public IShellIconOverlayIdentifier
+class CShellExtOverlay: public CSimpleUnknown, public IShellIconOverlayIdentifier
 {
-    ULONG m_cRef;
     const char myTortoiseClass;
 
 public:
     explicit CShellExtOverlay(char Class);
     ~CShellExtOverlay();
 
-    // IUnknown
-    STDMETHODIMP QueryInterface(REFIID riid, LPVOID FAR *ppv);
-    STDMETHODIMP_(ULONG) AddRef();
-    STDMETHODIMP_(ULONG) Release();
+    DECLARE_UNKNOWN()
 
     // IShellIconOverlayIdentifier
     STDMETHODIMP GetOverlayInfo(

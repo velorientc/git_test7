@@ -77,8 +77,8 @@ STDMETHODIMP CShellExtOverlay::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */
 CShellExtOverlay::CShellExtOverlay(char tortoiseClass) :
     myTortoiseClass(tortoiseClass)
 {
-    m_cRef = 0L;
     CShellExt::IncDllRef();
+    ADDIFACE(IShellIconOverlayIdentifier);
 }
 
 
@@ -87,42 +87,4 @@ CShellExtOverlay::~CShellExtOverlay()
     CShellExt::DecDllRef();
 }
 
-
-STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
-        return m_cRef;
-    delete this;
-    return 0L;
-}
-
-
-STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{    
-    if (ppv == 0)
-        return E_POINTER;
-
-    *ppv = NULL;
-
-    if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier) 
-        || IsEqualIID(riid, IID_IUnknown) )
-    {
-        *ppv = (IShellIconOverlayIdentifier*) this;
-    }
-    
-    if (*ppv)
-    {
-        AddRef();
-        return S_OK;
-    }
-
-    return E_NOINTERFACE;
-}
+IMPLEMENT_UNKNOWN(CShellExtOverlay)

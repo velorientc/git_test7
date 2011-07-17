@@ -146,6 +146,9 @@ class DiffLexerSelector(_ScriptLexerSelector):
             for e in effect.split(';'):
                 if e.startswith('color:'):
                     lexer.setColor(QColor(e[7:]), i)
+                if e.startswith('background-color:'):
+                    lexer.setEolFill(True, i)
+                    lexer.setPaper(QColor(e[18:]), i)
         font = qtlib.getfont('fontdiff').font()
         lexer.setFont(font, -1)
         return lexer

@@ -22,6 +22,7 @@ from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
 from tortoisehg.hgqt import visdiff, revert, revpanel
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
+from tortoisehg.hgqt.workbench import Workbench
 
 class ManifestDialog(QMainWindow):
     """
@@ -283,8 +284,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if not filename:
             filename = self.path
         if filename not in dlgdict:
-            dlg = dlgclass(self._repo, filename,
-                            repoviewer=self.window())
+            repoviewer = self.window()
+            if not isinstance(repoviewer, Workbench):
+                repoviewer = None
+            dlg = dlgclass(self._repo, filename, repoviewer)
             dlgdict[filename] = dlg
             ufname = hglib.tounicode(filename)
             dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)

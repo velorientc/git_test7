@@ -188,12 +188,16 @@ class StatusWidget(QWidget):
         self.diffvbox = vbox
 
     def checkAllNone(self):
-        if self.checkAllNoneBtn.isChecked():
+        state = self.checkAllNoneBtn.checkState()
+        if state == Qt.Checked:
             self.checkAll()
             self.checkAllNoneBtn.setToolTip(self.checkNoneTT)
         else:
-            self.checkNone()
+            if state == Qt.Unchecked:
+                self.checkNone()
             self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+        if state != Qt.PartiallyChecked:
+            self.checkAllNoneBtn.setTristate(False)
 
     def getTitle(self):
         if self.pats:
@@ -337,6 +341,13 @@ class StatusWidget(QWidget):
         model = self.tv.model()
         if model:
             model.checkCount = len(self.getChecked())
+            if model.checkCount == 0:
+                state = Qt.Unchecked
+            elif model.checkCount == len(model.rows):
+                state = Qt.Checked
+            else:
+                state = Qt.PartiallyChecked
+            self.checkAllNoneBtn.setCheckState(state)
 
     def checkAll(self):
         model = self.tv.model()

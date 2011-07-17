@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-07-11 12:32-0300\n"
-"PO-Revision-Date: 2011-07-12 04:22+0000\n"
+"PO-Revision-Date: 2011-07-12 15:23+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-07-12 04:47+0000\n"
+"X-Launchpad-Export-Date: 2011-07-13 04:38+0000\n"
 "X-Generator: Launchpad (build 13168)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -793,7 +793,7 @@ msgstr "使用代理伺服器"
 
 #: tortoisehg/hgqt/clone.py:147
 msgid "Do not verify host certificate"
-msgstr ""
+msgstr "無法驗證主機憑證"
 
 #: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1472
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
@@ -993,7 +993,7 @@ msgstr "提交"
 
 #: tortoisehg/hgqt/commit.py:232
 msgid "Create a new patch"
-msgstr "建立一個新的路徑"
+msgstr "建立一個新的補丁"
 
 #: tortoisehg/hgqt/commit.py:232 tortoisehg/hgqt/mq.py:978
 #: tortoisehg/hgtk/commit.py:657
@@ -1002,7 +1002,7 @@ msgstr "QNew"
 
 #: tortoisehg/hgqt/commit.py:233
 msgid "Refresh current patch"
-msgstr "刷新目前的路徑"
+msgstr "刷新目前的補丁"
 
 #: tortoisehg/hgqt/commit.py:233 tortoisehg/hgqt/mq.py:607
 #: tortoisehg/hgqt/mq.py:987 tortoisehg/hgtk/commit.py:660
@@ -1060,7 +1060,7 @@ msgstr "母系:"
 
 #: tortoisehg/hgqt/commit.py:525
 msgid "Patch name:"
-msgstr "路徑名稱"
+msgstr "補丁名稱"
 
 #: tortoisehg/hgqt/commit.py:552
 #, python-format
@@ -1298,7 +1298,7 @@ msgstr "使用簡潔檢視"
 #: tortoisehg/hgqt/revpanel.py:28 tortoisehg/hgtk/changeset.py:585
 #: tortoisehg/hgtk/cslist.py:143
 msgid "Patch:"
-msgstr ""
+msgstr "補丁:"
 
 #: tortoisehg/hgqt/cslist.py:133 tortoisehg/hgtk/cslist.py:409
 #, python-format
@@ -1387,7 +1387,7 @@ msgstr "寄件者:"
 
 #: tortoisehg/hgqt/filedata.py:189
 msgid "Subrepository not found in the working directory."
-msgstr ""
+msgstr "在工作目錄裡找不到子儲存庫"
 
 #: tortoisehg/hgqt/filedata.py:191 tortoisehg/hgqt/filedata.py:197
 msgid "Further subrepository revision information cannot be retrieved."
@@ -1502,15 +1502,15 @@ msgstr "視覺化 diff ..."
 #: tortoisehg/hgqt/filedialogs.py:199 tortoisehg/hgqt/filedialogs.py:675
 #: tortoisehg/hgqt/repowidget.py:1141
 msgid "Diff to local..."
-msgstr ""
+msgstr "Diff 到本地..."
 
 #: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:679
 msgid "Visual diff file..."
-msgstr ""
+msgstr "視覺化diff檔案..."
 
 #: tortoisehg/hgqt/filedialogs.py:206 tortoisehg/hgqt/filedialogs.py:682
 msgid "Diff file to local..."
-msgstr ""
+msgstr "Diff檔案到本地..."
 
 #: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:686
 msgid "View at revision..."
@@ -1518,7 +1518,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:689
 msgid "Edit local"
-msgstr ""
+msgstr "本地編輯"
 
 #: tortoisehg/hgqt/filedialogs.py:216 tortoisehg/hgqt/filedialogs.py:692
 msgid "Revert to revision..."
@@ -1555,7 +1555,7 @@ msgstr "在檔案上下文檢視變更"
 
 #: tortoisehg/hgqt/fileview.py:143
 msgid "annotate with revision numbers"
-msgstr ""
+msgstr "加註修訂版號碼"
 
 #: tortoisehg/hgqt/fileview.py:156
 msgid "Next diff (alt+down)"
@@ -1567,15 +1567,15 @@ msgstr "上個diff(alt + up)"
 
 #: tortoisehg/hgqt/fileview.py:169
 msgid "Show changes from first parent"
-msgstr ""
+msgstr "從第一個母系開始顯示變更"
 
 #: tortoisehg/hgqt/fileview.py:173
 msgid "Show changes from second parent"
-msgstr ""
+msgstr "從第二個母系開始顯示變更"
 
 #: tortoisehg/hgqt/fileview.py:181
 msgid "Toggle display of text search bar"
-msgstr ""
+msgstr "顯示/隱藏文字搜尋列"
 
 #: tortoisehg/hgqt/fileview.py:186
 msgid "Open shelve tool"
@@ -1583,7 +1583,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/fileview.py:609
 msgid "Search in current file"
-msgstr ""
+msgstr "在目前的檔案裡搜尋"
 
 #: tortoisehg/hgqt/fileview.py:610 tortoisehg/hgqt/fileview.py:633
 msgid "Search in history"
@@ -1648,11 +1648,11 @@ msgstr "所有歷史"
 
 #: tortoisehg/hgqt/grep.py:67
 msgid "Report only the first match per file"
-msgstr ""
+msgstr "只回報每個檔案第一個符合的"
 
 #: tortoisehg/hgqt/grep.py:68 tortoisehg/hgtk/datamine.py:329
 msgid "Follow copies and renames"
-msgstr ""
+msgstr "追蹤複製和更名"
 
 #: tortoisehg/hgqt/grep.py:79 tortoisehg/hgtk/datamine.py:313
 msgid "Includes:"
@@ -1771,11 +1771,11 @@ msgstr "符合文字"
 #: tortoisehg/hgqt/guess.py:35 tortoisehg/hgtk/guess.py:40
 #, python-format
 msgid "Detect Copies/Renames in %s"
-msgstr ""
+msgstr "在%s 偵測複製/更名"
 
 #: tortoisehg/hgqt/guess.py:61
 msgid "<b>Unrevisioned Files</b>"
-msgstr ""
+msgstr "<b>未加入版本追蹤的檔案</b>"
 
 #: tortoisehg/hgqt/guess.py:65 tortoisehg/hgqt/status.py:95
 msgid "Refresh file list"
@@ -1796,11 +1796,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/guess.py:96 tortoisehg/hgtk/guess.py:108
 msgid "Find Renames"
-msgstr ""
+msgstr "找尋更名"
 
 #: tortoisehg/hgqt/guess.py:97
 msgid "Find copy and/or rename sources"
-msgstr ""
+msgstr "找尋複製,和/或更名的來源"
 
 #: tortoisehg/hgqt/guess.py:105
 msgid "<b>Candidate Matches</b>"
@@ -1828,7 +1828,7 @@ msgstr "不能開始一個新的搜尋"
 
 #: tortoisehg/hgqt/guess.py:197
 msgid "No files to find"
-msgstr ""
+msgstr "找不到檔案"
 
 #: tortoisehg/hgqt/guess.py:198
 msgid "There are no files that may have been renamed"
@@ -1900,7 +1900,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/hgemail_ui.py:250
 msgid "Flag:"
-msgstr ""
+msgstr "旗標"
 
 #: tortoisehg/hgqt/hgemail_ui.py:251 tortoisehg/hgtk/hgemail.py:101
 msgid ""
@@ -1940,11 +1940,11 @@ msgid ""
 "Bundles store complete changesets in binary form. Upstream users can pull "
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
-msgstr ""
+msgstr "綁兜(Bundles)儲存完整的變更資料到一個二進位檔案,上游使用者可以從此檔案拉收.這是一個把變更資料傳給他人最安全的辦法"
 
 #: tortoisehg/hgqt/hgemail_ui.py:258 tortoisehg/hgtk/hgemail.py:122
 msgid "Send single binary bundle, not patches"
-msgstr ""
+msgstr "傳送單一二進位綁兜(bundle),而不是補丁"
 
 #: tortoisehg/hgqt/hgemail_ui.py:259 tortoisehg/hgtk/hgemail.py:137
 msgid "send patches as attachments"
@@ -2437,7 +2437,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/mq.py:123 tortoisehg/hgqt/mq.py:124
 msgid "Reorder patches"
-msgstr ""
+msgstr "重排補丁"
 
 #: tortoisehg/hgqt/mq.py:126 tortoisehg/hgqt/qqueue.py:97
 #: tortoisehg/hgqt/qscilib.py:185 tortoisehg/hgqt/shelve.py:68
@@ -2645,7 +2645,7 @@ msgstr "合併&M"
 
 #: tortoisehg/hgqt/pbranch.py:500
 msgid "No patch branch selected"
-msgstr ""
+msgstr "沒有選擇補丁分支"
 
 #: tortoisehg/hgqt/pbranch.py:551
 msgid "No editor found"
@@ -3095,7 +3095,7 @@ msgstr "必須要配置一個命令列終端機程式"
 
 #: tortoisehg/hgqt/qtlib.py:805
 msgid "Show Log"
-msgstr ""
+msgstr "顯示log"
 
 #: tortoisehg/hgqt/qtlib.py:975
 msgid "Please enter a username"
@@ -3522,7 +3522,7 @@ msgstr "開啟"
 
 #: tortoisehg/hgqt/reporegistry.py:368
 msgid "Open the repository in a new tab"
-msgstr "在新的頁籤開啟儲存庫"
+msgstr "用新分頁開啟儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:369
 msgid "Open All"
@@ -3530,7 +3530,7 @@ msgstr "開啟全部"
 
 #: tortoisehg/hgqt/reporegistry.py:370
 msgid "Open all repositories in new tabs"
-msgstr "在新頁籤開啟所有儲存庫"
+msgstr "在新分頁開啟所有儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:371 tortoisehg/hgqt/reporegistry.py:597
 msgid "New Group"
@@ -3744,7 +3744,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repoview.py:95
 msgid "Choose log columns..."
-msgstr ""
+msgstr "選擇log欄位..."
 
 #: tortoisehg/hgqt/repoview.py:240
 #, python-format
@@ -3939,7 +3939,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1149
 msgid "Tag..."
-msgstr ""
+msgstr "標籤..."
 
 #: tortoisehg/hgqt/repowidget.py:1151
 msgid "Bookmark..."
@@ -3955,11 +3955,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1159
 msgid "Export patch..."
-msgstr ""
+msgstr "匯出補丁..."
 
 #: tortoisehg/hgqt/repowidget.py:1161
 msgid "Email patch..."
-msgstr ""
+msgstr "Email補丁..."
 
 #: tortoisehg/hgqt/repowidget.py:1163
 msgid "Archive..."
@@ -3971,7 +3971,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1167 tortoisehg/hgqt/wctxactions.py:42
 msgid "Copy patch"
-msgstr ""
+msgstr "複製補丁"
 
 #: tortoisehg/hgqt/repowidget.py:1171
 msgid "Copy hash"
@@ -3999,7 +3999,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1186 tortoisehg/hgqt/repowidget.py:1362
 msgid "Rename patch..."
-msgstr ""
+msgstr "補丁更名..."
 
 #: tortoisehg/hgqt/repowidget.py:1189
 msgid "Rebase..."
@@ -4083,7 +4083,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1357
 msgid "Apply patch (QGoto)"
-msgstr ""
+msgstr "套用補丁(QGoto)"
 
 #: tortoisehg/hgqt/repowidget.py:1358
 msgid "QPush --move"
@@ -4095,11 +4095,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1360
 msgid "Delete patches..."
-msgstr ""
+msgstr "刪除補丁..."
 
 #: tortoisehg/hgqt/repowidget.py:1361
 msgid "Reorder patches..."
-msgstr ""
+msgstr "重排補丁..."
 
 #: tortoisehg/hgqt/repowidget.py:1403
 msgid "Pull to here..."
@@ -4107,7 +4107,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1418
 msgid "Export patch"
-msgstr ""
+msgstr "匯出補丁"
 
 #: tortoisehg/hgqt/repowidget.py:1436
 msgid "Cannot export revision"
@@ -4128,7 +4128,7 @@ msgstr "已經有個同樣名字的資料夾了"
 #: tortoisehg/hgqt/repowidget.py:1445 tortoisehg/hgqt/repowidget.py:1465
 #: tortoisehg/hgtk/thgshelve.py:161
 msgid "Replace"
-msgstr ""
+msgstr "取代"
 
 #: tortoisehg/hgqt/repowidget.py:1445 tortoisehg/hgtk/thgshelve.py:162
 msgid "Append"
@@ -4164,7 +4164,7 @@ msgstr "補丁檔已經存在"
 
 #: tortoisehg/hgqt/repowidget.py:1481
 msgid "Patch exported"
-msgstr ""
+msgstr "補丁匯出了"
 
 #: tortoisehg/hgqt/repowidget.py:1482
 #, python-format
@@ -4175,16 +4175,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1490
 msgid "Patches exported"
-msgstr ""
+msgstr "補丁匯出了"
 
 #: tortoisehg/hgqt/repowidget.py:1491
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
-msgstr ""
+msgstr "%d個補丁已經匯出到<p><a href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1605
 msgid "Write bundle"
-msgstr ""
+msgstr "寫進綁兜(bundle)"
 
 #: tortoisehg/hgqt/repowidget.py:1677
 msgid "Cannot import selected revision"
@@ -4473,7 +4473,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:48
 msgid "Changeset is closed."
-msgstr ""
+msgstr "變更集被關閉了"
 
 #: tortoisehg/hgqt/revset.py:50
 msgid ""
@@ -4972,7 +4972,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1030 tortoisehg/hgtk/hgtk.py:826
 msgid "import to the patch queue (MQ)"
-msgstr ""
+msgstr "匯入到補丁佇列(MQ)"
 
 #: tortoisehg/hgqt/run.py:1031
 msgid "thg import [OPTION] [SOURCE]..."
@@ -5109,7 +5109,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1086
 msgid "replace existing tag"
-msgstr ""
+msgstr "取代現有的標籤"
 
 #: tortoisehg/hgqt/run.py:1087
 msgid "make the tag local"
@@ -5121,7 +5121,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1089
 msgid "remove a tag"
-msgstr ""
+msgstr "移除一個標籤"
 
 #: tortoisehg/hgqt/run.py:1090
 msgid "use <text> as commit message"
@@ -5191,7 +5191,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1113 tortoisehg/hgtk/hgtk.py:810
 msgid "bundle file to preview"
-msgstr ""
+msgstr "預覽綁兜檔(bundle file)"
 
 #: tortoisehg/hgqt/run.py:1114 tortoisehg/hgtk/hgtk.py:811
 msgid "launch visual diff tool"
@@ -5257,7 +5257,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/serve_ui.py:85
 msgid "Status:"
-msgstr ""
+msgstr "狀態："
 
 #: tortoisehg/hgqt/serve_ui.py:86 tortoisehg/hgtk/serve.py:61
 msgid "Start"
@@ -5363,7 +5363,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:391
 msgid "Always show repo tabs, even for a single repo. Default: False"
-msgstr ""
+msgstr "總是顯示儲存庫分頁,就算是目前只有一個儲存庫也一樣.預設:False"
 
 #: tortoisehg/hgqt/settings.py:392 tortoisehg/hgtk/thgconfig.py:67
 msgid "Max Diff Size"
@@ -5384,7 +5384,7 @@ msgstr ""
 msgid ""
 "When running from the command line, fork a background process to run "
 "graphical dialogs.  Default: True"
-msgstr ""
+msgstr "當使用命令列執行的時候,衍生一個背景行程來執行視窗對話框. 預設:True"
 
 #: tortoisehg/hgqt/settings.py:399 tortoisehg/hgtk/thgconfig.py:81
 msgid "Full Path Title"
@@ -5394,7 +5394,7 @@ msgstr "全部路徑Title"
 msgid ""
 "Show a full directory path of the repository in the dialog title instead of "
 "just the root directory name.  Default: False"
-msgstr ""
+msgstr "在對話框標題列上顯示儲存庫的完整路徑,而非只是顯示最上層路徑.預設:False"
 
 #: tortoisehg/hgqt/settings.py:402
 msgid "Auto-resolve merges"
@@ -5412,13 +5412,13 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:413
 msgid "Default widget"
-msgstr ""
+msgstr "預設視窗組件"
 
 #: tortoisehg/hgqt/settings.py:415
 msgid ""
 "Select the initial widget that will be shown when opening a repository. "
 "Default: revdetails"
-msgstr ""
+msgstr "當開啟儲存庫時首先出現的視窗組件.預設:revdetails"
 
 #: tortoisehg/hgqt/settings.py:420
 msgid ""
@@ -5493,7 +5493,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:453 tortoisehg/hgtk/thgconfig.py:154
 msgid "Hide Tags"
-msgstr ""
+msgstr "隱藏標籤"
 
 #: tortoisehg/hgqt/settings.py:454
 msgid ""
@@ -6220,7 +6220,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/shellconf.py:167 tortoisehg/hgtk/shellconf.py:195
 msgid "Taskbar"
-msgstr "工作列"
+msgstr "任務列"
 
 #: tortoisehg/hgqt/shellconf.py:171 tortoisehg/hgtk/shellconf.py:202
 msgid "Show Icon"
@@ -6365,7 +6365,7 @@ msgstr ""
 #: tortoisehg/hgqt/shelve.py:384
 #, python-format
 msgid "Patch: %s"
-msgstr ""
+msgstr "補丁: %s"
 
 #: tortoisehg/hgqt/status.py:100
 msgid "### filter text ###"
@@ -6834,11 +6834,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:919
 msgid "Select bundle file"
-msgstr ""
+msgstr "選擇綁兜檔(bundle file)"
 
 #: tortoisehg/hgqt/sync.py:920
 msgid "Bundle files (*.hg)"
-msgstr ""
+msgstr "綁兜檔(Bundle files)(*.hg)"
 
 #: tortoisehg/hgqt/sync.py:939
 msgid "Unable to remove URL"
@@ -7069,7 +7069,7 @@ msgstr "搬移"
 #: tortoisehg/hgqt/tag.py:239
 #, python-format
 msgid "Tag '%s' already exists"
-msgstr ""
+msgstr "標籤 '%s'已經存在"
 
 #: tortoisehg/hgqt/tag.py:244 tortoisehg/hgqt/tag.py:307
 msgid "uncommitted merge"
@@ -7082,22 +7082,22 @@ msgstr "不是一個分支標頭(使用強制)"
 #: tortoisehg/hgqt/tag.py:254
 #, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
-msgstr ""
+msgstr "移動標籤%s到%s變更集(從%s變更集)"
 
 #: tortoisehg/hgqt/tag.py:259 tortoisehg/hgtk/tagadd.py:285
 #, python-format
 msgid "Added tag %s for changeset %s"
-msgstr ""
+msgstr "增加%s標籤給%s變更集"
 
 #: tortoisehg/hgqt/tag.py:266
 #, python-format
 msgid "Tag '%s' has been moved"
-msgstr ""
+msgstr "標籤'%s'已經移動了"
 
 #: tortoisehg/hgqt/tag.py:268
 #, python-format
 msgid "Tag '%s' has been added"
-msgstr ""
+msgstr "標籤'%s'已經增加了"
 
 #: tortoisehg/hgqt/tag.py:299 tortoisehg/hgtk/tagadd.py:303
 #, python-format
@@ -7769,11 +7769,11 @@ msgstr "設定(&S)"
 
 #: tortoisehg/hgqt/workbench.py:222
 msgid "Show Repository Registry"
-msgstr ""
+msgstr "顯示儲存庫紀錄列表"
 
 #: tortoisehg/hgqt/workbench.py:229
 msgid "Show Patch Queue"
-msgstr ""
+msgstr "顯示補丁佇列"
 
 #: tortoisehg/hgqt/workbench.py:235
 msgid "Show Output &Log"
@@ -7797,11 +7797,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:258
 msgid "Show Short Paths"
-msgstr ""
+msgstr "顯示簡短路徑"
 
 #: tortoisehg/hgqt/workbench.py:263
 msgid "Choose Log Columns..."
-msgstr ""
+msgstr "選擇log欄位..."
 
 #: tortoisehg/hgqt/workbench.py:266
 msgid "Save Open Repositories On Exit"
@@ -7821,7 +7821,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:283
 msgid "S&ynchronize"
-msgstr ""
+msgstr "同步化(&y)"
 
 #: tortoisehg/hgqt/workbench.py:284
 msgid "&Manifest"
@@ -7829,7 +7829,7 @@ msgstr "清單(&M)"
 
 #: tortoisehg/hgqt/workbench.py:285
 msgid "&Search"
-msgstr ""
+msgstr "搜尋(&S)"
 
 #: tortoisehg/hgqt/workbench.py:287
 msgid "&Patch Branch"
@@ -7845,11 +7845,11 @@ msgstr "刷新目前儲存庫"
 
 #: tortoisehg/hgqt/workbench.py:294
 msgid "Refresh &Task Tab"
-msgstr ""
+msgstr "刷新任務分頁(&T)"
 
 #: tortoisehg/hgqt/workbench.py:297
 msgid "Refresh only the current task tab"
-msgstr ""
+msgstr "只刷新目前的任務分頁"
 
 #: tortoisehg/hgqt/workbench.py:299
 msgid "Load all revisions"
@@ -7873,7 +7873,7 @@ msgstr "匯入..."
 
 #: tortoisehg/hgqt/workbench.py:311 tortoisehg/hgtk/recovery.py:68
 msgid "Verify"
-msgstr ""
+msgstr "驗證"
 
 #: tortoisehg/hgqt/workbench.py:313 tortoisehg/hgtk/recovery.py:63
 msgid "Recover"
@@ -7881,7 +7881,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:316
 msgid "Resolve..."
-msgstr ""
+msgstr "解決衝突..."
 
 #: tortoisehg/hgqt/workbench.py:319
 msgid "Rollback/Undo..."
@@ -7901,7 +7901,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:336
 msgid "About Qt"
-msgstr ""
+msgstr "關於 Qt"
 
 #: tortoisehg/hgqt/workbench.py:337 tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
@@ -7948,11 +7948,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:378 tortoisehg/hgqt/workbench.py:379
 msgid "Close tab"
-msgstr ""
+msgstr "關閉分頁"
 
 #: tortoisehg/hgqt/workbench.py:380 tortoisehg/hgqt/workbench.py:381
 msgid "Close other tabs"
-msgstr ""
+msgstr "關閉其他分頁"
 
 #: tortoisehg/hgqt/workbench.py:382
 msgid "Undo close tab"
@@ -7960,7 +7960,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:383
 msgid "Reopen last closed tab"
-msgstr ""
+msgstr "重新開啟最後關閉的分頁"
 
 #: tortoisehg/hgqt/workbench.py:384
 msgid "Undo close other tabs"
@@ -8286,11 +8286,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/clone.py:75
 msgid "Bundle..."
-msgstr "包裝..."
+msgstr "綁兜(Bundle)..."
 
 #: tortoisehg/hgtk/clone.py:77
 msgid "Select a Mercurial Bundle"
-msgstr "選取一個水銀包"
+msgstr "選取一個Mercurial綁兜(Bundle)"
 
 #: tortoisehg/hgtk/clone.py:90
 msgid "Source path:"
@@ -8323,7 +8323,7 @@ msgstr "拓製失敗"
 
 #: tortoisehg/hgtk/clone.py:226
 msgid "Mercurial bundles"
-msgstr "水銀包"
+msgstr "Mercurial綁兜(bundles)"
 
 #: tortoisehg/hgtk/clone.py:289
 msgid "Please enter a valid source path"
@@ -8466,7 +8466,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/commit.py:535 tortoisehg/hgtk/status.py:467
 msgid "Patch Preview"
-msgstr "Patch 預覽"
+msgstr "補丁預覽"
 
 #: tortoisehg/hgtk/commit.py:537 tortoisehg/hgtk/status.py:471
 msgid "Commit Preview"
@@ -8530,7 +8530,7 @@ msgstr "無法建立 "
 
 #: tortoisehg/hgtk/commit.py:1015
 msgid "Unable to apply patch"
-msgstr "無法套用 patch"
+msgstr "無法套用補丁"
 
 #: tortoisehg/hgtk/commit.py:1028
 msgid "Commit failed"
@@ -9019,7 +9019,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/hgcmd.py:307
 msgid "Toggle log window"
-msgstr ""
+msgstr "顯示/隱藏紀錄視窗"
 
 #: tortoisehg/hgtk/hgcmd.py:347
 msgid "Stop transaction"
@@ -9341,11 +9341,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/hgtk.py:799
 msgid "remove the status cache"
-msgstr ""
+msgstr "移除狀態快取"
 
 #: tortoisehg/hgtk/hgtk.py:800
 msgid "show the contents of the status cache (no update)"
-msgstr ""
+msgstr "顯示狀態快取的內容(無更新)"
 
 #: tortoisehg/hgtk/hgtk.py:802
 msgid "udpate all repos in current dir"
@@ -9475,7 +9475,7 @@ msgstr "拒絕(&R)"
 
 #: tortoisehg/hgtk/history.py:232
 msgid " (Bundle Preview)"
-msgstr ""
+msgstr " (預覽綁兜)(Bundle Preview)"
 
 #: tortoisehg/hgtk/history.py:248 tortoisehg/hgtk/status.py:134
 msgid "Re_fresh"
@@ -9564,7 +9564,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:409
 msgid "Choose Details..."
-msgstr ""
+msgstr "選擇細節..."
 
 #: tortoisehg/hgtk/history.py:412
 msgid "Compact Graph"
@@ -9604,15 +9604,15 @@ msgstr "電子信箱..."
 
 #: tortoisehg/hgtk/history.py:451
 msgid "Accept Bundle"
-msgstr "接受包"
+msgstr "接受綁兜(Bundle)"
 
 #: tortoisehg/hgtk/history.py:454
 msgid "Reject Bundle"
-msgstr "拒絕包"
+msgstr "拒絕綁兜(Bundle)"
 
 #: tortoisehg/hgtk/history.py:460
 msgid "Add Bundle..."
-msgstr "加入包"
+msgstr "加入綁兜(Bundle)"
 
 #: tortoisehg/hgtk/history.py:464
 msgid "Configure Paths..."
@@ -9857,7 +9857,7 @@ msgstr "回復(_R)"
 
 #: tortoisehg/hgtk/history.py:1295
 msgid "Tag"
-msgstr ""
+msgstr "標籤"
 
 #: tortoisehg/hgtk/history.py:1315
 msgid "Mercurial Queues"
@@ -9889,7 +9889,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1341
 msgid "Add/Remove _Tag..."
-msgstr ""
+msgstr "新增/移除 標籤_T"
 
 #: tortoisehg/hgtk/history.py:1342
 msgid "Add/Move/Remove B_ookmark..."
@@ -10029,11 +10029,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1773
 msgid "Applying bundle..."
-msgstr ""
+msgstr "套用綁兜(Bundle)中..."
 
 #: tortoisehg/hgtk/history.py:1774
 msgid "Applying bundle"
-msgstr ""
+msgstr "套用綁兜(Bundle)中"
 
 #: tortoisehg/hgtk/history.py:1819 tortoisehg/hgtk/history.py:1961
 #: tortoisehg/hgtk/history.py:1994 tortoisehg/hgtk/history.py:2603
@@ -10072,7 +10072,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1923
 msgid "Bundle Preview"
-msgstr ""
+msgstr "綁兜(Bundle)預覽"
 
 #: tortoisehg/hgtk/history.py:1928
 msgid "Failed to preview, a bundle file unrelated to this repository"
@@ -10080,11 +10080,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1933
 msgid "Failed to preview, not a Mercurial bundle file"
-msgstr ""
+msgstr "預覽失敗,不是一個Mercurial綁兜檔(bundle file)"
 
 #: tortoisehg/hgtk/history.py:1937
 msgid "Open Bundle"
-msgstr ""
+msgstr "開啟綁兜(Bundle)"
 
 #: tortoisehg/hgtk/history.py:1975
 msgid "Finished pull with rebase"
@@ -10158,7 +10158,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:2386
 msgid "Write bundle to"
-msgstr ""
+msgstr "寫入綁兜(bundle)到"
 
 #: tortoisehg/hgtk/history.py:2399
 #, python-format
@@ -10180,7 +10180,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:2411
 msgid "Failed to bundle"
-msgstr ""
+msgstr "綁兜(bundle)失敗"
 
 #: tortoisehg/hgtk/history.py:2413
 msgid "Bundling"
@@ -10200,11 +10200,11 @@ msgstr "匯入失敗"
 
 #: tortoisehg/hgtk/history.py:2442
 msgid "Importing"
-msgstr ""
+msgstr "匯入中"
 
 #: tortoisehg/hgtk/history.py:2443
 msgid "Importing to Patch Queue..."
-msgstr ""
+msgstr "匯入到補丁佇列..."
 
 #: tortoisehg/hgtk/history.py:2451
 msgid "Confirm Rebase Revision"
@@ -10251,7 +10251,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:2620 tortoisehg/hgtk/history.py:2625
 msgid "&Push"
-msgstr ""
+msgstr "推送(&P)"
 
 #: tortoisehg/hgtk/history.py:2628
 msgid "Confirm Forced Push"
@@ -10453,7 +10453,7 @@ msgstr "移除選擇的檔案"
 
 #: tortoisehg/hgtk/quickop.py:127
 msgid "Toggle all selections"
-msgstr ""
+msgstr "顯示/隱藏所有的選擇"
 
 #: tortoisehg/hgtk/quickop.py:154
 msgid "Unable to determine repository status"
@@ -10465,7 +10465,7 @@ msgstr "遺失"
 
 #: tortoisehg/hgtk/quickop.py:211
 msgid "Successfully"
-msgstr ""
+msgstr "成功"
 
 #: tortoisehg/hgtk/recovery.py:42
 #, python-format
@@ -10474,7 +10474,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/recovery.py:48 tortoisehg/hgtk/synch.py:53
 msgid "Stop the hg operation"
-msgstr ""
+msgstr "停止hg操作"
 
 #: tortoisehg/hgtk/recovery.py:54
 msgid "Clean checkout, undo all changes"
@@ -10722,7 +10722,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/shellconf.py:220
 msgid "Show the taskbar icon (restart needed)"
-msgstr ""
+msgstr "顯示任務列圖示(需要重新啟動)"
 
 #: tortoisehg/hgtk/shellconf.py:223
 msgid "Highlight the taskbar icon during activity"
@@ -10996,7 +10996,7 @@ msgstr "刪除錯誤"
 #: tortoisehg/hgtk/statusbar.py:67
 #, python-format
 msgid "unknown field name: %s"
-msgstr ""
+msgstr "未知的欄位名稱: %s"
 
 #: tortoisehg/hgtk/statusbar.py:94
 #, python-format
@@ -11006,7 +11006,7 @@ msgstr ""
 #: tortoisehg/hgtk/statusbar.py:103
 #, python-format
 msgid "invalid alignment value: %s"
-msgstr ""
+msgstr "無效的對齊數值: %s"
 
 #: tortoisehg/hgtk/synch.py:45
 #, python-format
@@ -11015,7 +11015,7 @@ msgstr "%s - 同步"
 
 #: tortoisehg/hgtk/synch.py:59
 msgid "Display changes that can be pulled from selected repository"
-msgstr ""
+msgstr "顯示將從選擇的儲存庫拉收回來的變更"
 
 #: tortoisehg/hgtk/synch.py:62
 msgid "   Pull   "
@@ -11027,7 +11027,7 @@ msgstr "從選擇的儲存庫中拉收變更"
 
 #: tortoisehg/hgtk/synch.py:70
 msgid "Display local changes that will be pushed to selected repository"
-msgstr ""
+msgstr "顯示將推送到選擇的儲存庫的本地變更"
 
 #: tortoisehg/hgtk/synch.py:75
 msgid "Push local changes to selected repository"
@@ -11051,7 +11051,7 @@ msgstr "修訂:"
 
 #: tortoisehg/hgtk/synch.py:112
 msgid "Bundle:"
-msgstr "包裹:"
+msgstr "綁兜(Bundle):"
 
 #: tortoisehg/hgtk/synch.py:167
 msgid "Advanced Options"
@@ -11067,7 +11067,7 @@ msgstr "允許推送一個新的分支"
 
 #: tortoisehg/hgtk/synch.py:191
 msgid "Target revision:"
-msgstr ""
+msgstr "目標修訂版:"
 
 #: tortoisehg/hgtk/synch.py:196
 msgid "A specific revision up to which you would like to push or pull."
@@ -11083,7 +11083,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/synch.py:219
 msgid "Show patches"
-msgstr "顯示補丁集"
+msgstr "顯示補丁"
 
 #: tortoisehg/hgtk/synch.py:220
 msgid "Show newest first"
@@ -11104,19 +11104,19 @@ msgstr "未知的排序鍵值 '%s'"
 
 #: tortoisehg/hgtk/synch.py:390
 msgid "Select Bundle"
-msgstr ""
+msgstr "選擇綁兜(Bundle)"
 
 #: tortoisehg/hgtk/synch.py:392
 msgid "Bundle (*.hg)"
-msgstr "打包 (*.hg)"
+msgstr "綁兜(Bundle)(*.hg)"
 
 #: tortoisehg/hgtk/synch.py:393
 msgid "Bundle (*)"
-msgstr "打包 (*)"
+msgstr "綁兜(Bundle)(*)"
 
 #: tortoisehg/hgtk/synch.py:690
 msgid "Toggle _Wordwrap"
-msgstr "Toggle _Wordwrap"
+msgstr ""
 
 #: tortoisehg/hgtk/tagadd.py:77
 msgid "Tag is local"
@@ -11124,28 +11124,28 @@ msgstr "本地標籤"
 
 #: tortoisehg/hgtk/tagadd.py:79
 msgid "Replace existing tag"
-msgstr ""
+msgstr "取代已存在的標籤"
 
 #: tortoisehg/hgtk/tagadd.py:219
 msgid "Tag input is empty"
-msgstr ""
+msgstr "標籤輸入是空的"
 
 #: tortoisehg/hgtk/tagadd.py:220
 msgid "Please enter tag name"
-msgstr "請輸入一個名字"
+msgstr "請輸入一個標籤名字"
 
 #: tortoisehg/hgtk/tagadd.py:224
 msgid "Custom commit message is empty"
-msgstr ""
+msgstr "自訂提交訊息是空的"
 
 #: tortoisehg/hgtk/tagadd.py:233 tortoisehg/hgtk/tagadd.py:265
 msgid "Tagging completed"
-msgstr ""
+msgstr "標籤完成"
 
 #: tortoisehg/hgtk/tagadd.py:234
 #, python-format
 msgid "Tag \"%s\" has been added"
-msgstr ""
+msgstr "'%s'標籤已經新增"
 
 #: tortoisehg/hgtk/tagadd.py:237 tortoisehg/hgtk/tagadd.py:240
 #: tortoisehg/hgtk/tagadd.py:269 tortoisehg/hgtk/tagadd.py:272
@@ -11154,21 +11154,21 @@ msgstr ""
 
 #: tortoisehg/hgtk/tagadd.py:253
 msgid "Tag name is empty"
-msgstr ""
+msgstr "標籤名字是空的"
 
 #: tortoisehg/hgtk/tagadd.py:254
 msgid "Please select tag name to remove"
-msgstr ""
+msgstr "請選擇標籤名字來移除他"
 
 #: tortoisehg/hgtk/tagadd.py:266
 #, python-format
 msgid "Tag \"%s\" has been removed"
-msgstr ""
+msgstr "'%s'標籤已經移除"
 
 #: tortoisehg/hgtk/tagadd.py:279
 #, python-format
 msgid "a tag named \"%s\" already exists"
-msgstr ""
+msgstr "'%s'標籤名字已經存在"
 
 #: tortoisehg/hgtk/tagadd.py:289
 #, python-format
@@ -11620,11 +11620,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:115
 msgid "Unapply last patch"
-msgstr ""
+msgstr "反套用最後的補丁"
 
 #: tortoisehg/hgtk/thgmq.py:120
 msgid "Apply next patch"
-msgstr ""
+msgstr "套用下一個補丁"
 
 #: tortoisehg/hgtk/thgmq.py:212
 msgid "#"
@@ -11645,7 +11645,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:377
 msgid "Do you want to delete these patches?"
-msgstr ""
+msgstr "你想刪除這些補丁?"
 
 #: tortoisehg/hgtk/thgmq.py:468 tortoisehg/hgtk/thgmq.py:472
 msgid "Confirm Fold"
@@ -11816,7 +11816,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:697
 msgid "Show status"
-msgstr ""
+msgstr "顯示狀態"
 
 #: tortoisehg/hgtk/thgpbranch.py:698
 msgid "Show name"
@@ -11824,11 +11824,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:699
 msgid "Show title"
-msgstr ""
+msgstr "顯示標題"
 
 #: tortoisehg/hgtk/thgpbranch.py:700
 msgid "Show message"
-msgstr ""
+msgstr "顯示訊息"
 
 #: tortoisehg/hgtk/thgpbranch.py:709
 msgid "Show internal branches"
@@ -11941,7 +11941,7 @@ msgstr "開啟..."
 
 #: tortoisehg/hgtk/update.py:107
 msgid "Always show log"
-msgstr ""
+msgstr "總是顯示log"
 
 #: tortoisehg/hgtk/update.py:152
 msgid "Updated successfully"
