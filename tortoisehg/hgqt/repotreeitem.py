@@ -215,8 +215,12 @@ class RepoItem(RepoTreeItem):
             cpath = self.getCommonPath()
         except:
             cpath = ''
-        spath = os.path.normpath(self._root)
-        if cpath and spath.startswith(cpath):
+        spath2 = spath = os.path.normpath(self._root)
+
+        if os.name == 'nt':
+            spath2 = spath2.lower()
+
+        if cpath and spath2.startswith(cpath):
             iShortPathStart = len(cpath) + 1
             spath = spath[iShortPathStart:]
         return hglib.tounicode(spath)
@@ -449,35 +453,13 @@ class RepoGroupItem(RepoTreeItem):
             # If a group has no repo items, the common path is empty
             self._commonpath = ''
         else:
-            # Calculate the group common path
-            def splitPath(path):
-                path = os.path.normpath(path)
-                return path.split(os.path.sep)[:-1]
-
-            cpath = splitPath(self.childs[0].rootpath())
-
-            for c in self.childs[1:]:
-                if not cpath:
-                    # There is no common path
-                    break
-                # Update the common path to the common path with the current
-                # child
-                childpath = splitPath(c.rootpath())
-                # The common part cannot go beyond the smaller of the current
-                # common path and the current child
-                clen = min(len(cpath), len(childpath))
-                cpath = cpath[:clen]
-                childpath = childpath[:clen]
-                if cpath == childpath:
-                    # Trivial case
-                    continue
-                for n in range(clen):
-                    # From left to right, find the first path part that is not
-                    # the same
-                    if cpath[n] != childpath[n]:
-                        cpath = cpath[:n]
-                        break
-            self._commonpath = os.path.sep.join(cpath)
+            if os.name == 'nt':
+                childs = [child.rootpath().lower()
+                          for child in self.childs]
+            else:
+                childs = [child.rootpath()
+                          for child in self.childs]
+            self._commonpath = os.path.dirname(os.path.commonprefix(childs))
         return self._commonpath
 
     def getCommonPath(self):
