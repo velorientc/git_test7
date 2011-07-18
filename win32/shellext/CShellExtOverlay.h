@@ -14,10 +14,10 @@ public:
     DECLARE_UNKNOWN()
 
     // IShellIconOverlayIdentifier
-    STDMETHODIMP GetOverlayInfo(
+    STDMETHOD(GetOverlayInfo)(
         LPWSTR pwszIconFile, int cchMax, int* pIndex, DWORD* pdwFlags);
-    STDMETHODIMP GetPriority(int* pPriority);
-    STDMETHODIMP IsMemberOf(LPCWSTR pwszPath, DWORD dwAttrib);
+    STDMETHOD(GetPriority)(int* pPriority);
+    STDMETHOD(IsMemberOf)(LPCWSTR pwszPath, DWORD dwAttrib);
 };
 
 

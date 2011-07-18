@@ -48,19 +48,19 @@ public:
     DECLARE_UNKNOWN()
 
     // IContextMenu3
-    STDMETHODIMP QueryContextMenu(
+    STDMETHOD(QueryContextMenu)(
         HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast,
         UINT uFlags);
-    STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
-    STDMETHODIMP GetCommandString(
+    STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpcmi);
+    STDMETHOD(GetCommandString)(
         UINT_PTR idCmd, UINT uFlags, UINT FAR* reserved,LPSTR pszName,
         UINT cchMax);
-    STDMETHODIMP HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam);
-    STDMETHODIMP HandleMenuMsg2(
+    STDMETHOD(HandleMenuMsg)(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    STDMETHOD(HandleMenuMsg2)(
         UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 
     // IShellExtInit
-    STDMETHODIMP Initialize(
+    STDMETHOD(Initialize)(
         LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hKeyID);
 };
 

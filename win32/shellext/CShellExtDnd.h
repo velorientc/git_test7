@@ -16,12 +16,12 @@ public:
     ~CShellExtDnd();
 
     // IContextMenu3
-    STDMETHODIMP QueryContextMenu(
+    STDMETHOD(QueryContextMenu)(
         HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast,
         UINT uFlags);
 
     // IShellExtInit
-    STDMETHODIMP Initialize(
+    STDMETHOD(Initialize)(
         LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hKeyID);
 };
 
