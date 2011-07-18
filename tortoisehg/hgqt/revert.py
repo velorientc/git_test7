@@ -18,6 +18,13 @@ from tortoisehg.hgqt import cmdui, qtlib
 
 class RevertDialog(QDialog):
     def __init__(self, repo, wfiles, rev, parent):
+        if rev is None:
+            qtlib.WarningMsgBox(_('Cannot revert to working directory'),
+                                _('Reverting to the working directory revision '
+                                'does not make sense'),
+                                parent=parent)
+            raise ValueError(_('Cannot revert to working directory'))
+
         super(RevertDialog, self).__init__(parent)
         self.setWindowTitle(_('Revert - %s') % repo.displayname)
 
