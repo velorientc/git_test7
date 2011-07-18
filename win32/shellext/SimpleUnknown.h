@@ -37,6 +37,20 @@
         return CSimpleUnknown::Release(); \
     }
 
+#define INLINE_UNKNOWN() \
+    STDMETHODIMP QueryInterface(REFIID riid, LPVOID FAR* ppv) \
+    { \
+        return CSimpleUnknown::QueryInterface(riid, ppv); \
+    } \
+    STDMETHODIMP_(ULONG) AddRef() \
+    { \
+        return CSimpleUnknown::AddRef(); \
+    } \
+    STDMETHODIMP_(ULONG) Release() \
+    { \
+        return CSimpleUnknown::Release(); \
+    }
+
 #define ADDIFACE(iface) \
     AddInterface(IID_##iface, (iface*)this)
 
