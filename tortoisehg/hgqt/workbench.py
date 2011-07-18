@@ -478,10 +478,10 @@ class Workbench(QMainWindow):
         """ Close tab if the repo is removed from reporegistry [unicode] """
         root = hglib.fromunicode(root)
         for i in xrange(self.repoTabsWidget.count()):
-             w = self.repoTabsWidget.widget(i)
-             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
-                 self.repoTabCloseRequested(i)
-                 return
+            w = self.repoTabsWidget.widget(i)
+            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
+                self.repoTabCloseRequested(i)
+                return
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
