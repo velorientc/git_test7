@@ -478,6 +478,8 @@ _fontdefaults = {
     'fontlog': 'monospace,10',
     'fontoutputlog': 'sans,8'
 }
+if sys.platform == 'darwin':
+    _fontdefaults['fontoutputlog'] = 'sans,10'
 _fontcache = {}
 
 def initfontcache(ui):
