@@ -275,9 +275,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def revertfile(self):
         if self.path is None:
             return
-        if self.rev is None:
+        rev = self.rev
+        if rev is None:
             rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, [self.path], self.rev, self)
+        dlg = revert.RevertDialog(self._repo, [self.path], rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):

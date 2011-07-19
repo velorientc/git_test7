@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import extensions
+from mercurial import encoding, extensions
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
 
@@ -58,6 +58,7 @@ class BugReport(QDialog):
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
         text += '** CWD: %s\n' % hglib.tounicode(os.getcwd())
+        text += '** Encoding: %s\n' % encoding.encoding
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += '** Python version: %s\n' % sys.version.replace('\n', '')

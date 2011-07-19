@@ -136,6 +136,11 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 _user_shell = None
 def openshell(root, reponame):
     global _user_shell
+    if not os.path.exists(root):
+        WarningMsgBox(
+            _('Failed to open path in terminal'),
+            _('"%s" is not a valid directory') % hglib.tounicode(root))
+        return
     if _user_shell:
         cwd = os.getcwd()
         try:
