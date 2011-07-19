@@ -627,8 +627,8 @@ class RepoRegistryView(QDockWidget):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
-        self.tview.removeSelected()
         root = self.selitem.internalPointer().rootpath()
+        self.tview.removeSelected()
         self.removeRepo.emit(hglib.tounicode(root))
 
     @pyqtSlot(QString, QString)
