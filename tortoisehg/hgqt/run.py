@@ -501,6 +501,12 @@ class _QtRunner(QObject):
             QTimer.singleShot(0, reraise)
 
         try:
+            from thginithook import thginithook
+            thginithook()
+        except ImportError:
+            pass
+        
+        try:
             return self._mainapp.exec_()
         finally:
             self._mainapp = None
