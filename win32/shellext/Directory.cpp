@@ -73,10 +73,10 @@ int Directory::add(const std::string& n_in, Direntry& e)
 {
     std::string base;
     std::string rest;
-    
+
     std::string n = n_in;
     Directory* cur = this;
-    
+
     for (;;)
     {
 
@@ -94,7 +94,7 @@ int Directory::add(const std::string& n_in, Direntry& e)
         }
 
         Directory* d = 0;
-        for (DirsT::iterator i = cur->subdirs_.begin(); 
+        for (DirsT::iterator i = cur->subdirs_.begin();
                 i != cur->subdirs_.end(); ++i)
         {
             if ((*i)->name_ == base) {
