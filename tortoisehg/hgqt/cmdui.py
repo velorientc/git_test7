@@ -80,8 +80,12 @@ class ThgStatusBar(QStatusBar):
         self.setStyleSheet('QStatusBar::item { border: none }')
 
     @pyqtSlot(unicode)
-    def showMessage(self, ustr):
+    def showMessage(self, ustr, error=False):
         self.lbl.setText(ustr)
+        if error:
+            self.lbl.setStyleSheet('QLabel { color: red }')
+        else:
+            self.lbl.setStyleSheet('')
 
     def clear(self):
         keys = self.topics.keys()
@@ -298,15 +302,19 @@ class Core(QObject):
     @pyqtSlot(int)
     def onThreadFinished(self, ret):
         if self.stbar:
+            error = False
             if ret is None:
                 self.stbar.clear()
                 if self.thread.abortbyuser:
                     status = _('Terminated by user')
                 else:
                     status = _('Terminated')
-            else:
+            elif ret == 0:
                 status = _('Finished')
-            self.stbar.showMessage(status)
+            else:
+                status = _('Failed!')
+                error = True
+            self.stbar.showMessage(status, error)
 
         self.display = None
         if ret == 0 and self.runNext():
