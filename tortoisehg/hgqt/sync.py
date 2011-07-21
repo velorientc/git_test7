@@ -79,6 +79,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.repo = repo
         self.finishfunc = None
         self.curuser = None
+        self.default_user = None
+        self.lastsshuser = None
         self.curpw = None
         self.updateInProgress = False
         self.opts = {}
@@ -195,7 +197,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.schemecombo = QComboBox()
         for s in self._schemes:
             self.schemecombo.addItem(s)
-        self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
+        self.schemecombo.currentIndexChanged.connect(self.schemeChange)
         tbar.addWidget(self.schemecombo)
         tbar.addWidget(qtlib.Spacer(2, 2))
 
@@ -300,9 +302,25 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.setUrl('')
             self.curalias = None
 
+        self.default_user = self.curuser
+        self.lastsshuser = self.curuser
+
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
 
+    def schemeChange(self):
+        if not self.default_user:
+            return
+
+        scheme = self._schemes[self.schemecombo.currentIndex()]
+        if scheme == 'ssh':
+            self.default_user = self.curuser
+            self.curuser = self.lastsshuser
+        else:
+            self.curuser = self.default_user
+            
+        self.refreshUrl()
+ 
     def refreshStatusTips(self):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
@@ -450,6 +468,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 else:
                     user, host = host.split('@', 1)
                 self.curuser = hglib.fromunicode(user)
+                self.lastsshuser = self.curuser
             if self.curuser:
                 parts.append(self.curuser)
                 if self.curpw:
