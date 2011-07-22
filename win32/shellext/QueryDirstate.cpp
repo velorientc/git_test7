@@ -78,12 +78,12 @@ bool hasHgDir(char cls, const std::string& path, unsigned& ticks)
 
 int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
 {
-    std::string dp = "["; dp += cls; dp += "] findHgRoot"; 
+    std::string dp = "["; dp += cls; dp += "] findHgRoot";
 
     {
         std::string p = cur.path;
         p.push_back('\\');
-        if (p.find("\\.hg\\") != std::string::npos) 
+        if (p.find("\\.hg\\") != std::string::npos)
         {
             // ignore files and dirs named '.hg'
             last = cur;
@@ -91,7 +91,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
         }
     }
 
-    if (!outdated && !last.hgroot.empty() 
+    if (!outdated && !last.hgroot.empty()
         && cur.path.size() >= last.hgroot.size()
         && StartsWith(cur.path, last.hgroot + "\\"))
     {
@@ -141,7 +141,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
             goto exit;
         }
 
-        if (has_hg) 
+        if (has_hg)
         {
             cur.hgroot = p;
             TDEBUG_TRACE(
@@ -173,7 +173,7 @@ exit:
 
 
 int get_relpath(
-    const std::string& hgroot, 
+    const std::string& hgroot,
     const std::string& path,
     std::string& res
 )
@@ -187,7 +187,7 @@ int get_relpath(
 
     if (path[offset] == '\\')
         offset++;
-    
+
     const char* relpathptr = path.c_str() + offset;
 
     res = relpathptr;
@@ -198,11 +198,11 @@ int get_relpath(
 int HgQueryDirstate(
     const char cls,
     const std::string& path,
-    const char& filterStatus, 
+    const char& filterStatus,
     char& outStatus
 )
 {
-    std::string dp = "["; dp += cls; dp += "] HgQueryDirstate: "; 
+    std::string dp = "["; dp += cls; dp += "] HgQueryDirstate: ";
 
     static QueryState last;
 
@@ -216,7 +216,7 @@ int HgQueryDirstate(
 
     const bool outdated = cur.tickcount - last.tickcount > 2000;
 
-    if (!outdated && last.path == path) 
+    if (!outdated && last.path == path)
     {
         outStatus = last.status;
         if (outStatus == 'P')
@@ -283,7 +283,7 @@ int HgQueryDirstate(
     }
 
     Winstat stat;
-    if (0 != stat.lstat(path.c_str())) 
+    if (0 != stat.lstat(path.c_str()))
     {
         TDEBUG_TRACE(dp << "lstat(" << path << ") failed");
         last = cur;
@@ -313,7 +313,7 @@ int HgQueryDirstate(
     }
 
     const Direntry* const e = pds->root().get(relpath);
-    if (!e) 
+    if (!e)
     {
         last = cur;
         return 0;
@@ -338,7 +338,7 @@ int HgQueryDirstate(
 
             if (basedir_status != 'M')
                 update = true;
-        }        
+        }
     }
     else if (outStatus == 'P')
     {
