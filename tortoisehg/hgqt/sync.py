@@ -224,6 +224,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
         self.portentry.setFixedWidth(8 * fontm.width('9'))
+        self.portentry.setValidator(QIntValidator(0, 65536, self.portentry))
         self.portentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.portentry)
         tbar.addWidget(qtlib.Spacer(2, 2))
