@@ -309,6 +309,9 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(False)
         self.actionPrevDiff.setEnabled(False)
 
+        self.maxWidth = 0
+        self.sci.showHScrollBar(False)
+
     def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
@@ -433,6 +436,13 @@ class HgFileView(QFrame):
             self.timer.start()
         self.actionNextDiff.setEnabled(bool(self._diffs))
         self.actionPrevDiff.setEnabled(bool(self._diffs))
+
+        font = self.sci.lexer().font(0)
+        fm = QFontMetrics(font)
+        lines = self.sci.text().split('\n')
+        widths = [fm.width(line) for line in lines]
+        self.maxWidth = max(widths)
+        self.updateScrollBar()
 
     #
     # These four functions are used by Shift+Cursor actions in revdetails
@@ -674,6 +684,13 @@ class HgFileView(QFrame):
                 add(name, func)
         menu.exec_(point)
 
+    def resizeEvent(self, event):
+        super(HgFileView, self).resizeEvent(event)
+        self.updateScrollBar()
+
+    def updateScrollBar(self):
+        sbWidth = self.sci.verticalScrollBar().width()
+        self.sci.showHScrollBar(self.maxWidth + sbWidth > self.sci.width())
 
 class AnnotateView(qscilib.Scintilla):
     'QScintilla widget capable of displaying annotations'
