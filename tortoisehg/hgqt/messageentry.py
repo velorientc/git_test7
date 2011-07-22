@@ -31,7 +31,9 @@ class MessageEntry(qscilib.Scintilla):
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         self.setAutoCompletionFillupsEnabled(True)
         self.setLexer(QsciLexerMakefile(self))
-        self.lexer().setFont(qtlib.getfont('fontcomment').font())
+        font = qtlib.getfont('fontcomment').font()
+        self.fontHeight = QFontMetrics(font).height()
+        self.lexer().setFont(font)
         self.lexer().setColor(QColor(Qt.red), QsciLexerMakefile.Error)
         self.setMatchedBraceBackgroundColor(Qt.yellow)
         self.setIndentationsUseTabs(False)
@@ -47,6 +49,7 @@ class MessageEntry(qscilib.Scintilla):
         self.getChecked = getCheckedFunc
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
+
 
     def menuRequested(self, point):
         line = self.lineAt(point)
@@ -143,3 +146,12 @@ class MessageEntry(qscilib.Scintilla):
             super(MessageEntry, self).keyPressEvent(newev)
         else:
             super(MessageEntry, self).keyPressEvent(event)
+
+    def resizeEvent(self, event):
+        super(MessageEntry, self).resizeEvent(event)
+        self.showHScrollBar(self.frameGeometry().height() > self.fontHeight * 3)
+
+    def minimumSizeHint(self):
+        size = super(MessageEntry, self).minimumSizeHint()
+        size.setHeight(self.fontHeight * 3 / 2)
+        return size

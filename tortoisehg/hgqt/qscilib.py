@@ -305,6 +305,9 @@ class Scintilla(QsciScintilla):
         self.SendScintilla(self.SCI_INDICSETALPHA, id, 100)
         return id
 
+    def showHScrollBar(self, show=True):
+        self.SendScintilla(self.SCI_SETHSCROLLBAR, show)
+
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
     """Emitted (pattern, icase, wrap) when search condition changed"""
