@@ -92,10 +92,10 @@ Dirstate* Dirstatecache::get(
         new_stat = true;
     }
 
-    if (iter->dstate) 
+    if (iter->dstate)
     {
         unset = iter->unset;
-        
+
         if (!new_stat)
             return iter->dstate;
 
@@ -106,8 +106,8 @@ Dirstate* Dirstatecache::get(
         }
 
         TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
-    } 
-    else 
+    }
+    else
     {
         TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
     }
