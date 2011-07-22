@@ -439,8 +439,9 @@ class HgFileView(QFrame):
 
         font = self.sci.lexer().font(0)
         fm = QFontMetrics(font)
+        maxWidth = fm.maxWidth()
         lines = self.sci.text().split('\n')
-        widths = [fm.width(line) for line in lines]
+        widths = [fm.width(line) + maxWidth for line in lines]
         self.maxWidth = max(widths)
         self.updateScrollBar()
 
@@ -690,7 +691,9 @@ class HgFileView(QFrame):
 
     def updateScrollBar(self):
         sbWidth = self.sci.verticalScrollBar().width()
-        self.sci.showHScrollBar(self.maxWidth + sbWidth > self.sci.width())
+        scrollWidth = self.maxWidth + sbWidth - self.sci.width()
+        self.sci.showHScrollBar(scrollWidth > 0)
+        self.sci.horizontalScrollBar().setRange(0, scrollWidth)
 
 class AnnotateView(qscilib.Scintilla):
     'QScintilla widget capable of displaying annotations'
