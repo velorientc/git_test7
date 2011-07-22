@@ -35,13 +35,13 @@ class Dirstatecache
         unsigned        tickcount;
         bool            unset;
 
-        E(): 
-            dstate(0), 
-            dstate_mtime(0), 
-            dstate_size(0), 
+        E():
+            dstate(0),
+            dstate_mtime(0),
+            dstate_size(0),
             tickcount(0),
             unset(false)
-        {}         
+        {}
     };
 
     static std::list<E>& cache();
