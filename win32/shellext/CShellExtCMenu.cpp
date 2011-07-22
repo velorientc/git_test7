@@ -158,7 +158,7 @@ void GetCMenuTranslation(
     else
     {
         TDEBUG_TRACEW(
-            L"GetCMenuTranslation: RegOpenKeyExW(\"" 
+            L"GetCMenuTranslation: RegOpenKeyExW(\""
             << subkey << "\") failed"
         );
     }
@@ -192,7 +192,7 @@ void CShellExtCMenu::InitMenuMaps(const MenuDescription *menuDescs, std::size_t 
 
             myDescMap[md.name] = md;
         }
-        
+
     }
 
     myMenuIdMap.clear();
@@ -335,7 +335,7 @@ int HasTortoiseMenu(HMENU hMenu, bool& hasmenu)
     {
         memset(&mii, 0, sizeof(MENUITEMINFOW));
         mii.cbSize = sizeof(MENUITEMINFOW);
-        
+
         // first GetMenuItemInfoW call: get size of menu item string
         mii.fMask = MIIM_STRING;
         BOOL res = ::GetMenuItemInfoW(hMenu, i, true, &mii);
@@ -639,7 +639,7 @@ CShellExtCMenu::GetCommandString(
         {
             pszw = iter->second.helpText.c_str();
             res = S_OK;
-            
+
             size_t size = iter->second.helpText.size();
             if (size >= 40)
             {
@@ -896,7 +896,7 @@ void CShellExtCMenu::PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDat
     }
 
     TDEBUG_TRACEW(
-        L"---- TortoiseHg shell extension version " 
+        L"---- TortoiseHg shell extension version "
         << ThgVersion::get() << L"----"
     );
 
@@ -921,7 +921,7 @@ STDMETHODIMP CShellExtCMenu::Initialize(
         if (SUCCEEDED(pDataObj->GetData(&fmt, &stg)) && stg.hGlobal)
         {
             HDROP hDrop = (HDROP) GlobalLock(stg.hGlobal);
-            
+
             if (hDrop)
             {
                 UINT uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
@@ -931,10 +931,10 @@ STDMETHODIMP CShellExtCMenu::Initialize(
                     {
                         TDEBUG_TRACE("  DragQueryFile [" << i << "] = " << name);
                         myFiles.push_back(name);
-                    }   
+                    }
                 }
             }
-            else 
+            else
             {
                 TDEBUG_TRACE("  hDrop is NULL ");
             }
@@ -953,7 +953,7 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     }
 
     // if a directory background
-    if (pIDFolder) 
+    if (pIDFolder)
     {
         SHGetPathFromIDList(pIDFolder, name);
         TDEBUG_TRACE("  Folder " << name);
