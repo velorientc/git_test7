@@ -61,7 +61,7 @@ class ManifestModel(QAbstractItemModel):
         """Return the subrepo context of the specified index"""
         path = self.filePath(index)
         return self.fileSubrepoCtxFromPath(path)
-    
+
     def fileSubrepoCtxFromPath(self, path):
         """Return the subrepo context of the specified file"""
         if not path:
@@ -309,9 +309,9 @@ class ManifestModel(QAbstractItemModel):
                         srepo = sub._repo
                         if srev in srepo:
                             sctx = srepo[srev]
-    
+
                             self._subinfo[toprelpath]['ctx'] = sctx
-                            
+
                             # Add the subrepo contents to the tree
                             e = addrepocontentstotree(e, sctx, toprelpath)
 
