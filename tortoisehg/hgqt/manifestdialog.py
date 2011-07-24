@@ -214,7 +214,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               _('Open the selected subrepository in a file browser'),
               self.explore),
             ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T', 
+              'utilities-terminal', 'Alt+Ctrl+T',
               _('Open a shell terminal in the selected subrepository root'),
               self.terminal),
             ]:
@@ -485,7 +485,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def setPath(self, path):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
-    
+
     def displayFile(self):
         ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
         if ctx is None:
@@ -495,7 +495,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             ctx._repo.maxdiff = self._repo.maxdiff
         self._fileview.setContext(ctx)
         self._fileview.displayFile(path, self.status)
-    
+
     @pyqtSlot()
     def _updatecontent(self):
         self.displayFile()
