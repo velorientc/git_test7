@@ -519,7 +519,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                self.showRepo(root)
+                self.showRepo(hglib.tounicode(root))
                 accept = True
         if accept:
             event.setDropAction(Qt.LinkAction)
