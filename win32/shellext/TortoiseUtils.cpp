@@ -22,17 +22,6 @@ LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
 }
 
 
-LPSTR hf_wctomb(LPSTR lpa, LPCWSTR lpw, int nChars)
-{
-    assert(lpw != NULL);
-    assert(lpa != NULL);
-
-    lpa[0] = '\0';
-    WideCharToMultiByte(CP_ACP, 0, lpw, -1, lpa, nChars, NULL, NULL);
-    return lpa;
-}
-
-
 std::string GetTHgProgRoot()
 {
     LPCSTR regname = "Software\\TortoiseHg";

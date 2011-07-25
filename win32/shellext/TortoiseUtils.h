@@ -9,7 +9,6 @@
 #define _WCSTR(str) hf_mbtowc((LPWSTR)alloca((strlen(str) + 1) * sizeof(WCHAR)),(str),strlen(str) + 1)
 
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars);
-LPSTR hf_wctomb(LPSTR lpa, LPCWSTR lpw, int nChars);
 
 std::string GetTHgProgRoot();
 std::string GetTemporaryFile(LPCSTR prefix="THG");
