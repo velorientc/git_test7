@@ -37,8 +37,8 @@ protected:
     void PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj);
     void InitMenuMaps(const MenuDescription *menuDescs, std::size_t sz);
     void InsertMenuItemByName(
-	    HMENU hMenu, const std::string& name, UINT indexMenu,
-	    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);
+        HMENU hMenu, const std::string& name, UINT indexMenu,
+        UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);
     void AddMenuList(UINT idCmd, const std::string& name);
 
 public:
