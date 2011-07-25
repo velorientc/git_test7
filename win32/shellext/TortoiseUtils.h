@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#define _MBSTR(wstr) hf_wctomb((LPSTR)alloca(wcslen(wstr) + 1), (wstr),wcslen(wstr) + 1)
 #define _WCSTR(str) hf_mbtowc((LPWSTR)alloca((strlen(str) + 1) * sizeof(WCHAR)),(str),strlen(str) + 1)
 
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars);
