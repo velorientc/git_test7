@@ -243,30 +243,6 @@ FILE* fopenReadRenameAllowed(const char* path)
 }
 
 
-// read string value from registry
-int GetRegSZValue(HKEY hkey, const char* name, std::string& res)
-{
-    res = "";
-
-    if (!hkey)
-        return 0;
-
-    std::vector<BYTE> Data(300);
-    DWORD cbData = Data.size();
-
-    LONG rv = ::RegQueryValueExA(hkey, name, 0, 0, &Data[0], &cbData);
-
-    if (rv == ERROR_SUCCESS)
-    {
-        res = reinterpret_cast<char*>(&Data[0]);
-        return 1;
-    }
-
-    TDEBUG_TRACE("GetRegSZValue(" << name << ") failed");
-
-    return 0;
-}
-
 // read string value from registry, wide version
 int GetRegSZValueW(HKEY hkey, const wchar_t* name, std::wstring& res)
 {

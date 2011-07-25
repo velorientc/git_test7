@@ -20,7 +20,6 @@ HICON GetTortoiseIcon(const std::string & iconname);
 std::string GetHgRepoRoot(const std::string& path);
 bool IsHgRepo(const std::string& path);
 FILE* fopenReadRenameAllowed(const char* path);
-int GetRegSZValue(HKEY hkey, const char* name, std::string& res);
 int GetRegSZValueW(HKEY hkey, const wchar_t* name, std::wstring& res);
 bool StartsWith(const std::string& a, const std::string& b);
 void Tokenize(const std::string& str, std::vector<std::string>& tokens,
