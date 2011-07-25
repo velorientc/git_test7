@@ -478,7 +478,7 @@ CShellExtCMenu::QueryContextMenu(
     }
 
     TDEBUG_TRACE(
-        "CShellExtCMenu::QueryContextMenu: isHgrepo = " 
+        "CShellExtCMenu::QueryContextMenu: isHgrepo = "
         << isHgrepo << ", fileMenu = " << fileMenu
     );
 
@@ -620,7 +620,7 @@ CShellExtCMenu::GetCommandString(
     }
 
     TDEBUG_TRACE(
-        "CShellExtCMenu::GetCommandString: idCmd = " << idCmd 
+        "CShellExtCMenu::GetCommandString: idCmd = " << idCmd
         << ", uFlags = " << uFlags << " (" << sflags << ")"
         << ", cchMax = " << cchMax
     );
@@ -644,7 +644,7 @@ CShellExtCMenu::GetCommandString(
             if (size >= 40)
             {
                 TDEBUG_TRACE(
-                    "***** CShellExtCMenu::GetCommandString: warning:" 
+                    "***** CShellExtCMenu::GetCommandString: warning:"
                     << " length of help text is " << size
                     << ", which is not reasonably short (<40)");
             }
@@ -673,7 +673,7 @@ CShellExtCMenu::GetCommandString(
 
     if (cchMax < 1)
     {
-        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: cchMax = " 
+        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: cchMax = "
             << cchMax << " (is <1)");
         return res;
     }
