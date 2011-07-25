@@ -310,15 +310,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         return not self.targetcheckbox.isChecked()
 
     def schemeChange(self):
-        if not self.default_user:
-            return
-
-        scheme = self._schemes[self.schemecombo.currentIndex()]
-        if scheme == 'ssh':
-            self.default_user = self.curuser
-            self.curuser = self.lastsshuser
-        else:
-            self.curuser = self.default_user
+        if self.default_user:
+            scheme = self._schemes[self.schemecombo.currentIndex()]
+            if scheme == 'ssh':
+                self.default_user = self.curuser
+                self.curuser = self.lastsshuser
+            else:
+                self.curuser = self.default_user
             
         self.refreshUrl()
  
