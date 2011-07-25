@@ -11,17 +11,6 @@
 #include "shlwapi.h"
 
 
-LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
-{
-    assert(lpa != NULL);
-    assert(lpw != NULL);
-
-    lpw[0] = '\0';
-    MultiByteToWideChar(CP_ACP, 0, lpa, -1, lpw, nChars);
-    return lpw;
-}
-
-
 std::string GetTHgProgRoot()
 {
     LPCSTR regname = "Software\\TortoiseHg";
@@ -242,30 +231,6 @@ FILE* fopenReadRenameAllowed(const char* path)
     return f;
 }
 
-
-// read string value from registry
-int GetRegSZValue(HKEY hkey, const char* name, std::string& res)
-{
-    res = "";
-
-    if (!hkey)
-        return 0;
-
-    std::vector<BYTE> Data(300);
-    DWORD cbData = Data.size();
-
-    LONG rv = ::RegQueryValueExA(hkey, name, 0, 0, &Data[0], &cbData);
-
-    if (rv == ERROR_SUCCESS)
-    {
-        res = reinterpret_cast<char*>(&Data[0]);
-        return 1;
-    }
-
-    TDEBUG_TRACE("GetRegSZValue(" << name << ") failed");
-
-    return 0;
-}
 
 // read string value from registry, wide version
 int GetRegSZValueW(HKEY hkey, const wchar_t* name, std::wstring& res)
