@@ -140,9 +140,9 @@ void GetCMenuTranslation(
 )
 {
     std::wstring subkey = L"Software\\TortoiseHg\\CMenu\\";
-    subkey += _WCSTR(lang.c_str());
+    subkey += MultibyteToWide(lang);
     subkey += L"\\";
-    subkey += _WCSTR(name.c_str());
+    subkey += MultibyteToWide(name);
 
     TDEBUG_TRACEW(L"GetCMenuTranslation: " << subkey);
 
@@ -683,7 +683,8 @@ CShellExtCMenu::GetCommandString(
     if (uFlags & GCS_UNICODE)
     {
         wchar_t* const dest = reinterpret_cast<wchar_t*>(pszName);
-        const wchar_t* const src = pszw ? pszw : _WCSTR(psz);
+        std::wstring wpsz = MultibyteToWide(psz);
+        const wchar_t* const src = pszw ? pszw : wpsz.c_str();
 
         wcsncpy(dest, src, cchMax-1);
         *(dest + cchMax-1) = 0;

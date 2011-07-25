@@ -11,17 +11,6 @@
 #include "shlwapi.h"
 
 
-LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
-{
-    assert(lpa != NULL);
-    assert(lpw != NULL);
-
-    lpw[0] = '\0';
-    MultiByteToWideChar(CP_ACP, 0, lpa, -1, lpw, nChars);
-    return lpw;
-}
-
-
 std::string GetTHgProgRoot()
 {
     LPCSTR regname = "Software\\TortoiseHg";
