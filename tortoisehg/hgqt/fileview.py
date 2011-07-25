@@ -437,7 +437,13 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(bool(self._diffs))
         self.actionPrevDiff.setEnabled(bool(self._diffs))
 
-        font = self.sci.lexer().font(0)
+        lexer = self.sci.lexer()
+
+        if lexer:
+            font = self.sci.lexer().font(0)
+        else:
+            font = self.sci.font()
+
         fm = QFontMetrics(font)
         maxWidth = fm.maxWidth()
         lines = self.sci.text().split('\n')
