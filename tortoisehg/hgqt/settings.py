@@ -1051,6 +1051,12 @@ class SettingsForm(QWidget):
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
+        elif event.type() in (QEvent.Leave, QEvent.FocusOut):
+            focus = QApplication.focusWidget()
+            if focus is not None and hasattr(focus, 'toolTip'):
+                self.desctext.setHtml(focus.toolTip())
+            else:
+                self.desctext.setHtml('')
         if event.type() == QEvent.ToolTip:
             return True  # tooltip is shown in self.desctext
         return False
