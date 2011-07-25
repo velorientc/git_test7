@@ -993,6 +993,7 @@ class SettingsForm(QWidget):
         widgets = []
         frame = QFrame()
         form = QFormLayout()
+        form.setContentsMargins(5, 5, 0, 5)
         frame.setLayout(form)
         self.stack.addWidget(frame)
 
@@ -1027,6 +1028,7 @@ class SettingsForm(QWidget):
         widgets = []
         frame = QFrame()
         grid = QGridLayout()
+        grid.setContentsMargins(5, 5, 0, 5)
         frame.setLayout(grid)
         self.stack.addWidget(frame)
         allexts = hglib.allextensions()
