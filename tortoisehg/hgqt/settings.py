@@ -126,18 +126,33 @@ class PasswordEntry(QLineEdit):
     def isDirty(self):
         return self.value() != self.curvalue
 
-class FontEntry(QPushButton):
+class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
-        QPushButton.__init__(self, parent, toolTip=opts['tooltip'])
+        QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
-        self.clicked.connect(self.on_clicked)
+
+        self.label = QLabel()
+        self.setButton = QPushButton(_('&Set...'))
+        self.clearButton = QPushButton(_('&Clear'))
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.label)
+        layout.addStretch()
+        layout.addWidget(self.setButton)
+        layout.addWidget(self.clearButton)
+        self.setLayout(layout)
+
+        self.setButton.clicked.connect(self.onSetClicked)
+        self.clearButton.clicked.connect(self.onClearClicked)
+
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def on_clicked(self, checked):
+    def onSetClicked(self, checked):
         def newFont(font):
             self.setText(font.toString())
             thgf.setFont(font)
@@ -146,8 +161,13 @@ class FontEntry(QPushButton):
         dlg = QFontDialog(self)
         dlg.currentFontChanged.connect(newFont)
         font, isok = dlg.getFont(origfont, self)
-        self.setText(font.toString())
+        if not isok:
+            return
+        self.label.setText(font.toString())
         thgf.setFont(font)
+
+    def onClearClicked(self, checked):
+        self.label.setText(_unspecstr)
 
     def currentFont(self):
         """currently selected QFont if specified"""
@@ -163,12 +183,12 @@ class FontEntry(QPushButton):
     def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
-            self.setText(hglib.tounicode(curvalue))
+            self.label.setText(hglib.tounicode(curvalue))
         else:
-            self.setText(_unspecstr)
+            self.label.setText(_unspecstr)
 
     def value(self):
-        utext = self.text()
+        utext = self.label.text()
         if utext == _unspecstr:
             return None
         else:
