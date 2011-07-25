@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import error, hg, ui, util
+from mercurial import commands, error, hg, ui, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -525,7 +525,8 @@ class RepoRegistryView(QDockWidget):
 
                     # Read the current .hgsub file contents
                     lines = []
-                    if os.path.exists(repo.wjoin('.hgsub')):
+                    hasHgsub = os.path.exists(repo.wjoin('.hgsub'))
+                    if hasHgsub:
                         try:
                             fsub = repo.wopener('.hgsub', 'r')
                             lines = fsub.readlines()
@@ -564,6 +565,9 @@ class RepoRegistryView(QDockWidget):
                         fsub = repo.wopener('.hgsub', 'w')
                         fsub.write(linesep.join(lines))
                         fsub.close()
+
+                        if not hasHgsub:
+                            commands.add(ui.ui(), repo, '.hgsub')
 
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
