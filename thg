@@ -13,13 +13,13 @@ import sys
 
 argv = sys.argv[1:]
 if 'THG_OSX_APP' in os.environ:
-	# Remove the -psn argument supplied by launchd
-	if argv[0].startswith('-psn'):
-	    argv = argv[1:]
-	# sys.path as created by py2app doesn't work quite right with demandimport
-	# Add the explicit path where PyQt4 and other libs are
-	bundlepath = os.path.dirname(os.path.realpath(__file__))
-	sys.path.insert(0, os.path.join(bundlepath, 'lib/python2.6/lib-dynload'))
+    # Remove the -psn argument supplied by launchd
+    if argv[0].startswith('-psn'):
+        argv = argv[1:]
+    # sys.path as created by py2app doesn't work quite right with demandimport
+    # Add the explicit path where PyQt4 and other libs are
+    bundlepath = os.path.dirname(os.path.realpath(__file__))
+    sys.path.insert(0, os.path.join(bundlepath, 'lib/python2.6/lib-dynload'))
 
 if hasattr(sys, "frozen"):
     if sys.frozen == 'windows_exe' and 'THGDEBUG' in os.environ:
