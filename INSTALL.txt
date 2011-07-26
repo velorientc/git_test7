@@ -9,4 +9,4 @@ cloned repository.
 
 For source install details, see:
 
-http://bitbucket.org/tortoisehg/thg/wiki/developers/Hacking
+https://bitbucket.org/tortoisehg/thg/wiki/developers/Home
