@@ -9,7 +9,7 @@ import os
 import time
 import errno
 
-from mercurial import extensions, ui, error
+from mercurial import extensions, ui, error, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, update, revdetails
@@ -343,13 +343,11 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         Prompt user for new patch name. Patch is created
         on current branch.
         """
-        parent =  None
-        title = _('TortoiseHg Prompt')
-        label = _('New Patch Name')
-        new_name, ok = QInputDialog.getText(self, title, label)
-        if not ok:
+        dialog = PNewDialog()
+        if dialog.exec_() != QDialog.Accepted:
             return False
-        self.pnew(hglib.fromunicode(new_name))
+        self.repo.incrementBusyCount()
+        self.runner.run(dialog.getCmd(cwd=self.repo.root))
         return True
 
     def pnew(self, patch_name):
@@ -836,3 +834,64 @@ class PatchBranchModel(QAbstractTableModel):
 
         painter.end()
         return QVariant(pix)
+
+class PNewDialog(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.setWindowFlags(Qt.Window)
+        self.setWindowIcon(qtlib.geticon("fileadd"))
+        self.setWindowTitle(_('New Patch Branch'))
+        
+        def AddField(var, label, optional=False):
+            hbox = QHBoxLayout()
+            SP = QSizePolicy
+            le = QLineEdit()
+            le.setSizePolicy(SP(SP.Expanding, SP.Fixed))
+            if optional:
+                cb = QCheckBox(label)
+                le.setEnabled(False)
+                cb.toggled.connect(le.setEnabled)
+                hbox.addWidget(cb)
+                setattr(self, var+'cb', cb) 
+            else:
+                hbox.addWidget(QLabel(label))
+            hbox.addWidget(le)
+            setattr(self, var+'le', le)
+            return hbox
+
+        def DialogButtons():
+            BB = QDialogButtonBox
+            bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+            bb.accepted.connect(self.accept)
+            bb.rejected.connect(self.reject)
+            bb.button(BB.Ok).setDefault(True)
+            bb.button(BB.Cancel).setDefault(False)
+            self.commitButton = bb.button(BB.Ok)
+            self.commitButton.setText(_('Commit', 'action button'))
+            self.bb = bb
+            return bb
+            
+        layout = QVBoxLayout()
+        layout.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(layout)
+        layout.addLayout(AddField('patchname',_('Patch name:')))
+        layout.addLayout(AddField('patchtext',_('Patch message:'), optional=True))
+        layout.addLayout(AddField('patchdate',_('Patch date:'), optional=True))
+        layout.addLayout(AddField('patchuser',_('Patch user:'), optional=True))
+        layout.addWidget(DialogButtons())
+
+        self.patchdatele.setText(
+                hglib.tounicode(hglib.displaytime(util.makedate())))
+
+    def patchname(self):
+        return self.patchnamele.text()
+    
+    def getCmd(self, cwd):
+        cmd = ['pnew', '--cwd', cwd, hglib.fromunicode(self.patchname())]
+        optList = [('patchtext','--text'),
+                   ('patchdate','--date'),
+                   ('patchuser','--user')]
+        for v,o in optList:
+            if getattr(self,v+'cb').isChecked():
+                cmd.extend([o,hglib.fromunicode(getattr(self,v+'le').text())])
+        return cmd
