@@ -47,7 +47,7 @@ class FileData(object):
             return None
         try:
             data = fctx.data()
-            if '\0' in data:
+            if '\0' in data or ctx.isKbf(wfile):
                 self.error = p + _('File is binary.\n')
                 return None
         except (EnvironmentError, util.Abort), e:
@@ -72,6 +72,7 @@ class FileData(object):
                 return 'C'
             return None
 
+        isbfile = False
         repo = ctx._repo
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
@@ -302,6 +303,9 @@ class FileData(object):
                     else:
                         self.contents = olddata
                 self.flabel += _(' <i>(was deleted)</i>')
+            elif ctx.p1().hasBfile(wfile):
+                self.error = 'binary file'
+                self.flabel += _(' <i>(was deleted)</i>')
             else:
                 self.flabel += _(' <i>(was added, now missing)</i>')
             return
@@ -315,6 +319,8 @@ class FileData(object):
                     return
                 else:
                     data = util.posixfile(absfile, 'r').read()
+            elif ctx.hasBfile(wfile):
+                data = '\0'
             else:
                 data = ctx.filectx(wfile).data()
             if '\0' in data:
@@ -324,6 +330,9 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
+            if ctx.hasBfile(wfile):
+                wfile = ctx.standin(wfile)
+                isbfile = True
             res = self.checkMaxDiff(ctx, wfile, maxdiff)
             if res is None:
                 if status == 'A':
@@ -367,5 +376,8 @@ class FileData(object):
         revs = [str(ctx), str(ctx2)]
         diffopts = patch.diffopts(repo.ui, {})
         diffopts.git = False
+        if isbfile:
+            olddata += '\0'
+            newdata += '\0'
         self.diff = mdiff.unidiff(olddata, olddate, newdata, newdate,
                                   oldname, wfile, revs, diffopts)
