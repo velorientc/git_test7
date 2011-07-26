@@ -8,8 +8,8 @@
 import os
 import re
 
-from mercurial import util, error, merge, commands
-from tortoisehg.hgqt import qtlib, htmlui, visdiff
+from mercurial import util, error, merge, commands, extensions
+from tortoisehg.hgqt import qtlib, htmlui, visdiff, bfprompt
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -52,6 +52,8 @@ class WctxActions(QObject):
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
+        if 'kbfiles' in self.repo.extensions():
+            make(_('Add &Bfiles'), addbf, frozenset('I?'))
         make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename')
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
@@ -266,8 +268,29 @@ def forget(parent, ui, repo, files):
     return True
 
 def add(parent, ui, repo, files):
+    if 'kbfiles' in repo.extensions():
+        result = bfprompt.promptForBfiles(parent, ui, repo, files)
+        if not result:
+            return False
+        files, bfiles = result
+        for name, module in extensions.extensions():
+            if name == 'kbfiles':
+                override_add = module.bfsetup.override_add
+                if files:
+                    override_add(commands.add, ui, repo, *files)
+                if bfiles:
+                    override_add(commands.add, ui, repo, *bfiles, bf=1)
+                return True
     commands.add(ui, repo, *files)
     return True
+
+def addbf(parent, ui, repo, files):
+    for name, module in extensions.extensions():
+        if name == 'kbfiles':
+            override_add = module.bfsetup.override_add
+            override_add(commands.add, ui, repo, *files, bf=True)
+            return True
+    return False
 
 def guessRename(parent, ui, repo, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog
