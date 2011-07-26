@@ -74,7 +74,7 @@ CShellExtDnd::QueryContextMenu(
 void CShellExtDnd::RunDialog(const std::string &cmd)
 {
     if (cmd == "drag_move" || cmd == "drag_copy") {
-		//Append the current directory as the dest
+        //Append the current directory as the dest
         myFiles.push_back(myFolder);
     }
     CShellExtCMenu::RunDialog(cmd);
@@ -129,7 +129,7 @@ STDMETHODIMP CShellExtDnd::Initialize(
                             TDEBUG_TRACE("  " << name << " isn't in target dir repository");
                             myFiles.clear();
                             break;
-					    }
+                        }
                         myFiles.push_back(name);
                     }
                 }
