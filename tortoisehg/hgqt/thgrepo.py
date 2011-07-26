@@ -670,3 +670,6 @@ def relatedRepositories(repoid):
         raise
     else:
         f.close()
+
+def isKbf(path):
+    return _kbfregex.match(path)
