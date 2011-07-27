@@ -57,6 +57,8 @@ if debugthg.debug('N'):
 else:
     debugf = debugthg.debugf_No
 
+# avoid breaking other Python nautilus extensions
+demandimport.disable()
 
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
 
@@ -373,8 +375,8 @@ class HgExtensionIcons(HgExtensionDefault):
         return True
 
 if ui.ui().configbool("tortoisehg", "overlayicons", default = True):
-	class HgExtension(HgExtensionIcons, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider, nautilus.InfoProvider):
-		pass
+    class HgExtension(HgExtensionIcons, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider, nautilus.InfoProvider):
+        pass
 else:
-	class HgExtension(HgExtensionDefault, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider):
-		pass
+    class HgExtension(HgExtensionDefault, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider):
+        pass
