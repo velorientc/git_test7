@@ -288,6 +288,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
 
         self.tv.setSortingEnabled(False)
         self.tv.pattern = pattern
+        self.tv.icase = icase
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
         if inc: inc = inc.split(', ')
@@ -525,6 +526,7 @@ class MatchTree(QTableView):
 
         self.repo = repo
         self.pattern = None
+        self.icase = False
         self.embedded = parent.parent() is not None
         self.selectedRows = ()
 
@@ -627,7 +629,7 @@ class MatchTree(QTableView):
     def onAnnotateFile(self):
         from tortoisehg.hgqt.manifestdialog import run
         from tortoisehg.hgqt.run import qtrun
-        repo, ui, pattern = self.repo, self.repo.ui, self.pattern
+        repo, ui, pattern, icase = self.repo, self.repo.ui, self.pattern, self.icase
         seen = set()
         for rev, path, line in self.selectedRows:
             # Only open one annotate instance per file
@@ -644,7 +646,7 @@ class MatchTree(QTableView):
                         rev = repo['.'].rev()
                     srepo = thgrepo.repository(None, root)
                     opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
-                            'line': line, 'pattern': pattern}
+                            'line': line, 'pattern': pattern, 'ignorecase': icase}
                     qtrun(run, ui, **opts)
                 else:
                     continue
@@ -652,7 +654,7 @@ class MatchTree(QTableView):
                 if rev is None:
                     rev = repo['.'].rev()
                 opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
-                        'line': line, 'pattern': pattern}
+                        'line': line, 'pattern': pattern, 'ignorecase': icase}
                 qtrun(run, ui, **opts)
 
     def onViewChangeset(self):

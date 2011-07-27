@@ -79,6 +79,10 @@ class ManifestDialog(QMainWindow):
         """Set search pattern [unicode]"""
         self._manifest_widget._fileview.searchbar.setPattern(text)
 
+    def setSearchCaseInsensitive(self, ignorecase):
+        """Set if search is case insensitive"""
+        self._manifest_widget._fileview.searchbar.setCaseInsensitive(ignorecase)
+
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
@@ -537,6 +541,7 @@ def run(ui, *pats, **opts):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
                 dlg._manifest_widget._fileview.actionAnnMode.trigger()
+            dlg.setSearchCaseInsensitive(opts['ignorecase'])
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
