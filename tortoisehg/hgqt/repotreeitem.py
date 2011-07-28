@@ -453,13 +453,10 @@ class RepoGroupItem(RepoTreeItem):
             # If a group has no repo items, the common path is empty
             self._commonpath = ''
         else:
-            if os.name == 'nt':
-                childs = [child.rootpath().lower()
-                          for child in self.childs]
-            else:
-                childs = [child.rootpath()
-                          for child in self.childs]
+            childs = [os.path.normcase(child.rootpath())
+                        for child in self.childs]
             self._commonpath = os.path.dirname(os.path.commonprefix(childs))
+
         return self._commonpath
 
     def getCommonPath(self):
