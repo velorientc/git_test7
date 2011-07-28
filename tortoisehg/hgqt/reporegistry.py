@@ -348,8 +348,23 @@ class RepoRegistryView(QDockWidget):
         self.expand()
         self._pendingReloadModel = False
 
-    def expand(self):
-        self.tview.expandToDepth(0)
+    def expand(self, it=None):
+        if not it:
+            self.tview.expandToDepth(0)
+        else:
+            # Create a list of ancestors (including the selected item)
+            from repotreeitem import RepoGroupItem
+            itchain = [it]
+            while(not isinstance(itchain[-1], RepoGroupItem)):
+                itchain.append(itchain[-1].parent())
+
+            # Starting from the topmost ancestor (a root item), expand the
+            # ancestors one by one
+            m = self.tview.model()
+            idx = self.tview.rootIndex()
+            for it in reversed(itchain):
+                idx = m.index(it.row(), 0, idx)
+                self.tview.expand(idx)
 
     def addRepo(self, root):
         'workbench has opened a new repowidget, ensure it is in the registry'
@@ -374,6 +389,9 @@ class RepoRegistryView(QDockWidget):
             self._activeTabRepo = it
             it.setActive(True)
             self.tview.dataChanged(QModelIndex(), QModelIndex())
+
+            # Make sure that the active tab is visible by expanding its parent
+            self.expand(it.parent())
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
@@ -631,7 +649,7 @@ class RepoRegistryView(QDockWidget):
 
     def removeSelected(self):
         self.tview.removeSelected()
-	
+
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
