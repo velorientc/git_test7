@@ -279,7 +279,7 @@ def add(parent, ui, repo, files):
                 if files:
                     override_add(commands.add, ui, repo, *files)
                 if bfiles:
-                    override_add(commands.add, ui, repo, *bfiles, bf=1)
+                    override_add(commands.add, ui, repo, bf=1, *bfiles)
                 return True
     commands.add(ui, repo, *files)
     return True
@@ -288,7 +288,7 @@ def addbf(parent, ui, repo, files):
     for name, module in extensions.extensions():
         if name == 'kbfiles':
             override_add = module.bfsetup.override_add
-            override_add(commands.add, ui, repo, *files, bf=True)
+            override_add(commands.add, ui, repo, bf=True, *files)
             return True
     return False
 
