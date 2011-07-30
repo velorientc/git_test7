@@ -396,10 +396,10 @@ class HistorySearchThread(QThread):
             fullmsg = ''
             def write(self, msg, *args, **opts):
                 self.fullmsg += msg
-                if self.fullmsg.endswith('\0'):
+                if self.fullmsg.count('\0') >= 6:
                     try:
-                        fname, line, rev, addremove, user, text = \
-                                self.fullmsg.split('\0', 5)
+                        fname, line, rev, addremove, user, text, tail = \
+                                self.fullmsg.split('\0', 6)
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (
@@ -408,7 +408,7 @@ class HistorySearchThread(QThread):
                         emitrow(row)
                     except ValueError:
                         pass
-                    self.fullmsg = ''
+                    self.fullmsg = tail
             def progress(topic, pos, item='', unit='', total=None):
                 emitprog(topic, pos, item, unit, total)
         cwd = os.getcwd()
