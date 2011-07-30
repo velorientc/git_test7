@@ -494,7 +494,8 @@ class CtxSearchThread(QThread):
                 if pos:
                     self.hu.write(line[pos:], label='ui.status')
                     path = os.path.join(prefix, wfile)
-                    row = [path, i + 1, ctx.rev(), None, self.hu.getdata()[0]]
+                    row = [path, i + 1, ctx.rev(), None,
+                           hglib.tounicode(self.hu.getdata()[0])]
                     w = DataWrapper(row)
                     self.matchedRow.emit(w)
                     if self.once:
