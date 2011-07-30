@@ -12,6 +12,7 @@ import os
 import sys
 import shutil
 import tempfile
+import re
 
 from PyQt4.QtCore import *
 
@@ -24,6 +25,7 @@ from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 
 _repocache = {}
+_kbfregex = re.compile(r'^\.kbf/')
 
 if 'THGDEBUG' in os.environ:
     def dbgoutput(*args):
@@ -259,8 +261,8 @@ _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
 
-        def changectx(self, changeid):
-            '''Extends Mercurial's standard changectx() method to
+        def __getitem__(self, changeid):
+            '''Extends Mercurial's standard __getitem__() method to
             a) return a thgchangectx with additional methods
             b) return a patchctx if changeid is the name of an MQ
             unapplied patch
@@ -279,7 +281,7 @@ def _extendrepo(repo):
                     os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 
-            changectx = super(thgrepository, self).changectx(changeid)
+            changectx = super(thgrepository, self).__getitem__(changeid)
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
 
@@ -532,6 +534,17 @@ def _extendrepo(repo):
             dest = tempfile.mktemp(ext+'.bak', root+'_', trashcan)
             shutil.copyfile(path, dest)
 
+        def isKbf(self, path):
+            return 'kbfiles' in self.extensions() and _kbfregex.match(path)
+
+        def removeKbf(self, path):
+            if 'kbfiles' in self.extensions():
+                path = _kbfregex.sub('', path)
+            return path
+        
+        def standin(self, path):
+            return '.kbf/' + path
+        
     return thgrepository
 
 
@@ -598,10 +611,20 @@ def _extendchangectx(changectx):
                     summary += u' \u2026' # ellipsis ...
 
             return summary
+        
+        def hasBfile(self, file):
+            return 'kbfiles' in self._repo.extensions() and self._repo.standin(file) in self.manifest()
 
+        def isKbf(self, path):
+            return self._repo.isKbf(path)
+        
+        def removeKbf(self, path):
+            return self._repo.removeKbf(path)
+        
+        def standin(self, path):
+            return self._repo.standin(path)
+        
     return thgchangectx
-
-
 
 _pctxcache = {}
 def genPatchContext(repo, patchpath, rev=None):
@@ -647,3 +670,6 @@ def relatedRepositories(repoid):
         raise
     else:
         f.close()
+
+def isKbf(path):
+    return _kbfregex.match(path)

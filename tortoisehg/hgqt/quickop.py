@@ -12,7 +12,7 @@ from mercurial import util
 
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, status, cmdui
+from tortoisehg.hgqt import qtlib, status, cmdui, bfprompt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -101,6 +101,11 @@ class QuickOpDialog(QDialog):
         hbox.addWidget(bb)
         toplayout.addLayout(hbox)
         self.bb = bb
+        
+        if self.command == 'add' and 'kbfiles' in self.repo.extensions():
+            self.addBfilesButton = QPushButton(_("Add &Bfiles"))
+            self.addBfilesButton.clicked.connect(self.addBfiles)
+            bb.addButton(self.addBfilesButton, BB.ActionRole)
 
         layout.addWidget(self.statusbar)
 
@@ -136,14 +141,20 @@ class QuickOpDialog(QDialog):
                                 parent=self)
             return
         if self.command == 'remove':
-            wctx = self.repo[None]
+            self.repo.bfstatus = True
+            repostate = self.repo.status()
+            self.repo.bfstatus = False
+            unknown, ignored = repostate[4:6]
             for wfile in files:
-                if wfile not in wctx:
+                if wfile in unknown or wfile in ignored:
                     try:
                         util.unlink(wfile)
                     except EnvironmentError:
                         pass
                     files.remove(wfile)
+        elif self.command == 'add' and 'kbfiles' in self.repo.extensions():
+            self.addWithPrompt(files)
+            return
         if files:
             cmdline.extend(files)
             self.files = files
@@ -164,6 +175,33 @@ class QuickOpDialog(QDialog):
                 s.setValue('quickop/nobackup', self.chk.isChecked())
             QDialog.reject(self)
 
+    def addBfiles(self):
+        cmdline = ['add', '--bf']
+        files = self.stwidget.getChecked()
+        if not files:
+            qtlib.WarningMsgBox(_('No files selected'),
+                                _('No operation to perform'),
+                                parent=self)
+            return
+        cmdline.extend(files)
+        self.files = files
+        self.cmd.run(cmdline)
+
+    def addWithPrompt(self, files):
+        result = bfprompt.promptForBfiles(self, self.repo.ui, self.repo, files)
+        if not result:
+            return
+        files, bfiles = result
+        if files:
+            cmdline = ['add']
+            cmdline.extend(files)
+            self.files = files
+            self.cmd.run(cmdline)
+        if bfiles:
+            cmdline = ['add', '--bf']
+            cmdline.extend(bfiles)
+            self.files = bfiles
+            self.cmd.run(cmdline)
 
 instance = None
 class HeadlessQuickop(QWidget):
