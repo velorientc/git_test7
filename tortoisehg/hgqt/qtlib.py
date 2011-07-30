@@ -779,8 +779,8 @@ class InfoBar(QFrame):
         self._closebutton.clicked.connect(self.close)
         self.layout().addWidget(self._closebutton)
 
-    def addWidget(self, w):
-        self.layout().insertWidget(self.layout().count() - 2, w)
+    def addWidget(self, w, stretch=0):
+        self.layout().insertWidget(self.layout().count() - 2, w, stretch)
 
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
@@ -794,9 +794,9 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(message, self, wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
-        self.addWidget(self._msglabel)
+        self.addWidget(self._msglabel, stretch=1)
 
 class CommandErrorInfoBar(InfoBar):
     """Show command execution failure (with link to open log window)"""
@@ -805,9 +805,9 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(message, self, wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
-        self.addWidget(self._msglabel)
+        self.addWidget(self._msglabel, stretch=1)
 
         self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
         self._loglabel.linkActivated.connect(self.linkActivated)
@@ -822,6 +822,8 @@ class ConfirmInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(ConfirmInfoBar, self).__init__(parent)
 
+        # no wordWrap=True and stretch=1, which inserts unwanted space
+        # between _msglabel and _buttons.
         self._msglabel = QLabel(message, self,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
         self.addWidget(self._msglabel)
