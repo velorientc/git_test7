@@ -5,10 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, time
+import os, cgi, time
 
 from mercurial import ui
-from PyQt4 import QtCore
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
 
@@ -43,8 +42,7 @@ class htmlui(ui.ui):
 
     def style(self, msg, label):
         'Escape message for safe HTML, then apply specified style'
-        msg = QtCore.Qt.escape(msg)
-        msg = msg.replace('\n', '<br />')
+        msg = cgi.escape(msg).replace('\n', '<br />')
         style = qtlib.geteffect(label)
         return '<span style="%s">%s</span>' % (style, msg)
 
