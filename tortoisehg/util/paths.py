@@ -96,7 +96,7 @@ if os.name == 'nt':
             unc, rest = os.path.splitunc(drive)
             if unc: # All UNC paths (\\host\mount) are considered nonlocal
                 return True
-        letter = os.path.splitdrive(drive)[0]
+        letter = os.path.splitdrive(drive)[0].upper()
         _drives, total, _ = win32net.NetUseEnum(None, 1, 0)
         for drv in _drives:
             if drv['local'] == letter:
