@@ -541,7 +541,8 @@ def run(ui, *pats, **opts):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
                 dlg._manifest_widget._fileview.actionAnnMode.trigger()
-            dlg.setSearchCaseInsensitive(opts['ignorecase'])
+            if 'ignorecase' in opts:
+                dlg.setSearchCaseInsensitive(opts['ignorecase'])
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
