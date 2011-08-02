@@ -336,7 +336,8 @@ class StatusWidget(QWidget):
         if status in 'MAR!':
             self.actions.allactions[0].trigger()
         elif status == 'S':
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+            self.linkActivated.emit(
+                u'subrepo:' + hglib.tounicode(self.repo.wjoin(path)))
 
     @pyqtSlot(QString)
     def setFilter(self, match):
@@ -865,7 +866,7 @@ class StatusFilterButton(QToolButton):
         assert util.all(c in self._TYPES for c in text)
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
-                        
+
 class StatusDialog(QDialog):
     'Standalone status browser'
     def __init__(self, repo, pats, opts, parent=None):
