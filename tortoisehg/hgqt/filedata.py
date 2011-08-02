@@ -303,7 +303,7 @@ class FileData(object):
                     else:
                         self.contents = olddata
                 self.flabel += _(' <i>(was deleted)</i>')
-            elif ctx.p1().hasBfile(wfile):
+            elif hasattr(ctx.p1(), 'hasBfile') and ctx.p1().hasBfile(wfile):
                 self.error = 'binary file'
                 self.flabel += _(' <i>(was deleted)</i>')
             else:
