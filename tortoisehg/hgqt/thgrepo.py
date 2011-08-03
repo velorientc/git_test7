@@ -88,7 +88,7 @@ class ThgRepoWrapper(QObject):
             dbgoutput('not watching F/S events for network drive')
         else:
             self.watcher = QFileSystemWatcher(self)
-            self.watcher.addPath(repo.path)
+            self.watcher.addPath(hglib.tounicode(repo.path))
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
@@ -112,12 +112,11 @@ class ThgRepoWrapper(QObject):
         for f in existing:
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
-                self.watcher.addPath(f)
-        _, files = self.repo.uifiles()
-        for f in files:
+                self.watcher.addPath(hglib.tounicode(f))
+        for f in self.repo.uifiles()[1]:
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
-                self.watcher.addPath(f)
+                self.watcher.addPath(hglib.tounicode(f))
 
     def pollStatus(self):
         if not os.path.exists(self.repo.path):

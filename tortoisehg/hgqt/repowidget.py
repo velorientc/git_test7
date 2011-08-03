@@ -1437,7 +1437,7 @@ class RepoWidget(QWidget):
                     QMessageBox.warning(self,
                         _('Cannot export revision'),
                         (_('Cannot export revision %s into the file named:'
-                        '\n\n%s\n') % (rev, epath % rev)) + \
+                        '\n\n%s\n') % (rev, hglib.tounicode(epath % rev))) + \
                         _('There is already an existing folder '
                         'with that same name.'))
                     return
@@ -1485,16 +1485,16 @@ class RepoWidget(QWidget):
                 '<a href="file:///%s">%s</a>%s'
                 '<a href="file:///%s">%s</a>') \
                 % (rev, str(self.repo[rev]),
-                patchdirname, patchdirname, os.path.sep,
-                patchfilename, patchshortname))
+                hglib.tounicode(patchdirname), hglib.tounicode(patchdirname), os.path.sep,
+                hglib.tounicode(patchfilename), hglib.tounicode(patchshortname)))
         else:
             # Show a message box with a link to the export folder
             qtlib.InfoMsgBox(_('Patches exported'),
                 _('%d patches were exported to:<p>'
                 '<a href="file:///%s">%s</a>') \
                 % (len(revisions),
-                strdir,
-                strdir))
+                hglib.tounicode(strdir),
+                hglib.tounicode(strdir)))
 
     def visualDiffRevision(self):
         opts = dict(change=self.rev)
