@@ -20,7 +20,7 @@
   <?include TortoiseOverlaysDefines.wxi ?>
 
   <!-- shell extension CLSID's -->
-  <?include ../../win32/shellext/ThgCLSIDs.wxi ?>
+  <?include ../../../../shellext/src/ThgCLSIDs.wxi ?>
 
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
