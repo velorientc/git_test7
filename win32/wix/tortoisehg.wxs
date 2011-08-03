@@ -146,11 +146,11 @@
             </Component>
             <Component Id='CmenuShellRegistrationX64' Win64='yes'
                        Guid='$(var.CmenuShellRegistrationX64.guid)'>
-              <?include shell-register-cmenu.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX64' Win64='yes'
                        Guid='$(var.OverlaysShellRegistrationX64.guid)'>
-              <?include shell-register-overlays.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
             </Component>
           <?else?>
             <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
@@ -178,11 +178,11 @@
             </Component>         
             <Component Id='CmenuShellRegistrationX86' 
                       Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
-              <?include shell-register-cmenu.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX86' 
                       Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
-              <?include shell-register-overlays.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
             </Component>
           <?endif?>
 
@@ -326,11 +326,11 @@
             </Component>         
             <Component Id='CmenuShellRegistrationX86' 
                       Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
-              <?include shell-register-cmenu.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX86' 
                       Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
-              <?include shell-register-overlays.wxi ?>
+              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
             </Component>
           </Directory>
         </Directory>
