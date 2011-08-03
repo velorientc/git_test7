@@ -144,8 +144,7 @@ class HgFileListModel(QAbstractTableModel):
         for lst, flag in ((added, 'A'), (modified, 'M'), (removed, 'R')):
             for f in filter(func, lst):
                 wasmerged = ismerge and f in ctxfiles
-                if hasattr(self._ctx, 'removeKbf'):
-                    f = self._ctx.removeKbf(f)
+                f = self._ctx.removeKbf(f)
                 files.append({'path': f, 'status': flag, 'parent': parent,
                               'wasmerged': wasmerged})
         return files
