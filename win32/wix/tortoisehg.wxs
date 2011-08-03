@@ -16,11 +16,12 @@
   <?endif?>
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
+  <?define ShellextRepoFolder = ../../../build-shellext ?>
 
   <?include TortoiseOverlaysDefines.wxi ?>
 
   <!-- shell extension CLSID's -->
-  <?include ../../../build-shellext/src/ThgCLSIDs.wxi ?>
+  <?include $(var.ShellextRepoFolder)/src/ThgCLSIDs.wxi ?>
 
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
@@ -146,11 +147,11 @@
             </Component>
             <Component Id='CmenuShellRegistrationX64' Win64='yes'
                        Guid='$(var.CmenuShellRegistrationX64.guid)'>
-              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX64' Win64='yes'
                        Guid='$(var.OverlaysShellRegistrationX64.guid)'>
-              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-overlays.wxi ?>
             </Component>
           <?else?>
             <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
@@ -178,11 +179,11 @@
             </Component>         
             <Component Id='CmenuShellRegistrationX86' 
                       Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
-              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX86' 
                       Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
-              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-overlays.wxi ?>
             </Component>
           <?endif?>
 
@@ -326,11 +327,11 @@
             </Component>         
             <Component Id='CmenuShellRegistrationX86' 
                       Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
-              <?include ../../../build-shellext/wix/shell-register-cmenu.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-cmenu.wxi ?>
             </Component>
             <Component Id='OverlaysShellRegistrationX86' 
                       Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
-              <?include ../../../build-shellext/wix/shell-register-overlays.wxi ?>
+              <?include $(var.ShellextRepoFolder)/wix/shell-register-overlays.wxi ?>
             </Component>
           </Directory>
         </Directory>
