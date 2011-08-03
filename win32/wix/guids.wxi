@@ -36,9 +36,6 @@
   <?define dist.guid = {9A429564-6BA8-4F18-ACCF-59C586364FFC} ?>
   <?define imageformats.guid = {056DFB00-3EB1-4ACA-A43B-55CD5004DED1} ?>
 
-  <!-- cmenu-i18n.wxs -->
-  <?define cmenuI18n.guid = {25A9DAFA-FF37-420C-9958-5920301E293A} ?>
-
   <!-- icons.wxs -->
   <?define Icons.guid = {34369923-9610-461C-9FB3-26CA3A139836} ?>
 
