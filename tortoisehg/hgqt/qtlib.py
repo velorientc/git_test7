@@ -86,7 +86,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
             for m in regexp.finditer(editor):
                 expanded.append(editor[pos:m.start()-1])
                 phrase = editor[m.start()+1:m.end()-1]
-                pos=m.end()+1
+                pos = m.end()+1
                 if '$LINENUM' in phrase:
                     if lineno is None:
                         # throw away phrase
@@ -135,7 +135,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
 _user_shell = None
 def openshell(root, reponame):
-    global _user_shell
     if not os.path.exists(root):
         WarningMsgBox(
             _('Failed to open path in terminal'),
@@ -192,7 +191,8 @@ _thgstyles = {
    'control': 'black bold #dddddd_background',
 }
 
-thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
+thgstylesheet = '* { white-space: pre; font-family: monospace;' \
+                ' font-size: 9pt; }'
 tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
@@ -330,7 +330,8 @@ def descriptionhtmlizer(ui):
     u'<a href="http://example/">http://example/</a>'
     """
     csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
-    httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
+    httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*' \
+                r'[-A-Za-z0-9+&@#/%=~_()|]))'
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
 
