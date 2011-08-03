@@ -1437,7 +1437,7 @@ class RepoWidget(QWidget):
                     QMessageBox.warning(self,
                         _('Cannot export revision'),
                         (_('Cannot export revision %s into the file named:'
-                        '\n\n%s\n') % (rev, epath % rev)) + \
+                        '\n\n%s\n') % (rev, hglib.tounicode(epath % rev))) + \
                         _('There is already an existing folder '
                         'with that same name.'))
                     return
