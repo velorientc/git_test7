@@ -129,7 +129,7 @@
           <?if $(var.Platform) = "x64" ?>
             <Component Id='thgshellx64dll' Guid='$(var.thgshellx64dll.guid)' Win64='yes'>
               <File Id='thgshellx64dll' Name='ThgShellx64.dll' KeyPath='yes'
-                    Source='win32\ThgShellx64.dll'/>
+                    Source='../build-shellext/src/ThgShellx64.dll'/>
               <RegistryValue
                   Root='HKLM' Key='$(var.ProgramRegKey)'
                   Type='string' Value='[INSTALLDIR]'/>
@@ -156,7 +156,7 @@
           <?else?>
             <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
               <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
-                    Source='win32\ThgShellx86.dll'
+                    Source='../build-shellext/src/ThgShellx86.dll'
               />
               <RegistryValue
                 Root='HKLM' Key='$(var.ProgramRegKey)'
@@ -304,7 +304,7 @@
           <Directory Id='INSTALLDIRx86' Name='TortoiseHg'>
             <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
               <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
-                    Source='win32\ThgShellx86.dll'
+                    Source='../build-shellext/src/ThgShellx86.dll'
               />
               <RegistryValue
                 Root='HKLM' Key='$(var.ProgramRegKey)'
@@ -485,7 +485,7 @@
          fails to shutdown TortoiseHgOverlayServer.exe, which occasionally leads to a crash
          of TortoiseHgOverlayServer.exe during install, which in turn pops up an ugly crash
          report dialog pointing to faulting module PYTHON26.DLL. -->
-    <Binary Id='TerminateDLL' SourceFile='win32\terminate-x86.dll' />
+    <Binary Id='TerminateDLL' SourceFile='../build-shellext/src/terminate-x86.dll' />
     <CustomAction Id='CallTerminate'
       BinaryKey='TerminateDLL' DllEntry='TerminateIconServer'
     />
