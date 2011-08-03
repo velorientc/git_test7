@@ -111,8 +111,7 @@ class ThgRepoWrapper(QObject):
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
-        _, files = self.repo.uifiles()
-        for f in files:
+        for f in self.repo.uifiles()[1]:
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
