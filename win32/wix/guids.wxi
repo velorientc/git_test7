@@ -48,14 +48,6 @@
   <?define ComponentMainExecutableGUID = {D648EC48-559C-4C66-A4CE-2D40A495DC5B} ?>
   <?define ComponentWinExecutableGUID = {B4115B52-4FD3-478C-B605-D3F618287335} ?>
 
-  <?define thgshellx86dll.guid = {728E8840-5878-4EA7-918F-281C2697ABB1} ?>
-  <?define thgshellx64dll.guid = {D5D1E532-CDAD-4FFD-9695-757B8A29B4BA} ?>
-
-  <?define CmenuShellRegistrationX86.guid = {2BF442D0-EBD9-4B03-8F78-0F45C28F8AB5} ?>
-  <?define CmenuShellRegistrationX64.guid = {858CE519-8BA2-4E80-BBEB-591AE78384FA} ?>
-
-  <?define OverlaysShellRegistrationX86.guid = {8505A107-D6B1-4EAF-9929-3D6E847B5FCB} ?>
-  <?define OverlaysShellRegistrationX64.guid = {9A678A1C-72D3-4713-AD8A-E7C08ED64DC9} ?>
   <?define OverlayServerEXE.guid = {62C58746-BE5D-45F0-8AB7-2FE2AB9C57B0} ?>
 
   <?define ExtensionVersions.guid = {4ADF436B-9B25-4D95-B6AC-88717F5A037A} ?>
