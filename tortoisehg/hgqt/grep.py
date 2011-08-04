@@ -402,8 +402,7 @@ class HistorySearchThread(QThread):
                                 self.fullmsg.split('\0', 6)
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
-                        text = '<b>%s</b> <span>%s</span>' % (
-                                addremove, text[:-1])
+                        text = '<b>%s</b> <span>%s</span>' % (addremove, text)
                         row = [fname, rev, line, user, text]
                         emitrow(row)
                     except ValueError:
