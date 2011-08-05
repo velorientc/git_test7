@@ -17,8 +17,6 @@
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
 
-  <?include TortoiseOverlaysDefines.wxi ?>
-
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
            Version='$(var.Version)'
@@ -244,12 +242,7 @@
               SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x64_msm.msm'/>
         <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
               SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x64_msm.msm'/>
-        <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
-               SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX64)'/>
       <?endif?>
-
-      <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
-             SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)'/>
 
     </Directory>
 
