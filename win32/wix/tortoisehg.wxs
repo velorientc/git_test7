@@ -104,21 +104,6 @@
                   Source='..\extension-versions.txt'
             />
           </Component>
-          <Component Id='OverlayServerEXE' Guid='$(var.OverlayServerEXE.guid)' Win64='$(var.IsX64)'>
-            <File Id='OverlayServerEXE' Name='TortoiseHgOverlayServer.exe'
-                  KeyPath='yes'
-                  Source='dist\TortoiseHgOverlayServer.exe' >
-              <Shortcut Id="OverlayServerEXEshortcut" Directory="ProgramMenuDir"
-                        Name="TortoiseHg Overlay Icon Server"
-                        Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
-              />
-            </File>
-            <RegistryValue
-              Name='TortoiseHgOverlayIconServer' 
-              Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Run'
-              Type='string' Value='[INSTALLDIR]TortoiseHgOverlayServer.exe'
-            />
-          </Component>
 
           <Component Id='COPYING' Guid='$(var.COPYING.guid)' Win64='$(var.IsX64)'>
             <File Id='COPYING' Name='COPYING.txt'
