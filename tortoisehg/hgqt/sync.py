@@ -151,6 +151,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         tb.addWidget(self.optionsbutton)
 
         self.targetcombo = QComboBox()
+        self.targetcombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.targetcombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
@@ -339,12 +341,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
