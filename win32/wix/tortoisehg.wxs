@@ -318,20 +318,6 @@
       </Feature>
     </Feature>
 
-    <!-- terminate.dll terminates any running TortoiseHgOverlayServer.exe that supports the
-         terminate command over the command pipe. Windows installer sometimes
-         fails to shutdown TortoiseHgOverlayServer.exe, which occasionally leads to a crash
-         of TortoiseHgOverlayServer.exe during install, which in turn pops up an ugly crash
-         report dialog pointing to faulting module PYTHON26.DLL. -->
-    <Binary Id='TerminateDLL' SourceFile='../build-shellext/src/terminate-x86.dll' />
-    <CustomAction Id='CallTerminate'
-      BinaryKey='TerminateDLL' DllEntry='TerminateIconServer'
-    />
-
-    <CustomAction Id='StartOverlayServerEXE'
-      FileKey='OverlayServerEXE' ExeCommand='' Return='asyncNoWait'
-    />
-
     <InstallExecuteSequence>
         <!-- AppSearch must be done before RemoveExistingProducts and before 
              FindRelatedProducts -->
