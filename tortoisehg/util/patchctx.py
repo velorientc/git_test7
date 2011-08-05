@@ -128,6 +128,11 @@ class patchctx(object):
     def thgmqunappliedpatch(self):  return True
     def thgid(self):                return self._identity
 
+    # kbfiles methods
+    def hasBfile(self, file):       return False
+    def isKbf(self, path):          return False
+    def removeKbf(self, path):      return path
+
     def longsummary(self):
         summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
