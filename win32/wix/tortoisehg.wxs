@@ -16,12 +16,8 @@
   <?endif?>
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
-  <?define ShellextRepoFolder = ../../../build-shellext ?>
 
   <?include TortoiseOverlaysDefines.wxi ?>
-
-  <!-- shell extension CLSID's -->
-  <?include $(var.ShellextRepoFolder)/src/ThgCLSIDs.wxi ?>
 
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
