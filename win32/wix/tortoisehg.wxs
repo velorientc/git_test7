@@ -257,43 +257,6 @@
         <MergeRef Id='VCRedist'/>
         <MergeRef Id='VCRedistPolicy' />
       </Feature>
-      <?if $(var.Platform) = "x64" ?>
-          <Feature Id='ShellExtensionX64' Title='Shell Extension x64'
-                   Level='1' AllowAdvertise='no'
-                   Description='Context menu for 64-bit processes'>
-            <ComponentRef Id='cmenuI18n' />
-            <ComponentRef Id='thgshellx64dll' />
-            <ComponentRef Id='CmenuShellRegistrationX64' />
-            <Feature Id='OverlaysX64' Title='Overlay Icons'
-                     Level='1' AllowAdvertise='no'
-                     Description='Overlay icons for 64-bit processes'
-            >
-              <ComponentRef Id='OverlayServerEXE' />
-              <MergeRef Id='TortoiseOverlaysMergeX64' />
-              <ComponentRef Id='OverlaysShellRegistrationX64' />
-            </Feature>
-          </Feature>
-      <?endif?>
-      <?if $(var.Platform) = "x64" ?>
-          <?define ShellExtensionX86level = 1000 ?>
-      <?else?>
-          <?define ShellExtensionX86level = 1 ?>
-      <?endif?>
-      <Feature Id='ShellExtensionX86' Title='Shell Extension x86'
-               Level='$(var.ShellExtensionX86level)'
-               Absent='allow' AllowAdvertise='no'
-               Description='Context menu for 32-bit processes'>
-        <ComponentRef Id='cmenuI18n' />
-        <ComponentRef Id='thgshellx86dll' />
-        <ComponentRef Id='CmenuShellRegistrationX86' />
-        <Feature Id='OverlaysX86' Title='Overlay Icons'
-                 Level='1' AllowAdvertise='no'
-                 Description='Overlay icons for 32-bit processes'>
-          <ComponentRef Id='OverlayServerEXE' />
-          <MergeRef Id='TortoiseOverlaysMergeX86' />
-          <ComponentRef Id='OverlaysShellRegistrationX86' />
-        </Feature>
-      </Feature>
       <Feature Id='Locales' Level='1'
                Title='Translations'
                Description='Mercurial and TortoiseHg Translations'>
