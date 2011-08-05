@@ -48,8 +48,6 @@
   <?define ComponentMainExecutableGUID = {D648EC48-559C-4C66-A4CE-2D40A495DC5B} ?>
   <?define ComponentWinExecutableGUID = {B4115B52-4FD3-478C-B605-D3F618287335} ?>
 
-  <?define OverlayServerEXE.guid = {62C58746-BE5D-45F0-8AB7-2FE2AB9C57B0} ?>
-
   <?define ExtensionVersions.guid = {4ADF436B-9B25-4D95-B6AC-88717F5A037A} ?>
   <?define COPYING.guid = {09DEF174-D0AB-4E8B-8A4E-1AD5B7E4C9BD} ?>
 
