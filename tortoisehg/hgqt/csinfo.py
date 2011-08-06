@@ -249,8 +249,11 @@ class SummaryInfo(object):
                 return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return qtlib.markup(value, **mono)
-            elif item in ('revnum', 'p4', 'svn', 'close'):
+            elif item in ('revnum', 'p4', 'close'):
                 return str(value)
+            elif item == 'svn':
+                # svn is always in utf-8 because ctx.extra() isn't converted
+                return unicode(value, 'utf-8', 'replace')
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
                 return qtlib.markup(' %s ' % value, **opts)
