@@ -11,7 +11,7 @@ from mercurial import hg, util, cmdutil, error, context, merge
 
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview
+from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -413,7 +413,7 @@ class StatusThread(QThread):
 
     def __init__(self, repo, pctx, pats, opts, parent=None):
         super(StatusThread, self).__init__()
-        self.repo = hg.repository(repo.ui, repo.root)
+        self.repo = thgrepo.repository(repo.ui, repo.root)
         self.pctx = pctx
         self.pats = pats
         self.opts = opts
@@ -434,7 +434,9 @@ class StatusThread(QThread):
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
                 m = hglib.match(self.repo[None], self.pats)
+                self.repo.bfstatus = True
                 status = self.repo.status(match=m, **stopts)
+                self.repo.bfstatus = False
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
                     if stat == 'S':
@@ -446,11 +448,15 @@ class StatusThread(QThread):
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
             elif self.pctx:
+                self.repo.bfstatus = True
                 status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
+                self.repo.bfstatus = False
                 wctx = context.workingctx(self.repo, changes=status)
             else:
                 wctx = self.repo[None]
+                self.repo.bfstatus = True
                 wctx.status(**stopts)
+                self.repo.bfstatus = False
             self.wctx = wctx
 
             wctx.dirtySubrepos = []
