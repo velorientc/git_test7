@@ -17,6 +17,8 @@
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
 
+  <?define ShellextRepoFolder = ../../../build-shellext ?>
+
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
            Version='$(var.Version)'
@@ -257,6 +259,11 @@
         <MergeRef Id='VCRedist'/>
         <MergeRef Id='VCRedistPolicy' />
       </Feature>
+      <!-- referencing of the shellext features with FeatureRef sorts the
+           shellext features in some unknown and not controllable ridiculous
+           order in the feature dialog, so we have to include them here to
+           preserve and control ordering -->
+      <?include $(var.ShellextRepoFolder)/wix/features.wxi ?>
       <Feature Id='Locales' Level='1'
                Title='Translations'
                Description='Mercurial and TortoiseHg Translations'>
