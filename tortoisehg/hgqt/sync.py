@@ -167,7 +167,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             bottomlayout.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(bottomlayout)
-        
+
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         bottomlayout.addLayout(hbox)
@@ -319,9 +319,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.curuser = self.lastsshuser
             else:
                 self.curuser = self.default_user
-            
+
         self.refreshUrl()
- 
+
     def refreshStatusTips(self):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
