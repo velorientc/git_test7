@@ -151,6 +151,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         tb.addWidget(self.optionsbutton)
 
         self.targetcombo = QComboBox()
+        self.targetcombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.targetcombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
@@ -165,7 +167,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             bottomlayout.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(bottomlayout)
-        
+
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         bottomlayout.addLayout(hbox)
@@ -317,9 +319,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.curuser = self.lastsshuser
             else:
                 self.curuser = self.default_user
-            
+
         self.refreshUrl()
- 
+
     def refreshStatusTips(self):
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
@@ -339,12 +341,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
@@ -523,14 +527,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         data = event.mimeData()
         if data.hasUrls():
             url = data.urls()[0]
-            self.setUrl(hglib.fromunicode(url.toString()))
+            lurl = hglib.fromunicode(url.toString())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
             text = data.text()
-            self.setUrl(hglib.fromunicode(text))
+            lurl = hglib.fromunicode(text)
             event.setDropAction(Qt.CopyAction)
             event.accept()
+        else:
+            return
+        if lurl.startswith('file:///'):
+            lurl = lurl[8:]
+        self.setUrl(lurl)
 
     def canExit(self):
         return not self.cmd.core.running()

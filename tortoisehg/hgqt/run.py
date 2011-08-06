@@ -36,6 +36,11 @@ try:
 except ImportError:
     config_nofork = None
 
+try:
+    from thginithook import thginithook
+except ImportError:
+    thginithook = None
+
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve rejects log'''
 
@@ -500,12 +505,9 @@ class _QtRunner(QObject):
                 raise
             QTimer.singleShot(0, reraise)
 
-        try:
-            from thginithook import thginithook
+        if thginithook is not None:
             thginithook()
-        except ImportError:
-            pass
-        
+
         try:
             return self._mainapp.exec_()
         finally:
