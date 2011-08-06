@@ -527,14 +527,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         data = event.mimeData()
         if data.hasUrls():
             url = data.urls()[0]
-            self.setUrl(hglib.fromunicode(url.toString()))
+            lurl = hglib.fromunicode(url.toString())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
             text = data.text()
-            self.setUrl(hglib.fromunicode(text))
+            lurl = hglib.fromunicode(text)
             event.setDropAction(Qt.CopyAction)
             event.accept()
+        else:
+            return
+        if lurl.startswith('file:///'):
+            lurl = lurl[8:]
+        self.setUrl(lurl)
 
     def canExit(self):
         return not self.cmd.core.running()
