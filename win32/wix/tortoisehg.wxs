@@ -17,7 +17,7 @@
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
 
-  <?define ShellextRepoFolder = ../../../build-shellext ?>
+  <?define ShellextRepoFolder = ../../../shellext ?>
 
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
