@@ -47,7 +47,7 @@ class FileData(object):
             return None
         try:
             data = fctx.data()
-            if '\0' in data or ctx.isKbf(wfile):
+            if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary.\n')
                 return None
         except (EnvironmentError, util.Abort), e:
@@ -303,7 +303,7 @@ class FileData(object):
                     else:
                         self.contents = olddata
                 self.flabel += _(' <i>(was deleted)</i>')
-            elif hasattr(ctx.p1(), 'hasBfile') and ctx.p1().hasBfile(wfile):
+            elif hasattr(ctx.p1(), 'hasStandin') and ctx.p1().hasStandin(wfile):
                 self.error = 'binary file'
                 self.flabel += _(' <i>(was deleted)</i>')
             else:
@@ -319,7 +319,7 @@ class FileData(object):
                     return
                 else:
                     data = util.posixfile(absfile, 'r').read()
-            elif ctx.hasBfile(wfile):
+            elif ctx.hasStandin(wfile):
                 data = '\0'
             else:
                 data = ctx.filectx(wfile).data()
@@ -330,8 +330,8 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
-            if ctx.hasBfile(wfile):
-                wfile = ctx.standin(wfile)
+            if ctx.hasStandin(wfile):
+                wfile = ctx.findStandin(wfile)
                 isbfile = True
             res = self.checkMaxDiff(ctx, wfile, maxdiff)
             if res is None:

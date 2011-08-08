@@ -252,7 +252,7 @@ class ManifestModel(QAbstractItemModel):
                     continue
 
                 origpath = path
-                path = self._repo.removeKbf(path)
+                path = self._repo.removeStandin(path)
                 
                 e = treeroot
                 for p in hglib.tounicode(path).split('/'):

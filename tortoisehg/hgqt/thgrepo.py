@@ -26,6 +26,7 @@ from tortoisehg.util.patchctx import patchctx
 
 _repocache = {}
 _kbfregex = re.compile(r'^\.kbf/')
+_lfregex = re.compile(r'^\.hglf/')
 
 if 'THGDEBUG' in os.environ:
     def dbgoutput(*args):
@@ -537,16 +538,27 @@ def _extendrepo(repo):
             dest = tempfile.mktemp(ext+'.bak', root+'_', trashcan)
             shutil.copyfile(path, dest)
 
-        def isKbf(self, path):
-            return 'kbfiles' in self.extensions() and _kbfregex.match(path)
+        def isStandin(self, path):
+            if 'largefiles' in self.extensions():
+                if _lfregex.match(path):
+                    return True
+            if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
+                if _kbfregex.match(path):
+                    return True
+            return False
 
-        def removeKbf(self, path):
-            if 'kbfiles' in self.extensions():
+        def removeStandin(self, path):
+            if 'largefiles' in self.extensions():
+                path = _lfregex.sub('', path)
+            if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
                 path = _kbfregex.sub('', path)
             return path
         
-        def standin(self, path):
+        def bfStandin(self, path):
             return '.kbf/' + path
+
+        def lfStandin(self, path):
+            return '.hglf/' + path
         
     return thgrepository
 
@@ -615,18 +627,27 @@ def _extendchangectx(changectx):
 
             return summary
         
-        def hasBfile(self, file):
-            return 'kbfiles' in self._repo.extensions() and self._repo.standin(file) in self.manifest()
+        def hasStandin(self, file):
+            if 'largefiles' in self._repo.extensions():
+                if self._repo.lfStandin(file) in self.manifest():
+                    return True
+            elif 'largefiles' in self._repo.extensions() or 'kbfiles' in self._repo.extensions():
+                if self._repo.bfStandin(file) in self.manifest():
+                    return True
+            return False
 
-        def isKbf(self, path):
-            return self._repo.isKbf(path)
+        def isStandin(self, path):
+            return self._repo.isStandin(path)
         
-        def removeKbf(self, path):
-            return self._repo.removeKbf(path)
+        def removeStandin(self, path):
+            return self._repo.removeStandin(path)
         
-        def standin(self, path):
-            return self._repo.standin(path)
-        
+        def findStandin(self, file):
+            if 'largefiles' in self._repo.extensions():
+                if self._repo.lfStandin(file) in self.manifest():
+                    return self._repo.lfStandin(file)
+            return self._repo.bfStandin(file)
+                    
     return thgchangectx
 
 _pctxcache = {}
@@ -674,5 +695,8 @@ def relatedRepositories(repoid):
     else:
         f.close()
 
-def isKbf(path):
+def isBfStandin(path):
     return _kbfregex.match(path)
+
+def isLfStandin(path):
+    return _lfregex.match(path)
