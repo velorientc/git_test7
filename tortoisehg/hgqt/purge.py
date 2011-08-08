@@ -98,8 +98,10 @@ class PurgeDialog(QDialog):
             def run(self):
                 try:
                     repo.bfstatus = True
+                    repo.lfstatus = True
                     stat = repo.status(ignored=True, unknown=True)
                     repo.bfstatus = False
+                    repo.lfstatus = False
                     trashcan = repo.join('Trashcan')
                     if os.path.isdir(trashcan):
                         trash = os.listdir(trashcan)
@@ -215,9 +217,11 @@ class PurgeThread(QThread):
         match = hglib.matchall(repo)
         match.dir = directories.append
         repo.bfstatus = True
+        repo.lfstatus = True
         status = repo.status(match=match, ignored=opts['ignored'],
                              unknown=opts['unknown'], clean=False)
         repo.bfstatus = False
+        repo.lfstatus = False
         files = status[4] + status[5]
 
         def remove(remove_func, name):

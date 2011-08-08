@@ -435,8 +435,10 @@ class StatusThread(QThread):
                     precheckfn = lambda x: x < 4
                 m = hglib.match(self.repo[None], self.pats)
                 self.repo.bfstatus = True
+                self.repo.lfstatus = True
                 status = self.repo.status(match=m, **stopts)
                 self.repo.bfstatus = False
+                self.repo.lfstatus = False
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
                     if stat == 'S':
@@ -449,14 +451,18 @@ class StatusThread(QThread):
                 self.patchecked = patchecked
             elif self.pctx:
                 self.repo.bfstatus = True
+                self.repo.lfstatus = True
                 status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
                 self.repo.bfstatus = False
+                self.repo.lfstatus = False
                 wctx = context.workingctx(self.repo, changes=status)
             else:
                 wctx = self.repo[None]
                 self.repo.bfstatus = True
+                self.repo.lfstatus = True
                 wctx.status(**stopts)
                 self.repo.bfstatus = False
+                self.repo.lfstatus = False
             self.wctx = wctx
 
             wctx.dirtySubrepos = []
