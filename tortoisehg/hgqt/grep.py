@@ -469,11 +469,14 @@ class CtxSearchThread(QThread):
         unit = _('files')
         total = len(ctx.manifest())
         count = 0
-        hasKbf = settings.hasExtension('kbfiles')
+        haskbf = settings.hasExtension('kbfiles')
+        haslf = settings.hasExtension('largefiles')
         for wfile in ctx:                # walk manifest
             if self.canceled:
                 break
-            if hasKbf and thgrepo.isKbf(wfile):
+            if haslf and thgrepo.isLfStandin(wfile):
+                continue
+            if (haslf or haskbf) and thgrepo.isBfStandin(wfile):
                 continue
             self.progress.emit(topic, count, wfile, unit, total)
             count += 1
