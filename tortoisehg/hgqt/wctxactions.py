@@ -52,8 +52,10 @@ class WctxActions(QObject):
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
-        if 'kbfiles' in self.repo.extensions():
-            make(_('Add &Bfiles'), addbf, frozenset('I?'))
+        if 'largefiles' in self.repo.extensions():
+            make(_('Add &Largefiles...'), addlf, frozenset('I?'))
+        elif 'kbfiles' in self.repo.extensions():
+            make(_('Add &Bfiles'), addlf, frozenset('I?'))
         make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename')
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
@@ -268,24 +270,36 @@ def forget(parent, ui, repo, files):
     return True
 
 def add(parent, ui, repo, files):
-    if 'kbfiles' in repo.extensions():
+    haslf = 'largefiles' in repo.extensions()
+    if haslf or 'kbfiles' in repo.extensions():
         result = bfprompt.promptForBfiles(parent, ui, repo, files)
         if not result:
             return False
-        files, bfiles = result
+        files, lfiles = result
         for name, module in extensions.extensions():
+            if name == 'largefiles':
+                override_add = module.lfsetup.override_add
+                if files:
+                    override_add(commands.add, ui, repo, *files)
+                if lfiles:
+                    override_add(commands.add, ui, repo, large=True, *lfiles)
+                return True
             if name == 'kbfiles':
                 override_add = module.bfsetup.override_add
                 if files:
                     override_add(commands.add, ui, repo, *files)
-                if bfiles:
-                    override_add(commands.add, ui, repo, bf=1, *bfiles)
+                if lfiles:
+                    override_add(commands.add, ui, repo, bf=True, *lfiles)
                 return True
     commands.add(ui, repo, *files)
     return True
 
-def addbf(parent, ui, repo, files):
+def addlf(parent, ui, repo, files):
     for name, module in extensions.extensions():
+        if name == 'largefiles':
+            override_add = module.lfsetup.override_add
+            override_add(commands.add, ui, repo, large=True, *files)
+            return True
         if name == 'kbfiles':
             override_add = module.bfsetup.override_add
             override_add(commands.add, ui, repo, bf=True, *files)

@@ -12,7 +12,7 @@ from mercurial import util
 
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, status, cmdui, bfprompt
+from tortoisehg.hgqt import qtlib, status, cmdui, lfprompt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -102,10 +102,16 @@ class QuickOpDialog(QDialog):
         toplayout.addLayout(hbox)
         self.bb = bb
         
-        if self.command == 'add' and 'kbfiles' in self.repo.extensions():
-            self.addBfilesButton = QPushButton(_("Add &Bfiles"))
-            self.addBfilesButton.clicked.connect(self.addBfiles)
-            bb.addButton(self.addBfilesButton, BB.ActionRole)
+        if self.command == 'add':
+            if 'largefiles' in self.repo.extensions():
+                self.addLfilesButton = QPushButton(_('Add &Largefiles'))
+            elif 'kbfiles' in self.repo.extensions():
+                self.addLfilesButton = QPushButton(_("Add &Bfiles"))
+            else:
+                self.addLfilesButton = None
+            if self.addLfilesButton:
+                self.addLfilesButton.clicked.connect(self.addLfiles)
+                bb.addButton(self.addLfilesButton, BB.ActionRole)
 
         layout.addWidget(self.statusbar)
 
@@ -142,8 +148,10 @@ class QuickOpDialog(QDialog):
             return
         if self.command == 'remove':
             self.repo.bfstatus = True
+            self.repo.lfstatus = True
             repostate = self.repo.status()
             self.repo.bfstatus = False
+            self.repo.lfstatus = False
             unknown, ignored = repostate[4:6]
             for wfile in files:
                 if wfile in unknown or wfile in ignored:
@@ -152,9 +160,10 @@ class QuickOpDialog(QDialog):
                     except EnvironmentError:
                         pass
                     files.remove(wfile)
-        elif self.command == 'add' and 'kbfiles' in self.repo.extensions():
-            self.addWithPrompt(files)
-            return
+        elif self.command == 'add':
+            if 'largefiles' in self.repo.extensions() or 'kbfiles' in self.repo.extensions():
+                self.addWithPrompt(files)
+                return
         if files:
             cmdline.extend(files)
             self.files = files
@@ -175,8 +184,11 @@ class QuickOpDialog(QDialog):
                 s.setValue('quickop/nobackup', self.chk.isChecked())
             QDialog.reject(self)
 
-    def addBfiles(self):
-        cmdline = ['add', '--bf']
+    def addLfiles(self):
+        if 'kbfiles' in self.repo.extensions():
+            cmdline = ['add', '--bf']
+        else:
+            cmdline = ['add', '--large']
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
@@ -188,7 +200,8 @@ class QuickOpDialog(QDialog):
         self.cmd.run(cmdline)
 
     def addWithPrompt(self, files):
-        result = bfprompt.promptForBfiles(self, self.repo.ui, self.repo, files)
+        result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files,
+                                          'kbfiles' in self.repo.extensions())
         if not result:
             return
         files, bfiles = result
@@ -198,7 +211,10 @@ class QuickOpDialog(QDialog):
             self.files = files
             self.cmd.run(cmdline)
         if bfiles:
-            cmdline = ['add', '--bf']
+            if 'kbfiles' in self.repo.extensions():
+                cmdline = ['add', '--bf']
+            else:
+                cmdline = ['add', '--large']
             cmdline.extend(bfiles)
             self.files = bfiles
             self.cmd.run(cmdline)
