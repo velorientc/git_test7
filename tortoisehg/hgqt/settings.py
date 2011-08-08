@@ -797,6 +797,16 @@ INFO = (
         _('Path to the directory where a system-wide cache of bfiles will be stored')),
     )),
 
+({'name': 'largefiles', 'label': _('Largefiles'), 'icon': 'kiln', 'extension': 'largefiles'}, (
+    _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
+        _('Files with names meeting the specified patterns will be automatically '
+          'added as largefiles')),
+    _fi(_('Size'), 'largefiles.size', genEditCombo,
+        _('Files of at least the specified size (in megabytes) will be added as largefiles')),
+    _fi(_('System Cache'), 'largefiles.systemcache', genPathBrowser,
+        _('Path to the directory where a system-wide cache of largefiles will be stored')),
+    )),
+
 )
 
 CONF_GLOBAL = 0
