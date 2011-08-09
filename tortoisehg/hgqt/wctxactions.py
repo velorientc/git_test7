@@ -8,7 +8,7 @@
 import os
 
 from mercurial import util, error, merge, commands, extensions
-from tortoisehg.hgqt import qtlib, htmlui, visdiff, bfprompt
+from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -270,8 +270,9 @@ def forget(parent, ui, repo, files):
 
 def add(parent, ui, repo, files):
     haslf = 'largefiles' in repo.extensions()
-    if haslf or 'kbfiles' in repo.extensions():
-        result = bfprompt.promptForBfiles(parent, ui, repo, files)
+    haskbf = 'kbfiles' in repo.extensions()
+    if haslf or haskbf:
+        result = lfprompt.promptForLfiles(parent, ui, repo, files, haskbf)
         if not result:
             return False
         files, lfiles = result
