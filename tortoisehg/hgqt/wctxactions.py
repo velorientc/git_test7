@@ -6,7 +6,6 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import re
 
 from mercurial import util, error, merge, commands, extensions
 from tortoisehg.hgqt import qtlib, htmlui, visdiff, bfprompt
