@@ -685,15 +685,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
-        files = self.stwidget.getChecked('MAR?!S')
-        if not (files or brcmd or newbranch):
+        self.files = self.stwidget.getChecked('MAR?!S')
+        if not (self.files or brcmd or newbranch):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
         if len(repo.parents()) > 1:
-            files = []
+            self.files = []
 
         user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
@@ -743,7 +743,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             dcmd = []
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
-        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
+        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in self.files]
         if len(repo.parents()) == 1:
             for fname in self.opts.get('autoinc', '').split(','):
                 fname = fname.strip()
@@ -786,6 +786,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     self.addMessageToHistory(umsg)
                 self.setMessage('')
                 if self.currentAction == 'commit':
+                    shlib.shell_notify(self.files)
                     self.commitComplete.emit()
 
 class DetailsDialog(QDialog):
