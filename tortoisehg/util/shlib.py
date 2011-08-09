@@ -94,7 +94,7 @@ if os.name == 'nt':
         repo.lfstatus = True
         repostate = repo.status() # will update .hg/dirstate as a side effect
         repo.bfstatus = False
-        self.lfstatus = False
+        repo.lfstatus = False
         modified, added, removed, deleted = repostate[:4]
 
         dirstatus = {}
