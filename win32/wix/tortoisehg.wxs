@@ -16,8 +16,12 @@
   <?endif?>
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
+    
+  <?ifndef ProductName ?>
+    <?define ProductName = TortoiseHg ?>
+  <?endif?>
 
-  <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
+  <Product Name='$(var.ProductName) $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
            Version='$(var.Version)'
            UpgradeCode='$(var.ProductUpgradeCode)'
