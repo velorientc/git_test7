@@ -57,9 +57,6 @@ if os.name == 'nt':
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
                                  pidl, None)
-            shell.SHChangeNotify(shellcon.SHCNE_ASSOCCHANGED,
-                                 shellcon.SHCNF_FLUSH,
-                                 None, None)
 
     def update_thgstatus(ui, root, wait=False):
         '''Rewrite the file .hg/thgstatus
