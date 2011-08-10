@@ -385,6 +385,8 @@ class HistorySearchThread(QThread):
                 pass
 
     def run(self):
+        haskbf = settings.hasExtension('kbfiles')
+        haslf = settings.hasExtension('largefiles')
         self.thread_id = int(QThread.currentThreadId())
 
         def emitrow(row):
@@ -400,6 +402,10 @@ class HistorySearchThread(QThread):
                     try:
                         fname, line, rev, addremove, user, text, tail = \
                                 self.fullmsg.split('\0', 6)
+                        if haslf and thgrepo.isLfStandin(fname):
+                            raise ValueError
+                        if (haslf or haskbf) and thgrepo.isBfStandin(fname):
+                            raise ValueError
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (addremove, text)
