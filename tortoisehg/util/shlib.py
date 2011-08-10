@@ -32,7 +32,7 @@ if os.name == 'nt':
                 pass
         threading.Thread(target=start_browser).start()
 
-    def shell_notify(paths):
+    def shell_notify(paths, noassoc=False):
         try:
             from win32com.shell import shell, shellcon
             import pywintypes
@@ -57,9 +57,10 @@ if os.name == 'nt':
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
                                  pidl, None)
-        shell.SHChangeNotify(shellcon.SHCNE_ASSOCCHANGED,
-                             shellcon.SHCNF_FLUSH,
-                             None, None)
+        if not noassoc:
+            shell.SHChangeNotify(shellcon.SHCNE_ASSOCCHANGED,
+                                 shellcon.SHCNF_FLUSH,
+                                 None, None)
 
     def update_thgstatus(ui, root, wait=False):
         '''Rewrite the file .hg/thgstatus
@@ -141,7 +142,7 @@ if os.name == 'nt':
             f.rename()
 
 else:
-    def shell_notify(paths):
+    def shell_notify(paths, noassoc=False):
         if not paths:
             return
         notify = os.environ.get('THG_NOTIFY', '.tortoisehg/notify')
