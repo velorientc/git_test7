@@ -93,7 +93,11 @@ if os.name == 'nt':
                 time.sleep(tdelta)
 
         repo = hg.repository(ui, root) # a fresh repo object is needed
+        repo.bfstatus = True
+        repo.lfstatus = True
         repostate = repo.status() # will update .hg/dirstate as a side effect
+        repo.bfstatus = False
+        repo.lfstatus = False
         modified, added, removed, deleted = repostate[:4]
 
         dirstatus = {}
