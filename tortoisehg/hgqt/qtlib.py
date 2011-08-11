@@ -73,7 +73,7 @@ def startswith(strQstring, startstr):
 
     takes st, unicode or QString as strQstring'''
 
-     if isinstance(strQstring, QString):
+    if isinstance(strQstring, QString):
         return strQstring.startsWith(startstr)
     else:
         return strQstring.startswith(startstr)
