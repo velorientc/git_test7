@@ -592,7 +592,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         url = hglib.fromunicode(self.menuurl)
         u, h, p, folder, pw, scheme = parseurl(url)
         if scheme == 'local':
-            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+            qtlib.openlocalurl(folder)
         else:
             QDesktopServices.openUrl(QUrl(url))
 

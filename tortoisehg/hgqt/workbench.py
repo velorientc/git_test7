@@ -884,7 +884,7 @@ class Workbench(QMainWindow):
     def explore(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(w.repo.root))
+            qtlib.openlocalurl(w.repo.root)
 
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()

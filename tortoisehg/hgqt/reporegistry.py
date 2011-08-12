@@ -480,7 +480,7 @@ class RepoRegistryView(QDockWidget):
 
     def explore(self):
         root = self.selitem.internalPointer().rootpath()
-        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+        qtlib.openlocalurl(root)
 
     def terminal(self):
         repoitem = self.selitem.internalPointer()
