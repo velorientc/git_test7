@@ -1152,7 +1152,8 @@ class CommitDialog(QDialog):
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
+    root = opts.get('root', paths.find_root())
+    repo = thgrepo.repository(ui, path=root)
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
     return CommitDialog(repo, pats, opts)
