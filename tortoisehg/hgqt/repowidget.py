@@ -705,9 +705,8 @@ class RepoWidget(QWidget):
     def setupModels(self):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
-        branch = hglib.fromunicode(self.ubranch)
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
-                                         branch, self.revset,
+                                         self.ubranch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)

@@ -9,6 +9,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import revset, qtlib
 
@@ -246,8 +247,10 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
-            self._branchCombo.addItem(branch)
-            self._branchCombo.setItemData(self._branchCombo.count() - 1, branch, Qt.ToolTipRole)
+            self._branchCombo.addItem(hglib.tounicode(branch))
+            self._branchCombo.setItemData(self._branchCombo.count() - 1,
+                                          hglib.tounicode(branch),
+                                          Qt.ToolTipRole)
         self._branchLabel.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
         self._branchCombo.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
         self._branchReloading = False

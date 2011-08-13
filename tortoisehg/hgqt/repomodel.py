@@ -123,13 +123,16 @@ class HgRepoListModel(QAbstractTableModel):
             self.setBranch(branch)
 
     def setBranch(self, branch=None, allparents=True):
-        self.filterbranch = branch
+        self.filterbranch = branch  # unicode
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
-            grapher = revision_grapher(self.repo, branch=branch, revset=self.revset)
+            grapher = revision_grapher(self.repo,
+                                       branch=hglib.fromunicode(branch),
+                                       revset=self.revset)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:
-            grapher = revision_grapher(self.repo, branch=branch,
+            grapher = revision_grapher(self.repo,
+                                       branch=hglib.fromunicode(branch),
                                        allparents=allparents)
             self.graph = Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
