@@ -13,6 +13,8 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import error
+
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
@@ -526,7 +528,14 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    dlg = ManifestDialog(repo, opts.get('rev'))
+    try:
+        # ManifestWidget expects integer revision
+        rev = repo[opts.get('rev')].rev()
+    except error.RepoLookupError, e:
+        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
+                          hglib.tounicode(e.message))
+        return
+    dlg = ManifestDialog(repo, rev)
 
     # set initial state after dialog visible
     def init():
@@ -538,7 +547,7 @@ def run(ui, *pats, **opts):
             else:
                 return
             line = opts.get('line') and int(opts['line']) or None
-            dlg.setSource(path, opts.get('rev'), line)
+            dlg.setSource(path, rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
