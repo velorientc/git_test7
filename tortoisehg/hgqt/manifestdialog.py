@@ -243,7 +243,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def vdiff(self):
         if self.path is None:
             return
-        pats = [self.path]
+        pats = [hglib.fromunicode(self.path)]
         opts = {'change':self.rev}
         dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
         if dlg:
@@ -252,7 +252,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def vdifflocal(self):
         if self.path is None:
             return
-        pats = [self.path]
+        pats = [hglib.fromunicode(self.path)]
         assert type(self.rev) is int
         opts = {'rev':['rev(%d)' % self.rev]}
         dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
@@ -263,17 +263,20 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if self.path is None:
             return
         if self.rev is None:
-            qtlib.editfiles(self._repo, [self.path], parent=self)
+            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                            parent=self)
         else:
-            base, _ = visdiff.snapshot(self._repo, [self.path],
+            base, _ = visdiff.snapshot(self._repo,
+                                       [hglib.fromunicode(self.path)],
                                        self._repo[self.rev])
-            files = [os.path.join(base, self.path)]
+            files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
 
     def editlocal(self):
         if self.path is None:
             return
-        qtlib.editfiles(self._repo, [self.path], parent=self)
+        qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                        parent=self)
 
     def revertfile(self):
         if self.path is None:
@@ -281,12 +284,13 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         rev = self.rev
         if rev is None:
             rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, [self.path], rev, self)
+        dlg = revert.RevertDialog(self._repo, [hglib.fromunicode(self.path)],
+                                  rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
-            filename = self.path
+            filename = hglib.fromunicode(self.path)
         if filename not in dlgdict:
             repoviewer = self.window()
             if not isinstance(repoviewer, workbench.Workbench):
@@ -302,7 +306,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         dlg.activateWindow()
 
     def opensubrepo(self):
-        path = self._repo.wjoin(self.path)
+        path = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(path):
             self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
@@ -311,14 +315,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 _("The selected subrepository does not exist on the working directory"))
 
     def explore(self):
-        root = self._repo.wjoin(self.path)
+        root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+            QDesktopServices.openUrl(QUrl.fromLocalFile(hglib.tounicode(root)))
 
     def terminal(self):
-        root = self._repo.wjoin(self.path)
+        root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            qtlib.openshell(root, self.path)
+            qtlib.openshell(root, hglib.fromunicode(self.path))
 
     def showEvent(self, event):
         QWidget.showEvent(self, event)
@@ -445,7 +449,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self.revChanged.emit(rev)
         self._setupmodel()
         ctx = self._repo[rev]
-        if path and path in ctx:
+        if path and hglib.fromunicode(path) in ctx:
             # recover file selection after reloading the model
             self.setPath(path)
             self._fileview.setContext(ctx)
@@ -468,7 +472,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if path != self.path:
             self.setPath(path)
             ctx = self._repo[rev]
-            if self.path in ctx:
+            if hglib.fromunicode(self.path) in ctx:
                 self._fileview.displayFile(path, self.status)
                 if line:
                     self._fileview.showLine(int(line) - 1)
@@ -477,7 +481,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
     @property
     def path(self):
-        """Return currently selected path"""
+        """Return currently selected path [unicode]"""
         return self._treemodel.filePath(self._treeview.currentIndex())
 
     @property
