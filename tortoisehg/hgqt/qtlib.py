@@ -68,27 +68,22 @@ def openhelpcontents(url):
                 return
         QDesktopServices.openUrl(QUrl(fullurl))
 
-def startswith(strQstring, startstr):
-    '''calls startsWith of QString or startswith for others
-
-    takes st, unicode or QString as strQstring'''
-
-    if isinstance(strQstring, QString):
-        return strQstring.startsWith(startstr)
-    else:
-        return strQstring.startswith(startstr)
-
 def openlocalurl(path):
     '''open the given path with the default application
 
-    takes str, unicode or QString as argument'''
+    takes str, unicode or QString as argument
+    returns True if open was successfull
+    '''
 
     if isinstance(path, str):
-        path = hglib.tounicode(path)
-    if os.name == 'nt' and startswith(path, '\\\\'):
+        path = QString(hglib.tounicode(path))
+    elif isinstance(path, unicode):
+        path = QString(path)
+    if os.name == 'nt' and path.startsWith('\\\\'):
         # network share, special handling because of qt bug 13359
         # see http://bugreports.qt.nokia.com/browse/QTBUG-13359
-        qurl = QUrl().setUrl(QDir.toNativeSeparators(path))
+        qurl = QUrl()
+        qurl.setUrl(QDir.toNativeSeparators(path))
     else:
         qurl = QUrl.fromLocalFile(path)
     return QDesktopServices.openUrl(qurl)
