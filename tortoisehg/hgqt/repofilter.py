@@ -40,7 +40,7 @@ class RepoFilterBar(QToolBar):
 
         #Check if the font contains the glyph needed by the branch combo
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
-             self._allBranchesLabel = u'*** %s ***' % _('Show all')
+            self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
