@@ -10,15 +10,13 @@
 
 import os
 
-from mercurial import util
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
+from tortoisehg.hgqt import qtlib, fileview, status, thgrepo
 from tortoisehg.hgqt import visdiff, revert, revpanel, workbench
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
