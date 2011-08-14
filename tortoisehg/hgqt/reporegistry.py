@@ -50,15 +50,14 @@ class RepoTreeView(QTreeView):
         self.setDragDropMode(QAbstractItemView.DragDrop)
         self.setDefaultDropAction(Qt.MoveAction)
         self.setDropIndicatorShown(True)
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setEditTriggers(QAbstractItemView.DoubleClicked
+                             | QAbstractItemView.EditKeyPressed)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         QShortcut('Return', self, self.showFirstTabOrOpen).setContext(
                   Qt.WidgetShortcut)
         QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(
                   Qt.WidgetShortcut)
         QShortcut('Delete', self, self.removeSelected).setContext(
-                  Qt.WidgetShortcut)
-        QShortcut('F2', self, self.renameSelected).setContext(
                   Qt.WidgetShortcut)
 
     def contextMenuEvent(self, event):
@@ -221,10 +220,6 @@ class RepoTreeView(QTreeView):
         m.removeRows(row, 1, parent)
         self.selectionChanged(None, None)
         self.updateSettingsFile.emit()
-
-    def renameSelected(self):
-        'rename selected repository'
-        self.edit(self.selitem)
 
 class RepoRegistryView(QDockWidget):
 
@@ -642,7 +637,7 @@ class RepoRegistryView(QDockWidget):
         clip.setText(self.selitem.internalPointer().rootpath())
 
     def startRename(self):
-        self.tview.renameSelected()
+        self.tview.edit(self.tview.currentIndex())
 
     def newGroup(self):
         self.tview.model().addGroup(_('New Group'))
