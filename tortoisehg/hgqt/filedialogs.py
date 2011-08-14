@@ -288,7 +288,7 @@ class FileLogDialog(_AbstractFileDialog):
         if ':' in link:
             scheme, param = link.split(':', 1)
             if scheme == 'cset':
-                rev = self.repo[param].rev()
+                rev = self.repo[hglib.fromunicode(param)].rev()
                 return self.goto(rev)
         QDesktopServices.openUrl(QUrl(link))
 
