@@ -16,9 +16,6 @@ from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import qtlib
-
-
 def settingsfilename():
     """Return path to thg-reporegistry.xml as unicode"""
     s = QSettings()
