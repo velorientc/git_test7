@@ -204,6 +204,8 @@ class RepoTreeView(QTreeView):
         'remove selected repository'
         s = self.selitem
         item = s.internalPointer()
+        if 'remove' not in item.menulist():  # check capability
+            return
         if not item.okToDelete():
             labels = [(QMessageBox.Yes, _('&Delete')),
                       (QMessageBox.No, _('Cancel'))]
