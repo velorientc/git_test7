@@ -245,6 +245,10 @@ class RepoWidget(QWidget):
             idx = self.namedTabs[tabname]
             self.taskTabsWidget.setCurrentIndex(idx)
 
+            # restore default splitter position if task tab is invisible
+            if self.repotabs_splitter.sizes()[1] == 0:
+                self.repotabs_splitter.setSizes([1, 1])
+
     def title(self):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
