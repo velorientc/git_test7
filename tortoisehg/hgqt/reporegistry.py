@@ -270,6 +270,8 @@ class RepoRegistryView(QDockWidget):
         # Note that we must make sure that the settings file exists before
         # setting thefile watcher
         if not os.path.exists(sfile):
+            if not os.path.exists(os.path.dirname(sfile)):
+                os.makedirs(os.path.dirname(sfile))
             tv.model().write(sfile)
         self.watcher = QFileSystemWatcher(self)
         self.watcher.addPath(sfile)
