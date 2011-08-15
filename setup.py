@@ -334,6 +334,15 @@ def setup_windows(version):
         if '--version' not in sys.argv:
             raise
 
+    # Allow use of environment variables to specify the location of Mercurial
+    import modulefinder
+    path = os.getenv('MERCURIAL_PATH')
+    if path:
+        modulefinder.AddPackagePath('mercurial', path)
+    path = os.getenv('HGEXT_PATH')
+    if path:
+        modulefinder.AddPackagePath('hgext', path)
+
     if 'py2exe' in sys.argv:
         import hgext
         hgextdir = os.path.dirname(hgext.__file__)
