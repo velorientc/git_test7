@@ -741,6 +741,7 @@ class RepoWidget(QWidget):
 
     def onRevisionClicked(self, rev):
         'User clicked on a repoview row'
+        self.clearInfoBar(qtlib.InfoBar.INFO)
         tw = self.taskTabsWidget
         cw = tw.currentWidget()
         if not cw.canswitch():
@@ -756,7 +757,6 @@ class RepoWidget(QWidget):
     def onRevisionSelected(self, rev):
         'View selection changed, could be a reload'
         self.showMessage('')
-        self.clearInfoBar(qtlib.InfoBar.INFO)
         if self.repomodel.graph is None:
             return
         try:
