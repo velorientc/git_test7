@@ -296,12 +296,16 @@ class RepoWidget(QWidget):
         w.setFocus()  # to handle key press by InfoBar
         return w
 
+    @pyqtSlot()
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
         it = self._infobarlayout.itemAt(0)
         if not it:
             return True
         if priority is None or it.widget().infobartype <= priority:
+            # removes current infobar explicitly, because close() seems to
+            # delay deletion until next eventloop.
+            self._infobarlayout.removeItem(it)
             it.widget().close()
             return True
         else:
@@ -363,6 +367,7 @@ class RepoWidget(QWidget):
         sw.output.connect(self._showOutputOnInfoBar)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
+        sw.syncStarted.connect(self.clearInfoBar)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.showMessage.connect(self._showMessageOnInfoBar)

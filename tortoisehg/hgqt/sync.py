@@ -51,6 +51,7 @@ def parseurl(path):
     return user, host, port, folder, passwd, scheme
 
 class SyncWidget(QWidget, qtlib.TaskWidget):
+    syncStarted = pyqtSignal()  # incoming/outgoing/pull/push started
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
@@ -752,6 +753,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     ##
 
     def inclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Getting incoming changesets from %s...') % urlu)
@@ -787,6 +789,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def pullclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         def finished(ret, output):
@@ -825,6 +828,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(cmdline, ('force', 'branch', 'rev', 'bookmark'))
 
     def outclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
@@ -898,6 +902,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         if (not hg.islocal(self.currentUrl(False)) and confirm
