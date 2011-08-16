@@ -80,6 +80,12 @@ class QuickOpDialog(QDialog):
         if self.command == 'revert':
             ## no backup checkbox
             chk = QCheckBox(_('Do not save backup files (*.orig)'))
+        elif self.command == 'remove':
+            ## force checkbox
+            chk = QCheckBox(_('Force removal of modified files (--force)'))
+        else:
+            chk = None
+        if chk:
             self.chk = chk
             hbox.addWidget(chk)
 
@@ -128,7 +134,10 @@ class QuickOpDialog(QDialog):
     def accept(self):
         cmdline = [self.command]
         if hasattr(self, 'chk') and self.chk.isChecked():
-            cmdline.append('--no-backup')
+            if self.command == 'revert':
+                cmdline.append('--no-backup')
+            elif self.command == 'remove':
+                cmdline.append('--force')
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
