@@ -273,12 +273,12 @@ def guessRename(parent, ui, repo, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog
     dlg = DetectRenameDialog(repo, parent, *files)
     def matched():
-        ret = True
-    ret = False
+        ret[0] = True
+    ret = [False]
     dlg.matchAccepted.connect(matched)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
-    return ret
+    return ret[0]
 
 def ignore(parent, ui, repo, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
