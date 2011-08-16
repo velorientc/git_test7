@@ -265,7 +265,7 @@ def update_batch(batch):
             for r in sorted(roots):
                 try:
                     shlib.update_thgstatus(_ui, r, wait=False)
-                    shlib.shell_notify([r])
+                    shlib.shell_notify([r], noassoc=True)
                     logger.msg('Updated ' + r)
                 except (IOError, OSError):
                     print "IOError or OSError on updating %s (check permissions)" % r
