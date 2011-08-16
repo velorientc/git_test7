@@ -545,12 +545,12 @@ class CustomPrompt(QMessageBox):
             try:
                 char = s[s.index('&')+1].lower()
                 self.hotkeys[char] = btn
-                if default == i:
-                    self.setDefaultButton(btn)
-                if esc == i:
-                    self.setEscapeButton(btn)
             except (ValueError, IndexError):
                 pass
+            if default == i:
+                self.setDefaultButton(btn)
+            if esc == i:
+                self.setEscapeButton(btn)
 
     def run(self):
         return self.exec_()
