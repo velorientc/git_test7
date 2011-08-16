@@ -114,7 +114,10 @@ class QuickOpDialog(QDialog):
         stwidget.loadSettings(s, 'quickop')
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         if hasattr(self, 'chk'):
-            self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
+            if self.command == 'revert':
+                self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
+            elif self.command == 'remove':
+                self.chk.setChecked(s.value('quickop/forceremove', False).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
@@ -145,6 +148,25 @@ class QuickOpDialog(QDialog):
                                 parent=self)
             return
         if self.command == 'remove':
+            if not self.chk.isChecked():
+                modified = self.repo.status()[0]
+                selmodified = []
+                for wfile in files:
+                    if wfile in modified:
+                        selmodified.append(wfile)
+                if selmodified:
+                    prompt = qtlib.CustomPrompt(_('Confirm Remove'),
+                                                _('You have selected one or more files that have been '
+                                                  'modified.  By default, these files will not be '
+                                                  'removed.  What would you like to do?'), self,
+                                                (_('Remove &Unmodified Files'),
+                                                 _('Remove &All Selected Files'), _('Cancel')),
+                                                0, 2, selmodified)
+                    ret = prompt.run()
+                    if ret == 1:
+                        cmdline.append('--force')
+                    elif ret == 2:
+                        return
             wctx = self.repo[None]
             for wfile in files:
                 if wfile not in wctx:
@@ -170,7 +192,10 @@ class QuickOpDialog(QDialog):
             self.stwidget.saveSettings(s, 'quickop')
             s.setValue('quickop/geom', self.saveGeometry())
             if hasattr(self, 'chk'):
-                s.setValue('quickop/nobackup', self.chk.isChecked())
+                if self.command == 'revert':
+                    s.setValue('quickop/nobackup', self.chk.isChecked())
+                elif self.command == 'remove':
+                    s.setValue('quickop/forceremove', self.chk.isChecked())
             QDialog.reject(self)
 
 
