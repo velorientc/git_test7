@@ -114,7 +114,7 @@ class CloneDialog(QDialog):
             if btnlabel:
                 btn = QPushButton(btnlabel)
                 btn.setEnabled(False)
-                btn.setAutoDefault = False
+                btn.setAutoDefault(False)
                 btn.clicked.connect(btnslot)
                 hbox.addWidget(btn)
                 chk.toggled.connect(
