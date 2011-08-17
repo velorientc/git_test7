@@ -97,9 +97,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             val = s.value('sync/' + opt, None).toBool()
             if val:
                 self.opts[opt] = val
-        val = str(s.value('sync/remotecmd', None).toString())
-        if val:
-            self.opts['remotecmd'] = val
+        for opt in ('remotecmd', 'branch'):
+            val = str(s.value('sync/' + opt, None).toString())
+            if val:
+                self.opts[opt] = val
 
         self.repo.configChanged.connect(self.configChanged)
 
@@ -1557,6 +1558,12 @@ class OptionsDialog(QDialog):
             self.remotele.setText(hglib.tounicode(opts['remotecmd']))
         layout.addRow(lbl, self.remotele)
 
+        lbl = QLabel(_('Branch:'))
+        self.branchle = QLineEdit()
+        if opts.get('branch'):
+            self.branchle.setText(hglib.tounicode(opts['branch']))
+        layout.addRow(lbl, self.branchle)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1566,7 +1573,8 @@ class OptionsDialog(QDialog):
 
     def accept(self):
         outopts = {}
-        for name, le in (('remotecmd', self.remotele),):
+        for name, le in (('remotecmd', self.remotele),
+                         ('branch', self.branchle)):
             outopts[name] = hglib.fromunicode(le.text()).strip()
 
         outopts['subrepos'] = self.subrepocb.isChecked()
