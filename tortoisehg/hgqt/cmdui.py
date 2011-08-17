@@ -512,6 +512,7 @@ class ConsoleWidget(QWidget):
         self.setFocusProxy(self._logwidget)
         self.setRepository(None)
         self.openPrompt()
+        self.suppressPrompt = False
 
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
@@ -566,7 +567,8 @@ class ConsoleWidget(QWidget):
         try:
             self._logwidget.appendLog(msg, label)
         finally:
-            self.openPrompt()
+            if not self.suppressPrompt:
+                self.openPrompt()
 
     @pyqtSlot(object)
     def setRepository(self, repo):
@@ -626,9 +628,15 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_hg(self, args):
+        self.suppressPrompt = True
+        self.closePrompt()
         if self._repo:
             args = ['--cwd', self._repo.root] + args
-        self._cmdcore.run(args)
+        try:
+            self._cmdcore.run(args)
+        finally:
+            self.suppressPrompt = False
+            self.openPrompt()
 
     @_cmdtable
     def _cmd_thg(self, args):

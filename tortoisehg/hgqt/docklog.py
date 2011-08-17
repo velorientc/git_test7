@@ -41,6 +41,15 @@ class LogDockWidget(QDockWidget):
     def output(self, msg, label):
         self.logte.appendLog(msg, label)
 
+    @pyqtSlot()
+    def beginSuppressPrompt(self):
+        self.logte.suppressPrompt = True
+
+    @pyqtSlot()
+    def endSuppressPrompt(self):
+        self.logte.suppressPrompt = False
+        self.logte.openPrompt()
+
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
 

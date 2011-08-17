@@ -61,6 +61,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    beginSuppressPrompt = pyqtSignal()
+    endSuppressPrompt = pyqtSignal()
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
@@ -288,7 +290,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.optionsbutton.pressed.connect(self.editOptions)
 
         cmd = cmdui.Widget(not self.embedded, True, self)
+        cmd.commandStarted.connect(self.beginSuppressPrompt)
         cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.endSuppressPrompt)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
