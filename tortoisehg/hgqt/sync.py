@@ -92,6 +92,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.embedded = bool(parent)
         self.targetargs = []
 
+        s = QSettings()
+        for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug'):
+            val = s.value('sync/' + opt, None).toBool()
+            if val:
+                self.opts[opt] = val
+        val = str(s.value('sync/remotecmd', None).toString())
+        if val:
+            self.opts['remotecmd'] = val
+
         self.repo.configChanged.connect(self.configChanged)
 
         if self.embedded:
@@ -389,6 +398,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
             self.refreshUrl()
+
+            s = QSettings()
+            for opt, val in self.opts.iteritems():
+                s.setValue('sync/' + opt, val)
 
     def reload(self):
         # Refresh configured paths
