@@ -296,6 +296,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
+        cmd.output.connect(self.outputHook)
         cmd.progress.connect(self.progress)
         if not self.embedded:
             self.showMessage.connect(cmd.stbar.showMessage)
@@ -656,6 +657,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def run(self, cmdline, details):
         if self.cmd.core.running():
             return
+        self.lastcmdline = list(cmdline)
         for name in list(details) + ['remotecmd']:
             val = self.opts.get(name)
             if not val:
@@ -711,6 +713,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline.append(cururl)
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
+
+    def outputHook(self, msg, label):
+        if '\'hg push --new-branch\'' in msg:
+            self.needNewBranch = True
 
     ##
     ## Workbench toolbar buttons
@@ -908,6 +914,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None):
+        validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark')
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
@@ -927,6 +934,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.showMessage.emit(_('Push to %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
+                if self.needNewBranch:
+                    r = qtlib.QuestionMsgBox(_('Confirm New Branch'),
+                                             _('One or more of the changesets that you '
+                                               'are attempting to push involve the '
+                                               'creation of a new branch.  Do you want '
+                                               'to create a new branch in the remote '
+                                               'repository?'))
+                    if r:
+                        cmdline = self.lastcmdline
+                        cmdline.extend(['--new-branch'])
+                        self.run(cmdline, validopts)
+                        return
             self.pushCompleted.emit()
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
@@ -934,7 +953,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.extend(['--rev', str(rev)])
         if branch:
             cmdline.extend(['--branch', branch])
-        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev', 'bookmark'))
+        self.needNewBranch = False
+        self.run(cmdline, validopts)
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
