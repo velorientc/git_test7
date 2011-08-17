@@ -116,6 +116,7 @@ class CloneDialog(QDialog):
                 btn.setEnabled(False)
                 btn.setAutoDefault(False)
                 btn.clicked.connect(btnslot)
+                hbox.addSpacing(6)
                 hbox.addWidget(btn)
                 chk.toggled.connect(
                     lambda e: self.toggle_enabled(e, text, target2=btn))
