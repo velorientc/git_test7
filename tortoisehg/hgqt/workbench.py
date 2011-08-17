@@ -654,6 +654,8 @@ class Workbench(QMainWindow):
             self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
+        rw.beginSuppressPrompt.connect(self.log.beginSuppressPrompt)
+        rw.endSuppressPrompt.connect(self.log.endSuppressPrompt)
         rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)

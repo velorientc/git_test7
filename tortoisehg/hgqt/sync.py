@@ -36,7 +36,8 @@ def parseurl(path):
             port = m.group(3)
             folder = m.group(5) or '.'
         else:
-            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
+            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path),
+                                parent=self)
             host, port, folder = '', '', ''
     elif path.startswith(('http://', 'https://', 'svn+https://')):
         snpaqf = urlparse.urlparse(path)
@@ -61,6 +62,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    beginSuppressPrompt = pyqtSignal()
+    endSuppressPrompt = pyqtSignal()
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
@@ -288,11 +291,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.optionsbutton.pressed.connect(self.editOptions)
 
         cmd = cmdui.Widget(not self.embedded, True, self)
+        cmd.commandStarted.connect(self.beginSuppressPrompt)
         cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.endSuppressPrompt)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
+        cmd.output.connect(self.outputHook)
         cmd.progress.connect(self.progress)
+        if not self.embedded:
+            self.showMessage.connect(cmd.stbar.showMessage)
 
         bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
@@ -650,6 +658,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def run(self, cmdline, details):
         if self.cmd.core.running():
             return
+        self.lastcmdline = list(cmdline)
         for name in list(details) + ['remotecmd']:
             val = self.opts.get(name)
             if not val:
@@ -705,6 +714,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline.append(cururl)
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
+
+    def outputHook(self, msg, label):
+        if '\'hg push --new-branch\'' in msg:
+            self.needNewBranch = True
 
     ##
     ## Workbench toolbar buttons
@@ -902,6 +915,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None):
+        validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark')
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
@@ -909,7 +923,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
-                                     % urlu)
+                                     % urlu, parent=self)
             if not r:
                 self.showMessage.emit(_('Push to %s aborted') % urlu)
                 self.pushCompleted.emit()
@@ -921,6 +935,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.showMessage.emit(_('Push to %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
+                if self.needNewBranch:
+                    r = qtlib.QuestionMsgBox(_('Confirm New Branch'),
+                                             _('One or more of the changesets that you '
+                                               'are attempting to push involve the '
+                                               'creation of a new branch.  Do you want '
+                                               'to create a new branch in the remote '
+                                               'repository?'), parent=self)
+                    if r:
+                        cmdline = self.lastcmdline
+                        cmdline.extend(['--new-branch'])
+                        self.run(cmdline, validopts)
+                        return
             self.pushCompleted.emit()
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
@@ -928,7 +954,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.extend(['--rev', str(rev)])
         if branch:
             cmdline.extend(['--branch', branch])
-        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev', 'bookmark'))
+        self.needNewBranch = False
+        self.run(cmdline, validopts)
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
@@ -1160,7 +1187,7 @@ class SaveDialog(QDialog):
             path = self.origurl
         if alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
-                    _('%s already exists, replace URL?') % alias):
+                    _('%s already exists, replace URL?') % alias, parent=self):
                 return
         cfg.set('paths', alias, path)
         self.repo.incrementBusyCount()

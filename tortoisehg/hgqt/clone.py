@@ -7,7 +7,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, string
+import os
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -55,7 +55,6 @@ class CloneDialog(QDialog):
         self.src_combo = QComboBox()
         self.src_combo.setEditable(True)
         self.src_combo.setMinimumWidth(310)
-        self.src_combo.lineEdit().returnPressed.connect(self.clone)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
         self.src_btn.clicked.connect(self.browse_src)
@@ -114,8 +113,9 @@ class CloneDialog(QDialog):
             if btnlabel:
                 btn = QPushButton(btnlabel)
                 btn.setEnabled(False)
-                btn.setAutoDefault = False
+                btn.setAutoDefault(False)
                 btn.clicked.connect(btnslot)
+                hbox.addSpacing(6)
                 hbox.addWidget(btn)
                 chk.toggled.connect(
                     lambda e: self.toggle_enabled(e, text, target2=btn))
@@ -196,6 +196,8 @@ class CloneDialog(QDialog):
         # connect extra signals
         self.src_combo.editTextChanged.connect(self.composeCommand)
         self.src_combo.editTextChanged.connect(self.onUrlHttps)
+        self.src_combo.editTextChanged.connect(self.onResetDefault)
+        self.src_combo.currentIndexChanged.connect(self.onResetDefault)
         self.dest_combo.editTextChanged.connect(self.composeCommand)
         self.rev_chk.toggled.connect(self.composeCommand)
         self.rev_text.textChanged.connect(self.composeCommand)
@@ -436,6 +438,10 @@ class CloneDialog(QDialog):
             self.qclone_txt.setFocus()
         self.composeCommand()
 
+    @pyqtSlot(QString)
+    def onResetDefault(self, text):
+        self.clone_btn.setDefault(True)
+
     def command_started(self):
         self.cmd.setShown(True)
         self.clone_btn.setHidden(True)
@@ -451,7 +457,7 @@ class CloneDialog(QDialog):
             self.detail_btn.setChecked(True)
             self.clone_btn.setShown(True)
             self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
+            self.close_btn.setDefault(True)
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:

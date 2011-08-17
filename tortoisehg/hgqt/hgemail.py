@@ -354,6 +354,14 @@ class EmailDialog(QDialog):
             self._repo.invalidateui()  # force reloading config immediately
             self._filldefaults()
 
+    @pyqtSlot()
+    def on_selectall_button_clicked(self):
+        self._changesets.selectAll()
+
+    @pyqtSlot()
+    def on_selectnone_button_clicked(self):
+        self._changesets.selectNone()
+
 class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewer?
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
                 ('author', lambda ctx: hglib.username(ctx.user())),
@@ -436,6 +444,19 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
             return QVariant()
 
         return QVariant(self._COLUMNS[section][0].capitalize())
+
+    def selectAll(self):
+        self._selectedrevs = set(self._revs)
+        self.updateAll()
+
+    def selectNone(self):
+        self._selectedrevs = set()
+        self.updateAll()
+
+    def updateAll(self):
+        first = self.createIndex(0, 0)
+        last = self.createIndex(len(self._revs) - 1, 0)
+        self.dataChanged.emit(first, last)
 
 def run(ui, *revs, **opts):
     # TODO: same options as patchbomb

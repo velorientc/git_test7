@@ -80,6 +80,12 @@ class QuickOpDialog(QDialog):
         if self.command == 'revert':
             ## no backup checkbox
             chk = QCheckBox(_('Do not save backup files (*.orig)'))
+        elif self.command == 'remove':
+            ## force checkbox
+            chk = QCheckBox(_('Force removal of modified files (--force)'))
+        else:
+            chk = None
+        if chk:
             self.chk = chk
             hbox.addWidget(chk)
 
@@ -119,7 +125,10 @@ class QuickOpDialog(QDialog):
         stwidget.loadSettings(s, 'quickop')
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         if hasattr(self, 'chk'):
-            self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
+            if self.command == 'revert':
+                self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
+            elif self.command == 'remove':
+                self.chk.setChecked(s.value('quickop/forceremove', False).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
@@ -139,7 +148,10 @@ class QuickOpDialog(QDialog):
     def accept(self):
         cmdline = [self.command]
         if hasattr(self, 'chk') and self.chk.isChecked():
-            cmdline.append('--no-backup')
+            if self.command == 'revert':
+                cmdline.append('--no-backup')
+            elif self.command == 'remove':
+                cmdline.append('--force')
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
@@ -147,6 +159,25 @@ class QuickOpDialog(QDialog):
                                 parent=self)
             return
         if self.command == 'remove':
+            if not self.chk.isChecked():
+                modified = self.repo.status()[0]
+                selmodified = []
+                for wfile in files:
+                    if wfile in modified:
+                        selmodified.append(wfile)
+                if selmodified:
+                    prompt = qtlib.CustomPrompt(_('Confirm Remove'),
+                                                _('You have selected one or more files that have been '
+                                                  'modified.  By default, these files will not be '
+                                                  'removed.  What would you like to do?'), self,
+                                                (_('Remove &Unmodified Files'),
+                                                 _('Remove &All Selected Files'), _('Cancel')),
+                                                0, 2, selmodified)
+                    ret = prompt.run()
+                    if ret == 1:
+                        cmdline.append('--force')
+                    elif ret == 2:
+                        return
             self.repo.bfstatus = True
             self.repo.lfstatus = True
             repostate = self.repo.status()
@@ -181,7 +212,10 @@ class QuickOpDialog(QDialog):
             self.stwidget.saveSettings(s, 'quickop')
             s.setValue('quickop/geom', self.saveGeometry())
             if hasattr(self, 'chk'):
-                s.setValue('quickop/nobackup', self.chk.isChecked())
+                if self.command == 'revert':
+                    s.setValue('quickop/nobackup', self.chk.isChecked())
+                elif self.command == 'remove':
+                    s.setValue('quickop/forceremove', self.chk.isChecked())
             QDialog.reject(self)
 
     def addLfiles(self):
