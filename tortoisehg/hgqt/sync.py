@@ -297,6 +297,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
         cmd.progress.connect(self.progress)
+        if not self.embedded:
+            self.showMessage.connect(cmd.stbar.showMessage)
 
         bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
