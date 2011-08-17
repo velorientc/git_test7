@@ -36,7 +36,8 @@ def parseurl(path):
             port = m.group(3)
             folder = m.group(5) or '.'
         else:
-            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
+            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path),
+                                parent=self)
             host, port, folder = '', '', ''
     elif path.startswith(('http://', 'https://', 'svn+https://')):
         snpaqf = urlparse.urlparse(path)
@@ -922,7 +923,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
-                                     % urlu)
+                                     % urlu, parent=self)
             if not r:
                 self.showMessage.emit(_('Push to %s aborted') % urlu)
                 self.pushCompleted.emit()
@@ -940,7 +941,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                                'are attempting to push involve the '
                                                'creation of a new branch.  Do you want '
                                                'to create a new branch in the remote '
-                                               'repository?'))
+                                               'repository?'), parent=self)
                     if r:
                         cmdline = self.lastcmdline
                         cmdline.extend(['--new-branch'])
@@ -1186,7 +1187,7 @@ class SaveDialog(QDialog):
             path = self.origurl
         if alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
-                    _('%s already exists, replace URL?') % alias):
+                    _('%s already exists, replace URL?') % alias, parent=self):
                 return
         cfg.set('paths', alias, path)
         self.repo.incrementBusyCount()
