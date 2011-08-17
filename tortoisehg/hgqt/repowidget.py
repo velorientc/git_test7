@@ -118,6 +118,8 @@ class RepoWidget(QWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
+        self.runner.commandStarted.connect(self.beginSuppressPrompt)
+        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.onCommandFinished)
 
         # Select the widget chosen by the user
