@@ -628,15 +628,10 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_hg(self, args):
-        self.suppressPrompt = True
         self.closePrompt()
         if self._repo:
             args = ['--cwd', self._repo.root] + args
-        try:
-            self._cmdcore.run(args)
-        finally:
-            self.suppressPrompt = False
-            self.openPrompt()
+        self._cmdcore.run(args)
 
     @_cmdtable
     def _cmd_thg(self, args):
