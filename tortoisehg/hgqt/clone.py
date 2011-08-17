@@ -55,7 +55,6 @@ class CloneDialog(QDialog):
         self.src_combo = QComboBox()
         self.src_combo.setEditable(True)
         self.src_combo.setMinimumWidth(310)
-        self.src_combo.lineEdit().returnPressed.connect(self.clone)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
         self.src_btn.clicked.connect(self.browse_src)
@@ -197,6 +196,8 @@ class CloneDialog(QDialog):
         # connect extra signals
         self.src_combo.editTextChanged.connect(self.composeCommand)
         self.src_combo.editTextChanged.connect(self.onUrlHttps)
+        self.src_combo.editTextChanged.connect(self.onResetDefault)
+        self.src_combo.currentIndexChanged.connect(self.onResetDefault)
         self.dest_combo.editTextChanged.connect(self.composeCommand)
         self.rev_chk.toggled.connect(self.composeCommand)
         self.rev_text.textChanged.connect(self.composeCommand)
@@ -437,6 +438,10 @@ class CloneDialog(QDialog):
             self.qclone_txt.setFocus()
         self.composeCommand()
 
+    @pyqtSlot(QString)
+    def onResetDefault(self, text):
+        self.clone_btn.setDefault(True)
+
     def command_started(self):
         self.cmd.setShown(True)
         self.clone_btn.setHidden(True)
@@ -452,7 +457,7 @@ class CloneDialog(QDialog):
             self.detail_btn.setChecked(True)
             self.clone_btn.setShown(True)
             self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
+            self.close_btn.setDefault(True)
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
