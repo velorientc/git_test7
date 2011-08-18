@@ -212,33 +212,31 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.securebutton = a
         tbar.addWidget(qtlib.Spacer(2, 2))
 
+        self.hostAndPortActions = []
+
         fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
         self.hostentry.setToolTip(_('Hostname'))
         self.hostentry.setAcceptDrops(False)
         self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
-        tbar.addWidget(self.hostentry)
-        tbar.addWidget(qtlib.Spacer(2, 2))
+        self.hostAndPortActions.append(tbar.addWidget(self.hostentry))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
 
-        self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
-        tbar.addWidget(w)
-        tbar.addWidget(qtlib.Spacer(2, 2))
-        self.HostAndPortWidgets.append(w)
+        self.hostAndPortActions.append(tbar.addWidget(w))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.setValidator(QIntValidator(0, 65536, self.portentry))
         self.portentry.textChanged.connect(self.refreshUrl)
-        tbar.addWidget(self.portentry)
-        tbar.addWidget(qtlib.Spacer(2, 2))
-        self.HostAndPortWidgets.append(self.portentry)
+        self.hostAndPortActions.append(tbar.addWidget(self.portentry))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         w = QLabel('/')
-        tbar.addWidget(w)
-        tbar.addWidget(qtlib.Spacer(2, 2))
-        self.HostAndPortWidgets.append(w)
+        self.hostAndPortActions.append(tbar.addWidget(w))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
@@ -451,8 +449,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
-        for w in self.HostAndPortWidgets:
-            w.setDisabled(schemeIndex == 0)
+        for w in self.hostAndPortActions:
+            w.setVisible(schemeIndex != 0)
         self.securebutton.setVisible(schemeIndex >= 3)
 
         opts = []
