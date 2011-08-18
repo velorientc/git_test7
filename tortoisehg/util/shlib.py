@@ -140,6 +140,7 @@ if os.name == 'nt':
                 f.write(s + dn + '\n')
                 ui.note("%s %s\n" % (s, dn))
             f.rename()
+        return update
 
 else:
     def shell_notify(paths, noassoc=False):
