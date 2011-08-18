@@ -158,9 +158,14 @@ class QuickOpDialog(QDialog):
                                 _('No operation to perform'),
                                 parent=self)
             return
+        self.repo.bfstatus = True
+        self.repo.lfstatus = True
+        repostate = self.repo.status()
+        self.repo.bfstatus = False
+        self.repo.lfstatus = False
         if self.command == 'remove':
             if not self.chk.isChecked():
-                modified = self.repo.status()[0]
+                modified = repostate[0]
                 selmodified = []
                 for wfile in files:
                     if wfile in modified:
@@ -178,11 +183,6 @@ class QuickOpDialog(QDialog):
                         cmdline.append('--force')
                     elif ret == 2:
                         return
-            self.repo.bfstatus = True
-            self.repo.lfstatus = True
-            repostate = self.repo.status()
-            self.repo.bfstatus = False
-            self.repo.lfstatus = False
             unknown, ignored = repostate[4:6]
             for wfile in files:
                 if wfile in unknown or wfile in ignored:
