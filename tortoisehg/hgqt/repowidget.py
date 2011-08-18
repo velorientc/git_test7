@@ -11,7 +11,7 @@ import os
 
 from mercurial import revset, error, patch
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, shlib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -1788,6 +1788,7 @@ class RepoWidget(QWidget):
 
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
+        shlib.shell_notify(self.repo.root)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
