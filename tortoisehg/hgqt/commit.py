@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 
 from mercurial import ui, util, error
 
@@ -675,6 +676,22 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                 parent=self)
             self.msgte.setFocus()
             return
+
+        linkmandatory = self.repo.ui.config('tortoisehg',
+                                            'issue.linkmandatory', False)
+        if linkmandatory:
+            issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
+            if issueregex:
+                m = re.search(issueregex, msg)
+                if not m:
+                    qtlib.WarningMsgBox(_('Nothing Commited'),
+                                        _('No issue link was found in the commit message.  '
+                                          'The commit message should contain an issue '
+                                          'link.  Configure this in the \'Issue Tracking\' '
+                                          'section of the settings.'),
+                                        parent=self)
+                    self.msgte.setFocus()
+                    return False
 
         commandlines = []
 
