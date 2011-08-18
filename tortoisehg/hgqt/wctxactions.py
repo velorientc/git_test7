@@ -278,7 +278,7 @@ def add(parent, ui, repo, files):
         files, lfiles = result
         for name, module in extensions.extensions():
             if name == 'largefiles':
-                override_add = module.lfsetup.override_add
+                override_add = module.overrides.override_add
                 if files:
                     override_add(commands.add, ui, repo, *files)
                 if lfiles:
@@ -297,7 +297,7 @@ def add(parent, ui, repo, files):
 def addlf(parent, ui, repo, files):
     for name, module in extensions.extensions():
         if name == 'largefiles':
-            override_add = module.lfsetup.override_add
+            override_add = module.overrides.override_add
             override_add(commands.add, ui, repo, large=True, *files)
             return True
         if name == 'kbfiles':
