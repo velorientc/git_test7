@@ -289,7 +289,7 @@ class RenameDialog(QDialog):
                 return
             else:
                 try:
-                    targetdir = os.path.dirname(dest)
+                    targetdir = os.path.dirname(fulldest)
                     if not os.path.isdir(targetdir):
                         os.makedirs(targetdir)
                     os.rename(fullsrc, fulldest)
