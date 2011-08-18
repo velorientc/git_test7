@@ -262,6 +262,8 @@ def update_batch(batch):
         _stderr = sys.stderr
         sys.stderr = errorstream
         try:
+            # Ensure that all unset dirstate entries can be updated.
+            time.sleep(2)
             updated_any = False
             for r in sorted(roots):
                 try:
@@ -279,7 +281,6 @@ def update_batch(batch):
                     failedroots.add(r)
             notifypaths -= failedroots
             if notifypaths:
-                time.sleep(2)
                 shlib.shell_notify(list(notifypaths), noassoc=not updated_any)
                 logger.msg('Shell notified')
             errmsg = errorstream.getvalue()
