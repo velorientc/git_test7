@@ -45,6 +45,11 @@ class UpdateDialog(QDialog):
         self.grid.addWidget(QLabel(_('Update to:')), 0, 0)
         self.grid.addWidget(combo, 0, 1)
 
+        # Give the combo box a minimum width that will ensure that the dialog is
+        # large enough to fit the additional progress bar that will appear when
+        # updating subrepositories.
+        combo.setMinimumWidth(450)
+
         if rev is None:
             rev = self.repo.dirstate.branch()
         else:
