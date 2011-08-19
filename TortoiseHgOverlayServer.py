@@ -262,10 +262,14 @@ def update_batch(batch):
         _stderr = sys.stderr
         sys.stderr = errorstream
         try:
+            # Ensure that all unset dirstate entries can be updated.
+            time.sleep(2)
+            updated_any = False
             for r in sorted(roots):
                 try:
-                    shlib.update_thgstatus(_ui, r, wait=False)
-                    shlib.shell_notify([r])
+                    if shlib.update_thgstatus(_ui, r, wait=False):
+                        updated_any = True
+                    shlib.shell_notify([r], noassoc=True)
                     logger.msg('Updated ' + r)
                 except (IOError, OSError):
                     print "IOError or OSError on updating %s (check permissions)" % r
@@ -277,8 +281,7 @@ def update_batch(batch):
                     failedroots.add(r)
             notifypaths -= failedroots
             if notifypaths:
-                time.sleep(2)
-                shlib.shell_notify(list(notifypaths))
+                shlib.shell_notify(list(notifypaths), noassoc=not updated_any)
                 logger.msg('Shell notified')
             errmsg = errorstream.getvalue()
             if errmsg:
