@@ -1496,6 +1496,8 @@ class RepoWidget(QWidget):
             patchfilename = os.path.normpath(epath % rev)
             patchdirname = os.path.normpath(strdir)
             patchshortname = os.path.basename(patchfilename)
+            if patchdirname.endswith(os.path.sep):
+                patchdirname = patchdirname[:-1]
             qtlib.InfoMsgBox(_('Patch exported'),
                 _('Revision #%d (%s) was exported to:<p>'
                 '<a href="file:///%s">%s</a>%s'
