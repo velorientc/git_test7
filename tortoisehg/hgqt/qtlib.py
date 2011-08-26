@@ -64,9 +64,29 @@ def openhelpcontents(url):
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
             if os.path.exists(chm):
                 fullurl = (r'mk:@MSITStore:%s::/' % chm) + url
-                QDesktopServices.openUrl(QUrl.fromLocalFile(fullurl))
+                openlocalurl(fullurl)
                 return
         QDesktopServices.openUrl(QUrl(fullurl))
+
+def openlocalurl(path):
+    '''open the given path with the default application
+
+    takes str, unicode or QString as argument
+    returns True if open was successfull
+    '''
+
+    if isinstance(path, str):
+        path = QString(hglib.tounicode(path))
+    elif isinstance(path, unicode):
+        path = QString(path)
+    if os.name == 'nt' and path.startsWith('\\\\'):
+        # network share, special handling because of qt bug 13359
+        # see http://bugreports.qt.nokia.com/browse/QTBUG-13359
+        qurl = QUrl()
+        qurl.setUrl(QDir.toNativeSeparators(path))
+    else:
+        qurl = QUrl.fromLocalFile(path)
+    return QDesktopServices.openUrl(qurl)
 
 def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:

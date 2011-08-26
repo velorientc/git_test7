@@ -92,6 +92,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.embedded = bool(parent)
         self.targetargs = []
 
+        s = QSettings()
+        for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug'):
+            val = s.value('sync/' + opt, None).toBool()
+            if val:
+                self.opts[opt] = val
+        for opt in ('remotecmd', 'branch'):
+            val = str(s.value('sync/' + opt, None).toString())
+            if val:
+                self.opts[opt] = val
+
         self.repo.configChanged.connect(self.configChanged)
 
         if self.embedded:
@@ -388,6 +398,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
             self.refreshUrl()
 
+            s = QSettings()
+            for opt, val in self.opts.iteritems():
+                s.setValue('sync/' + opt, val)
+
     def reload(self):
         # Refresh configured paths
         self.paths = {}
@@ -578,7 +592,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         url = hglib.fromunicode(self.menuurl)
         u, h, p, folder, pw, scheme = parseurl(url)
         if scheme == 'local':
-            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+            qtlib.openlocalurl(folder)
         else:
             QDesktopServices.openUrl(QUrl(url))
 
@@ -1506,41 +1520,50 @@ class OptionsDialog(QDialog):
         self.setWindowTitle(_('%s - sync options') % parent.repo.displayname)
         self.repo = parent.repo
 
-        layout = QFormLayout()
+        layout = QVBoxLayout()
         self.setLayout(layout)
 
         self.newbranchcb = QCheckBox(
             _('Allow push of a new branch (--new-branch)'))
         self.newbranchcb.setChecked(opts.get('new-branch', False))
-        layout.addRow(self.newbranchcb, None)
+        layout.addWidget(self.newbranchcb)
 
         self.forcecb = QCheckBox(
             _('Force push or pull (override safety checks, --force)'))
         self.forcecb.setChecked(opts.get('force', False))
-        layout.addRow(self.forcecb, None)
+        layout.addWidget(self.forcecb)
 
         self.subrepocb = QCheckBox(
             _('Recurse into subrepositories') + u' (--subrepos)')
         self.subrepocb.setChecked(opts.get('subrepos', False))
-        layout.addRow(self.subrepocb, None)
+        layout.addWidget(self.subrepocb)
 
         self.noproxycb = QCheckBox(
             _('Temporarily disable configured HTTP proxy'))
         self.noproxycb.setChecked(opts.get('noproxy', False))
-        layout.addRow(self.noproxycb, None)
+        layout.addWidget(self.noproxycb)
         proxy = self.repo.ui.config('http_proxy', 'host')
         self.noproxycb.setEnabled(bool(proxy))
 
         self.debugcb = QCheckBox(
             _('Emit debugging output (--debug)'))
         self.debugcb.setChecked(opts.get('debug', False))
-        layout.addRow(self.debugcb, None)
+        layout.addWidget(self.debugcb)
+
+        form = QFormLayout()
+        layout.addLayout(form)
 
         lbl = QLabel(_('Remote command:'))
         self.remotele = QLineEdit()
         if opts.get('remotecmd'):
             self.remotele.setText(hglib.tounicode(opts['remotecmd']))
-        layout.addRow(lbl, self.remotele)
+        form.addRow(lbl, self.remotele)
+
+        lbl = QLabel(_('Branch:'))
+        self.branchle = QLineEdit()
+        if opts.get('branch'):
+            self.branchle.setText(hglib.tounicode(opts['branch']))
+        form.addRow(lbl, self.branchle)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -1551,7 +1574,8 @@ class OptionsDialog(QDialog):
 
     def accept(self):
         outopts = {}
-        for name, le in (('remotecmd', self.remotele),):
+        for name, le in (('remotecmd', self.remotele),
+                         ('branch', self.branchle)):
             outopts[name] = hglib.fromunicode(le.text()).strip()
 
         outopts['subrepos'] = self.subrepocb.isChecked()

@@ -317,7 +317,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def explore(self):
         root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(hglib.tounicode(root)))
+            qtlib.openlocalurl(root)
 
     def terminal(self):
         root = self._repo.wjoin(hglib.fromunicode(self.path))

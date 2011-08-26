@@ -251,6 +251,9 @@ class ManifestModel(QAbstractItemModel):
                 if not pathinstatus(path, status, uncleanpaths):
                     continue
 
+                origpath = path
+                path = self._repo.removeStandin(path)
+                
                 e = treeroot
                 for p in hglib.tounicode(path).split('/'):
                     if not p in e:
@@ -258,7 +261,7 @@ class ManifestModel(QAbstractItemModel):
                     e = e[p]
 
                 for st, filesofst in status.iteritems():
-                    if path in filesofst:
+                    if origpath in filesofst:
                         e.setstatus(st)
                         break
                 else:
