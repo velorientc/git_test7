@@ -39,10 +39,10 @@ except (ImportError, AttributeError):
     from mercurial.url import hidepassword, removeauth
 try:
     # hg >= 1.9
-    from mercurial.httpconnection import readauthforuri
+    from mercurial.httpconnection import readauthforuri as hgreadauthforuri
 except (ImportError, AttributeError):
     # hg <= 1.8
-    from mercurial.url import readauthforuri
+    from mercurial.url import readauthforuri as hgreadauthforuri
 try:
     # hg >= 1.9
     from mercurial.scmutil import revrange, expandpats, revpair, match, matchall
@@ -50,6 +50,12 @@ except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
 demandimport.enable()
+
+def readauthforuri(ui, uri, user):
+    try:
+        return hgreadauthforuri(ui, uri, user)
+    except TypeError:
+        return hgreadauthforuri(ui, uri)
 
 def revsetmatch(ui, pattern):
     try:
