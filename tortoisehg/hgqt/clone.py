@@ -438,8 +438,8 @@ class CloneDialog(QDialog):
             self.qclone_txt.setFocus()
         self.composeCommand()
 
-    @pyqtSlot(QString)
-    def onResetDefault(self, text):
+    @pyqtSlot()
+    def onResetDefault(self):
         self.clone_btn.setDefault(True)
 
     def command_started(self):
