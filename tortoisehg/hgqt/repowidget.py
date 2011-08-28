@@ -1433,21 +1433,37 @@ class RepoWidget(QWidget):
     def exportRevisions(self, revisions):
         if not revisions:
             revisions = [self.rev]
-        udir = QFileDialog.getExistingDirectory(self, _('Export patch'),
-                                               hglib.tounicode(self.repo.root))
-        if not udir:
-            return
-        strdir = hglib.fromunicode(udir)
-        epath = os.path.join(strdir,
-                             hglib.fromunicode(self.repo.shortname)+'_%r.patch')
-
+        if len(revisions) == 1:
+            ret = QFileDialog.getSaveFileName(self, _('Export patch'),
+                                              hglib.tounicode(self.repo.root),
+                                              _('Patch Files (*.patch)'))
+            if not ret:
+                return
+            epath = str(ret)
+            strdir = os.path.dirname(epath)
+            udir = hglib.tounicode(strdir)
+            custompath = True
+        else:
+            udir = QFileDialog.getExistingDirectory(self, _('Export patch'),
+                                                   hglib.tounicode(self.repo.root))
+            if not udir:
+                return
+            strdir = hglib.fromunicode(udir)
+            epath = os.path.join(strdir,
+                                 hglib.fromunicode(self.repo.shortname)+'_%r.patch')
+            custompath = False
+            
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
 
         existingRevisions = []
         for rev in revisions:
-            if os.path.exists(epath % rev):
-                if os.path.isfile(epath % rev):
+            if custompath:
+                path = epath
+            else:
+                path = epath % rev
+            if os.path.exists(path):
+                if os.path.isfile(path):
                     existingRevisions.append(rev)
                 else:
                     QMessageBox.warning(self,
@@ -1483,7 +1499,10 @@ class RepoWidget(QWidget):
             if buttonNames[res] == _("Replace"):
                 # Remove the existing patch files
                 for rev in existingRevisions:
-                    os.remove(epath % rev)
+                    if custompath:
+                        os.remove(epath)
+                    else:
+                        os.remove(epath % rev)
             elif buttonNames[res] == _("Abort"):
                 return
 
@@ -1493,8 +1512,8 @@ class RepoWidget(QWidget):
             # Show a message box with a link to the export folder and to the
             # exported file
             rev = revisions[0]
-            patchfilename = os.path.normpath(epath % rev)
-            patchdirname = os.path.normpath(strdir)
+            patchfilename = os.path.normpath(epath)
+            patchdirname = os.path.normpath(os.path.dirname(epath))
             patchshortname = os.path.basename(patchfilename)
             if patchdirname.endswith(os.path.sep):
                 patchdirname = patchdirname[:-1]
