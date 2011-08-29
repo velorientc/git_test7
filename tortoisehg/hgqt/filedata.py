@@ -27,7 +27,7 @@ class FileData(object):
         except (EnvironmentError, error.LookupError), e:
             self.error = hglib.tounicode(str(e))
 
-    def checkMaxDiff(self, ctx, wfile, maxdiff=None):
+    def checkMaxDiff(self, ctx, wfile, maxdiff, status):
         p = _('File or diffs not displayed: ')
         try:
             fctx = ctx.filectx(wfile)
@@ -48,7 +48,18 @@ class FileData(object):
         try:
             data = fctx.data()
             if '\0' in data:
-                self.error = p + _('File is binary.\n')
+                self.error = p + _('File is binary')
+                if status != 'A':
+                    return None
+
+                renamed = fctx.renamed()
+                if renamed:
+                    oldname, node = renamed
+                    fr = hglib.tounicode(oldname)
+                    self.flabel += _(' <i>(renamed from %s)</i>') % fr
+                else:
+                    self.flabel += _(' <i>(was added)</i>')
+
                 return None
         except (EnvironmentError, util.Abort), e:
             self.error = p + hglib.tounicode(str(e))
@@ -324,10 +335,8 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
-            res = self.checkMaxDiff(ctx, wfile, maxdiff)
+            res = self.checkMaxDiff(ctx, wfile, maxdiff, status)
             if res is None:
-                if status == 'A':
-                    self.flabel += _(' <i>(was added)</i>')
                 return
             fctx, newdata = res
             self.contents = newdata
