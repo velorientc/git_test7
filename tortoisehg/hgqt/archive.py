@@ -130,8 +130,7 @@ class ArchiveDialog(QDialog):
         for b in self.repo.branchtags():
             self.rev_combo.addItem(b)
         tags = list(self.repo.tags())
-        tags.sort()
-        tags.reverse()
+        tags.sort(reverse=True)
         for t in tags:
             self.rev_combo.addItem(t)
         if self.initrev:

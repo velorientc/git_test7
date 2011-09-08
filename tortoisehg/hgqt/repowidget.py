@@ -1290,8 +1290,7 @@ class RepoWidget(QWidget):
             if ctxa.ancestor(ctxb) == ctxb:
                 revs = self.menuselection[:]
             elif ctxa.ancestor(ctxb) == ctxa:
-                revs = self.menuselection[:]
-                revs.reverse()
+                revs = reversed(self.menuselection)
             else:
                 InfoMsgBox(_('Unable to compress history'),
                            _('Selected changeset pair not related'))

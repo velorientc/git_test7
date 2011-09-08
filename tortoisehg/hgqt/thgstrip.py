@@ -65,8 +65,7 @@ class StripDialog(QDialog):
             combo.addItem(name)
 
         tags = list(self.repo.tags())
-        tags.sort()
-        tags.reverse()
+        tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
 
