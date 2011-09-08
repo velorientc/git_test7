@@ -729,7 +729,7 @@ class MatchModel(QAbstractTableModel):
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
-        self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+        self.rows.sort(key=lambda x: x[col])
         if order == Qt.DescendingOrder:
             self.rows.reverse()
         self.layoutChanged.emit()

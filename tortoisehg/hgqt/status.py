@@ -743,8 +743,7 @@ class WctxModel(QAbstractTableModel):
         # 2.- Perform a primary sort by the actual column that we are sorting on
 
         # Secondary sort:
-        self.rows.sort(lambda x, y: \
-                cmp(x[COL_PATH].lower(), y[COL_PATH].lower()))
+        self.rows.sort(key=lambda x: x[COL_PATH].lower())
 
         if col == COL_PATH_DISPLAY:
             # Already sorted!
@@ -758,13 +757,13 @@ class WctxModel(QAbstractTableModel):
             # Now we can perform the primary sort
             if col == COL_PATH:
                 c = self.checked
-                self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
+                self.rows.sort(key=lambda x: c[x[col]])
             elif col == COL_STATUS:
                 self.rows.sort(key=lambda x: getStatusRank(x[col]))
             elif col == COL_MERGE_STATE:
                 self.rows.sort(key=lambda x: getMergeStatusRank(x[col]))
             else:
-                self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+                self.rows.sort(key=lambda x: x[col])
 
         if order == Qt.DescendingOrder:
             self.rows.reverse()
