@@ -571,12 +571,10 @@ class WctxModel(QAbstractTableModel):
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
-                mst = r in ms and ms[r].upper() or ""
                 nchecked[r] = checked.get(r, r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
-                mst = d in ms and ms[d].upper() or ""
                 nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
