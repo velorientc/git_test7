@@ -553,6 +553,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         os.chdir(olddir)
         if newtext is not None:
             mgr.updategraphdesc(newtext)
+            self.refresh()
 
     ### context menu signal handlers ###
 
