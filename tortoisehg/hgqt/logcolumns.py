@@ -44,7 +44,7 @@ class ColumnSelectDialog(QDialog):
         self.disabled = [c for c in all if c not in self.curcolumns]
 
         layout = QVBoxLayout()
-        layout.setMargin(0)
+        layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(layout)
 
         list = QListWidget()
