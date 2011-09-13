@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2010-04-22 09:01+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2011-08-24 13:22+0000\n"
+"Last-Translator: Kyle Simpson <Unknown>\n"
 "Language-Team: English (Australia) <en_AU@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:43+0000\n"
-"X-Generator: Launchpad (build 13697)\n"
+"X-Launchpad-Export-Date: 2011-08-25 04:41+0000\n"
+"X-Generator: Launchpad (build 13727)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -32,7 +32,7 @@ msgstr "About"
 
 #: tortoisehg/hgqt/about.py:56
 msgid "Copyright 2008-2011 Steve Borho and others"
-msgstr ""
+msgstr "Copyright 2008-2011 Steve Borho and others"
 
 #: tortoisehg/hgqt/about.py:61 tortoisehg/hgtk/about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -40,28 +40,28 @@ msgstr "Several icons are courtesy of the TortoiseSVN project"
 
 #: tortoisehg/hgqt/about.py:71
 msgid "You can visit our site here"
-msgstr ""
+msgstr "You can visit our site here"
 
 #: tortoisehg/hgqt/about.py:80
 msgid "&License"
-msgstr ""
+msgstr "&License"
 
 #: tortoisehg/hgqt/about.py:86 tortoisehg/hgqt/archive.py:108
 #: tortoisehg/hgqt/hgemail_ui.py:286 tortoisehg/hgqt/hginit.py:58
 #: tortoisehg/hgqt/license.py:45 tortoisehg/hgqt/postreview_ui.py:179
 #: tortoisehg/hgqt/rename.py:105
 msgid "&Close"
-msgstr ""
+msgstr "&Close"
 
 #: tortoisehg/hgqt/about.py:106
 #, python-format
 msgid "version %s"
-msgstr ""
+msgstr "version %s"
 
 #: tortoisehg/hgqt/about.py:107
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr ""
+msgstr "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #: tortoisehg/hgqt/about.py:156 tortoisehg/hgtk/about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
@@ -83,12 +83,12 @@ msgstr "Revision:"
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "Only files modified/created in this revision"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:69
 #: tortoisehg/hgqt/sync.py:1523
 msgid "Recurse into subrepositories"
-msgstr ""
+msgstr "Recurse into subrepositories"
 
 #: tortoisehg/hgqt/archive.py:54 tortoisehg/hgqt/hginit.py:34
 #: tortoisehg/hgtk/archive.py:72 tortoisehg/hgtk/clone.py:106
@@ -137,19 +137,19 @@ msgstr "Zip archive compressed using deflate"
 #: tortoisehg/hgqt/archive.py:84 tortoisehg/hgqt/clone.py:157
 #: tortoisehg/hgqt/hginit.py:67 tortoisehg/hgqt/rename.py:84
 msgid "Hg command:"
-msgstr ""
+msgstr "Hg command:"
 
 #: tortoisehg/hgqt/archive.py:88 tortoisehg/hgqt/rename.py:89
 msgid "Always show output"
-msgstr ""
+msgstr "Always show output"
 
 #: tortoisehg/hgqt/archive.py:106
 msgid "&Archive"
-msgstr ""
+msgstr "&Archive"
 
 #: tortoisehg/hgqt/archive.py:111 tortoisehg/hgqt/rename.py:107
 msgid "&Detail"
-msgstr ""
+msgstr "&Detail"
 
 #: tortoisehg/hgqt/archive.py:114 tortoisehg/hgqt/backout.py:293
 #: tortoisehg/hgqt/commit.py:375 tortoisehg/hgqt/commit.py:383
@@ -179,7 +179,7 @@ msgstr "Select Destination Folder"
 
 #: tortoisehg/hgqt/archive.py:198
 msgid "Open File"
-msgstr ""
+msgstr "Open File"
 
 #: tortoisehg/hgqt/archive.py:228 tortoisehg/hgtk/archive.py:171
 msgid "Tar archives"
@@ -195,16 +195,16 @@ msgstr "Gzip tar archives"
 
 #: tortoisehg/hgqt/archive.py:237 tortoisehg/hgqt/archive.py:240
 msgid "Zip archives"
-msgstr ""
+msgstr "Zip archives"
 
 #: tortoisehg/hgqt/archive.py:315 tortoisehg/hgqt/archive.py:333
 msgid "Duplicate Name"
-msgstr ""
+msgstr "Duplicate Name"
 
 #: tortoisehg/hgqt/archive.py:316
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr ""
+msgstr "The destination \"%s\" already exists as a file!"
 
 #: tortoisehg/hgqt/archive.py:320 tortoisehg/hgqt/archive.py:327
 #: tortoisehg/hgtk/archive.py:213 tortoisehg/hgtk/archive.py:219
@@ -220,6 +220,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"The directory \"%s\" is not empty!\n"
+"\n"
+"Do you want to overwrite it?"
 
 #: tortoisehg/hgqt/archive.py:328 tortoisehg/hgtk/gtklib.py:595
 #, python-format
@@ -235,48 +238,48 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:334
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
-msgstr ""
+msgstr "The destination \"%s\" already exists as a folder!"
 
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "Backout - %s"
 
 #: tortoisehg/hgqt/backout.py:99
 msgid "Prepare to backout"
-msgstr ""
+msgstr "Prepare to backout"
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
-msgstr ""
+msgstr "Verify backout revision and ensure your working directory is clean."
 
 #: tortoisehg/hgqt/backout.py:109 tortoisehg/hgqt/backout.py:121
 msgid "Unable to backout"
-msgstr ""
+msgstr "Unable to backout"
 
 #: tortoisehg/hgqt/backout.py:110
 msgid "Backout revision not found"
-msgstr ""
+msgstr "Backout revision not found"
 
 #: tortoisehg/hgqt/backout.py:114
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
+msgstr "Backing out a parent revision is a single step operation"
 
 #: tortoisehg/hgqt/backout.py:122
 msgid "Cannot backout change on a different branch"
-msgstr ""
+msgstr "Cannot backout change on a different branch"
 
 #: tortoisehg/hgqt/backout.py:128
 msgid "Backout revision"
-msgstr ""
+msgstr "Backout revision"
 
 #: tortoisehg/hgqt/backout.py:138
 msgid "Not a head, backout will create a new head!"
-msgstr ""
+msgstr "Not a head, backout will create a new head!"
 
 #: tortoisehg/hgqt/backout.py:144
 msgid "Current local revision"
-msgstr ""
+msgstr "Current local revision"
 
 #: tortoisehg/hgqt/backout.py:162
 msgid "Merge parent to backout to"
@@ -287,33 +290,35 @@ msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
 msgstr ""
+"To backout a <b>merge</b> revision you must select which parent to backout "
+"to (i.e. whose changes will be <i>kept</i>)"
 
 #: tortoisehg/hgqt/backout.py:170
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "First Parent: revision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:176
 msgid "Backout to the first parent of the merge revision"
-msgstr ""
+msgstr "Backout to the first parent of the merge revision"
 
 #: tortoisehg/hgqt/backout.py:181
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Second Parent: revision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:186
 msgid "Backout to the second parent of the merge revision"
-msgstr ""
+msgstr "Backout to the second parent of the merge revision"
 
 #: tortoisehg/hgqt/backout.py:194 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
-msgstr ""
+msgstr "Working directory status"
 
 #: tortoisehg/hgqt/backout.py:202 tortoisehg/hgqt/compress.py:69
 #: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:110
 msgid "Checking..."
-msgstr ""
+msgstr "Checking…"
 
 #: tortoisehg/hgqt/backout.py:210
 msgid ""
@@ -321,16 +326,19 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a "
+"href=\"shelve\"><b>shelve</b></a> to patch, or <a "
+"href=\"discard\"><b>discard</b></a> changes."
 
 #: tortoisehg/hgqt/backout.py:221 tortoisehg/hgqt/merge.py:215
 #: tortoisehg/hgqt/rebase.py:73 tortoisehg/hgqt/sync.py:1067
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
-msgstr ""
+msgstr "Automatically resolve merge conflicts where possible"
 
 #: tortoisehg/hgqt/backout.py:267 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
-msgstr ""
+msgstr "<b>Uncommitted local changes are detected</b>"
 
 #: tortoisehg/hgqt/backout.py:271 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
@@ -347,25 +355,26 @@ msgstr "&Discard"
 #: tortoisehg/hgqt/backout.py:294 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:232
 msgid "Confirm Discard"
-msgstr ""
+msgstr "Confirm Discard"
 
 #: tortoisehg/hgqt/backout.py:295 tortoisehg/hgqt/compress.py:152
 #: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:233
 msgid "Discard outstanding changes to working directory?"
-msgstr ""
+msgstr "Discard outstanding changes to working directory?"
 
 #: tortoisehg/hgqt/backout.py:320
 msgid "Backing out, then merging..."
-msgstr ""
+msgstr "Backing out, then merging..."
 
 #: tortoisehg/hgqt/backout.py:321 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
-msgstr ""
+msgstr "All conflicting files will be marked unresolved."
 
 #: tortoisehg/hgqt/backout.py:334
 msgid ""
 "Automatically advance to next page when backout and merge are complete."
 msgstr ""
+"Automatically advance to next page when backout and merge are complete."
 
 #: tortoisehg/hgqt/backout.py:365 tortoisehg/hgqt/merge.py:395
 #, python-format
@@ -373,14 +382,16 @@ msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
+"%d files have <b>merge conflicts</b> that must be <a "
+"href=\"resolve\"><b>resolved</b></a>"
 
 #: tortoisehg/hgqt/backout.py:370 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
-msgstr ""
+msgstr "No merge conflicts, ready to commit"
 
 #: tortoisehg/hgqt/backout.py:405
 msgid "Commit backout and merge results"
-msgstr ""
+msgstr "Commit backout and merge results"
 
 #: tortoisehg/hgqt/backout.py:415 tortoisehg/hgqt/merge.py:449
 #: tortoisehg/hgtk/commit.py:236 tortoisehg/hgtk/history.py:66
@@ -392,23 +403,23 @@ msgstr "Parents"
 #: tortoisehg/hgqt/repomodel.py:589 tortoisehg/hgqt/repomodel.py:591
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:87
 msgid "Working Directory"
-msgstr ""
+msgstr "Working Directory"
 
 #: tortoisehg/hgqt/backout.py:459 tortoisehg/hgqt/merge.py:490
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Working Directory (merged)"
 
 #: tortoisehg/hgqt/backout.py:467 tortoisehg/hgqt/merge.py:498
 msgid "Commit message"
-msgstr ""
+msgstr "Commit message"
 
 #: tortoisehg/hgqt/backout.py:491 tortoisehg/hgqt/merge.py:522
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "Skip final confirmation page, close after commit."
 
 #: tortoisehg/hgqt/backout.py:502 tortoisehg/hgqt/backout.py:536
 msgid "Backed out merge changeset: "
-msgstr ""
+msgstr "Backed out merge changeset: "
 
 #: tortoisehg/hgqt/backout.py:504 tortoisehg/hgqt/backout.py:538
 #: tortoisehg/hgtk/backout.py:41
@@ -432,16 +443,16 @@ msgstr "Use English backout message"
 #: tortoisehg/hgqt/backout.py:546
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
+msgstr "Backed out merge revision to its first parent (%s)"
 
 #: tortoisehg/hgqt/backout.py:549
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
+msgstr "Backed out merge revision to its second parent (%s)"
 
 #: tortoisehg/hgqt/backout.py:578
 msgid "Backing out and committing..."
-msgstr ""
+msgstr "Backing out and committing..."
 
 #: tortoisehg/hgqt/backout.py:579
 msgid "Please wait while making backout."
@@ -449,11 +460,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:587 tortoisehg/hgqt/merge.py:573
 msgid "Committing..."
-msgstr ""
+msgstr "Committing..."
 
 #: tortoisehg/hgqt/backout.py:588 tortoisehg/hgqt/merge.py:574
 msgid "Please wait while committing merged files."
-msgstr ""
+msgstr "Please wait while committing merged files."
 
 #: tortoisehg/hgqt/backout.py:613 tortoisehg/hgqt/cmdui.py:313
 #: tortoisehg/hgqt/merge.py:602 tortoisehg/hgtk/p4pending.py:101
@@ -462,16 +473,16 @@ msgstr "Finished"
 
 #: tortoisehg/hgqt/backout.py:618
 msgid "Backout changeset"
-msgstr ""
+msgstr "Backout changeset"
 
 #: tortoisehg/hgqt/bisect.py:22
 #, python-format
 msgid "Bisect - %s"
-msgstr ""
+msgstr "Bisect - %s"
 
 #: tortoisehg/hgqt/bisect.py:34
 msgid "Known good revision:"
-msgstr ""
+msgstr "Known good revision:"
 
 #: tortoisehg/hgqt/bisect.py:38 tortoisehg/hgqt/bisect.py:48
 #: tortoisehg/hgqt/repowidget.py:428 tortoisehg/hgtk/history.py:1875
@@ -480,19 +491,19 @@ msgstr "Accept"
 
 #: tortoisehg/hgqt/bisect.py:43
 msgid "Known bad revision:"
-msgstr ""
+msgstr "Known bad revision:"
 
 #: tortoisehg/hgqt/bisect.py:59
 msgid "Revision is Good"
-msgstr ""
+msgstr "Revision is good"
 
 #: tortoisehg/hgqt/bisect.py:61
 msgid "Revision is Bad"
-msgstr ""
+msgstr "Revision is bad"
 
 #: tortoisehg/hgqt/bisect.py:63
 msgid "Skip this Revision"
-msgstr ""
+msgstr "Skip this revision"
 
 #: tortoisehg/hgqt/bisect.py:72 tortoisehg/hgqt/compress.py:138
 #: tortoisehg/hgqt/rebase.py:194 tortoisehg/hgtk/bugreport.py:48
@@ -502,19 +513,19 @@ msgstr "Close"
 
 #: tortoisehg/hgqt/bisect.py:83
 msgid "Error encountered."
-msgstr ""
+msgstr "Error encountered."
 
 #: tortoisehg/hgqt/bisect.py:88
 msgid "Culprit found."
-msgstr ""
+msgstr "Culprit found."
 
 #: tortoisehg/hgqt/bisect.py:93 tortoisehg/hgqt/grep.py:65
 msgid "Revision"
-msgstr ""
+msgstr "Revision"
 
 #: tortoisehg/hgqt/bisect.py:94
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr ""
+msgstr "Test this revision and report findings. (good/bad/skip)"
 
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
 #: tortoisehg/hgqt/commit.py:742 tortoisehg/hgqt/commit.py:1009
@@ -523,7 +534,7 @@ msgstr ""
 #: tortoisehg/hgqt/wctxactions.py:169
 #, python-format
 msgid "%s (hint: %s)"
-msgstr ""
+msgstr "%s (hint: %s)"
 
 #: tortoisehg/hgqt/bookmark.py:57 tortoisehg/hgtk/bookmark.py:66
 msgid "Bookmark:"
@@ -537,20 +548,20 @@ msgstr "New Name:"
 #: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:48
 #: tortoisehg/hgqt/wctxactions.py:54
 msgid "&Add"
-msgstr ""
+msgstr "&Add"
 
 #: tortoisehg/hgqt/bookmark.py:68
 msgid "Re&name"
-msgstr ""
+msgstr "Re&name"
 
 #: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:725
 #: tortoisehg/hgqt/tag.py:99
 msgid "&Remove"
-msgstr ""
+msgstr "&Remove"
 
 #: tortoisehg/hgqt/bookmark.py:70
 msgid "&Move"
-msgstr ""
+msgstr "&Move"
 
 #: tortoisehg/hgqt/bookmark.py:92 tortoisehg/hgtk/bookmark.py:34
 #, python-format
@@ -560,22 +571,22 @@ msgstr "Bookmark - %s"
 #: tortoisehg/hgqt/bookmark.py:160 tortoisehg/hgqt/bookmark.py:214
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "A bookmark named \"%s\" already exists"
 
 #: tortoisehg/hgqt/bookmark.py:165
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "Bookmark '%s' has been added"
 
 #: tortoisehg/hgqt/bookmark.py:176
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "Bookmark named \"%s\" does not exist"
 
 #: tortoisehg/hgqt/bookmark.py:181
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "Bookmark '%s' has been moved"
 
 #: tortoisehg/hgqt/bookmark.py:192 tortoisehg/hgqt/bookmark.py:210
 #: tortoisehg/hgtk/bookmark.py:287
@@ -586,17 +597,17 @@ msgstr "Bookmark '%s' does not exist"
 #: tortoisehg/hgqt/bookmark.py:196
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "Bookmark '%s' has been removed"
 
 #: tortoisehg/hgqt/bookmark.py:219
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "Bookmark '%s' has been renamed to '%s'"
 
 #: tortoisehg/hgqt/branchop.py:22
 #, python-format
 msgid "%s - branch operation"
-msgstr ""
+msgstr "%s - branch operation"
 
 #: tortoisehg/hgqt/branchop.py:29 tortoisehg/hgtk/commit.py:47
 msgid "Select branch of merge commit"
@@ -616,21 +627,21 @@ msgstr "Open a new named branch"
 
 #: tortoisehg/hgqt/branchop.py:48
 msgid "Close current branch"
-msgstr ""
+msgstr "Close current branch"
 
 #: tortoisehg/hgqt/bugreport.py:26
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
-msgstr ""
+msgstr "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 
 #: tortoisehg/hgqt/bugreport.py:44 tortoisehg/hgqt/qscilib.py:181
 #: tortoisehg/hgqt/rename.py:166
 msgid "Copy"
-msgstr ""
+msgstr "Copy"
 
 #: tortoisehg/hgqt/bugreport.py:45
 msgid "Quit"
-msgstr ""
+msgstr "Quit"
 
 #: tortoisehg/hgqt/bugreport.py:48 tortoisehg/hgtk/bugreport.py:25
 msgid "TortoiseHg Bug Report"
@@ -642,22 +653,24 @@ msgstr "Save error report to"
 
 #: tortoisehg/hgqt/bugreport.py:97
 msgid "Text files (*.txt)"
-msgstr ""
+msgstr "Text files (*.txt)"
 
 #: tortoisehg/hgqt/bugreport.py:101
 msgid "Error writing file"
-msgstr ""
+msgstr "Error writing file"
 
 #: tortoisehg/hgqt/bugreport.py:124 tortoisehg/hgqt/qqueue.py:342
 #: tortoisehg/hgqt/qreorder.py:228
 msgid "TortoiseHg Error"
-msgstr ""
+msgstr "TortoiseHg Error"
 
 #: tortoisehg/hgqt/bugreport.py:146
 msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug "
 "report</a>."
 msgstr ""
+"If you still have trouble, <a href=\"#bugreport\">please file a bug "
+"report</a>."
 
 #: tortoisehg/hgqt/chunks.py:89 tortoisehg/hgqt/grep.py:549
 #: tortoisehg/hgqt/manifestdialog.py:201 tortoisehg/hgqt/revdetails.py:230
@@ -668,27 +681,27 @@ msgstr "Visual Diff"
 #: tortoisehg/hgqt/chunks.py:90 tortoisehg/hgqt/manifestdialog.py:202
 #: tortoisehg/hgqt/revdetails.py:231
 msgid "View file changes in external diff tool"
-msgstr ""
+msgstr "View file changes in external diff tool"
 
 #: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:208
 #: tortoisehg/hgqt/revdetails.py:239
 msgid "Edit Local"
-msgstr ""
+msgstr "Edit Local"
 
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:209
 #: tortoisehg/hgqt/revdetails.py:240
 msgid "Edit current file in working copy"
-msgstr ""
+msgstr "Edit current file in working copy"
 
 #: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/manifestdialog.py:210
 #: tortoisehg/hgqt/revdetails.py:241
 msgid "Revert to Revision"
-msgstr ""
+msgstr "Revert to revision"
 
 #: tortoisehg/hgqt/chunks.py:94 tortoisehg/hgqt/manifestdialog.py:211
 #: tortoisehg/hgqt/revdetails.py:242
 msgid "Revert file(s) to contents at this revision"
-msgstr ""
+msgstr "Revert file(s) to contents at this revision"
 
 #: tortoisehg/hgqt/chunks.py:190
 msgid "Patch failed to apply"
@@ -6827,7 +6840,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:687
 msgid "An URL must be selected for this operation."
-msgstr ""
+msgstr "A URL must be selected for this operation."
 
 #: tortoisehg/hgqt/sync.py:702
 msgid "Redundant authentication info"
@@ -7077,7 +7090,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:1176
 msgid "Unable to save an URL"
-msgstr ""
+msgstr "Unable to save a URL"
 
 #: tortoisehg/hgqt/sync.py:1187
 msgid "Confirm URL replace"

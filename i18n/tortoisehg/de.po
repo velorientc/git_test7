@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2011-08-17 10:24+0000\n"
-"Last-Translator: simohe <Unknown>\n"
+"PO-Revision-Date: 2011-09-04 14:48+0000\n"
+"Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:39+0000\n"
-"X-Generator: Launchpad (build 13697)\n"
+"X-Launchpad-Export-Date: 2011-09-05 06:07+0000\n"
+"X-Generator: Launchpad (build 13830)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -770,7 +770,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:393
 msgid "Unable to remove"
-msgstr ""
+msgstr "Entfernen nicht möglich"
 
 #: tortoisehg/hgqt/chunks.py:394
 #, python-format
@@ -778,6 +778,8 @@ msgid ""
 "Unable to remove added file %s,\n"
 "permission denied"
 msgstr ""
+"Die hinzugefügte Datei %s kann nicht entfernt werden.\n"
+"Keine Berechtigung"
 
 #: tortoisehg/hgqt/chunks.py:530
 msgctxt "files"
@@ -2093,11 +2095,11 @@ msgstr "Änderungslisten"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "Select &All"
-msgstr ""
+msgstr "&Alle Auswählen"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "Select &None"
-msgstr ""
+msgstr "&Keine Auswählen"
 
 #: tortoisehg/hgqt/hgemail_ui.py:282 tortoisehg/hgqt/wctxactions.py:43
 #: tortoisehg/hgqt/webconf.py:256 tortoisehg/hgqt/webconf_ui.py:79
@@ -2374,7 +2376,7 @@ msgstr "Im Arbeitsverzeichnis gibt es das ausgewählte Unterarchiv nicht"
 
 #: tortoisehg/hgqt/manifestdialog.py:535
 msgid "Failed to open Manifest dialog"
-msgstr ""
+msgstr "Öffnen des Inhaltsverzeichnis-Dialogs gescheitert"
 
 #: tortoisehg/hgqt/merge.py:31
 #, python-format
@@ -3341,7 +3343,7 @@ msgstr "Sicherungskopien (*.orig) nicht speichern"
 
 #: tortoisehg/hgqt/quickop.py:85
 msgid "Force removal of modified files (--force)"
-msgstr ""
+msgstr "Entfernen der geänderten Dateien erzwingen (--force)"
 
 #: tortoisehg/hgqt/quickop.py:146 tortoisehg/hgtk/quickop.py:261
 msgid "No files selected"
@@ -3356,14 +3358,16 @@ msgid ""
 "You have selected one or more files that have been modified.  By default, "
 "these files will not be removed.  What would you like to do?"
 msgstr ""
+"Sie haben mindestens eine veränderte Datei ausgewählt. Standardmäßig werden "
+"diese Dateien nicht entfernt. Was möchten Sie tun?"
 
 #: tortoisehg/hgqt/quickop.py:162
 msgid "Remove &Unmodified Files"
-msgstr ""
+msgstr "&Unveränderte Dateien entfernen"
 
 #: tortoisehg/hgqt/quickop.py:163
 msgid "Remove &All Selected Files"
-msgstr ""
+msgstr "&Alle ausgewählten Dateien entfernen"
 
 #: tortoisehg/hgqt/rebase.py:40
 msgid "Rebase changeset and descendants"
@@ -7386,6 +7390,9 @@ msgid ""
 "creation of a new branch.  Do you want to create a new branch in the remote "
 "repository?"
 msgstr ""
+"Mindestens eine der Änderungslisten, die Sie zu Senden versuchen, enthält "
+"die Erzeugung eines neuen Zweigs. Wollen Sie einen neuen Zweig im entfernten "
+"Archiv erzeugen?"
 
 #: tortoisehg/hgqt/sync.py:965
 msgid "Determining outgoing changesets to email..."

@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Alil Adamov <diagiman@gmail.com>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2011-06-29 12:31+0000\n"
-"Last-Translator: Andrei Polushin <polushin@gmail.com>\n"
+"PO-Revision-Date: 2011-08-27 19:06+0000\n"
+"Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:41+0000\n"
-"X-Generator: Launchpad (build 13697)\n"
+"X-Launchpad-Export-Date: 2011-08-28 05:21+0000\n"
+"X-Generator: Launchpad (build 13794)\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Basepath: C:\\devel\\xtern\\thg\\\n"
 
@@ -298,7 +298,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:170
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "Первый Родитель: ревизия %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:176
 msgid "Backout to the first parent of the merge revision"
@@ -307,7 +307,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:181
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Второй Родитель: ревизия %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:186
 msgid "Backout to the second parent of the merge revision"
@@ -928,7 +928,7 @@ msgstr "Прервано"
 
 #: tortoisehg/hgqt/cmdui.py:315
 msgid "Failed!"
-msgstr ""
+msgstr "Неудача!"
 
 #: tortoisehg/hgqt/cmdui.py:543
 msgid "failed to run command\n"
@@ -2066,11 +2066,11 @@ msgstr "Наборы изменений"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "Select &All"
-msgstr ""
+msgstr "Выделить Всё"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "Select &None"
-msgstr ""
+msgstr "Снять Выделение"
 
 #: tortoisehg/hgqt/hgemail_ui.py:282 tortoisehg/hgqt/wctxactions.py:43
 #: tortoisehg/hgqt/webconf.py:256 tortoisehg/hgqt/webconf_ui.py:79
@@ -2311,19 +2311,19 @@ msgstr "Открыть выбранное подхранилище"
 
 #: tortoisehg/hgqt/manifestdialog.py:216 tortoisehg/hgqt/revdetails.py:247
 msgid "Explore subrepository"
-msgstr ""
+msgstr "Обзор подхранилища"
 
 #: tortoisehg/hgqt/manifestdialog.py:218
 msgid "Open the selected subrepository in a file browser"
-msgstr ""
+msgstr "Открыть выбранное подхранилище в обозревателе файлов"
 
 #: tortoisehg/hgqt/manifestdialog.py:220 tortoisehg/hgqt/revdetails.py:250
 msgid "Open terminal in subrepository"
-msgstr ""
+msgstr "Открыть консоль в подхранилище"
 
 #: tortoisehg/hgqt/manifestdialog.py:222 tortoisehg/hgqt/revdetails.py:252
 msgid "Open a shell terminal in the selected subrepository root"
-msgstr ""
+msgstr "Открыть консольное окно в выбранном подхранилище"
 
 #: tortoisehg/hgqt/manifestdialog.py:301 tortoisehg/hgqt/revdetails.py:389
 #, python-format
@@ -2340,7 +2340,7 @@ msgstr "Выбранное подхранилище не существует в
 
 #: tortoisehg/hgqt/manifestdialog.py:535
 msgid "Failed to open Manifest dialog"
-msgstr ""
+msgstr "Неудача при открытии окна Манифеста"
 
 #: tortoisehg/hgqt/merge.py:31
 #, python-format
@@ -2396,6 +2396,8 @@ msgid ""
 "href=\"skip\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> "
 "existing merge."
 msgstr ""
+"Рабочий каталог уже <b>слит</b>. <a href=\"skip\"><b>Продолжить</b></a> или "
+"<a href=\"discard\"><b>отказаться</b></a> от существующего слияния."
 
 #: tortoisehg/hgqt/merge.py:179
 msgid ""
@@ -2403,6 +2405,9 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"До слияния, необходимо <a href=\"commit\"><b>зафиксировать</b></a>, <a "
+"href=\"shelve\"><b>отложить</b></a> в заплатку, или <a "
+"href=\"discard\"><b>отбросить</b></a> изменения."
 
 #: tortoisehg/hgqt/merge.py:191
 msgid "Or use:"
@@ -2755,7 +2760,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/pbranch.py:879
 msgid "Patch date:"
-msgstr ""
+msgstr "Дата заплатки:"
 
 #: tortoisehg/hgqt/pbranch.py:880
 msgid "Patch user:"
@@ -3213,7 +3218,7 @@ msgstr ""
 #: tortoisehg/hgqt/qtlib.py:141
 #, python-format
 msgid "\"%s\" is not a valid directory"
-msgstr ""
+msgstr "\"%s\" не является подходящим каталогом"
 
 #: tortoisehg/hgqt/qtlib.py:152
 msgid "No shell configured"
@@ -3285,7 +3290,7 @@ msgstr "Не сохранять резервные копии файлов (*.or
 
 #: tortoisehg/hgqt/quickop.py:85
 msgid "Force removal of modified files (--force)"
-msgstr ""
+msgstr "Принудительное удаление изменённых файлов (--force)"
 
 #: tortoisehg/hgqt/quickop.py:146 tortoisehg/hgtk/quickop.py:261
 msgid "No files selected"
@@ -3300,14 +3305,16 @@ msgid ""
 "You have selected one or more files that have been modified.  By default, "
 "these files will not be removed.  What would you like to do?"
 msgstr ""
+"Выбрано один или более файлов, которые были изменены. По умолчанию, эти "
+"файлы не будут удалены. Что хотели бы вы сделать?"
 
 #: tortoisehg/hgqt/quickop.py:162
 msgid "Remove &Unmodified Files"
-msgstr ""
+msgstr "Удалить Неизменённые Файлы"
 
 #: tortoisehg/hgqt/quickop.py:163
 msgid "Remove &All Selected Files"
-msgstr ""
+msgstr "Удалить Все Выбранные Файлы"
 
 #: tortoisehg/hgqt/rebase.py:40
 msgid "Rebase changeset and descendants"
@@ -3580,7 +3587,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repofilter.py:213
 msgid "Display only active branches"
-msgstr ""
+msgstr "Отображать только активные ветки"
 
 #: tortoisehg/hgqt/repofilter.py:216
 msgid "Display closed branches"
@@ -4342,7 +4349,7 @@ msgstr "Файлы заплаток уже существуют"
 
 #: tortoisehg/hgqt/repowidget.py:1501
 msgid "Patch exported"
-msgstr ""
+msgstr "Заплатка экспортирована"
 
 #: tortoisehg/hgqt/repowidget.py:1502
 #, python-format
@@ -4350,15 +4357,17 @@ msgid ""
 "Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a "
 "href=\"file:///%s\">%s</a>"
 msgstr ""
+"Ревизия #%d (%s) была экспортирована в:<p><a href=\"file:///%s\">%s</a>%s<a "
+"href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1510
 msgid "Patches exported"
-msgstr ""
+msgstr "Экспортированные заплатки"
 
 #: tortoisehg/hgqt/repowidget.py:1511
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
-msgstr ""
+msgstr "%d заплаток экспортировано в:<p><a href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1625
 msgid "Write bundle"
@@ -5509,7 +5518,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:174
 msgid "&Clear"
-msgstr ""
+msgstr "Очистить"
 
 #: tortoisehg/hgqt/settings.py:298
 #, python-format
@@ -6970,7 +6979,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:219
 msgid "Hostname"
-msgstr ""
+msgstr "Имя хоста"
 
 #: tortoisehg/hgqt/sync.py:249 tortoisehg/hgqt/webconf_ui.py:77
 msgid "Save"

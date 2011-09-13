@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2011-07-31 19:49+0000\n"
-"Last-Translator: HOMERO DE LA FUENTE <Unknown>\n"
+"PO-Revision-Date: 2011-08-28 00:09+0000\n"
+"Last-Translator: Sebastian Valle Herrera <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:42+0000\n"
-"X-Generator: Launchpad (build 13697)\n"
+"X-Launchpad-Export-Date: 2011-08-29 04:39+0000\n"
+"X-Generator: Launchpad (build 13794)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -243,7 +243,7 @@ msgstr "¡El destino \"%s\" ya existe como carpeta!"
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "Anular - %s"
 
 #: tortoisehg/hgqt/backout.py:99
 msgid "Prepare to backout"
@@ -252,14 +252,16 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
+"Verifica la revision que quieres anular y asegurate de que tu directorio de "
+"trabajo esta limpio"
 
 #: tortoisehg/hgqt/backout.py:109 tortoisehg/hgqt/backout.py:121
 msgid "Unable to backout"
-msgstr ""
+msgstr "Incapaz de anular"
 
 #: tortoisehg/hgqt/backout.py:110
 msgid "Backout revision not found"
-msgstr ""
+msgstr "No se encontro la revision para anular"
 
 #: tortoisehg/hgqt/backout.py:114
 msgid "Backing out a parent revision is a single step operation"
@@ -267,19 +269,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:122
 msgid "Cannot backout change on a different branch"
-msgstr ""
+msgstr "No se puede anular un cambio en una rama diferente"
 
 #: tortoisehg/hgqt/backout.py:128
 msgid "Backout revision"
-msgstr ""
+msgstr "Anular revision"
 
 #: tortoisehg/hgqt/backout.py:138
 msgid "Not a head, backout will create a new head!"
-msgstr ""
+msgstr "No estas en una cabecera, anular creara una nueva cabecera"
 
 #: tortoisehg/hgqt/backout.py:144
 msgid "Current local revision"
-msgstr "Revisión local actual"
+msgstr "Revision local actual"
 
 #: tortoisehg/hgqt/backout.py:162
 msgid "Merge parent to backout to"
@@ -12641,7 +12643,7 @@ msgstr ""
 #: tortoisehg/util/prej.py:231
 #, python-format
 msgid "file %s already exists\n"
-msgstr ""
+msgstr "El archivo %s ya existe\n"
 
 #: tortoisehg/util/prej.py:283
 #, python-format
@@ -12671,12 +12673,12 @@ msgstr ""
 
 #: tortoisehg/util/prej.py:546
 msgid "could not extract binary patch"
-msgstr ""
+msgstr "no se pudo extraer el parche binario"
 
 #: tortoisehg/util/prej.py:562
 #, python-format
 msgid "binary patch is %d bytes, not %d"
-msgstr ""
+msgstr "el parche binario es tiene %d bytes, no %d"
 
 #: tortoisehg/util/prej.py:587
 #, python-format

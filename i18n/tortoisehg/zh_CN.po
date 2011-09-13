@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2011-07-19 02:25+0000\n"
-"Last-Translator: Xiaomao Chen <Unknown>\n"
+"PO-Revision-Date: 2011-09-02 17:41+0000\n"
+"Last-Translator: jerecao <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:44+0000\n"
-"X-Generator: Launchpad (build 13697)\n"
+"X-Launchpad-Export-Date: 2011-09-03 05:43+0000\n"
+"X-Generator: Launchpad (build 13830)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -24,7 +24,7 @@ msgstr "TortoiseHg Overlay 图标服务"
 
 #: TortoiseHgOverlayServer.py:162
 msgid "Exit"
-msgstr "退出"
+msgstr "离开"
 
 #: tortoisehg/hgqt/about.py:31 tortoisehg/hgtk/gdialog.py:505
 msgid "About"

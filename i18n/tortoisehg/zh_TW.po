@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-08-21 20:08-0300\n"
-"PO-Revision-Date: 2011-08-19 09:34+0000\n"
+"PO-Revision-Date: 2011-08-23 09:36+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-08-22 04:44+0000\n"
+"X-Launchpad-Export-Date: 2011-08-24 04:42+0000\n"
 "X-Generator: Launchpad (build 13697)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -736,7 +736,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:393
 msgid "Unable to remove"
-msgstr ""
+msgstr "不能移除"
 
 #: tortoisehg/hgqt/chunks.py:394
 #, python-format
@@ -744,6 +744,8 @@ msgid ""
 "Unable to remove added file %s,\n"
 "permission denied"
 msgstr ""
+"不能移除已經新增的檔案 %s,\n"
+"權限不符"
 
 #: tortoisehg/hgqt/chunks.py:530
 msgctxt "files"
@@ -1235,10 +1237,12 @@ msgid ""
 "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"壓縮之前,你得要<a href=\"commit\"><b>提交</b></a> 或 <a "
+"href=\"discard\"><b>放棄</b></a>變更"
 
 #: tortoisehg/hgqt/compress.py:104
 msgid "You may continue the compress"
-msgstr ""
+msgstr "你可以繼續壓縮"
 
 #: tortoisehg/hgqt/compress.py:121
 msgid "Changes have been moved, you must now commit"
@@ -1250,11 +1254,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:48 tortoisehg/hgtk/csinfo.py:49
 msgid "must be specified repository"
-msgstr ""
+msgstr "必須指定儲存庫"
 
 #: tortoisehg/hgqt/csinfo.py:85 tortoisehg/hgtk/csinfo.py:86
 msgid "must be specified 'type' in style"
-msgstr ""
+msgstr "必須在style裡指定type"
 
 #: tortoisehg/hgqt/csinfo.py:106 tortoisehg/hgqt/postreview_ui.py:165
 #: tortoisehg/hgqt/qfold.py:85 tortoisehg/hgqt/qreorder.py:89
@@ -1336,6 +1340,8 @@ msgid ""
 "File is larger than the specified max size.\n"
 "maxdiff = %s KB"
 msgstr ""
+"檔案比描述的最大大小還要大\n"
+"maxdiff= %s KB"
 
 #: tortoisehg/hgqt/filedata.py:51 tortoisehg/hgtk/chunks.py:85
 msgid "File is binary.\n"
@@ -1348,15 +1354,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:83 tortoisehg/hgqt/filedata.py:337
 msgid "set"
-msgstr ""
+msgstr "設定"
 
 #: tortoisehg/hgqt/filedata.py:83 tortoisehg/hgqt/filedata.py:339
 msgid "unset"
-msgstr ""
+msgstr "取消設定"
 
 #: tortoisehg/hgqt/filedata.py:86 tortoisehg/hgqt/filedata.py:106
 msgid " <i>(is a symlink)</i>"
-msgstr ""
+msgstr " <i>(是一個符號連結)</i>"
 
 #: tortoisehg/hgqt/filedata.py:135
 #, python-format
@@ -1365,6 +1371,9 @@ msgid ""
 "\t%s\n"
 "\n"
 msgstr ""
+"[WARNING] 無效的子儲存庫版本 ID:\n"
+"\t%s\n"
+"\n"
 
 #: tortoisehg/hgqt/filedata.py:155
 msgid "Subrepo created and set to initial revision."
@@ -1479,29 +1488,29 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:304
 msgid " <i>(was deleted)</i>"
-msgstr ""
+msgstr " <i>(已被刪除了)</i>"
 
 #: tortoisehg/hgqt/filedata.py:306
 msgid " <i>(was added, now missing)</i>"
-msgstr ""
+msgstr " <i>(已被新增,現在遺失了)</i>"
 
 #: tortoisehg/hgqt/filedata.py:312
 msgid " <i>(is unversioned)</i>"
-msgstr ""
+msgstr " <i>(不受版本控管)</i>"
 
 #: tortoisehg/hgqt/filedata.py:330 tortoisehg/hgqt/filedata.py:347
 #: tortoisehg/hgqt/filedata.py:357
 msgid " <i>(was added)</i>"
-msgstr ""
+msgstr " <i>(已被新增)</i>"
 
 #: tortoisehg/hgqt/filedata.py:352
 #, python-format
 msgid " <i>(renamed from %s)</i>"
-msgstr ""
+msgstr " <i>(已從%s更名)</i>"
 
 #: tortoisehg/hgqt/filedialogs.py:124
 msgid "File History Log Columns"
-msgstr ""
+msgstr "檔案歷史紀錄欄位"
 
 #: tortoisehg/hgqt/filedialogs.py:166 tortoisehg/hgqt/workbench.py:342
 msgid "Back"
@@ -1543,7 +1552,7 @@ msgstr "回復(revert)到修訂版..."
 
 #: tortoisehg/hgqt/filedialogs.py:363
 msgid "File Differences Log Columns"
-msgstr ""
+msgstr "檔案差異紀錄欄位"
 
 #: tortoisehg/hgqt/filedialogs.py:471
 msgid "Next diff"
@@ -1837,7 +1846,7 @@ msgstr "<b>從來源到目的地的差異</b>"
 
 #: tortoisehg/hgqt/guess.py:186
 msgid "Search already in progress"
-msgstr ""
+msgstr "搜尋已經在進行"
 
 #: tortoisehg/hgqt/guess.py:187
 msgid "Cannot start a new search"
@@ -1950,7 +1959,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/hgemail_ui.py:267 tortoisehg/hgtk/hgemail.py:114
 msgid "Plain, do not prepend Hg header"
-msgstr ""
+msgstr "純的,沒有Hg標頭"
 
 #: tortoisehg/hgqt/hgemail_ui.py:268 tortoisehg/hgtk/hgemail.py:126
 msgid ""
@@ -2010,11 +2019,11 @@ msgstr "變更集"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "Select &All"
-msgstr ""
+msgstr "全選(&A)"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "Select &None"
-msgstr ""
+msgstr "全不選(&N)"
 
 #: tortoisehg/hgqt/hgemail_ui.py:282 tortoisehg/hgqt/wctxactions.py:43
 #: tortoisehg/hgqt/webconf.py:256 tortoisehg/hgqt/webconf_ui.py:79
@@ -2064,7 +2073,7 @@ msgstr "編輯檔案"
 
 #: tortoisehg/hgqt/hgignore.py:84
 msgid "<b>Ignore Filter</b>"
-msgstr ""
+msgstr "<b>忽略過濾器</b>"
 
 #: tortoisehg/hgqt/hgignore.py:91
 msgid "<b>Untracked Files</b>"
@@ -2282,7 +2291,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/manifestdialog.py:535
 msgid "Failed to open Manifest dialog"
-msgstr ""
+msgstr "不能開啟清單對話框"
 
 #: tortoisehg/hgqt/merge.py:31
 #, python-format
@@ -2303,11 +2312,11 @@ msgstr "離開(&E)"
 
 #: tortoisehg/hgqt/merge.py:118
 msgid "Prepare to merge"
-msgstr ""
+msgstr "準備合併"
 
 #: tortoisehg/hgqt/merge.py:119
 msgid "Verify merge targets and ensure your working directory is clean."
-msgstr ""
+msgstr "驗證合併的目標並確保你的工作目錄是乾淨的."
 
 #: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:595
 #: tortoisehg/hgqt/revpanel.py:158 tortoisehg/hgtk/merge.py:73
@@ -2382,18 +2391,18 @@ msgstr "合併中..."
 
 #: tortoisehg/hgqt/merge.py:355
 msgid "Automatically advance to next page when merge is complete."
-msgstr ""
+msgstr "合併完成時自動到下一頁"
 
 #: tortoisehg/hgqt/merge.py:400
 #, python-format
 msgid ""
 "%d files were modified on both branches and must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr ""
+msgstr "%d個檔案在兩個分支都被改過,得要<a href=\"resolve\"><b>解決衝突</b></a>"
 
 #: tortoisehg/hgqt/merge.py:439
 msgid "Commit merge results"
-msgstr ""
+msgstr "提交合併結果"
 
 #: tortoisehg/hgqt/merge.py:540 tortoisehg/hgtk/merge.py:135
 msgid "Merge"
@@ -4087,11 +4096,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1241
 msgid "Write diff file"
-msgstr ""
+msgstr "寫進diff檔"
 
 #: tortoisehg/hgqt/repowidget.py:1252
 msgid "Unable to write diff file"
-msgstr ""
+msgstr "不能寫進diff檔"
 
 #: tortoisehg/hgqt/repowidget.py:1296
 msgid "Unable to compress history"
@@ -4107,15 +4116,15 @@ msgstr "視覺化 Diff ..."
 
 #: tortoisehg/hgqt/repowidget.py:1306
 msgid "Export Diff..."
-msgstr ""
+msgstr "匯出Diff..."
 
 #: tortoisehg/hgqt/repowidget.py:1308 tortoisehg/hgqt/repowidget.py:1397
 msgid "Export Selected..."
-msgstr ""
+msgstr "匯出選擇的..."
 
 #: tortoisehg/hgqt/repowidget.py:1309 tortoisehg/hgqt/repowidget.py:1398
 msgid "Email Selected..."
-msgstr ""
+msgstr "Email選擇的"
 
 #: tortoisehg/hgqt/repowidget.py:1311
 msgid "Export DAG Range..."
@@ -4139,7 +4148,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1317
 msgid "Compress History..."
-msgstr ""
+msgstr "壓縮歷史..."
 
 #: tortoisehg/hgqt/repowidget.py:1329 tortoisehg/hgqt/repowidget.py:1407
 msgid "Transplant Selected to local"
@@ -4159,7 +4168,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1377
 msgid "Fold patches..."
-msgstr ""
+msgstr "目錄路徑..."
 
 #: tortoisehg/hgqt/repowidget.py:1378
 msgid "Delete patches..."
@@ -4179,7 +4188,7 @@ msgstr "匯出補丁"
 
 #: tortoisehg/hgqt/repowidget.py:1454
 msgid "Cannot export revision"
-msgstr ""
+msgstr "不能匯出修訂版"
 
 #: tortoisehg/hgqt/repowidget.py:1455
 #, python-format
@@ -4188,6 +4197,9 @@ msgid ""
 "\n"
 "%s\n"
 msgstr ""
+"不能匯出%s修訂版到這個檔案:\n"
+"\n"
+"%s\n"
 
 #: tortoisehg/hgqt/repowidget.py:1457
 msgid "There is already an existing folder with that same name."
@@ -4240,6 +4252,8 @@ msgid ""
 "Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a "
 "href=\"file:///%s\">%s</a>"
 msgstr ""
+"修訂版 #%d (%s) 已經匯出到:<p><a href=\"file:///%s\">%s</a>%s<a "
+"href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1510
 msgid "Patches exported"
@@ -4276,7 +4290,7 @@ msgstr "先前命令還在執行"
 #: tortoisehg/hgqt/resolve.py:25
 #, python-format
 msgid "Resolve conflicts - %s"
-msgstr ""
+msgstr "解決衝突 - %s"
 
 #: tortoisehg/hgqt/resolve.py:54
 msgid "Local revision information"
@@ -4288,7 +4302,7 @@ msgstr "其他修訂版資訊"
 
 #: tortoisehg/hgqt/resolve.py:77
 msgid "Unresolved conflicts"
-msgstr ""
+msgstr "未解決的衝突"
 
 #: tortoisehg/hgqt/resolve.py:91
 msgid "Mercurial Resolve"
@@ -4300,7 +4314,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:94
 msgid "Tool Resolve"
-msgstr ""
+msgstr "解決衝突工具"
 
 #: tortoisehg/hgqt/resolve.py:95
 msgid "Merge using selected merge tool"
@@ -4308,7 +4322,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:97
 msgid "Take Local"
-msgstr ""
+msgstr "取用本地的"
 
 #: tortoisehg/hgqt/resolve.py:98
 msgid "Accept the local file version (yours)"
@@ -4316,7 +4330,7 @@ msgstr "接受本地檔案版本(你的)"
 
 #: tortoisehg/hgqt/resolve.py:100
 msgid "Take Other"
-msgstr ""
+msgstr "取用其他的"
 
 #: tortoisehg/hgqt/resolve.py:101
 msgid "Accept the other file version (theirs)"
@@ -4332,7 +4346,7 @@ msgstr "標示這個檔案為已解決"
 
 #: tortoisehg/hgqt/resolve.py:114
 msgid "Resolved conflicts"
-msgstr ""
+msgstr "已解決的衝突"
 
 #: tortoisehg/hgqt/resolve.py:129
 msgid "Edit resolved file"
@@ -4348,7 +4362,7 @@ msgstr "視覺化 3-Way diff"
 
 #: tortoisehg/hgqt/resolve.py:134 tortoisehg/hgtk/history.py:1271
 msgid "Diff to Local"
-msgstr ""
+msgstr "Diff到本地"
 
 #: tortoisehg/hgqt/resolve.py:135
 msgid "Visual diff between resolved file and first parent"
@@ -4356,7 +4370,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:137
 msgid "Diff to Other"
-msgstr ""
+msgstr "Diff到其他"
 
 #: tortoisehg/hgqt/resolve.py:138
 msgid "Visual diff between resolved file and second parent"
@@ -4390,11 +4404,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:342
 msgid "There are merge <b>conflicts</b> to be resolved"
-msgstr ""
+msgstr "有合併<b>衝突</b>被解決"
 
 #: tortoisehg/hgqt/resolve.py:344
 msgid "All conflicts are resolved."
-msgstr ""
+msgstr "全部的衝突都被解決了"
 
 #: tortoisehg/hgqt/resolve.py:346
 msgid "There are no conflicting file merges."
