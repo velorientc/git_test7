@@ -47,7 +47,7 @@ class FileData(object):
             return None
         try:
             data = fctx.data()
-            if '\0' in data:
+            if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary')
                 if status != 'A':
                     return None
@@ -83,6 +83,7 @@ class FileData(object):
                 return 'C'
             return None
 
+        isbfile = False
         repo = ctx._repo
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
@@ -313,6 +314,9 @@ class FileData(object):
                     else:
                         self.contents = olddata
                 self.flabel += _(' <i>(was deleted)</i>')
+            elif hasattr(ctx.p1(), 'hasStandin') and ctx.p1().hasStandin(wfile):
+                self.error = 'binary file'
+                self.flabel += _(' <i>(was deleted)</i>')
             else:
                 self.flabel += _(' <i>(was added, now missing)</i>')
             return
@@ -326,6 +330,8 @@ class FileData(object):
                     return
                 else:
                     data = util.posixfile(absfile, 'r').read()
+            elif ctx.hasStandin(wfile):
+                data = '\0'
             else:
                 data = ctx.filectx(wfile).data()
             if '\0' in data:
@@ -335,6 +341,9 @@ class FileData(object):
             return
 
         if status in ('M', 'A'):
+            if ctx.hasStandin(wfile):
+                wfile = ctx.findStandin(wfile)
+                isbfile = True
             res = self.checkMaxDiff(ctx, wfile, maxdiff, status)
             if res is None:
                 return
@@ -376,5 +385,8 @@ class FileData(object):
         revs = [str(ctx), str(ctx2)]
         diffopts = patch.diffopts(repo.ui, {})
         diffopts.git = False
+        if isbfile:
+            olddata += '\0'
+            newdata += '\0'
         self.diff = mdiff.unidiff(olddata, olddate, newdata, newdate,
                                   oldname, wfile, revs, diffopts)

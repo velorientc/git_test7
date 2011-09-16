@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error
+from mercurial import ui, util, error, extensions
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
@@ -23,6 +23,12 @@ from PyQt4.QtGui import *
 
 _unspecstr = _('<unspecified>')
 ENTRY_WIDTH = 300
+
+def hasExtension(extname):
+    for name, module in extensions.extensions():
+        if name == extname:
+            return True
+    return False
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
@@ -315,6 +321,46 @@ class BugTraqConfigureEntry(QPushButton):
         return self.value() != self.curvalue
 
 
+class PathBrowser(QWidget):
+    def __init__(self, parent=None, **opts):
+        QWidget.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        
+        self.lineEdit = QLineEdit()
+        completer = QCompleter(self)
+        completer.setModel(QDirModel(completer))
+        self.lineEdit.setCompleter(completer)
+        
+        self.browseButton = QPushButton(_('&Browse...'))
+        self.browseButton.clicked.connect(self.browse)
+        
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.lineEdit)
+        layout.addWidget(self.browseButton)
+        self.setLayout(layout)
+        
+    def browse(self):
+        dir = QFileDialog.getExistingDirectory(self, directory=self.lineEdit.text(),
+                                               options=QFileDialog.ShowDirsOnly)
+        if dir:
+            self.lineEdit.setText(dir)
+    
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue:
+            self.lineEdit.setText(hglib.tounicode(curvalue))
+        else:
+            self.lineEdit.setText('')
+            
+    def value(self):
+        utext = self.lineEdit.text()
+        return utext and hglib.fromunicode(utext) or None
+    
+    def isDirty(self):
+        return self.value() != self.curvalue
+        
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -351,6 +397,9 @@ def genFontEdit(opts):
 
 def genBugTraqEdit(opts):
     return BugTraqConfigureEntry(**opts)
+
+def genPathBrowser(opts):
+    return PathBrowser(**opts)
 
 def findIssueTrackerPlugins():
     plugins = bugtraq.get_issue_plugins_with_names()
@@ -713,6 +762,10 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory', genBoolRBGroup,
+        _('When committing, require that a reference to an issue be specified.  '
+          'If enabled, the regex configured in \'Issue Regex\' must find a match '
+          'in the commit message.')),
     _fi(_('Issue Tracker Plugin'), 'tortoisehg.issue.bugtraqplugin',
         (genDeferredCombo, findIssueTrackerPlugins),
         _('Configures a COM IBugTraqProvider or IBugTrackProvider2 issue '
@@ -736,6 +789,26 @@ INFO = (
         _('A comma separated list of target groups')),
     _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma separated list of target people')),
+    )),
+    
+({'name': 'kbfiles', 'label': _('Kiln Bfiles'), 'icon': 'kiln', 'extension': 'kbfiles'}, (
+    _fi(_('Patterns'), 'kilnbfiles.patterns', genEditCombo,
+        _('Files with names meeting the specified patterns will be automatically '
+          'added as bfiles')),
+    _fi(_('Size'), 'kilnbfiles.size', genEditCombo,
+        _('Files of at least the specified size (in megabytes) will be added as bfiles')),
+    _fi(_('System Cache'), 'kilnbfiles.systemcache', genPathBrowser,
+        _('Path to the directory where a system-wide cache of bfiles will be stored')),
+    )),
+
+({'name': 'largefiles', 'label': _('Largefiles'), 'icon': 'kiln', 'extension': 'largefiles'}, (
+    _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
+        _('Files with names meeting the specified patterns will be automatically '
+          'added as largefiles')),
+    _fi(_('Size'), 'largefiles.size', genEditCombo,
+        _('Files of at least the specified size (in megabytes) will be added as largefiles')),
+    _fi(_('System Cache'), 'largefiles.systemcache', genPathBrowser,
+        _('Path to the directory where a system-wide cache of largefiles will be stored')),
     )),
 
 )
@@ -915,6 +988,8 @@ class SettingsForm(QWidget):
 
         # add page items to treeview
         for meta, info in INFO:
+            if 'extension' in meta and not hasExtension(meta['extension']):
+                continue
             if isinstance(meta['icon'], str):
                 icon = qtlib.geticon(meta['icon'])
             else:
