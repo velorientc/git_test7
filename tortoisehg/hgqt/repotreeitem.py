@@ -296,7 +296,35 @@ class RepoItem(RepoTreeItem):
                 sri._valid = False
                 invalidRepoList.append(abssubpath)
             invalidRepoList.append(self._root)
+        except Exception, e:
+            # If any other sort of exception happens, show the corresponding
+            # error message, but do not crash!
+            # Note that we _also_ will mark the offending repos as invalid
+            # It is unfortunate that Python 2.4, which we target does not
+            # support combined try/except/finally clauses, forcing us
+            # to duplicate some code here
+            self._valid = False
+            if sri:
+                sri._valid = False
+                invalidRepoList.append(abssubpath)
+            invalidRepoList.append(self._root)
 
+            # Show a warning message indicating that there was an error
+            if repo:
+                rootpath = repo.root
+            else:
+                rootpath = self._root
+            warningMessage = (_('An exception happened while loading the ' \
+                'subrepos of:<br><br>"%s"<br><br>') + \
+                _('The exception error message was:<br><br>%s<br><br>') +\
+                _('Click OK to continue or Abort to exit.')) \
+                % (rootpath, e.message)
+            res = qtlib.WarningMsgBox(_('Error loading subrepos'),
+                                warningMessage,
+                                buttons = QMessageBox.Ok | QMessageBox.Abort)
+            # Let the user abort so that he gets the full exception info
+            if res == QMessageBox.Abort:
+                raise
         return invalidRepoList
 
     def setActive(self, sel):
