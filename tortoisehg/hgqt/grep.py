@@ -34,7 +34,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
 
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
-        self.setLayout(mainvbox)
 
         hbox = QHBoxLayout()
         hbox.setMargin(2)
@@ -173,15 +172,21 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchhistory = [s for s in sh if s]
         self.setCompleters()
 
-        mainvbox.setContentsMargins(2, 2, 2, 2)
         if parent:
             self.closeonesc = False
+            mainvbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(mainvbox)
         else:
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 550)
             self.closeonesc = True
             self.stbar = cmdui.ThgStatusBar()
-            mainvbox.addWidget(self.stbar)
+            mainvbox.setContentsMargins(5, 5, 5, 5)
+            outervbox = QVBoxLayout()
+            outervbox.addLayout(mainvbox)
+            outervbox.addWidget(self.stbar)
+            outervbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(outervbox)
             self.showMessage.connect(self.stbar.showMessage)
             self.progress.connect(self.stbar.progress)
 
