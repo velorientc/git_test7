@@ -67,7 +67,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, addmargin=False, **opts):
+    def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -166,7 +166,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             tb.addWidget(self.targetcombo)
 
         bottomlayout = QVBoxLayout()
-        if addmargin:
+        if not parent:
             bottomlayout.setContentsMargins(5, 5, 5, 5)
         else:
             bottomlayout.setContentsMargins(0, 0, 0, 0)
@@ -1566,4 +1566,4 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return SyncWidget(repo, None, addmargin=True, **opts)
+    return SyncWidget(repo, None, **opts)
