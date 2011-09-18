@@ -159,6 +159,7 @@ class HgignoreDialog(QDialog):
             base, ext = os.path.splitext(local)
             if ext:
                 filters.append(['*'+ext])
+                filters.append(['**'+ext])
         else:
             filters.append(selected)
         for f in filters:
