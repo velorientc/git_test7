@@ -36,8 +36,7 @@ def parseurl(path):
             port = m.group(3)
             folder = m.group(5) or '.'
         else:
-            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path),
-                                parent=self)
+            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
             host, port, folder = '', '', ''
     elif path.startswith(('http://', 'https://', 'svn+https://')):
         snpaqf = urlparse.urlparse(path)
