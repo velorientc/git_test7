@@ -197,7 +197,10 @@ class RepoFilterBar(QToolBar):
             self.hide()
 
     def saveSettings(self, s):
-        repoid = str(self._repo[0])
+        try:
+            repoid = str(self._repo[0])
+        except EnvironmentError:
+            return
         s.setValue('revset/' + repoid + '/geom', self.entrydlg.saveGeometry())
         s.setValue('revset/' + repoid + '/queries', self.revsethist)
         s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
