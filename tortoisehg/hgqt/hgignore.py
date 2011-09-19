@@ -101,6 +101,7 @@ class HgignoreDialog(QDialog):
         unknownlist.currentTextChanged.connect(self.setGlobFilter)
         unknownlist.setContextMenuPolicy(Qt.CustomContextMenu)
         unknownlist.customContextMenuRequested.connect(self.menuRequest)
+        unknownlist.itemDoubleClicked.connect(self.unknownDoubleClicked)
         lbl = QLabel(_('Backspace or Del to remove row(s)'))
         ivbox.addWidget(lbl)
 
@@ -159,6 +160,7 @@ class HgignoreDialog(QDialog):
             base, ext = os.path.splitext(local)
             if ext:
                 filters.append(['*'+ext])
+                filters.append(['**'+ext])
         else:
             filters.append(selected)
         for f in filters:
@@ -167,6 +169,9 @@ class HgignoreDialog(QDialog):
             a._patterns = f
             a.triggered.connect(self.insertFilters)
         self.contextmenu.exec_(point)
+
+    def unknownDoubleClicked(self, item):
+        self.insertFilters([str(item.text())])
 
     def insertFilters(self, pats=False, isregexp=False):
         if pats is False:

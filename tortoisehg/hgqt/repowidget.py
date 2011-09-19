@@ -1433,8 +1433,13 @@ class RepoWidget(QWidget):
         if not revisions:
             revisions = [self.rev]
         if len(revisions) == 1:
+            if isinstance(self.rev, int):
+                defaultpath = self.repo.wjoin('%d.patch' % self.rev)
+            else:
+                defaultpath = self.repo.root
+
             ret = QFileDialog.getSaveFileName(self, _('Export patch'),
-                                              hglib.tounicode(self.repo.root),
+                                              hglib.tounicode(defaultpath),
                                               _('Patch Files (*.patch)'))
             if not ret:
                 return
@@ -1451,7 +1456,7 @@ class RepoWidget(QWidget):
             epath = os.path.join(strdir,
                                  hglib.fromunicode(self.repo.shortname)+'_%r.patch')
             custompath = False
-            
+
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
 

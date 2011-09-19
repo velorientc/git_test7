@@ -382,18 +382,19 @@ class ChunksWidget(QWidget):
                 del fp
             ctx.invalidate()
         else:
-            repo.thgbackup(repo.wjoin(wfile))
+            fullpath = repo.wjoin(wfile)
+            repo.thgbackup(fullpath)
             wasadded = wfile in repo[None].added()
-            commands.revert(repo.ui, repo, repo.wjoin(wfile), rev='.',
-                            no_backup=True)
-            if wasadded:
-                try:
-                    os.unlink(repo.wjoin(wfile))
-                except EnvironmentError:
-                    qtlib.InfoMsgBox(_("Unable to remove"),
-                                     _("Unable to remove added file %s,\n"
-                                       "permission denied") %
-                                     hglib.tounicode(wfile))
+            try:
+                commands.revert(repo.ui, repo, fullpath, rev='.',
+                                no_backup=True)
+                if wasadded and os.path.exists(fullpath):
+                    os.unlink(fullpath)
+            except EnvironmentError:
+                qtlib.InfoMsgBox(_("Unable to remove"),
+                                 _("Unable to remove file %s,\n"
+                                   "permission denied") %
+                                    hglib.tounicode(wfile))
         self.fileModified.emit()
 
     def getChunksForFile(self, wfile):
