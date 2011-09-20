@@ -1545,7 +1545,8 @@ class RepoWidget(QWidget):
             dlg.deleteLater()
 
     def visualDiffToLocal(self):
-        assert type(self.rev) is int
+        if self.rev is None:
+            return
         opts = dict(rev=['rev(%d)' % self.rev])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
