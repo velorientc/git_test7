@@ -332,7 +332,7 @@ class MQPatchesWidget(QDockWidget):
             cont = True
             for p in self.repo.mq.fullseries:
                 if '#' in p:
-                    cont = QuestionMsgBox('Confirm qreorder',
+                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'
                               'Guard or comment found.<br>'
                               'Reordering patches will destroy them.<br>'
@@ -781,7 +781,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             cont = True
             for p in self.repo.mq.fullseries:
                 if '#' in p:
-                    cont = QuestionMsgBox('Confirm qreorder',
+                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'
                               'Guard or comment found.<br>'
                               'Reordering patches will destroy them.<br>'
