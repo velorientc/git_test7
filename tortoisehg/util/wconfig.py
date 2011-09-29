@@ -241,6 +241,6 @@ def writefile(config, path):
         # normalize line endings
         for line in buf.getvalue().splitlines():
             f.write(line + '\n')
-        f.rename()
+        f.close()
     finally:
         del f  # unlink temp file

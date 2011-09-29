@@ -283,7 +283,7 @@ class HgignoreDialog(QDialog):
         try:
             f = util.atomictempfile(self.ignorefile, 'wb', createmode=None)
             f.write(out)
-            f.rename()
+            f.close()
             shlib.shell_notify([self.ignorefile])
             self.ignoreFilterUpdated.emit()
         except EnvironmentError, e:
