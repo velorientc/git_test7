@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-09-20 09:45-0300\n"
-"PO-Revision-Date: 2011-09-04 14:48+0000\n"
+"PO-Revision-Date: 2011-09-22 21:40+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-09-21 05:03+0000\n"
-"X-Generator: Launchpad (build 13996)\n"
+"X-Launchpad-Export-Date: 2011-09-23 04:42+0000\n"
+"X-Generator: Launchpad (build 14012)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -778,6 +778,8 @@ msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"Die Daten %s konnte nicht gelöscht werden,\n"
+"keine Berechtigung"
 
 #: tortoisehg/hgqt/chunks.py:531
 msgctxt "files"
@@ -1381,7 +1383,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:51
 msgid "File is binary"
-msgstr ""
+msgstr "Die Datei enthält Binärdaten"
 
 #: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:361
 #, python-format
@@ -3954,19 +3956,21 @@ msgstr "Lokales Projektarchiv %s"
 msgid ""
 "An exception happened while loading the subrepos of:<br><br>\"%s\"<br><br>"
 msgstr ""
+"Eine Ausnahmesituation ist aufgetreten beim Laden des Unterarchivs "
+"von:<br><br>\"%s\"<br><br>"
 
 #: tortoisehg/hgqt/repotreeitem.py:322
 #, python-format
 msgid "The exception error message was:<br><br>%s<br><br>"
-msgstr ""
+msgstr "Die Fehlermeldung lautete :<br><br>%s<br><br>"
 
 #: tortoisehg/hgqt/repotreeitem.py:323
 msgid "Click OK to continue or Abort to exit."
-msgstr ""
+msgstr "Wählen Sie OK zum Fortfahren oder Abort zum Beenden."
 
 #: tortoisehg/hgqt/repotreeitem.py:325
 msgid "Error loading subrepos"
-msgstr ""
+msgstr "Fehler beim Laden der Unterarchive"
 
 #: tortoisehg/hgqt/repotreeitem.py:343
 msgid "Unable to update repository name"
@@ -4390,7 +4394,7 @@ msgstr "Flicken exportieren"
 
 #: tortoisehg/hgqt/repowidget.py:1443
 msgid "Patch Files (*.patch)"
-msgstr ""
+msgstr "Flickendateien (*.patch)"
 
 #: tortoisehg/hgqt/repowidget.py:1474
 msgid "Cannot export revision"

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-09-20 09:45-0300\n"
-"PO-Revision-Date: 2011-08-23 09:36+0000\n"
+"PO-Revision-Date: 2011-09-21 17:13+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-09-21 05:08+0000\n"
+"X-Launchpad-Export-Date: 2011-09-22 04:51+0000\n"
 "X-Generator: Launchpad (build 13996)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1032,7 +1032,7 @@ msgstr "確認分支改變"
 #: tortoisehg/hgqt/commit.py:369
 #, python-format
 msgid "Named branch \"%s\" already exists, last used in revision %d\n"
-msgstr ""
+msgstr "\"%s\"命名分支已經存在.最後一次是在%d 修訂版被使用過\n"
 
 #: tortoisehg/hgqt/commit.py:373
 msgid "Restart &Branch"
@@ -1050,7 +1050,7 @@ msgstr "確認新分支"
 #: tortoisehg/hgqt/commit.py:378
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
-msgstr ""
+msgstr "這次提交時要建立新的\"%s\"分支嗎?\n"
 
 #: tortoisehg/hgqt/commit.py:381
 msgid "Create &Branch"
@@ -3180,7 +3180,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/quickop.py:21 tortoisehg/hgtk/quickop.py:20
 msgid "Forget"
-msgstr ""
+msgstr "忘記"
 
 #: tortoisehg/hgqt/quickop.py:22
 msgid "Checkmark files to revert"
@@ -3371,7 +3371,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rejects.py:280
 msgid "Filename required"
-msgstr ""
+msgstr "需要檔名"
 
 #: tortoisehg/hgqt/rejects.py:281
 msgid "You must provide the path to a file"
@@ -3694,7 +3694,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:433 tortoisehg/hgqt/wctxactions.py:44
 msgid "Copy path"
-msgstr ""
+msgstr "複製路徑"
 
 #: tortoisehg/hgqt/reporegistry.py:434
 msgid "Copy the root path of the repository to the clipboard"
@@ -3797,7 +3797,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreeitem.py:343
 msgid "Unable to update repository name"
-msgstr ""
+msgstr "無法更新儲存庫名字"
 
 #: tortoisehg/hgqt/repotreeitem.py:344
 #, python-format
@@ -4045,7 +4045,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1176 tortoisehg/hgtk/history.py:1293
 msgid "Export"
-msgstr ""
+msgstr "匯出"
 
 #: tortoisehg/hgqt/repowidget.py:1177
 msgid "Export patch..."
@@ -4069,7 +4069,7 @@ msgstr "複製補丁"
 
 #: tortoisehg/hgqt/repowidget.py:1189
 msgid "Copy hash"
-msgstr ""
+msgstr "複製hash號碼"
 
 #: tortoisehg/hgqt/repowidget.py:1193
 msgid "Transplant to local"
@@ -4089,7 +4089,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1202
 msgid "Finish patch"
-msgstr ""
+msgstr "完成補丁"
 
 #: tortoisehg/hgqt/repowidget.py:1204 tortoisehg/hgqt/repowidget.py:1379
 msgid "Rename patch..."
@@ -4109,7 +4109,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1216
 msgid "Remote Update..."
-msgstr ""
+msgstr "遠端更新..."
 
 #: tortoisehg/hgqt/repowidget.py:1241
 msgid "Write diff file"
@@ -4197,7 +4197,7 @@ msgstr "重排補丁..."
 
 #: tortoisehg/hgqt/repowidget.py:1420
 msgid "Pull to here..."
-msgstr ""
+msgstr "拉收到這裡..."
 
 #: tortoisehg/hgqt/repowidget.py:1441 tortoisehg/hgqt/repowidget.py:1451
 msgid "Export patch"
@@ -4339,7 +4339,7 @@ msgstr "解決衝突工具"
 
 #: tortoisehg/hgqt/resolve.py:95
 msgid "Merge using selected merge tool"
-msgstr ""
+msgstr "使用選擇的合併工具來合併"
 
 #: tortoisehg/hgqt/resolve.py:97
 msgid "Take Local"
@@ -4375,7 +4375,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:131
 msgid "3-Way Diff"
-msgstr ""
+msgstr "第三方Diff"
 
 #: tortoisehg/hgqt/resolve.py:132
 msgid "Visual three-way diff"
@@ -4568,7 +4568,7 @@ msgstr "命名的書籤或所有的書籤"
 
 #: tortoisehg/hgqt/revset.py:40
 msgid "The named tag or all tags."
-msgstr ""
+msgstr "命名的標籤或全部的標籤"
 
 #: tortoisehg/hgqt/revset.py:42
 msgid "Changeset is tagged."
@@ -5418,7 +5418,7 @@ msgstr "請描述你喜愛的使用者介面語言(需要重新啟動)"
 
 #: tortoisehg/hgqt/settings.py:408 tortoisehg/hgtk/thgconfig.py:45
 msgid "Three-way Merge Tool"
-msgstr ""
+msgstr "第三方合併工具"
 
 #: tortoisehg/hgqt/settings.py:410
 msgid ""
@@ -5739,7 +5739,7 @@ msgstr "網頁伺服器"
 #: tortoisehg/hgqt/settings.py:555 tortoisehg/hgtk/thgconfig.py:180
 #: tortoisehg/hgtk/thgpbranch.py:210
 msgid "Name"
-msgstr "名稱"
+msgstr "名字"
 
 #: tortoisehg/hgqt/settings.py:556
 msgid ""
@@ -5858,7 +5858,7 @@ msgstr "編碼"
 
 #: tortoisehg/hgqt/settings.py:599 tortoisehg/hgtk/thgconfig.py:222
 msgid "Character encoding name"
-msgstr ""
+msgstr "字元編碼名稱"
 
 #: tortoisehg/hgqt/settings.py:602 tortoisehg/hgtk/thgconfig.py:225
 msgid "Proxy"
@@ -6333,7 +6333,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/shellconf.py:151 tortoisehg/hgtk/shellconf.py:159
 msgid "Added"
-msgstr ""
+msgstr "已新增"
 
 #: tortoisehg/hgqt/shellconf.py:153 tortoisehg/hgtk/shellconf.py:166
 msgid "Locked*"
@@ -6600,11 +6600,11 @@ msgstr ""
 #: tortoisehg/hgqt/status.py:804
 #, python-format
 msgid "%s is added"
-msgstr ""
+msgstr "%s已新增"
 
 #: tortoisehg/hgqt/status.py:805 tortoisehg/hgtk/quickop.py:166
 msgid "added"
-msgstr ""
+msgstr "已新增"
 
 #: tortoisehg/hgqt/status.py:806
 #, python-format
@@ -7624,7 +7624,7 @@ msgstr "沒有檔案被變更"
 
 #: tortoisehg/hgqt/visdiff.py:217 tortoisehg/hgtk/visdiff.py:196
 msgid "There are no file changes to view"
-msgstr ""
+msgstr "找不到檔案有變更,所以不用檢視了"
 
 #: tortoisehg/hgqt/visdiff.py:353 tortoisehg/hgtk/visdiff.py:326
 msgid "cleaning up temp directory\n"
@@ -7703,7 +7703,7 @@ msgstr "加註(&A)"
 
 #: tortoisehg/hgqt/wctxactions.py:53
 msgid "&Forget"
-msgstr ""
+msgstr "忘記(&F)"
 
 #: tortoisehg/hgqt/wctxactions.py:55
 msgid "&Detect Renames..."
@@ -7929,7 +7929,7 @@ msgstr "顯示補丁佇列"
 
 #: tortoisehg/hgqt/workbench.py:235
 msgid "Show Output &Log"
-msgstr ""
+msgstr "顯示輸出記錄(&L)"
 
 #: tortoisehg/hgqt/workbench.py:242
 msgid "Repository Registry Options"
@@ -8568,7 +8568,7 @@ msgstr "移除(_R)"
 #: tortoisehg/hgtk/commit.py:263 tortoisehg/hgtk/status.py:130
 #: tortoisehg/hgtk/status.py:1253
 msgid "_Forget"
-msgstr "遺忘(_F)"
+msgstr "忘記(_F)"
 
 #: tortoisehg/hgtk/commit.py:301
 msgid "undo recent commit"
@@ -10029,7 +10029,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1332
 msgid "_Export Patch..."
-msgstr ""
+msgstr "匯出補丁(_E)"
 
 #: tortoisehg/hgtk/history.py:1333
 msgid "E_mail Patch..."
@@ -11560,11 +11560,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgconfig.py:313
 msgid "Command Output"
-msgstr ""
+msgstr "指令輸出"
 
 #: tortoisehg/hgtk/thgconfig.py:314
 msgid "Font used in command output window. Default: monospace 10"
-msgstr ""
+msgstr "指令輸出視窗的字型.預設:monospace 10"
 
 #: tortoisehg/hgtk/thgconfig.py:333
 msgid "Mandatory Issue Reference"
@@ -12471,7 +12471,7 @@ msgstr "回復(Revert)檔案變更"
 
 #: tortoisehg/util/menuthg.py:37
 msgid "Forget Files..."
-msgstr ""
+msgstr "忘記檔案..."
 
 #: tortoisehg/util/menuthg.py:38 tortoisehg/util/menuthg.py:41
 msgid "Remove files from version control"
