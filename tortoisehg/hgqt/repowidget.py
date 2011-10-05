@@ -858,7 +858,7 @@ class RepoWidget(QWidget):
                     while self._reload_rev not in self.repo.mq.series and idx:
                         idx -= 1
                         self._reload_rev = self._last_series[idx]
-            except (AttributeError, IndexError):
+            except (AttributeError, IndexError, ValueError):
                 self._reload_rev = 'tip'
         elif len(self.repo) <= self.rev:
             self._reload_rev = 'tip'

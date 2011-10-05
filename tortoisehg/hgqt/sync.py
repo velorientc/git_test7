@@ -486,10 +486,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             port = self.portentry.text()
             parts = [scheme, '://']
             if scheme == 'ssh' and '@' in host:
-                if host[0] == '@':
-                    user, host = '', host[1:]
-                else:
-                    user, host = host.split('@', 1)
+                user, host = unicode(host).split('@', 1)
                 self.curuser = hglib.fromunicode(user)
                 self.lastsshuser = self.curuser
             if self.curuser:

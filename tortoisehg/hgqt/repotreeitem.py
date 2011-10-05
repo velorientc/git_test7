@@ -259,72 +259,75 @@ class RepoItem(RepoTreeItem):
 
     def appendSubrepos(self, repo=None):
         invalidRepoList = []
-        try:
-            sri = None
-            if repo is None:
-                repo = hg.repository(ui.ui(), self._root)
-            wctx = repo['.']
-            for subpath in wctx.substate:
+
+        # Mercurial repos are the only ones that can have subrepos
+        if self.repotype() == 'hg':
+            try:
                 sri = None
-                abssubpath = repo.wjoin(subpath)
-                subtype = wctx.substate[subpath][2]
-                sriIsValid = os.path.isdir(abssubpath)
-                sri = SubrepoItem(abssubpath, subtype=subtype)
-                sri._valid = sriIsValid
-                self.appendChild(sri)
+                if repo is None:
+                    repo = hg.repository(ui.ui(), self._root)
+                wctx = repo['.']
+                for subpath in wctx.substate:
+                    sri = None
+                    abssubpath = repo.wjoin(subpath)
+                    subtype = wctx.substate[subpath][2]
+                    sriIsValid = os.path.isdir(abssubpath)
+                    sri = SubrepoItem(abssubpath, subtype=subtype)
+                    sri._valid = sriIsValid
+                    self.appendChild(sri)
 
-                if not sriIsValid:
-                    self._valid = False
-                    sri._valid = False
-                    invalidRepoList.append(repo.wjoin(subpath))
-                    return invalidRepoList
-                    continue
-
-                if subtype == 'hg':
-                    # Only recurse into mercurial subrepos
-                    sctx = wctx.sub(subpath)
-                    invalidSubrepoList = sri.appendSubrepos(sctx._repo)
-                    if invalidSubrepoList:
+                    if not sriIsValid:
                         self._valid = False
-                        invalidRepoList += invalidSubrepoList
+                        sri._valid = False
+                        invalidRepoList.append(repo.wjoin(subpath))
+                        return invalidRepoList
+                        continue
 
-        except (EnvironmentError, error.RepoError, util.Abort), e:
-            # Add the repo to the list of repos/subrepos
-            # that could not be open
-            self._valid = False
-            if sri:
-                sri._valid = False
-                invalidRepoList.append(abssubpath)
-            invalidRepoList.append(self._root)
-        except Exception, e:
-            # If any other sort of exception happens, show the corresponding
-            # error message, but do not crash!
-            # Note that we _also_ will mark the offending repos as invalid
-            # It is unfortunate that Python 2.4, which we target does not
-            # support combined try/except/finally clauses, forcing us
-            # to duplicate some code here
-            self._valid = False
-            if sri:
-                sri._valid = False
-                invalidRepoList.append(abssubpath)
-            invalidRepoList.append(self._root)
+                    if subtype == 'hg':
+                        # Only recurse into mercurial subrepos
+                        sctx = wctx.sub(subpath)
+                        invalidSubrepoList = sri.appendSubrepos(sctx._repo)
+                        if invalidSubrepoList:
+                            self._valid = False
+                            invalidRepoList += invalidSubrepoList
 
-            # Show a warning message indicating that there was an error
-            if repo:
-                rootpath = repo.root
-            else:
-                rootpath = self._root
-            warningMessage = (_('An exception happened while loading the ' \
-                'subrepos of:<br><br>"%s"<br><br>') + \
-                _('The exception error message was:<br><br>%s<br><br>') +\
-                _('Click OK to continue or Abort to exit.')) \
-                % (rootpath, e.message)
-            res = qtlib.WarningMsgBox(_('Error loading subrepos'),
-                                warningMessage,
-                                buttons = QMessageBox.Ok | QMessageBox.Abort)
-            # Let the user abort so that he gets the full exception info
-            if res == QMessageBox.Abort:
-                raise
+            except (EnvironmentError, error.RepoError, util.Abort), e:
+                # Add the repo to the list of repos/subrepos
+                # that could not be open
+                self._valid = False
+                if sri:
+                    sri._valid = False
+                    invalidRepoList.append(abssubpath)
+                invalidRepoList.append(self._root)
+            except Exception, e:
+                # If any other sort of exception happens, show the corresponding
+                # error message, but do not crash!
+                # Note that we _also_ will mark the offending repos as invalid
+                # It is unfortunate that Python 2.4, which we target does not
+                # support combined try/except/finally clauses, forcing us
+                # to duplicate some code here
+                self._valid = False
+                if sri:
+                    sri._valid = False
+                    invalidRepoList.append(abssubpath)
+                invalidRepoList.append(self._root)
+
+                # Show a warning message indicating that there was an error
+                if repo:
+                    rootpath = repo.root
+                else:
+                    rootpath = self._root
+                warningMessage = (_('An exception happened while loading the ' \
+                    'subrepos of:<br><br>"%s"<br><br>') + \
+                    _('The exception error message was:<br><br>%s<br><br>') +\
+                    _('Click OK to continue or Abort to exit.')) \
+                    % (rootpath, e.message)
+                res = qtlib.WarningMsgBox(_('Error loading subrepos'),
+                                    warningMessage,
+                                    buttons = QMessageBox.Ok | QMessageBox.Abort)
+                # Let the user abort so that he gets the full exception info
+                if res == QMessageBox.Abort:
+                    raise
         return invalidRepoList
 
     def setActive(self, sel):

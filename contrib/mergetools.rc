@@ -4,6 +4,7 @@ beyondcompare3.priority=-1
 beyondcompare3.args=$local $other $base /mergeoutput=$output /ro /lefttitle=parent1 /centertitle=base /righttitle=parent2 /outputtitle=merged /automerge /reviewconflicts /solo
 beyondcompare3.premerge=False
 beyondcompare3.regkey=Software\Scooter Software\Beyond Compare 3
+beyondcompare3.regkeyalt=Software\Wow6432Node\Scooter Software\Beyond Compare 3
 beyondcompare3.regname=ExePath
 beyondcompare3.gui=True
 beyondcompare3.diffargs=/lro /lefttitle='$plabel1' /righttitle='$clabel' /solo /expandall $parent $child
@@ -14,6 +15,7 @@ beyondcompare3.dirdiff=True
 beyondcompare2.priority=-4
 beyondcompare2.args= /ro /title1="Original" /title2="Working copy" $local $other
 beyondcompare2.regkey=Software\Scooter Software\Beyond Compare
+beyondcompare2.regkeyalt=Software\Wow6432Node\Scooter Software\Beyond Compare
 beyondcompare2.regname=ExePath
 beyondcompare2.gui=True
 beyondcompare2.diffargs=/lro /title1='$plabel1' /title2='$clabel' $parent $child
