@@ -324,6 +324,7 @@ class SearchToolBar(QToolBar):
                                              shortcut=Qt.Key_Escape)
             self._close_button.clicked.connect(self.hide)
             self.addWidget(self._close_button)
+            self.addWidget(qtlib.Spacer(2, 2))
 
         self._le = QLineEdit()
         if hasattr(self._le, 'setPlaceholderText'): # Qt >= 4.7
@@ -335,6 +336,7 @@ class SearchToolBar(QToolBar):
             self._lbl.setBuddy(self._le)
         self._le.returnPressed.connect(self._emitSearchRequested)
         self.addWidget(self._le)
+        self.addWidget(qtlib.Spacer(4, 4))
         self._chk = QCheckBox(_('Ignore case'))
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
@@ -345,6 +347,7 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
+        self.setStyleSheet(qtlib.tbstylesheet)
 
         def defaultsettings():
             s = QSettings()
