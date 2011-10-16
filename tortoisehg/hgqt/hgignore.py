@@ -11,7 +11,7 @@ import re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import match, util, error
+from mercurial import commands, match, ui, util, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import shlib, hglib
@@ -279,11 +279,20 @@ class HgignoreDialog(QDialog):
     def writeIgnoreFile(self):
         eol = self.doseoln and '\r\n' or '\n'
         out = eol.join(self.ignorelines) + eol
+        hasignore = os.path.exists(self.repo.join(self.ignorefile))
 
         try:
             f = util.atomictempfile(self.ignorefile, 'wb', createmode=None)
             f.write(out)
             f.rename()
+            if not hasignore:
+                ret = qtlib.QuestionMsgBox(_('New file created'),
+                                           _('TortoiseHg has created a new '
+                                             '.hgignore file.  Would you like to '
+                                             'add this file to the source code '
+                                             'control repository?'), parent=self)
+                if ret:
+                    commands.add(ui.ui(), self.repo, self.ignorefile)
             shlib.shell_notify([self.ignorefile])
             self.ignoreFilterUpdated.emit()
         except EnvironmentError, e:
