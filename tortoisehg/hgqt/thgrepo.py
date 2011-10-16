@@ -472,7 +472,10 @@ def _extendrepo(repo):
             self.shelfdir = sdir = self.join('shelves')
             if os.path.isdir(sdir):
                 def getModificationTime(x):
-                    return os.path.getmtime(os.path.join(sdir, x))
+                    try:
+                        return os.path.getmtime(os.path.join(sdir, x))
+                    except EnvironmentError:
+                        return 0
                 shelves = sorted(os.listdir(sdir),
                     key=getModificationTime, reverse=True)
                 return [s for s in shelves if \
