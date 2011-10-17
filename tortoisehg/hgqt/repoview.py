@@ -292,8 +292,11 @@ class HgRepoView(QTableView):
         for c in range(self.model().columnCount(QModelIndex())):
             col_widths.append(self.columnWidth(c))
 
-        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
-        s.setValue(key, col_widths)
+        try:
+            key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+            s.setValue(key, col_widths)
+        except EnvironmentError:
+            pass
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
