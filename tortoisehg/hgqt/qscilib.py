@@ -219,20 +219,34 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.eolVisibility() == m)
                 a.triggered.connect(lambda: self.setEolVisibility(m))
             mkaction(name, mode)
+        acmenu = None
+        if not self.isReadOnly():
+            acmenu = QMenu(_('AutoComplete'), self)
+            for name, value in ((_('Enable'), 2),
+                                (_('Disable'), -1)):
+                def mkaction(n, v):
+                    a = acmenu.addAction(n)
+                    a.setCheckable(True)
+                    a.setChecked(self.autoCompletionThreshold() == v)
+                    a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
+                mkaction(name, value)
         self._stdMenu.addMenu(wrapmenu)
         self._stdMenu.addMenu(wsmenu)
         self._stdMenu.addMenu(vsmenu)
+        if (acmenu): self._stdMenu.addMenu(acmenu)
         return self._stdMenu
 
     def saveSettings(self, qs, prefix):
         qs.setValue(prefix+'/wrap', self.wrapMode())
         qs.setValue(prefix+'/whitespace', self.whitespaceVisibility())
         qs.setValue(prefix+'/eol', self.eolVisibility())
+        qs.setValue(prefix+'/autocomplete', self.autoCompletionThreshold())
 
     def loadSettings(self, qs, prefix):
         self.setWrapMode(qs.value(prefix+'/wrap').toInt()[0])
         self.setWhitespaceVisibility(qs.value(prefix+'/whitespace').toInt()[0])
         self.setEolVisibility(qs.value(prefix+'/eol').toBool())
+        self.setAutoCompletionThreshold(qs.value(prefix+'/autocomplete').toInt()[0])
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
