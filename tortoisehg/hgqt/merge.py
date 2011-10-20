@@ -633,8 +633,11 @@ class CheckThread(QThread):
                 unresolved = True
                 break
         wctx = self.repo[None]
-        dirty = bool(wctx.dirty()) or unresolved
-        self.results = (dirty, len(wctx.parents()))
+        try:
+            dirty = bool(wctx.dirty()) or unresolved
+            self.results = (dirty, len(wctx.parents()))
+        except EnvironmentError:
+            self.results = (True, len(wctx.parents()))
 
     def cancel(self):
         self.canceled = True
