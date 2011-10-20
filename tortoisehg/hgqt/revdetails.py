@@ -438,7 +438,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo', 'explore', 'terminal']
+            actionlist = ['opensubrepo', 'explore', 'terminal', None, 'revert']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,

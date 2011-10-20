@@ -52,7 +52,7 @@ class WctxActions(QObject):
         make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
-        make(_('&Revert...'), revert, frozenset('MAR!'), 'hg-revert')
+        make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
         make(_('File History'), log, frozenset('MARC!'), 'hg-log')
