@@ -485,7 +485,8 @@ class RepoGroupItem(RepoTreeItem):
             self._commonpath = ''
         else:
             childs = [os.path.normcase(child.rootpath())
-                        for child in self.childs]
+                      for child in self.childs
+                      if not isinstance(child, RepoGroupItem)]
             self._commonpath = os.path.dirname(os.path.commonprefix(childs))
 
         return self._commonpath
