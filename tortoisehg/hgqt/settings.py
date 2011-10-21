@@ -480,6 +480,11 @@ INFO = (
         'repository.  You can select the "current" (i.e. the working directory '
         'parent), the current "tip" or the working directory ("workingdir"). '
         'Default: current')),
+    _fi(_('Open new tabs next\nto the current tab'),
+        'tortoisehg.opentabsaftercurrent', genBoolRBGroup,
+        _('Should new tabs be open next to the current tab? '
+        'If False new tabs will be open after the last tab. '
+        'Default: True')),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '

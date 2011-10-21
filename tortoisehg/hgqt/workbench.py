@@ -655,7 +655,15 @@ class Workbench(QMainWindow):
         rw.repoChanged.connect(self.reporegistry.repoChanged)
 
         tw = self.repoTabsWidget
-        index = self.repoTabsWidget.addTab(rw, rw.title())
+        # We can open new tabs next to the current one or next to the last tab
+        openTabAfterCurrent = self.ui.configbool('tortoisehg',
+            'opentabsaftercurrent', True)
+        if openTabAfterCurrent:
+            index = self.repoTabsWidget.insertTab(
+                tw.currentIndex()+1, rw, rw.title())
+        else:
+            index = self.repoTabsWidget.addTab(rw, rw.title())
+
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
             lambda title: tw.setTabText(tw.indexOf(rw), title))
