@@ -510,7 +510,11 @@ class RepoRegistryView(QDockWidget):
         path = unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
+            path = os.path.normcase(os.path.normpath(path))
             sroot = paths.find_root(path)
+
+            root = os.path.normcase(os.path.normpath(root))
+
             if sroot != root and root == paths.find_root(os.path.dirname(path)):
                 # The selected path is the root of a repository that is inside
                 # the selected repository
