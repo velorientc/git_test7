@@ -547,7 +547,7 @@ def run(ui, *pats, **opts):
             else:
                 return
             line = opts.get('line') and int(opts['line']) or None
-            dlg.setSource(path, rev, line)
+            dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
