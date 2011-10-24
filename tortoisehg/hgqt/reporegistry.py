@@ -81,19 +81,16 @@ class RepoTreeView(QTreeView):
         index = self.indexAt(event.pos())
 
         # Determine where the item was dropped.
-        # Depth in tree: 1 = group, 2 = repo, and (eventually) 3+ = subrepo
-        depth = self.model().depth(index)
-        if depth == 1:
+        target = index.internalPointer()
+        if not target.isRepo():
             group = index
             row = -1
-        elif depth == 2:
+        else:
             indicator = self.dropIndicatorPosition()
             group = index.parent()
             row = index.row()
             if indicator == QAbstractItemView.BelowItem:
                 row = index.row() + 1
-        else:
-            index = group = row = None
 
         return index, group, row
 
