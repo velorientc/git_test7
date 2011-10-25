@@ -26,8 +26,7 @@ def checkhgversion(v):
     vers = re.split(r'\.|-', v)[:2]
     if vers == reqver or len(vers) < 2:
         return
-    nextver = list(reqver)
-    nextver[1] = str(int(reqver[1])+1)
+    nextver = map(str, divmod(int(reqver[0]) * 10 + int(reqver[1]) + 1, 10))
     if vers == nextver:
         return
     return (('This version of TortoiseHg requires Mercurial '
