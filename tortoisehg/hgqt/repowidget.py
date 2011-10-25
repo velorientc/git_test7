@@ -1443,7 +1443,7 @@ class RepoWidget(QWidget):
                                               _('Patch Files (*.patch)'))
             if not ret:
                 return
-            epath = str(ret)
+            epath = hglib.fromunicode(ret)
             strdir = os.path.dirname(epath)
             udir = hglib.tounicode(strdir)
             custompath = True
