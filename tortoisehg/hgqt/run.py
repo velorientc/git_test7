@@ -135,9 +135,9 @@ def get_lines_from_listfile(filename, isutf8):
             fd.close()
             os.unlink(filename)
         if isutf8:
-          _linesutf8 = lines
+            _linesutf8 = lines
         else:
-          _lines = lines
+            _lines = lines
     except IOError:
         sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
 

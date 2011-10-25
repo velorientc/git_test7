@@ -27,7 +27,6 @@ class MessageEntry(qscilib.Scintilla):
         self.setCaretLineBackgroundColor(QColor("#e6fff0"))
         self.setCaretLineVisible(True)
         self.setAutoIndent(True)
-        self.setAutoCompletionThreshold(2)
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         self.setAutoCompletionFillupsEnabled(True)
         self.setLexer(QsciLexerMakefile(self))

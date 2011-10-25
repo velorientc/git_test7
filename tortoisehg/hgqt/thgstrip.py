@@ -159,7 +159,7 @@ class StripDialog(QDialog):
     def updatecslist(self, uselimit=True):
         """Update the cs list and return the success status as a bool"""
         rev = self.get_rev()
-        if not rev:
+        if rev is None:
             return False
         striprevs = list(self.repo.changelog.descendants(rev))
         striprevs.append(rev)

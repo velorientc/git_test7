@@ -1029,7 +1029,8 @@ class SettingsForm(QWidget):
                 self.applyChanges()
             elif ret == 2:
                 return
-        if qscilib.fileEditor(self.fn, foldable=True) == QDialog.Accepted:
+        if (qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
+            == QDialog.Accepted):
             self.refresh()
 
     def refresh(self, *args):

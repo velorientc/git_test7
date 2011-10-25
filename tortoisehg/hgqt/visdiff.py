@@ -314,7 +314,8 @@ def visualdiff(ui, repo, pats, opts):
         # If only one change, diff the files instead of the directories
         # Handle bogus modifies correctly by checking if the files exist
         if len(MAR) == 1:
-            file2 = util.localpath(MAR.pop())
+            file2 = MAR.pop()
+            file2local = util.localpath(file2)
             if file2 in cto:
                 file1 = util.localpath(cpy[file2])
             else:
@@ -322,7 +323,7 @@ def visualdiff(ui, repo, pats, opts):
             label1a, dir1a = getfile(file1, dir1a, label1a)
             if do3way:
                 label1b, dir1b = getfile(file1, dir1b, label1b)
-            label2, dir2 = getfile(file2, dir2, label2)
+            label2, dir2 = getfile(file2local, dir2, label2)
         if do3way:
             label1a += '[local]'
             label1b += '[other]'

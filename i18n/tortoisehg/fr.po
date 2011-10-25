@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-09-20 09:45-0300\n"
-"PO-Revision-Date: 2011-07-22 14:32+0000\n"
+"PO-Revision-Date: 2011-10-09 15:22+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-09-21 05:03+0000\n"
-"X-Generator: Launchpad (build 13996)\n"
+"X-Launchpad-Export-Date: 2011-10-10 05:14+0000\n"
+"X-Generator: Launchpad (build 14123)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -297,7 +297,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:170
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "Premier parent : révision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:176
 msgid "Backout to the first parent of the merge revision"
@@ -306,7 +306,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:181
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Second parent : révision %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:186
 msgid "Backout to the second parent of the merge revision"
@@ -386,7 +386,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:370 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
-msgstr ""
+msgstr "Aucun conflit de fusion, prêt à appliquer un commit"
 
 #: tortoisehg/hgqt/backout.py:405
 msgid "Commit backout and merge results"
@@ -406,15 +406,15 @@ msgstr "Répertoire de travail"
 
 #: tortoisehg/hgqt/backout.py:459 tortoisehg/hgqt/merge.py:490
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Espace de travail (fusionné)"
 
 #: tortoisehg/hgqt/backout.py:467 tortoisehg/hgqt/merge.py:498
 msgid "Commit message"
-msgstr ""
+msgstr "Message de commit"
 
 #: tortoisehg/hgqt/backout.py:491 tortoisehg/hgqt/merge.py:522
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "Sauter la confirmation finale, fermer après commit."
 
 #: tortoisehg/hgqt/backout.py:502 tortoisehg/hgqt/backout.py:536
 msgid "Backed out merge changeset: "
@@ -459,11 +459,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:587 tortoisehg/hgqt/merge.py:573
 msgid "Committing..."
-msgstr ""
+msgstr "Commit en cours..."
 
 #: tortoisehg/hgqt/backout.py:588 tortoisehg/hgqt/merge.py:574
 msgid "Please wait while committing merged files."
-msgstr ""
+msgstr "Attendre pendant le commit des fichiers fusionnés."
 
 #: tortoisehg/hgqt/backout.py:613 tortoisehg/hgqt/cmdui.py:313
 #: tortoisehg/hgqt/merge.py:602 tortoisehg/hgtk/p4pending.py:101
@@ -687,7 +687,7 @@ msgstr "Voir les changements du fichier dans un outil de diff externe"
 #: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:208
 #: tortoisehg/hgqt/revdetails.py:239
 msgid "Edit Local"
-msgstr "Éditer la version locale"
+msgstr "Éditer la révision locale"
 
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:209
 #: tortoisehg/hgqt/revdetails.py:240
@@ -731,11 +731,11 @@ msgstr "Enlever tous les changement du fichier ?"
 
 #: tortoisehg/hgqt/chunks.py:270
 msgid "file has been deleted, refresh"
-msgstr "le fichier a été supprimé, actualiser"
+msgstr "le fichier a été supprimé, rafraîchir"
 
 #: tortoisehg/hgqt/chunks.py:273
 msgid "file has been modified, refresh"
-msgstr "le fichier a été modifié, actualiser"
+msgstr "le fichier a été modifié, rafraîchir"
 
 #: tortoisehg/hgqt/chunks.py:307
 msgid "Unable to merge chunks"
@@ -749,7 +749,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:394
 msgid "Unable to remove"
-msgstr ""
+msgstr "Impossible d'enlever"
 
 #: tortoisehg/hgqt/chunks.py:395
 #, python-format
@@ -757,6 +757,8 @@ msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"Impossible de supprimer le fichier %s,\n"
+"permission refusée"
 
 #: tortoisehg/hgqt/chunks.py:531
 msgctxt "files"
@@ -818,7 +820,7 @@ msgstr "Utiliser un serveur proxy"
 
 #: tortoisehg/hgqt/clone.py:147
 msgid "Do not verify host certificate"
-msgstr ""
+msgstr "Ne pas vérifier le certificat de l'hôte"
 
 #: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1538
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
@@ -926,7 +928,7 @@ msgstr "Terminé"
 
 #: tortoisehg/hgqt/cmdui.py:315
 msgid "Failed!"
-msgstr ""
+msgstr "Échec !"
 
 #: tortoisehg/hgqt/cmdui.py:543
 msgid "failed to run command\n"
@@ -1357,7 +1359,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:51
 msgid "File is binary"
-msgstr ""
+msgstr "Le fichier est binaire"
 
 #: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:361
 #, python-format
@@ -1456,7 +1458,7 @@ msgstr "Première révision"
 
 #: tortoisehg/hgqt/filedata.py:239
 msgid "Not a Mercurial subrepo, not previewable"
-msgstr "Pas un dépôt Mercurial, pas présentable"
+msgstr "Pas un sous-dépôt Mercurial, pas présentable"
 
 #: tortoisehg/hgqt/filedata.py:254
 msgid "File Status:"
@@ -1542,7 +1544,7 @@ msgstr "Diff visuel..."
 #: tortoisehg/hgqt/filedialogs.py:199 tortoisehg/hgqt/filedialogs.py:675
 #: tortoisehg/hgqt/repowidget.py:1159
 msgid "Diff to local..."
-msgstr "Diff avec la version locale..."
+msgstr "Diff avec la révision locale..."
 
 #: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:679
 msgid "Visual diff file..."
@@ -1823,7 +1825,7 @@ msgstr "<b>Fichiers non versionnés</b>"
 
 #: tortoisehg/hgqt/guess.py:65 tortoisehg/hgqt/status.py:96
 msgid "Refresh file list"
-msgstr "Actualiser la liste des fichiers"
+msgstr "Rafraîchir la liste des fichiers"
 
 #: tortoisehg/hgqt/guess.py:83
 #, python-format
@@ -2281,7 +2283,7 @@ msgstr "Comparer les révisions du fichier sélectionné"
 
 #: tortoisehg/hgqt/manifestdialog.py:203 tortoisehg/hgqt/revdetails.py:232
 msgid "Visual Diff to Local"
-msgstr "Diff visuel avec la version locale"
+msgstr "Diff visuel avec la révision locale"
 
 #: tortoisehg/hgqt/manifestdialog.py:204 tortoisehg/hgqt/revdetails.py:233
 msgid "View changes to current in external diff tool"
@@ -4100,7 +4102,7 @@ msgstr "Parcourir à la révision..."
 
 #: tortoisehg/hgqt/repowidget.py:1164
 msgid "Merge with local..."
-msgstr "Fusionner avec la version locale..."
+msgstr "Fusionner avec la révision locale..."
 
 #: tortoisehg/hgqt/repowidget.py:1167
 msgid "Tag..."
@@ -4144,7 +4146,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1193
 msgid "Transplant to local"
-msgstr "Transplanter vers la version locale"
+msgstr "Transplanter vers la révision locale"
 
 #: tortoisehg/hgqt/repowidget.py:1197
 msgid "Modify history"
@@ -4240,7 +4242,7 @@ msgstr "Compresser l'historique..."
 
 #: tortoisehg/hgqt/repowidget.py:1328 tortoisehg/hgqt/repowidget.py:1406
 msgid "Transplant Selected to local"
-msgstr "Transplanter les révisions sélectionnées vers la version locale"
+msgstr "Transplanter les révisions sélectionnées vers la révision locale"
 
 #: tortoisehg/hgqt/repowidget.py:1334 tortoisehg/hgqt/repowidget.py:1412
 msgid "Post Selected to Review Board..."
@@ -4381,11 +4383,11 @@ msgstr "Résoudre les conflits - %s"
 
 #: tortoisehg/hgqt/resolve.py:54
 msgid "Local revision information"
-msgstr "Information de révision locale"
+msgstr "Révision locale"
 
 #: tortoisehg/hgqt/resolve.py:64
 msgid "Other revision information"
-msgstr "Information de l'autre révision"
+msgstr "Autre révision"
 
 #: tortoisehg/hgqt/resolve.py:77
 msgid "Unresolved conflicts"
@@ -4409,7 +4411,7 @@ msgstr "Fusionner en utilisant l'outil sélectionné"
 
 #: tortoisehg/hgqt/resolve.py:97
 msgid "Take Local"
-msgstr "Prendre la version locale"
+msgstr "Prendre la révision locale"
 
 #: tortoisehg/hgqt/resolve.py:98
 msgid "Accept the local file version (yours)"
@@ -4417,7 +4419,7 @@ msgstr "Accepter la version locale du fichier (la votre)"
 
 #: tortoisehg/hgqt/resolve.py:100
 msgid "Take Other"
-msgstr "Prendre l'autre version"
+msgstr "Prendre l'autre révision"
 
 #: tortoisehg/hgqt/resolve.py:101
 msgid "Accept the other file version (theirs)"
@@ -4449,7 +4451,7 @@ msgstr "Diff visuel 3 voies"
 
 #: tortoisehg/hgqt/resolve.py:134 tortoisehg/hgtk/history.py:1271
 msgid "Diff to Local"
-msgstr "Diff avec la version locale"
+msgstr "Diff avec la révision locale"
 
 #: tortoisehg/hgqt/resolve.py:135
 msgid "Visual diff between resolved file and first parent"
@@ -4897,7 +4899,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:427 tortoisehg/hgqt/run.py:428
 msgid "Try refreshing your repository."
-msgstr "Essayer d'actualiser votre dépôt."
+msgstr "Essayer de rafraîchir votre dépôt."
 
 #: tortoisehg/hgqt/run.py:431
 #, python-format
@@ -6508,7 +6510,7 @@ msgstr ""
 #: tortoisehg/hgqt/status.py:268 tortoisehg/hgtk/commit.py:240
 #: tortoisehg/hgtk/hgignore.py:142 tortoisehg/hgtk/history.py:404
 msgid "Refresh"
-msgstr "Actualiser"
+msgstr "Rafraîchir"
 
 #: tortoisehg/hgqt/shelve.py:142
 msgid "New Shelf"
@@ -8075,19 +8077,19 @@ msgstr "Branche de &patch"
 
 #: tortoisehg/hgqt/workbench.py:290 tortoisehg/hgtk/status.py:1320
 msgid "&Refresh"
-msgstr "Actualise&r"
+msgstr "&Rafraîchir"
 
 #: tortoisehg/hgqt/workbench.py:293
 msgid "Refresh current repository"
-msgstr "Actualiser le dépôt actuel"
+msgstr "Rafraîchir le dépôt courant"
 
 #: tortoisehg/hgqt/workbench.py:294
 msgid "Refresh &Task Tab"
-msgstr "Actualiser l'onglet de tâche"
+msgstr "Rafraîchir l'onglet de &tâche"
 
 #: tortoisehg/hgqt/workbench.py:297
 msgid "Refresh only the current task tab"
-msgstr "Actualiser uniquement l'onglet de tâche actuel"
+msgstr "Rafraîchir uniquement l'onglet de tâche courant"
 
 #: tortoisehg/hgqt/workbench.py:299
 msgid "Load all revisions"
@@ -9740,7 +9742,7 @@ msgstr " ( Prévisualisation du paquet )"
 
 #: tortoisehg/hgtk/history.py:248 tortoisehg/hgtk/status.py:134
 msgid "Re_fresh"
-msgstr "Actualiser (_f)"
+msgstr "Ra_fraîchir"
 
 #: tortoisehg/hgtk/history.py:250 tortoisehg/hgtk/history.py:1533
 msgid "Reload revision history"

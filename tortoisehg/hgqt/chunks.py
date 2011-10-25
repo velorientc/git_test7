@@ -152,11 +152,14 @@ class ChunksWidget(QWidget):
             mtime = self.mtime
         else:
             return
-        if os.path.exists(path):
-            newmtime = os.path.getmtime(path)
-            if mtime != newmtime:
-                self.mtime = newmtime
-                self.refresh()
+        try:
+            if os.path.exists(path):
+                newmtime = os.path.getmtime(path)
+                if mtime != newmtime:
+                    self.mtime = newmtime
+                    self.refresh()
+        except EnvironmentError:
+            pass
 
     def runPatcher(self, fp, wfile, updatestate):
         ui = self.repo.ui.copy()
