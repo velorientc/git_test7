@@ -6,10 +6,9 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import re
 
-from mercurial import util, error, merge, commands
-from tortoisehg.hgqt import qtlib, htmlui, visdiff
+from mercurial import util, error, merge, commands, extensions
+from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -52,6 +51,10 @@ class WctxActions(QObject):
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
+        if 'largefiles' in self.repo.extensions():
+            make(_('Add &Largefiles...'), addlf, frozenset('I?'))
+        elif 'kbfiles' in self.repo.extensions():
+            make(_('Add &Bfiles'), addlf, frozenset('I?'))
         make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename')
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
@@ -266,8 +269,42 @@ def forget(parent, ui, repo, files):
     return True
 
 def add(parent, ui, repo, files):
+    haslf = 'largefiles' in repo.extensions()
+    haskbf = 'kbfiles' in repo.extensions()
+    if haslf or haskbf:
+        result = lfprompt.promptForLfiles(parent, ui, repo, files, haskbf)
+        if not result:
+            return False
+        files, lfiles = result
+        for name, module in extensions.extensions():
+            if name == 'largefiles':
+                override_add = module.overrides.override_add
+                if files:
+                    override_add(commands.add, ui, repo, *files)
+                if lfiles:
+                    override_add(commands.add, ui, repo, large=True, *lfiles)
+                return True
+            if name == 'kbfiles':
+                override_add = module.bfsetup.override_add
+                if files:
+                    override_add(commands.add, ui, repo, *files)
+                if lfiles:
+                    override_add(commands.add, ui, repo, bf=True, *lfiles)
+                return True
     commands.add(ui, repo, *files)
     return True
+
+def addlf(parent, ui, repo, files):
+    for name, module in extensions.extensions():
+        if name == 'largefiles':
+            override_add = module.overrides.override_add
+            override_add(commands.add, ui, repo, large=True, *files)
+            return True
+        if name == 'kbfiles':
+            override_add = module.bfsetup.override_add
+            override_add(commands.add, ui, repo, bf=True, *files)
+            return True
+    return False
 
 def guessRename(parent, ui, repo, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog

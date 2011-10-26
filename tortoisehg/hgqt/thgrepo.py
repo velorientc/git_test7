@@ -12,6 +12,7 @@ import os
 import sys
 import shutil
 import tempfile
+import re
 
 from PyQt4.QtCore import *
 
@@ -24,6 +25,8 @@ from tortoisehg.util import hglib, paths
 from tortoisehg.util.patchctx import patchctx
 
 _repocache = {}
+_kbfregex = re.compile(r'^\.kbf/')
+_lfregex = re.compile(r'^\.hglf/')
 
 if 'THGDEBUG' in os.environ:
     def dbgoutput(*args):
@@ -262,8 +265,8 @@ _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
 
-        def changectx(self, changeid):
-            '''Extends Mercurial's standard changectx() method to
+        def __getitem__(self, changeid):
+            '''Extends Mercurial's standard __getitem__() method to
             a) return a thgchangectx with additional methods
             b) return a patchctx if changeid is the name of an MQ
             unapplied patch
@@ -282,7 +285,7 @@ def _extendrepo(repo):
                     os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 
-            changectx = super(thgrepository, self).changectx(changeid)
+            changectx = super(thgrepository, self).__getitem__(changeid)
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
 
@@ -538,6 +541,28 @@ def _extendrepo(repo):
             dest = tempfile.mktemp(ext+'.bak', root+'_', trashcan)
             shutil.copyfile(path, dest)
 
+        def isStandin(self, path):
+            if 'largefiles' in self.extensions():
+                if _lfregex.match(path):
+                    return True
+            if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
+                if _kbfregex.match(path):
+                    return True
+            return False
+
+        def removeStandin(self, path):
+            if 'largefiles' in self.extensions():
+                path = _lfregex.sub('', path)
+            if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
+                path = _kbfregex.sub('', path)
+            return path
+        
+        def bfStandin(self, path):
+            return '.kbf/' + path
+
+        def lfStandin(self, path):
+            return '.hglf/' + path
+        
     return thgrepository
 
 
@@ -604,10 +629,29 @@ def _extendchangectx(changectx):
                     summary += u' \u2026' # ellipsis ...
 
             return summary
+        
+        def hasStandin(self, file):
+            if 'largefiles' in self._repo.extensions():
+                if self._repo.lfStandin(file) in self.manifest():
+                    return True
+            elif 'largefiles' in self._repo.extensions() or 'kbfiles' in self._repo.extensions():
+                if self._repo.bfStandin(file) in self.manifest():
+                    return True
+            return False
 
+        def isStandin(self, path):
+            return self._repo.isStandin(path)
+        
+        def removeStandin(self, path):
+            return self._repo.removeStandin(path)
+        
+        def findStandin(self, file):
+            if 'largefiles' in self._repo.extensions():
+                if self._repo.lfStandin(file) in self.manifest():
+                    return self._repo.lfStandin(file)
+            return self._repo.bfStandin(file)
+                    
     return thgchangectx
-
-
 
 _pctxcache = {}
 def genPatchContext(repo, patchpath, rev=None):
@@ -653,3 +697,9 @@ def relatedRepositories(repoid):
         raise
     else:
         f.close()
+
+def isBfStandin(path):
+    return _kbfregex.match(path)
+
+def isLfStandin(path):
+    return _lfregex.match(path)

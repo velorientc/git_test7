@@ -224,6 +224,7 @@ class RepoRegistryView(QDockWidget):
 
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
+    removeRepo = pyqtSignal(QString)
 
     def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
             showShortPaths=False):
@@ -479,7 +480,7 @@ class RepoRegistryView(QDockWidget):
 
     def explore(self):
         root = self.selitem.internalPointer().rootpath()
-        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+        qtlib.openlocalurl(root)
 
     def terminal(self):
         repoitem = self.selitem.internalPointer()
@@ -648,7 +649,16 @@ class RepoRegistryView(QDockWidget):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
+        ip = self.selitem.internalPointer()
+        if ip.isRepo():
+            root = ip.rootpath()
+        else:
+            root = None
+
         self.tview.removeSelected()
+
+        if root is not None:
+            self.removeRepo.emit(hglib.tounicode(root))
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
