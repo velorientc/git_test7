@@ -11,7 +11,7 @@ import os
 
 from mercurial import revset, error, patch
 
-from tortoisehg.util import hglib, shlib
+from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -247,6 +247,8 @@ class RepoWidget(QWidget):
     def switchToNamedTaskTab(self, tabname):
         if tabname in self.namedTabs:
             idx = self.namedTabs[tabname]
+            if tabname == 'commit':
+                self._refreshCommitTabIfNeeded()
             self.taskTabsWidget.setCurrentIndex(idx)
 
             # restore default splitter position if task tab is invisible
@@ -762,6 +764,7 @@ class RepoWidget(QWidget):
         ctx = self.repo.changectx(rev)
         if rev is None or ('mq' in self.repo.extensions() and 'qtip' in ctx.tags()):
             # Clicking on working copy switches to commit tab
+            self._refreshCommitTabIfNeeded()
             tw.setCurrentIndex(self.commitTabIndex)
         else:
             # Clicking on a normal revision switches from commit tab
@@ -1823,3 +1826,12 @@ class RepoWidget(QWidget):
             return
         self.repo.incrementBusyCount()
         self.runner.run(*cmdlines)
+
+    def _refreshCommitTabIfNeeded(self):
+        """Refresh the Commit tab if the user settings require it"""
+        refreshwd = self.repo.ui.config('tortoisehg', 'refreshwdstatus', 'auto')
+        # Valid refreshwd values are 'auto', 'always' and 'alwayslocal'
+        if refreshwd != 'auto':
+            if refreshwd == 'always' \
+                    or not paths.netdrive_status(self.repo.root):
+                self.commitDemand.forward('refreshWctx')
