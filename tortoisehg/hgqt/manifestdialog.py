@@ -121,11 +121,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
+        # proxy model will hold the sort filter proxy model used to filter the
+        # manifest file tree
+        self._proxymodel = None
+
         self._initwidget()
         self._initactions()
         self._setupmodel()
-        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
-
+        self._treeview.setCurrentIndex(self._proxymodel.index(0, 0))
         self.setRev(self._rev)
 
     def _initwidget(self):
@@ -182,6 +185,15 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         qs.setValue(prefix+'/revpanel.expanded', self.revpanel.is_expanded())
 
     def _initactions(self):
+        self.le = QLineEdit()
+        if hasattr(self.le, 'setPlaceholderText'): # Qt >= 4.7
+            self.le.setPlaceholderText(_('### filter text ###'))
+        else:
+            lbl = QLabel(_('Filter:'))
+            self._toolbar.addWidget(lbl)
+        self._toolbar.addWidget(self.le)
+        self.le.textEdited.connect(self.setFilter)
+
         self._statusfilter = status.StatusFilterButton(
           statustext='MASC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
@@ -231,6 +243,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
+
+    def getCurrentIndex(self):
+        # We cannot directly return the treeview's current index
+        # Instead we have to map it into the corresponding index
+        # in the proxy model
+        return self._proxymodel.mapToSource(self._treeview.currentIndex())
 
     def navigate(self, filename=None):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
@@ -364,7 +382,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             return
         point = self._treeview.viewport().mapToGlobal(point)
 
-        currentindex = self._treeview.currentIndex()
+        currentindex = self.getCurrentIndex()
         itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
 
         # Subrepos and regular items have different context menus
@@ -409,10 +427,18 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._treemodel = ManifestModel(self._repo, self._rev,
                                         statusfilter=self._statusfilter.status(),
                                         parent=self)
+
+        # Use a sort filter proxy model to allow the filtering of the manifest
+        self._proxymodel = QSortFilterProxyModel()
+        self._proxymodel.setSourceModel(self._treemodel)
+        self._proxymodel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self._proxymodel.setDynamicSortFilter(True)
+        
         oldmodel = self._treeview.model()
         oldselmodel = self._treeview.selectionModel()
-        self._treeview.setModel(self._treemodel)
+        self._treeview.setModel(self._proxymodel)
         if oldmodel:
+            oldmodel.sourceModel().deleteLater()
             oldmodel.deleteLater()
         if oldselmodel:
             oldselmodel.deleteLater()
@@ -424,6 +450,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._statusfilter.statusChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.statusChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
+
+        self.le.textEdited.emit(self.le.text())
 
     @pyqtSlot()
     def _autoexpandtree(self):
@@ -498,20 +526,28 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             else:
                 self._fileview.clearDisplay()
 
+    @pyqtSlot(QString)
+    def setFilter(self, match):
+        """Set the filter that will be applied to the manifest file tree"""
+        if self._proxymodel:
+            self._proxymodel.invalidateFilter()
+            self._proxymodel.setFilterWildcard(match)
+
     @property
     def path(self):
         """Return currently selected path [unicode]"""
-        return self._treemodel.filePath(self._treeview.currentIndex())
+        return self._treemodel.filePath(self.getCurrentIndex())
 
     @property
     def status(self):
         """Return currently selected path"""
-        return self._treemodel.fileStatus(self._treeview.currentIndex())
+        return self._treemodel.fileStatus(self.getCurrentIndex())
 
     @pyqtSlot(unicode)
     def setPath(self, path):
         """Change path to show"""
-        self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
+        self._treeview.setCurrentIndex(
+            self._proxymodel.mapFromSource(self._treemodel.indexFromPath(path)))
 
     def displayFile(self):
         ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
