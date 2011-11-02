@@ -617,16 +617,29 @@ class ProxyFilterModel(QSortFilterProxyModel):
     contained by items that do not match the filter
     """
     def filterAcceptsRow(self, sourceRow, sourceParent):
-        if super(ProxyFilterModel, self).filterAcceptsRow(sourceRow, sourceParent):
+        if self.filterMatchesRow(sourceRow, sourceParent):
             # The item matches the filter
             return True
+        return self.hasAcceptedChildren(sourceRow, sourceParent)
 
+    def filterMatchesRow(self, sourceRow, sourceParent):
+        return super(ProxyFilterModel, self).filterAcceptsRow(sourceRow, sourceParent)
+
+    def hasAcceptedChildren(self, sourceRow, sourceParent):
         # If the item does not match the filter but it has some children,
         # show it anyway, so that matching descendants may be shown
         item = self.sourceModel().index(sourceRow, 0, sourceParent)
         if not item.isValid():
              return False;
         childCount = item.model().rowCount(item)
-        if childCount:
-            return True
+        if not childCount:
+            return False
+
+        # Does the current item have any descendant that matches the filter?
+        for c in range(0, childCount):
+            if self.filterMatchesRow(c, item):
+                return True;
+            # Recursive call
+            if self.hasAcceptedChildren(c, item):
+                return True
         return False
