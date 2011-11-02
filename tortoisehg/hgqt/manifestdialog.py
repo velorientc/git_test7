@@ -429,11 +429,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                                         parent=self)
 
         # Use a sort filter proxy model to allow the filtering of the manifest
-        self._proxymodel = QSortFilterProxyModel()
+        self._proxymodel = ProxyFilterModel()
         self._proxymodel.setSourceModel(self._treemodel)
         self._proxymodel.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self._proxymodel.setDynamicSortFilter(True)
-        
+
         oldmodel = self._treeview.model()
         oldselmodel = self._treeview.selectionModel()
         self._treeview.setModel(self._proxymodel)
@@ -606,3 +606,27 @@ def run(ui, *pats, **opts):
     QTimer.singleShot(0, init)
 
     return dlg
+
+
+class ProxyFilterModel(QSortFilterProxyModel):
+    """
+    Customized QSortFilterProxyModel which does not apply the filter to
+    elements that have some children.
+
+    This lets the filtered view show items which match the filter but are
+    contained by items that do not match the filter
+    """
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        if super(ProxyFilterModel, self).filterAcceptsRow(sourceRow, sourceParent):
+            # The item matches the filter
+            return True
+
+        # If the item does not match the filter but it has some children,
+        # show it anyway, so that matching descendants may be shown
+        item = self.sourceModel().index(sourceRow, 0, sourceParent)
+        if not item.isValid():
+             return False;
+        childCount = item.model().rowCount(item)
+        if childCount:
+            return True
+        return False
