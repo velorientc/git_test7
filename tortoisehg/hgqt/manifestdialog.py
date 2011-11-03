@@ -89,12 +89,6 @@ class ManifestDialog(QMainWindow):
         from tortoisehg.hgqt import run
         run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
 
-    @pyqtSlot(unicode, object, int)
-    def _openInEditor(self, path, rev, line):
-        """Open editor to show the specified file"""
-        _openineditor(self._repo, path, rev, line,
-                      pattern=self._fileview.searchbar.pattern(), parent=self)
-
 class ManifestWidget(QWidget, qtlib.TaskWidget):
     """Display file tree and contents at the specified revision"""
 
@@ -516,15 +510,6 @@ def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
-
-def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
-    """Open editor to show the specified file [unicode]"""
-    path = hglib.fromunicode(path)
-    pattern = hglib.fromunicode(pattern)
-    base = visdiff.snapshot(repo, [path], repo[rev])[0]
-    files = [os.path.join(base, path)]
-    qtlib.editfiles(repo, files, line, pattern, parent=self)
-
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
