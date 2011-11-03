@@ -406,7 +406,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def explore(self):
         root = self.repo.wjoin(self.filelist.currentFile())
         if os.path.isdir(root):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+            qtlib.openlocalurl(root)
 
     def terminal(self):
         root = self.repo.wjoin(self.filelist.currentFile())

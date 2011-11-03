@@ -202,10 +202,18 @@ class RepoTreeModel(QAbstractItemModel):
         group = parent.internalPointer()
         d = str(data.data(repoRegMimeType))
         if not data.hasUrls():
-            # don't allow nesting of groups
-            row = parent.row()
-            group = self.rootItem
-            parent = QModelIndex()
+            # The source is a group
+            if row < 0:
+                # The group has been dropped on a group
+                # In that case, place the group at the same level as the target
+                # group
+                row = parent.row()
+                parent = parent.parent()
+                group = parent.internalPointer()
+                if row < 0 or not isinstance(group, RepoGroupItem):
+                    # The group was dropped at the top level
+                    group = self.rootItem
+                    parent = QModelIndex()
         itemread = readXml(d, extractXmlElementName)
         if itemread is None:
             return False

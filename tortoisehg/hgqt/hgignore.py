@@ -284,7 +284,7 @@ class HgignoreDialog(QDialog):
         try:
             f = util.atomictempfile(self.ignorefile, 'wb', createmode=None)
             f.write(out)
-            f.rename()
+            f.close()
             if not hasignore:
                 ret = qtlib.QuestionMsgBox(_('New file created'),
                                            _('TortoiseHg has created a new '

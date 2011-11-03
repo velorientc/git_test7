@@ -81,19 +81,16 @@ class RepoTreeView(QTreeView):
         index = self.indexAt(event.pos())
 
         # Determine where the item was dropped.
-        # Depth in tree: 1 = group, 2 = repo, and (eventually) 3+ = subrepo
-        depth = self.model().depth(index)
-        if depth == 1:
+        target = index.internalPointer()
+        if not target.isRepo():
             group = index
             row = -1
-        elif depth == 2:
+        else:
             indicator = self.dropIndicatorPosition()
             group = index.parent()
             row = index.row()
             if indicator == QAbstractItemView.BelowItem:
                 row = index.row() + 1
-        else:
-            index = group = row = None
 
         return index, group, row
 
@@ -224,6 +221,7 @@ class RepoRegistryView(QDockWidget):
 
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
+    removeRepo = pyqtSignal(QString)
 
     def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
             showShortPaths=False):
@@ -479,7 +477,7 @@ class RepoRegistryView(QDockWidget):
 
     def explore(self):
         root = self.selitem.internalPointer().rootpath()
-        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+        qtlib.openlocalurl(root)
 
     def terminal(self):
         repoitem = self.selitem.internalPointer()
@@ -648,7 +646,16 @@ class RepoRegistryView(QDockWidget):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
+        ip = self.selitem.internalPointer()
+        if ip.isRepo():
+            root = ip.rootpath()
+        else:
+            root = None
+
         self.tview.removeSelected()
+
+        if root is not None:
+            self.removeRepo.emit(hglib.tounicode(root))
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):

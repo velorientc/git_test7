@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, match, util, subrepo
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui
+from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui, settings
 from tortoisehg.util import paths, hglib, thread2
 from tortoisehg.hgqt.i18n import _
 
@@ -390,6 +390,8 @@ class HistorySearchThread(QThread):
                 pass
 
     def run(self):
+        haskbf = settings.hasExtension('kbfiles')
+        haslf = settings.hasExtension('largefiles')
         self.thread_id = int(QThread.currentThreadId())
 
         def emitrow(row):
@@ -405,6 +407,10 @@ class HistorySearchThread(QThread):
                     try:
                         fname, line, rev, addremove, user, text, tail = \
                                 self.fullmsg.split('\0', 6)
+                        if haslf and thgrepo.isLfStandin(fname):
+                            raise ValueError
+                        if (haslf or haskbf) and thgrepo.isBfStandin(fname):
+                            raise ValueError
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (addremove, text)
@@ -474,9 +480,15 @@ class CtxSearchThread(QThread):
         unit = _('files')
         total = len(ctx.manifest())
         count = 0
+        haskbf = settings.hasExtension('kbfiles')
+        haslf = settings.hasExtension('largefiles')
         for wfile in ctx:                # walk manifest
             if self.canceled:
                 break
+            if haslf and thgrepo.isLfStandin(wfile):
+                continue
+            if (haslf or haskbf) and thgrepo.isBfStandin(wfile):
+                continue
             self.progress.emit(topic, count, wfile, unit, total)
             count += 1
             if not matchfn(wfile):
