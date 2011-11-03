@@ -102,21 +102,6 @@ class HgRepoListModel(QAbstractTableModel):
         self._user_colors = {}
         self._branch_colors = {}
 
-        self._columnmap = {
-            'Rev':      self.getrev,
-            'Node':     lambda ctx, gnode: str(ctx),
-            'Graph':    lambda ctx, gnode: "",
-            'Description': self.getlog,
-            'Author':   self.getauthor,
-            'Tags':     self.gettags,
-            'Branch':   self.getbranch,
-            'Filename': lambda ctx, gnode: gnode.extra[0],
-            'Age':      lambda ctx, gnode: hglib.age(ctx.date()).decode('utf-8'),
-            'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
-            'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
-            'Changes':  self.getchanges,
-        }
-
         if repo:
             self.reloadConfig()
             self.updateColumns()
@@ -452,7 +437,7 @@ class HgRepoListModel(QAbstractTableModel):
         ctx = self.repo.changectx(gnode.rev)
 
         if role == Qt.DisplayRole:
-            text = self._columnmap[column](ctx, gnode)
+            text = self._columnmap[column](self, ctx, gnode)
             if not isinstance(text, (QString, unicode)):
                 text = hglib.tounicode(text)
             return QVariant(text)
@@ -655,3 +640,18 @@ class HgRepoListModel(QAbstractTableModel):
         if R:
             addtotal(R, 'log.removed')
         return ''.join(changes)
+
+    _columnmap = {
+        'Rev':      getrev,
+        'Node':     lambda self, ctx, gnode: str(ctx),
+        'Graph':    lambda self, ctx, gnode: "",
+        'Description': getlog,
+        'Author':   getauthor,
+        'Tags':     gettags,
+        'Branch':   getbranch,
+        'Filename': lambda self, ctx, gnode: gnode.extra[0],
+        'Age':      lambda self, ctx, gnode: hglib.age(ctx.date()).decode('utf-8'),
+        'LocalTime':lambda self, ctx, gnode: hglib.displaytime(ctx.date()),
+        'UTCTime':  lambda self, ctx, gnode: hglib.utctime(ctx.date()),
+        'Changes':  getchanges,
+    }
