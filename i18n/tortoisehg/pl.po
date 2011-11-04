@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-09-20 09:45-0300\n"
-"PO-Revision-Date: 2011-08-14 18:24+0000\n"
+"POT-Creation-Date: 2011-11-03 13:11-0200\n"
+"PO-Revision-Date: 2011-10-25 22:12+0000\n"
 "Last-Translator: Peter_lin <floubadour@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2011-09-21 05:05+0000\n"
-"X-Generator: Launchpad (build 13996)\n"
+"X-Launchpad-Export-Date: 2011-11-04 05:09+0000\n"
+"X-Generator: Launchpad (build 14231)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -33,7 +33,7 @@ msgstr "O TortoiseHg"
 
 #: tortoisehg/hgqt/about.py:56
 msgid "Copyright 2008-2011 Steve Borho and others"
-msgstr ""
+msgstr "Copyright 2008-2011 Steve Borho i inni"
 
 #: tortoisehg/hgqt/about.py:61 tortoisehg/hgtk/about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -48,7 +48,7 @@ msgid "&License"
 msgstr "&Licencja"
 
 #: tortoisehg/hgqt/about.py:86 tortoisehg/hgqt/archive.py:108
-#: tortoisehg/hgqt/hgemail_ui.py:286 tortoisehg/hgqt/hginit.py:58
+#: tortoisehg/hgqt/hgemail_ui.py:273 tortoisehg/hgqt/hginit.py:58
 #: tortoisehg/hgqt/license.py:45 tortoisehg/hgqt/postreview_ui.py:179
 #: tortoisehg/hgqt/rename.py:105
 msgid "&Close"
@@ -72,7 +72,7 @@ msgstr "Nowa wersja TortoiseHG jest dostępna do pobrania!"
 msgid "= Working Directory Parent ="
 msgstr "= Nadzędna ścieżka pracy ="
 
-#: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:413
+#: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:420
 #: tortoisehg/hgqt/bookmark.py:50 tortoisehg/hgqt/csinfo.py:105
 #: tortoisehg/hgqt/csinfo.py:106 tortoisehg/hgqt/cslist.py:86
 #: tortoisehg/hgqt/merge.py:447 tortoisehg/hgqt/tag.py:49
@@ -87,7 +87,7 @@ msgid "Only files modified/created in this revision"
 msgstr "Tylko pliki zmodyfikowane/utworzone podczas tej rewizji"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:68
-#: tortoisehg/hgqt/sync.py:1522
+#: tortoisehg/hgqt/sync.py:1533
 msgid "Recurse into subrepositories"
 msgstr "Reukursywnie w subrepozytoriach"
 
@@ -152,17 +152,18 @@ msgstr "&Archiwizuj"
 msgid "&Detail"
 msgstr "&Szczegóły"
 
-#: tortoisehg/hgqt/archive.py:114 tortoisehg/hgqt/backout.py:293
-#: tortoisehg/hgqt/commit.py:375 tortoisehg/hgqt/commit.py:383
-#: tortoisehg/hgqt/commit.py:712 tortoisehg/hgqt/commit.py:725
-#: tortoisehg/hgqt/compress.py:150 tortoisehg/hgqt/merge.py:100
+#: tortoisehg/hgqt/archive.py:114 tortoisehg/hgqt/backout.py:300
+#: tortoisehg/hgqt/commit.py:376 tortoisehg/hgqt/commit.py:384
+#: tortoisehg/hgqt/commit.py:729 tortoisehg/hgqt/commit.py:758
+#: tortoisehg/hgqt/compress.py:150 tortoisehg/hgqt/lfprompt.py:23
+#: tortoisehg/hgqt/lfprompt.py:35 tortoisehg/hgqt/merge.py:100
 #: tortoisehg/hgqt/merge.py:235 tortoisehg/hgqt/merge.py:312
-#: tortoisehg/hgqt/quickop.py:163 tortoisehg/hgqt/rebase.py:231
+#: tortoisehg/hgqt/quickop.py:179 tortoisehg/hgqt/rebase.py:231
 #: tortoisehg/hgqt/rebase.py:252 tortoisehg/hgqt/rename.py:110
-#: tortoisehg/hgqt/reporegistry.py:211 tortoisehg/hgqt/resolve.py:356
-#: tortoisehg/hgqt/settings.py:838 tortoisehg/hgqt/settings.py:951
-#: tortoisehg/hgqt/wctxactions.py:229 tortoisehg/hgqt/wctxactions.py:242
-#: tortoisehg/hgqt/wctxactions.py:297 tortoisehg/hgtk/shellconf.py:28
+#: tortoisehg/hgqt/reporegistry.py:208 tortoisehg/hgqt/resolve.py:356
+#: tortoisehg/hgqt/settings.py:916 tortoisehg/hgqt/settings.py:1031
+#: tortoisehg/hgqt/wctxactions.py:232 tortoisehg/hgqt/wctxactions.py:245
+#: tortoisehg/hgqt/wctxactions.py:334 tortoisehg/hgtk/shellconf.py:28
 #: tortoisehg/hgtk/thgshelve.py:163
 msgid "Cancel"
 msgstr "Anuluj"
@@ -256,39 +257,44 @@ msgstr ""
 "Weryfikuj wycofywaną rewizję aby upewnić się, że Twój katalog roboczy jest "
 "czysty."
 
-#: tortoisehg/hgqt/backout.py:109 tortoisehg/hgqt/backout.py:121
+#: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
+#: tortoisehg/hgqt/backout.py:130
 msgid "Unable to backout"
 msgstr "Nie można wycofać"
 
-#: tortoisehg/hgqt/backout.py:110
+#: tortoisehg/hgqt/backout.py:112
 msgid "Backout revision not found"
 msgstr "Wycofywana rewizja nie mogła być znaleziona"
 
-#: tortoisehg/hgqt/backout.py:114
+#: tortoisehg/hgqt/backout.py:117
 msgid "Backing out a parent revision is a single step operation"
 msgstr "Wycofywanie nadrzędnej rewizji jest operacją jedno-krokową"
 
-#: tortoisehg/hgqt/backout.py:122
+#: tortoisehg/hgqt/backout.py:124
+msgid "Backout requires a parent revision"
+msgstr ""
+
+#: tortoisehg/hgqt/backout.py:131
 msgid "Cannot backout change on a different branch"
 msgstr "Nie można wycofać zmian pochodzących z innej gałęzi"
 
-#: tortoisehg/hgqt/backout.py:128
+#: tortoisehg/hgqt/backout.py:137
 msgid "Backout revision"
 msgstr "Wycofaj rewizję"
 
-#: tortoisehg/hgqt/backout.py:138
+#: tortoisehg/hgqt/backout.py:147
 msgid "Not a head, backout will create a new head!"
 msgstr "To nie jest head, wycofanie stworzy nowy head!"
 
-#: tortoisehg/hgqt/backout.py:144
+#: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
 msgstr "Aktualne lokalne rewizje"
 
-#: tortoisehg/hgqt/backout.py:162
+#: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
 msgstr "Scal rodzica aby wycofać do"
 
-#: tortoisehg/hgqt/backout.py:165
+#: tortoisehg/hgqt/backout.py:174
 msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
@@ -296,34 +302,34 @@ msgstr ""
 "Aby wycofać rewizję <b>scalającą</b>, musisz wybrać, do którego rodzica się "
 "wycofać (tzn. które zmiany mają zostać <i>zatrzymane</i>)"
 
-#: tortoisehg/hgqt/backout.py:170
+#: tortoisehg/hgqt/backout.py:179
 #, python-format
 msgid "First Parent: revision %s (%s)"
 msgstr "Pierwszy Rodzic: rewizja %s (%s)"
 
-#: tortoisehg/hgqt/backout.py:176
+#: tortoisehg/hgqt/backout.py:185
 msgid "Backout to the first parent of the merge revision"
 msgstr "Wycofaj do pierwszego rodzica wybranej rewizji scalającej"
 
-#: tortoisehg/hgqt/backout.py:181
+#: tortoisehg/hgqt/backout.py:190
 #, python-format
 msgid "Second Parent: revision %s (%s)"
 msgstr "Drugi rodzic: rewizja %s (%s)"
 
-#: tortoisehg/hgqt/backout.py:186
+#: tortoisehg/hgqt/backout.py:195
 msgid "Backout to the second parent of the merge revision"
 msgstr "Wycofaj do drugiego rodzica tej rewizji scalającej"
 
-#: tortoisehg/hgqt/backout.py:194 tortoisehg/hgqt/merge.py:154
+#: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
 msgstr "Status kopii roboczej"
 
-#: tortoisehg/hgqt/backout.py:202 tortoisehg/hgqt/compress.py:69
+#: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
 #: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:110
 msgid "Checking..."
 msgstr "Sprawdzanie..."
 
-#: tortoisehg/hgqt/backout.py:210
+#: tortoisehg/hgqt/backout.py:217
 msgid ""
 "Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a "
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
@@ -333,54 +339,54 @@ msgstr ""
 "href=\"shelve\"><b>odłożyć</b></a> do patcha lub <a "
 "href=\"discard\"><b>odrzucić</b></a> zmiany."
 
-#: tortoisehg/hgqt/backout.py:221 tortoisehg/hgqt/merge.py:215
-#: tortoisehg/hgqt/rebase.py:73 tortoisehg/hgqt/sync.py:1066
+#: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:215
+#: tortoisehg/hgqt/rebase.py:73 tortoisehg/hgqt/sync.py:1077
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
 msgstr "Automatycznie rozwiązuj konflikty gdzie to tylko możliwe"
 
-#: tortoisehg/hgqt/backout.py:267 tortoisehg/hgqt/merge.py:285
+#: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
 msgstr "<b>Wykryto niewcommitowane lokalne zmiany</b>"
 
-#: tortoisehg/hgqt/backout.py:271 tortoisehg/hgtk/recovery.py:52
+#: tortoisehg/hgqt/backout.py:278 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
 msgstr "Wyczyść"
 
-#: tortoisehg/hgqt/backout.py:292 tortoisehg/hgqt/compress.py:149
+#: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:149
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
-#: tortoisehg/hgqt/rebase.py:230 tortoisehg/hgqt/settings.py:951
+#: tortoisehg/hgqt/rebase.py:230 tortoisehg/hgqt/settings.py:1031
 #: tortoisehg/hgqt/update.py:260 tortoisehg/hgtk/thgconfig.py:775
 #: tortoisehg/hgtk/update.py:233
 msgid "&Discard"
 msgstr "Odrzuć"
 
-#: tortoisehg/hgqt/backout.py:294 tortoisehg/hgqt/compress.py:151
+#: tortoisehg/hgqt/backout.py:301 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:232
 msgid "Confirm Discard"
 msgstr "Potwierdź odrzucenie"
 
-#: tortoisehg/hgqt/backout.py:295 tortoisehg/hgqt/compress.py:152
+#: tortoisehg/hgqt/backout.py:302 tortoisehg/hgqt/compress.py:152
 #: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:233
 msgid "Discard outstanding changes to working directory?"
 msgstr "Odrzucić odstające zmiany do kopii roboczej?"
 
-#: tortoisehg/hgqt/backout.py:320
+#: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
 msgstr "Wycofywanie i scalanie..."
 
-#: tortoisehg/hgqt/backout.py:321 tortoisehg/hgqt/merge.py:342
+#: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
 msgstr "Wszystkie konfliktowe pliki zostaną oznaczone jako nierozwiązane."
 
-#: tortoisehg/hgqt/backout.py:334
+#: tortoisehg/hgqt/backout.py:341
 msgid ""
 "Automatically advance to next page when backout and merge are complete."
 msgstr ""
 "Automatycznie przechodź do następnej strony kiedy wycofywanie i scalanie "
 "zakończone sukcesem."
 
-#: tortoisehg/hgqt/backout.py:365 tortoisehg/hgqt/merge.py:395
+#: tortoisehg/hgqt/backout.py:372 tortoisehg/hgqt/merge.py:395
 #, python-format
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
@@ -389,93 +395,93 @@ msgstr ""
 "%d plików z <b>konfliktami scaleń</b>, które muszą być <a "
 "href=\"resolve\"><b>rozwiązane</b></a>"
 
-#: tortoisehg/hgqt/backout.py:370 tortoisehg/hgqt/merge.py:405
+#: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
 msgstr "Brak konfliktów scalania, gotowy do wcommitowania"
 
-#: tortoisehg/hgqt/backout.py:405
+#: tortoisehg/hgqt/backout.py:412
 msgid "Commit backout and merge results"
 msgstr "Wcommituj wycofanie i scal rezultat"
 
-#: tortoisehg/hgqt/backout.py:415 tortoisehg/hgqt/merge.py:449
+#: tortoisehg/hgqt/backout.py:422 tortoisehg/hgqt/merge.py:449
 #: tortoisehg/hgtk/commit.py:236 tortoisehg/hgtk/history.py:66
 #: tortoisehg/hgtk/history.py:481 tortoisehg/hgtk/history.py:1223
 msgid "Parents"
 msgstr "Rodzice"
 
-#: tortoisehg/hgqt/backout.py:419 tortoisehg/hgqt/merge.py:453
-#: tortoisehg/hgqt/repomodel.py:589 tortoisehg/hgqt/repomodel.py:591
+#: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
+#: tortoisehg/hgqt/repomodel.py:574 tortoisehg/hgqt/repomodel.py:576
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:87
 msgid "Working Directory"
 msgstr "Kopia robocza"
 
-#: tortoisehg/hgqt/backout.py:459 tortoisehg/hgqt/merge.py:490
+#: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:490
 msgid "Working Directory (merged)"
 msgstr "Kopia robocza (scalona)"
 
-#: tortoisehg/hgqt/backout.py:467 tortoisehg/hgqt/merge.py:498
+#: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:498
 msgid "Commit message"
 msgstr "Wcommituj wiadomość"
 
-#: tortoisehg/hgqt/backout.py:491 tortoisehg/hgqt/merge.py:522
+#: tortoisehg/hgqt/backout.py:498 tortoisehg/hgqt/merge.py:522
 msgid "Skip final confirmation page, close after commit."
 msgstr "Pomiń ostatnią stronę potwierdzenia, zamknij po commicie."
 
-#: tortoisehg/hgqt/backout.py:502 tortoisehg/hgqt/backout.py:536
+#: tortoisehg/hgqt/backout.py:509 tortoisehg/hgqt/backout.py:543
 msgid "Backed out merge changeset: "
-msgstr ""
+msgstr "Wycofane scalone zestawy zmian: "
 
-#: tortoisehg/hgqt/backout.py:504 tortoisehg/hgqt/backout.py:538
+#: tortoisehg/hgqt/backout.py:511 tortoisehg/hgqt/backout.py:545
 #: tortoisehg/hgtk/backout.py:41
 msgid "Backed out changeset: "
 msgstr "Wycofano pakiet zmian: "
 
-#: tortoisehg/hgqt/backout.py:507 tortoisehg/hgqt/commit.py:594
+#: tortoisehg/hgqt/backout.py:514 tortoisehg/hgqt/commit.py:595
 #: tortoisehg/hgqt/mq.py:822 tortoisehg/hgtk/backout.py:139
 #: tortoisehg/hgtk/commit.py:580
 msgid "Confirm Discard Message"
 msgstr "Wiadomość potwierdzenia usunięcia"
 
-#: tortoisehg/hgqt/backout.py:508 tortoisehg/hgtk/backout.py:140
+#: tortoisehg/hgqt/backout.py:515 tortoisehg/hgtk/backout.py:140
 msgid "Discard current backout message?"
 msgstr "Usunąć obecną wiadomość wycofania?"
 
-#: tortoisehg/hgqt/backout.py:517 tortoisehg/hgtk/backout.py:82
+#: tortoisehg/hgqt/backout.py:524 tortoisehg/hgtk/backout.py:82
 msgid "Use English backout message"
 msgstr "Użyj angielskiej wiadomości dotyczącej wycofania"
 
-#: tortoisehg/hgqt/backout.py:546
+#: tortoisehg/hgqt/backout.py:553
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
+msgstr "Wycofana scalona rewizja do pierwszego rodzica (%s)"
 
-#: tortoisehg/hgqt/backout.py:549
+#: tortoisehg/hgqt/backout.py:556
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
+msgstr "Wycofana scalona rewizja do drugiego rodzica (%s)"
 
-#: tortoisehg/hgqt/backout.py:578
+#: tortoisehg/hgqt/backout.py:585
 msgid "Backing out and committing..."
-msgstr ""
+msgstr "Wycofywanie i commitowanie..."
 
-#: tortoisehg/hgqt/backout.py:579
+#: tortoisehg/hgqt/backout.py:586
 msgid "Please wait while making backout."
-msgstr ""
+msgstr "Proszę poczekać podczas wykonywania wycofania."
 
-#: tortoisehg/hgqt/backout.py:587 tortoisehg/hgqt/merge.py:573
+#: tortoisehg/hgqt/backout.py:594 tortoisehg/hgqt/merge.py:573
 msgid "Committing..."
 msgstr "Commitowanie..."
 
-#: tortoisehg/hgqt/backout.py:588 tortoisehg/hgqt/merge.py:574
+#: tortoisehg/hgqt/backout.py:595 tortoisehg/hgqt/merge.py:574
 msgid "Please wait while committing merged files."
-msgstr ""
+msgstr "Proszę poczekać podczas commitowania scalonych plików."
 
-#: tortoisehg/hgqt/backout.py:613 tortoisehg/hgqt/cmdui.py:313
+#: tortoisehg/hgqt/backout.py:620 tortoisehg/hgqt/cmdui.py:313
 #: tortoisehg/hgqt/merge.py:602 tortoisehg/hgtk/p4pending.py:101
 msgid "Finished"
 msgstr "Zakończono"
 
-#: tortoisehg/hgqt/backout.py:618
+#: tortoisehg/hgqt/backout.py:625
 msgid "Backout changeset"
 msgstr "Wycofaj zestaw zmian"
 
@@ -532,10 +538,10 @@ msgid "Test this revision and report findings. (good/bad/skip)"
 msgstr "Przetestuj tę rewizję i oznacz jej status (dobra/zła/pomiń)"
 
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
-#: tortoisehg/hgqt/commit.py:742 tortoisehg/hgqt/commit.py:1009
-#: tortoisehg/hgqt/commit.py:1029 tortoisehg/hgqt/hgignore.py:257
-#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:466
-#: tortoisehg/hgqt/wctxactions.py:169
+#: tortoisehg/hgqt/commit.py:775 tortoisehg/hgqt/commit.py:1042
+#: tortoisehg/hgqt/commit.py:1062 tortoisehg/hgqt/hgignore.py:257
+#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:478
+#: tortoisehg/hgqt/wctxactions.py:172
 #, python-format
 msgid "%s (hint: %s)"
 msgstr "%s (podpowiedź: %s)"
@@ -548,9 +554,9 @@ msgstr "Zakładka:"
 msgid "New Name:"
 msgstr "Nowa nazwa:"
 
-#: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:712
-#: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:48
-#: tortoisehg/hgqt/wctxactions.py:54
+#: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:729
+#: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:47
+#: tortoisehg/hgqt/wctxactions.py:53
 msgid "&Add"
 msgstr "&Dodaj"
 
@@ -558,7 +564,7 @@ msgstr "&Dodaj"
 msgid "Re&name"
 msgstr "Zmień nazwę"
 
-#: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:725
+#: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:758
 #: tortoisehg/hgqt/tag.py:99
 msgid "&Remove"
 msgstr "Usuń"
@@ -677,103 +683,105 @@ msgstr ""
 "Jeśli ciągle masz problem, <a href=\"#bugreport\">wyślij nam raport o "
 "błędzie</a>."
 
-#: tortoisehg/hgqt/chunks.py:89 tortoisehg/hgqt/grep.py:554
-#: tortoisehg/hgqt/manifestdialog.py:201 tortoisehg/hgqt/revdetails.py:230
+#: tortoisehg/hgqt/chunks.py:89 tortoisehg/hgqt/grep.py:566
+#: tortoisehg/hgqt/manifestdialog.py:195 tortoisehg/hgqt/revdetails.py:230
 #: tortoisehg/util/menuthg.py:76
 msgid "Visual Diff"
 msgstr "Wizualny Diff"
 
-#: tortoisehg/hgqt/chunks.py:90 tortoisehg/hgqt/manifestdialog.py:202
+#: tortoisehg/hgqt/chunks.py:90 tortoisehg/hgqt/manifestdialog.py:196
 #: tortoisehg/hgqt/revdetails.py:231
 msgid "View file changes in external diff tool"
 msgstr "Zobacz zmiany w pliku w zewnętrznym narzędziu do diffa"
 
-#: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:208
+#: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:202
 #: tortoisehg/hgqt/revdetails.py:239
 msgid "Edit Local"
 msgstr "Edytuj lokalny"
 
-#: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:209
+#: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:203
 #: tortoisehg/hgqt/revdetails.py:240
 msgid "Edit current file in working copy"
 msgstr "Edytuj wybrany plik w kopii roboczej"
 
-#: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/manifestdialog.py:210
+#: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/manifestdialog.py:204
 #: tortoisehg/hgqt/revdetails.py:241
 msgid "Revert to Revision"
 msgstr "Przywróć do Rewizji"
 
-#: tortoisehg/hgqt/chunks.py:94 tortoisehg/hgqt/manifestdialog.py:211
+#: tortoisehg/hgqt/chunks.py:94 tortoisehg/hgqt/manifestdialog.py:205
 #: tortoisehg/hgqt/revdetails.py:242
 msgid "Revert file(s) to contents at this revision"
 msgstr "Przywróc zawartość pliku(ów) do tej rewizji"
 
-#: tortoisehg/hgqt/chunks.py:190
+#: tortoisehg/hgqt/chunks.py:193
 msgid "Patch failed to apply"
 msgstr "Nieudana próba spatchowania"
 
-#: tortoisehg/hgqt/chunks.py:196 tortoisehg/hgqt/mq.py:245
+#: tortoisehg/hgqt/chunks.py:199 tortoisehg/hgqt/mq.py:245
 #: tortoisehg/hgqt/mq.py:750
 msgid "Manually resolve rejected chunks?"
-msgstr ""
+msgstr "Ręcznie rozwiązać konflikty odrzuconych zmian?"
 
-#: tortoisehg/hgqt/chunks.py:198
+#: tortoisehg/hgqt/chunks.py:201
 msgid "Edit patched file and rejects?"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:232
+#: tortoisehg/hgqt/chunks.py:235
 msgid "No deletable chunks"
-msgstr ""
+msgstr "Brak usuwalnych zmian"
 
-#: tortoisehg/hgqt/chunks.py:236
+#: tortoisehg/hgqt/chunks.py:239
 msgid "No chunks remain"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:237
+#: tortoisehg/hgqt/chunks.py:240
 msgid "Remove all file changes?"
-msgstr ""
+msgstr "Usunąć wszystkie zmiany w plikach?"
 
-#: tortoisehg/hgqt/chunks.py:270
+#: tortoisehg/hgqt/chunks.py:273
 msgid "file has been deleted, refresh"
 msgstr "plik został usunięty, odświeżanie"
 
-#: tortoisehg/hgqt/chunks.py:273
+#: tortoisehg/hgqt/chunks.py:276
 msgid "file has been modified, refresh"
 msgstr "plik został zmodyfikowany, odświeżanie"
 
-#: tortoisehg/hgqt/chunks.py:307
+#: tortoisehg/hgqt/chunks.py:310
 msgid "Unable to merge chunks"
-msgstr ""
+msgstr "Nie można było scalić zian"
 
-#: tortoisehg/hgqt/chunks.py:308
+#: tortoisehg/hgqt/chunks.py:311
 msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:394
+#: tortoisehg/hgqt/chunks.py:397
 msgid "Unable to remove"
 msgstr "Nie można usunąć"
 
-#: tortoisehg/hgqt/chunks.py:395
+#: tortoisehg/hgqt/chunks.py:398
 #, python-format
 msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"Nie można było usunąć pliku %s,\n"
+"odmowa dostępu"
 
-#: tortoisehg/hgqt/chunks.py:531
+#: tortoisehg/hgqt/chunks.py:534
 msgctxt "files"
 msgid "All"
 msgstr "Wszystkie"
 
-#: tortoisehg/hgqt/chunks.py:536
+#: tortoisehg/hgqt/chunks.py:539
 msgctxt "files"
 msgid "None"
 msgstr "Żadne"
 
-#: tortoisehg/hgqt/chunks.py:592
+#: tortoisehg/hgqt/chunks.py:595
 #, python-format
 msgid "Chunks selected: %d / %d"
-msgstr ""
+msgstr "Wybrane zmiany: %d / %d"
 
 #: tortoisehg/hgqt/clone.py:61 tortoisehg/hgqt/rename.py:66
 #: tortoisehg/hgqt/thgimport.py:62 tortoisehg/hgtk/thgimport.py:82
@@ -785,10 +793,10 @@ msgstr "Źródło:"
 msgid "Destination:"
 msgstr "Cel:"
 
-#: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:112
+#: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:113
 #: tortoisehg/hgqt/merge.py:202 tortoisehg/hgqt/mq.py:622
 #: tortoisehg/hgqt/postreview_ui.py:170 tortoisehg/hgqt/rebase.py:57
-#: tortoisehg/hgqt/sync.py:151 tortoisehg/hgqt/tag.py:64
+#: tortoisehg/hgqt/sync.py:161 tortoisehg/hgqt/tag.py:64
 #: tortoisehg/hgtk/hgemail.py:64
 msgid "Options"
 msgstr "Preferencje"
@@ -811,7 +819,7 @@ msgstr "Użyj transferu nieskompresowanego"
 
 #: tortoisehg/hgqt/clone.py:138
 msgid "Include patch queue"
-msgstr ""
+msgstr "Załącz kolejkę patchy"
 
 #: tortoisehg/hgqt/clone.py:141 tortoisehg/hgtk/clone.py:149
 #: tortoisehg/hgtk/history.py:467 tortoisehg/hgtk/synch.py:179
@@ -822,7 +830,7 @@ msgstr "Użyj serwera proxy"
 msgid "Do not verify host certificate"
 msgstr "Nie weryfikuj certyfikatów hosta"
 
-#: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1538
+#: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1552
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
 msgid "Remote command:"
 msgstr "Komenda zdalna:"
@@ -839,7 +847,7 @@ msgstr "Klonuj"
 #: tortoisehg/hgqt/thgimport.py:118 tortoisehg/hgqt/thgstrip.py:112
 #: tortoisehg/hgqt/update.py:147
 msgid "Detail"
-msgstr "Szczegół"
+msgstr "Szczegóły"
 
 #: tortoisehg/hgqt/clone.py:193
 #, python-format
@@ -894,7 +902,7 @@ msgstr "Wybierz folder patcha"
 
 #: tortoisehg/hgqt/clone.py:432
 msgid "The selected patch folder is not under the source repository."
-msgstr ""
+msgstr "Wybrany folder nie należy do systemu kontroli wersji."
 
 #: tortoisehg/hgqt/cmdui.py:232 tortoisehg/hgqt/thread.py:369
 #, python-format
@@ -936,12 +944,12 @@ msgstr "Niepowodzenie przy wykonywaniu polecenia\n"
 
 #: tortoisehg/hgqt/cmdui.py:544
 msgid "crashed\n"
-msgstr ""
+msgstr "zepsuty\n"
 
 #: tortoisehg/hgqt/cmdui.py:612
 #, python-format
 msgid "command parse error: %s"
-msgstr ""
+msgstr "błąd parsowania komendy: %s"
 
 #: tortoisehg/hgqt/cmdui.py:618
 #, python-format
@@ -950,11 +958,11 @@ msgstr "nie znaleziono odpowiadających elementów: %s"
 
 #: tortoisehg/hgqt/cmdui.py:773
 msgid "TortoiseHg Command Dialog"
-msgstr ""
+msgstr "Okno komend TortoiseHg"
 
 #: tortoisehg/hgqt/cmdui.py:793 tortoisehg/hgqt/merge.py:101
 #: tortoisehg/hgqt/rebase.py:253 tortoisehg/hgqt/resolve.py:357
-#: tortoisehg/hgqt/settings.py:835 tortoisehg/hgtk/commit.py:322
+#: tortoisehg/hgqt/settings.py:913 tortoisehg/hgtk/commit.py:322
 #: tortoisehg/hgtk/merge.py:196 tortoisehg/hgtk/thgconfig.py:846
 msgid "Confirm Exit"
 msgstr "Potwierdź Wyjście"
@@ -971,38 +979,38 @@ msgstr ""
 msgid "TortoiseHg"
 msgstr "TortoiseHg"
 
-#: tortoisehg/hgqt/commit.py:71
+#: tortoisehg/hgqt/commit.py:72
 msgctxt "window title"
 msgid "Commit"
 msgstr "Commituj"
 
-#: tortoisehg/hgqt/commit.py:93
+#: tortoisehg/hgqt/commit.py:94
 msgid "Commit Dialog Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/commit.py:97 tortoisehg/hgqt/commit.py:512
+#: tortoisehg/hgqt/commit.py:98 tortoisehg/hgqt/commit.py:513
 msgid "Branch: "
 msgstr "Gałąź: "
 
-#: tortoisehg/hgqt/commit.py:105
+#: tortoisehg/hgqt/commit.py:106
 msgid "Copy message"
 msgstr "Kopiuj wiadomość"
 
-#: tortoisehg/hgqt/commit.py:107
+#: tortoisehg/hgqt/commit.py:108
 msgid "Copy one of the recent commit messages"
 msgstr ""
 
-#: tortoisehg/hgqt/commit.py:122 tortoisehg/hgqt/commit.py:460
-#: tortoisehg/hgqt/settings.py:297
+#: tortoisehg/hgqt/commit.py:123 tortoisehg/hgqt/commit.py:461
+#: tortoisehg/hgqt/settings.py:303
 msgid "Issue Tracker"
 msgstr "Issue Tracker"
 
-#: tortoisehg/hgqt/commit.py:123
+#: tortoisehg/hgqt/commit.py:124
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
 msgstr "Nie można było załadować issue trackera '%s': %s"
 
-#: tortoisehg/hgqt/commit.py:133 tortoisehg/hgqt/grep.py:53
+#: tortoisehg/hgqt/commit.py:134 tortoisehg/hgqt/grep.py:53
 #: tortoisehg/hgqt/serve_ui.py:87 tortoisehg/hgtk/datamine.py:54
 #: tortoisehg/hgtk/hgcmd.py:46 tortoisehg/hgtk/history.py:448
 #: tortoisehg/hgtk/recovery.py:48 tortoisehg/hgtk/serve.py:65
@@ -1010,11 +1018,11 @@ msgstr "Nie można było załadować issue trackera '%s': %s"
 msgid "Stop"
 msgstr "Stop"
 
-#: tortoisehg/hgqt/commit.py:235
+#: tortoisehg/hgqt/commit.py:236
 msgid "Commit changes"
 msgstr "Commituj zmiany"
 
-#: tortoisehg/hgqt/commit.py:235 tortoisehg/hgtk/commit.py:653
+#: tortoisehg/hgqt/commit.py:236 tortoisehg/hgtk/commit.py:653
 #: tortoisehg/hgtk/commit.py:950 tortoisehg/hgtk/commit.py:1014
 #: tortoisehg/hgtk/commit.py:1263 tortoisehg/hgtk/gdialog.py:485
 #: tortoisehg/hgtk/history.py:279 tortoisehg/hgtk/merge.py:136
@@ -1022,208 +1030,210 @@ msgstr "Commituj zmiany"
 msgid "Commit"
 msgstr "Commituj"
 
-#: tortoisehg/hgqt/commit.py:236
+#: tortoisehg/hgqt/commit.py:237
 msgid "Create a new patch"
 msgstr "Stwórz nowy patch"
 
-#: tortoisehg/hgqt/commit.py:236 tortoisehg/hgqt/mq.py:976
+#: tortoisehg/hgqt/commit.py:237 tortoisehg/hgqt/mq.py:976
 #: tortoisehg/hgtk/commit.py:657
 msgid "QNew"
 msgstr "QNowy"
 
-#: tortoisehg/hgqt/commit.py:237
+#: tortoisehg/hgqt/commit.py:238
 msgid "Refresh current patch"
 msgstr "Odśwież wybrany patch"
 
-#: tortoisehg/hgqt/commit.py:237 tortoisehg/hgqt/mq.py:605
+#: tortoisehg/hgqt/commit.py:238 tortoisehg/hgqt/mq.py:605
 #: tortoisehg/hgqt/mq.py:985 tortoisehg/hgtk/commit.py:660
 msgid "QRefresh"
 msgstr "QOdśwież"
 
-#: tortoisehg/hgqt/commit.py:368 tortoisehg/hgtk/commit.py:1185
+#: tortoisehg/hgqt/commit.py:369 tortoisehg/hgtk/commit.py:1185
 msgid "Confirm Branch Change"
 msgstr "Potwierdź zmianę gałęzi"
 
-#: tortoisehg/hgqt/commit.py:369
+#: tortoisehg/hgqt/commit.py:370
 #, python-format
 msgid "Named branch \"%s\" already exists, last used in revision %d\n"
 msgstr "Gałąź nazwa \"%s\" już istnieje, ostatnio używana w rewizji %d\n"
 
-#: tortoisehg/hgqt/commit.py:373
+#: tortoisehg/hgqt/commit.py:374
 msgid "Restart &Branch"
 msgstr "Restartuj gałąź"
 
-#: tortoisehg/hgqt/commit.py:374 tortoisehg/hgqt/commit.py:382
+#: tortoisehg/hgqt/commit.py:375 tortoisehg/hgqt/commit.py:383
 msgid "&Commit to current branch"
 msgstr "&Commituj do wybranej gałęzi"
 
-#: tortoisehg/hgqt/commit.py:377 tortoisehg/hgqt/sync.py:936
+#: tortoisehg/hgqt/commit.py:378 tortoisehg/hgqt/sync.py:947
 #: tortoisehg/hgtk/commit.py:1194
 msgid "Confirm New Branch"
 msgstr "Potwierdź nową gałąź"
 
-#: tortoisehg/hgqt/commit.py:378
+#: tortoisehg/hgqt/commit.py:379
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
 msgstr "Utworzyć nową gałąź nazwaną \"%s\" wraz z commitem?\n"
 
-#: tortoisehg/hgqt/commit.py:381
+#: tortoisehg/hgqt/commit.py:382
 msgid "Create &Branch"
 msgstr "Utwórz gałąź"
 
-#: tortoisehg/hgqt/commit.py:412
+#: tortoisehg/hgqt/commit.py:413
 msgctxt "start progress"
 msgid "MQ Action"
-msgstr ""
+msgstr "Akcja MQ"
 
-#: tortoisehg/hgqt/commit.py:514
+#: tortoisehg/hgqt/commit.py:515
 msgid "Close Branch: "
 msgstr "Zamknij gałąź: "
 
-#: tortoisehg/hgqt/commit.py:516
+#: tortoisehg/hgqt/commit.py:517
 msgid "New Branch: "
 msgstr "Nowa gałąź: "
 
-#: tortoisehg/hgqt/commit.py:528 tortoisehg/hgqt/revpanel.py:24
+#: tortoisehg/hgqt/commit.py:529 tortoisehg/hgqt/revpanel.py:24
 #: tortoisehg/hgqt/update.py:87 tortoisehg/hgtk/changeset.py:581
 #: tortoisehg/hgtk/update.py:90
 msgid "Parent:"
 msgstr "Nadrzędna:"
 
-#: tortoisehg/hgqt/commit.py:529 tortoisehg/hgqt/pbranch.py:878
+#: tortoisehg/hgqt/commit.py:530 tortoisehg/hgqt/pbranch.py:878
 msgid "Patch name:"
 msgstr "Nazwa patcha:"
 
-#: tortoisehg/hgqt/commit.py:556
+#: tortoisehg/hgqt/commit.py:557
 #, python-format
 msgid "Rollback commit to revision %d"
 msgstr "Wycofaj commit do rewizji %d"
 
-#: tortoisehg/hgqt/commit.py:565
+#: tortoisehg/hgqt/commit.py:566
 msgid "Confirm Undo"
 msgstr "Potwierdź cofnięcie"
 
-#: tortoisehg/hgqt/commit.py:595 tortoisehg/hgqt/mq.py:823
+#: tortoisehg/hgqt/commit.py:596 tortoisehg/hgqt/mq.py:823
 #: tortoisehg/hgtk/commit.py:581
 msgid "Discard current commit message?"
 msgstr "Odrzucić aktualną treść komunikatu wcommitowania"
 
-#: tortoisehg/hgqt/commit.py:673 tortoisehg/hgtk/commit.py:934
-#: tortoisehg/hgtk/commit.py:1078 tortoisehg/hgtk/commit.py:1097
+#: tortoisehg/hgqt/commit.py:674 tortoisehg/hgqt/commit.py:687
+#: tortoisehg/hgtk/commit.py:934 tortoisehg/hgtk/commit.py:1078
+#: tortoisehg/hgtk/commit.py:1097
 msgid "Nothing Commited"
 msgstr "Nic nie wcommitowano"
 
-#: tortoisehg/hgqt/commit.py:674 tortoisehg/hgtk/commit.py:1079
+#: tortoisehg/hgqt/commit.py:675 tortoisehg/hgtk/commit.py:1079
 #: tortoisehg/hgtk/tagadd.py:225
 msgid "Please enter commit message"
 msgstr "Proszę wprowadzić komunikat"
 
-#: tortoisehg/hgqt/commit.py:694
+#: tortoisehg/hgqt/commit.py:711
 msgid "No files checked"
 msgstr "Nie wybrano plików"
 
-#: tortoisehg/hgqt/commit.py:695
+#: tortoisehg/hgqt/commit.py:712
 msgid "No modified files checkmarked for commit"
 msgstr "Brak zmodyfikowanych lub zaznaczonych plików do wcommitowania"
 
-#: tortoisehg/hgqt/commit.py:710
+#: tortoisehg/hgqt/commit.py:727 tortoisehg/hgqt/lfprompt.py:16
+#: tortoisehg/hgqt/lfprompt.py:28
 msgid "Confirm Add"
 msgstr "Potwierdź dodanie"
 
-#: tortoisehg/hgqt/commit.py:711
+#: tortoisehg/hgqt/commit.py:728
 msgid "Add selected untracked files?"
 msgstr "Dodać wybrane nieśledzone pliki?"
 
-#: tortoisehg/hgqt/commit.py:723 tortoisehg/hgqt/quickop.py:158
+#: tortoisehg/hgqt/commit.py:756 tortoisehg/hgqt/quickop.py:174
 msgid "Confirm Remove"
 msgstr "Potwierdź usunięcie"
 
-#: tortoisehg/hgqt/commit.py:724
+#: tortoisehg/hgqt/commit.py:757
 msgid "Remove selected deleted files?"
 msgstr "Usunąć wybrane usunięte pliki?"
 
-#: tortoisehg/hgqt/commit.py:765
+#: tortoisehg/hgqt/commit.py:798
 msgctxt "start progress"
 msgid "Commit"
 msgstr "Commit"
 
-#: tortoisehg/hgqt/commit.py:800
+#: tortoisehg/hgqt/commit.py:833
 #, python-format
 msgid "%s - commit options"
-msgstr "%s - opcje commitu"
+msgstr "%s - opcje commitowania"
 
-#: tortoisehg/hgqt/commit.py:807
+#: tortoisehg/hgqt/commit.py:840
 msgid "Set username:"
-msgstr "Ustaw nazwę użytkownika:"
+msgstr "Ustaw użytkownika:"
 
-#: tortoisehg/hgqt/commit.py:834 tortoisehg/hgqt/commit.py:881
-#: tortoisehg/hgqt/commit.py:904
+#: tortoisehg/hgqt/commit.py:867 tortoisehg/hgqt/commit.py:914
+#: tortoisehg/hgqt/commit.py:937
 msgid "Save in Repo"
 msgstr "Zapisz w Repo"
 
-#: tortoisehg/hgqt/commit.py:839
+#: tortoisehg/hgqt/commit.py:872
 msgid "Save Global"
 msgstr "Zapisz globalnie"
 
-#: tortoisehg/hgqt/commit.py:851
+#: tortoisehg/hgqt/commit.py:884
 msgid "Set Date:"
 msgstr "Ustaw datę:"
 
-#: tortoisehg/hgqt/commit.py:855 tortoisehg/hgtk/history.py:1589
+#: tortoisehg/hgqt/commit.py:888 tortoisehg/hgtk/history.py:1589
 #: tortoisehg/hgtk/synch.py:148 tortoisehg/hgtk/update.py:128
 msgid "Update"
 msgstr "Aktualizuj"
 
-#: tortoisehg/hgqt/commit.py:874
+#: tortoisehg/hgqt/commit.py:907
 msgid "Push After Commit:"
 msgstr "Popchnij po commicie:"
 
-#: tortoisehg/hgqt/commit.py:897
+#: tortoisehg/hgqt/commit.py:930
 msgid "Auto Includes:"
 msgstr "Autozałączane:"
 
-#: tortoisehg/hgqt/commit.py:936
+#: tortoisehg/hgqt/commit.py:969
 msgid "Unable to save username"
 msgstr "Nie można zapisać nazwy użytkownika"
 
-#: tortoisehg/hgqt/commit.py:937 tortoisehg/hgqt/commit.py:960
-#: tortoisehg/hgqt/commit.py:983 tortoisehg/hgqt/sync.py:1008
-#: tortoisehg/hgqt/sync.py:1106 tortoisehg/hgqt/sync.py:1176
-#: tortoisehg/hgqt/sync.py:1344
+#: tortoisehg/hgqt/commit.py:970 tortoisehg/hgqt/commit.py:993
+#: tortoisehg/hgqt/commit.py:1016 tortoisehg/hgqt/sync.py:1019
+#: tortoisehg/hgqt/sync.py:1117 tortoisehg/hgqt/sync.py:1187
+#: tortoisehg/hgqt/sync.py:1355
 msgid "Iniparse must be installed."
 msgstr "Iniparse musi być zainstalowane."
 
-#: tortoisehg/hgqt/commit.py:952 tortoisehg/hgqt/commit.py:975
-#: tortoisehg/hgqt/commit.py:998 tortoisehg/hgqt/settings.py:1174
-#: tortoisehg/hgqt/sync.py:1018 tortoisehg/hgqt/sync.py:1117
-#: tortoisehg/hgqt/sync.py:1194 tortoisehg/hgqt/sync.py:1383
+#: tortoisehg/hgqt/commit.py:985 tortoisehg/hgqt/commit.py:1008
+#: tortoisehg/hgqt/commit.py:1031 tortoisehg/hgqt/settings.py:1255
+#: tortoisehg/hgqt/sync.py:1029 tortoisehg/hgqt/sync.py:1128
+#: tortoisehg/hgqt/sync.py:1205 tortoisehg/hgqt/sync.py:1394
 #: tortoisehg/hgtk/thgconfig.py:1654
 msgid "Unable to write configuration file"
 msgstr "Nie można zapisać pliku konfiguracyjnego"
 
-#: tortoisehg/hgqt/commit.py:959
+#: tortoisehg/hgqt/commit.py:992
 msgid "Unable to save after commit push"
 msgstr "Nie można było zapisać po popchnięciu zmian"
 
-#: tortoisehg/hgqt/commit.py:982
+#: tortoisehg/hgqt/commit.py:1015
 msgid "Unable to save auto include list"
 msgstr "Nie można było zapisać listy automatycznie dołączanych plików"
 
-#: tortoisehg/hgqt/commit.py:1013
+#: tortoisehg/hgqt/commit.py:1046
 msgid "Invalid date format"
 msgstr "Niepoprawny format daty"
 
-#: tortoisehg/hgqt/commit.py:1033
+#: tortoisehg/hgqt/commit.py:1066
 msgid "No username configured"
 msgstr "Nie ustawiono nazwy użytkownika"
 
-#: tortoisehg/hgqt/commit.py:1083 tortoisehg/hgqt/compress.py:122
+#: tortoisehg/hgqt/commit.py:1116 tortoisehg/hgqt/compress.py:122
 #: tortoisehg/hgqt/pbranch.py:871 tortoisehg/hgqt/repowidget.py:337
 msgctxt "action button"
 msgid "Commit"
 msgstr "Commit"
 
-#: tortoisehg/hgqt/commit.py:1096
+#: tortoisehg/hgqt/commit.py:1129
 #, python-format
 msgid "%s - commit"
 msgstr "%s - commit"
@@ -1294,7 +1304,8 @@ msgid "Age:"
 msgstr "Wiek:"
 
 #: tortoisehg/hgqt/csinfo.py:108 tortoisehg/hgqt/csinfo.py:110
-#: tortoisehg/hgtk/csinfo.py:214 tortoisehg/hgtk/csinfo.py:215
+#: tortoisehg/hgqt/sync.py:1558 tortoisehg/hgtk/csinfo.py:214
+#: tortoisehg/hgtk/csinfo.py:215
 msgid "Branch:"
 msgstr "Gałąź:"
 
@@ -1317,7 +1328,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:112 tortoisehg/hgtk/csinfo.py:217
 msgid "Subversion:"
-msgstr ""
+msgstr "Subversion:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 #: tortoisehg/hgtk/cslist.py:384
@@ -1353,151 +1364,160 @@ msgid ""
 "File is larger than the specified max size.\n"
 "maxdiff = %s KB"
 msgstr ""
+"Ten plik jest większy niż ustalone maksimum.\n"
+"maxdiff = %s KB"
 
 #: tortoisehg/hgqt/filedata.py:51
 msgid "File is binary"
-msgstr ""
+msgstr "Ten plik jest binarny"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(przezwany z: %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:356
-#: tortoisehg/hgqt/filedata.py:366
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
+#: tortoisehg/hgqt/filedata.py:375
 msgid " <i>(was added)</i>"
 msgstr " <i>(dodany)</i>"
 
-#: tortoisehg/hgqt/filedata.py:93 tortoisehg/hgqt/filedata.py:350
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
 #, python-format
 msgid "exec mode has been <font color='red'>%s</font>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:346
+#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
 msgid "set"
 msgstr "ustaw"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:348
+#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
 msgid "unset"
 msgstr "odznacz"
 
-#: tortoisehg/hgqt/filedata.py:97 tortoisehg/hgqt/filedata.py:117
+#: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
-msgstr ""
+msgstr " <i>(jest symlinkiem)</i>"
 
-#: tortoisehg/hgqt/filedata.py:146
+#: tortoisehg/hgqt/filedata.py:147
 #, python-format
 msgid ""
 "[WARNING] Invalid subrepo revision ID:\n"
 "\t%s\n"
 "\n"
 msgstr ""
+"[UWAGA] Niepoprawne ID rewizji w subrepo:\n"
+"\t%s\n"
+"\n"
 
-#: tortoisehg/hgqt/filedata.py:166
+#: tortoisehg/hgqt/filedata.py:167
 msgid "Subrepo created and set to initial revision."
 msgstr "Subrepo utworzone i ustawione na wstępną rewizję."
 
-#: tortoisehg/hgqt/filedata.py:170
+#: tortoisehg/hgqt/filedata.py:171
 msgid "Subrepo initialized to revision:"
 msgstr "Subrepo zainicjalizowane do rewizji:"
 
-#: tortoisehg/hgqt/filedata.py:173
+#: tortoisehg/hgqt/filedata.py:174
 msgid "Subrepo removed from repository."
 msgstr "Subrepo usunięte z repozytorium."
 
-#: tortoisehg/hgqt/filedata.py:177
+#: tortoisehg/hgqt/filedata.py:178
 msgid "Subrepo was not changed."
 msgstr "Subrepo nie zostało zmienione."
 
-#: tortoisehg/hgqt/filedata.py:178
+#: tortoisehg/hgqt/filedata.py:179
 msgid "Subrepo state is:"
 msgstr "Stan subrepo:"
 
-#: tortoisehg/hgqt/filedata.py:180 tortoisehg/hgqt/filedata.py:190
-#: tortoisehg/hgqt/filedata.py:195 tortoisehg/hgqt/filedata.py:199
-#: tortoisehg/hgqt/filedata.py:205
+#: tortoisehg/hgqt/filedata.py:181 tortoisehg/hgqt/filedata.py:191
+#: tortoisehg/hgqt/filedata.py:196 tortoisehg/hgqt/filedata.py:200
+#: tortoisehg/hgqt/filedata.py:206
 #, python-format
 msgid "changeset: %s"
 msgstr "zestaw zmian: %s"
 
-#: tortoisehg/hgqt/filedata.py:187
+#: tortoisehg/hgqt/filedata.py:188
 msgid "Revision has changed to:"
 msgstr "Rewizja zmieniła się na:"
 
-#: tortoisehg/hgqt/filedata.py:196 tortoisehg/hgqt/hgemail_ui.py:258
+#: tortoisehg/hgqt/filedata.py:197 tortoisehg/hgqt/hgemail_ui.py:247
 #: tortoisehg/hgtk/hgemail.py:86
 msgid "From:"
 msgstr "Od:"
 
-#: tortoisehg/hgqt/filedata.py:200
+#: tortoisehg/hgqt/filedata.py:201
 msgid "Subrepository not found in the working directory."
 msgstr "Subrepo nie zostało znalezione w folderze roboczym."
 
-#: tortoisehg/hgqt/filedata.py:202 tortoisehg/hgqt/filedata.py:208
+#: tortoisehg/hgqt/filedata.py:203 tortoisehg/hgqt/filedata.py:209
 msgid "Further subrepository revision information cannot be retrieved."
-msgstr ""
+msgstr "Dodatkowe informacje o rewizji subrepozytorium nie mogą być pobrane."
 
-#: tortoisehg/hgqt/filedata.py:206
+#: tortoisehg/hgqt/filedata.py:207
 msgid "Subrepository is either damaged or missing some revisions"
 msgstr ""
+"Subrepozytorium jest albo uszkodzone, albo brakuje informacji o niektórych "
+"rewizjach"
 
-#: tortoisehg/hgqt/filedata.py:210
+#: tortoisehg/hgqt/filedata.py:211
 msgid ""
 "You may need to open the missing subrepository and manually\n"
 "pull the missing revisions from its source repository."
 msgstr ""
+"Możesz potrzebować otworzyć ręcznie brakujące repozytorium\n"
+"i pociągnąć brakujące rewizje z repozytorium źródłowego."
 
-#: tortoisehg/hgqt/filedata.py:219 tortoisehg/hgqt/settings.py:477
+#: tortoisehg/hgqt/filedata.py:220 tortoisehg/hgqt/settings.py:526
 msgid "Initial revision"
 msgstr "Wstępna rewizja"
 
-#: tortoisehg/hgqt/filedata.py:239
+#: tortoisehg/hgqt/filedata.py:240
 msgid "Not a Mercurial subrepo, not previewable"
-msgstr ""
+msgstr "To nie jest subrepo Mercuriala, nie można podejrzeć"
 
-#: tortoisehg/hgqt/filedata.py:254
+#: tortoisehg/hgqt/filedata.py:255
 msgid "File Status:"
 msgstr "Status pliku:"
 
-#: tortoisehg/hgqt/filedata.py:279
+#: tortoisehg/hgqt/filedata.py:280
 msgid "(is a changed sub-repository)"
 msgstr "(jest zmieniony subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:280
+#: tortoisehg/hgqt/filedata.py:281
 msgid "(is an unchanged sub-repository)"
 msgstr "(jest niezmienionym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:281
+#: tortoisehg/hgqt/filedata.py:282
 msgid "(is a dirty sub-repository)"
 msgstr "(jest brudnym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:282
+#: tortoisehg/hgqt/filedata.py:283
 msgid "(is a new sub-repository)"
 msgstr "(jest nowym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:283 tortoisehg/hgqt/filedata.py:286
+#: tortoisehg/hgqt/filedata.py:284 tortoisehg/hgqt/filedata.py:287
 msgid "(is a removed sub-repository)"
 msgstr "(jest usuniętym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:284
+#: tortoisehg/hgqt/filedata.py:285
 msgid "(is a changed and dirty sub-repository)"
 msgstr "(jest zmienionym i brudnym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:285
+#: tortoisehg/hgqt/filedata.py:286
 msgid "(is a new and dirty sub-repository)"
 msgstr "(jest nowym i brudnym subrepozytorium)"
 
-#: tortoisehg/hgqt/filedata.py:290
+#: tortoisehg/hgqt/filedata.py:291
 #, python-format
 msgid " <a href=\"subrepo:%s\">open...</a>"
 msgstr " <a href=\"subrepo:%s\">otwórz...</a>"
 
-#: tortoisehg/hgqt/filedata.py:293
+#: tortoisehg/hgqt/filedata.py:294
 #, python-format
 msgid "Error previewing subrepo: %s"
 msgstr "Błąd przy przeglądaniu subrepo: %s"
 
-#: tortoisehg/hgqt/filedata.py:300
+#: tortoisehg/hgqt/filedata.py:301
 #, python-format
 msgid ""
 "File or diffs not displayed: File is larger than the specified max size.\n"
@@ -1507,27 +1527,27 @@ msgstr ""
 "dopuszczalne maksimum.\n"
 "maxdiff = %s KB"
 
-#: tortoisehg/hgqt/filedata.py:315
+#: tortoisehg/hgqt/filedata.py:316 tortoisehg/hgqt/filedata.py:319
 msgid " <i>(was deleted)</i>"
 msgstr " <i>(usunięty)</i>"
 
-#: tortoisehg/hgqt/filedata.py:317
+#: tortoisehg/hgqt/filedata.py:321
 msgid " <i>(was added, now missing)</i>"
 msgstr " <i>(dodany, teraz brakujący)</i>"
 
-#: tortoisehg/hgqt/filedata.py:323
+#: tortoisehg/hgqt/filedata.py:327
 msgid " <i>(is unversioned)</i>"
 msgstr " <i>(poza kontrolą wersji)</i>"
 
 #: tortoisehg/hgqt/filedialogs.py:124
 msgid "File History Log Columns"
-msgstr ""
+msgstr "Kolumny historii pliku"
 
-#: tortoisehg/hgqt/filedialogs.py:166 tortoisehg/hgqt/workbench.py:342
+#: tortoisehg/hgqt/filedialogs.py:166 tortoisehg/hgqt/workbench.py:343
 msgid "Back"
 msgstr "Cofnij"
 
-#: tortoisehg/hgqt/filedialogs.py:168 tortoisehg/hgqt/workbench.py:345
+#: tortoisehg/hgqt/filedialogs.py:168 tortoisehg/hgqt/workbench.py:346
 msgid "Forward"
 msgstr "Naprzód"
 
@@ -1567,11 +1587,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedialogs.py:471
 msgid "Next diff"
-msgstr "Następny diff"
+msgstr "Następna różnica"
 
 #: tortoisehg/hgqt/filedialogs.py:476
 msgid "Previous diff"
-msgstr "Poprzedni diff"
+msgstr "Poprzednia różnica"
 
 #: tortoisehg/hgqt/filerevmodel.py:23
 msgctxt "column header"
@@ -1580,19 +1600,19 @@ msgstr "Nazwa pliku"
 
 #: tortoisehg/hgqt/fileview.py:62
 msgid "Diff Toolbar"
-msgstr ""
+msgstr "Pasek Diffa"
 
 #: tortoisehg/hgqt/fileview.py:133
 msgid "View change as unified diff output"
-msgstr ""
+msgstr "Zobacz zmiany jako zunifikowany diff"
 
 #: tortoisehg/hgqt/fileview.py:138
 msgid "View change in context of file"
-msgstr ""
+msgstr "Zobacz zmiany w kontekście pliku"
 
 #: tortoisehg/hgqt/fileview.py:143
 msgid "annotate with revision numbers"
-msgstr ""
+msgstr "komentuj dokument numerami rewizji"
 
 #: tortoisehg/hgqt/fileview.py:156
 msgid "Next diff (alt+down)"
@@ -1616,62 +1636,62 @@ msgstr "Pokazuj pasek wyszukiwania"
 
 #: tortoisehg/hgqt/fileview.py:186
 msgid "Open shelve tool"
-msgstr ""
+msgstr "Otwórz narzędzie Shelve"
 
-#: tortoisehg/hgqt/fileview.py:609
+#: tortoisehg/hgqt/fileview.py:626
 msgid "Search in current file"
 msgstr "Szukaj w bieżącym pliku"
 
-#: tortoisehg/hgqt/fileview.py:610 tortoisehg/hgqt/fileview.py:633
+#: tortoisehg/hgqt/fileview.py:627 tortoisehg/hgqt/fileview.py:650
 msgid "Search in history"
 msgstr "Szukaj w historii"
 
-#: tortoisehg/hgqt/fileview.py:628
+#: tortoisehg/hgqt/fileview.py:645
 msgid "Search in original revision"
 msgstr "Szukaj w oryginalnej rewizji"
 
-#: tortoisehg/hgqt/fileview.py:630
+#: tortoisehg/hgqt/fileview.py:647
 msgid "Search in working revision"
 msgstr "Szukaj w roboczej rewizji"
 
-#: tortoisehg/hgqt/fileview.py:632
+#: tortoisehg/hgqt/fileview.py:649
 msgid "Search in current annotation"
 msgstr "Szukaj w bieżącej adnotacji"
 
-#: tortoisehg/hgqt/fileview.py:652
+#: tortoisehg/hgqt/fileview.py:669
 msgid "Annotate originating revision"
 msgstr "Adnotuj inicjalną rewizję"
 
-#: tortoisehg/hgqt/fileview.py:653
+#: tortoisehg/hgqt/fileview.py:670
 msgid "View originating revision"
 msgstr "Zobacz inicjalną rewizję"
 
-#: tortoisehg/hgqt/fileview.py:665
+#: tortoisehg/hgqt/fileview.py:682
 #, python-format
 msgid "Annotate parent revision %d"
 msgstr "Adnotuj rewizję rodzica %d"
 
-#: tortoisehg/hgqt/fileview.py:667
+#: tortoisehg/hgqt/fileview.py:684
 #, python-format
 msgid "View parent revision %d"
-msgstr ""
+msgstr "Zobacz rewizję nadrzędną %d"
 
 #: tortoisehg/hgqt/grep.py:42
 msgid "### regular expression search pattern ###"
-msgstr ""
+msgstr "### wzorzec wyszukiwania wyrażeń regularnych ###"
 
-#: tortoisehg/hgqt/grep.py:44 tortoisehg/hgqt/qscilib.py:332
+#: tortoisehg/hgqt/grep.py:44 tortoisehg/hgqt/qscilib.py:347
 #: tortoisehg/hgtk/datamine.py:311 tortoisehg/hgtk/hgignore.py:60
 msgid "Regexp:"
 msgstr "Regexp:"
 
-#: tortoisehg/hgqt/grep.py:47 tortoisehg/hgqt/qscilib.py:338
+#: tortoisehg/hgqt/grep.py:47 tortoisehg/hgqt/qscilib.py:354
 #: tortoisehg/hgtk/datamine.py:330
 msgid "Ignore case"
 msgstr "Ignoruj wielkość liter"
 
-#: tortoisehg/hgqt/grep.py:48 tortoisehg/hgqt/qscilib.py:319
-#: tortoisehg/hgqt/qscilib.py:342 tortoisehg/hgtk/datamine.py:310
+#: tortoisehg/hgqt/grep.py:48 tortoisehg/hgqt/qscilib.py:333
+#: tortoisehg/hgqt/qscilib.py:358 tortoisehg/hgtk/datamine.py:310
 msgid "Search"
 msgstr "Szukaj"
 
@@ -1685,7 +1705,7 @@ msgstr "Cała historia"
 
 #: tortoisehg/hgqt/grep.py:66
 msgid "Report only the first match per file"
-msgstr ""
+msgstr "Wskaż tylko pierwsze wpasowanie w pliku"
 
 #: tortoisehg/hgqt/grep.py:67 tortoisehg/hgtk/datamine.py:329
 msgid "Follow copies and renames"
@@ -1704,36 +1724,40 @@ msgid ""
 "Comma separated list of exclusion file patterns. Exclusion patterns are "
 "applied after inclusion patterns."
 msgstr ""
+"Lista wzorców plików do wykluczenia. Wzorce wykluczające są aplikowane po "
+"wzorcach załączających."
 
 #: tortoisehg/hgqt/grep.py:84
 msgid ""
 "Comma separated list of inclusion file patterns. By default, the entire "
 "repository is searched."
 msgstr ""
+"Lista wzorców plików do załączenia. Domyślnie przeszukiwane jest całe "
+"repozytorium."
 
 #: tortoisehg/hgqt/grep.py:180
 msgid "TortoiseHg Search"
-msgstr ""
+msgstr "Wyszukiwarka TortoiseHg"
 
 #: tortoisehg/hgqt/grep.py:211
 #, python-format
 msgid "\"%s\" removed from search history"
-msgstr ""
+msgstr "\"%s\" usunięte z historii wyszukiwań"
 
 #: tortoisehg/hgqt/grep.py:219
 #, python-format
 msgid "\"%s\" removed from path history"
-msgstr ""
+msgstr "\"%s\" usunięte z historii ścieżek"
 
 #: tortoisehg/hgqt/grep.py:289
 #, python-format
 msgid "grep: invalid match pattern: %s\n"
-msgstr ""
+msgstr "grep: Niepoprawny wzorzec: %s\n"
 
 #: tortoisehg/hgqt/grep.py:318
 #, python-format
 msgid "grep: %s\n"
-msgstr ""
+msgstr "grep: %s\n"
 
 #: tortoisehg/hgqt/grep.py:361 tortoisehg/hgqt/revset.py:387
 #, python-format
@@ -1744,56 +1768,56 @@ msgstr "znaleziono %d wyników"
 msgid "No matches found"
 msgstr "Nic nie znaleziono"
 
-#: tortoisehg/hgqt/grep.py:420 tortoisehg/hgqt/grep.py:433
-#: tortoisehg/hgqt/grep.py:473
+#: tortoisehg/hgqt/grep.py:426 tortoisehg/hgqt/grep.py:439
+#: tortoisehg/hgqt/grep.py:479
 msgid "Searching"
 msgstr "Szukanie"
 
-#: tortoisehg/hgqt/grep.py:420
+#: tortoisehg/hgqt/grep.py:426
 msgid "history"
 msgstr "historia"
 
-#: tortoisehg/hgqt/grep.py:432
+#: tortoisehg/hgqt/grep.py:438
 msgid "Interrupted"
 msgstr "Przerwane"
 
-#: tortoisehg/hgqt/grep.py:474
+#: tortoisehg/hgqt/grep.py:480
 msgid "files"
 msgstr "plików"
 
-#: tortoisehg/hgqt/grep.py:487
+#: tortoisehg/hgqt/grep.py:499
 #, python-format
 msgid "Skipping %s, unable to read"
 msgstr "Pomijanie %s, nie można odczytać"
 
-#: tortoisehg/hgqt/grep.py:552
+#: tortoisehg/hgqt/grep.py:564
 msgid "View file"
 msgstr "Zobacz plik"
 
-#: tortoisehg/hgqt/grep.py:553
+#: tortoisehg/hgqt/grep.py:565
 msgid "View Changeset"
 msgstr "Zobacz zestaw zmian"
 
-#: tortoisehg/hgqt/grep.py:555
+#: tortoisehg/hgqt/grep.py:567
 msgid "Annotate file"
 msgstr "Adnotuj plik"
 
-#: tortoisehg/hgqt/grep.py:709 tortoisehg/hgtk/datamine.py:364
+#: tortoisehg/hgqt/grep.py:721 tortoisehg/hgtk/datamine.py:364
 #: tortoisehg/hgtk/datamine.py:654
 msgid "File"
 msgstr "Plik"
 
-#: tortoisehg/hgqt/grep.py:709 tortoisehg/hgtk/datamine.py:652
+#: tortoisehg/hgqt/grep.py:721 tortoisehg/hgtk/datamine.py:652
 msgid "Line"
 msgstr "Linia"
 
-#: tortoisehg/hgqt/grep.py:709 tortoisehg/hgtk/datamine.py:363
+#: tortoisehg/hgqt/grep.py:721 tortoisehg/hgtk/datamine.py:363
 #: tortoisehg/hgtk/datamine.py:653 tortoisehg/hgtk/logview/treeview.py:441
 msgid "Rev"
 msgstr "Rew"
 
-#: tortoisehg/hgqt/grep.py:709 tortoisehg/hgqt/settings.py:609
-#: tortoisehg/hgqt/settings.py:729 tortoisehg/hgqt/settings.py:774
+#: tortoisehg/hgqt/grep.py:721 tortoisehg/hgqt/settings.py:663
+#: tortoisehg/hgqt/settings.py:787 tortoisehg/hgqt/settings.py:852
 #: tortoisehg/hgtk/datamine.py:142 tortoisehg/hgtk/datamine.py:655
 #: tortoisehg/hgtk/history.py:101 tortoisehg/hgtk/history.py:502
 #: tortoisehg/hgtk/history.py:695 tortoisehg/hgtk/logview/treeview.py:512
@@ -1801,7 +1825,7 @@ msgstr "Rew"
 msgid "User"
 msgstr "Użytkownik"
 
-#: tortoisehg/hgqt/grep.py:710
+#: tortoisehg/hgqt/grep.py:722
 msgid "Match Text"
 msgstr "Pasujący tekst"
 
@@ -1821,15 +1845,16 @@ msgstr "Odśwież listę plików"
 #: tortoisehg/hgqt/guess.py:83
 #, python-format
 msgid "Min Similarity: %d%%"
-msgstr ""
+msgstr "Min Podobieństwo: %d%%"
 
 #: tortoisehg/hgqt/guess.py:92
 msgid "Only consider deleted files"
-msgstr ""
+msgstr "Uwzględniaj tylko usunięte pliki"
 
 #: tortoisehg/hgqt/guess.py:93
 msgid "Uncheck to consider all revisioned files for copy sources"
 msgstr ""
+"Odznacz by rozważać wszystkie wersjonowane pliki pod względem kopii źródeł"
 
 #: tortoisehg/hgqt/guess.py:96 tortoisehg/hgtk/guess.py:108
 msgid "Find Renames"
@@ -1837,7 +1862,7 @@ msgstr "Szukaj zmian nazw plików"
 
 #: tortoisehg/hgqt/guess.py:97
 msgid "Find copy and/or rename sources"
-msgstr ""
+msgstr "Szukaj kopii oraz zmian nazw źródeł"
 
 #: tortoisehg/hgqt/guess.py:105
 msgid "<b>Candidate Matches</b>"
@@ -1869,11 +1894,11 @@ msgstr "Nie ma plików do znalezienia"
 
 #: tortoisehg/hgqt/guess.py:198
 msgid "There are no files that may have been renamed"
-msgstr ""
+msgstr "Nie ma plików, które mogły mieć zmienione nazwy"
 
 #: tortoisehg/hgqt/guess.py:240
 msgid "Multiple sources chosen"
-msgstr ""
+msgstr "Wybrano wiele źródeł"
 
 #: tortoisehg/hgqt/guess.py:241
 #, python-format
@@ -1916,100 +1941,106 @@ msgstr ""
 msgid "Failed to open Email dialog"
 msgstr "Nie można było otworzyć okna Emaila"
 
-#: tortoisehg/hgqt/hgemail_ui.py:255 tortoisehg/hgqt/settings.py:615
+#: tortoisehg/hgqt/hgemail_ui.py:244 tortoisehg/hgqt/settings.py:669
 #: tortoisehg/hgtk/synch.py:78 tortoisehg/hgtk/thgconfig.py:238
 msgid "Email"
 msgstr "Email"
 
-#: tortoisehg/hgqt/hgemail_ui.py:256 tortoisehg/hgtk/hgemail.py:76
+#: tortoisehg/hgqt/hgemail_ui.py:245 tortoisehg/hgtk/hgemail.py:76
 msgid "To:"
 msgstr "Do:"
 
-#: tortoisehg/hgqt/hgemail_ui.py:257 tortoisehg/hgtk/hgemail.py:81
+#: tortoisehg/hgqt/hgemail_ui.py:246 tortoisehg/hgtk/hgemail.py:81
 msgid "Cc:"
 msgstr "Cc:"
 
-#: tortoisehg/hgqt/hgemail_ui.py:259 tortoisehg/hgtk/hgemail.py:90
+#: tortoisehg/hgqt/hgemail_ui.py:248 tortoisehg/hgtk/hgemail.py:90
 msgid "In-Reply-To:"
-msgstr ""
+msgstr "W-Odpowiedzi-Na:"
 
-#: tortoisehg/hgqt/hgemail_ui.py:260 tortoisehg/hgtk/hgemail.py:92
+#: tortoisehg/hgqt/hgemail_ui.py:249 tortoisehg/hgtk/hgemail.py:92
 msgid "Message identifier to reply to, for threading"
-msgstr ""
+msgstr "Identyfikator wiadomości do odpowiedzi na (do wątków)"
 
-#: tortoisehg/hgqt/hgemail_ui.py:261
+#: tortoisehg/hgqt/hgemail_ui.py:250
 msgid "Flag:"
 msgstr "Flaga:"
 
-#: tortoisehg/hgqt/hgemail_ui.py:262 tortoisehg/hgtk/hgemail.py:101
+#: tortoisehg/hgqt/hgemail_ui.py:251 tortoisehg/hgtk/hgemail.py:101
 msgid ""
 "Hg patches (as generated by export command) are compatible with most patch "
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
+"Patche hg (t.j. generowane przez komendę export) są kompatybilne z "
+"większością programów patchujących. Załączany jest nagłówek, który zaiwera "
+"większość najważniejszych informacji meta."
 
-#: tortoisehg/hgqt/hgemail_ui.py:263 tortoisehg/hgtk/hgemail.py:98
+#: tortoisehg/hgqt/hgemail_ui.py:252 tortoisehg/hgtk/hgemail.py:98
 msgid "Send changesets as Hg patches"
-msgstr ""
+msgstr "Wyślij zmiany jako patche Hg"
 
-#: tortoisehg/hgqt/hgemail_ui.py:264 tortoisehg/hgtk/hgemail.py:109
+#: tortoisehg/hgqt/hgemail_ui.py:253 tortoisehg/hgtk/hgemail.py:109
 msgid ""
 "Git patches can describe binary files, copies, and permission changes, but "
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
+"Patche gita mogą opisywać pliki binarne, kopie i zmiany dostępowe, ale "
+"odbiorcy mogą nie być w stanie ich użyć jeśli nie używają Mercuriala lub "
+"Gita."
 
-#: tortoisehg/hgqt/hgemail_ui.py:265 tortoisehg/hgtk/hgemail.py:106
+#: tortoisehg/hgqt/hgemail_ui.py:254 tortoisehg/hgtk/hgemail.py:106
 msgid "Use extended (git) patch format"
-msgstr ""
+msgstr "Użyj rozszerzonego formatu patcha (git)"
 
-#: tortoisehg/hgqt/hgemail_ui.py:266 tortoisehg/hgtk/hgemail.py:117
+#: tortoisehg/hgqt/hgemail_ui.py:255 tortoisehg/hgtk/hgemail.py:117
 msgid ""
 "Stripping Mercurial header removes username and parent information.  Only "
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:267 tortoisehg/hgtk/hgemail.py:114
+#: tortoisehg/hgqt/hgemail_ui.py:256 tortoisehg/hgtk/hgemail.py:114
 msgid "Plain, do not prepend Hg header"
-msgstr ""
+msgstr "Płaski, nie załączaj nagłówek Hg"
 
-#: tortoisehg/hgqt/hgemail_ui.py:268 tortoisehg/hgtk/hgemail.py:126
+#: tortoisehg/hgqt/hgemail_ui.py:257 tortoisehg/hgtk/hgemail.py:126
 msgid ""
 "Bundles store complete changesets in binary form. Upstream users can pull "
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:269 tortoisehg/hgtk/hgemail.py:122
+#: tortoisehg/hgqt/hgemail_ui.py:258 tortoisehg/hgtk/hgemail.py:122
 msgid "Send single binary bundle, not patches"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:270 tortoisehg/hgtk/hgemail.py:137
+#: tortoisehg/hgqt/hgemail_ui.py:259 tortoisehg/hgtk/hgemail.py:137
 msgid "send patches as attachments"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:271 tortoisehg/hgtk/hgemail.py:135
+#: tortoisehg/hgqt/hgemail_ui.py:260 tortoisehg/hgtk/hgemail.py:135
 msgid "attach"
 msgstr "załącz"
 
-#: tortoisehg/hgqt/hgemail_ui.py:272 tortoisehg/hgtk/hgemail.py:140
+#: tortoisehg/hgqt/hgemail_ui.py:261 tortoisehg/hgtk/hgemail.py:140
 msgid "send patches as inline attachments"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:273 tortoisehg/hgtk/hgemail.py:138
+#: tortoisehg/hgqt/hgemail_ui.py:262 tortoisehg/hgtk/hgemail.py:138
 msgid "inline"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:274 tortoisehg/hgtk/hgemail.py:143
+#: tortoisehg/hgqt/hgemail_ui.py:263 tortoisehg/hgtk/hgemail.py:143
 msgid "add diffstat output to messages"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:275 tortoisehg/hgtk/hgemail.py:141
+#: tortoisehg/hgqt/hgemail_ui.py:264 tortoisehg/hgtk/hgemail.py:141
 msgid "diffstat"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:276 tortoisehg/hgtk/hgemail.py:232
+#: tortoisehg/hgqt/hgemail_ui.py:265 tortoisehg/hgtk/hgemail.py:232
 msgid ""
 "Patch series description is sent in initial summary email with [PATCH 0 of "
 "N] subject.  It should describe the effects of the entire patch series.  "
@@ -2018,41 +2049,41 @@ msgid ""
 "subject prefix."
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:277
+#: tortoisehg/hgqt/hgemail_ui.py:266
 msgid "Write patch series (bundle) description"
 msgstr ""
 
-#: tortoisehg/hgqt/hgemail_ui.py:278 tortoisehg/hgtk/hgemail.py:151
+#: tortoisehg/hgqt/hgemail_ui.py:267 tortoisehg/hgtk/hgemail.py:151
 msgid "Subject:"
 msgstr "Temat:"
 
-#: tortoisehg/hgqt/hgemail_ui.py:279 tortoisehg/hgqt/postreview_ui.py:174
+#: tortoisehg/hgqt/hgemail_ui.py:268 tortoisehg/hgqt/postreview_ui.py:174
 msgid "Changesets"
 msgstr "Zestawy zmian"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "Select &All"
-msgstr ""
+msgstr "Wybierz Wszystko"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "Select &None"
-msgstr ""
+msgstr "Odznacz wszystko"
 
-#: tortoisehg/hgqt/hgemail_ui.py:282 tortoisehg/hgqt/wctxactions.py:43
+#: tortoisehg/hgqt/hgemail_ui.py:269 tortoisehg/hgqt/wctxactions.py:42
 #: tortoisehg/hgqt/webconf.py:256 tortoisehg/hgqt/webconf_ui.py:79
 #: tortoisehg/hgtk/status.py:1243
 msgid "Edit"
 msgstr "Edytuj"
 
-#: tortoisehg/hgqt/hgemail_ui.py:283
+#: tortoisehg/hgqt/hgemail_ui.py:270
 msgid "Preview"
 msgstr "Podgląd"
 
-#: tortoisehg/hgqt/hgemail_ui.py:284 tortoisehg/hgqt/postreview_ui.py:175
+#: tortoisehg/hgqt/hgemail_ui.py:271 tortoisehg/hgqt/postreview_ui.py:175
 msgid "&Settings"
 msgstr "Ustawienia"
 
-#: tortoisehg/hgqt/hgemail_ui.py:285
+#: tortoisehg/hgqt/hgemail_ui.py:272
 msgid "Send &Email"
 msgstr "Wyślij maila"
 
@@ -2079,7 +2110,7 @@ msgid "Add"
 msgstr "Dodaj"
 
 #: tortoisehg/hgqt/hgignore.py:72 tortoisehg/hgqt/resolve.py:128
-#: tortoisehg/hgqt/settings.py:885 tortoisehg/hgtk/hgignore.py:77
+#: tortoisehg/hgqt/settings.py:963 tortoisehg/hgtk/hgignore.py:77
 #: tortoisehg/hgtk/thgconfig.py:676
 msgid "Edit File"
 msgstr "Edytuj plik"
@@ -2120,7 +2151,17 @@ msgstr "Niepoprawne wyrażenie regexp"
 msgid "Unable to read repository status"
 msgstr "Nie można odczytać statusu repozytorium"
 
-#: tortoisehg/hgqt/hgignore.py:290 tortoisehg/hgtk/hgignore.py:261
+#: tortoisehg/hgqt/hgignore.py:289
+msgid "New file created"
+msgstr ""
+
+#: tortoisehg/hgqt/hgignore.py:290
+msgid ""
+"TortoiseHg has created a new .hgignore file.  Would you like to add this "
+"file to the source code control repository?"
+msgstr ""
+
+#: tortoisehg/hgqt/hgignore.py:299 tortoisehg/hgtk/hgignore.py:261
 msgid "Unable to write .hgignore file"
 msgstr "Nie można zapisać pliku .hgignore"
 
@@ -2162,7 +2203,7 @@ msgstr "Proszę wskazać ścieżkę katalogu"
 #: tortoisehg/hgqt/hginit.py:147
 #, python-format
 msgid "Are you sure about adding the new repository %d extra levels deep?"
-msgstr ""
+msgstr "Jesteś pewien, że chcesz dodawać do repozytorium %d nowych poziomów"
 
 #: tortoisehg/hgqt/hginit.py:149
 #, python-format
@@ -2190,12 +2231,12 @@ msgstr "Błąd podczas tworzenia repozytorium"
 #: tortoisehg/hgqt/hginit.py:211 tortoisehg/hgqt/hginit.py:217
 #, python-format
 msgid "<p>Repository successfully created at</p><p>%s</p>"
-msgstr ""
+msgstr "<p>Repozytorium szczęśliwie utworzone w </p><p>%s</p>"
 
 #: tortoisehg/hgqt/hginit.py:212
 #, python-format
 msgid "<p>But could not run Workbench for it.</p><p>%s</p>"
-msgstr ""
+msgstr "<p>Ale nie można było uruchomić Warsztatu do tego.</p><p>%s</p>"
 
 #: tortoisehg/hgqt/hgrcutil.py:29
 msgid "Unable to create a config file"
@@ -2218,8 +2259,8 @@ msgstr "Licencja"
 msgid "Drag to change order"
 msgstr "Przeciągnij by zmienić kolejność"
 
-#: tortoisehg/hgqt/logcolumns.py:100 tortoisehg/hgqt/settings.py:471
-#: tortoisehg/hgqt/workbench.py:675 tortoisehg/util/menuthg.py:46
+#: tortoisehg/hgqt/logcolumns.py:100 tortoisehg/hgqt/settings.py:520
+#: tortoisehg/hgqt/workbench.py:693 tortoisehg/util/menuthg.py:46
 msgid "Workbench"
 msgstr "Warsztat"
 
@@ -2228,81 +2269,81 @@ msgstr "Warsztat"
 msgid "Manifest %s@%s"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:192 tortoisehg/hgtk/thgmq.py:862
+#: tortoisehg/hgqt/manifestdialog.py:186 tortoisehg/hgtk/thgmq.py:862
 msgid "Status"
 msgstr "Status"
 
-#: tortoisehg/hgqt/manifestdialog.py:197 tortoisehg/hgqt/revdetails.py:226
+#: tortoisehg/hgqt/manifestdialog.py:191 tortoisehg/hgqt/revdetails.py:226
 msgid "File history"
 msgstr "Historia pliku"
 
-#: tortoisehg/hgqt/manifestdialog.py:198 tortoisehg/hgqt/revdetails.py:227
+#: tortoisehg/hgqt/manifestdialog.py:192 tortoisehg/hgqt/revdetails.py:227
 msgid "Show the history of the selected file"
 msgstr "Pokaż historię wybranego pliku"
 
-#: tortoisehg/hgqt/manifestdialog.py:199 tortoisehg/hgqt/revdetails.py:228
+#: tortoisehg/hgqt/manifestdialog.py:193 tortoisehg/hgqt/revdetails.py:228
 msgid "Compare file revisions"
 msgstr "Porównaj rewizje plików"
 
-#: tortoisehg/hgqt/manifestdialog.py:200 tortoisehg/hgqt/revdetails.py:229
+#: tortoisehg/hgqt/manifestdialog.py:194 tortoisehg/hgqt/revdetails.py:229
 msgid "Compare revisions of the selected file"
 msgstr "Porównaj rewizje dla wybranego pliku"
 
-#: tortoisehg/hgqt/manifestdialog.py:203 tortoisehg/hgqt/revdetails.py:232
+#: tortoisehg/hgqt/manifestdialog.py:197 tortoisehg/hgqt/revdetails.py:232
 msgid "Visual Diff to Local"
 msgstr "Wizualny diff z Lokalną wersją"
 
-#: tortoisehg/hgqt/manifestdialog.py:204 tortoisehg/hgqt/revdetails.py:233
+#: tortoisehg/hgqt/manifestdialog.py:198 tortoisehg/hgqt/revdetails.py:233
 msgid "View changes to current in external diff tool"
 msgstr "Pokaż zmiany do bieżącego w zewn. narzędziu diff"
 
-#: tortoisehg/hgqt/manifestdialog.py:206 tortoisehg/hgqt/revdetails.py:235
+#: tortoisehg/hgqt/manifestdialog.py:200 tortoisehg/hgqt/revdetails.py:235
 msgid "View at Revision"
 msgstr "Zobacz w rewizji"
 
-#: tortoisehg/hgqt/manifestdialog.py:207 tortoisehg/hgqt/revdetails.py:236
+#: tortoisehg/hgqt/manifestdialog.py:201 tortoisehg/hgqt/revdetails.py:236
 msgid "View file as it appeared at this revision"
 msgstr "Zobacz plik tak jak wyglądał w tej rewizji"
 
-#: tortoisehg/hgqt/manifestdialog.py:213 tortoisehg/hgqt/revdetails.py:244
+#: tortoisehg/hgqt/manifestdialog.py:207 tortoisehg/hgqt/revdetails.py:244
 msgid "Open subrepository"
 msgstr "Otwórz subrepo"
 
-#: tortoisehg/hgqt/manifestdialog.py:214 tortoisehg/hgqt/revdetails.py:245
+#: tortoisehg/hgqt/manifestdialog.py:208 tortoisehg/hgqt/revdetails.py:245
 #: tortoisehg/hgqt/revdetails.py:248
 msgid "Open the selected subrepository"
 msgstr "Otwórz wybrane subrepo"
 
-#: tortoisehg/hgqt/manifestdialog.py:216 tortoisehg/hgqt/revdetails.py:247
+#: tortoisehg/hgqt/manifestdialog.py:210 tortoisehg/hgqt/revdetails.py:247
 msgid "Explore subrepository"
 msgstr "Eksploruj subrepo"
 
-#: tortoisehg/hgqt/manifestdialog.py:218
+#: tortoisehg/hgqt/manifestdialog.py:212
 msgid "Open the selected subrepository in a file browser"
 msgstr "Otwórz wybrane subrepo w eksplorerze"
 
-#: tortoisehg/hgqt/manifestdialog.py:220 tortoisehg/hgqt/revdetails.py:250
+#: tortoisehg/hgqt/manifestdialog.py:214 tortoisehg/hgqt/revdetails.py:250
 msgid "Open terminal in subrepository"
 msgstr "Otwórz konsolę w subrepozytorium"
 
-#: tortoisehg/hgqt/manifestdialog.py:222 tortoisehg/hgqt/revdetails.py:252
+#: tortoisehg/hgqt/manifestdialog.py:216 tortoisehg/hgqt/revdetails.py:252
 msgid "Open a shell terminal in the selected subrepository root"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:301 tortoisehg/hgqt/revdetails.py:389
+#: tortoisehg/hgqt/manifestdialog.py:295 tortoisehg/hgqt/revdetails.py:389
 #, python-format
 msgid "Hg file log viewer - %s"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:314 tortoisehg/hgqt/revdetails.py:403
+#: tortoisehg/hgqt/manifestdialog.py:308 tortoisehg/hgqt/revdetails.py:403
 msgid "Cannot open subrepository"
 msgstr "Nie można otworzyć subrepo"
 
-#: tortoisehg/hgqt/manifestdialog.py:315 tortoisehg/hgqt/revdetails.py:404
+#: tortoisehg/hgqt/manifestdialog.py:309 tortoisehg/hgqt/revdetails.py:404
 msgid "The selected subrepository does not exist on the working directory"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:535
+#: tortoisehg/hgqt/manifestdialog.py:520
 msgid "Failed to open Manifest dialog"
 msgstr ""
 
@@ -2333,21 +2374,21 @@ msgid "Verify merge targets and ensure your working directory is clean."
 msgstr ""
 "Weryfikuj cele scalania aby upewnić się, że katalog roboczy jest czysty."
 
-#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:595
+#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:580
 #: tortoisehg/hgqt/revpanel.py:158 tortoisehg/hgtk/merge.py:73
 msgid "Not a head revision!"
-msgstr ""
+msgstr "To nie jest główna rewizja"
 
 #: tortoisehg/hgqt/merge.py:135
 msgid "Merge from (other revision)"
 msgstr "Scal z (inna rewizja)"
 
-#: tortoisehg/hgqt/merge.py:140 tortoisehg/hgqt/merge.py:649
+#: tortoisehg/hgqt/merge.py:140 tortoisehg/hgqt/merge.py:652
 #: tortoisehg/hgtk/merge.py:47 tortoisehg/hgtk/merge.py:60
 msgid "Unable to merge"
 msgstr "Nie można było scalić"
 
-#: tortoisehg/hgqt/merge.py:141 tortoisehg/hgqt/merge.py:650
+#: tortoisehg/hgqt/merge.py:141 tortoisehg/hgqt/merge.py:653
 msgid "Merge revision not specified or not found"
 msgstr ""
 
@@ -2380,7 +2421,7 @@ msgstr "Albo użyj:"
 
 #: tortoisehg/hgqt/merge.py:194
 msgid "Force a merge with outstanding changes (-f/--force)"
-msgstr ""
+msgstr "Wymuś scalenie z niewcommitowanymi zmianami (-f/--force)"
 
 #: tortoisehg/hgqt/merge.py:208 tortoisehg/hgtk/merge.py:118
 msgid "Discard all changes from merge target (other) revision"
@@ -2397,6 +2438,9 @@ msgid ""
 "\n"
 "Are you sure this is what you want to do?"
 msgstr ""
+"Zmiany od rewizji %s i wszyscy niescaleni rodzice będą odrzucone.\n"
+"\n"
+"Czy jesteś pewien, że na pewno chcesz to zrobić?"
 
 #: tortoisehg/hgqt/merge.py:290
 msgctxt "working dir state"
@@ -2419,6 +2463,8 @@ msgid ""
 "%d files were modified on both branches and must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
+"%d plików zostało zmodyfikowanych w obydwu gałęziach i wynikłe konflikty "
+"muszą być <a href=\"resolve\"><b>rozwiązane</b></a>"
 
 #: tortoisehg/hgqt/merge.py:439
 msgid "Commit merge results"
@@ -2437,15 +2483,15 @@ msgstr "Scal z %s"
 msgid "Merge changeset"
 msgstr "Scal zestaw zmian"
 
-#: tortoisehg/hgqt/messageentry.py:75
+#: tortoisehg/hgqt/messageentry.py:74
 msgid "Paste &Filenames"
 msgstr "Wklej &Nazwy plików"
 
-#: tortoisehg/hgqt/messageentry.py:77
+#: tortoisehg/hgqt/messageentry.py:76
 msgid "App&ly Format"
 msgstr "Zastosuj &format"
 
-#: tortoisehg/hgqt/messageentry.py:78
+#: tortoisehg/hgqt/messageentry.py:77
 msgid "C&onfigure Format"
 msgstr "K&onfiguruj format"
 
@@ -2554,12 +2600,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/mq.py:510
 msgid "no guards"
-msgstr ""
+msgstr "brak stróżów"
 
 #: tortoisehg/hgqt/mq.py:549 tortoisehg/hgqt/mq.py:1016
 #, python-format
 msgid "Guards: %d/%d"
-msgstr ""
+msgstr "Stróże: %d/%d"
 
 #: tortoisehg/hgqt/mq.py:611
 msgid "Queues"
@@ -2603,19 +2649,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/mq.py:1153
 msgid "Update date field with current date (--currentdate)"
-msgstr ""
+msgstr "Aktualizuj datę aktualną datą (--currentdate)"
 
 #: tortoisehg/hgqt/mq.py:1157
 msgid "Specify an explicit date:"
-msgstr ""
+msgstr "Wskaż konkretną datę:"
 
 #: tortoisehg/hgqt/mq.py:1160
 msgid "Update author field with current user (--currentuser)"
-msgstr ""
+msgstr "Aktualizuj autora aktualnym użytkownikiem (--currentuser)"
 
 #: tortoisehg/hgqt/mq.py:1164
 msgid "Specify an explicit author:"
-msgstr ""
+msgstr "Wskaż jednoznacznie autora:"
 
 #: tortoisehg/hgqt/p4pending.py:66 tortoisehg/hgtk/p4pending.py:30
 #, python-format
@@ -2652,7 +2698,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/pbranch.py:82 tortoisehg/hgtk/thgpbranch.py:116
 msgid "Start a new patch branch"
-msgstr ""
+msgstr "Stwórz nową gałąź patcha"
 
 #: tortoisehg/hgqt/pbranch.py:88 tortoisehg/hgtk/thgpbranch.py:121
 msgid "Edit patch dependency graph"
@@ -2665,7 +2711,7 @@ msgstr "będzie zamknięty"
 #: tortoisehg/hgqt/pbranch.py:301 tortoisehg/hgtk/thgpbranch.py:375
 #, python-format
 msgid "needs merge of %i heads\n"
-msgstr ""
+msgstr "wymaga scalenia %i głów\n"
 
 #: tortoisehg/hgqt/pbranch.py:304 tortoisehg/hgtk/thgpbranch.py:378
 #, python-format
@@ -2704,6 +2750,8 @@ msgid ""
 "Mercurial was unable to find an editor. Please configure Mercurial to use an "
 "editor installed on your system."
 msgstr ""
+"Mercurial nie był w stanie znaleźć edytora. Skonfiguruj Mercuriala by używał "
+"edytora dostępnego w Twoim systemie."
 
 #: tortoisehg/hgqt/pbranch.py:844
 msgid "New Patch Branch"
@@ -2742,7 +2790,7 @@ msgstr ""
 #: tortoisehg/hgqt/postreview.py:110 tortoisehg/hgqt/postreview.py:126
 #: tortoisehg/hgqt/postreview.py:343 tortoisehg/hgqt/postreview.py:366
 #: tortoisehg/hgqt/postreview.py:378 tortoisehg/hgqt/postreview_ui.py:163
-#: tortoisehg/hgqt/settings.py:725
+#: tortoisehg/hgqt/settings.py:783
 msgid "Review Board"
 msgstr "Review Board"
 
@@ -2842,15 +2890,15 @@ msgstr ""
 msgid "%s - purge"
 msgstr ""
 
-#: tortoisehg/hgqt/purge.py:83 tortoisehg/hgqt/purge.py:115
+#: tortoisehg/hgqt/purge.py:83 tortoisehg/hgqt/purge.py:118
 msgid "Checking"
 msgstr "Sprawdzanie"
 
-#: tortoisehg/hgqt/purge.py:119
+#: tortoisehg/hgqt/purge.py:122
 msgid "Ready to purge."
 msgstr ""
 
-#: tortoisehg/hgqt/purge.py:123
+#: tortoisehg/hgqt/purge.py:126
 #, python-format
 msgid "Delete %d unknown file"
 msgid_plural "Delete %d unknown files"
@@ -2858,7 +2906,7 @@ msgstr[0] "Usunąć %d nieznany plik"
 msgstr[1] "Usunąć %d nieznane pliki"
 msgstr[2] "Usunąć %d nieznanych plików"
 
-#: tortoisehg/hgqt/purge.py:129
+#: tortoisehg/hgqt/purge.py:132
 #, python-format
 msgid "Delete %d ignored file"
 msgid_plural "Delete %d ignored files"
@@ -2866,40 +2914,41 @@ msgstr[0] "Usunąć %d ignorowany plik"
 msgstr[1] "Usunąć %d ignorowane pliki"
 msgstr[2] "Usunąć %d ignorowanych plików"
 
-#: tortoisehg/hgqt/purge.py:135
+#: tortoisehg/hgqt/purge.py:138
 #, python-format
 msgid "Delete %d file in .hg/Trashcan"
 msgid_plural "Delete %d files in .hg/Trashcan"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Usuwanie %d pliku z .hg/Trashcan"
+msgstr[1] "Usuwanie %d plików z .hg/Trashcan"
+msgstr[2] "Usuwanie %d plików z .hg/Trashcan"
 
-#: tortoisehg/hgqt/purge.py:159
+#: tortoisehg/hgqt/purge.py:162
 msgid "Confirm file deletions"
 msgstr "Potwierdź wszystkie usunięcia"
 
-#: tortoisehg/hgqt/purge.py:160
+#: tortoisehg/hgqt/purge.py:163
 msgid "Are you sure you want to delete these files and/or folders?"
 msgstr "Jesteś pewien, że chcesz usunąć te pliki i/lub foldery?"
 
-#: tortoisehg/hgqt/purge.py:167
+#: tortoisehg/hgqt/purge.py:170
 msgid "Deletion failures"
-msgstr ""
+msgstr "Błędy usuwania"
 
-#: tortoisehg/hgqt/purge.py:168
+#: tortoisehg/hgqt/purge.py:171
 #, python-format
 msgid "Unable to delete %d files or folders"
-msgstr ""
+msgstr "Nie można usunąć %d plików lub folderów"
 
-#: tortoisehg/hgqt/purge.py:206
+#: tortoisehg/hgqt/purge.py:209
 msgid "Deleting trash folder..."
-msgstr ""
+msgstr "Usuwanie kosza..."
 
-#: tortoisehg/hgqt/purge.py:245
+#: tortoisehg/hgqt/purge.py:252
 #, python-format
 msgid "Deleted %d files"
 msgstr "Usunięto %d plików"
 
-#: tortoisehg/hgqt/purge.py:255
+#: tortoisehg/hgqt/purge.py:262
 #, python-format
 msgid "Deleted %d files and %d folders"
 msgstr "Usunięto %d plików i %d folderów"
@@ -2942,7 +2991,7 @@ msgstr "Repozytorium:"
 msgid "Patch queues:"
 msgstr "Kolejki patchy:"
 
-#: tortoisehg/hgqt/qqueue.py:85 tortoisehg/hgqt/settings.py:888
+#: tortoisehg/hgqt/qqueue.py:85 tortoisehg/hgqt/settings.py:966
 #: tortoisehg/hgtk/thgconfig.py:680
 msgid "Reload"
 msgstr "Przeładuj"
@@ -2952,7 +3001,7 @@ msgid "Activate"
 msgstr "Aktywuj"
 
 #: tortoisehg/hgqt/qqueue.py:94 tortoisehg/hgqt/rename.py:170
-#: tortoisehg/hgqt/reporegistry.py:414 tortoisehg/hgtk/bookmark.py:49
+#: tortoisehg/hgqt/reporegistry.py:412 tortoisehg/hgtk/bookmark.py:49
 msgid "Rename"
 msgstr "Zmień nazwę"
 
@@ -3011,6 +3060,8 @@ msgid ""
 "<p>This will also erase the patchfiles on disk!</p><p>Do you really want to "
 "purge patch queue '%s' ?</p>"
 msgstr ""
+"<p>Ta akcja spowoduje usunięcie plików patchy na dysku!</p><p>Czy na pewno "
+"chcesz przeczyścić kolejkę patchy '%s' ?</p>"
 
 #: tortoisehg/hgqt/qqueue.py:343 tortoisehg/hgqt/qreorder.py:229
 msgid "Please enable the MQ extension first."
@@ -3049,7 +3100,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/qrename.py:132
 msgid "Overwrite existing patchfile"
-msgstr ""
+msgstr "Nadpisz istniejący plik patcha"
 
 #: tortoisehg/hgqt/qrename.py:134
 msgid "Go back and change new patchname"
@@ -3057,19 +3108,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/qreorder.py:27
 msgid "Reorder Unapplied Patches"
-msgstr ""
+msgstr "Zmień kolejność niezastosowanych patchy"
 
 #: tortoisehg/hgqt/qreorder.py:68
 msgid "Unapplied Patches - drag to reorder"
-msgstr ""
+msgstr "Niezastosowane patche - przeciągnij by zmienić kolejność"
 
 #: tortoisehg/hgqt/qreorder.py:79
 msgid "Applied Patches"
-msgstr ""
+msgstr "Zastosowane patche"
 
 #: tortoisehg/hgqt/qreorder.py:119
 msgid "Rename patch"
-msgstr ""
+msgstr "Zmień nazwę patcha"
 
 #: tortoisehg/hgqt/qscilib.py:174 tortoisehg/hgtk/merge.py:137
 msgid "Undo"
@@ -3122,68 +3173,80 @@ msgstr "Niewidoczne"
 
 #: tortoisehg/hgqt/qscilib.py:206
 msgid "AfterIndent"
-msgstr ""
+msgstr "AfterIndent"
 
 #: tortoisehg/hgqt/qscilib.py:213
 msgid "EolnVisibility"
+msgstr "EolnVisibility"
+
+#: tortoisehg/hgqt/qscilib.py:224
+msgid "AutoComplete"
 msgstr ""
 
-#: tortoisehg/hgqt/qscilib.py:330
+#: tortoisehg/hgqt/qscilib.py:225
+msgid "Enable"
+msgstr ""
+
+#: tortoisehg/hgqt/qscilib.py:226
+msgid "Disable"
+msgstr ""
+
+#: tortoisehg/hgqt/qscilib.py:345
 msgid "### regular expression ###"
-msgstr ""
+msgstr "### wyrażenie regularne ###"
 
-#: tortoisehg/hgqt/qscilib.py:333 tortoisehg/hgtk/datamine.py:319
+#: tortoisehg/hgqt/qscilib.py:348 tortoisehg/hgtk/datamine.py:319
 msgid "Regular expression search pattern"
-msgstr ""
+msgstr "Wzorzec wyszukiwania wyrażeń regularnych"
 
-#: tortoisehg/hgqt/qscilib.py:340
+#: tortoisehg/hgqt/qscilib.py:356
 msgid "Wrap search"
 msgstr "Zawijaj wyszukiwanie"
 
-#: tortoisehg/hgqt/qscilib.py:518
+#: tortoisehg/hgqt/qscilib.py:535
 msgid "Unable to read/write config file"
 msgstr "Nie można czytać/zapisać pliku konfiguracyjnego"
 
-#: tortoisehg/hgqt/qtlib.py:118 tortoisehg/hgtk/gdialog.py:682
+#: tortoisehg/hgqt/qtlib.py:138 tortoisehg/hgtk/gdialog.py:682
 #: tortoisehg/hgtk/gtklib.py:406
 msgid "No visual editor configured"
 msgstr "Brak skonfigurowanego edytora"
 
-#: tortoisehg/hgqt/qtlib.py:119 tortoisehg/hgtk/gdialog.py:683
+#: tortoisehg/hgqt/qtlib.py:139 tortoisehg/hgtk/gdialog.py:683
 #: tortoisehg/hgtk/gtklib.py:407
 msgid "Please configure a visual editor."
 msgstr "Proszę skonfigurować edytor."
 
-#: tortoisehg/hgqt/qtlib.py:131
+#: tortoisehg/hgqt/qtlib.py:151
 msgid "Editor launch failure"
-msgstr ""
+msgstr "Błąd uruchamiania edytora"
 
-#: tortoisehg/hgqt/qtlib.py:140
+#: tortoisehg/hgqt/qtlib.py:160
 msgid "Failed to open path in terminal"
 msgstr "Nie można było otworzyć ścieżki w terminalu"
 
-#: tortoisehg/hgqt/qtlib.py:141
+#: tortoisehg/hgqt/qtlib.py:161
 #, python-format
 msgid "\"%s\" is not a valid directory"
 msgstr "\"%s\" nie jest poprawnym katalogiem"
 
-#: tortoisehg/hgqt/qtlib.py:152
+#: tortoisehg/hgqt/qtlib.py:172
 msgid "No shell configured"
 msgstr "Brak skonfigurowanej powłoki"
 
-#: tortoisehg/hgqt/qtlib.py:153
+#: tortoisehg/hgqt/qtlib.py:173
 msgid "A terminal shell must be configured"
 msgstr "Powłoka terminala musi być skonfigurowana"
 
-#: tortoisehg/hgqt/qtlib.py:813
+#: tortoisehg/hgqt/qtlib.py:833
 msgid "Show Log"
 msgstr "Pokaż log"
 
-#: tortoisehg/hgqt/qtlib.py:985
+#: tortoisehg/hgqt/qtlib.py:1005
 msgid "Please enter a username"
 msgstr "Proszę wprowadzić nazwę użytkownika"
 
-#: tortoisehg/hgqt/qtlib.py:986
+#: tortoisehg/hgqt/qtlib.py:1006
 msgid "You must identify yourself to Mercurial"
 msgstr "Musisz autoryzować się do Mercuriala"
 
@@ -3197,11 +3260,11 @@ msgstr "Idź"
 
 #: tortoisehg/hgqt/quickop.py:20
 msgid "Checkmark files to add"
-msgstr ""
+msgstr "Zaznacz pliki do dodania"
 
 #: tortoisehg/hgqt/quickop.py:21
 msgid "Checkmark files to forget"
-msgstr ""
+msgstr "Zaznacz pliki do zapomnienia"
 
 #: tortoisehg/hgqt/quickop.py:21 tortoisehg/hgtk/quickop.py:20
 msgid "Forget"
@@ -3209,7 +3272,7 @@ msgstr "Zapomnij"
 
 #: tortoisehg/hgqt/quickop.py:22
 msgid "Checkmark files to revert"
-msgstr ""
+msgstr "Zaznacz pliki do odrzucenia"
 
 #: tortoisehg/hgqt/quickop.py:22 tortoisehg/hgtk/p4pending.py:67
 #: tortoisehg/hgtk/quickop.py:21
@@ -3218,9 +3281,9 @@ msgstr "Przywróć"
 
 #: tortoisehg/hgqt/quickop.py:23
 msgid "Checkmark files to remove"
-msgstr ""
+msgstr "Zaznacz pliki do usunięcia"
 
-#: tortoisehg/hgqt/quickop.py:23 tortoisehg/hgqt/sync.py:562
+#: tortoisehg/hgqt/quickop.py:23 tortoisehg/hgqt/sync.py:573
 #: tortoisehg/hgqt/webconf_ui.py:80 tortoisehg/hgtk/bookmark.py:47
 #: tortoisehg/hgtk/quickop.py:22 tortoisehg/hgtk/tagadd.py:40
 msgid "Remove"
@@ -3237,29 +3300,33 @@ msgstr "Nie zapisuj plików backupu (*.orig)"
 
 #: tortoisehg/hgqt/quickop.py:85
 msgid "Force removal of modified files (--force)"
-msgstr ""
+msgstr "Wymuś usuwanie zmodyfikowanych plików (--force)"
 
-#: tortoisehg/hgqt/quickop.py:146 tortoisehg/hgtk/quickop.py:261
+#: tortoisehg/hgqt/quickop.py:157 tortoisehg/hgqt/quickop.py:228
+#: tortoisehg/hgtk/quickop.py:261
 msgid "No files selected"
 msgstr "Brak zaznaczonych plików"
 
-#: tortoisehg/hgqt/quickop.py:147 tortoisehg/hgtk/quickop.py:262
+#: tortoisehg/hgqt/quickop.py:158 tortoisehg/hgqt/quickop.py:229
+#: tortoisehg/hgtk/quickop.py:262
 msgid "No operation to perform"
 msgstr "Brak operacji do wykonania"
 
-#: tortoisehg/hgqt/quickop.py:159
+#: tortoisehg/hgqt/quickop.py:175
 msgid ""
 "You have selected one or more files that have been modified.  By default, "
 "these files will not be removed.  What would you like to do?"
 msgstr ""
+"Zaznaczyłeś jeden lub więcej plików, które były zmodyfikowane. Domyśle pliki "
+"te zostaną usunięte. Co chcesz zrobić?"
 
-#: tortoisehg/hgqt/quickop.py:162
+#: tortoisehg/hgqt/quickop.py:178
 msgid "Remove &Unmodified Files"
-msgstr ""
+msgstr "Usuń niemodyfikowane pliki"
 
-#: tortoisehg/hgqt/quickop.py:163
+#: tortoisehg/hgqt/quickop.py:179
 msgid "Remove &All Selected Files"
-msgstr ""
+msgstr "Usuń wszystkie zaznaczone pliki"
 
 #: tortoisehg/hgqt/rebase.py:40
 msgid "Rebase changeset and descendants"
@@ -3271,11 +3338,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/rebase.py:60
 msgid "Keep original changesets"
-msgstr ""
+msgstr "Zachowaj oryginalne zmiany"
 
 #: tortoisehg/hgqt/rebase.py:64
 msgid "Keep original branch names"
-msgstr ""
+msgstr "Zachowaj oryginalne nazwy gałęzi"
 
 #: tortoisehg/hgqt/rebase.py:68
 msgid "Force detach of rebased changesets from their original branch"
@@ -3289,7 +3356,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:95 tortoisehg/hgtk/history.py:1594
 #: tortoisehg/hgtk/synch.py:153
 msgid "Rebase"
-msgstr ""
+msgstr "Przebazuj"
 
 #: tortoisehg/hgqt/rebase.py:98 tortoisehg/hgqt/rebase.py:265
 #: tortoisehg/hgqt/repowidget.py:1483 tortoisehg/hgqt/repowidget.py:1510
@@ -3300,25 +3367,27 @@ msgstr "Przerwij"
 #: tortoisehg/hgqt/rebase.py:118
 #, python-format
 msgid "Rebase - %s"
-msgstr ""
+msgstr "Przebazuj - %s"
 
 #: tortoisehg/hgqt/rebase.py:142
 msgid ""
 "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"Przed przebazowaniem musisz <a href=\"commit\"><b>wcommitować</b></a> lub <a "
+"href=\"discard\"><b>odrzucić</b></a> zmiany."
 
 #: tortoisehg/hgqt/rebase.py:147 tortoisehg/hgqt/rebase.py:207
 msgid "You may continue the rebase"
-msgstr ""
+msgstr "Możesz kontynuować przebazowanie"
 
 #: tortoisehg/hgqt/rebase.py:189
 msgid "Rebase is complete"
-msgstr ""
+msgstr "Przebazowanie zostało zakończone"
 
 #: tortoisehg/hgqt/rebase.py:191
 msgid "Rebase aborted"
-msgstr ""
+msgstr "Przebazowanie zaniechane"
 
 #: tortoisehg/hgqt/rebase.py:201
 msgid ""
@@ -3336,7 +3405,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rebase.py:262
 msgid "Rebase already in progress"
-msgstr ""
+msgstr "Przebazowanie już jest w trakcie wykonywania"
 
 #: tortoisehg/hgqt/rebase.py:263
 msgid "Resuming rebase already in progress"
@@ -3361,15 +3430,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/rejects.py:96 tortoisehg/hgqt/rejects.py:103
 msgid "Unable to merge rejects"
-msgstr ""
+msgstr "Nie można scalić odrzuceń"
 
 #: tortoisehg/hgqt/rejects.py:97
 msgid "Can't read this file (maybe deleted)"
-msgstr ""
+msgstr "Nie można odczytać tego pliku (może został usunięty)"
 
 #: tortoisehg/hgqt/rejects.py:104
 msgid "This appears to be a binary file"
-msgstr ""
+msgstr "Wygląda to na plik binarny"
 
 #: tortoisehg/hgqt/rejects.py:199 tortoisehg/hgtk/commit.py:1351
 #: tortoisehg/hgtk/commit.py:1356
@@ -3396,16 +3465,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/rejects.py:280
 msgid "Filename required"
-msgstr ""
+msgstr "Nazwa pliku jest wymagana"
 
 #: tortoisehg/hgqt/rejects.py:281
 msgid "You must provide the path to a file"
-msgstr ""
+msgstr "Musisz podać ścieżkę do pliku"
 
 #: tortoisehg/hgqt/rename.py:46
 #, python-format
 msgid "Could not find or initialize the repository from folder<p>%s</p>"
-msgstr ""
+msgstr "Nie można było zainicjalizować repozytorium z folderu <p>%s</p>"
 
 #: tortoisehg/hgqt/rename.py:75
 msgid "Copy source -> destination"
@@ -3447,23 +3516,23 @@ msgstr "Źródło nie istnieje"
 
 #: tortoisehg/hgqt/rename.py:261
 msgid "The source must be within the repository tree."
-msgstr ""
+msgstr "Źródło musi się znajdować w repozytorium."
 
 #: tortoisehg/hgqt/rename.py:266
 msgid "The destination must be within the repository tree."
-msgstr ""
+msgstr "Cel musi się znajdować w repozytorium."
 
 #: tortoisehg/hgqt/rename.py:270
 msgid "Please give a destination that differs from the source"
-msgstr ""
+msgstr "Proszę podać cel, który jest różny od źródła"
 
 #: tortoisehg/hgqt/rename.py:274
 msgid "Destination file already exists."
-msgstr ""
+msgstr "Plik docelowy już istnieje."
 
 #: tortoisehg/hgqt/rename.py:275
 msgid "Are you sure you want to overwrite it ?"
-msgstr ""
+msgstr "Czy na pewno chcesz nadpisać?"
 
 #: tortoisehg/hgqt/rename.py:288
 msgid "Cannot do a pure casefolding copy on Windows"
@@ -3471,11 +3540,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/rename.py:298
 msgid "The following error was caught while copying:"
-msgstr ""
+msgstr "Poniższy błąd został złapany podczas kopiowania:"
 
 #: tortoisehg/hgqt/rename.py:300
 msgid "The following error was caught while renaming:"
-msgstr ""
+msgstr "Poniższy błąd został złapany podczas zmieniania nazw:"
 
 #: tortoisehg/hgqt/repofilter.py:31 tortoisehg/hgqt/repofilter.py:44
 #: tortoisehg/hgtk/cslist.py:88
@@ -3517,7 +3586,7 @@ msgstr "Gałąź"
 
 #: tortoisehg/hgqt/repofilter.py:212
 msgid "Display graph the named branch only"
-msgstr ""
+msgstr "Wyświetl graf tylko nazwanych gałęzi"
 
 #: tortoisehg/hgqt/repofilter.py:216
 msgid "Display only active branches"
@@ -3529,7 +3598,7 @@ msgstr "Pokazuj zamknięte gałęzie"
 
 #: tortoisehg/hgqt/repofilter.py:222
 msgid "Include all ancestors"
-msgstr ""
+msgstr "Załącz wszystkich przodków"
 
 #: tortoisehg/hgqt/repomodel.py:42
 msgctxt "column header"
@@ -3586,212 +3655,215 @@ msgctxt "column header"
 msgid "Changes"
 msgstr "Zmiany"
 
-#: tortoisehg/hgqt/repomodel.py:209
+#: tortoisehg/hgqt/repomodel.py:194
 #, python-format
 msgid "filling (%d)"
 msgstr "wypełnianie (%d)"
 
-#: tortoisehg/hgqt/repomodel.py:582
+#: tortoisehg/hgqt/repomodel.py:567
 msgid "Mercurial User"
 msgstr "Użytkownik Mercuriala"
 
-#: tortoisehg/hgqt/reporegistry.py:178 tortoisehg/hgqt/reporegistry.py:632
+#: tortoisehg/hgqt/reporegistry.py:175 tortoisehg/hgqt/reporegistry.py:634
 #, python-format
 msgid "Unsupported repository type (%s)"
 msgstr "Nieobsługiwany typ repozytorium (%s)"
 
-#: tortoisehg/hgqt/reporegistry.py:179 tortoisehg/hgqt/reporegistry.py:633
+#: tortoisehg/hgqt/reporegistry.py:176 tortoisehg/hgqt/reporegistry.py:635
 msgid "Cannot open non mercurial repositories or subrepositories"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:210 tortoisehg/hgqt/wctxactions.py:297
+#: tortoisehg/hgqt/reporegistry.py:207 tortoisehg/hgqt/wctxactions.py:334
 msgid "&Delete"
 msgstr "Usuń"
 
-#: tortoisehg/hgqt/reporegistry.py:212 tortoisehg/hgtk/thgmq.py:372
+#: tortoisehg/hgqt/reporegistry.py:209 tortoisehg/hgtk/thgmq.py:372
 #: tortoisehg/hgtk/thgmq.py:376 tortoisehg/hgtk/thgshelve.py:224
 msgid "Confirm Delete"
 msgstr "Potwierdź usunięcie"
 
-#: tortoisehg/hgqt/reporegistry.py:213
+#: tortoisehg/hgqt/reporegistry.py:210
 #, python-format
 msgid "Delete Group '%s' and all its entries?"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:240
+#: tortoisehg/hgqt/reporegistry.py:238
 msgid "Repository Registry"
 msgstr "Rejestr repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:406
+#: tortoisehg/hgqt/reporegistry.py:404
 msgid "Refresh repository list"
 msgstr "Odśwież listę repozytoriów"
 
-#: tortoisehg/hgqt/reporegistry.py:407
+#: tortoisehg/hgqt/reporegistry.py:405
 msgid "Refresh the Repository Registry list"
 msgstr "Odśwież listę repozytoriów"
 
-#: tortoisehg/hgqt/reporegistry.py:408 tortoisehg/hgqt/webconf_ui.py:76
+#: tortoisehg/hgqt/reporegistry.py:406 tortoisehg/hgqt/webconf_ui.py:76
 msgid "Open"
 msgstr "Otwórz"
 
-#: tortoisehg/hgqt/reporegistry.py:409
+#: tortoisehg/hgqt/reporegistry.py:407
 msgid "Open the repository in a new tab"
 msgstr "Otwórz repozytorium w nowym tabie"
 
-#: tortoisehg/hgqt/reporegistry.py:410
+#: tortoisehg/hgqt/reporegistry.py:408
 msgid "Open All"
 msgstr "Otwórz wszystkie"
 
-#: tortoisehg/hgqt/reporegistry.py:411
+#: tortoisehg/hgqt/reporegistry.py:409
 msgid "Open all repositories in new tabs"
 msgstr "Otwórz wszystkie repozytoria w nowych tabach"
 
-#: tortoisehg/hgqt/reporegistry.py:412 tortoisehg/hgqt/reporegistry.py:644
+#: tortoisehg/hgqt/reporegistry.py:410 tortoisehg/hgqt/reporegistry.py:646
 msgid "New Group"
 msgstr "Nowe grupy"
 
-#: tortoisehg/hgqt/reporegistry.py:413
+#: tortoisehg/hgqt/reporegistry.py:411
 msgid "Create a new group"
 msgstr "Stwórz nową grupę"
 
-#: tortoisehg/hgqt/reporegistry.py:415
+#: tortoisehg/hgqt/reporegistry.py:413
 msgid "Rename the entry"
 msgstr "Zmień nazwę wpisu"
 
-#: tortoisehg/hgqt/reporegistry.py:416
+#: tortoisehg/hgqt/reporegistry.py:414
 msgid "Settings..."
 msgstr "Ustawienia..."
 
-#: tortoisehg/hgqt/reporegistry.py:417
+#: tortoisehg/hgqt/reporegistry.py:415
 msgid "View the repository's settings"
 msgstr "Zobacz ustawienia repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:418
+#: tortoisehg/hgqt/reporegistry.py:416
 msgid "Remove from registry"
 msgstr "Usuń z rejestru"
 
-#: tortoisehg/hgqt/reporegistry.py:419
+#: tortoisehg/hgqt/reporegistry.py:417
 msgid ""
 "Remove the node and all its subnodes. Repositories are not deleted from disk."
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:422 tortoisehg/util/menuthg.py:25
+#: tortoisehg/hgqt/reporegistry.py:420 tortoisehg/util/menuthg.py:25
 msgid "Clone..."
 msgstr "Klonuj..."
 
-#: tortoisehg/hgqt/reporegistry.py:423
+#: tortoisehg/hgqt/reporegistry.py:421
 msgid "Clone Repository"
 msgstr "Klonuj repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:424 tortoisehg/hgqt/sync.py:560
-#: tortoisehg/hgqt/workbench.py:328
+#: tortoisehg/hgqt/reporegistry.py:422 tortoisehg/hgqt/sync.py:571
+#: tortoisehg/hgqt/workbench.py:329
 msgid "Explore"
 msgstr "Eksploruj"
 
-#: tortoisehg/hgqt/reporegistry.py:425
+#: tortoisehg/hgqt/reporegistry.py:423
 msgid "Open the repository in a file browser"
 msgstr "Otwórz repozytorium w managerze plików"
 
-#: tortoisehg/hgqt/reporegistry.py:426 tortoisehg/hgqt/sync.py:561
-#: tortoisehg/hgqt/workbench.py:331
+#: tortoisehg/hgqt/reporegistry.py:424 tortoisehg/hgqt/sync.py:572
+#: tortoisehg/hgqt/workbench.py:332
 msgid "Terminal"
 msgstr "Konsola"
 
-#: tortoisehg/hgqt/reporegistry.py:427
+#: tortoisehg/hgqt/reporegistry.py:425
 msgid "Open a shell terminal in the repository root"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:428
+#: tortoisehg/hgqt/reporegistry.py:426
 msgid "Add repository..."
 msgstr "Dodaj repozytorium..."
 
-#: tortoisehg/hgqt/reporegistry.py:429
+#: tortoisehg/hgqt/reporegistry.py:427
 msgid "Add a repository to this group"
 msgstr "Dodaj repozytorium do tej grupy"
 
-#: tortoisehg/hgqt/reporegistry.py:430
+#: tortoisehg/hgqt/reporegistry.py:428
 msgid "Add a subrepository..."
 msgstr "Dodaj subrepozytorium..."
 
-#: tortoisehg/hgqt/reporegistry.py:431
+#: tortoisehg/hgqt/reporegistry.py:429
 msgid "Convert an existing repository into a subrepository"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:433 tortoisehg/hgqt/wctxactions.py:44
+#: tortoisehg/hgqt/reporegistry.py:431 tortoisehg/hgqt/wctxactions.py:43
 msgid "Copy path"
 msgstr "Kopiuj ścieżkę"
 
-#: tortoisehg/hgqt/reporegistry.py:434
+#: tortoisehg/hgqt/reporegistry.py:432
 msgid "Copy the root path of the repository to the clipboard"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:490
+#: tortoisehg/hgqt/reporegistry.py:488
 msgid "Select repository directory to add"
 msgstr "Wybierz katalog repozytorium do dodania"
 
-#: tortoisehg/hgqt/reporegistry.py:501 tortoisehg/hgqt/reporegistry.py:550
-#: tortoisehg/hgqt/reporegistry.py:567 tortoisehg/hgqt/reporegistry.py:596
-#: tortoisehg/hgqt/reporegistry.py:602
+#: tortoisehg/hgqt/reporegistry.py:499 tortoisehg/hgqt/reporegistry.py:552
+#: tortoisehg/hgqt/reporegistry.py:569 tortoisehg/hgqt/reporegistry.py:598
+#: tortoisehg/hgqt/reporegistry.py:604
 msgid "Failed to add repository"
 msgstr "Nie udało się dodać repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:502 tortoisehg/hgqt/workbench.py:763
+#: tortoisehg/hgqt/reporegistry.py:500 tortoisehg/hgqt/workbench.py:781
 #, python-format
 msgid "%s is not a valid repository"
 msgstr "%s nie jest poprawnym repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:508
+#: tortoisehg/hgqt/reporegistry.py:506
 msgid "Select an existing repository to add as a subrepo"
 msgstr "Wybierz istniejące repozytorium do dodania jako subrepo"
 
-#: tortoisehg/hgqt/reporegistry.py:526
+#: tortoisehg/hgqt/reporegistry.py:528
 msgid "Cannot open repository"
 msgstr "Nie można otworzyć repozytorium"
 
-#: tortoisehg/hgqt/reporegistry.py:527
+#: tortoisehg/hgqt/reporegistry.py:529
 #, python-format
 msgid "The selected repository:<br><br>%s<br><br>cannot be open!"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:532
+#: tortoisehg/hgqt/reporegistry.py:534
 msgid "Subrepository already exists"
 msgstr "Subrepozytorium już istnieje"
 
-#: tortoisehg/hgqt/reporegistry.py:533
+#: tortoisehg/hgqt/reporegistry.py:535
 #, python-format
 msgid ""
 "The selected repository:<br><br>%s<br><br>is already a subrepository "
 "of:<br><br>%s<br><br>as: \"%s\""
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:551
+#: tortoisehg/hgqt/reporegistry.py:553
 #, python-format
 msgid "Cannot open the .hgsub file in:<br><br>%s"
-msgstr ""
+msgstr "Nie można otworzyć pliku .hgsub w:<br><br>%s"
 
-#: tortoisehg/hgqt/reporegistry.py:568
+#: tortoisehg/hgqt/reporegistry.py:570
 #, python-format
 msgid "The .hgsub file already contains the line:<br><br>%s"
-msgstr ""
+msgstr "Plik .hgsub już zawiera linijkę:<br><br>%s"
 
-#: tortoisehg/hgqt/reporegistry.py:587
+#: tortoisehg/hgqt/reporegistry.py:589
 msgid "Subrepo added to .hgsub file"
-msgstr ""
+msgstr "Subrepo dodane do pliku .hgsub"
 
-#: tortoisehg/hgqt/reporegistry.py:588
+#: tortoisehg/hgqt/reporegistry.py:590
 #, python-format
 msgid ""
 "The selected subrepo:<br><br><i>%s</i><br><br>has been added to the .hgsub "
 "file.<br><br>Remember that in order to finish adding the subrepo<br><i>you "
 "must still commit</i> the .hgsub file changes."
 msgstr ""
+"Wybrane subrepo:<br><br><i>%s</i><br><br>zostało dodane do pliku "
+".hgsub.<br><br>Pamiętaj by zakończyć dodawanie subrepo<br><i>musisz wykonać "
+"commit</i> zmian w pliku .hgsub."
 
-#: tortoisehg/hgqt/reporegistry.py:597
+#: tortoisehg/hgqt/reporegistry.py:599
 #, python-format
 msgid "Cannot update the .hgsub file in:<br><br>%s"
-msgstr ""
+msgstr "Nie można zaktualizować pliku .hgsub w:<br><br>%s"
 
-#: tortoisehg/hgqt/reporegistry.py:603
+#: tortoisehg/hgqt/reporegistry.py:605
 #, python-format
 msgid "\"%s\" is not a valid repository inside \"%s\""
 msgstr ""
@@ -3814,46 +3886,46 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreeitem.py:323
 msgid "Click OK to continue or Abort to exit."
-msgstr ""
+msgstr "Kliknij OK aby kontynuować lub Przerwij aby zakończyć."
 
 #: tortoisehg/hgqt/repotreeitem.py:325
 msgid "Error loading subrepos"
-msgstr ""
+msgstr "Błąd podczas ładowania subrepozytoriów"
 
 #: tortoisehg/hgqt/repotreeitem.py:343
 msgid "Unable to update repository name"
-msgstr ""
+msgstr "Nie można było zaktualizować nazwy repozytorium"
 
 #: tortoisehg/hgqt/repotreeitem.py:344
 #, python-format
 msgid "An error occurred while updating the repository hgrc file (%s)"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:498
+#: tortoisehg/hgqt/repotreeitem.py:499
 msgid "default"
 msgstr "domyślny"
 
 #: tortoisehg/hgqt/repotreemodel.py:164 tortoisehg/hgqt/resolve.py:399
-#: tortoisehg/hgqt/sync.py:241 tortoisehg/hgqt/webconf.py:266
+#: tortoisehg/hgqt/sync.py:251 tortoisehg/hgqt/webconf.py:266
 msgid "Path"
 msgstr "Ścieżka"
 
-#: tortoisehg/hgqt/repotreemodel.py:274
+#: tortoisehg/hgqt/repotreemodel.py:282
 msgid "Could not get subrepository list"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreemodel.py:275
+#: tortoisehg/hgqt/repotreemodel.py:283
 #, python-format
 msgid ""
 "It was not possible to get the subrepository list for the repository "
 "in:<br><br><i>%s</i>"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreemodel.py:278
+#: tortoisehg/hgqt/repotreemodel.py:286
 msgid "Could not open some subrepositories"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreemodel.py:279
+#: tortoisehg/hgqt/repotreemodel.py:287
 #, python-format
 msgid ""
 "It was not possible to fully load the subrepository list for the repository "
@@ -3935,14 +4007,14 @@ msgstr "Odrzuć"
 msgid "Reject incoming changesets"
 msgstr "Odrzuć przychodzące zestawy zmian"
 
-#: tortoisehg/hgqt/repowidget.py:523 tortoisehg/hgqt/sync.py:968
+#: tortoisehg/hgqt/repowidget.py:523 tortoisehg/hgqt/sync.py:979
 #: tortoisehg/hgtk/history.py:2021
 #, python-format
 msgid "%d outgoing changesets"
 msgstr "%d wychodzących zestawów zmian"
 
 #: tortoisehg/hgqt/repowidget.py:525 tortoisehg/hgqt/repowidget.py:1146
-#: tortoisehg/hgqt/workbench.py:371 tortoisehg/hgtk/history.py:444
+#: tortoisehg/hgqt/workbench.py:372 tortoisehg/hgtk/history.py:444
 #: tortoisehg/hgtk/history.py:2069 tortoisehg/hgtk/synch.py:73
 msgid "Push"
 msgstr "Pchnij"
@@ -3994,7 +4066,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:696
 msgid "Remove current working revision?"
-msgstr ""
+msgstr "Usunąć aktualny katalog roboczy?"
 
 #: tortoisehg/hgqt/repowidget.py:697
 #, python-format
@@ -4003,6 +4075,9 @@ msgid ""
 "uncommitted changes.\n"
 " Continue?"
 msgstr ""
+"Twój aktualna rewizja robocza (%d) będzie usunięta po tym wycofaniu, "
+"pozostawiając niewcommitowane zmiany.\n"
+" Kontynuować?"
 
 #: tortoisehg/hgqt/repowidget.py:840
 msgid "Repository stripped, incoming preview cleared"
@@ -4030,7 +4105,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:986
 msgid "Repository command still running"
-msgstr ""
+msgstr "Komenda repozytorium ciągle działa"
 
 #: tortoisehg/hgqt/repowidget.py:1147
 msgid "Push all"
@@ -4078,7 +4153,7 @@ msgstr "Eksport patcha..."
 
 #: tortoisehg/hgqt/repowidget.py:1179
 msgid "Email patch..."
-msgstr ""
+msgstr "Patch emailem..."
 
 #: tortoisehg/hgqt/repowidget.py:1181
 msgid "Archive..."
@@ -4088,7 +4163,7 @@ msgstr "Archiwizuj..."
 msgid "Bundle rev to tip..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1185 tortoisehg/hgqt/wctxactions.py:42
+#: tortoisehg/hgqt/repowidget.py:1185 tortoisehg/hgqt/wctxactions.py:41
 msgid "Copy patch"
 msgstr "Kopiuj patch"
 
@@ -4122,7 +4197,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1207
 msgid "Rebase..."
-msgstr ""
+msgstr "Przebazuj..."
 
 #: tortoisehg/hgqt/repowidget.py:1210
 msgid "Strip..."
@@ -4166,7 +4241,7 @@ msgstr "Eksportuj wybrane..."
 
 #: tortoisehg/hgqt/repowidget.py:1308 tortoisehg/hgqt/repowidget.py:1397
 msgid "Email Selected..."
-msgstr ""
+msgstr "Wybrane emailem..."
 
 #: tortoisehg/hgqt/repowidget.py:1310
 msgid "Export DAG Range..."
@@ -4182,15 +4257,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1314
 msgid "Bisect - Good, Bad..."
-msgstr ""
+msgstr "Bisekcja - Dobra, Zła..."
 
 #: tortoisehg/hgqt/repowidget.py:1315
 msgid "Bisect - Bad, Good..."
-msgstr ""
+msgstr "Bisekcja - Zła, Dobra..."
 
 #: tortoisehg/hgqt/repowidget.py:1316
 msgid "Compress History..."
-msgstr ""
+msgstr "Kompresuj historię..."
 
 #: tortoisehg/hgqt/repowidget.py:1328 tortoisehg/hgqt/repowidget.py:1406
 msgid "Transplant Selected to local"
@@ -4206,7 +4281,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1375
 msgid "QPush --move"
-msgstr ""
+msgstr "QPush --move"
 
 #: tortoisehg/hgqt/repowidget.py:1376
 msgid "Fold patches..."
@@ -4214,11 +4289,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1377
 msgid "Delete patches..."
-msgstr ""
+msgstr "Usuń patche..."
 
 #: tortoisehg/hgqt/repowidget.py:1378
 msgid "Reorder patches..."
-msgstr ""
+msgstr "Sortuj patche..."
 
 #: tortoisehg/hgqt/repowidget.py:1420
 msgid "Pull to here..."
@@ -4230,11 +4305,11 @@ msgstr "Eksportuj patch"
 
 #: tortoisehg/hgqt/repowidget.py:1443
 msgid "Patch Files (*.patch)"
-msgstr ""
+msgstr "Patchuj pliki (*.patch)"
 
 #: tortoisehg/hgqt/repowidget.py:1474
 msgid "Cannot export revision"
-msgstr ""
+msgstr "Nie można wyeksportować rewizji"
 
 #: tortoisehg/hgqt/repowidget.py:1475
 #, python-format
@@ -4243,10 +4318,13 @@ msgid ""
 "\n"
 "%s\n"
 msgstr ""
+"Nie można eksportować rewizji %s do pliku o nazwie:\n"
+"\n"
+"%s\n"
 
 #: tortoisehg/hgqt/repowidget.py:1477
 msgid "There is already an existing folder with that same name."
-msgstr ""
+msgstr "Już jest katalog o tej samej nazwie."
 
 #: tortoisehg/hgqt/repowidget.py:1483 tortoisehg/hgqt/repowidget.py:1503
 #: tortoisehg/hgtk/thgshelve.py:161
@@ -4313,7 +4391,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1721
 msgid "Cannot import selected revision"
-msgstr ""
+msgstr "Nie można zaimportować wybranej rewizji"
 
 #: tortoisehg/hgqt/repowidget.py:1722
 #, python-format
@@ -4349,15 +4427,15 @@ msgstr "Nierozwiązane konflikty"
 
 #: tortoisehg/hgqt/resolve.py:91
 msgid "Mercurial Resolve"
-msgstr ""
+msgstr "Rozwiązywanie konfliktów przez Mercuriala"
 
 #: tortoisehg/hgqt/resolve.py:92
 msgid "Attempt automatic (trivial) merge"
-msgstr ""
+msgstr "Przystąp do automatycznego (prostego) scalania"
 
 #: tortoisehg/hgqt/resolve.py:94
 msgid "Tool Resolve"
-msgstr ""
+msgstr "Narzędzie do Rozwiązywania konfliktów"
 
 #: tortoisehg/hgqt/resolve.py:95
 msgid "Merge using selected merge tool"
@@ -4385,7 +4463,7 @@ msgstr "Oznacz jako Nierozwiązany"
 
 #: tortoisehg/hgqt/resolve.py:104
 msgid "Mark this file as resolved"
-msgstr ""
+msgstr "Oznacz ten plik jako rozwiązany"
 
 #: tortoisehg/hgqt/resolve.py:114
 msgid "Resolved conflicts"
@@ -4409,7 +4487,7 @@ msgstr "Diff z lokalną wersją"
 
 #: tortoisehg/hgqt/resolve.py:135
 msgid "Visual diff between resolved file and first parent"
-msgstr ""
+msgstr "Wizualny diff pomiędzy rozwiązanym plikiem, a pierwszym rodzicem"
 
 #: tortoisehg/hgqt/resolve.py:137
 msgid "Diff to Other"
@@ -4417,7 +4495,7 @@ msgstr "Diff z Innym"
 
 #: tortoisehg/hgqt/resolve.py:138
 msgid "Visual diff between resolved file and second parent"
-msgstr ""
+msgstr "Wizualny diff pomiędzy rozwiązanym plikiem, a drugim rodzicem"
 
 #: tortoisehg/hgqt/resolve.py:140
 msgid "Mark as Unresolved"
@@ -4437,7 +4515,7 @@ msgstr "Wyjście konsoli"
 
 #: tortoisehg/hgqt/resolve.py:247
 msgid "Unable to show subrepository files"
-msgstr ""
+msgstr "Nie można pokazać plików z subrepozytorium"
 
 #: tortoisehg/hgqt/resolve.py:248
 msgid ""
@@ -4447,7 +4525,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:342
 msgid "There are merge <b>conflicts</b> to be resolved"
-msgstr ""
+msgstr "Są <b>konflikty</b> scalania, które muszą być rozwiązane"
 
 #: tortoisehg/hgqt/resolve.py:344
 msgid "All conflicts are resolved."
@@ -4465,13 +4543,13 @@ msgstr "Wyjść bez rozwiązywania wszystkich konfliktów?"
 msgid "Unresolved conflicts remain. Are you sure?"
 msgstr "Konflikty pozostają nierozwiązane. Jesteś pewien?"
 
-#: tortoisehg/hgqt/resolve.py:355 tortoisehg/hgqt/workbench.py:219
+#: tortoisehg/hgqt/resolve.py:355 tortoisehg/hgqt/workbench.py:220
 msgid "E&xit"
 msgstr "Wyjście"
 
 #: tortoisehg/hgqt/resolve.py:399
 msgid "Ext"
-msgstr ""
+msgstr "Ext"
 
 #: tortoisehg/hgqt/resolve.py:399 tortoisehg/hgqt/thgimport.py:85
 #: tortoisehg/hgtk/thgimport.py:110
@@ -4541,7 +4619,7 @@ msgstr ""
 msgid "Revert all files to this revision"
 msgstr "Przywróć wszystkie pliki do tej rewizji"
 
-#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:239
+#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:242
 #: tortoisehg/hgtk/statusact.py:146
 msgid "Confirm Revert"
 msgstr "Potwierdź przywrócenie"
@@ -4566,7 +4644,7 @@ msgstr "Podrzędna:"
 
 #: tortoisehg/hgqt/revpanel.py:163
 msgid "Head is closed!"
-msgstr ""
+msgstr "Głowa jest zamknięta!"
 
 #: tortoisehg/hgqt/revset.py:28
 msgid "Changesets where username contains string."
@@ -4597,7 +4675,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:42
 msgid "Changeset is tagged."
-msgstr ""
+msgstr "Zestaw zmian jest otagowany."
 
 #: tortoisehg/hgqt/revset.py:44
 msgid "Changeset is a named branch head."
@@ -4609,7 +4687,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:48
 msgid "Changeset is closed."
-msgstr ""
+msgstr "Zestaw zmian jest zamknięty."
 
 #: tortoisehg/hgqt/revset.py:50
 msgid ""
@@ -4745,6 +4823,8 @@ msgid ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
 "revsets</a>"
 msgstr ""
+"<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">pomoc na "
+"temat revision setów</a>"
 
 #: tortoisehg/hgqt/revset.py:221
 msgid "Searching..."
@@ -4982,11 +5062,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1040 tortoisehg/hgtk/hgtk.py:752
 msgid "read file list from file"
-msgstr ""
+msgstr "czytaj listę plików z pliku"
 
 #: tortoisehg/hgqt/run.py:1041
 msgid "read file list from file encoding utf-8"
-msgstr ""
+msgstr "czytaj listę plików z pliku o kodowaniu utf-8"
 
 #: tortoisehg/hgqt/run.py:1045
 msgid "thg about"
@@ -5002,7 +5082,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1049 tortoisehg/hgqt/run.py:1102
 msgid "open to line"
-msgstr ""
+msgstr "otwórz na linii"
 
 #: tortoisehg/hgqt/run.py:1050 tortoisehg/hgqt/run.py:1103
 msgid "initial search pattern"
@@ -5014,7 +5094,7 @@ msgstr "thg annotate"
 
 #: tortoisehg/hgqt/run.py:1053
 msgid "revision to archive"
-msgstr ""
+msgstr "rewizja do zarchiwizowania"
 
 #: tortoisehg/hgqt/run.py:1054
 msgid "thg archive"
@@ -5030,7 +5110,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1059
 msgid "revision to backout"
-msgstr ""
+msgstr "rewizja do wycofania"
 
 #: tortoisehg/hgqt/run.py:1060
 msgid "thg backout [OPTION]... [[-r] REV]"
@@ -5046,11 +5126,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1068
 msgid "revision, tag or branch to check out"
-msgstr ""
+msgstr "rewizja, tag lub gałąź do check outa"
 
 #: tortoisehg/hgqt/run.py:1069
 msgid "include the specified changeset"
-msgstr ""
+msgstr "załącz wskazany zestaw zmian"
 
 #: tortoisehg/hgqt/run.py:1071
 msgid "clone only the specified branch"
@@ -5134,7 +5214,7 @@ msgstr "thg log [OPTIONS] [FILE]"
 
 #: tortoisehg/hgqt/run.py:1101
 msgid "revision to display"
-msgstr ""
+msgstr "rewizja do pokazania"
 
 #: tortoisehg/hgqt/run.py:1104
 msgid "thg manifest [-r REV] [FILE]"
@@ -5142,7 +5222,7 @@ msgstr "thg manifest [-r REV] [FILE]"
 
 #: tortoisehg/hgqt/run.py:1107
 msgid "revision to merge"
-msgstr ""
+msgstr "rewizja do scalenia"
 
 #: tortoisehg/hgqt/run.py:1108
 msgid "thg merge [[-r] REV]"
@@ -5191,7 +5271,7 @@ msgstr "thg sync"
 
 #: tortoisehg/hgqt/run.py:1124
 msgid "show files without changes"
-msgstr ""
+msgstr "pokaż pliki bez zmian"
 
 #: tortoisehg/hgqt/run.py:1125
 msgid "show ignored files"
@@ -5251,15 +5331,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1146
 msgid "revision to tag"
-msgstr ""
+msgstr "rewizja do otagowania"
 
 #: tortoisehg/hgqt/run.py:1147
 msgid "remove a tag"
-msgstr ""
+msgstr "usuń tag"
 
 #: tortoisehg/hgqt/run.py:1148
 msgid "use <text> as commit message"
-msgstr ""
+msgstr "użyj <text> jako komunikat commita"
 
 #: tortoisehg/hgqt/run.py:1149
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
@@ -5383,7 +5463,7 @@ msgstr "Zatrzymane"
 #: tortoisehg/hgqt/serve_ui.py:83 tortoisehg/hgtk/gdialog.py:491
 #: tortoisehg/hgtk/history.py:288
 msgid "Serve"
-msgstr "Serwuj"
+msgstr "Web Server"
 
 #: tortoisehg/hgqt/serve_ui.py:84
 msgid "Port:"
@@ -5397,7 +5477,7 @@ msgstr "Status:"
 msgid "Start"
 msgstr "Start"
 
-#: tortoisehg/hgqt/serve_ui.py:88 tortoisehg/hgqt/settings.py:827
+#: tortoisehg/hgqt/serve_ui.py:88 tortoisehg/hgqt/settings.py:905
 #: tortoisehg/hgtk/gdialog.py:497
 msgid "Settings"
 msgstr "Ustawienia"
@@ -5406,44 +5486,45 @@ msgstr "Ustawienia"
 msgid "<unspecified>"
 msgstr "<nieistotne>"
 
-#: tortoisehg/hgqt/settings.py:111
+#: tortoisehg/hgqt/settings.py:117
 msgid "&True"
 msgstr "&Prawda"
 
-#: tortoisehg/hgqt/settings.py:112
+#: tortoisehg/hgqt/settings.py:118
 msgid "&False"
 msgstr "&Fałsz"
 
-#: tortoisehg/hgqt/settings.py:113
+#: tortoisehg/hgqt/settings.py:119
 msgid "&Unspecified"
 msgstr "&Nieistotne"
 
-#: tortoisehg/hgqt/settings.py:173
+#: tortoisehg/hgqt/settings.py:179
 msgid "&Set..."
 msgstr "Ustaw"
 
-#: tortoisehg/hgqt/settings.py:174
+#: tortoisehg/hgqt/settings.py:180
 msgid "&Clear"
 msgstr "Wyczyść"
 
-#: tortoisehg/hgqt/settings.py:298
+#: tortoisehg/hgqt/settings.py:304
 #, python-format
 msgid "Failed to load issue tracker: '%s': %s. "
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:404 tortoisehg/hgtk/thgconfig.py:43
+#: tortoisehg/hgqt/settings.py:453 tortoisehg/hgtk/thgconfig.py:43
 msgid "UI Language"
-msgstr "Język UI"
+msgstr "Język interfejsu"
 
-#: tortoisehg/hgqt/settings.py:406 tortoisehg/hgtk/thgconfig.py:44
+#: tortoisehg/hgqt/settings.py:455 tortoisehg/hgtk/thgconfig.py:44
 msgid "Specify your preferred user interface language (restart needed)"
 msgstr ""
+"Wskaż swój preferowany język interfejsu (restart aplikacji będzie wymagany)"
 
-#: tortoisehg/hgqt/settings.py:408 tortoisehg/hgtk/thgconfig.py:45
+#: tortoisehg/hgqt/settings.py:457 tortoisehg/hgtk/thgconfig.py:45
 msgid "Three-way Merge Tool"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:410
+#: tortoisehg/hgqt/settings.py:459
 msgid ""
 "Graphical merge program for resolving merge conflicts.  If left unspecified, "
 "Mercurial will use the first applicable tool it finds on your system or use "
@@ -5453,22 +5534,22 @@ msgid ""
 "manual merging"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:416 tortoisehg/hgtk/thgconfig.py:52
+#: tortoisehg/hgqt/settings.py:465 tortoisehg/hgtk/thgconfig.py:52
 msgid "Visual Diff Tool"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:418 tortoisehg/hgtk/thgconfig.py:53
+#: tortoisehg/hgqt/settings.py:467 tortoisehg/hgtk/thgconfig.py:53
 msgid ""
 "Specify visual diff tool, as described in the [merge-tools] section of your "
 "Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
 "selected merge tool. Failing that it uses the first applicable tool it finds."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:422 tortoisehg/hgtk/thgconfig.py:57
+#: tortoisehg/hgqt/settings.py:471 tortoisehg/hgtk/thgconfig.py:57
 msgid "Visual Editor"
 msgstr "Edytor wizualny"
 
-#: tortoisehg/hgqt/settings.py:423
+#: tortoisehg/hgqt/settings.py:472
 #, python-format
 msgid ""
 "Specify the visual editor used to view files.  Format:<br>myeditor -flags "
@@ -5476,11 +5557,11 @@ msgid ""
 "href=\"%s\">OpenAtLine</a>"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:427
+#: tortoisehg/hgqt/settings.py:476
 msgid "Shell"
 msgstr "Powłoka"
 
-#: tortoisehg/hgqt/settings.py:428
+#: tortoisehg/hgqt/settings.py:477
 #, python-format
 msgid ""
 "Specify the command to launch your preferred terminal shell application. If "
@@ -5490,81 +5571,81 @@ msgid ""
 "other: xterm -T \"%(reponame)s\""
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:436
+#: tortoisehg/hgqt/settings.py:485
 msgid "Immediate Operations"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:437
+#: tortoisehg/hgqt/settings.py:486
 msgid ""
 "Space separated list of shell operations you would like to be performed "
 "immediately, without user interaction. Commands are \"add remove revert "
 "forget\". Default: None (leave blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:441 tortoisehg/hgtk/thgconfig.py:63
+#: tortoisehg/hgqt/settings.py:490 tortoisehg/hgtk/thgconfig.py:63
 msgid "Tab Width"
 msgstr "Szerokość Taba"
 
-#: tortoisehg/hgqt/settings.py:442
+#: tortoisehg/hgqt/settings.py:491
 msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHg "
 "windows. Default: 0, Not expanded"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:445
+#: tortoisehg/hgqt/settings.py:494
 msgid "Force Repo Tab"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:446
+#: tortoisehg/hgqt/settings.py:495
 msgid "Always show repo tabs, even for a single repo. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:447
+#: tortoisehg/hgqt/settings.py:496
 msgid "Monitor Repo Changes"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:449
+#: tortoisehg/hgqt/settings.py:498
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
 "always"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:451 tortoisehg/hgtk/thgconfig.py:67
+#: tortoisehg/hgqt/settings.py:500 tortoisehg/hgtk/thgconfig.py:67
 msgid "Max Diff Size"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:452
+#: tortoisehg/hgqt/settings.py:501
 msgid ""
 "The maximum size file (in KB) that TortoiseHg will show changes for in the "
 "changelog, status, and commit windows. A value of zero implies no limit.  "
 "Default: 1024 (1MB)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:455
+#: tortoisehg/hgqt/settings.py:504
 msgid "Fork GUI"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:456
+#: tortoisehg/hgqt/settings.py:505
 msgid ""
 "When running from the command line, fork a background process to run "
 "graphical dialogs.  Default: True"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:458 tortoisehg/hgtk/thgconfig.py:81
+#: tortoisehg/hgqt/settings.py:507 tortoisehg/hgtk/thgconfig.py:81
 msgid "Full Path Title"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:459
+#: tortoisehg/hgqt/settings.py:508
 msgid ""
 "Show a full directory path of the repository in the dialog title instead of "
 "just the root directory name.  Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:461
+#: tortoisehg/hgqt/settings.py:510
 msgid "Auto-resolve merges"
-msgstr ""
+msgstr "Auto-rozwiązywanie konfliktów"
 
-#: tortoisehg/hgqt/settings.py:462
+#: tortoisehg/hgqt/settings.py:511
 msgid ""
 "Indicates whether TortoiseHg should attempt to automatically resolve changes "
 "from both sides to the same file, and only report merge conflicts when this "
@@ -5574,79 +5655,91 @@ msgid ""
 "to review and resolve changes manually. Default: False."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:472
+#: tortoisehg/hgqt/settings.py:521
 msgid "Default widget"
-msgstr ""
+msgstr "Domyślny widget"
 
-#: tortoisehg/hgqt/settings.py:474
+#: tortoisehg/hgqt/settings.py:523
 msgid ""
 "Select the initial widget that will be shown when opening a repository. "
 "Default: revdetails"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:479
+#: tortoisehg/hgqt/settings.py:528
 msgid ""
 "Select the initial revision that will be selected when opening a repository. "
 " You can select the \"current\" (i.e. the working directory parent), the "
 "current \"tip\" or the working directory (\"workingdir\"). Default: current"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:483 tortoisehg/hgtk/thgconfig.py:130
-msgid "Author Coloring"
+#: tortoisehg/hgqt/settings.py:532
+msgid ""
+"Open new tabs next\n"
+"to the current tab"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:484 tortoisehg/hgtk/thgconfig.py:131
+#: tortoisehg/hgqt/settings.py:534
+msgid ""
+"Should new tabs be open next to the current tab? If False new tabs will be "
+"open after the last tab. Default: True"
+msgstr ""
+
+#: tortoisehg/hgqt/settings.py:537 tortoisehg/hgtk/thgconfig.py:130
+msgid "Author Coloring"
+msgstr "Kolorowanie wg autorów"
+
+#: tortoisehg/hgqt/settings.py:538 tortoisehg/hgtk/thgconfig.py:131
 msgid ""
 "Color changesets by author name.  If not enabled, the changes are colored "
 "green for merge, red for non-trivial parents, black for normal. Default: "
 "False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:488
+#: tortoisehg/hgqt/settings.py:542
 msgid "Task Tabs"
-msgstr ""
+msgstr "Taby Zadań"
 
-#: tortoisehg/hgqt/settings.py:490
+#: tortoisehg/hgqt/settings.py:544
 msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:493 tortoisehg/hgtk/thgconfig.py:135
+#: tortoisehg/hgqt/settings.py:547 tortoisehg/hgtk/thgconfig.py:135
 msgid "Long Summary"
 msgstr "Długie podsumowanie"
 
-#: tortoisehg/hgqt/settings.py:494 tortoisehg/hgtk/thgconfig.py:136
+#: tortoisehg/hgqt/settings.py:548 tortoisehg/hgtk/thgconfig.py:136
 msgid ""
 "If true, concatenate multiple lines of changeset summary until they reach 80 "
 "characters. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:497 tortoisehg/hgtk/thgconfig.py:139
+#: tortoisehg/hgqt/settings.py:551 tortoisehg/hgtk/thgconfig.py:139
 msgid "Log Batch Size"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:498 tortoisehg/hgtk/thgconfig.py:140
+#: tortoisehg/hgqt/settings.py:552 tortoisehg/hgtk/thgconfig.py:140
 msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:501 tortoisehg/hgtk/thgconfig.py:143
+#: tortoisehg/hgqt/settings.py:555 tortoisehg/hgtk/thgconfig.py:143
 msgid "Dead Branches"
-msgstr ""
+msgstr "Martwe gałęzie"
 
-#: tortoisehg/hgqt/settings.py:502 tortoisehg/hgtk/thgconfig.py:144
+#: tortoisehg/hgqt/settings.py:556 tortoisehg/hgtk/thgconfig.py:144
 msgid ""
 "Comma separated list of branch names that should be ignored when building a "
 "list of branch names for a repository. Default: None (leave blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:505 tortoisehg/hgtk/thgconfig.py:147
+#: tortoisehg/hgqt/settings.py:559 tortoisehg/hgtk/thgconfig.py:147
 msgid "Branch Colors"
-msgstr ""
+msgstr "Kolory gałęzi"
 
-#: tortoisehg/hgqt/settings.py:506
+#: tortoisehg/hgqt/settings.py:560
 msgid ""
 "Space separated list of branch names and colors of the form branch:#XXXXXX. "
 "Spaces and colons in the branch name must be escaped using a backslash (\\). "
@@ -5655,39 +5748,39 @@ msgid ""
 "blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:512 tortoisehg/hgtk/thgconfig.py:154
+#: tortoisehg/hgqt/settings.py:566 tortoisehg/hgtk/thgconfig.py:154
 msgid "Hide Tags"
 msgstr "Ukryj tagi"
 
-#: tortoisehg/hgqt/settings.py:513
+#: tortoisehg/hgqt/settings.py:567
 msgid ""
 "Space separated list of tags that will not be shown.Useful example: Specify "
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None (leave blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:517 tortoisehg/hgtk/thgconfig.py:172
+#: tortoisehg/hgqt/settings.py:571 tortoisehg/hgtk/thgconfig.py:172
 msgid "After Pull Operation"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:519
+#: tortoisehg/hgqt/settings.py:573
 msgid ""
 "Operation which is performed directly after a successful pull. update "
 "equates to pull --update, fetch equates to the fetch extension, rebase "
 "equates to pull --rebase.  Default: none"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:524
+#: tortoisehg/hgqt/settings.py:578
 msgctxt "config item"
 msgid "Commit"
 msgstr "Commit"
 
-#: tortoisehg/hgqt/settings.py:525 tortoisehg/hgqt/sync.py:1297
+#: tortoisehg/hgqt/settings.py:579 tortoisehg/hgqt/sync.py:1308
 #: tortoisehg/hgtk/thgconfig.py:90
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
-#: tortoisehg/hgqt/settings.py:526
+#: tortoisehg/hgqt/settings.py:580
 msgid ""
 "Name associated with commits.  The common format is:<br>Full Name "
 "&lt;email@example.com&gt;"
@@ -5695,166 +5788,166 @@ msgstr ""
 "Nazwa powiązana z commitami. Zwykły format to: <br>Imię Nazwisko "
 "&lt;email@example.com&gt;"
 
-#: tortoisehg/hgqt/settings.py:528 tortoisehg/hgtk/thgconfig.py:92
+#: tortoisehg/hgqt/settings.py:582 tortoisehg/hgtk/thgconfig.py:92
 msgid "Summary Line Length"
 msgstr "Długość linii podsumowania"
 
-#: tortoisehg/hgqt/settings.py:529
+#: tortoisehg/hgqt/settings.py:583
 msgid ""
 "Suggested length of commit message lines. A red vertical line will mark this "
 "length.  CTRL-E will reflow the current paragraph to the specified line "
 "length. Default: 80"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:532 tortoisehg/hgtk/thgconfig.py:103
+#: tortoisehg/hgqt/settings.py:586 tortoisehg/hgtk/thgconfig.py:103
 msgid "Close After Commit"
 msgstr "Zamknij po Commicie"
 
-#: tortoisehg/hgqt/settings.py:533
+#: tortoisehg/hgqt/settings.py:587
 msgid "Close the commit tool after every successful commit.  Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:535 tortoisehg/hgtk/thgconfig.py:106
+#: tortoisehg/hgqt/settings.py:589 tortoisehg/hgtk/thgconfig.py:106
 msgid "Push After Commit"
 msgstr "Pchnij po Commicie"
 
-#: tortoisehg/hgqt/settings.py:537
+#: tortoisehg/hgqt/settings.py:591
 msgid ""
 "Attempt to push to specified URL or alias after each successful commit.  "
 "Default: No push"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:539 tortoisehg/hgtk/thgconfig.py:109
+#: tortoisehg/hgqt/settings.py:593 tortoisehg/hgtk/thgconfig.py:109
 msgid "Auto Commit List"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:540 tortoisehg/hgtk/thgconfig.py:110
+#: tortoisehg/hgqt/settings.py:594 tortoisehg/hgtk/thgconfig.py:110
 msgid ""
 "Comma separated list of files that are automatically included in every "
 "commit.  Intended for use only as a repository setting. Default: None (leave "
 "blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:543 tortoisehg/hgtk/thgconfig.py:113
+#: tortoisehg/hgqt/settings.py:597 tortoisehg/hgtk/thgconfig.py:113
 msgid "Auto Exclude List"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:544
+#: tortoisehg/hgqt/settings.py:598
 msgid ""
 "Comma separated list of files that are automatically unchecked when the "
 "status, and commit dialogs are opened. Default: None (leave blank)"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:547 tortoisehg/hgtk/thgconfig.py:117
+#: tortoisehg/hgqt/settings.py:601 tortoisehg/hgtk/thgconfig.py:117
 msgid "English Messages"
 msgstr "Angielskie komunikaty"
 
-#: tortoisehg/hgqt/settings.py:548 tortoisehg/hgtk/thgconfig.py:118
+#: tortoisehg/hgqt/settings.py:602 tortoisehg/hgtk/thgconfig.py:118
 msgid ""
 "Generate English commit messages even if LANGUAGE or LANG environment "
 "variables are set to a non-English language. This setting is used by the "
 "Merge, Tag and Backout dialogs. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:554 tortoisehg/hgtk/thgconfig.py:179
+#: tortoisehg/hgqt/settings.py:608 tortoisehg/hgtk/thgconfig.py:179
 #: tortoisehg/util/menuthg.py:55
 msgid "Web Server"
 msgstr "Web Serwer"
 
-#: tortoisehg/hgqt/settings.py:555 tortoisehg/hgtk/thgconfig.py:180
+#: tortoisehg/hgqt/settings.py:609 tortoisehg/hgtk/thgconfig.py:180
 #: tortoisehg/hgtk/thgpbranch.py:210
 msgid "Name"
 msgstr "Nazwa"
 
-#: tortoisehg/hgqt/settings.py:556
+#: tortoisehg/hgqt/settings.py:610
 msgid ""
 "Repository name to use in the web interface, and by TortoiseHg as a "
 "shorthand name.  Default is the working directory."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:558 tortoisehg/hgtk/thgconfig.py:183
+#: tortoisehg/hgqt/settings.py:612 tortoisehg/hgtk/thgconfig.py:183
 #: tortoisehg/hgtk/thgconfig.py:745
 msgid "Description"
 msgstr "Opis"
 
-#: tortoisehg/hgqt/settings.py:559 tortoisehg/hgtk/thgconfig.py:184
+#: tortoisehg/hgqt/settings.py:613 tortoisehg/hgtk/thgconfig.py:184
 msgid "Textual description of the repository's purpose or contents."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:561 tortoisehg/hgtk/thgconfig.py:186
+#: tortoisehg/hgqt/settings.py:615 tortoisehg/hgtk/thgconfig.py:186
 msgid "Contact"
 msgstr "Kontakt"
 
-#: tortoisehg/hgqt/settings.py:562 tortoisehg/hgtk/thgconfig.py:187
+#: tortoisehg/hgqt/settings.py:616 tortoisehg/hgtk/thgconfig.py:187
 msgid "Name or email address of the person in charge of the repository."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:564 tortoisehg/hgtk/thgconfig.py:189
+#: tortoisehg/hgqt/settings.py:618 tortoisehg/hgtk/thgconfig.py:189
 msgid "Style"
 msgstr "Styl"
 
-#: tortoisehg/hgqt/settings.py:566 tortoisehg/hgtk/thgconfig.py:191
+#: tortoisehg/hgqt/settings.py:620 tortoisehg/hgtk/thgconfig.py:191
 msgid "Which template map style to use"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:567 tortoisehg/hgtk/thgconfig.py:192
+#: tortoisehg/hgqt/settings.py:621 tortoisehg/hgtk/thgconfig.py:192
 msgid "Archive Formats"
-msgstr ""
+msgstr "Formaty archiwów"
 
-#: tortoisehg/hgqt/settings.py:569 tortoisehg/hgtk/thgconfig.py:193
+#: tortoisehg/hgqt/settings.py:623 tortoisehg/hgtk/thgconfig.py:193
 msgid "Comma separated list of archive formats allowed for downloading"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:571 tortoisehg/hgqt/sync.py:230
+#: tortoisehg/hgqt/settings.py:625 tortoisehg/hgqt/sync.py:240
 #: tortoisehg/hgtk/thgconfig.py:195 tortoisehg/hgtk/thgconfig.py:368
 msgid "Port"
 msgstr "Port"
 
-#: tortoisehg/hgqt/settings.py:571 tortoisehg/hgtk/thgconfig.py:195
+#: tortoisehg/hgqt/settings.py:625 tortoisehg/hgtk/thgconfig.py:195
 msgid "Port to listen on"
 msgstr "Port do nasłuchiwania"
 
-#: tortoisehg/hgqt/settings.py:572 tortoisehg/hgtk/thgconfig.py:196
+#: tortoisehg/hgqt/settings.py:626 tortoisehg/hgtk/thgconfig.py:196
 msgid "Push Requires SSL"
 msgstr "Pchnięcie wymaga SSL"
 
-#: tortoisehg/hgqt/settings.py:573 tortoisehg/hgtk/thgconfig.py:197
+#: tortoisehg/hgqt/settings.py:627 tortoisehg/hgtk/thgconfig.py:197
 msgid ""
 "Whether to require that inbound pushes be transported over SSL to prevent "
 "password sniffing."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:575 tortoisehg/hgtk/thgconfig.py:199
+#: tortoisehg/hgqt/settings.py:629 tortoisehg/hgtk/thgconfig.py:199
 msgid "Stripes"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:576 tortoisehg/hgtk/thgconfig.py:200
+#: tortoisehg/hgqt/settings.py:630 tortoisehg/hgtk/thgconfig.py:200
 msgid ""
 "How many lines a \"zebra stripe\" should span in multiline output. Default "
 "is 1; set to 0 to disable."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:578 tortoisehg/hgtk/thgconfig.py:202
+#: tortoisehg/hgqt/settings.py:632 tortoisehg/hgtk/thgconfig.py:202
 msgid "Max Files"
 msgstr "Max plików"
 
-#: tortoisehg/hgqt/settings.py:579
+#: tortoisehg/hgqt/settings.py:633
 msgid "Maximum number of files to list per changeset. Default: 10"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:580 tortoisehg/hgtk/thgconfig.py:204
+#: tortoisehg/hgqt/settings.py:634 tortoisehg/hgtk/thgconfig.py:204
 msgid "Max Changes"
 msgstr "Max zmian"
 
-#: tortoisehg/hgqt/settings.py:581
+#: tortoisehg/hgqt/settings.py:635
 msgid "Maximum number of changes to list on the changelog. Default: 10"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:583 tortoisehg/hgtk/thgconfig.py:206
+#: tortoisehg/hgqt/settings.py:637 tortoisehg/hgtk/thgconfig.py:206
 msgid "Allow Push"
 msgstr "Zezwól na pchnięcie"
 
-#: tortoisehg/hgqt/settings.py:584 tortoisehg/hgtk/thgconfig.py:207
+#: tortoisehg/hgqt/settings.py:638 tortoisehg/hgtk/thgconfig.py:207
 msgid ""
 "Whether to allow pushing to the repository. If empty or not set, push is not "
 "allowed. If the special value \"*\", any remote user can push, including "
@@ -5864,11 +5957,11 @@ msgid ""
 "examined after the deny_push list."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:591 tortoisehg/hgtk/thgconfig.py:214
+#: tortoisehg/hgqt/settings.py:645 tortoisehg/hgtk/thgconfig.py:214
 msgid "Deny Push"
 msgstr "Nie zezwalaj na pchnięcie"
 
-#: tortoisehg/hgqt/settings.py:592 tortoisehg/hgtk/thgconfig.py:215
+#: tortoisehg/hgqt/settings.py:646 tortoisehg/hgtk/thgconfig.py:215
 msgid ""
 "Whether to deny pushing to the repository. If empty or not set, push is not "
 "denied. If the special value \"*\", all remote users are denied push. "
@@ -5877,88 +5970,88 @@ msgid ""
 "The contents of the deny_push list are examined before the allow_push list."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:598 tortoisehg/hgtk/thgconfig.py:221
+#: tortoisehg/hgqt/settings.py:652 tortoisehg/hgtk/thgconfig.py:221
 msgid "Encoding"
 msgstr "Kodowanie"
 
-#: tortoisehg/hgqt/settings.py:599 tortoisehg/hgtk/thgconfig.py:222
+#: tortoisehg/hgqt/settings.py:653 tortoisehg/hgtk/thgconfig.py:222
 msgid "Character encoding name"
 msgstr "Nazwa kodowania znaków"
 
-#: tortoisehg/hgqt/settings.py:602 tortoisehg/hgtk/thgconfig.py:225
+#: tortoisehg/hgqt/settings.py:656 tortoisehg/hgtk/thgconfig.py:225
 msgid "Proxy"
 msgstr "Proxy"
 
-#: tortoisehg/hgqt/settings.py:603 tortoisehg/hgtk/thgconfig.py:226
+#: tortoisehg/hgqt/settings.py:657 tortoisehg/hgtk/thgconfig.py:226
 #: tortoisehg/hgtk/thgconfig.py:369
 msgid "Host"
 msgstr "Host"
 
-#: tortoisehg/hgqt/settings.py:604 tortoisehg/hgtk/thgconfig.py:227
+#: tortoisehg/hgqt/settings.py:658 tortoisehg/hgtk/thgconfig.py:227
 msgid ""
 "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:606 tortoisehg/hgtk/thgconfig.py:229
+#: tortoisehg/hgqt/settings.py:660 tortoisehg/hgtk/thgconfig.py:229
 msgid "Bypass List"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:607 tortoisehg/hgtk/thgconfig.py:230
+#: tortoisehg/hgqt/settings.py:661 tortoisehg/hgtk/thgconfig.py:230
 msgid ""
 "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:610 tortoisehg/hgtk/thgconfig.py:233
+#: tortoisehg/hgqt/settings.py:664 tortoisehg/hgtk/thgconfig.py:233
 msgid "Optional. User name to authenticate with at the proxy server"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:611 tortoisehg/hgqt/settings.py:731
-#: tortoisehg/hgqt/sync.py:1305 tortoisehg/hgtk/thgconfig.py:234
+#: tortoisehg/hgqt/settings.py:665 tortoisehg/hgqt/settings.py:789
+#: tortoisehg/hgqt/sync.py:1316 tortoisehg/hgtk/thgconfig.py:234
 #: tortoisehg/hgtk/thgconfig.py:370
 msgid "Password"
 msgstr "Hasło"
 
-#: tortoisehg/hgqt/settings.py:612 tortoisehg/hgtk/thgconfig.py:235
+#: tortoisehg/hgqt/settings.py:666 tortoisehg/hgtk/thgconfig.py:235
 msgid "Optional. Password to authenticate with at the proxy server"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:616 tortoisehg/hgtk/thgconfig.py:239
+#: tortoisehg/hgqt/settings.py:670 tortoisehg/hgtk/thgconfig.py:239
 msgid "From"
-msgstr "Z"
+msgstr "Od"
 
-#: tortoisehg/hgqt/settings.py:617 tortoisehg/hgtk/thgconfig.py:240
+#: tortoisehg/hgqt/settings.py:671 tortoisehg/hgtk/thgconfig.py:240
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:619 tortoisehg/hgtk/thgconfig.py:242
+#: tortoisehg/hgqt/settings.py:673 tortoisehg/hgtk/thgconfig.py:242
 msgid "To"
 msgstr "Do"
 
-#: tortoisehg/hgqt/settings.py:620 tortoisehg/hgtk/thgconfig.py:243
+#: tortoisehg/hgqt/settings.py:674 tortoisehg/hgtk/thgconfig.py:243
 msgid "Comma-separated list of recipient email addresses"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:621 tortoisehg/hgtk/thgconfig.py:244
+#: tortoisehg/hgqt/settings.py:675 tortoisehg/hgtk/thgconfig.py:244
 msgid "Cc"
 msgstr "Cc"
 
-#: tortoisehg/hgqt/settings.py:622 tortoisehg/hgtk/thgconfig.py:245
+#: tortoisehg/hgqt/settings.py:676 tortoisehg/hgtk/thgconfig.py:245
 msgid "Comma-separated list of carbon copy recipient email addresses"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:623 tortoisehg/hgtk/thgconfig.py:246
+#: tortoisehg/hgqt/settings.py:677 tortoisehg/hgtk/thgconfig.py:246
 msgid "Bcc"
 msgstr "Bcc"
 
-#: tortoisehg/hgqt/settings.py:624 tortoisehg/hgtk/thgconfig.py:247
+#: tortoisehg/hgqt/settings.py:678 tortoisehg/hgtk/thgconfig.py:247
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:626 tortoisehg/hgtk/thgconfig.py:249
+#: tortoisehg/hgqt/settings.py:680 tortoisehg/hgtk/thgconfig.py:249
 msgid "method"
-msgstr "metoda"
+msgstr "Metoda"
 
-#: tortoisehg/hgqt/settings.py:627 tortoisehg/hgtk/thgconfig.py:250
+#: tortoisehg/hgqt/settings.py:681 tortoisehg/hgtk/thgconfig.py:250
 msgid ""
 "Optional. Method to use to send email messages. If value is \"smtp\" "
 "(default), use SMTP (configured below).  Otherwise, use as name of program "
@@ -5968,82 +6061,82 @@ msgid ""
 "messages."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:633 tortoisehg/hgtk/thgconfig.py:256
+#: tortoisehg/hgqt/settings.py:687 tortoisehg/hgtk/thgconfig.py:256
 msgid "SMTP Host"
-msgstr "SMTP Host"
+msgstr "Host SMTP"
 
-#: tortoisehg/hgqt/settings.py:634 tortoisehg/hgtk/thgconfig.py:256
+#: tortoisehg/hgqt/settings.py:688 tortoisehg/hgtk/thgconfig.py:256
 msgid "Host name of mail server"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:635 tortoisehg/hgtk/thgconfig.py:257
+#: tortoisehg/hgqt/settings.py:689 tortoisehg/hgtk/thgconfig.py:257
 msgid "SMTP Port"
-msgstr "SMTP Port"
+msgstr "Port SMTP"
 
-#: tortoisehg/hgqt/settings.py:636 tortoisehg/hgtk/thgconfig.py:258
+#: tortoisehg/hgqt/settings.py:690 tortoisehg/hgtk/thgconfig.py:258
 msgid "Port to connect to on mail server. Default: 25"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:638 tortoisehg/hgtk/thgconfig.py:260
+#: tortoisehg/hgqt/settings.py:692 tortoisehg/hgtk/thgconfig.py:260
 msgid "SMTP TLS"
 msgstr "SMTP TLS"
 
-#: tortoisehg/hgqt/settings.py:639 tortoisehg/hgtk/thgconfig.py:261
+#: tortoisehg/hgqt/settings.py:693 tortoisehg/hgtk/thgconfig.py:261
 msgid "Connect to mail server using TLS. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:641 tortoisehg/hgtk/thgconfig.py:263
+#: tortoisehg/hgqt/settings.py:695 tortoisehg/hgtk/thgconfig.py:263
 msgid "SMTP Username"
-msgstr "SMTP Nazwa użytkownika"
+msgstr "Nazwa użytkownika SMTP"
 
-#: tortoisehg/hgqt/settings.py:642 tortoisehg/hgtk/thgconfig.py:264
+#: tortoisehg/hgqt/settings.py:696 tortoisehg/hgtk/thgconfig.py:264
 msgid "Username to authenticate to mail server with"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:643 tortoisehg/hgtk/thgconfig.py:265
+#: tortoisehg/hgqt/settings.py:697 tortoisehg/hgtk/thgconfig.py:265
 msgid "SMTP Password"
-msgstr "SMTP Hasło"
+msgstr "Hasło SMTP"
 
-#: tortoisehg/hgqt/settings.py:644 tortoisehg/hgtk/thgconfig.py:266
+#: tortoisehg/hgqt/settings.py:698 tortoisehg/hgtk/thgconfig.py:266
 msgid "Password to authenticate to mail server with"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:645 tortoisehg/hgtk/thgconfig.py:267
+#: tortoisehg/hgqt/settings.py:699 tortoisehg/hgtk/thgconfig.py:267
 msgid "Local Hostname"
 msgstr "Lokalna nazwa komputera"
 
-#: tortoisehg/hgqt/settings.py:646 tortoisehg/hgtk/thgconfig.py:268
+#: tortoisehg/hgqt/settings.py:700 tortoisehg/hgtk/thgconfig.py:268
 msgid "Hostname the sender can use to identify itself to the mail server."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:650 tortoisehg/hgtk/thgconfig.py:272
+#: tortoisehg/hgqt/settings.py:704 tortoisehg/hgtk/thgconfig.py:272
 msgid "Diff"
 msgstr "Diff"
 
-#: tortoisehg/hgqt/settings.py:652 tortoisehg/hgtk/thgconfig.py:273
+#: tortoisehg/hgqt/settings.py:706 tortoisehg/hgtk/thgconfig.py:273
 msgid "Patch EOL"
-msgstr "Patch EOL"
+msgstr "EOL Patchy"
 
-#: tortoisehg/hgqt/settings.py:654 tortoisehg/hgtk/thgconfig.py:274
+#: tortoisehg/hgqt/settings.py:708 tortoisehg/hgtk/thgconfig.py:274
 msgid ""
 "Normalize file line endings during and after patch to lf or crlf.  Strict "
 "does no normalization.  Auto does per-file detection, and is the recommended "
 "setting. Default: strict"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:658 tortoisehg/hgtk/thgconfig.py:278
+#: tortoisehg/hgqt/settings.py:712 tortoisehg/hgtk/thgconfig.py:278
 msgid "Git Format"
 msgstr "Format Gita"
 
-#: tortoisehg/hgqt/settings.py:659 tortoisehg/hgtk/thgconfig.py:279
+#: tortoisehg/hgqt/settings.py:713 tortoisehg/hgtk/thgconfig.py:279
 msgid "Use git extended diff header format. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:661
+#: tortoisehg/hgqt/settings.py:715
 msgid "MQ Git Format"
 msgstr "Format MQ Git"
 
-#: tortoisehg/hgqt/settings.py:663
+#: tortoisehg/hgqt/settings.py:717
 msgid ""
 "If set to 'keep', mq will obey the [diff] section configuration while "
 "preserving existing git patches upon qrefresh. If set to 'yes' or 'no', mq "
@@ -6051,112 +6144,112 @@ msgid ""
 "possibly losing data in the second case."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:667 tortoisehg/hgtk/thgconfig.py:281
+#: tortoisehg/hgqt/settings.py:721 tortoisehg/hgtk/thgconfig.py:281
 msgid "No Dates"
 msgstr "Bez dat"
 
-#: tortoisehg/hgqt/settings.py:668 tortoisehg/hgtk/thgconfig.py:282
+#: tortoisehg/hgqt/settings.py:722 tortoisehg/hgtk/thgconfig.py:282
 msgid "Do not include modification dates in diff headers. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:670 tortoisehg/hgtk/thgconfig.py:284
+#: tortoisehg/hgqt/settings.py:724 tortoisehg/hgtk/thgconfig.py:284
 msgid "Show Function"
 msgstr "Pokaż funkcję"
 
-#: tortoisehg/hgqt/settings.py:671 tortoisehg/hgtk/thgconfig.py:285
+#: tortoisehg/hgqt/settings.py:725 tortoisehg/hgtk/thgconfig.py:285
 msgid "Show which function each change is in. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:673 tortoisehg/hgtk/thgconfig.py:287
+#: tortoisehg/hgqt/settings.py:727 tortoisehg/hgtk/thgconfig.py:287
 msgid "Ignore White Space"
 msgstr "Ignoruj białe znaki"
 
-#: tortoisehg/hgqt/settings.py:674 tortoisehg/hgtk/thgconfig.py:288
+#: tortoisehg/hgqt/settings.py:728 tortoisehg/hgtk/thgconfig.py:288
 msgid "Ignore white space when comparing lines. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:676 tortoisehg/hgtk/thgconfig.py:290
+#: tortoisehg/hgqt/settings.py:730 tortoisehg/hgtk/thgconfig.py:290
 msgid "Ignore WS Amount"
 msgstr "Ignoruj ilość BZ"
 
-#: tortoisehg/hgqt/settings.py:677 tortoisehg/hgtk/thgconfig.py:291
+#: tortoisehg/hgqt/settings.py:731 tortoisehg/hgtk/thgconfig.py:291
 msgid "Ignore changes in the amount of white space. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:679 tortoisehg/hgtk/thgconfig.py:293
+#: tortoisehg/hgqt/settings.py:733 tortoisehg/hgtk/thgconfig.py:293
 msgid "Ignore Blank Lines"
 msgstr "Ignoruj puste linie"
 
-#: tortoisehg/hgqt/settings.py:680 tortoisehg/hgtk/thgconfig.py:294
+#: tortoisehg/hgqt/settings.py:734 tortoisehg/hgtk/thgconfig.py:294
 msgid "Ignore changes whose lines are all blank. Default: False"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:684
+#: tortoisehg/hgqt/settings.py:738
 msgid "Fonts"
 msgstr "Czcionki"
 
-#: tortoisehg/hgqt/settings.py:685
+#: tortoisehg/hgqt/settings.py:739
 msgid "Message Font"
 msgstr "Czcionka komunikatów"
 
-#: tortoisehg/hgqt/settings.py:686
+#: tortoisehg/hgqt/settings.py:740
 msgid "Font used to display commit messages. Default: monospace 10"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:688
+#: tortoisehg/hgqt/settings.py:742
 msgid "Diff Font"
 msgstr "Czcionka diffa"
 
-#: tortoisehg/hgqt/settings.py:689
+#: tortoisehg/hgqt/settings.py:743
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:691
+#: tortoisehg/hgqt/settings.py:745
 msgid "List Font"
 msgstr "Czcionka listy"
 
-#: tortoisehg/hgqt/settings.py:692
+#: tortoisehg/hgqt/settings.py:746
 msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:694
+#: tortoisehg/hgqt/settings.py:748
 msgid "ChangeLog Font"
 msgstr "Czcionka listy zmian"
 
-#: tortoisehg/hgqt/settings.py:695
+#: tortoisehg/hgqt/settings.py:749
 msgid "Font used to display changelog data. Default: monospace 10"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:697
+#: tortoisehg/hgqt/settings.py:751
 msgid "Output Font"
 msgstr "Czcionka wyników"
 
-#: tortoisehg/hgqt/settings.py:698
+#: tortoisehg/hgqt/settings.py:752
 msgid "Font used to display output messages. Default: sans 8"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:702 tortoisehg/hgqt/settings.py:1183
+#: tortoisehg/hgqt/settings.py:756 tortoisehg/hgqt/settings.py:1264
 #: tortoisehg/hgtk/thgconfig.py:318
 msgid "Extensions"
 msgstr "Wtyczki"
 
-#: tortoisehg/hgqt/settings.py:705 tortoisehg/hgtk/thgconfig.py:321
+#: tortoisehg/hgqt/settings.py:759 tortoisehg/hgtk/thgconfig.py:321
 msgid "Issue Tracking"
 msgstr "Issue Tracking"
 
-#: tortoisehg/hgqt/settings.py:706 tortoisehg/hgtk/thgconfig.py:323
+#: tortoisehg/hgqt/settings.py:760 tortoisehg/hgtk/thgconfig.py:323
 msgid "Issue Regex"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:707 tortoisehg/hgtk/thgconfig.py:324
+#: tortoisehg/hgqt/settings.py:761 tortoisehg/hgtk/thgconfig.py:324
 msgid "Defines the regex to match when picking up issue numbers."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:708 tortoisehg/hgtk/thgconfig.py:325
+#: tortoisehg/hgqt/settings.py:762 tortoisehg/hgtk/thgconfig.py:325
 msgid "Issue Link"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:709 tortoisehg/hgtk/thgconfig.py:326
+#: tortoisehg/hgqt/settings.py:763 tortoisehg/hgtk/thgconfig.py:326
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -6165,135 +6258,135 @@ msgid ""
 "tokensare found in issue.link, the entire matched string is appended instead."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:716
+#: tortoisehg/hgqt/settings.py:774
 msgid "Issue Tracker Plugin"
-msgstr ""
+msgstr "Plugin do Issue Trackera"
 
-#: tortoisehg/hgqt/settings.py:718
+#: tortoisehg/hgqt/settings.py:776
 msgid ""
 "Configures a COM IBugTraqProvider or IBugTrackProvider2 issue tracking "
 "plugin."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:720
+#: tortoisehg/hgqt/settings.py:778
 msgid "Configure Issue Tracker"
-msgstr ""
+msgstr "Konfiguruj Issue Trackera"
 
-#: tortoisehg/hgqt/settings.py:721
+#: tortoisehg/hgqt/settings.py:779
 msgid "Configure the selected COM Bug Tracker plugin."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:726
+#: tortoisehg/hgqt/settings.py:784
 msgid "Server"
 msgstr "Serwer"
 
-#: tortoisehg/hgqt/settings.py:727
+#: tortoisehg/hgqt/settings.py:785
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:730
+#: tortoisehg/hgqt/settings.py:788
 msgid "User name to authenticate with review board"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:732
+#: tortoisehg/hgqt/settings.py:790
 msgid "Password to authenticate with review board"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:733
+#: tortoisehg/hgqt/settings.py:791
 msgid "Server Repository ID"
 msgstr "ID Serwera Repozytorium"
 
-#: tortoisehg/hgqt/settings.py:734
+#: tortoisehg/hgqt/settings.py:792
 msgid "The default repository id for this repo on the review board server"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:735
+#: tortoisehg/hgqt/settings.py:793
 msgid "Target Groups"
-msgstr ""
+msgstr "Grupy docelowe"
 
-#: tortoisehg/hgqt/settings.py:736
+#: tortoisehg/hgqt/settings.py:794
 msgid "A comma separated list of target groups"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:737
+#: tortoisehg/hgqt/settings.py:795
 msgid "Target People"
 msgstr "Docelowi ludzie"
 
-#: tortoisehg/hgqt/settings.py:738
+#: tortoisehg/hgqt/settings.py:796
 msgid "A comma separated list of target people"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:750
+#: tortoisehg/hgqt/settings.py:828
 msgid "TortoiseHg Settings"
 msgstr "Ustawienia TortoiseHg"
 
-#: tortoisehg/hgqt/settings.py:755 tortoisehg/hgtk/thgconfig.py:648
+#: tortoisehg/hgqt/settings.py:833 tortoisehg/hgtk/thgconfig.py:648
 msgid "Iniparse package not found"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:756 tortoisehg/hgtk/thgconfig.py:649
+#: tortoisehg/hgqt/settings.py:834 tortoisehg/hgtk/thgconfig.py:649
 msgid "Can't change settings without iniparse package - view is readonly."
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:780
+#: tortoisehg/hgqt/settings.py:858
 #, python-format
 msgid "%s's global settings"
 msgstr "%s - Ustawienia Globalne"
 
-#: tortoisehg/hgqt/settings.py:794 tortoisehg/hgtk/thgconfig.py:638
+#: tortoisehg/hgqt/settings.py:872 tortoisehg/hgtk/thgconfig.py:638
 msgid "No repository found"
 msgstr "Nie znalezionio repozytorium"
 
-#: tortoisehg/hgqt/settings.py:795 tortoisehg/hgtk/thgconfig.py:639
+#: tortoisehg/hgqt/settings.py:873 tortoisehg/hgtk/thgconfig.py:639
 msgid "no repo at "
 msgstr "brak repo w "
 
-#: tortoisehg/hgqt/settings.py:801 tortoisehg/hgtk/thgconfig.py:671
+#: tortoisehg/hgqt/settings.py:879 tortoisehg/hgtk/thgconfig.py:671
 #, python-format
 msgid "%s repository settings"
 msgstr "%s - Ustawienia Repozytorium"
 
-#: tortoisehg/hgqt/settings.py:828
+#: tortoisehg/hgqt/settings.py:906
 msgid ""
 "Restart all TortoiseHg applications for the following changes to take effect:"
 msgstr "Zrestartuj TortoiseHg aby poniższe zmiany zostały wprowadzone:"
 
-#: tortoisehg/hgqt/settings.py:836
+#: tortoisehg/hgqt/settings.py:914
 msgid "Apply changes before exit?"
 msgstr "Zastosować zmiany przed wyjściem?"
 
-#: tortoisehg/hgqt/settings.py:837 tortoisehg/hgtk/commit.py:324
+#: tortoisehg/hgqt/settings.py:915 tortoisehg/hgtk/commit.py:324
 #: tortoisehg/hgtk/commit.py:1192 tortoisehg/hgtk/commit.py:1199
 #: tortoisehg/hgtk/status.py:1320 tortoisehg/hgtk/thgconfig.py:848
 #: tortoisehg/hgtk/thgmq.py:369
 msgid "&Yes"
 msgstr "Tak"
 
-#: tortoisehg/hgqt/settings.py:837 tortoisehg/hgtk/thgconfig.py:848
+#: tortoisehg/hgqt/settings.py:915 tortoisehg/hgtk/thgconfig.py:848
 msgid "&No (discard changes)"
 msgstr "Nie (odrzuć zmiany)"
 
-#: tortoisehg/hgqt/settings.py:891
+#: tortoisehg/hgqt/settings.py:969
 msgid "Settings File:"
 msgstr "Plik ustawień:"
 
-#: tortoisehg/hgqt/settings.py:949
+#: tortoisehg/hgqt/settings.py:1029
 msgid "Confirm Save"
 msgstr "Potwierdź zapis"
 
-#: tortoisehg/hgqt/settings.py:950
+#: tortoisehg/hgqt/settings.py:1030
 msgid "Save changes before editing?"
 msgstr "Zapisać zmiany przed edycją?"
 
-#: tortoisehg/hgqt/settings.py:951 tortoisehg/hgtk/thgconfig.py:775
+#: tortoisehg/hgqt/settings.py:1031 tortoisehg/hgtk/thgconfig.py:775
 msgid "&Save"
 msgstr "Zapisz"
 
-#: tortoisehg/hgqt/settings.py:1013 tortoisehg/hgtk/thgconfig.py:822
+#: tortoisehg/hgqt/settings.py:1094 tortoisehg/hgtk/thgconfig.py:822
 msgid "Confirm Reload"
 msgstr "Potwierdź przeładowanie"
 
-#: tortoisehg/hgqt/settings.py:1014 tortoisehg/hgtk/thgconfig.py:823
+#: tortoisehg/hgqt/settings.py:1095 tortoisehg/hgtk/thgconfig.py:823
 msgid ""
 "Unsaved changes will be lost.\n"
 "Do you want to reload?"
@@ -6301,11 +6394,11 @@ msgstr ""
 "Niezapisane zmiany będą utracone.\n"
 "Czy ciągle chcesz przeładować?"
 
-#: tortoisehg/hgqt/settings.py:1133 tortoisehg/hgtk/thgconfig.py:1550
+#: tortoisehg/hgqt/settings.py:1214 tortoisehg/hgtk/thgconfig.py:1550
 msgid "Unable to create a Mercurial.ini file"
 msgstr "Nie można było utworzyć pliku mercurial.ini"
 
-#: tortoisehg/hgqt/settings.py:1134
+#: tortoisehg/hgqt/settings.py:1215
 msgid "Insufficient access rights, reverting to read-only mode."
 msgstr ""
 
@@ -6340,15 +6433,15 @@ msgstr "Ikony"
 
 #: tortoisehg/hgqt/shellconf.py:133 tortoisehg/hgtk/shellconf.py:129
 msgid "Overlays"
-msgstr ""
+msgstr "Nakładki"
 
 #: tortoisehg/hgqt/shellconf.py:137
 msgid "Enabled overlays"
-msgstr ""
+msgstr "Nakładki włączone"
 
 #: tortoisehg/hgqt/shellconf.py:139 tortoisehg/hgtk/shellconf.py:138
 msgid "Local disks only"
-msgstr ""
+msgstr "Tylko lokalne dyski"
 
 #: tortoisehg/hgqt/shellconf.py:144 tortoisehg/hgtk/shellconf.py:142
 msgid "Enabled Overlay Handlers"
@@ -6582,111 +6675,111 @@ msgstr ""
 msgid "No files found for this operation"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:601
+#: tortoisehg/hgqt/status.py:613
 msgid "Stat"
 msgstr "Stat"
 
-#: tortoisehg/hgqt/status.py:601
+#: tortoisehg/hgqt/status.py:613
 msgid "M"
 msgstr "M"
 
-#: tortoisehg/hgqt/status.py:601 tortoisehg/hgtk/datamine.py:140
+#: tortoisehg/hgqt/status.py:613 tortoisehg/hgtk/datamine.py:140
 msgid "Filename"
 msgstr "Nazwa pliku"
 
-#: tortoisehg/hgqt/status.py:602 tortoisehg/hgtk/thgconfig.py:414
+#: tortoisehg/hgqt/status.py:614 tortoisehg/hgtk/thgconfig.py:414
 msgid "Type"
 msgstr "Typ"
 
-#: tortoisehg/hgqt/status.py:602
+#: tortoisehg/hgqt/status.py:614
 msgid "Size (KB)"
 msgstr "Wielkość (KB)"
 
-#: tortoisehg/hgqt/status.py:639
+#: tortoisehg/hgqt/status.py:651
 #, python-format
 msgid "Checked count: %d"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:787
+#: tortoisehg/hgqt/status.py:799
 msgid ", resolved merge"
 msgstr ", rozwiązane scalenie"
 
-#: tortoisehg/hgqt/status.py:789
+#: tortoisehg/hgqt/status.py:801
 msgid ", unresolved merge"
 msgstr ", nierozwiązane scalenie"
 
-#: tortoisehg/hgqt/status.py:802
+#: tortoisehg/hgqt/status.py:814
 #, python-format
 msgid "%s is modified"
 msgstr "%s jest zmodyfikowany"
 
-#: tortoisehg/hgqt/status.py:803 tortoisehg/hgtk/quickop.py:163
+#: tortoisehg/hgqt/status.py:815 tortoisehg/hgtk/quickop.py:163
 msgid "modified"
 msgstr "zmodyfikowany"
 
-#: tortoisehg/hgqt/status.py:804
+#: tortoisehg/hgqt/status.py:816
 #, python-format
 msgid "%s is added"
 msgstr "%s jest dodany"
 
-#: tortoisehg/hgqt/status.py:805 tortoisehg/hgtk/quickop.py:166
+#: tortoisehg/hgqt/status.py:817 tortoisehg/hgtk/quickop.py:166
 msgid "added"
 msgstr "dodany"
 
-#: tortoisehg/hgqt/status.py:806
+#: tortoisehg/hgqt/status.py:818
 #, python-format
 msgid "%s is removed"
 msgstr "%s jest usunięty"
 
-#: tortoisehg/hgqt/status.py:807 tortoisehg/hgtk/quickop.py:169
+#: tortoisehg/hgqt/status.py:819 tortoisehg/hgtk/quickop.py:169
 msgid "removed"
 msgstr "usunięty"
 
-#: tortoisehg/hgqt/status.py:808
+#: tortoisehg/hgqt/status.py:820
 #, python-format
 msgid "%s is not tracked (unknown)"
 msgstr "%s jest poza kontrolą wersji"
 
-#: tortoisehg/hgqt/status.py:809 tortoisehg/hgtk/quickop.py:175
+#: tortoisehg/hgqt/status.py:821 tortoisehg/hgtk/quickop.py:175
 #: tortoisehg/hgtk/quickop.py:255 tortoisehg/hgtk/serve.py:127
 #: tortoisehg/util/version.py:47 tortoisehg/util/version.py:73
 msgid "unknown"
 msgstr "nieznany"
 
-#: tortoisehg/hgqt/status.py:810
+#: tortoisehg/hgqt/status.py:822
 #, python-format
 msgid "%s is missing!"
 msgstr "%s jest brakujący!"
 
-#: tortoisehg/hgqt/status.py:811
+#: tortoisehg/hgqt/status.py:823
 msgid "deleted"
 msgstr "usunięty"
 
-#: tortoisehg/hgqt/status.py:812
+#: tortoisehg/hgqt/status.py:824
 #, python-format
 msgid "%s is ignored"
 msgstr "%s jest ignorowany"
 
-#: tortoisehg/hgqt/status.py:813 tortoisehg/hgtk/quickop.py:179
+#: tortoisehg/hgqt/status.py:825 tortoisehg/hgtk/quickop.py:179
 #: tortoisehg/hgtk/quickop.py:255
 msgid "ignored"
 msgstr "ignorowany"
 
-#: tortoisehg/hgqt/status.py:814
+#: tortoisehg/hgqt/status.py:826
 #, python-format
 msgid "%s is not modified (clean)"
 msgstr "%s jest niezmodyfikowany (czysty)"
 
-#: tortoisehg/hgqt/status.py:815 tortoisehg/hgtk/quickop.py:183
+#: tortoisehg/hgqt/status.py:827 tortoisehg/hgtk/quickop.py:183
 msgid "clean"
 msgstr "czysty"
 
-#: tortoisehg/hgqt/status.py:816
+#: tortoisehg/hgqt/status.py:828
 #, python-format
 msgid "%s is a dirty subrepo"
 msgstr "%s jest brudnym subrepo"
 
-#: tortoisehg/hgqt/status.py:817
+#: tortoisehg/hgqt/status.py:829
 msgid "subrepo"
 msgstr "subrepo"
 
@@ -6694,447 +6787,450 @@ msgstr "subrepo"
 msgid "Malformed ssh URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:99
+#: tortoisehg/hgqt/sync.py:109
 msgid "TortoiseHg Sync"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:118
+#: tortoisehg/hgqt/sync.py:128
 msgid "Preview incoming changesets from remote repository"
 msgstr "Podejrzyj przychodzące zmiany z repozytorium zdalnego"
 
-#: tortoisehg/hgqt/sync.py:121
+#: tortoisehg/hgqt/sync.py:131
 msgid "Pull incoming changesets from remote repository"
 msgstr "Ściągnij przychodzące zmiany ze zdalnego repozytorium"
 
-#: tortoisehg/hgqt/sync.py:124
+#: tortoisehg/hgqt/sync.py:134
 msgid "Filter outgoing changesets to remote repository"
 msgstr "Filtruj wychodzące zmiany do zdalnego repozytorium"
 
-#: tortoisehg/hgqt/sync.py:127
+#: tortoisehg/hgqt/sync.py:137
 msgid "Push outgoing changesets to remote repository"
 msgstr "Pchnij wychodzące zmiany do zdalnego repozytorium"
 
-#: tortoisehg/hgqt/sync.py:129
+#: tortoisehg/hgqt/sync.py:139
 msgid "Email outgoing changesets for remote repository"
 msgstr "Wyślij wychodzące zmiany emailem do zdalnego repozytorium"
 
-#: tortoisehg/hgqt/sync.py:134
+#: tortoisehg/hgqt/sync.py:144
 msgid "Manage pending perforce changelists"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:140
+#: tortoisehg/hgqt/sync.py:150
 msgid "Unbundle"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:144
+#: tortoisehg/hgqt/sync.py:154
 msgid "Stop current operation"
 msgstr "Zatrzymaj bieżącą operację"
 
-#: tortoisehg/hgqt/sync.py:160 tortoisehg/hgqt/update.py:73
+#: tortoisehg/hgqt/sync.py:170 tortoisehg/hgqt/update.py:73
 #: tortoisehg/hgtk/update.py:78
 msgid "Target:"
 msgstr "Cel:"
 
-#: tortoisehg/hgqt/sync.py:177
+#: tortoisehg/hgqt/sync.py:187
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Wybrane opcje:</b>"
 
-#: tortoisehg/hgqt/sync.py:187
+#: tortoisehg/hgqt/sync.py:197
 msgid "<b>Remote Repository:</b>"
 msgstr "<b>Zdalne repozytorium:</b>"
 
-#: tortoisehg/hgqt/sync.py:198
+#: tortoisehg/hgqt/sync.py:208
 msgid "Path Edit Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:209
+#: tortoisehg/hgqt/sync.py:219
 msgid "Security"
 msgstr "Bezpieczeństwo"
 
-#: tortoisehg/hgqt/sync.py:210
+#: tortoisehg/hgqt/sync.py:220
 msgid "Manage HTTPS connection security and user authentication"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:218
+#: tortoisehg/hgqt/sync.py:228
 msgid "Hostname"
 msgstr "Nazwa hosta"
 
-#: tortoisehg/hgqt/sync.py:248 tortoisehg/hgqt/webconf_ui.py:77
+#: tortoisehg/hgqt/sync.py:258 tortoisehg/hgqt/webconf_ui.py:77
 msgid "Save"
 msgstr "Zapisz"
 
-#: tortoisehg/hgqt/sync.py:249
+#: tortoisehg/hgqt/sync.py:259
 msgid "Save current URL under an alias"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:263
+#: tortoisehg/hgqt/sync.py:273
 msgid "Paths in Repository Settings:"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:278
+#: tortoisehg/hgqt/sync.py:288
 msgid "Related Paths:"
 msgstr "Powiązane ściezki:"
 
-#: tortoisehg/hgqt/sync.py:334
+#: tortoisehg/hgqt/sync.py:344
 #, python-format
 msgid "Preview incoming changesets from %s"
 msgstr "Podejrzyj przychodzące zmiany z %s"
 
-#: tortoisehg/hgqt/sync.py:335
+#: tortoisehg/hgqt/sync.py:345
 #, python-format
 msgid "Pull incoming changesets from %s"
 msgstr "Pociągnij przychodzące zmian z %s"
 
-#: tortoisehg/hgqt/sync.py:336
+#: tortoisehg/hgqt/sync.py:346
 #, python-format
 msgid "Filter outgoing changesets to %s"
 msgstr "Filtruj przychodzące zmian z %s"
 
-#: tortoisehg/hgqt/sync.py:337
+#: tortoisehg/hgqt/sync.py:347
 #, python-format
 msgid "Push outgoing changesets to %s"
 msgstr "Pchnij wychodzące zmiany do %s"
 
-#: tortoisehg/hgqt/sync.py:344
+#: tortoisehg/hgqt/sync.py:354
 #, python-format
 msgid "rev: %d (%s)"
 msgstr "rew: %d (%s)"
 
-#: tortoisehg/hgqt/sync.py:349 tortoisehg/hgtk/commit.py:791
+#: tortoisehg/hgqt/sync.py:359 tortoisehg/hgtk/commit.py:791
 msgid "branch: "
 msgstr "gałąź: "
 
-#: tortoisehg/hgqt/sync.py:356
+#: tortoisehg/hgqt/sync.py:366
 msgid "bookmark: "
 msgstr "zakładka: "
 
-#: tortoisehg/hgqt/sync.py:403 tortoisehg/hgtk/synch.py:157
+#: tortoisehg/hgqt/sync.py:417 tortoisehg/hgtk/synch.py:157
 msgid "Post Pull: "
 msgstr "Po pociągnięciu: "
 
-#: tortoisehg/hgqt/sync.py:588
+#: tortoisehg/hgqt/sync.py:599
 msgid "Repository not local"
 msgstr "Repozytorium nie jest lokalne"
 
-#: tortoisehg/hgqt/sync.py:589
+#: tortoisehg/hgqt/sync.py:600
 msgid "A terminal shell cannot be opened for remote"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:594 tortoisehg/hgqt/sync.py:1417
+#: tortoisehg/hgqt/sync.py:605 tortoisehg/hgqt/sync.py:1428
 msgid "Confirm path delete"
 msgstr "Potwierdź usunięcie ściezki"
 
-#: tortoisehg/hgqt/sync.py:595 tortoisehg/hgqt/sync.py:1418
+#: tortoisehg/hgqt/sync.py:606 tortoisehg/hgqt/sync.py:1429
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:685
+#: tortoisehg/hgqt/sync.py:696
 msgid "No URL selected"
 msgstr "Nie wybrano URLa"
 
-#: tortoisehg/hgqt/sync.py:686
+#: tortoisehg/hgqt/sync.py:697
 msgid "An URL must be selected for this operation."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:701
+#: tortoisehg/hgqt/sync.py:712
 msgid "Redundant authentication info"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:702
+#: tortoisehg/hgqt/sync.py:713
 msgid ""
 "You have authentication info configured for this host and inside this URL.  "
 "Remove authentication info from this URL?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:725 tortoisehg/hgqt/sync.py:731
-#: tortoisehg/hgqt/sync.py:737 tortoisehg/hgqt/sync.py:743
-#: tortoisehg/hgqt/sync.py:750
+#: tortoisehg/hgqt/sync.py:736 tortoisehg/hgqt/sync.py:742
+#: tortoisehg/hgqt/sync.py:748 tortoisehg/hgqt/sync.py:754
+#: tortoisehg/hgqt/sync.py:761
 msgid "sync command already running"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:769
+#: tortoisehg/hgqt/sync.py:780
 #, python-format
 msgid "Getting incoming changesets from %s..."
 msgstr "Pobieranie przychodzących zmian z %s..."
 
-#: tortoisehg/hgqt/sync.py:774 tortoisehg/hgqt/sync.py:792
+#: tortoisehg/hgqt/sync.py:785 tortoisehg/hgqt/sync.py:803
 #, python-format
 msgid "Found incoming changesets from %s"
 msgstr "Znaleziono przychodzące zmiany z %s"
 
-#: tortoisehg/hgqt/sync.py:777 tortoisehg/hgqt/sync.py:794
+#: tortoisehg/hgqt/sync.py:788 tortoisehg/hgqt/sync.py:805
 #, python-format
 msgid "No incoming changesets from %s"
 msgstr "Brak przychodzących zmian z %s"
 
-#: tortoisehg/hgqt/sync.py:779 tortoisehg/hgqt/sync.py:796
+#: tortoisehg/hgqt/sync.py:790 tortoisehg/hgqt/sync.py:807
 #, python-format
 msgid "Incoming from %s aborted, ret %d"
 msgstr "Pobieranie z %s anulowane, ret %d"
 
-#: tortoisehg/hgqt/sync.py:807
+#: tortoisehg/hgqt/sync.py:818
 #, python-format
 msgid "Pull from %s completed"
 msgstr "Pociągnięcie z %s zostało zakończone"
 
-#: tortoisehg/hgqt/sync.py:809
+#: tortoisehg/hgqt/sync.py:820
 #, python-format
 msgid "Pull from %s aborted, ret %d"
 msgstr "Pociągnięcie z %s zostało przerwane, ret %d"
 
-#: tortoisehg/hgqt/sync.py:821 tortoisehg/hgqt/update.py:347
+#: tortoisehg/hgqt/sync.py:832 tortoisehg/hgqt/update.py:347
 msgid "Merge caused file conflicts"
 msgstr "Scalenie spowodowało konflikty plików"
 
-#: tortoisehg/hgqt/sync.py:822 tortoisehg/hgqt/update.py:348
+#: tortoisehg/hgqt/sync.py:833 tortoisehg/hgqt/update.py:348
 msgid "File conflicts need to be resolved"
 msgstr "Konflikty plików muszą zostać rozwiązane"
 
-#: tortoisehg/hgqt/sync.py:828
+#: tortoisehg/hgqt/sync.py:839
 #, python-format
 msgid "Pulling from %s..."
 msgstr "Ściąganie z %s..."
 
-#: tortoisehg/hgqt/sync.py:844
+#: tortoisehg/hgqt/sync.py:855
 #, python-format
 msgid "Finding outgoing changesets to %s..."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:856
+#: tortoisehg/hgqt/sync.py:867
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d wychodzących zmian do %s"
 
-#: tortoisehg/hgqt/sync.py:859
+#: tortoisehg/hgqt/sync.py:870
 #, python-format
 msgid "No outgoing changesets to %s"
 msgstr "Brak wychodzących zmian do %s"
 
-#: tortoisehg/hgqt/sync.py:861
+#: tortoisehg/hgqt/sync.py:872
 #, python-format
 msgid "Outgoing to %s aborted, ret %d"
 msgstr "Wysyłanie zmian do %s przerwane, ret %d"
 
-#: tortoisehg/hgqt/sync.py:886 tortoisehg/hgtk/history.py:584
+#: tortoisehg/hgqt/sync.py:897 tortoisehg/hgtk/history.py:584
 #, python-format
 msgid "%s (submitted)"
 msgstr "%s (przekazany)"
 
-#: tortoisehg/hgqt/sync.py:888 tortoisehg/hgtk/history.py:586
+#: tortoisehg/hgqt/sync.py:899 tortoisehg/hgtk/history.py:586
 #: tortoisehg/hgtk/history.py:592
 #, python-format
 msgid "%s (pending)"
 msgstr "%s (w trakcie)"
 
-#: tortoisehg/hgqt/sync.py:893 tortoisehg/hgtk/history.py:595
+#: tortoisehg/hgqt/sync.py:904 tortoisehg/hgtk/history.py:595
 msgid "Unable to parse p4pending output"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:895 tortoisehg/hgtk/history.py:597
+#: tortoisehg/hgqt/sync.py:906 tortoisehg/hgtk/history.py:597
 #, python-format
 msgid "%d pending changelists found"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:897 tortoisehg/hgtk/history.py:599
+#: tortoisehg/hgqt/sync.py:908 tortoisehg/hgtk/history.py:599
 msgid "No pending Perforce changelists"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:899 tortoisehg/hgtk/history.py:601
+#: tortoisehg/hgqt/sync.py:910 tortoisehg/hgtk/history.py:601
 msgid "Aborted p4pending"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:901 tortoisehg/hgtk/history.py:603
+#: tortoisehg/hgqt/sync.py:912 tortoisehg/hgtk/history.py:603
 msgid "Unable to determine pending changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:911
+#: tortoisehg/hgqt/sync.py:922
 msgid "Perforce pending..."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:921 tortoisehg/hgtk/history.py:2623
+#: tortoisehg/hgqt/sync.py:932 tortoisehg/hgtk/history.py:2623
 msgid "Confirm Push to remote Repository"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:922 tortoisehg/hgtk/history.py:2624
+#: tortoisehg/hgqt/sync.py:933 tortoisehg/hgtk/history.py:2624
 #, python-format
 msgid ""
 "Push to remote repository\n"
 "%s\n"
 "?"
 msgstr ""
+"Popchnąć do zdalnego repozytorium\n"
+"%s\n"
+"?"
 
-#: tortoisehg/hgqt/sync.py:925
+#: tortoisehg/hgqt/sync.py:936
 #, python-format
 msgid "Push to %s aborted"
-msgstr ""
+msgstr "Popchnięcie %s zostało przerwane"
 
-#: tortoisehg/hgqt/sync.py:929
+#: tortoisehg/hgqt/sync.py:940
 #, python-format
 msgid "Pushing to %s..."
 msgstr "Popychanie do %s..."
 
-#: tortoisehg/hgqt/sync.py:932
+#: tortoisehg/hgqt/sync.py:943
 #, python-format
 msgid "Push to %s completed"
-msgstr ""
+msgstr "Popchnięcie do %s zostało zakończone"
 
-#: tortoisehg/hgqt/sync.py:934
+#: tortoisehg/hgqt/sync.py:945
 #, python-format
 msgid "Push to %s aborted, ret %d"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:937
+#: tortoisehg/hgqt/sync.py:948
 msgid ""
 "One or more of the changesets that you are attempting to push involve the "
 "creation of a new branch.  Do you want to create a new branch in the remote "
 "repository?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:964
+#: tortoisehg/hgqt/sync.py:975
 msgid "Determining outgoing changesets to email..."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:978 tortoisehg/hgtk/history.py:2025
+#: tortoisehg/hgqt/sync.py:989 tortoisehg/hgtk/history.py:2025
 msgid "No outgoing changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:980
+#: tortoisehg/hgqt/sync.py:991
 #, python-format
 msgid "Outgoing aborted, ret %d"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:987
+#: tortoisehg/hgqt/sync.py:998
 msgid "Select bundle file"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:988
+#: tortoisehg/hgqt/sync.py:999
 msgid "Bundle files (*.hg)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1007
+#: tortoisehg/hgqt/sync.py:1018
 msgid "Unable to remove URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1029
+#: tortoisehg/hgqt/sync.py:1040
 msgid "Post Pull Behavior"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1033
+#: tortoisehg/hgqt/sync.py:1044
 msgid "Select post-pull operation for this repository"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1036
+#: tortoisehg/hgqt/sync.py:1047
 msgid "None - simply pull changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1037
+#: tortoisehg/hgqt/sync.py:1048
 msgid "Update - pull, then try to update"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1043
+#: tortoisehg/hgqt/sync.py:1054
 msgid "Fetch - use fetch (auto merge pulled changes)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1045
+#: tortoisehg/hgqt/sync.py:1056
 msgid "Fetch - use fetch extension (fetch is not active!)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1052
+#: tortoisehg/hgqt/sync.py:1063
 msgid "Rebase - rebase local commits above pulled changes"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1054
+#: tortoisehg/hgqt/sync.py:1065
 msgid "Rebase - use rebase extension (rebase is not active!)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1072
+#: tortoisehg/hgqt/sync.py:1083
 msgid "<a href=\"config\">Launch settings tool...</a>"
 msgstr "<a href=\"config\">Uruchom narzędzie ustawień...</a>"
 
-#: tortoisehg/hgqt/sync.py:1105
+#: tortoisehg/hgqt/sync.py:1116
 msgid "Unable to save post pull operation"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1129
+#: tortoisehg/hgqt/sync.py:1140
 msgid "Save Path"
 msgstr "Zapisz ścieżkę"
 
-#: tortoisehg/hgqt/sync.py:1139 tortoisehg/hgqt/sync.py:1461
+#: tortoisehg/hgqt/sync.py:1150 tortoisehg/hgqt/sync.py:1472
 #: tortoisehg/hgtk/thgconfig.py:371 tortoisehg/hgtk/thgconfig.py:954
 msgid "Alias"
 msgstr "Alias"
 
-#: tortoisehg/hgqt/sync.py:1142 tortoisehg/hgqt/sync.py:1461
+#: tortoisehg/hgqt/sync.py:1153 tortoisehg/hgqt/sync.py:1472
 #: tortoisehg/hgtk/thgconfig.py:368
 msgid "URL"
 msgstr "URL"
 
-#: tortoisehg/hgqt/sync.py:1151
+#: tortoisehg/hgqt/sync.py:1162
 msgid "Remove authentication data from URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1153
+#: tortoisehg/hgqt/sync.py:1164
 msgid ""
 "User authentication data should be associated with the hostname using the "
 "security dialog."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1175
+#: tortoisehg/hgqt/sync.py:1186
 msgid "Unable to save an URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1186
+#: tortoisehg/hgqt/sync.py:1197
 msgid "Confirm URL replace"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1187
+#: tortoisehg/hgqt/sync.py:1198
 #, python-format
 msgid "%s already exists, replace URL?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1211
+#: tortoisehg/hgqt/sync.py:1222
 msgid "Certificate Query Error"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1224
+#: tortoisehg/hgqt/sync.py:1235
 msgid "Security: "
-msgstr ""
+msgstr "Bezpieczeństwo: "
 
-#: tortoisehg/hgqt/sync.py:1243
+#: tortoisehg/hgqt/sync.py:1254
 #, python-format
 msgid "<b>Host:</b> %s"
 msgstr "<b>Host:</b> %s"
 
-#: tortoisehg/hgqt/sync.py:1245
+#: tortoisehg/hgqt/sync.py:1256
 msgid "Secure HTTPS Connection"
-msgstr ""
+msgstr "Bezpieczne połączenie HTTPS"
 
-#: tortoisehg/hgqt/sync.py:1252
+#: tortoisehg/hgqt/sync.py:1263
 msgid "Verify with Certificate Authority certificates (best)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1254
+#: tortoisehg/hgqt/sync.py:1265
 msgid "Verify with stored host fingerprint (good)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1256
+#: tortoisehg/hgqt/sync.py:1267
 msgid "No host validation, but still encrypted (bad)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1263
+#: tortoisehg/hgqt/sync.py:1274
 msgid "### host certificate fingerprint ###"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1267
+#: tortoisehg/hgqt/sync.py:1278
 msgid "Query"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1286
+#: tortoisehg/hgqt/sync.py:1297
 msgid "User Authentication"
-msgstr ""
+msgstr "Autentyfikacja użytkownika"
 
-#: tortoisehg/hgqt/sync.py:1293
+#: tortoisehg/hgqt/sync.py:1304
 msgid ""
 "Optional. Username to authenticate with. If not given, and the remote\n"
 "site requires basic or digest authentication, the user will be prompted for\n"
@@ -7142,61 +7238,61 @@ msgid ""
 "foo.username = $USER."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1302
+#: tortoisehg/hgqt/sync.py:1313
 msgid ""
 "Optional. Password to authenticate with. If not given, and the remote\n"
 "site requires basic or digest authentication, the user will be prompted for\n"
 "it."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1309
+#: tortoisehg/hgqt/sync.py:1320
 msgid ""
 "Mercurial keyring extension is enabled. Passwords will be stored in a "
 "platform-native secure method."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1315
+#: tortoisehg/hgqt/sync.py:1326
 msgid ""
 "Optional. PEM encoded client certificate key file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1317
+#: tortoisehg/hgqt/sync.py:1328
 msgid "User Certificate Key File"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1321
+#: tortoisehg/hgqt/sync.py:1332
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1323
+#: tortoisehg/hgqt/sync.py:1334
 msgid "User Certificate Chain File"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1343
+#: tortoisehg/hgqt/sync.py:1354
 msgid "Unable to save authentication"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1505
+#: tortoisehg/hgqt/sync.py:1516
 #, python-format
 msgid "%s - sync options"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1512
+#: tortoisehg/hgqt/sync.py:1523
 msgid "Allow push of a new branch (--new-branch)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1517
+#: tortoisehg/hgqt/sync.py:1528
 msgid "Force push or pull (override safety checks, --force)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1527
+#: tortoisehg/hgqt/sync.py:1538
 msgid "Temporarily disable configured HTTP proxy"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1534
+#: tortoisehg/hgqt/sync.py:1545
 msgid "Emit debugging output (--debug)"
 msgstr ""
 
@@ -7274,17 +7370,17 @@ msgstr ""
 #: tortoisehg/hgqt/tag.py:299 tortoisehg/hgtk/tagadd.py:303
 #, python-format
 msgid "tag '%s' is not a local tag"
-msgstr ""
+msgstr "tag '%s' nie jest tagiem lokalnym"
 
 #: tortoisehg/hgqt/tag.py:303 tortoisehg/hgtk/tagadd.py:306
 #, python-format
 msgid "tag '%s' is not a global tag"
-msgstr ""
+msgstr "tag '%s' nie jest tagiem globalnym"
 
 #: tortoisehg/hgqt/tag.py:314 tortoisehg/hgtk/tagadd.py:309
 #, python-format
 msgid "Removed tag %s"
-msgstr ""
+msgstr "Usunięto tag %s"
 
 #: tortoisehg/hgqt/tag.py:319
 #, python-format
@@ -7322,7 +7418,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/thgimport.py:103
 msgid "Checking working directory status..."
-msgstr ""
+msgstr "Sprawdzanie stanu katalogu roboczego..."
 
 #: tortoisehg/hgqt/thgimport.py:115
 msgid "&Import"
@@ -7397,11 +7493,11 @@ msgstr "Nieznana rewizja!"
 
 #: tortoisehg/hgqt/thgstrip.py:204
 msgid "Detected uncommitted local changes."
-msgstr ""
+msgstr "Wykryto niewcommitowane lokalne zmiany."
 
 #: tortoisehg/hgqt/thgstrip.py:205
 msgid "Do you want to discard them and continue?"
-msgstr ""
+msgstr "Czy chcesz je odrzucić i kontynuować?"
 
 #: tortoisehg/hgqt/thgstrip.py:206 tortoisehg/hgtk/thgstrip.py:217
 msgid "&Yes (--force)"
@@ -7421,7 +7517,7 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:77 tortoisehg/hgtk/hgthread.py:78
 #: tortoisehg/hgtk/hgthread.py:90 tortoisehg/hgtk/hgthread.py:97
 msgid "response expected"
-msgstr ""
+msgstr "oczekiwano odpowiedzi"
 
 #: tortoisehg/hgqt/thread.py:128 tortoisehg/hgtk/hgthread.py:94
 msgid "password: "
@@ -7429,7 +7525,7 @@ msgstr "hasło: "
 
 #: tortoisehg/hgqt/thread.py:276 tortoisehg/hgtk/hgthread.py:187
 msgid "abort: "
-msgstr ""
+msgstr "anulowane: "
 
 #: tortoisehg/hgqt/thread.py:278
 msgid "hint: "
@@ -7438,26 +7534,26 @@ msgstr "podp: "
 #: tortoisehg/hgqt/thread.py:282
 #, python-format
 msgid "HTTP Error: %d (%s)"
-msgstr ""
+msgstr "Błąd HTTP: %d (%s)"
 
 #: tortoisehg/hgqt/thread.py:285
 #, python-format
 msgid "URLError: %s"
-msgstr ""
+msgstr "Błąd HTTP: %s"
 
 #: tortoisehg/hgqt/thread.py:293 tortoisehg/hgtk/hgthread.py:198
 msgid "SSL: Server certificate verify failed"
-msgstr ""
+msgstr "SSL: Weryfikacja certyfikatu serwera nie powiodła się"
 
 #: tortoisehg/hgqt/thread.py:295 tortoisehg/hgtk/hgthread.py:200
 #, python-format
 msgid "SSL: unknown error %s:%s"
-msgstr ""
+msgstr "SSL: nieznany błąd %s:%s"
 
 #: tortoisehg/hgqt/thread.py:297 tortoisehg/hgtk/hgthread.py:202
 #, python-format
 msgid "SSL error: %s"
-msgstr ""
+msgstr "Błąd SSL: %s"
 
 #: tortoisehg/hgqt/thread.py:302
 #, python-format
@@ -7474,7 +7570,7 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:309
 #, python-format
 msgid "hg: parse error: %s\n"
-msgstr ""
+msgstr "hg: błąd parsowania: %s\n"
 
 #: tortoisehg/hgqt/thread.py:312
 #, python-format
@@ -7490,7 +7586,7 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:352
 #, python-format
 msgid "abort: %s: %s\n"
-msgstr ""
+msgstr "anulowane: %s: %s\n"
 
 #: tortoisehg/hgqt/thread.py:317
 #, python-format
@@ -7500,7 +7596,7 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:322
 #, python-format
 msgid "abort: %s"
-msgstr ""
+msgstr "anulowane: %s"
 
 #: tortoisehg/hgqt/thread.py:326
 msgid " empty string\n"
@@ -7510,7 +7606,7 @@ msgstr " pusty ciąg\n"
 #: tortoisehg/hgqt/thread.py:354
 #, python-format
 msgid "abort: %s\n"
-msgstr ""
+msgstr "anulowane: %s\n"
 
 #: tortoisehg/hgqt/thread.py:339
 #, python-format
@@ -7524,12 +7620,12 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:365
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr ""
+msgstr "[komenda przerwana przez użytkownika %s]"
 
 #: tortoisehg/hgqt/thread.py:367
 #, python-format
 msgid "[command interrupted %s]"
-msgstr ""
+msgstr "[komenda przerwana %s]"
 
 #: tortoisehg/hgqt/update.py:45 tortoisehg/hgtk/update.py:46
 msgid "Update to:"
@@ -7651,184 +7747,184 @@ msgstr "Brak zmian w pliku"
 msgid "There are no file changes to view"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:353 tortoisehg/hgtk/visdiff.py:326
+#: tortoisehg/hgqt/visdiff.py:354 tortoisehg/hgtk/visdiff.py:326
 msgid "cleaning up temp directory\n"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:373 tortoisehg/hgtk/visdiff.py:352
+#: tortoisehg/hgqt/visdiff.py:374 tortoisehg/hgtk/visdiff.py:352
 msgid "working changes"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:375
+#: tortoisehg/hgqt/visdiff.py:376
 #, python-format
 msgid "changeset %d:%s"
 msgstr "zestaw zmian %d:%s"
 
-#: tortoisehg/hgqt/visdiff.py:377
+#: tortoisehg/hgqt/visdiff.py:378
 #, python-format
 msgid "revisions %d:%s to %d:%s"
 msgstr "rewizje %d:%s do %d:%s"
 
-#: tortoisehg/hgqt/visdiff.py:379 tortoisehg/hgtk/visdiff.py:357
+#: tortoisehg/hgqt/visdiff.py:380 tortoisehg/hgtk/visdiff.py:357
 msgid "Visual Diffs - "
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:381 tortoisehg/hgtk/visdiff.py:359
+#: tortoisehg/hgqt/visdiff.py:382 tortoisehg/hgtk/visdiff.py:359
 msgid " filtered"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:396 tortoisehg/hgtk/visdiff.py:370
+#: tortoisehg/hgqt/visdiff.py:397 tortoisehg/hgtk/visdiff.py:370
 msgid "Temporary files are removed when this dialog is closed"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:414
+#: tortoisehg/hgqt/visdiff.py:415
 msgid "Select Tool:"
 msgstr "Wybierz narzędzie:"
 
-#: tortoisehg/hgqt/visdiff.py:438 tortoisehg/hgtk/visdiff.py:424
+#: tortoisehg/hgqt/visdiff.py:439 tortoisehg/hgtk/visdiff.py:424
 msgid "Dir diff to p1"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:440 tortoisehg/hgtk/visdiff.py:426
+#: tortoisehg/hgqt/visdiff.py:441 tortoisehg/hgtk/visdiff.py:426
 msgid "Dir diff to p2"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:442 tortoisehg/hgtk/visdiff.py:428
+#: tortoisehg/hgqt/visdiff.py:443 tortoisehg/hgtk/visdiff.py:428
 msgid "3-way dir diff"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:445 tortoisehg/hgtk/visdiff.py:434
+#: tortoisehg/hgqt/visdiff.py:446 tortoisehg/hgtk/visdiff.py:434
 msgid "Directory diff"
 msgstr ""
 
-#: tortoisehg/hgqt/visdiff.py:613 tortoisehg/hgtk/visdiff.py:631
+#: tortoisehg/hgqt/visdiff.py:614 tortoisehg/hgtk/visdiff.py:631
 msgid "No repository found here"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:41
+#: tortoisehg/hgqt/wctxactions.py:40
 msgid "&Visual Diff"
 msgstr "Wizualny diff"
 
-#: tortoisehg/hgqt/wctxactions.py:45 tortoisehg/hgtk/status.py:1244
+#: tortoisehg/hgqt/wctxactions.py:44 tortoisehg/hgtk/status.py:1244
 msgid "View missing"
 msgstr "Zobacz brakujące"
 
-#: tortoisehg/hgqt/wctxactions.py:47
+#: tortoisehg/hgqt/wctxactions.py:46
 msgid "&Revert..."
 msgstr "Odrzuć..."
 
-#: tortoisehg/hgqt/wctxactions.py:50 tortoisehg/hgtk/status.py:1250
+#: tortoisehg/hgqt/wctxactions.py:49 tortoisehg/hgtk/status.py:1250
 #: tortoisehg/util/menuthg.py:49
 msgid "File History"
 msgstr "Historia pliku"
 
-#: tortoisehg/hgqt/wctxactions.py:51
+#: tortoisehg/hgqt/wctxactions.py:50
 msgid "&Annotate"
 msgstr "&Adnotuj"
 
-#: tortoisehg/hgqt/wctxactions.py:53
+#: tortoisehg/hgqt/wctxactions.py:52
 msgid "&Forget"
 msgstr "Zapomnij"
 
-#: tortoisehg/hgqt/wctxactions.py:55
+#: tortoisehg/hgqt/wctxactions.py:58
 msgid "&Detect Renames..."
 msgstr "Wykryj zmiany nazw..."
 
-#: tortoisehg/hgqt/wctxactions.py:57
+#: tortoisehg/hgqt/wctxactions.py:60
 msgid "&Ignore..."
 msgstr "&Ignoruj..."
 
-#: tortoisehg/hgqt/wctxactions.py:58 tortoisehg/hgtk/status.py:1257
+#: tortoisehg/hgqt/wctxactions.py:61 tortoisehg/hgtk/status.py:1257
 msgid "Remove versioned"
 msgstr "Usuń wersjonowane"
 
-#: tortoisehg/hgqt/wctxactions.py:59
+#: tortoisehg/hgqt/wctxactions.py:62
 msgid "&Delete unversioned..."
 msgstr "Usuń spoza kontroli wersji..."
 
-#: tortoisehg/hgqt/wctxactions.py:61 tortoisehg/hgtk/status.py:1265
+#: tortoisehg/hgqt/wctxactions.py:64 tortoisehg/hgtk/status.py:1265
 msgid "Mark unresolved"
 msgstr "Oznacz jako nierozwiązane"
 
-#: tortoisehg/hgqt/wctxactions.py:62 tortoisehg/hgtk/status.py:1266
+#: tortoisehg/hgqt/wctxactions.py:65 tortoisehg/hgtk/status.py:1266
 msgid "Mark resolved"
 msgstr "Oznacz jako rozwiązane"
 
-#: tortoisehg/hgqt/wctxactions.py:105 tortoisehg/hgtk/status.py:1245
+#: tortoisehg/hgqt/wctxactions.py:108 tortoisehg/hgtk/status.py:1245
 msgid "View other"
 msgstr "Zobacz inne"
 
-#: tortoisehg/hgqt/wctxactions.py:109
+#: tortoisehg/hgqt/wctxactions.py:112
 msgid "&Copy..."
 msgstr "Kopiuj..."
 
-#: tortoisehg/hgqt/wctxactions.py:110 tortoisehg/hgtk/status.py:1262
+#: tortoisehg/hgqt/wctxactions.py:113 tortoisehg/hgtk/status.py:1262
 msgid "Rename..."
 msgstr "Zmień nazwę..."
 
-#: tortoisehg/hgqt/wctxactions.py:116
+#: tortoisehg/hgqt/wctxactions.py:119
 msgid "Was renamed from"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:127 tortoisehg/hgtk/status.py:1264
+#: tortoisehg/hgqt/wctxactions.py:130 tortoisehg/hgtk/status.py:1264
 msgid "Restart Merge..."
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:129 tortoisehg/hgtk/status.py:1274
+#: tortoisehg/hgqt/wctxactions.py:132 tortoisehg/hgtk/status.py:1274
 msgid "Restart merge with"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:158
+#: tortoisehg/hgqt/wctxactions.py:161
 msgid " errors"
 msgstr " błędów"
 
-#: tortoisehg/hgqt/wctxactions.py:160
+#: tortoisehg/hgqt/wctxactions.py:163
 msgid " output"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:166 tortoisehg/hgqt/wctxactions.py:173
-#: tortoisehg/hgqt/wctxactions.py:176 tortoisehg/hgtk/gdialog.py:582
+#: tortoisehg/hgqt/wctxactions.py:169 tortoisehg/hgqt/wctxactions.py:176
+#: tortoisehg/hgqt/wctxactions.py:179 tortoisehg/hgtk/gdialog.py:582
 #: tortoisehg/hgtk/gdialog.py:585
 msgid " Aborted"
 msgstr " Przerwane"
 
-#: tortoisehg/hgqt/wctxactions.py:227 tortoisehg/hgtk/statusact.py:125
+#: tortoisehg/hgqt/wctxactions.py:230 tortoisehg/hgtk/statusact.py:125
 msgid "Uncommited merge - please select a parent revision"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:228 tortoisehg/hgtk/statusact.py:126
+#: tortoisehg/hgqt/wctxactions.py:231 tortoisehg/hgtk/statusact.py:126
 msgid "Revert files to local or other parent?"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:229 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:232 tortoisehg/hgtk/statusact.py:127
 msgid "&Local"
 msgstr "&Lokalny"
 
-#: tortoisehg/hgqt/wctxactions.py:229 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:232 tortoisehg/hgtk/statusact.py:127
 msgid "&Other"
 msgstr "&Inny"
 
-#: tortoisehg/hgqt/wctxactions.py:240
+#: tortoisehg/hgqt/wctxactions.py:243
 msgid "Revert local file changes?"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:241
+#: tortoisehg/hgqt/wctxactions.py:244
 msgid "&Revert with backup"
 msgstr "P&rzywróć z backupem"
 
-#: tortoisehg/hgqt/wctxactions.py:241
+#: tortoisehg/hgqt/wctxactions.py:244
 msgid "&Discard changes"
 msgstr "O&drzuć zmiany"
 
-#: tortoisehg/hgqt/wctxactions.py:295
+#: tortoisehg/hgqt/wctxactions.py:332
 msgid "Confirm Delete Unversioned"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:296
+#: tortoisehg/hgqt/wctxactions.py:333
 msgid "Delete the following unversioned files?"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:308 tortoisehg/hgtk/statusact.py:40
+#: tortoisehg/hgqt/wctxactions.py:345 tortoisehg/hgtk/statusact.py:40
 msgid "Copy file to"
 msgstr "Kopiuj plik do"
 
@@ -7874,298 +7970,298 @@ msgstr ""
 
 #: tortoisehg/hgqt/webconf_ui.py:75
 msgid "Config File:"
-msgstr ""
+msgstr "Plik konfiguracyjny:"
 
-#: tortoisehg/hgqt/workbench.py:46 tortoisehg/hgqt/workbench.py:548
+#: tortoisehg/hgqt/workbench.py:46 tortoisehg/hgqt/workbench.py:558
 msgid "TortoiseHg Workbench"
 msgstr "Warsztat TortoiseHg"
 
-#: tortoisehg/hgqt/workbench.py:77
+#: tortoisehg/hgqt/workbench.py:78
 msgid "New Repository..."
 msgstr "Nowe repozytorium..."
 
-#: tortoisehg/hgqt/workbench.py:79 tortoisehg/hgqt/workbench.py:203
+#: tortoisehg/hgqt/workbench.py:80 tortoisehg/hgqt/workbench.py:204
 msgid "Clone Repository..."
 msgstr "Klonuj repozytorium..."
 
-#: tortoisehg/hgqt/workbench.py:81
+#: tortoisehg/hgqt/workbench.py:82
 msgid "Open Repository..."
 msgstr "Otwórz repozytorium..."
 
-#: tortoisehg/hgqt/workbench.py:122
+#: tortoisehg/hgqt/workbench.py:123
 msgid "&File"
 msgstr "&Plik"
 
-#: tortoisehg/hgqt/workbench.py:123
+#: tortoisehg/hgqt/workbench.py:124
 msgid "&View"
 msgstr "&Widok"
 
-#: tortoisehg/hgqt/workbench.py:124 tortoisehg/hgqt/workbench.py:355
+#: tortoisehg/hgqt/workbench.py:125 tortoisehg/hgqt/workbench.py:356
 msgid "Workbench Toolbars"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:125
+#: tortoisehg/hgqt/workbench.py:126
 msgid "&Repository"
 msgstr "&Repozytorium"
 
-#: tortoisehg/hgqt/workbench.py:126
+#: tortoisehg/hgqt/workbench.py:127
 msgid "&Help"
 msgstr "Pomoc"
 
-#: tortoisehg/hgqt/workbench.py:128
+#: tortoisehg/hgqt/workbench.py:129
 msgid "Edit Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:130
+#: tortoisehg/hgqt/workbench.py:131
 msgid "Dock Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:132
+#: tortoisehg/hgqt/workbench.py:133
 msgid "Sync Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:134
+#: tortoisehg/hgqt/workbench.py:135
 msgid "Task Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:201
+#: tortoisehg/hgqt/workbench.py:202
 msgid "&New Repository..."
 msgstr "&Nowe repozytorium..."
 
-#: tortoisehg/hgqt/workbench.py:207
+#: tortoisehg/hgqt/workbench.py:208
 msgid "&Open Repository..."
 msgstr "&Otwórz repozytorium..."
 
-#: tortoisehg/hgqt/workbench.py:209
+#: tortoisehg/hgqt/workbench.py:210
 msgid "&Close Repository"
 msgstr "&Zamknij repozytorium"
 
-#: tortoisehg/hgqt/workbench.py:216
+#: tortoisehg/hgqt/workbench.py:217
 msgid "&Settings..."
 msgstr "Ustawienia..."
 
-#: tortoisehg/hgqt/workbench.py:222
+#: tortoisehg/hgqt/workbench.py:223
 msgid "Show Repository Registry"
-msgstr ""
+msgstr "Pokaż rejestr repozytorium"
 
-#: tortoisehg/hgqt/workbench.py:229
+#: tortoisehg/hgqt/workbench.py:230
 msgid "Show Patch Queue"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:235
+#: tortoisehg/hgqt/workbench.py:236
 msgid "Show Output &Log"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:242
+#: tortoisehg/hgqt/workbench.py:243
 msgid "Repository Registry Options"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:244
+#: tortoisehg/hgqt/workbench.py:245
 msgid "Show Paths"
 msgstr "Pokaż ścieżki"
 
-#: tortoisehg/hgqt/workbench.py:248
+#: tortoisehg/hgqt/workbench.py:249
 msgid "Show Subrepos on Registry"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:253
+#: tortoisehg/hgqt/workbench.py:254
 msgid "Show Subrepos for remote repositories"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:258
+#: tortoisehg/hgqt/workbench.py:259
 msgid "Show Short Paths"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:263
+#: tortoisehg/hgqt/workbench.py:264
 msgid "Choose Log Columns..."
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:266
+#: tortoisehg/hgqt/workbench.py:267
 msgid "Save Open Repositories On Exit"
 msgstr "Zapisz otwarte repozytoria przy zamykaniu"
 
-#: tortoisehg/hgqt/workbench.py:279
+#: tortoisehg/hgqt/workbench.py:280
 msgid "Revision &Details"
 msgstr "Szczegóły &rewizji"
 
-#: tortoisehg/hgqt/workbench.py:280
+#: tortoisehg/hgqt/workbench.py:281
 msgid "&Commit"
 msgstr "&Commit"
 
-#: tortoisehg/hgqt/workbench.py:282
+#: tortoisehg/hgqt/workbench.py:283
 msgid "MQ Patch"
 msgstr "Patch MQ"
 
-#: tortoisehg/hgqt/workbench.py:283
+#: tortoisehg/hgqt/workbench.py:284
 msgid "S&ynchronize"
 msgstr "Synchronizacja"
 
-#: tortoisehg/hgqt/workbench.py:284
+#: tortoisehg/hgqt/workbench.py:285
 msgid "&Manifest"
 msgstr "&Manifest"
 
-#: tortoisehg/hgqt/workbench.py:285
+#: tortoisehg/hgqt/workbench.py:286
 msgid "&Search"
 msgstr "&Szukaj"
 
-#: tortoisehg/hgqt/workbench.py:287
+#: tortoisehg/hgqt/workbench.py:288
 msgid "&Patch Branch"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:290 tortoisehg/hgtk/status.py:1320
+#: tortoisehg/hgqt/workbench.py:291 tortoisehg/hgtk/status.py:1320
 msgid "&Refresh"
 msgstr "&Odśwież"
 
-#: tortoisehg/hgqt/workbench.py:293
-msgid "Refresh current repository"
-msgstr ""
-
 #: tortoisehg/hgqt/workbench.py:294
+msgid "Refresh current repository"
+msgstr "Odśwież aktualne repozytorium"
+
+#: tortoisehg/hgqt/workbench.py:295
 msgid "Refresh &Task Tab"
 msgstr "Odśwież &Tab Zadań"
 
-#: tortoisehg/hgqt/workbench.py:297
+#: tortoisehg/hgqt/workbench.py:298
 msgid "Refresh only the current task tab"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:299
+#: tortoisehg/hgqt/workbench.py:300
 msgid "Load all revisions"
 msgstr "Załaduj wszystkie rewizje"
 
-#: tortoisehg/hgqt/workbench.py:301
+#: tortoisehg/hgqt/workbench.py:302
 msgid "Load all revisions into graph"
 msgstr "Załaduj wszystkie rewizje do grafu"
 
-#: tortoisehg/hgqt/workbench.py:303
+#: tortoisehg/hgqt/workbench.py:304
 msgid "Web Server..."
 msgstr "Serwer Web..."
 
-#: tortoisehg/hgqt/workbench.py:306
+#: tortoisehg/hgqt/workbench.py:307
 msgid "Shelve..."
 msgstr "Odłóż..."
 
-#: tortoisehg/hgqt/workbench.py:308 tortoisehg/hgtk/history.py:458
+#: tortoisehg/hgqt/workbench.py:309 tortoisehg/hgtk/history.py:458
 msgid "Import..."
 msgstr "Importuj..."
 
-#: tortoisehg/hgqt/workbench.py:311 tortoisehg/hgtk/recovery.py:68
+#: tortoisehg/hgqt/workbench.py:312 tortoisehg/hgtk/recovery.py:68
 msgid "Verify"
 msgstr "Weryfikuj"
 
-#: tortoisehg/hgqt/workbench.py:313 tortoisehg/hgtk/recovery.py:63
+#: tortoisehg/hgqt/workbench.py:314 tortoisehg/hgtk/recovery.py:63
 msgid "Recover"
 msgstr "Odzyskaj"
 
-#: tortoisehg/hgqt/workbench.py:316
+#: tortoisehg/hgqt/workbench.py:317
 msgid "Resolve..."
 msgstr "Rozwiąż..."
 
-#: tortoisehg/hgqt/workbench.py:319
+#: tortoisehg/hgqt/workbench.py:320
 msgid "Rollback/Undo..."
 msgstr "Przywróć/Cofnij..."
 
-#: tortoisehg/hgqt/workbench.py:322
+#: tortoisehg/hgqt/workbench.py:323
 msgid "Purge..."
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:325
+#: tortoisehg/hgqt/workbench.py:326
 msgid "Bisect..."
 msgstr "Bisekcja..."
 
-#: tortoisehg/hgqt/workbench.py:335
+#: tortoisehg/hgqt/workbench.py:336
 msgid "Help"
 msgstr "Pomoc"
 
-#: tortoisehg/hgqt/workbench.py:336
+#: tortoisehg/hgqt/workbench.py:337
 msgid "About Qt"
 msgstr "O Qt"
 
-#: tortoisehg/hgqt/workbench.py:337 tortoisehg/util/menuthg.py:73
+#: tortoisehg/hgqt/workbench.py:338 tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
 msgstr "O TortoiseHG"
 
-#: tortoisehg/hgqt/workbench.py:350
+#: tortoisehg/hgqt/workbench.py:351
 msgid "Filter Toolbar"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:353
+#: tortoisehg/hgqt/workbench.py:354
 msgid "Filter graph with revision sets or branches"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:362 tortoisehg/hgtk/history.py:438
+#: tortoisehg/hgqt/workbench.py:363 tortoisehg/hgtk/history.py:438
 #: tortoisehg/hgtk/history.py:1856 tortoisehg/hgtk/synch.py:57
 msgid "Incoming"
 msgstr "Przychodzące"
 
-#: tortoisehg/hgqt/workbench.py:363
+#: tortoisehg/hgqt/workbench.py:364
 msgid "Check for incoming changes from selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:365 tortoisehg/hgtk/history.py:440
+#: tortoisehg/hgqt/workbench.py:366 tortoisehg/hgtk/history.py:440
 #: tortoisehg/hgtk/history.py:1986
 msgid "Pull"
 msgstr "Pociągnj"
 
-#: tortoisehg/hgqt/workbench.py:366
+#: tortoisehg/hgqt/workbench.py:367
 msgid "Pull incoming changes from selected URL"
 msgstr "Pociągnij zmiany ze wskazanego URLa"
 
-#: tortoisehg/hgqt/workbench.py:368 tortoisehg/hgtk/history.py:442
+#: tortoisehg/hgqt/workbench.py:369 tortoisehg/hgtk/history.py:442
 #: tortoisehg/hgtk/history.py:2029 tortoisehg/hgtk/synch.py:68
 msgid "Outgoing"
 msgstr "Wychodzące"
 
-#: tortoisehg/hgqt/workbench.py:369
+#: tortoisehg/hgqt/workbench.py:370
 msgid "Detect outgoing changes to selected URL"
 msgstr "Wykryj wychodzące zmiany do wskazanego URLa"
 
-#: tortoisehg/hgqt/workbench.py:372
+#: tortoisehg/hgqt/workbench.py:373
 msgid "Push outgoing changes to selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:378 tortoisehg/hgqt/workbench.py:379
+#: tortoisehg/hgqt/workbench.py:379 tortoisehg/hgqt/workbench.py:380
 msgid "Close tab"
 msgstr "Zamknij tab"
 
-#: tortoisehg/hgqt/workbench.py:380 tortoisehg/hgqt/workbench.py:381
+#: tortoisehg/hgqt/workbench.py:381 tortoisehg/hgqt/workbench.py:382
 msgid "Close other tabs"
 msgstr "Zamknij inne taby"
 
-#: tortoisehg/hgqt/workbench.py:382
+#: tortoisehg/hgqt/workbench.py:383
 msgid "Undo close tab"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:383
+#: tortoisehg/hgqt/workbench.py:384
 msgid "Reopen last closed tab"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:384
+#: tortoisehg/hgqt/workbench.py:385
 msgid "Undo close other tabs"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:385
+#: tortoisehg/hgqt/workbench.py:386
 msgid "Reopen last closed tab group"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:550
+#: tortoisehg/hgqt/workbench.py:560
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:553
+#: tortoisehg/hgqt/workbench.py:563
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:739
+#: tortoisehg/hgqt/workbench.py:757
 msgid "Select repository directory to open"
 msgstr "Wybierz repozytorium do otwarcia"
 
-#: tortoisehg/hgqt/workbench.py:762
+#: tortoisehg/hgqt/workbench.py:780
 msgid "Failed to open repository"
 msgstr "Nie można było otworzyć repozytorium"
 
-#: tortoisehg/hgqt/workbench.py:903
+#: tortoisehg/hgqt/workbench.py:921
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr ""
@@ -8407,7 +8503,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:478 tortoisehg/hgtk/status.py:1242
 msgid "_Visual Diff"
-msgstr ""
+msgstr "Wizualny Diff"
 
 #: tortoisehg/hgtk/changeset.py:480
 msgid "Diff to _local"
@@ -9065,7 +9161,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/gdialog.py:674
 msgid "edit failed"
-msgstr ""
+msgstr "edycja nie udała się"
 
 #: tortoisehg/hgtk/gdialog.py:823
 #, python-format
@@ -9098,7 +9194,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/gorev.py:63
 msgid "Invalid Revision"
-msgstr ""
+msgstr "Niepoprawna rewizja"
 
 #: tortoisehg/hgtk/gtklib.py:481
 msgid "Save File"
@@ -9130,7 +9226,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/gtklib.py:1114 tortoisehg/hgtk/thgconfig.py:85
 msgid "Spell Check Language"
-msgstr ""
+msgstr "Język sprawdzania pisowni"
 
 #: tortoisehg/hgtk/guess.py:60
 msgid "Minimum Simularity Percentage"
@@ -9138,11 +9234,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/guess.py:77
 msgid "Unrevisioned Files"
-msgstr ""
+msgstr "Pliki poza kontrolą Mercuriala"
 
 #: tortoisehg/hgtk/guess.py:111
 msgid "Find Copies"
-msgstr ""
+msgstr "Szukaj kopii"
 
 #: tortoisehg/hgtk/guess.py:116
 msgid "Candidate Matches"
@@ -9287,6 +9383,7 @@ msgstr ""
 msgid "Filters"
 msgstr "Filtry"
 
+#: tortoisehg/hgqt/settings.py:800 tortoisehg/hgqt/settings.py:810
 #: tortoisehg/hgtk/hgignore.py:104
 msgid "Patterns"
 msgstr "Wzorce"
@@ -9392,7 +9489,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/hgtk.py:583 tortoisehg/hgtk/hgtk.py:648
 msgid "(No help text available)"
-msgstr ""
+msgstr "(Brak treści pomocy)"
 
 #: tortoisehg/hgtk/hgtk.py:672
 msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
@@ -9607,7 +9704,7 @@ msgstr "Data"
 #: tortoisehg/hgtk/history.py:101 tortoisehg/hgtk/history.py:105
 #: tortoisehg/hgtk/history.py:493
 msgid "File Patterns"
-msgstr ""
+msgstr "Wzorce plików"
 
 #: tortoisehg/hgtk/history.py:158
 msgid "Branches..."
@@ -9699,7 +9796,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:376
 msgid "Identify"
-msgstr ""
+msgstr "Identyfikuj"
 
 #: tortoisehg/hgtk/history.py:378
 msgid "Pending"
@@ -9970,7 +10067,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1231
 msgid "no Merges"
-msgstr ""
+msgstr "brak Scanelń"
 
 #: tortoisehg/hgtk/history.py:1250
 #, python-format
@@ -10215,19 +10312,19 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1851
 msgid "No incoming changesets"
-msgstr ""
+msgstr "Brak przychodzących zestawów zmian"
 
 #: tortoisehg/hgtk/history.py:1855
 msgid "Checking incoming changesets..."
-msgstr ""
+msgstr "Sprawdzanie przychodzących zestawów zmian..."
 
 #: tortoisehg/hgtk/history.py:1874
 msgid "Accept incoming previewed changesets"
-msgstr ""
+msgstr "Akceptuj przychodzące zestawy zmian"
 
 #: tortoisehg/hgtk/history.py:1880
 msgid "Reject incoming previewed changesets"
-msgstr ""
+msgstr "Odrzuć przychodzące zestawy zmian"
 
 #: tortoisehg/hgtk/history.py:1923
 msgid "Bundle Preview"
@@ -10251,7 +10348,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1978
 msgid "Finished pull"
-msgstr ""
+msgstr "Pociągnięcie zakończone"
 
 #: tortoisehg/hgtk/history.py:1980
 msgid "No changesets to pull"
@@ -10271,7 +10368,7 @@ msgstr "Anulowane wychodzące"
 
 #: tortoisehg/hgtk/history.py:2028
 msgid "Checking outgoing changesets..."
-msgstr ""
+msgstr "Sprawdzanie wychodzących zestawów zmian..."
 
 #: tortoisehg/hgtk/history.py:2037 tortoisehg/hgtk/synch.py:505
 msgid "No repository selected"
@@ -10920,11 +11017,11 @@ msgstr "odśwież"
 
 #: tortoisehg/hgtk/status.py:277 tortoisehg/hgtk/thgmq.py:213
 msgid "st"
-msgstr ""
+msgstr "st"
 
 #: tortoisehg/hgtk/status.py:285
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: tortoisehg/hgtk/status.py:307
 msgid "View"
@@ -11563,7 +11660,7 @@ msgstr ""
 msgid "Font used in command output window. Default: monospace 10"
 msgstr ""
 
-#: tortoisehg/hgtk/thgconfig.py:333
+#: tortoisehg/hgqt/settings.py:770 tortoisehg/hgtk/thgconfig.py:333
 msgid "Mandatory Issue Reference"
 msgstr ""
 
@@ -11657,7 +11754,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgconfig.py:987
 msgid "_Test"
-msgstr ""
+msgstr "_Test"
 
 #: tortoisehg/hgtk/thgconfig.py:991
 msgid "Set as _default"
@@ -12510,15 +12607,15 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Synchronize with remote repository"
-msgstr ""
+msgstr "Synchronizuj ze zdalnym repozytorium"
 
 #: tortoisehg/util/menuthg.py:56
 msgid "Start web server for this repository"
-msgstr ""
+msgstr "Uruchom serwer dla tego repozytorium"
 
 #: tortoisehg/util/menuthg.py:59
 msgid "Update working directory"
-msgstr ""
+msgstr "Aktualizuj katalog roboczy"
 
 #: tortoisehg/util/menuthg.py:61
 msgid "Update Icons"
