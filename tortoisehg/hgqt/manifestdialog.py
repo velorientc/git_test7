@@ -199,8 +199,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               self.vdifflocal),
             ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
               _('View file as it appeared at this revision'), self.editfile),
+            ('open', _('Open at Revision'), '', 'Alt+Ctrl+O',
+              _('Open file as it appeared at this revision'), self.openfile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
+            ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
+              _('Edit current file in working copy'), self.openlocal),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
@@ -253,7 +257,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if dlg:
             dlg.exec_()
 
-    def editfile(self):
+    def editfile(self, editor=None):
         if self.path is None:
             return
         if self.rev is None:
@@ -266,11 +270,29 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
 
-    def editlocal(self):
+    def openfile(self, editor=None):
+        if self.path is None:
+            return
+        if self.rev is None:
+            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                            parent=self)
+        else:
+            base, _ = visdiff.snapshot(self._repo,
+                                       [hglib.fromunicode(self.path)],
+                                       self._repo[self.rev])
+            files = [os.path.join(base, hglib.fromunicode(self.path))]
+            qtlib.editfiles(self._repo, files, parent=self)
+
+    def editlocal(self, editor=None):
         if self.path is None:
             return
         qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
                         parent=self)
+
+    def openlocal(self):
+        if self.path is None:
+            return
+        qtlib.openfiles(self.repo, [hglib.fromunicode(self.path)])
 
     def revertfile(self):
         if self.path is None:
