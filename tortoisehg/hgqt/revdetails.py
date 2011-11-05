@@ -439,8 +439,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', 'edit', 'save', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']
+            actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
+                            'ledit', None, 'revert', None,
+                            'navigate', 'diffnavigate']
 
         if not contextmenu:
             contextmenu = QMenu(self)
