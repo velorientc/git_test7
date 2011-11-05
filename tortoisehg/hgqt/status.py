@@ -338,6 +338,8 @@ class StatusWidget(QWidget):
         elif status == 'S':
             self.linkActivated.emit(
                 u'subrepo:' + hglib.tounicode(self.repo.wjoin(path)))
+        elif status in 'C?':
+            qtlib.editfiles(self.repo, [path])
 
     @pyqtSlot(QString)
     def setFilter(self, match):

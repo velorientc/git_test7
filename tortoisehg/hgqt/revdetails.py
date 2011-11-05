@@ -424,9 +424,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         model = self.filelist.model()
-        itemissubrepo = (model.dataFromIndex(index)['status'] == 'S')
+        itemstatus = model.dataFromIndex(index)['status']
+        itemissubrepo = (itemstatus == 'S')
         if itemissubrepo:
             self.opensubrepo()
+        elif itemstatus == 'C':
+            self.editfile()
         else:
             self.vdiff()
 

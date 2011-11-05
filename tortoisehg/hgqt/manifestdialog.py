@@ -353,7 +353,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if itemissubrepo:
             self.opensubrepo()
         else:
-            self.vdiff()
+            if self._treemodel.fileStatus(index) in 'C?':
+                self.editfile()
+            else:
+                self.vdiff()
 
     def menuRequest(self, point):
         selmodel = self._treeview.selectionModel()
