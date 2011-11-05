@@ -496,6 +496,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.refresh()
 
     @pyqtSlot()
+    def refreshWctx(self):
+        'User has requested a working context refresh'
+        self.stwidget.refreshWctx() # Trigger reload of working context
+
+    @pyqtSlot()
     def reload(self):
         'User has requested a reload'
         self.repo.thginvalidate()

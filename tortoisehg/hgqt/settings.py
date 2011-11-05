@@ -603,6 +603,22 @@ INFO = (
          'environment variables are set to a non-English language. '
          'This setting is used by the Merge, Tag and Backout dialogs. '
          'Default: False')),
+    _fi(_('Monitor working<br>directory changes'),
+        'tortoisehg.refreshwdstatus',
+        (genDefaultCombo,
+        ['auto', 'always', 'alwayslocal']),
+        _('Select when the working directory status list will be refreshed:<br>'
+        '- <b>auto</b>: [<i>default</i>] let TortoiseHg decide when to refresh the working '
+        'directory status list.<br>'
+        'TortoiseHg will refresh the status list whenever it performs an action '
+        'that may potentially modify the working directory. <i>This may miss '
+        'any changes that happen outside of TortoiseHg\'s control;</i><br>'
+        '- <b>always</b>: in addition to the automatic updates above, also '
+        'refresh the status list whenever the user clicks on the "working dir '
+        'revision" or on the "Commit icon" on the workbench task bar;<br>'
+        '- <b>alwayslocal</b>: same as "<b>always</b>" but restricts forced '
+        'refreshes to <i>local repos</i>.<br>'
+        'Default: auto')),
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
