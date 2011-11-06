@@ -328,7 +328,7 @@ class HgRepoViewStyle(QStyle):
             # Drop indicators should be painted using the full viewport width
             vp = widget.viewport().rect()
             painter.drawRect(vp.x(), option.rect.y(),
-                             vp.width() - 1, option.rect.height())
+                             vp.width() - 1, 0.5)
         else:
             self._style.drawPrimitive(element, option, painter, widget)
     # Delegate all other methods overridden by QProxyStyle to the base class

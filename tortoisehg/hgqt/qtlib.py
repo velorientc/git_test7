@@ -88,7 +88,18 @@ def openlocalurl(path):
         qurl = QUrl.fromLocalFile(path)
     return QDesktopServices.openUrl(qurl)
 
-def editfiles(repo, files, lineno=None, search=None, parent=None):
+def openfiles(repo, files, parent=None):
+    if os.name == 'nt':
+        editor = 'start'
+    elif os.name == 'mac':
+        editor = 'open'
+    elif os.name == 'posix':
+        editor = 'xdg-open'
+    else:
+        editor = None
+    editfiles(repo, files, editor=editor)
+
+def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
     if len(files) == 1:
         path = repo.wjoin(files[0])
         cwd = os.path.dirname(path)
@@ -98,6 +109,8 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     files = [util.shellquote(util.localpath(f)) for f in files]
     editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
+    if not editor:
+        editor = repo.ui.config('tortoisehg', 'editor')
     if editor:
         try:
             regexp = re.compile('\[([^\]]*)\]')

@@ -40,6 +40,7 @@ class WctxActions(QObject):
         make(_('&Visual Diff'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
+        make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+O')
         make(_('Copy path'), copyPath, frozenset('MARC?!I'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
@@ -211,6 +212,9 @@ def vdiff(parent, ui, repo, files):
 
 def edit(parent, ui, repo, files, lineno=None, search=None):
     qtlib.editfiles(repo, files, lineno, search, parent)
+
+def openfile(parent, ui, repo, files):
+    qtlib.openfiles(repo, files, parent)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])

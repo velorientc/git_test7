@@ -238,6 +238,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
               _('Save file as it appeared at this revision'), self.savefile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
+            ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
+              _('Edit current file in working copy'), self.openlocal),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
@@ -367,6 +369,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             return
         qtlib.editfiles(self.repo, filenames, parent=self)
 
+    def openlocal(self):
+        filenames = self.filelist.getSelectedFiles()
+        if not filenames:
+            return
+        qtlib.openfiles(self.repo, filenames)
+
     def revertfile(self):
         fileSelection = self.filelist.getSelectedFiles()
         if len(fileSelection) == 0:
@@ -416,9 +424,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         model = self.filelist.model()
-        itemissubrepo = (model.dataFromIndex(index)['status'] == 'S')
+        itemstatus = model.dataFromIndex(index)['status']
+        itemissubrepo = (itemstatus == 'S')
         if itemissubrepo:
             self.opensubrepo()
+        elif itemstatus == 'C':
+            self.editfile()
         else:
             self.vdiff()
 
@@ -439,8 +450,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', 'edit', 'save', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']
+            actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
+                            'ledit', 'lopen', None, 'revert', None,
+                            'navigate', 'diffnavigate']
 
         if not contextmenu:
             contextmenu = QMenu(self)
