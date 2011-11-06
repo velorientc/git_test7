@@ -522,5 +522,16 @@ class CloneDialog(QDialog):
             self.startrev_chk.setDisabled(True)
             self.startrev_text.setDisabled(True)
 
+    def accept(self):
+        if self.cmd.core.running():
+            return
+        QDialog.accept(self)
+
+    def reject(self):
+        if self.cmd.core.running():
+            self.cmd.cancel()
+            return
+        QDialog.reject(self)
+
 def run(ui, *pats, **opts):
     return CloneDialog(pats, opts)
