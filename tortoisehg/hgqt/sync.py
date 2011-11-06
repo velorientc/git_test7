@@ -694,7 +694,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cururl = self.currentUrl(False)
         if not cururl:
             qtlib.InfoMsgBox(_('No URL selected'),
-                    _('An URL must be selected for this operation.'),
+                    _('No URL has been configured for this repository.'),
                     parent=self)
             return
 
