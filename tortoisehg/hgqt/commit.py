@@ -1099,7 +1099,7 @@ class CommitDialog(QDialog):
         toplayout = QVBoxLayout()
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
-        
+
         commit = CommitWidget(repo, pats, opts, False, self)
         toplayout.addWidget(commit, 1)
 
