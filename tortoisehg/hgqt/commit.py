@@ -122,7 +122,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
                 qtlib.ErrorMsgBox(_('Issue Tracker'),
                                   _('Failed to load issue tracker \'%s\': %s'
-                                    % (tracker, e)),
+                                    % (tracker, hglib.tounicode(str(e))),
                                   parent=self)
                 self.bugtraq = None
             else:
