@@ -89,15 +89,8 @@ def openlocalurl(path):
     return QDesktopServices.openUrl(qurl)
 
 def openfiles(repo, files, parent=None):
-    if os.name == 'nt':
-        editor = 'start'
-    elif os.name == 'mac':
-        editor = 'open'
-    elif os.name == 'posix':
-        editor = 'xdg-open'
-    else:
-        editor = None
-    editfiles(repo, files, editor=editor)
+    for filename in files:
+        openlocalurl(repo.wjoin(filename))
 
 def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
     if len(files) == 1:
