@@ -347,6 +347,7 @@ class RepoWidget(QWidget):
         cw.loadSettings(QSettings(), 'workbench')
 
         cw.output.connect(self.output)
+        cw.output.connect(self._showOutputOnInfoBar)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
         cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
