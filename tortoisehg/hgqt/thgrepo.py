@@ -568,6 +568,12 @@ def _extendrepo(repo):
 
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
+        def sub(self, path):
+            srepo = super(thgchangectx, self).sub(path)
+            if isinstance(srepo, subrepo.hgsubrepo):
+                srepo._repo.__class__ = _extendrepo(srepo._repo)
+            return srepo
+
         def thgtags(self):
             '''Returns all unhidden tags for self'''
             htlist = self._repo._thghiddentags
