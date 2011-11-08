@@ -89,7 +89,7 @@ def snapshot(repo, files, ctx):
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
     if not os.path.exists(base):
-        os.mkdir(base)
+        os.makedirs(base)
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
