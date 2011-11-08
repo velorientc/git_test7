@@ -188,6 +188,8 @@ class ChunksWidget(QWidget):
                                           eolmode=eolmode)
                 if updatestate:
                     cmdutil.updatedir(repo.ui, repo, pfiles)
+            except ValueError:
+                ret = -1
             if ret < 0:
                 ok = False
                 self.showMessage.emit(_('Patch failed to apply'))
