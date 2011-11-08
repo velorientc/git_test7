@@ -49,7 +49,7 @@ class WctxActions(QObject):
         make(_('Open terminal in subrepository'), terminal, frozenset('S'),
             'utilities-terminal', 'ALT+CTRL+T')
         allactions.append(None)
-        make(_('Copy path'), copyPath, frozenset('MARC?!I'), '')
+        make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
         make(_('&Revert...'), revert, frozenset('MAR!'), 'hg-revert')
