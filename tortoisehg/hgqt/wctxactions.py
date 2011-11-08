@@ -41,6 +41,14 @@ class WctxActions(QObject):
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
         make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+O')
+        allactions.append(None)
+        make(_('Open subrepository'), opensubrepo, frozenset('S'),
+            'thg-repository-open', 'ALT+CTRL+O')
+        make(_('Explore subrepository'), explore, frozenset('S'),
+            'system-file-manager', 'ALT+CTRL+E')
+        make(_('Open terminal in subrepository'), terminal, frozenset('S'),
+            'utilities-terminal', 'ALT+CTRL+T')
+        allactions.append(None)
         make(_('Copy path'), copyPath, frozenset('MARC?!I'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
@@ -215,6 +223,25 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
 
 def openfile(parent, ui, repo, files):
     qtlib.openfiles(repo, files, parent)
+
+def opensubrepo(parent, ui, repo, files):
+    for filename in files:
+        path = os.path.join(repo.root, files[0])
+        if os.path.isdir(path):
+            parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+
+def explore(parent, ui, repo, files):
+    qtlib.openfiles(repo, files, parent)
+
+def terminal(parent, ui, repo, files):
+    for filename in files:
+        root = repo.wjoin(filename)
+        if os.path.isdir(root):
+            qtlib.openshell(root, filename)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])
