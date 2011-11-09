@@ -221,8 +221,12 @@ class RepoItem(RepoTreeItem):
             spath2 = spath2.lower()
 
         if cpath and spath2.startswith(cpath):
-            iShortPathStart = len(cpath) + 1
+            iShortPathStart = len(cpath)
             spath = spath[iShortPathStart:]
+            if spath and spath[0] in '/\\':
+                # do not show a slash at the beginning of the short path
+                spath = spath[1:]
+
         return hglib.tounicode(spath)
 
     def menulist(self):
