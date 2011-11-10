@@ -820,7 +820,7 @@ class RepoWidget(QWidget):
             if 'qtip' in ctx.tags():
                 qgoto = False
         if qgoto:
-            self.qgotoRevision()
+            self.qgotoSelectedRevision()
         else:
             self.visualDiffRevision()
 
@@ -1200,7 +1200,7 @@ class RepoWidget(QWidget):
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modify history'))
             entry(submenu, 'mq', qgoto, _('Unapply patch (QGoto parent)'), 'hg-qgoto',
-                  self.qgotoRevision)
+                  self.qgotoParentRevision)
             entry(submenu, 'mq', fixed, _('Import to MQ'), 'qimport',
                   self.qimportRevision)
             entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
@@ -1375,7 +1375,7 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         acts = []
         for name, cb, icon in (
-            (_('Apply patch (QGoto)'), self.qgotoRevision, 'hg-qgoto'),
+            (_('Apply patch (QGoto)'), self.qgotoSelectedRevision, 'hg-qgoto'),
             (_('QPush --move'), self.qpushMoveRevision, 'hg-qpush'),
             (_('Fold patches...'), qfoldact, 'hg-qfold'),
             (_('Delete patches...'), qdeleteact, 'hg-qdelete'),
@@ -1771,12 +1771,22 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(cmdline)
 
-    def qgotoRevision(self):
+    def qgotoParentRevision(self):
+        """Apply an unapplied patch, or qgoto the parent of an applied patch"""
+        self.qgotoRevision(self.rev, unapplySelected=True)
+
+    def qgotoSelectedRevision(self):
+        self.qgotoRevision(self.rev, unapplySelected=False)
+
+    def qgotoRevision(self, rev, unapplySelected=True):
         """Make REV the top applied patch"""
+        # If unapplySelected is true and rev is an applied patch
+        # it will be unapplied (qgoto its parent)
+        # Otherwise, qgoto the selected revision
         def qpopAll(repo):
             cmdline = ['qpop', '--all', '--repository', repo.root]
-            self.runCommand(cmdline
-            )
+            self.runCommand(cmdline)
+
         ctx = self.repo.changectx(self.rev)
         if 'qparent'in ctx.tags():
             return qpopAll(self.repo)
@@ -1787,14 +1797,17 @@ class RepoWidget(QWidget):
             applied = True
             mqpatch = False
 
-        if mqpatch and applied and 'qparent' in ctx.p1().tags():
+        if unapplySelected and mqpatch and applied and 'qparent' in ctx.p1().tags():
             return qpopAll(self.repo)
 
         if not applied:
             patchname = self.repo.changectx(self.rev).thgmqpatchname()
         else:
-            thgp1 = self.repo.changectx(self.repo.changectx(self.rev).p1().node())
-            patchname = thgp1.thgmqpatchname()
+            if unapplySelected:
+                thgp = self.repo.changectx(self.repo.changectx(self.rev).p1().node())
+            else:
+                thgp = self.repo.changectx(self.repo.changectx(self.rev).node())
+            patchname = thgp.thgmqpatchname()
         self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
         self.mqDemand.forward('qgotoRevision', patchname)
 
