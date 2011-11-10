@@ -8,19 +8,19 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-07 11:02-0200\n"
-"PO-Revision-Date: 2011-10-30 07:42+0000\n"
+"PO-Revision-Date: 2011-11-10 04:13+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-11-07 13:41+0000\n"
-"X-Generator: Launchpad (build 14231)\n"
+"X-Launchpad-Export-Date: 2011-11-10 05:02+0000\n"
+"X-Generator: Launchpad (build 14263)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
-msgstr "TortoiseHg Overlay Icon Server"
+msgstr ""
 
 #: TortoiseHgOverlayServer.py:162
 msgid "Exit"
@@ -285,7 +285,7 @@ msgstr "沒有標頭,backout操作將建立一個新的標頭!"
 
 #: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
-msgstr "目前本地修訂版"
+msgstr "目前的本地工作目錄所在的修訂版"
 
 #: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
@@ -339,7 +339,7 @@ msgstr "在可能情況下自動解決合併衝突"
 
 #: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
-msgstr "<b>沒有被提交的本地變更被偵測到了</b>"
+msgstr "<b>偵測到有未提交的本地工作目錄變更</b>"
 
 #: tortoisehg/hgqt/backout.py:278 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
@@ -682,7 +682,7 @@ msgstr "使用外部diff工具來觀看檔案變更"
 #: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:204
 #: tortoisehg/hgqt/revdetails.py:239
 msgid "Edit Local"
-msgstr "本地編輯"
+msgstr "編輯本地工作複本"
 
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:205
 #: tortoisehg/hgqt/manifestdialog.py:207 tortoisehg/hgqt/revdetails.py:240
@@ -1545,7 +1545,7 @@ msgstr "視覺化 diff ..."
 #: tortoisehg/hgqt/filedialogs.py:199 tortoisehg/hgqt/filedialogs.py:675
 #: tortoisehg/hgqt/repowidget.py:1162
 msgid "Diff to local..."
-msgstr "Diff 到本地..."
+msgstr "跟本地工作複本做Diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:679
 msgid "Visual diff file..."
@@ -1553,7 +1553,7 @@ msgstr "視覺化diff檔案..."
 
 #: tortoisehg/hgqt/filedialogs.py:206 tortoisehg/hgqt/filedialogs.py:682
 msgid "Diff file to local..."
-msgstr "Diff檔案到本地..."
+msgstr "跟本地工作複本檔案做Diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:686
 msgid "View at revision..."
@@ -1561,7 +1561,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:689
 msgid "Edit local"
-msgstr "本地編輯"
+msgstr "編輯本地工作複本"
 
 #: tortoisehg/hgqt/filedialogs.py:216 tortoisehg/hgqt/filedialogs.py:692
 msgid "Revert to revision..."
@@ -2132,7 +2132,7 @@ msgstr ""
 msgid ""
 "TortoiseHg has created a new .hgignore file.  Would you like to add this "
 "file to the source code control repository?"
-msgstr ""
+msgstr "TortoiseHg 建立了一個新的.hgignore 檔案,你要把他加到儲存庫嗎?"
 
 #: tortoisehg/hgqt/hgignore.py:299 tortoisehg/hgtk/hgignore.py:261
 msgid "Unable to write .hgignore file"
@@ -2294,7 +2294,7 @@ msgstr "比對選擇的檔案的修訂版"
 
 #: tortoisehg/hgqt/manifestdialog.py:197 tortoisehg/hgqt/revdetails.py:232
 msgid "Visual Diff to Local"
-msgstr "視覺化Diff到本地"
+msgstr "用視覺化Diff工具,跟本地工作複本做Diff ..."
 
 #: tortoisehg/hgqt/manifestdialog.py:198 tortoisehg/hgqt/revdetails.py:233
 msgid "View changes to current in external diff tool"
@@ -2318,7 +2318,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/manifestdialog.py:206 tortoisehg/hgqt/revdetails.py:241
 msgid "Open Local"
-msgstr ""
+msgstr "開啟本地工作複本"
 
 #: tortoisehg/hgqt/manifestdialog.py:211 tortoisehg/hgqt/revdetails.py:246
 msgid "Open subrepository"
@@ -4123,7 +4123,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1167
 msgid "Merge with local..."
-msgstr ""
+msgstr "跟本地工作目錄做合併..."
 
 #: tortoisehg/hgqt/repowidget.py:1170
 msgid "Tag..."
@@ -4437,11 +4437,11 @@ msgstr "使用選擇的合併工具來合併"
 
 #: tortoisehg/hgqt/resolve.py:97
 msgid "Take Local"
-msgstr "取用本地的"
+msgstr "取用本地工作複本的"
 
 #: tortoisehg/hgqt/resolve.py:98
 msgid "Accept the local file version (yours)"
-msgstr "接受本地檔案版本(你的)"
+msgstr "接受本地工作複本的檔案版本(你的)"
 
 #: tortoisehg/hgqt/resolve.py:100
 msgid "Take Other"
@@ -4477,7 +4477,7 @@ msgstr "視覺化 3-Way diff"
 
 #: tortoisehg/hgqt/resolve.py:134 tortoisehg/hgtk/history.py:1271
 msgid "Diff to Local"
-msgstr "Diff到本地"
+msgstr "跟本地工作複本做Diff"
 
 #: tortoisehg/hgqt/resolve.py:135
 msgid "Visual diff between resolved file and first parent"
@@ -6174,7 +6174,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:743 tortoisehg/hgtk/thgconfig.py:287
 msgid "Ignore White Space"
-msgstr ""
+msgstr "忽略空白"
 
 #: tortoisehg/hgqt/settings.py:744 tortoisehg/hgtk/thgconfig.py:288
 msgid "Ignore white space when comparing lines. Default: False"
@@ -6833,12 +6833,12 @@ msgstr "已刪除"
 #: tortoisehg/hgqt/status.py:826
 #, python-format
 msgid "%s is ignored"
-msgstr ""
+msgstr "%s 被忽略"
 
 #: tortoisehg/hgqt/status.py:827 tortoisehg/hgtk/quickop.py:179
 #: tortoisehg/hgtk/quickop.py:255
 msgid "ignored"
-msgstr ""
+msgstr "被忽略的"
 
 #: tortoisehg/hgqt/status.py:828
 #, python-format
@@ -7541,7 +7541,7 @@ msgstr "選項:"
 
 #: tortoisehg/hgqt/thgstrip.py:87 tortoisehg/hgtk/thgstrip.py:89
 msgid "Discard local changes, no backup (-f/--force)"
-msgstr "放棄本地變更,不備份(-f/--force)"
+msgstr "放棄本地工作目錄的變更,不備份(-f/--force)"
 
 #: tortoisehg/hgqt/thgstrip.py:88 tortoisehg/hgtk/thgstrip.py:114
 msgid "No backup (-n/--nobackup)"
@@ -7567,7 +7567,7 @@ msgstr "未知的修訂版!"
 
 #: tortoisehg/hgqt/thgstrip.py:204
 msgid "Detected uncommitted local changes."
-msgstr "偵測沒有提交的本地變更"
+msgstr "偵測沒有提交的本地作目錄變更"
 
 #: tortoisehg/hgqt/thgstrip.py:205
 msgid "Do you want to discard them and continue?"
@@ -7721,7 +7721,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:100 tortoisehg/hgtk/update.py:98
 msgid "Discard local changes, no backup (-C/--clean)"
-msgstr "放棄本地變更,不備份(-C/--clean)"
+msgstr "放棄本地工作目錄變更,不備份(-C/--clean)"
 
 #: tortoisehg/hgqt/update.py:102 tortoisehg/hgtk/update.py:104
 msgid "Always merge (when possible)"
@@ -7756,7 +7756,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:261 tortoisehg/hgtk/update.py:234
 msgid "Discard - discard local changes, no backup"
-msgstr "放棄本地變更,不備份"
+msgstr "放棄本地工作目錄變更,不備份"
 
 #: tortoisehg/hgqt/update.py:262 tortoisehg/hgtk/update.py:235
 msgid "&Shelve"
@@ -7768,7 +7768,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:265 tortoisehg/hgtk/update.py:238
 msgid "Merge - allow to merge with local changes"
-msgstr ""
+msgstr "合併 - 允許跟本地工作目錄變更作合併"
 
 #: tortoisehg/hgqt/update.py:273 tortoisehg/hgtk/update.py:251
 msgid "Confirm Update"
@@ -7910,7 +7910,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/wctxactions.py:61
 msgid "&Ignore..."
-msgstr ""
+msgstr "(&l)忽略"
 
 #: tortoisehg/hgqt/wctxactions.py:62 tortoisehg/hgtk/status.py:1257
 msgid "Remove versioned"
@@ -7918,7 +7918,7 @@ msgstr "移除版本"
 
 #: tortoisehg/hgqt/wctxactions.py:63
 msgid "&Delete unversioned..."
-msgstr ""
+msgstr "(&D)刪除未受版本控管的檔案..."
 
 #: tortoisehg/hgqt/wctxactions.py:65 tortoisehg/hgtk/status.py:1265
 msgid "Mark unresolved"
@@ -7996,11 +7996,11 @@ msgstr "放棄變更(&D)"
 
 #: tortoisehg/hgqt/wctxactions.py:336
 msgid "Confirm Delete Unversioned"
-msgstr "確認刪除沒有受版本控管的"
+msgstr "確認刪除沒有受版本控管的檔案"
 
 #: tortoisehg/hgqt/wctxactions.py:337
 msgid "Delete the following unversioned files?"
-msgstr ""
+msgstr "刪除下列未受版本控管的檔案嗎?"
 
 #: tortoisehg/hgqt/wctxactions.py:349 tortoisehg/hgtk/statusact.py:40
 msgid "Copy file to"
@@ -8587,7 +8587,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:480
 msgid "Diff to _local"
-msgstr ""
+msgstr "(_l)與本地工作複本做Diff"
 
 #: tortoisehg/hgtk/changeset.py:482
 msgid "_View at Revision"
@@ -10758,7 +10758,7 @@ msgstr "不能合併"
 
 #: tortoisehg/hgtk/merge.py:211
 msgid "Uncommitted local changes"
-msgstr "未提交的本地變更"
+msgstr "未提交的本地工作目錄變更"
 
 #: tortoisehg/hgtk/merge.py:253
 msgid "Confirm undo merge"
@@ -11271,11 +11271,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/status.py:1256
 msgid "_Ignore"
-msgstr "忽略(_I)"
+msgstr "(_I)忽略"
 
 #: tortoisehg/hgtk/status.py:1258
 msgid "_Delete unversioned"
-msgstr "刪除未修訂版本(_D)"
+msgstr "(_D)刪除未受版本控管的檔案"
 
 #: tortoisehg/hgtk/status.py:1261
 msgid "_Copy..."
@@ -11382,7 +11382,7 @@ msgstr "顯示將推送到選擇的儲存庫的本地變更"
 
 #: tortoisehg/hgtk/synch.py:75
 msgid "Push local changes to selected repository"
-msgstr "推送本地變更到選擇的儲存庫"
+msgstr "推送本地工作目錄變更到選擇的儲存庫"
 
 #: tortoisehg/hgtk/synch.py:80
 msgid "Email local outgoing changes to one or more recipients"
@@ -12117,7 +12117,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:499
 msgid "Uncommitted Local Changes"
-msgstr "未提交的本地變更"
+msgstr "未提交的本地工作目錄變更"
 
 #: tortoisehg/hgtk/thgpbranch.py:500
 msgid ""

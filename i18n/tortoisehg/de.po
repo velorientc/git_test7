@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-07 11:02-0200\n"
-"PO-Revision-Date: 2011-11-07 12:58+0000\n"
+"PO-Revision-Date: 2011-11-09 18:47+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-11-07 13:41+0000\n"
-"X-Generator: Launchpad (build 14231)\n"
+"X-Launchpad-Export-Date: 2011-11-10 05:02+0000\n"
+"X-Generator: Launchpad (build 14263)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -107,7 +107,7 @@ msgstr "Zielpfad:"
 #: tortoisehg/hgtk/hginit.py:55 tortoisehg/hgtk/thgconfig.py:394
 #: tortoisehg/hgtk/thgimport.py:63
 msgid "Browse..."
-msgstr "Durchsuchen..."
+msgstr "Betrachten..."
 
 #: tortoisehg/hgqt/archive.py:65 tortoisehg/hgtk/archive.py:77
 msgid "Archive types:"
@@ -1156,6 +1156,10 @@ msgid ""
 "contain an issue link.  Configure this in the 'Issue Tracking' section of "
 "the settings."
 msgstr ""
+"Es gibt keinen Abweichungsverweis im  Übernahmekommentar. Der "
+"Übernahmekommentar sollte einen Verweis auf die Abweichung enthalten. Dies "
+"können Sie in den Einstellungen im Bereich \"Abweichungsverfolgung\" "
+"konfigurieren."
 
 #: tortoisehg/hgqt/commit.py:716
 msgid "No files checked"
@@ -2316,14 +2320,20 @@ msgid ""
 "repository, with older revisions available on the server.  Do you wish to "
 "add these files as largefiles?"
 msgstr ""
+"Einige der ausgewählten Dateien sind größer als 10 MiB. Durch die "
+"Kennzeichnung dieser Dateien als Großdateien können Sie den Platz "
+"effizienter nutzen, da auf diese Weise nur die jüngste Version dieser "
+"Dateien in Ihrem lokalen Archiv abgelegt wird, während die älteren "
+"Revisionen auf dem Server verbleiben. Wollen Sie diese Dateien als "
+"Großdateien hinzufügen?"
 
 #: tortoisehg/hgqt/lfprompt.py:23
 msgid "Add as &Largefiles"
-msgstr ""
+msgstr "Als &Großdateien hinzufügen"
 
 #: tortoisehg/hgqt/lfprompt.py:23 tortoisehg/hgqt/lfprompt.py:35
 msgid "Add as &Normal Files"
-msgstr ""
+msgstr "Als &normale Dateien hinzufügen"
 
 #: tortoisehg/hgqt/lfprompt.py:29
 msgid ""
@@ -2333,10 +2343,16 @@ msgid ""
 "repository, with older revisions available on the server.  Do you wish to "
 "add these files as bfiles?"
 msgstr ""
+"Einige der ausgewählten Dateien sind größer als 10 MiB. Durch die "
+"Kennzeichnung dieser Dateien als Binärdateien können Sie den Platz "
+"effizienter nutzen, da auf diese Weise nur die jüngste Version dieser "
+"Dateien in Ihrem lokalen Archiv abgelegt wird, während die älteren "
+"Revisionen auf dem Server verbleiben. Wollen Sie diese Dateien als "
+"Binärdateien hinzufügen?"
 
 #: tortoisehg/hgqt/lfprompt.py:35
 msgid "Add as &Bfiles"
-msgstr ""
+msgstr "Als &Binärdateien hinzufügen"
 
 #: tortoisehg/hgqt/license.py:29
 msgid "License"
@@ -2395,15 +2411,15 @@ msgstr "Datei in dem Zustand dieser Revision anzeigen"
 
 #: tortoisehg/hgqt/manifestdialog.py:202
 msgid "Open at Revision"
-msgstr ""
+msgstr "Bestimmte Revision öffnen"
 
 #: tortoisehg/hgqt/manifestdialog.py:203
 msgid "Open file as it appeared at this revision"
-msgstr ""
+msgstr "Datei so öffnen, wie sie in der Revision aussah"
 
 #: tortoisehg/hgqt/manifestdialog.py:206 tortoisehg/hgqt/revdetails.py:241
 msgid "Open Local"
-msgstr ""
+msgstr "Lokal öffnen"
 
 #: tortoisehg/hgqt/manifestdialog.py:211 tortoisehg/hgqt/revdetails.py:246
 msgid "Open subrepository"
@@ -3430,11 +3446,11 @@ msgstr "Entfernen der geänderten Dateien erzwingen (--force)"
 
 #: tortoisehg/hgqt/quickop.py:113
 msgid "Add &Largefiles"
-msgstr ""
+msgstr "&Großdateien hinzufügen"
 
 #: tortoisehg/hgqt/quickop.py:115 tortoisehg/hgqt/wctxactions.py:58
 msgid "Add &Bfiles"
-msgstr ""
+msgstr "&Binärdateien hinzufügen"
 
 #: tortoisehg/hgqt/quickop.py:157 tortoisehg/hgqt/quickop.py:228
 #: tortoisehg/hgtk/quickop.py:261
@@ -4307,7 +4323,7 @@ msgstr "Aktualisieren..."
 
 #: tortoisehg/hgqt/repowidget.py:1164
 msgid "Browse at rev..."
-msgstr "Betrachten in Revision..."
+msgstr "Bestimmte Revision betrachten..."
 
 #: tortoisehg/hgqt/repowidget.py:1167
 msgid "Merge with local..."
@@ -5767,7 +5783,7 @@ msgstr "Das Laden des Abweichungsverfolgers '%s' ist fehlgeschlagen: %s. "
 
 #: tortoisehg/hgqt/settings.py:334
 msgid "&Browse..."
-msgstr ""
+msgstr "&Betrachten..."
 
 #: tortoisehg/hgqt/settings.py:453 tortoisehg/hgtk/thgconfig.py:43
 msgid "UI Language"
@@ -6204,7 +6220,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:606
 msgid "Monitor working<br>directory changes"
-msgstr ""
+msgstr "Änderungen im<br/>Arbeitsverzeichnis überwachen"
 
 #: tortoisehg/hgqt/settings.py:610
 msgid ""
@@ -6219,6 +6235,18 @@ msgid ""
 "<b>alwayslocal</b>: same as \"<b>always</b>\" but restricts forced refreshes "
 "to <i>local repos</i>.<br>Default: auto"
 msgstr ""
+"Wählen Sie, wann die Statusliste des Arbeitsverzeichnisses aktualisiert "
+"wird:<br/>- <b>auto</b>: [<i>Vorgabe</i>] TortoiseHg entscheidet, wann die "
+"Arbeitsverzeichnis-Statusliste aktualisiert wird.<br/>TortoiseHg wird die "
+"Liste aktualisieren, sobald es Operationen ausführt, die das "
+"Arbeitsverzeichnis beeinflussen können. <i>Auf diese Weise werden alle "
+"Änderungen außerhalb der Reichweite von TortoiseHg übersehen;</i><br/>- "
+"<b>always</b>: ergänzend zu den automatischen Aktualisierungen wie oben wird "
+"die Statusliste auch aktualisiert, wenn der Benutzer auf die "
+"Arbeitsverzeichnis-Revision oder das Übernahmesymbol in der Werkbank-"
+"Statuszeile klickt;<br/>- <b>alwayslocal</b>: so wie \"<b>always</b>\", "
+"jedoch beschränkt auf die Aktualisierung <i>lokaler Archive.</i><br/>. "
+"Vorgabe: auto"
 
 #: tortoisehg/hgqt/settings.py:624 tortoisehg/hgtk/thgconfig.py:179
 #: tortoisehg/util/menuthg.py:55
@@ -6711,6 +6739,9 @@ msgid ""
 "enabled, the regex configured in 'Issue Regex' must find a match in the "
 "commit message."
 msgstr ""
+"Bei der Übernahme die Angabe einer Abweichung verlangen. Bei Aktivierung "
+"muss der reguläre Ausdruck in 'Abweichungsausdruck' im Übernahmekommentar "
+"enthalten sein."
 
 #: tortoisehg/hgqt/settings.py:790
 msgid "Issue Tracker Plugin"
@@ -6778,7 +6809,7 @@ msgstr "Eine kommagetrennte Liste von Zielpersonen"
 
 #: tortoisehg/hgqt/settings.py:815
 msgid "Kiln Bfiles"
-msgstr ""
+msgstr "binär eingebrannt"
 
 #: tortoisehg/hgqt/settings.py:816 tortoisehg/hgqt/settings.py:826
 #: tortoisehg/hgtk/hgignore.py:104
@@ -6790,45 +6821,55 @@ msgid ""
 "Files with names meeting the specified patterns will be automatically added "
 "as bfiles"
 msgstr ""
+"Dateien mit Namen entsprechend der angegebenen Muster werden automatisch als "
+"Binärdateien hinzugefügt"
 
 #: tortoisehg/hgqt/settings.py:819 tortoisehg/hgqt/settings.py:829
 msgid "Size"
-msgstr ""
+msgstr "Größe"
 
 #: tortoisehg/hgqt/settings.py:820
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as bfiles"
 msgstr ""
+"Dateien mit der angegebenen Mindestgröße (in MiB) werden als Binärdateien "
+"hinzugefügt"
 
 #: tortoisehg/hgqt/settings.py:821 tortoisehg/hgqt/settings.py:831
 msgid "System Cache"
-msgstr ""
+msgstr "Sytemcache"
 
 #: tortoisehg/hgqt/settings.py:822
 msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr ""
+"Verzeichnis, in dem ein systemweiter Cache von Binärdateien erstellt wird"
 
 #: tortoisehg/hgqt/settings.py:825
 msgid "Largefiles"
-msgstr ""
+msgstr "Großdateien"
 
 #: tortoisehg/hgqt/settings.py:827
 msgid ""
 "Files with names meeting the specified patterns will be automatically added "
 "as largefiles"
 msgstr ""
+"Dateien mit Namen entsprechend dem angegebenen Muster werden automatisch als "
+"Großdateien hinzugefügt"
 
 #: tortoisehg/hgqt/settings.py:830
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as "
 "largefiles"
 msgstr ""
+"Dateien mit der angegebenen Mindestgröße (in MiB) werden als Großdateien "
+"hinzugefügt"
 
 #: tortoisehg/hgqt/settings.py:832
 msgid ""
 "Path to the directory where a system-wide cache of largefiles will be stored"
 msgstr ""
+"Verzeichnis, in dem ein systemweiter Cache von Großdateien erstellt wird"
 
 #: tortoisehg/hgqt/settings.py:844
 msgid "TortoiseHg Settings"
@@ -7451,7 +7492,7 @@ msgstr "Es wurde keine URL ausgewählt"
 
 #: tortoisehg/hgqt/sync.py:697
 msgid "No URL has been configured for this repository."
-msgstr ""
+msgstr "Für dieses Archiv wurde keine URL hinterlegt."
 
 #: tortoisehg/hgqt/sync.py:712
 msgid "Redundant authentication info"
@@ -8392,7 +8433,7 @@ msgstr "&Vergessen"
 
 #: tortoisehg/hgqt/wctxactions.py:56
 msgid "Add &Largefiles..."
-msgstr ""
+msgstr "&Großdateien hinzufügen..."
 
 #: tortoisehg/hgqt/wctxactions.py:59
 msgid "&Detect Renames..."
@@ -11456,7 +11497,7 @@ msgstr "Server anhalten"
 
 #: tortoisehg/hgtk/serve.py:69
 msgid "Browse"
-msgstr "Durchsuchen"
+msgstr "Betrachten"
 
 #: tortoisehg/hgtk/serve.py:71
 msgid "Launch browser to view repository"
