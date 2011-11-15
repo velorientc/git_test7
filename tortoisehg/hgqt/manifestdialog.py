@@ -352,7 +352,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
         if itemissubrepo:
             self.opensubrepo()
-        else:
+        elif not self._treemodel.isDir(index):
             if self._treemodel.fileStatus(index) in 'C?':
                 self.editfile()
             else:
