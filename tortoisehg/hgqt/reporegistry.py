@@ -513,7 +513,25 @@ class RepoRegistryView(QDockWidget):
 
             root = os.path.normcase(os.path.normpath(root))
 
-            if sroot != root and root == paths.find_root(os.path.dirname(path)):
+            if not os.path.isdir(sroot):
+                qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('"%s" is not a folder' % sroot),
+                    parent=self)
+                return
+            elif sroot == root:
+                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('A repository cannot be added as a subrepo of itself'),
+                    parent=self)
+                 return
+            elif root != paths.find_root(os.path.dirname(path)):
+                qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('The selected folder:<br><br>%s<br><br>'
+                    'is not inside the target repository.<br><br>'
+                    'This may be allowed but is greatly discouraged.<br>'
+                    'If you want to add a non trivial subrepository mapping '
+                    'you must manually edit the <i>.hgsub</i> file') % root, parent=self)
+                return
+            else:
                 # The selected path is the root of a repository that is inside
                 # the selected repository
 
@@ -549,9 +567,10 @@ class RepoRegistryView(QDockWidget):
                             fsub.close()
                         except:
                             qtlib.WarningMsgBox(
-                                _('Failed to add repository'),
+                                _('Failed to add subrepository'),
                                 _('Cannot open the .hgsub file in:<br><br>%s') \
                                 % root, parent=self)
+                            return
 
                     # Make sure that the selected subrepo (or one of its
                     # subrepos!) is not already on the .hgsub file
