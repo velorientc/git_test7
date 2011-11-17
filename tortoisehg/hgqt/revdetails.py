@@ -240,6 +240,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
               _('Edit current file in working copy'), self.editlocal),
             ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
               _('Edit current file in working copy'), self.openlocal),
+            ('copypath', _('Copy Path'), '', 'Shift+Ctrl+C',
+              _('Copy full path of file(s) to the clipboard'),
+              self.copypath),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
@@ -375,6 +378,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             return
         qtlib.openfiles(self.repo, filenames)
 
+    def copypath(self):
+        absfiles = [util.localpath(self.repo.wjoin(hglib.fromunicode(f)))
+                    for f in self.filelist.getSelectedFiles()]
+        QApplication.clipboard().setText(os.linesep.join(absfiles))
+
     def revertfile(self):
         fileSelection = self.filelist.getSelectedFiles()
         if len(fileSelection) == 0:
@@ -451,7 +459,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
-                            'ledit', 'lopen', None, 'revert', None,
+                            'ledit', 'lopen', 'copypath', None, 'revert', None,
                             'navigate', 'diffnavigate']
 
         if not contextmenu:
