@@ -1113,6 +1113,7 @@ class RepoWidget(QWidget):
         self.unappacts[4].setEnabled(unapplied > 1)
         self.unappacts[5].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
+
     def generateSingleMenu(self, mode=None):
         items = []
         # This menu will never be opened for an unapplied patch, they
@@ -1225,6 +1226,7 @@ class RepoWidget(QWidget):
         else:
             self.singlecmenu = menu
             self.singlecmenuitems = items
+
     def generatePairMenu(self):
         def dagrange():
             revA, revB = self.menuselection
