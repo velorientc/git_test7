@@ -300,6 +300,9 @@ class Workbench(QMainWindow):
         newaction(_("Load all revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
+        newaction(_("&Goto revision..."), self.gotorev,
+                  enabled='repoopen', menu='view', shortcut='Ctrl+Shift+G',
+                  tooltip=_('Go to a specific revision'))
 
         newaction(_("Web Server..."), self.serve, enabled='repoopen',
                   menu='repository')
@@ -723,6 +726,14 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.repoview.model().loadall()
+
+    def gotorev(self):
+        rev, ok = QInputDialog.getText(self, "Goto revision",
+                                       "Enter revision identifier",
+                                       flags=Qt.WindowTitleHint)
+        w = self.repoTabsWidget.currentWidget()
+        if ok and w:
+            w.repoview.goto(rev)
 
     def newRepository(self):
         """ Run init dialog """
