@@ -139,7 +139,13 @@ if os.name == 'nt':
                 s = dirstatus[dn]
                 f.write(s + dn + '\n')
                 ui.note("%s %s\n" % (s, dn))
-            f.rename()
+            if hasattr(f, 'rename'):
+                # On Mercurial 1.9 and earlier, there was a rename() function
+                # that served the purpose now served by close(), while close()
+                # served the purpose now served by discard().
+                f.rename()
+            else:
+                f.close()
         return update
 
 else:
