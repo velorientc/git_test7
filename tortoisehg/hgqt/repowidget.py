@@ -1302,6 +1302,10 @@ class RepoWidget(QWidget):
             dlg = compress.CompressDialog(self.repo, revs, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
+        def gotoAncestor():
+            ctxa = self.repo[self.menuselection[0]]
+            ctxb = self.repo[self.menuselection[1]]
+            self.goto(ctxa.ancestor(ctxb).rev())
 
         menu = QMenu(self)
         for name, cb, icon in (
@@ -1317,7 +1321,9 @@ class RepoWidget(QWidget):
                 (None, None, None),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
-                (_('Compress History...'), compressDlg, 'hg-compress')
+                (_('Compress History...'), compressDlg, 'hg-compress'),
+                (None, None, None),
+                (_('Goto common ancestor'), gotoAncestor, 'hg-merge')
                 ):
             if name is None:
                 menu.addSeparator()
