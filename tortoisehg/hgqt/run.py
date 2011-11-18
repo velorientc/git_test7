@@ -1120,7 +1120,7 @@ table = {
            _('name of the hgweb config file (DEPRECATED)'))],
          _('thg serve [--web-conf FILE]')),
     "^sync|synchronize": (sync, [], _('thg sync')),
-    "^status": (status,
+    "^status|st": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
         _('thg status [OPTIONS] [FILE]')),
