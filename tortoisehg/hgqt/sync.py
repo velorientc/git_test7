@@ -92,10 +92,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.targetargs = []
 
         s = QSettings()
-        for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug'):
+        for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug', 'mq'):
             val = s.value('sync/' + opt, None).toBool()
             if val:
-                self.opts[opt] = val
+                if opt != 'mq' or 'mq' in self.repo.extensions():
+                    self.opts[opt] = val
         for opt in ('remotecmd', 'branch'):
             val = str(s.value('sync/' + opt, None).toString())
             if val:
@@ -719,7 +720,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
-        cmdline.append(cururl)
+        if not self.opts['mq']:
+            cmdline.append(cururl)
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
 
@@ -846,7 +848,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--update', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
-        self.run(cmdline, ('force', 'branch', 'rev', 'bookmark'))
+        elif self.opts['mq']:
+            # force the tool to update to the pulled changeset
+            cmdline += ['--update', '--config', uimerge]
+        self.run(cmdline, ('force', 'branch', 'rev', 'bookmark', 'mq'))
 
     def outclicked(self):
         self.syncStarted.emit()
@@ -923,7 +928,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None):
-        validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark')
+        validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark', 'mq')
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
@@ -1546,6 +1551,12 @@ class OptionsDialog(QDialog):
         self.debugcb.setChecked(opts.get('debug', False))
         layout.addWidget(self.debugcb)
 
+        if 'mq' in self.repo.extensions():
+            self.mqcb = QCheckBox(
+                _('Work on patch queue (--mq)'))
+            self.mqcb.setChecked(opts.get('mq', False))
+            layout.addWidget(self.mqcb)
+
         form = QFormLayout()
         layout.addLayout(form)
 
@@ -1579,6 +1590,8 @@ class OptionsDialog(QDialog):
         outopts['new-branch'] = self.newbranchcb.isChecked()
         outopts['noproxy'] = self.noproxycb.isChecked()
         outopts['debug'] = self.debugcb.isChecked()
+        if 'mq' in self.repo.extensions():
+            outopts['mq'] = self.mqcb.isChecked()
 
         self.outopts = outopts
         QDialog.accept(self)
