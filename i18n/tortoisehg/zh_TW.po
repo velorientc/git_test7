@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-11-07 11:02-0200\n"
-"PO-Revision-Date: 2011-11-10 04:13+0000\n"
+"POT-Creation-Date: 2011-11-18 10:47-0200\n"
+"PO-Revision-Date: 2011-11-21 11:04+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-11-10 05:02+0000\n"
-"X-Generator: Launchpad (build 14263)\n"
+"X-Launchpad-Export-Date: 2011-11-22 05:04+0000\n"
+"X-Generator: Launchpad (build 14299)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -157,12 +157,12 @@ msgstr "詳細(&D)"
 #: tortoisehg/hgqt/compress.py:150 tortoisehg/hgqt/lfprompt.py:23
 #: tortoisehg/hgqt/lfprompt.py:35 tortoisehg/hgqt/merge.py:100
 #: tortoisehg/hgqt/merge.py:235 tortoisehg/hgqt/merge.py:312
-#: tortoisehg/hgqt/quickop.py:179 tortoisehg/hgqt/rebase.py:231
-#: tortoisehg/hgqt/rebase.py:252 tortoisehg/hgqt/rename.py:110
+#: tortoisehg/hgqt/quickop.py:179 tortoisehg/hgqt/rebase.py:237
+#: tortoisehg/hgqt/rebase.py:258 tortoisehg/hgqt/rename.py:110
 #: tortoisehg/hgqt/reporegistry.py:208 tortoisehg/hgqt/resolve.py:356
 #: tortoisehg/hgqt/settings.py:932 tortoisehg/hgqt/settings.py:1047
-#: tortoisehg/hgqt/wctxactions.py:236 tortoisehg/hgqt/wctxactions.py:249
-#: tortoisehg/hgqt/wctxactions.py:338 tortoisehg/hgtk/shellconf.py:28
+#: tortoisehg/hgqt/wctxactions.py:263 tortoisehg/hgqt/wctxactions.py:276
+#: tortoisehg/hgqt/wctxactions.py:365 tortoisehg/hgtk/shellconf.py:28
 #: tortoisehg/hgtk/thgshelve.py:163
 msgid "Cancel"
 msgstr "取消"
@@ -285,7 +285,7 @@ msgstr "沒有標頭,backout操作將建立一個新的標頭!"
 
 #: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
-msgstr "目前的本地工作目錄所在的修訂版"
+msgstr "目前的本地工作複本所在的修訂版"
 
 #: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
@@ -320,7 +320,7 @@ msgid "Working directory status"
 msgstr "工作目錄狀態"
 
 #: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
-#: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:110
+#: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:113
 msgid "Checking..."
 msgstr "檢查中..."
 
@@ -330,16 +330,18 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"backout之前,你必須 <a href=\"commit\"><b>提交</b></a>, <a "
+"href=\"shelve\"><b>shelve</b></a> 到補丁,或 <a href=\"discard\"><b>丟棄</b></a>變更"
 
 #: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:215
-#: tortoisehg/hgqt/rebase.py:73 tortoisehg/hgqt/sync.py:1077
+#: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1077
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
 msgstr "在可能情況下自動解決合併衝突"
 
 #: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
-msgstr "<b>偵測到有未提交的本地工作目錄變更</b>"
+msgstr "<b>偵測到有未提交的本地工作複本變更</b>"
 
 #: tortoisehg/hgqt/backout.py:278 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
@@ -347,25 +349,25 @@ msgstr "清除"
 
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:149
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
-#: tortoisehg/hgqt/rebase.py:230 tortoisehg/hgqt/settings.py:1047
+#: tortoisehg/hgqt/rebase.py:236 tortoisehg/hgqt/settings.py:1047
 #: tortoisehg/hgqt/update.py:260 tortoisehg/hgtk/thgconfig.py:775
 #: tortoisehg/hgtk/update.py:233
 msgid "&Discard"
 msgstr "丟棄(&D)"
 
 #: tortoisehg/hgqt/backout.py:301 tortoisehg/hgqt/compress.py:151
-#: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:232
+#: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:238
 msgid "Confirm Discard"
 msgstr "確認丟棄"
 
 #: tortoisehg/hgqt/backout.py:302 tortoisehg/hgqt/compress.py:152
-#: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:233
+#: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:239
 msgid "Discard outstanding changes to working directory?"
 msgstr ""
 
 #: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
-msgstr ""
+msgstr "正在backout,然後合併..."
 
 #: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
@@ -398,7 +400,7 @@ msgid "Parents"
 msgstr "母系"
 
 #: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
-#: tortoisehg/hgqt/repomodel.py:574 tortoisehg/hgqt/repomodel.py:576
+#: tortoisehg/hgqt/repomodel.py:587 tortoisehg/hgqt/repomodel.py:589
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:87
 msgid "Working Directory"
 msgstr "工作目錄"
@@ -483,7 +485,7 @@ msgid "Known good revision:"
 msgstr "已知的良好修訂版:"
 
 #: tortoisehg/hgqt/bisect.py:38 tortoisehg/hgqt/bisect.py:48
-#: tortoisehg/hgqt/repowidget.py:430 tortoisehg/hgtk/history.py:1875
+#: tortoisehg/hgqt/repowidget.py:431 tortoisehg/hgtk/history.py:1875
 msgid "Accept"
 msgstr "接受"
 
@@ -504,7 +506,7 @@ msgid "Skip this Revision"
 msgstr "跳過這一個修訂版"
 
 #: tortoisehg/hgqt/bisect.py:72 tortoisehg/hgqt/compress.py:138
-#: tortoisehg/hgqt/rebase.py:194 tortoisehg/hgtk/bugreport.py:48
+#: tortoisehg/hgqt/rebase.py:200 tortoisehg/hgtk/bugreport.py:48
 #: tortoisehg/hgtk/hgcmd.py:50 tortoisehg/hgtk/thgmq.py:142
 msgid "Close"
 msgstr "關閉"
@@ -529,7 +531,7 @@ msgstr "測試修訂版然後回報結果.  (良好/不良/跳過)"
 #: tortoisehg/hgqt/commit.py:780 tortoisehg/hgqt/commit.py:1047
 #: tortoisehg/hgqt/commit.py:1067 tortoisehg/hgqt/hgignore.py:257
 #: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:480
-#: tortoisehg/hgqt/wctxactions.py:173
+#: tortoisehg/hgqt/wctxactions.py:181
 #, python-format
 msgid "%s (hint: %s)"
 msgstr "%s(暗示: %s)"
@@ -543,8 +545,8 @@ msgid "New Name:"
 msgstr "新名稱:"
 
 #: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:734
-#: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:48
-#: tortoisehg/hgqt/wctxactions.py:54
+#: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:56
+#: tortoisehg/hgqt/wctxactions.py:62
 msgid "&Add"
 msgstr "加入 [&A]"
 
@@ -613,7 +615,7 @@ msgstr "選擇要合併的分支"
 
 #: tortoisehg/hgqt/branchop.py:41 tortoisehg/hgtk/commit.py:76
 msgid "Changes take effect on next commit"
-msgstr "變更將於下次提交時發生效用"
+msgstr "將於下次提交時生效"
 
 #: tortoisehg/hgqt/branchop.py:46 tortoisehg/hgtk/commit.py:59
 msgid "No branch changes"
@@ -691,61 +693,61 @@ msgid "Edit current file in working copy"
 msgstr "在工作副本編輯目前的檔案"
 
 #: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/manifestdialog.py:208
-#: tortoisehg/hgqt/revdetails.py:243
+#: tortoisehg/hgqt/revdetails.py:246
 msgid "Revert to Revision"
-msgstr "回復(revert)到修訂版"
+msgstr "Revert到修訂版"
 
 #: tortoisehg/hgqt/chunks.py:94 tortoisehg/hgqt/manifestdialog.py:209
-#: tortoisehg/hgqt/revdetails.py:244
+#: tortoisehg/hgqt/revdetails.py:247
 msgid "Revert file(s) to contents at this revision"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:193
+#: tortoisehg/hgqt/chunks.py:195
 msgid "Patch failed to apply"
 msgstr "套用補丁失敗"
 
-#: tortoisehg/hgqt/chunks.py:199 tortoisehg/hgqt/mq.py:245
+#: tortoisehg/hgqt/chunks.py:201 tortoisehg/hgqt/mq.py:245
 #: tortoisehg/hgqt/mq.py:750
 msgid "Manually resolve rejected chunks?"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:201
+#: tortoisehg/hgqt/chunks.py:203
 msgid "Edit patched file and rejects?"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:235
+#: tortoisehg/hgqt/chunks.py:237
 msgid "No deletable chunks"
 msgstr "沒有可刪除的區塊"
 
-#: tortoisehg/hgqt/chunks.py:239
+#: tortoisehg/hgqt/chunks.py:241
 msgid "No chunks remain"
 msgstr "沒有區塊剩下了"
 
-#: tortoisehg/hgqt/chunks.py:240
+#: tortoisehg/hgqt/chunks.py:242
 msgid "Remove all file changes?"
 msgstr "移除所有檔案更改?"
 
-#: tortoisehg/hgqt/chunks.py:273
+#: tortoisehg/hgqt/chunks.py:275
 msgid "file has been deleted, refresh"
 msgstr "檔案已經被刪除,刷新"
 
-#: tortoisehg/hgqt/chunks.py:276
+#: tortoisehg/hgqt/chunks.py:278
 msgid "file has been modified, refresh"
 msgstr "檔案已經被修改,刷新"
 
-#: tortoisehg/hgqt/chunks.py:310
+#: tortoisehg/hgqt/chunks.py:312
 msgid "Unable to merge chunks"
 msgstr "不能去合併區塊"
 
-#: tortoisehg/hgqt/chunks.py:311
+#: tortoisehg/hgqt/chunks.py:313
 msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:397
+#: tortoisehg/hgqt/chunks.py:399
 msgid "Unable to remove"
 msgstr "不能移除"
 
-#: tortoisehg/hgqt/chunks.py:398
+#: tortoisehg/hgqt/chunks.py:400
 #, python-format
 msgid ""
 "Unable to remove file %s,\n"
@@ -754,17 +756,17 @@ msgstr ""
 "不能移除 %s,\n"
 "權限不允許"
 
-#: tortoisehg/hgqt/chunks.py:534
+#: tortoisehg/hgqt/chunks.py:536
 msgctxt "files"
 msgid "All"
 msgstr "全部"
 
-#: tortoisehg/hgqt/chunks.py:539
+#: tortoisehg/hgqt/chunks.py:541
 msgctxt "files"
 msgid "None"
 msgstr ""
 
-#: tortoisehg/hgqt/chunks.py:595
+#: tortoisehg/hgqt/chunks.py:597
 #, python-format
 msgid "Chunks selected: %d / %d"
 msgstr "選擇區塊: %d/%d"
@@ -947,7 +949,7 @@ msgid "TortoiseHg Command Dialog"
 msgstr "TortoiseHg 命令對話框"
 
 #: tortoisehg/hgqt/cmdui.py:793 tortoisehg/hgqt/merge.py:101
-#: tortoisehg/hgqt/rebase.py:253 tortoisehg/hgqt/resolve.py:357
+#: tortoisehg/hgqt/rebase.py:259 tortoisehg/hgqt/resolve.py:357
 #: tortoisehg/hgqt/settings.py:929 tortoisehg/hgtk/commit.py:322
 #: tortoisehg/hgtk/merge.py:196 tortoisehg/hgtk/thgconfig.py:846
 msgid "Confirm Exit"
@@ -1529,21 +1531,21 @@ msgstr " <i>(不受版本控管)</i>"
 msgid "File History Log Columns"
 msgstr "檔案歷史紀錄欄位"
 
-#: tortoisehg/hgqt/filedialogs.py:166 tortoisehg/hgqt/workbench.py:343
+#: tortoisehg/hgqt/filedialogs.py:166 tortoisehg/hgqt/workbench.py:346
 msgid "Back"
 msgstr "上一個"
 
-#: tortoisehg/hgqt/filedialogs.py:168 tortoisehg/hgqt/workbench.py:346
+#: tortoisehg/hgqt/filedialogs.py:168 tortoisehg/hgqt/workbench.py:349
 msgid "Forward"
 msgstr "下一個"
 
 #: tortoisehg/hgqt/filedialogs.py:196 tortoisehg/hgqt/filedialogs.py:672
-#: tortoisehg/hgqt/repowidget.py:1160 tortoisehg/hgqt/repowidget.py:1424
+#: tortoisehg/hgqt/repowidget.py:1162 tortoisehg/hgqt/repowidget.py:1433
 msgid "Visual diff..."
 msgstr "視覺化 diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:199 tortoisehg/hgqt/filedialogs.py:675
-#: tortoisehg/hgqt/repowidget.py:1162
+#: tortoisehg/hgqt/repowidget.py:1164
 msgid "Diff to local..."
 msgstr "跟本地工作複本做Diff ..."
 
@@ -1565,7 +1567,7 @@ msgstr "編輯本地工作複本"
 
 #: tortoisehg/hgqt/filedialogs.py:216 tortoisehg/hgqt/filedialogs.py:692
 msgid "Revert to revision..."
-msgstr "回復(revert)到修訂版..."
+msgstr "Revert到修訂版..."
 
 #: tortoisehg/hgqt/filedialogs.py:363
 msgid "File Differences Log Columns"
@@ -2124,17 +2126,17 @@ msgstr "無效的正規表示式"
 msgid "Unable to read repository status"
 msgstr "不能讀取儲存庫狀態"
 
-#: tortoisehg/hgqt/hgignore.py:289
+#: tortoisehg/hgqt/hgignore.py:292
 msgid "New file created"
 msgstr ""
 
-#: tortoisehg/hgqt/hgignore.py:290
+#: tortoisehg/hgqt/hgignore.py:293
 msgid ""
 "TortoiseHg has created a new .hgignore file.  Would you like to add this "
 "file to the source code control repository?"
 msgstr "TortoiseHg 建立了一個新的.hgignore 檔案,你要把他加到儲存庫嗎?"
 
-#: tortoisehg/hgqt/hgignore.py:299 tortoisehg/hgtk/hgignore.py:261
+#: tortoisehg/hgqt/hgignore.py:302 tortoisehg/hgtk/hgignore.py:261
 msgid "Unable to write .hgignore file"
 msgstr "不能寫入.hgignore檔案"
 
@@ -2263,7 +2265,7 @@ msgid "Drag to change order"
 msgstr "用拖拉來改變順序"
 
 #: tortoisehg/hgqt/logcolumns.py:100 tortoisehg/hgqt/settings.py:520
-#: tortoisehg/hgqt/workbench.py:693 tortoisehg/util/menuthg.py:46
+#: tortoisehg/hgqt/workbench.py:696 tortoisehg/util/menuthg.py:46
 msgid "Workbench"
 msgstr "工作台"
 
@@ -2320,16 +2322,18 @@ msgstr ""
 msgid "Open Local"
 msgstr "開啟本地工作複本"
 
-#: tortoisehg/hgqt/manifestdialog.py:211 tortoisehg/hgqt/revdetails.py:246
+#: tortoisehg/hgqt/manifestdialog.py:211 tortoisehg/hgqt/revdetails.py:249
+#: tortoisehg/hgqt/wctxactions.py:45
 msgid "Open subrepository"
 msgstr "開啟子儲存庫"
 
-#: tortoisehg/hgqt/manifestdialog.py:212 tortoisehg/hgqt/revdetails.py:247
-#: tortoisehg/hgqt/revdetails.py:250
+#: tortoisehg/hgqt/manifestdialog.py:212 tortoisehg/hgqt/revdetails.py:250
+#: tortoisehg/hgqt/revdetails.py:253
 msgid "Open the selected subrepository"
 msgstr "開啟選擇的子儲存庫"
 
-#: tortoisehg/hgqt/manifestdialog.py:214 tortoisehg/hgqt/revdetails.py:249
+#: tortoisehg/hgqt/manifestdialog.py:214 tortoisehg/hgqt/revdetails.py:252
+#: tortoisehg/hgqt/wctxactions.py:47
 msgid "Explore subrepository"
 msgstr ""
 
@@ -2337,24 +2341,27 @@ msgstr ""
 msgid "Open the selected subrepository in a file browser"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:218 tortoisehg/hgqt/revdetails.py:252
+#: tortoisehg/hgqt/manifestdialog.py:218 tortoisehg/hgqt/revdetails.py:255
+#: tortoisehg/hgqt/wctxactions.py:49
 msgid "Open terminal in subrepository"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:220 tortoisehg/hgqt/revdetails.py:254
+#: tortoisehg/hgqt/manifestdialog.py:220 tortoisehg/hgqt/revdetails.py:257
 msgid "Open a shell terminal in the selected subrepository root"
 msgstr ""
 
-#: tortoisehg/hgqt/manifestdialog.py:317 tortoisehg/hgqt/revdetails.py:397
+#: tortoisehg/hgqt/manifestdialog.py:317 tortoisehg/hgqt/revdetails.py:405
 #, python-format
 msgid "Hg file log viewer - %s"
 msgstr "Hg 檔案紀錄檢視器 - %s"
 
-#: tortoisehg/hgqt/manifestdialog.py:330 tortoisehg/hgqt/revdetails.py:411
+#: tortoisehg/hgqt/manifestdialog.py:330 tortoisehg/hgqt/revdetails.py:419
+#: tortoisehg/hgqt/wctxactions.py:234
 msgid "Cannot open subrepository"
 msgstr "不能開啟子儲存庫"
 
-#: tortoisehg/hgqt/manifestdialog.py:331 tortoisehg/hgqt/revdetails.py:412
+#: tortoisehg/hgqt/manifestdialog.py:331 tortoisehg/hgqt/revdetails.py:420
+#: tortoisehg/hgqt/wctxactions.py:235
 msgid "The selected subrepository does not exist on the working directory"
 msgstr ""
 
@@ -2375,7 +2382,7 @@ msgstr "你想離開嗎?"
 msgid "To finish merging, you need to commit the working directory."
 msgstr "為了要完成合併,你需要提交工作目錄"
 
-#: tortoisehg/hgqt/merge.py:99 tortoisehg/hgqt/rebase.py:251
+#: tortoisehg/hgqt/merge.py:99 tortoisehg/hgqt/rebase.py:257
 msgid "&Exit"
 msgstr "離開(&E)"
 
@@ -2387,7 +2394,7 @@ msgstr "準備合併"
 msgid "Verify merge targets and ensure your working directory is clean."
 msgstr "驗證合併的目標並確保你的工作目錄是乾淨的."
 
-#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:580
+#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:593
 #: tortoisehg/hgqt/revpanel.py:158 tortoisehg/hgtk/merge.py:73
 msgid "Not a head revision!"
 msgstr "不是一個標頭修訂版(head revision)!"
@@ -2582,7 +2589,7 @@ msgid "%s had rejected chunks, edit patched file together with rejects?"
 msgstr ""
 
 #: tortoisehg/hgqt/mq.py:336 tortoisehg/hgqt/mq.py:785
-#: tortoisehg/hgqt/repowidget.py:1356
+#: tortoisehg/hgqt/repowidget.py:1365
 msgid ""
 "<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
 "them.<br><br>Continue?</p>"
@@ -2677,7 +2684,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/p4pending.py:108
 msgid "Reverting p4 changelist..."
-msgstr "正在回復(reverting) p4 變更列表中..."
+msgstr "Reverting p4 變更列表中..."
 
 #: tortoisehg/hgqt/pathedit.py:23
 msgid "Edit Repository URL"
@@ -3202,46 +3209,46 @@ msgstr ""
 msgid "Unable to read/write config file"
 msgstr "不能讀/寫設定檔"
 
-#: tortoisehg/hgqt/qtlib.py:151 tortoisehg/hgtk/gdialog.py:682
+#: tortoisehg/hgqt/qtlib.py:144 tortoisehg/hgtk/gdialog.py:682
 #: tortoisehg/hgtk/gtklib.py:406
 msgid "No visual editor configured"
 msgstr "沒有視覺化編輯器的配置"
 
-#: tortoisehg/hgqt/qtlib.py:152 tortoisehg/hgtk/gdialog.py:683
+#: tortoisehg/hgqt/qtlib.py:145 tortoisehg/hgtk/gdialog.py:683
 #: tortoisehg/hgtk/gtklib.py:407
 msgid "Please configure a visual editor."
 msgstr "請配置一個視覺化編輯器"
 
-#: tortoisehg/hgqt/qtlib.py:164
+#: tortoisehg/hgqt/qtlib.py:157
 msgid "Editor launch failure"
 msgstr "啟動編輯器失敗"
 
-#: tortoisehg/hgqt/qtlib.py:173
+#: tortoisehg/hgqt/qtlib.py:166
 msgid "Failed to open path in terminal"
 msgstr ""
 
-#: tortoisehg/hgqt/qtlib.py:174
+#: tortoisehg/hgqt/qtlib.py:167
 #, python-format
 msgid "\"%s\" is not a valid directory"
 msgstr ""
 
-#: tortoisehg/hgqt/qtlib.py:185
+#: tortoisehg/hgqt/qtlib.py:178
 msgid "No shell configured"
 msgstr "沒有配置命令列程式"
 
-#: tortoisehg/hgqt/qtlib.py:186
+#: tortoisehg/hgqt/qtlib.py:179
 msgid "A terminal shell must be configured"
 msgstr "必須要配置一個命令列終端機程式"
 
-#: tortoisehg/hgqt/qtlib.py:846
+#: tortoisehg/hgqt/qtlib.py:839
 msgid "Show Log"
 msgstr "顯示log"
 
-#: tortoisehg/hgqt/qtlib.py:1018
+#: tortoisehg/hgqt/qtlib.py:1011
 msgid "Please enter a username"
 msgstr "請輸入一個使用者名字"
 
-#: tortoisehg/hgqt/qtlib.py:1019
+#: tortoisehg/hgqt/qtlib.py:1012
 msgid "You must identify yourself to Mercurial"
 msgstr ""
 
@@ -3272,7 +3279,7 @@ msgstr ""
 #: tortoisehg/hgqt/quickop.py:22 tortoisehg/hgtk/p4pending.py:67
 #: tortoisehg/hgtk/quickop.py:21
 msgid "Revert"
-msgstr "回復(Revert)"
+msgstr ""
 
 #: tortoisehg/hgqt/quickop.py:23
 msgid "Checkmark files to remove"
@@ -3301,7 +3308,7 @@ msgstr ""
 msgid "Add &Largefiles"
 msgstr ""
 
-#: tortoisehg/hgqt/quickop.py:115 tortoisehg/hgqt/wctxactions.py:58
+#: tortoisehg/hgqt/quickop.py:115 tortoisehg/hgqt/wctxactions.py:66
 msgid "Add &Bfiles"
 msgstr ""
 
@@ -3349,68 +3356,72 @@ msgstr "保持原始分支名稱"
 msgid "Force detach of rebased changesets from their original branch"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:80
+#: tortoisehg/hgqt/rebase.py:72
+msgid "Collapse the rebased changesets "
+msgstr ""
+
+#: tortoisehg/hgqt/rebase.py:83
 msgid ""
 "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:95 tortoisehg/hgtk/history.py:1594
+#: tortoisehg/hgqt/rebase.py:98 tortoisehg/hgtk/history.py:1594
 #: tortoisehg/hgtk/synch.py:153
 msgid "Rebase"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:98 tortoisehg/hgqt/rebase.py:265
-#: tortoisehg/hgqt/repowidget.py:1486 tortoisehg/hgqt/repowidget.py:1513
+#: tortoisehg/hgqt/rebase.py:101 tortoisehg/hgqt/rebase.py:271
+#: tortoisehg/hgqt/repowidget.py:1495 tortoisehg/hgqt/repowidget.py:1522
 #: tortoisehg/hgtk/gdialog.py:863
 msgid "Abort"
 msgstr "中止"
 
-#: tortoisehg/hgqt/rebase.py:118
+#: tortoisehg/hgqt/rebase.py:121
 #, python-format
 msgid "Rebase - %s"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:142
+#: tortoisehg/hgqt/rebase.py:145
 msgid ""
 "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:147 tortoisehg/hgqt/rebase.py:207
+#: tortoisehg/hgqt/rebase.py:150 tortoisehg/hgqt/rebase.py:213
 msgid "You may continue the rebase"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:189
+#: tortoisehg/hgqt/rebase.py:195
 msgid "Rebase is complete"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:191
+#: tortoisehg/hgqt/rebase.py:197
 msgid "Rebase aborted"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:201
+#: tortoisehg/hgqt/rebase.py:207
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:249
+#: tortoisehg/hgqt/rebase.py:255
 msgid "Exiting with an unfinished rebase is not recommended."
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:250
+#: tortoisehg/hgqt/rebase.py:256
 msgid "Consider aborting the rebase first."
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:262
+#: tortoisehg/hgqt/rebase.py:268
 msgid "Rebase already in progress"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:263
+#: tortoisehg/hgqt/rebase.py:269
 msgid "Resuming rebase already in progress"
 msgstr ""
 
-#: tortoisehg/hgqt/rebase.py:266
+#: tortoisehg/hgqt/rebase.py:272
 msgid "You must provide source and dest arguments"
 msgstr ""
 
@@ -3437,7 +3448,7 @@ msgstr "不能讀這個檔案(可能被刪除了)"
 
 #: tortoisehg/hgqt/rejects.py:104
 msgid "This appears to be a binary file"
-msgstr ""
+msgstr "似乎是一個二進位檔案"
 
 #: tortoisehg/hgqt/rejects.py:199 tortoisehg/hgtk/commit.py:1351
 #: tortoisehg/hgtk/commit.py:1356
@@ -3515,15 +3526,15 @@ msgstr "來源不存在"
 
 #: tortoisehg/hgqt/rename.py:261
 msgid "The source must be within the repository tree."
-msgstr ""
+msgstr "來源必須在儲存庫樹裡面"
 
 #: tortoisehg/hgqt/rename.py:266
 msgid "The destination must be within the repository tree."
-msgstr ""
+msgstr "目的必須在儲存庫樹裡面"
 
 #: tortoisehg/hgqt/rename.py:270
 msgid "Please give a destination that differs from the source"
-msgstr ""
+msgstr "請給我一個不同於來源的目的地"
 
 #: tortoisehg/hgqt/rename.py:274
 msgid "Destination file already exists."
@@ -3539,11 +3550,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/rename.py:298
 msgid "The following error was caught while copying:"
-msgstr ""
+msgstr "複製的時候產生以下錯誤:"
 
 #: tortoisehg/hgqt/rename.py:300
 msgid "The following error was caught while renaming:"
-msgstr ""
+msgstr "更名的時後產生以下錯誤:"
 
 #: tortoisehg/hgqt/repofilter.py:31 tortoisehg/hgqt/repofilter.py:44
 #: tortoisehg/hgtk/cslist.py:88
@@ -3654,25 +3665,25 @@ msgctxt "column header"
 msgid "Changes"
 msgstr "變更"
 
-#: tortoisehg/hgqt/repomodel.py:194
+#: tortoisehg/hgqt/repomodel.py:207
 #, python-format
 msgid "filling (%d)"
 msgstr ""
 
-#: tortoisehg/hgqt/repomodel.py:567
+#: tortoisehg/hgqt/repomodel.py:580
 msgid "Mercurial User"
 msgstr "Mercurial 使用者"
 
-#: tortoisehg/hgqt/reporegistry.py:175 tortoisehg/hgqt/reporegistry.py:634
+#: tortoisehg/hgqt/reporegistry.py:175 tortoisehg/hgqt/reporegistry.py:653
 #, python-format
 msgid "Unsupported repository type (%s)"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:176 tortoisehg/hgqt/reporegistry.py:635
+#: tortoisehg/hgqt/reporegistry.py:176 tortoisehg/hgqt/reporegistry.py:654
 msgid "Cannot open non mercurial repositories or subrepositories"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:207 tortoisehg/hgqt/wctxactions.py:338
+#: tortoisehg/hgqt/reporegistry.py:207 tortoisehg/hgqt/wctxactions.py:365
 msgid "&Delete"
 msgstr "刪除(&D)"
 
@@ -3715,7 +3726,7 @@ msgstr "開啟全部"
 msgid "Open all repositories in new tabs"
 msgstr "在新分頁開啟所有儲存庫"
 
-#: tortoisehg/hgqt/reporegistry.py:410 tortoisehg/hgqt/reporegistry.py:646
+#: tortoisehg/hgqt/reporegistry.py:410 tortoisehg/hgqt/reporegistry.py:665
 msgid "New Group"
 msgstr "新群組"
 
@@ -3753,7 +3764,7 @@ msgid "Clone Repository"
 msgstr "拓製儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:422 tortoisehg/hgqt/sync.py:571
-#: tortoisehg/hgqt/workbench.py:329
+#: tortoisehg/hgqt/workbench.py:332
 msgid "Explore"
 msgstr "瀏覽"
 
@@ -3762,7 +3773,7 @@ msgid "Open the repository in a file browser"
 msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:424 tortoisehg/hgqt/sync.py:572
-#: tortoisehg/hgqt/workbench.py:332
+#: tortoisehg/hgqt/workbench.py:335
 msgid "Terminal"
 msgstr "終端機"
 
@@ -3786,7 +3797,7 @@ msgstr ""
 msgid "Convert an existing repository into a subrepository"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:431 tortoisehg/hgqt/wctxactions.py:44
+#: tortoisehg/hgqt/reporegistry.py:431 tortoisehg/hgqt/wctxactions.py:52
 msgid "Copy path"
 msgstr "複製路徑"
 
@@ -3798,13 +3809,12 @@ msgstr ""
 msgid "Select repository directory to add"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:499 tortoisehg/hgqt/reporegistry.py:552
-#: tortoisehg/hgqt/reporegistry.py:569 tortoisehg/hgqt/reporegistry.py:598
-#: tortoisehg/hgqt/reporegistry.py:604
+#: tortoisehg/hgqt/reporegistry.py:499 tortoisehg/hgqt/reporegistry.py:588
+#: tortoisehg/hgqt/reporegistry.py:617 tortoisehg/hgqt/reporegistry.py:623
 msgid "Failed to add repository"
 msgstr "加入儲存庫失敗了"
 
-#: tortoisehg/hgqt/reporegistry.py:500 tortoisehg/hgqt/workbench.py:781
+#: tortoisehg/hgqt/reporegistry.py:500 tortoisehg/hgqt/workbench.py:792
 #, python-format
 msgid "%s is not a valid repository"
 msgstr "%s 不是一個有效的儲存庫"
@@ -3813,41 +3823,68 @@ msgstr "%s 不是一個有效的儲存庫"
 msgid "Select an existing repository to add as a subrepo"
 msgstr ""
 
+#: tortoisehg/hgqt/reporegistry.py:517 tortoisehg/hgqt/reporegistry.py:522
+#: tortoisehg/hgqt/reporegistry.py:527
+msgid "Cannot add subrepository"
+msgstr ""
+
+#: tortoisehg/hgqt/reporegistry.py:518
+#, python-format
+msgid "\"%s\" is not a folder"
+msgstr ""
+
+#: tortoisehg/hgqt/reporegistry.py:523
+msgid "A repository cannot be added as a subrepo of itself"
+msgstr ""
+
 #: tortoisehg/hgqt/reporegistry.py:528
+#, python-format
+msgid ""
+"The selected folder:<br><br>%s<br><br>is not inside the target "
+"repository.<br><br>This may be allowed but is greatly discouraged.<br>If you "
+"want to add a non trivial subrepository mapping you must manually edit the "
+"<i>.hgsub</i> file"
+msgstr ""
+
+#: tortoisehg/hgqt/reporegistry.py:546
 msgid "Cannot open repository"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:529
+#: tortoisehg/hgqt/reporegistry.py:547
 #, python-format
 msgid "The selected repository:<br><br>%s<br><br>cannot be open!"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:534
+#: tortoisehg/hgqt/reporegistry.py:552
 msgid "Subrepository already exists"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:535
+#: tortoisehg/hgqt/reporegistry.py:553
 #, python-format
 msgid ""
 "The selected repository:<br><br>%s<br><br>is already a subrepository "
 "of:<br><br>%s<br><br>as: \"%s\""
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:553
+#: tortoisehg/hgqt/reporegistry.py:570
+msgid "Failed to add subrepository"
+msgstr ""
+
+#: tortoisehg/hgqt/reporegistry.py:571
 #, python-format
 msgid "Cannot open the .hgsub file in:<br><br>%s"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:570
+#: tortoisehg/hgqt/reporegistry.py:589
 #, python-format
 msgid "The .hgsub file already contains the line:<br><br>%s"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:589
+#: tortoisehg/hgqt/reporegistry.py:608
 msgid "Subrepo added to .hgsub file"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:590
+#: tortoisehg/hgqt/reporegistry.py:609
 #, python-format
 msgid ""
 "The selected subrepo:<br><br><i>%s</i><br><br>has been added to the .hgsub "
@@ -3855,50 +3892,50 @@ msgid ""
 "must still commit</i> the .hgsub file changes."
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:599
+#: tortoisehg/hgqt/reporegistry.py:618
 #, python-format
 msgid "Cannot update the .hgsub file in:<br><br>%s"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:605
+#: tortoisehg/hgqt/reporegistry.py:624
 #, python-format
 msgid "\"%s\" is not a valid repository inside \"%s\""
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:250
+#: tortoisehg/hgqt/repotreeitem.py:254
 #, python-format
 msgid "Local Repository %s"
 msgstr "本地儲存庫 %s"
 
-#: tortoisehg/hgqt/repotreeitem.py:320
+#: tortoisehg/hgqt/repotreeitem.py:324
 #, python-format
 msgid ""
 "An exception happened while loading the subrepos of:<br><br>\"%s\"<br><br>"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:322
+#: tortoisehg/hgqt/repotreeitem.py:326
 #, python-format
 msgid "The exception error message was:<br><br>%s<br><br>"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:323
+#: tortoisehg/hgqt/repotreeitem.py:327
 msgid "Click OK to continue or Abort to exit."
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:325
+#: tortoisehg/hgqt/repotreeitem.py:329
 msgid "Error loading subrepos"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:343
+#: tortoisehg/hgqt/repotreeitem.py:347
 msgid "Unable to update repository name"
 msgstr "無法更新儲存庫名字"
 
-#: tortoisehg/hgqt/repotreeitem.py:344
+#: tortoisehg/hgqt/repotreeitem.py:348
 #, python-format
 msgid "An error occurred while updating the repository hgrc file (%s)"
 msgstr ""
 
-#: tortoisehg/hgqt/repotreeitem.py:499
+#: tortoisehg/hgqt/repotreeitem.py:503
 msgid "default"
 msgstr "預設值"
 
@@ -3988,84 +4025,84 @@ msgstr "補丁分支"
 msgid "%s <incoming>"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:428
+#: tortoisehg/hgqt/repowidget.py:429
 msgid "Found incoming changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:431
+#: tortoisehg/hgqt/repowidget.py:432
 msgid "Pull incoming changesets into your repository"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:433 tortoisehg/hgtk/history.py:1881
+#: tortoisehg/hgqt/repowidget.py:434 tortoisehg/hgtk/history.py:1881
 msgid "Reject"
 msgstr "拒絕"
 
-#: tortoisehg/hgqt/repowidget.py:434
+#: tortoisehg/hgqt/repowidget.py:435
 msgid "Reject incoming changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:525 tortoisehg/hgqt/sync.py:979
+#: tortoisehg/hgqt/repowidget.py:526 tortoisehg/hgqt/sync.py:979
 #: tortoisehg/hgtk/history.py:2021
 #, python-format
 msgid "%d outgoing changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:527 tortoisehg/hgqt/repowidget.py:1149
-#: tortoisehg/hgqt/workbench.py:372 tortoisehg/hgtk/history.py:444
+#: tortoisehg/hgqt/repowidget.py:528 tortoisehg/hgqt/repowidget.py:1151
+#: tortoisehg/hgqt/workbench.py:375 tortoisehg/hgtk/history.py:444
 #: tortoisehg/hgtk/history.py:2069 tortoisehg/hgtk/synch.py:73
 msgid "Push"
 msgstr "推送"
 
-#: tortoisehg/hgqt/repowidget.py:654
+#: tortoisehg/hgqt/repowidget.py:655
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s 驗證儲存庫"
 
-#: tortoisehg/hgqt/repowidget.py:661
+#: tortoisehg/hgqt/repowidget.py:662
 #, python-format
 msgid "%s - recover repository"
-msgstr ""
+msgstr "%s - recover 儲存庫"
 
-#: tortoisehg/hgqt/repowidget.py:677
+#: tortoisehg/hgqt/repowidget.py:678
 msgid "No transaction available"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:678
+#: tortoisehg/hgqt/repowidget.py:679
 msgid "There is no rollback transaction available"
 msgstr "沒有rollback交易可以用"
 
-#: tortoisehg/hgqt/repowidget.py:681 tortoisehg/hgtk/commit.py:1034
+#: tortoisehg/hgqt/repowidget.py:682 tortoisehg/hgtk/commit.py:1034
 msgid "Undo last commit?"
 msgstr "復原(Undo)最後的提交?"
 
-#: tortoisehg/hgqt/repowidget.py:682
+#: tortoisehg/hgqt/repowidget.py:683
 #, python-format
 msgid "Undo most recent commit (%d), preserving file changes?"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:686
+#: tortoisehg/hgqt/repowidget.py:687
 msgid "Undo last transaction?"
 msgstr "復原(Undo)最後的交易?"
 
-#: tortoisehg/hgqt/repowidget.py:687
+#: tortoisehg/hgqt/repowidget.py:688
 #, python-format
 msgid "Rollback to revision %d (undo %s)?"
 msgstr "RollBack到%d修訂版(Undo %s)?"
 
-#: tortoisehg/hgqt/repowidget.py:693 tortoisehg/hgqt/repowidget.py:1254
+#: tortoisehg/hgqt/repowidget.py:694 tortoisehg/hgqt/repowidget.py:1257
 #: tortoisehg/hgqt/run.py:544
 msgid "Repository Error"
 msgstr "儲存庫錯誤"
 
-#: tortoisehg/hgqt/repowidget.py:694
+#: tortoisehg/hgqt/repowidget.py:695
 msgid "Unable to determine working copy revision\n"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:698
+#: tortoisehg/hgqt/repowidget.py:699
 msgid "Remove current working revision?"
 msgstr "移除目前的工作修訂版?"
 
-#: tortoisehg/hgqt/repowidget.py:699
+#: tortoisehg/hgqt/repowidget.py:700
 #, python-format
 msgid ""
 "Your current working revision (%d) will be removed by this rollback, leaving "
@@ -4073,239 +4110,243 @@ msgid ""
 " Continue?"
 msgstr "你目前工作的修訂版(%d)將會經由這個RollBack操作而移除,回到未提交的變更.要繼續嗎?"
 
-#: tortoisehg/hgqt/repowidget.py:843
+#: tortoisehg/hgqt/repowidget.py:844
 msgid "Repository stripped, incoming preview cleared"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:848
+#: tortoisehg/hgqt/repowidget.py:849
 msgid "Repository stripped, revision set cleared"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:973
+#: tortoisehg/hgqt/repowidget.py:974
 msgid "Commit tab cannot exit"
 msgstr "提交分頁不能結束"
 
-#: tortoisehg/hgqt/repowidget.py:977
+#: tortoisehg/hgqt/repowidget.py:978
 msgid "Sync tab cannot exit"
 msgstr "同步化分頁不能結束"
 
-#: tortoisehg/hgqt/repowidget.py:982
+#: tortoisehg/hgqt/repowidget.py:983
 msgid "MQ tab cannot exit"
 msgstr "MQ分頁不能結束"
 
-#: tortoisehg/hgqt/repowidget.py:986
+#: tortoisehg/hgqt/repowidget.py:987
 msgid "Search tab cannot exit"
 msgstr "搜尋分頁不能結束"
 
-#: tortoisehg/hgqt/repowidget.py:989
+#: tortoisehg/hgqt/repowidget.py:990
 msgid "Repository command still running"
 msgstr "儲存庫命令還在執行"
 
-#: tortoisehg/hgqt/repowidget.py:1150
+#: tortoisehg/hgqt/repowidget.py:1152
 msgid "Push all"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1152
+#: tortoisehg/hgqt/repowidget.py:1154
 msgid "Push to here"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1154
+#: tortoisehg/hgqt/repowidget.py:1156
 msgid "Push selected branch"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1157 tortoisehg/util/menuthg.py:58
+#: tortoisehg/hgqt/repowidget.py:1159 tortoisehg/util/menuthg.py:58
 msgid "Update..."
 msgstr "更新..."
 
-#: tortoisehg/hgqt/repowidget.py:1164
+#: tortoisehg/hgqt/repowidget.py:1166
 msgid "Browse at rev..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1167
+#: tortoisehg/hgqt/repowidget.py:1169
 msgid "Merge with local..."
-msgstr "跟本地工作目錄做合併..."
+msgstr "跟本地工作複本做合併..."
 
-#: tortoisehg/hgqt/repowidget.py:1170
+#: tortoisehg/hgqt/repowidget.py:1172
 msgid "Tag..."
 msgstr "標籤..."
 
-#: tortoisehg/hgqt/repowidget.py:1172
+#: tortoisehg/hgqt/repowidget.py:1174
 msgid "Bookmark..."
 msgstr "書籤..."
 
-#: tortoisehg/hgqt/repowidget.py:1175 tortoisehg/hgtk/history.py:1290
+#: tortoisehg/hgqt/repowidget.py:1177 tortoisehg/hgtk/history.py:1290
 msgid "Backout..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1179 tortoisehg/hgtk/history.py:1293
+#: tortoisehg/hgqt/repowidget.py:1181 tortoisehg/hgtk/history.py:1293
 msgid "Export"
 msgstr "匯出"
 
-#: tortoisehg/hgqt/repowidget.py:1180
+#: tortoisehg/hgqt/repowidget.py:1182
 msgid "Export patch..."
 msgstr "匯出補丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1182
+#: tortoisehg/hgqt/repowidget.py:1184
 msgid "Email patch..."
 msgstr "Email補丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1184
+#: tortoisehg/hgqt/repowidget.py:1186
 msgid "Archive..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1186
+#: tortoisehg/hgqt/repowidget.py:1188
 msgid "Bundle rev to tip..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1188 tortoisehg/hgqt/wctxactions.py:41
+#: tortoisehg/hgqt/repowidget.py:1190 tortoisehg/hgqt/wctxactions.py:41
 msgid "Copy patch"
 msgstr "複製補丁"
 
-#: tortoisehg/hgqt/repowidget.py:1192
+#: tortoisehg/hgqt/repowidget.py:1194
 msgid "Copy hash"
 msgstr "複製hash號碼"
 
-#: tortoisehg/hgqt/repowidget.py:1196
+#: tortoisehg/hgqt/repowidget.py:1198
 msgid "Transplant to local"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1200
+#: tortoisehg/hgqt/repowidget.py:1202
 msgid "Modify history"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1201
+#: tortoisehg/hgqt/repowidget.py:1203
 msgid "Unapply patch (QGoto parent)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1203
+#: tortoisehg/hgqt/repowidget.py:1205
 msgid "Import to MQ"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1205
+#: tortoisehg/hgqt/repowidget.py:1207
 msgid "Finish patch"
 msgstr "完成補丁"
 
-#: tortoisehg/hgqt/repowidget.py:1207 tortoisehg/hgqt/repowidget.py:1382
+#: tortoisehg/hgqt/repowidget.py:1209 tortoisehg/hgqt/repowidget.py:1391
 msgid "Rename patch..."
 msgstr "補丁更名..."
 
-#: tortoisehg/hgqt/repowidget.py:1210
+#: tortoisehg/hgqt/repowidget.py:1212
 msgid "Rebase..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1213
+#: tortoisehg/hgqt/repowidget.py:1215
 msgid "Strip..."
 msgstr "剝除..."
 
-#: tortoisehg/hgqt/repowidget.py:1216
+#: tortoisehg/hgqt/repowidget.py:1218
 msgid "Post to Review Board..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1219
+#: tortoisehg/hgqt/repowidget.py:1221
 msgid "Remote Update..."
 msgstr "遠端更新..."
 
-#: tortoisehg/hgqt/repowidget.py:1244
+#: tortoisehg/hgqt/repowidget.py:1247
 msgid "Write diff file"
 msgstr "寫進diff檔"
 
-#: tortoisehg/hgqt/repowidget.py:1255
+#: tortoisehg/hgqt/repowidget.py:1258
 msgid "Unable to write diff file"
 msgstr "不能寫進diff檔"
 
-#: tortoisehg/hgqt/repowidget.py:1298
+#: tortoisehg/hgqt/repowidget.py:1301
 msgid "Unable to compress history"
 msgstr "不能壓縮history"
 
-#: tortoisehg/hgqt/repowidget.py:1299
+#: tortoisehg/hgqt/repowidget.py:1302
 msgid "Selected changeset pair not related"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1307
+#: tortoisehg/hgqt/repowidget.py:1314
 msgid "Visual Diff..."
 msgstr "視覺化 Diff ..."
 
-#: tortoisehg/hgqt/repowidget.py:1308
+#: tortoisehg/hgqt/repowidget.py:1315
 msgid "Export Diff..."
 msgstr "匯出Diff..."
 
-#: tortoisehg/hgqt/repowidget.py:1310 tortoisehg/hgqt/repowidget.py:1399
+#: tortoisehg/hgqt/repowidget.py:1317 tortoisehg/hgqt/repowidget.py:1408
 msgid "Export Selected..."
 msgstr "匯出選擇的..."
 
-#: tortoisehg/hgqt/repowidget.py:1311 tortoisehg/hgqt/repowidget.py:1400
+#: tortoisehg/hgqt/repowidget.py:1318 tortoisehg/hgqt/repowidget.py:1409
 msgid "Email Selected..."
 msgstr "Email選擇的"
 
-#: tortoisehg/hgqt/repowidget.py:1313
+#: tortoisehg/hgqt/repowidget.py:1320
 msgid "Export DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1314
+#: tortoisehg/hgqt/repowidget.py:1321
 msgid "Email DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1315
+#: tortoisehg/hgqt/repowidget.py:1322
 msgid "Bundle DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1317
+#: tortoisehg/hgqt/repowidget.py:1324
 msgid "Bisect - Good, Bad..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1318
+#: tortoisehg/hgqt/repowidget.py:1325
 msgid "Bisect - Bad, Good..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1319
+#: tortoisehg/hgqt/repowidget.py:1326
 msgid "Compress History..."
 msgstr "壓縮歷史..."
 
-#: tortoisehg/hgqt/repowidget.py:1331 tortoisehg/hgqt/repowidget.py:1409
+#: tortoisehg/hgqt/repowidget.py:1328
+msgid "Goto common ancestor"
+msgstr ""
+
+#: tortoisehg/hgqt/repowidget.py:1340 tortoisehg/hgqt/repowidget.py:1418
 msgid "Transplant Selected to local"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1337 tortoisehg/hgqt/repowidget.py:1415
+#: tortoisehg/hgqt/repowidget.py:1346 tortoisehg/hgqt/repowidget.py:1424
 msgid "Post Selected to Review Board..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1377
+#: tortoisehg/hgqt/repowidget.py:1386
 msgid "Apply patch (QGoto)"
 msgstr "套用補丁(QGoto)"
 
-#: tortoisehg/hgqt/repowidget.py:1378
+#: tortoisehg/hgqt/repowidget.py:1387
 msgid "QPush --move"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1379
+#: tortoisehg/hgqt/repowidget.py:1388
 msgid "Fold patches..."
 msgstr "目錄路徑..."
 
-#: tortoisehg/hgqt/repowidget.py:1380
+#: tortoisehg/hgqt/repowidget.py:1389
 msgid "Delete patches..."
 msgstr "刪除補丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1381
+#: tortoisehg/hgqt/repowidget.py:1390
 msgid "Reorder patches..."
 msgstr "重排補丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1423
+#: tortoisehg/hgqt/repowidget.py:1432
 msgid "Pull to here..."
 msgstr "拉收到這裡..."
 
-#: tortoisehg/hgqt/repowidget.py:1444 tortoisehg/hgqt/repowidget.py:1454
+#: tortoisehg/hgqt/repowidget.py:1453 tortoisehg/hgqt/repowidget.py:1463
 msgid "Export patch"
 msgstr "匯出補丁"
 
-#: tortoisehg/hgqt/repowidget.py:1446
+#: tortoisehg/hgqt/repowidget.py:1455
 msgid "Patch Files (*.patch)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1477
+#: tortoisehg/hgqt/repowidget.py:1486
 msgid "Cannot export revision"
 msgstr "不能匯出修訂版"
 
-#: tortoisehg/hgqt/repowidget.py:1478
+#: tortoisehg/hgqt/repowidget.py:1487
 #, python-format
 msgid ""
 "Cannot export revision %s into the file named:\n"
@@ -4316,20 +4357,20 @@ msgstr ""
 "\n"
 "%s\n"
 
-#: tortoisehg/hgqt/repowidget.py:1480
+#: tortoisehg/hgqt/repowidget.py:1489
 msgid "There is already an existing folder with that same name."
 msgstr "已經有個同樣名字的資料夾了"
 
-#: tortoisehg/hgqt/repowidget.py:1486 tortoisehg/hgqt/repowidget.py:1506
+#: tortoisehg/hgqt/repowidget.py:1495 tortoisehg/hgqt/repowidget.py:1515
 #: tortoisehg/hgtk/thgshelve.py:161
 msgid "Replace"
 msgstr "取代"
 
-#: tortoisehg/hgqt/repowidget.py:1486 tortoisehg/hgtk/thgshelve.py:162
+#: tortoisehg/hgqt/repowidget.py:1495 tortoisehg/hgtk/thgshelve.py:162
 msgid "Append"
 msgstr "加入"
 
-#: tortoisehg/hgqt/repowidget.py:1489
+#: tortoisehg/hgqt/repowidget.py:1498
 #, python-format
 msgid ""
 "There are existing patch files for %d revisions (%s) in the selected "
@@ -4337,31 +4378,31 @@ msgid ""
 "\n"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1496
+#: tortoisehg/hgqt/repowidget.py:1505
 msgid "What do you want to do?\n"
 msgstr "你想做什麼?\n"
 
-#: tortoisehg/hgqt/repowidget.py:1497
+#: tortoisehg/hgqt/repowidget.py:1506
 msgid "Replace the existing patch files.\n"
 msgstr "取代存在的補丁檔\n"
 
-#: tortoisehg/hgqt/repowidget.py:1498
+#: tortoisehg/hgqt/repowidget.py:1507
 msgid "Append the changes to the existing patch files.\n"
 msgstr "附加變更到存在的補丁檔\n"
 
-#: tortoisehg/hgqt/repowidget.py:1499
+#: tortoisehg/hgqt/repowidget.py:1508
 msgid "Abort the export operation.\n"
 msgstr "退出匯出的操作\n"
 
-#: tortoisehg/hgqt/repowidget.py:1501
+#: tortoisehg/hgqt/repowidget.py:1510
 msgid "Patch files already exist"
 msgstr "補丁檔已經存在"
 
-#: tortoisehg/hgqt/repowidget.py:1527
+#: tortoisehg/hgqt/repowidget.py:1536
 msgid "Patch exported"
 msgstr "補丁匯出了"
 
-#: tortoisehg/hgqt/repowidget.py:1528
+#: tortoisehg/hgqt/repowidget.py:1537
 #, python-format
 msgid ""
 "Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a "
@@ -4370,35 +4411,35 @@ msgstr ""
 "修訂版 #%d (%s) 已經匯出到:<p><a href=\"file:///%s\">%s</a>%s<a "
 "href=\"file:///%s\">%s</a>"
 
-#: tortoisehg/hgqt/repowidget.py:1536
+#: tortoisehg/hgqt/repowidget.py:1545
 msgid "Patches exported"
 msgstr "補丁匯出了"
 
-#: tortoisehg/hgqt/repowidget.py:1537
+#: tortoisehg/hgqt/repowidget.py:1546
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d個補丁已經匯出到<p><a href=\"file:///%s\">%s</a>"
 
-#: tortoisehg/hgqt/repowidget.py:1652
+#: tortoisehg/hgqt/repowidget.py:1661
 msgid "Write bundle"
 msgstr "寫進綁兜(bundle)"
 
-#: tortoisehg/hgqt/repowidget.py:1724
+#: tortoisehg/hgqt/repowidget.py:1733
 msgid "Cannot import selected revision"
 msgstr "不能匯入選定的修訂版"
 
-#: tortoisehg/hgqt/repowidget.py:1725
+#: tortoisehg/hgqt/repowidget.py:1734
 #, python-format
 msgid ""
 "The selected revision (rev #%d) cannot be imported because it is not a "
 "descendant of qparent (rev #%d)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1824
+#: tortoisehg/hgqt/repowidget.py:1846
 msgid "Unable to start"
 msgstr "不能開始"
 
-#: tortoisehg/hgqt/repowidget.py:1825
+#: tortoisehg/hgqt/repowidget.py:1847
 msgid "Previous command is still running"
 msgstr "先前命令還在執行"
 
@@ -4578,26 +4619,34 @@ msgstr ""
 msgid "Save file as it appeared at this revision"
 msgstr ""
 
-#: tortoisehg/hgqt/revdetails.py:349 tortoisehg/hgtk/changeset.py:958
+#: tortoisehg/hgqt/revdetails.py:243
+msgid "Copy Path"
+msgstr ""
+
+#: tortoisehg/hgqt/revdetails.py:244
+msgid "Copy full path of file(s) to the clipboard"
+msgstr ""
+
+#: tortoisehg/hgqt/revdetails.py:352 tortoisehg/hgtk/changeset.py:958
 msgid "Save file to"
 msgstr "儲存檔案至"
 
-#: tortoisehg/hgqt/revdetails.py:362 tortoisehg/hgtk/changeset.py:969
+#: tortoisehg/hgqt/revdetails.py:365 tortoisehg/hgtk/changeset.py:969
 msgid "Unable to save file"
 msgstr "無法儲存檔案"
 
 #: tortoisehg/hgqt/revert.py:22 tortoisehg/hgqt/revert.py:26
 msgid "Cannot revert to working directory"
-msgstr "不能回復(revert)到工作目錄"
+msgstr "不能revert到工作目錄"
 
 #: tortoisehg/hgqt/revert.py:23
 msgid "Reverting to the working directory revision does not make sense"
-msgstr "回復(revert)到工作目錄修訂版沒啥意義(make sense)"
+msgstr "Revert到工作目錄修訂版沒啥意義(make sense)"
 
 #: tortoisehg/hgqt/revert.py:29
 #, python-format
 msgid "Revert - %s"
-msgstr "回復(Revert) - %s"
+msgstr ""
 
 #: tortoisehg/hgqt/revert.py:40
 #, python-format
@@ -4611,12 +4660,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/revert.py:50
 msgid "Revert all files to this revision"
-msgstr "回復(Revert)所有檔案到這個修訂版"
+msgstr "Revert所有檔案到這個修訂版"
 
-#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:246
+#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:273
 #: tortoisehg/hgtk/statusact.py:146
 msgid "Confirm Revert"
-msgstr "確認回復(Revert)"
+msgstr "Revert確認"
 
 #: tortoisehg/hgqt/revert.py:66
 msgid ""
@@ -5278,7 +5327,7 @@ msgstr "放棄沒提交的變更(不備份)"
 
 #: tortoisehg/hgqt/run.py:1129
 msgid "do not back up stripped revisions"
-msgstr ""
+msgstr "不要備份已剝除的修訂版"
 
 #: tortoisehg/hgqt/run.py:1130
 msgid "revision to strip"
@@ -5420,7 +5469,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rupdate.py:61
 msgid "Discard remote changes, no backup (-C/--clean)"
-msgstr ""
+msgstr "放棄遠端變更,不備份(-C/--clean)"
 
 #: tortoisehg/hgqt/rupdate.py:63
 msgid "Perform a push before updating (-p/--push)"
@@ -5884,7 +5933,7 @@ msgstr "描述"
 
 #: tortoisehg/hgqt/settings.py:629 tortoisehg/hgtk/thgconfig.py:184
 msgid "Textual description of the repository's purpose or contents."
-msgstr ""
+msgstr "儲存庫的目的或內容的文字描述"
 
 #: tortoisehg/hgqt/settings.py:631 tortoisehg/hgtk/thgconfig.py:186
 msgid "Contact"
@@ -5892,7 +5941,7 @@ msgstr "聯繫"
 
 #: tortoisehg/hgqt/settings.py:632 tortoisehg/hgtk/thgconfig.py:187
 msgid "Name or email address of the person in charge of the repository."
-msgstr ""
+msgstr "負責此儲存庫的人的姓名或Email"
 
 #: tortoisehg/hgqt/settings.py:634 tortoisehg/hgtk/thgconfig.py:189
 msgid "Style"
@@ -5900,7 +5949,7 @@ msgstr "樣式"
 
 #: tortoisehg/hgqt/settings.py:636 tortoisehg/hgtk/thgconfig.py:191
 msgid "Which template map style to use"
-msgstr ""
+msgstr "使用的整體樣式"
 
 #: tortoisehg/hgqt/settings.py:637 tortoisehg/hgtk/thgconfig.py:192
 msgid "Archive Formats"
@@ -6682,7 +6731,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/shelve.py:297
 msgid "Revert all working copy changes?"
-msgstr "回復(revert)所有工作目錄的變更嗎?"
+msgstr "Revert所有工作複本的變更嗎?"
 
 #: tortoisehg/hgqt/shelve.py:310 tortoisehg/hgqt/shelve.py:339
 #, python-format
@@ -6705,7 +6754,7 @@ msgstr "補丁: %s"
 
 #: tortoisehg/hgqt/status.py:101
 msgid "### filter text ###"
-msgstr ""
+msgstr "### 過濾條件文字 ###"
 
 #: tortoisehg/hgqt/status.py:103
 msgid "Filter:"
@@ -6717,7 +6766,7 @@ msgstr "檢查所有檔案"
 
 #: tortoisehg/hgqt/status.py:116
 msgid "Uncheck all files"
-msgstr ""
+msgstr "取消勾選所有的檔案"
 
 #: tortoisehg/hgqt/status.py:121
 msgid "Status File List Toolbar"
@@ -6725,7 +6774,7 @@ msgstr "狀態檔列表工具列"
 
 #: tortoisehg/hgqt/status.py:146 tortoisehg/hgtk/status.py:330
 msgid "Remove filter, show root"
-msgstr ""
+msgstr "移除過濾器,顯示最上層"
 
 #: tortoisehg/hgqt/status.py:207
 #, python-format
@@ -6735,7 +6784,7 @@ msgstr ""
 #: tortoisehg/hgqt/status.py:209
 #, python-format
 msgid "%s - status"
-msgstr ""
+msgstr "%s - 狀態"
 
 #: tortoisehg/hgqt/status.py:254 tortoisehg/hgtk/browse.py:112
 #: tortoisehg/hgtk/quickop.py:106 tortoisehg/hgtk/status.py:95
@@ -6744,11 +6793,11 @@ msgstr "狀態"
 
 #: tortoisehg/hgqt/status.py:283 tortoisehg/hgtk/quickop.py:186
 msgid "No appropriate files"
-msgstr ""
+msgstr "沒有適當的檔案"
 
 #: tortoisehg/hgqt/status.py:284 tortoisehg/hgtk/quickop.py:187
 msgid "No files found for this operation"
-msgstr ""
+msgstr "這次操作沒找到檔案"
 
 #: tortoisehg/hgqt/status.py:615
 msgid "Stat"
@@ -6756,7 +6805,7 @@ msgstr "狀態"
 
 #: tortoisehg/hgqt/status.py:615
 msgid "M"
-msgstr ""
+msgstr "修改"
 
 #: tortoisehg/hgqt/status.py:615 tortoisehg/hgtk/datamine.py:140
 msgid "Filename"
@@ -6764,7 +6813,7 @@ msgstr "檔名"
 
 #: tortoisehg/hgqt/status.py:616 tortoisehg/hgtk/thgconfig.py:414
 msgid "Type"
-msgstr ""
+msgstr "類型"
 
 #: tortoisehg/hgqt/status.py:616
 msgid "Size (KB)"
@@ -6777,11 +6826,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/status.py:801
 msgid ", resolved merge"
-msgstr ""
+msgstr ",以解決的合併"
 
 #: tortoisehg/hgqt/status.py:803
 msgid ", unresolved merge"
-msgstr ""
+msgstr ",未解決的合併"
 
 #: tortoisehg/hgqt/status.py:816
 #, python-format
@@ -6813,7 +6862,7 @@ msgstr "已移除"
 #: tortoisehg/hgqt/status.py:822
 #, python-format
 msgid "%s is not tracked (unknown)"
-msgstr ""
+msgstr "%s 沒有被追蹤(未知的)"
 
 #: tortoisehg/hgqt/status.py:823 tortoisehg/hgtk/quickop.py:175
 #: tortoisehg/hgtk/quickop.py:255 tortoisehg/hgtk/serve.py:127
@@ -6892,7 +6941,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:150
 msgid "Unbundle"
-msgstr ""
+msgstr "解榜兜"
 
 #: tortoisehg/hgqt/sync.py:154
 msgid "Stop current operation"
@@ -6913,11 +6962,11 @@ msgstr "<b>遠端儲存庫:</b>"
 
 #: tortoisehg/hgqt/sync.py:208
 msgid "Path Edit Toolbar"
-msgstr ""
+msgstr "路徑編輯工具列"
 
 #: tortoisehg/hgqt/sync.py:219
 msgid "Security"
-msgstr ""
+msgstr "安全"
 
 #: tortoisehg/hgqt/sync.py:220
 msgid "Manage HTTPS connection security and user authentication"
@@ -6929,7 +6978,7 @@ msgstr "主機名稱"
 
 #: tortoisehg/hgqt/sync.py:258 tortoisehg/hgqt/webconf_ui.py:77
 msgid "Save"
-msgstr ""
+msgstr "儲存"
 
 #: tortoisehg/hgqt/sync.py:259
 msgid "Save current URL under an alias"
@@ -7229,7 +7278,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:1140
 msgid "Save Path"
-msgstr ""
+msgstr "儲存路徑"
 
 #: tortoisehg/hgqt/sync.py:1150 tortoisehg/hgqt/sync.py:1472
 #: tortoisehg/hgtk/thgconfig.py:371 tortoisehg/hgtk/thgconfig.py:954
@@ -7541,11 +7590,11 @@ msgstr "選項:"
 
 #: tortoisehg/hgqt/thgstrip.py:87 tortoisehg/hgtk/thgstrip.py:89
 msgid "Discard local changes, no backup (-f/--force)"
-msgstr "放棄本地工作目錄的變更,不備份(-f/--force)"
+msgstr "放棄本地工作複本的變更,不備份(-f/--force)"
 
 #: tortoisehg/hgqt/thgstrip.py:88 tortoisehg/hgtk/thgstrip.py:114
 msgid "No backup (-n/--nobackup)"
-msgstr ""
+msgstr "不備份 (-n/--nobackup)"
 
 #: tortoisehg/hgqt/thgstrip.py:109
 msgid "&Strip"
@@ -7567,7 +7616,7 @@ msgstr "未知的修訂版!"
 
 #: tortoisehg/hgqt/thgstrip.py:204
 msgid "Detected uncommitted local changes."
-msgstr "偵測沒有提交的本地作目錄變更"
+msgstr "偵測沒有提交的本地工作複本變更"
 
 #: tortoisehg/hgqt/thgstrip.py:205
 msgid "Do you want to discard them and continue?"
@@ -7721,7 +7770,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:100 tortoisehg/hgtk/update.py:98
 msgid "Discard local changes, no backup (-C/--clean)"
-msgstr "放棄本地工作目錄變更,不備份(-C/--clean)"
+msgstr "放棄本地工作複本變更,不備份(-C/--clean)"
 
 #: tortoisehg/hgqt/update.py:102 tortoisehg/hgtk/update.py:104
 msgid "Always merge (when possible)"
@@ -7756,7 +7805,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:261 tortoisehg/hgtk/update.py:234
 msgid "Discard - discard local changes, no backup"
-msgstr "放棄本地工作目錄變更,不備份"
+msgstr "放棄本地工作複本變更,不備份"
 
 #: tortoisehg/hgqt/update.py:262 tortoisehg/hgtk/update.py:235
 msgid "&Shelve"
@@ -7768,7 +7817,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:265 tortoisehg/hgtk/update.py:238
 msgid "Merge - allow to merge with local changes"
-msgstr "合併 - 允許跟本地工作目錄變更作合併"
+msgstr "合併 - 允許跟本地工作複本變更作合併"
 
 #: tortoisehg/hgqt/update.py:273 tortoisehg/hgtk/update.py:251
 msgid "Confirm Update"
@@ -7879,130 +7928,130 @@ msgstr "這邊找不到儲存庫"
 msgid "&Visual Diff"
 msgstr "視覺化 Diff(&V)"
 
-#: tortoisehg/hgqt/wctxactions.py:45 tortoisehg/hgtk/status.py:1244
+#: tortoisehg/hgqt/wctxactions.py:53 tortoisehg/hgtk/status.py:1244
 msgid "View missing"
 msgstr "檢視遺失"
 
-#: tortoisehg/hgqt/wctxactions.py:47
+#: tortoisehg/hgqt/wctxactions.py:55
 msgid "&Revert..."
-msgstr "(&R)回復(Revert)..."
+msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:50 tortoisehg/hgtk/status.py:1250
+#: tortoisehg/hgqt/wctxactions.py:58 tortoisehg/hgtk/status.py:1250
 #: tortoisehg/util/menuthg.py:49
 msgid "File History"
 msgstr "檔案歷史"
 
-#: tortoisehg/hgqt/wctxactions.py:51
+#: tortoisehg/hgqt/wctxactions.py:59
 msgid "&Annotate"
 msgstr "加註(&A)"
 
-#: tortoisehg/hgqt/wctxactions.py:53
+#: tortoisehg/hgqt/wctxactions.py:61
 msgid "&Forget"
 msgstr "忘記(&F)"
 
-#: tortoisehg/hgqt/wctxactions.py:56
+#: tortoisehg/hgqt/wctxactions.py:64
 msgid "Add &Largefiles..."
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:59
+#: tortoisehg/hgqt/wctxactions.py:67
 msgid "&Detect Renames..."
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:61
+#: tortoisehg/hgqt/wctxactions.py:69
 msgid "&Ignore..."
 msgstr "(&l)忽略"
 
-#: tortoisehg/hgqt/wctxactions.py:62 tortoisehg/hgtk/status.py:1257
+#: tortoisehg/hgqt/wctxactions.py:70 tortoisehg/hgtk/status.py:1257
 msgid "Remove versioned"
 msgstr "移除版本"
 
-#: tortoisehg/hgqt/wctxactions.py:63
+#: tortoisehg/hgqt/wctxactions.py:71
 msgid "&Delete unversioned..."
 msgstr "(&D)刪除未受版本控管的檔案..."
 
-#: tortoisehg/hgqt/wctxactions.py:65 tortoisehg/hgtk/status.py:1265
+#: tortoisehg/hgqt/wctxactions.py:73 tortoisehg/hgtk/status.py:1265
 msgid "Mark unresolved"
 msgstr "標示為未解決"
 
-#: tortoisehg/hgqt/wctxactions.py:66 tortoisehg/hgtk/status.py:1266
+#: tortoisehg/hgqt/wctxactions.py:74 tortoisehg/hgtk/status.py:1266
 msgid "Mark resolved"
 msgstr "標示為已解決"
 
-#: tortoisehg/hgqt/wctxactions.py:109 tortoisehg/hgtk/status.py:1245
+#: tortoisehg/hgqt/wctxactions.py:117 tortoisehg/hgtk/status.py:1245
 msgid "View other"
 msgstr "檢視其他"
 
-#: tortoisehg/hgqt/wctxactions.py:113
+#: tortoisehg/hgqt/wctxactions.py:121
 msgid "&Copy..."
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:114 tortoisehg/hgtk/status.py:1262
+#: tortoisehg/hgqt/wctxactions.py:122 tortoisehg/hgtk/status.py:1262
 msgid "Rename..."
 msgstr "重新命名..."
 
-#: tortoisehg/hgqt/wctxactions.py:120
+#: tortoisehg/hgqt/wctxactions.py:128
 msgid "Was renamed from"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:131 tortoisehg/hgtk/status.py:1264
+#: tortoisehg/hgqt/wctxactions.py:139 tortoisehg/hgtk/status.py:1264
 msgid "Restart Merge..."
 msgstr "重新合併..."
 
-#: tortoisehg/hgqt/wctxactions.py:133 tortoisehg/hgtk/status.py:1274
+#: tortoisehg/hgqt/wctxactions.py:141 tortoisehg/hgtk/status.py:1274
 msgid "Restart merge with"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:162
+#: tortoisehg/hgqt/wctxactions.py:170
 msgid " errors"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:164
+#: tortoisehg/hgqt/wctxactions.py:172
 msgid " output"
 msgstr ""
 
-#: tortoisehg/hgqt/wctxactions.py:170 tortoisehg/hgqt/wctxactions.py:177
-#: tortoisehg/hgqt/wctxactions.py:180 tortoisehg/hgtk/gdialog.py:582
+#: tortoisehg/hgqt/wctxactions.py:178 tortoisehg/hgqt/wctxactions.py:185
+#: tortoisehg/hgqt/wctxactions.py:188 tortoisehg/hgtk/gdialog.py:582
 #: tortoisehg/hgtk/gdialog.py:585
 msgid " Aborted"
 msgstr " 失敗"
 
-#: tortoisehg/hgqt/wctxactions.py:234 tortoisehg/hgtk/statusact.py:125
+#: tortoisehg/hgqt/wctxactions.py:261 tortoisehg/hgtk/statusact.py:125
 msgid "Uncommited merge - please select a parent revision"
 msgstr "未提交的合併 - 請選擇一個母系修訂版"
 
-#: tortoisehg/hgqt/wctxactions.py:235 tortoisehg/hgtk/statusact.py:126
+#: tortoisehg/hgqt/wctxactions.py:262 tortoisehg/hgtk/statusact.py:126
 msgid "Revert files to local or other parent?"
-msgstr "回復(Revert)檔案到本地或其他的母系?"
+msgstr "Revert檔案到本地工作複本或其他的母系?"
 
-#: tortoisehg/hgqt/wctxactions.py:236 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:263 tortoisehg/hgtk/statusact.py:127
 msgid "&Local"
 msgstr "本地(&L)"
 
-#: tortoisehg/hgqt/wctxactions.py:236 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:263 tortoisehg/hgtk/statusact.py:127
 msgid "&Other"
 msgstr "其它(&O)"
 
-#: tortoisehg/hgqt/wctxactions.py:247
+#: tortoisehg/hgqt/wctxactions.py:274
 msgid "Revert local file changes?"
-msgstr "回復(Revert)本地檔案變更?"
+msgstr "Revert本地工作複本的檔案變更?"
 
-#: tortoisehg/hgqt/wctxactions.py:248
+#: tortoisehg/hgqt/wctxactions.py:275
 msgid "&Revert with backup"
-msgstr "(&R)回復(revert)並且備份"
+msgstr "&Revert並且備份"
 
-#: tortoisehg/hgqt/wctxactions.py:248
+#: tortoisehg/hgqt/wctxactions.py:275
 msgid "&Discard changes"
 msgstr "放棄變更(&D)"
 
-#: tortoisehg/hgqt/wctxactions.py:336
+#: tortoisehg/hgqt/wctxactions.py:363
 msgid "Confirm Delete Unversioned"
 msgstr "確認刪除沒有受版本控管的檔案"
 
-#: tortoisehg/hgqt/wctxactions.py:337
+#: tortoisehg/hgqt/wctxactions.py:364
 msgid "Delete the following unversioned files?"
 msgstr "刪除下列未受版本控管的檔案嗎?"
 
-#: tortoisehg/hgqt/wctxactions.py:349 tortoisehg/hgtk/statusact.py:40
+#: tortoisehg/hgqt/wctxactions.py:376 tortoisehg/hgtk/statusact.py:40
 msgid "Copy file to"
 msgstr "複製檔案到"
 
@@ -8050,7 +8099,7 @@ msgstr ""
 msgid "Config File:"
 msgstr "設定檔:"
 
-#: tortoisehg/hgqt/workbench.py:46 tortoisehg/hgqt/workbench.py:558
+#: tortoisehg/hgqt/workbench.py:46 tortoisehg/hgqt/workbench.py:561
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg工作台"
 
@@ -8074,7 +8123,7 @@ msgstr "檔案(&F)"
 msgid "&View"
 msgstr "檢視(&V)"
 
-#: tortoisehg/hgqt/workbench.py:125 tortoisehg/hgqt/workbench.py:356
+#: tortoisehg/hgqt/workbench.py:125 tortoisehg/hgqt/workbench.py:359
 msgid "Workbench Toolbars"
 msgstr "工作台工具列"
 
@@ -8210,136 +8259,144 @@ msgstr "載入所有修訂版"
 msgid "Load all revisions into graph"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:304
+#: tortoisehg/hgqt/workbench.py:303
+msgid "&Goto revision..."
+msgstr ""
+
+#: tortoisehg/hgqt/workbench.py:305
+msgid "Go to a specific revision"
+msgstr ""
+
+#: tortoisehg/hgqt/workbench.py:307
 msgid "Web Server..."
 msgstr "網頁伺服器..."
 
-#: tortoisehg/hgqt/workbench.py:307
+#: tortoisehg/hgqt/workbench.py:310
 msgid "Shelve..."
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:309 tortoisehg/hgtk/history.py:458
+#: tortoisehg/hgqt/workbench.py:312 tortoisehg/hgtk/history.py:458
 msgid "Import..."
 msgstr "匯入..."
 
-#: tortoisehg/hgqt/workbench.py:312 tortoisehg/hgtk/recovery.py:68
+#: tortoisehg/hgqt/workbench.py:315 tortoisehg/hgtk/recovery.py:68
 msgid "Verify"
 msgstr "驗證"
 
-#: tortoisehg/hgqt/workbench.py:314 tortoisehg/hgtk/recovery.py:63
+#: tortoisehg/hgqt/workbench.py:317 tortoisehg/hgtk/recovery.py:63
 msgid "Recover"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:317
+#: tortoisehg/hgqt/workbench.py:320
 msgid "Resolve..."
 msgstr "解決衝突..."
 
-#: tortoisehg/hgqt/workbench.py:320
+#: tortoisehg/hgqt/workbench.py:323
 msgid "Rollback/Undo..."
 msgstr "RollBack/Undo ..."
 
-#: tortoisehg/hgqt/workbench.py:323
+#: tortoisehg/hgqt/workbench.py:326
 msgid "Purge..."
 msgstr "徹底清除..."
 
-#: tortoisehg/hgqt/workbench.py:326
+#: tortoisehg/hgqt/workbench.py:329
 msgid "Bisect..."
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:336
+#: tortoisehg/hgqt/workbench.py:339
 msgid "Help"
 msgstr "說明"
 
-#: tortoisehg/hgqt/workbench.py:337
+#: tortoisehg/hgqt/workbench.py:340
 msgid "About Qt"
 msgstr "關於 Qt"
 
-#: tortoisehg/hgqt/workbench.py:338 tortoisehg/util/menuthg.py:73
+#: tortoisehg/hgqt/workbench.py:341 tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
 msgstr "關於 TortoiseHg"
 
-#: tortoisehg/hgqt/workbench.py:351
+#: tortoisehg/hgqt/workbench.py:354
 msgid "Filter Toolbar"
 msgstr "過濾器工具列"
 
-#: tortoisehg/hgqt/workbench.py:354
+#: tortoisehg/hgqt/workbench.py:357
 msgid "Filter graph with revision sets or branches"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:363 tortoisehg/hgtk/history.py:438
+#: tortoisehg/hgqt/workbench.py:366 tortoisehg/hgtk/history.py:438
 #: tortoisehg/hgtk/history.py:1856 tortoisehg/hgtk/synch.py:57
 msgid "Incoming"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:364
+#: tortoisehg/hgqt/workbench.py:367
 msgid "Check for incoming changes from selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:366 tortoisehg/hgtk/history.py:440
+#: tortoisehg/hgqt/workbench.py:369 tortoisehg/hgtk/history.py:440
 #: tortoisehg/hgtk/history.py:1986
 msgid "Pull"
 msgstr "拉收"
 
-#: tortoisehg/hgqt/workbench.py:367
+#: tortoisehg/hgqt/workbench.py:370
 msgid "Pull incoming changes from selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:369 tortoisehg/hgtk/history.py:442
+#: tortoisehg/hgqt/workbench.py:372 tortoisehg/hgtk/history.py:442
 #: tortoisehg/hgtk/history.py:2029 tortoisehg/hgtk/synch.py:68
 msgid "Outgoing"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:370
+#: tortoisehg/hgqt/workbench.py:373
 msgid "Detect outgoing changes to selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:373
+#: tortoisehg/hgqt/workbench.py:376
 msgid "Push outgoing changes to selected URL"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:379 tortoisehg/hgqt/workbench.py:380
+#: tortoisehg/hgqt/workbench.py:382 tortoisehg/hgqt/workbench.py:383
 msgid "Close tab"
 msgstr "關閉分頁"
 
-#: tortoisehg/hgqt/workbench.py:381 tortoisehg/hgqt/workbench.py:382
+#: tortoisehg/hgqt/workbench.py:384 tortoisehg/hgqt/workbench.py:385
 msgid "Close other tabs"
 msgstr "關閉其他分頁"
 
-#: tortoisehg/hgqt/workbench.py:383
+#: tortoisehg/hgqt/workbench.py:386
 msgid "Undo close tab"
 msgstr "復原(Undo)關閉的tab"
 
-#: tortoisehg/hgqt/workbench.py:384
+#: tortoisehg/hgqt/workbench.py:387
 msgid "Reopen last closed tab"
 msgstr "重新開啟最後關閉的分頁"
 
-#: tortoisehg/hgqt/workbench.py:385
+#: tortoisehg/hgqt/workbench.py:388
 msgid "Undo close other tabs"
 msgstr "復原(Undo)關閉的其他tab"
 
-#: tortoisehg/hgqt/workbench.py:386
+#: tortoisehg/hgqt/workbench.py:389
 msgid "Reopen last closed tab group"
 msgstr ""
 
-#: tortoisehg/hgqt/workbench.py:560
+#: tortoisehg/hgqt/workbench.py:563
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
 msgstr "%s - TortoiseHg工作台 - %s"
 
-#: tortoisehg/hgqt/workbench.py:563
+#: tortoisehg/hgqt/workbench.py:566
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg工作台"
 
-#: tortoisehg/hgqt/workbench.py:757
+#: tortoisehg/hgqt/workbench.py:768
 msgid "Select repository directory to open"
 msgstr "選擇儲存庫目錄來開啟"
 
-#: tortoisehg/hgqt/workbench.py:780
+#: tortoisehg/hgqt/workbench.py:791
 msgid "Failed to open repository"
 msgstr "開啟儲存庫失敗"
 
-#: tortoisehg/hgqt/workbench.py:921
+#: tortoisehg/hgqt/workbench.py:932
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr "hg 檔案log檢視器 [%s] - %s"
@@ -8437,7 +8494,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/backout.py:114
 msgid "Backed out successfully, you must now commit the results"
-msgstr ""
+msgstr "backout成功,你必須提交結果"
 
 #: tortoisehg/hgtk/backout.py:118
 msgid "Canceled backout"
@@ -8608,7 +8665,7 @@ msgstr "加註檔案(_A)"
 
 #: tortoisehg/hgtk/changeset.py:490
 msgid "_Revert File Contents"
-msgstr "回復(Revert)檔案內容(_R)"
+msgstr "_Revert檔案內容"
 
 #: tortoisehg/hgtk/changeset.py:782
 msgid "Diff to second Parent"
@@ -8616,12 +8673,12 @@ msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:1040
 msgid "Confirm revert file to old revision"
-msgstr "確認回復(Revert)檔案至舊的修訂版"
+msgstr "確認revert檔案至舊的修訂版"
 
 #: tortoisehg/hgtk/changeset.py:1041
 #, python-format
 msgid "Revert %s to contents at revision %d?"
-msgstr "回復(Revert) %s 到%d修訂版的內容"
+msgstr "Revert %s 到%d修訂版的內容"
 
 #: tortoisehg/hgtk/changeset.py:1054
 msgid "Enable _Wordwrap"
@@ -9121,7 +9178,7 @@ msgstr "加註第二個母系"
 
 #: tortoisehg/hgtk/datamine.py:182
 msgid "_Diff to Local"
-msgstr ""
+msgstr "(_D)與本地工作複本做Diff"
 
 #: tortoisehg/hgtk/datamine.py:318
 msgid "Start this search"
@@ -9141,7 +9198,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/datamine.py:331
 msgid "Show line numbers"
-msgstr "顯示行數"
+msgstr "顯示行號"
 
 #: tortoisehg/hgtk/datamine.py:332
 msgid "Show all matching revisions"
@@ -9211,7 +9268,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/gdialog.py:489 tortoisehg/hgtk/history.py:285
 msgid "Recovery"
-msgstr "修復"
+msgstr ""
 
 #: tortoisehg/hgtk/gdialog.py:493 tortoisehg/hgtk/history.py:291
 #: tortoisehg/hgtk/synch.py:83 tortoisehg/hgtk/thgshelve.py:72
@@ -9736,7 +9793,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/histdetails.py:35
 msgid "Log Details"
-msgstr ""
+msgstr "Log細節"
 
 #: tortoisehg/hgtk/histdetails.py:40
 msgid "Columns"
@@ -9862,7 +9919,7 @@ msgstr "啟動資料採礦工具"
 
 #: tortoisehg/hgtk/history.py:287
 msgid "Launch recovery tool"
-msgstr "啟動修復工具"
+msgstr "啟動 recovery 工具"
 
 #: tortoisehg/hgtk/history.py:290
 msgid "Launch web server"
@@ -10204,7 +10261,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1291 tortoisehg/hgtk/status.py:1247
 msgid "_Revert"
-msgstr "回復(_R)"
+msgstr ""
 
 #: tortoisehg/hgtk/history.py:1295
 msgid "Tag"
@@ -10492,16 +10549,14 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:2299
 msgid "Confirm Revert All Files"
-msgstr "確認回復(Revert)所有的檔案"
+msgstr "確認Revert所有的檔案"
 
 #: tortoisehg/hgtk/history.py:2300
 #, python-format
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
-msgstr ""
-"真的要回復(Revert)所有的檔案到%d修訂版?\n"
-"這將會覆寫你的本地變更"
+msgstr "真的要revert所有的檔案到%d修訂版?這將會覆寫你的本地工作複本變更"
 
 #: tortoisehg/hgtk/history.py:2350
 msgid "Save patches to"
@@ -10758,7 +10813,7 @@ msgstr "不能合併"
 
 #: tortoisehg/hgtk/merge.py:211
 msgid "Uncommitted local changes"
-msgstr "未提交的本地工作目錄變更"
+msgstr "未提交的本地工作複本變更"
 
 #: tortoisehg/hgtk/merge.py:253
 msgid "Confirm undo merge"
@@ -10796,7 +10851,7 @@ msgstr "忘記選擇的檔案"
 
 #: tortoisehg/hgtk/quickop.py:21
 msgid "Select files to revert"
-msgstr "選擇檔案去回復(revert)"
+msgstr "選擇要revert的檔案"
 
 #: tortoisehg/hgtk/quickop.py:22
 msgid "Select files to remove"
@@ -10821,7 +10876,7 @@ msgstr "成功"
 #: tortoisehg/hgtk/recovery.py:42
 #, python-format
 msgid "%s - recovery"
-msgstr "%s - 修復"
+msgstr ""
 
 #: tortoisehg/hgtk/recovery.py:48 tortoisehg/hgtk/synch.py:53
 msgid "Stop the hg operation"
@@ -10841,7 +10896,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/recovery.py:65
 msgid "Recover from interrupted operation"
-msgstr ""
+msgstr "從被中斷的操作那邊開始recover"
 
 #: tortoisehg/hgtk/recovery.py:70
 msgid "Validate repository consistency"
@@ -11211,11 +11266,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/status.py:1028 tortoisehg/hgtk/statusact.py:106
 msgid "Nothing Reverted"
-msgstr "沒什麼可以回復(reverted)"
+msgstr "沒什麼可以revert"
 
 #: tortoisehg/hgtk/status.py:1029
 msgid "No revertable files selected"
-msgstr "沒有可回復(reverted)檔案被選上"
+msgstr "沒有可revert的檔案被選上"
 
 #: tortoisehg/hgtk/status.py:1037
 msgid "Nothing Added"
@@ -11313,16 +11368,16 @@ msgstr ""
 
 #: tortoisehg/hgtk/statusact.py:107
 msgid "Revert not allowed when viewing revision range."
-msgstr "當檢視修訂版區間時不可回復(revert)"
+msgstr "當檢視修訂版區間時不可revert"
 
 #: tortoisehg/hgtk/statusact.py:140
 #, python-format
 msgid "Revert files to revision %s?"
-msgstr "回復(Revert)檔案到%s修訂版?"
+msgstr "revert檔案到%s修訂版?"
 
 #: tortoisehg/hgtk/statusact.py:143
 msgid "Revert files?"
-msgstr "回復(Revert)檔案?"
+msgstr "revert檔案?"
 
 #: tortoisehg/hgtk/statusact.py:147
 msgid "&Yes (backup changes)"
@@ -11378,15 +11433,15 @@ msgstr "從選擇的儲存庫中拉收變更"
 
 #: tortoisehg/hgtk/synch.py:70
 msgid "Display local changes that will be pushed to selected repository"
-msgstr "顯示將推送到選擇的儲存庫的本地變更"
+msgstr "顯示將推送到選擇的儲存庫的本地工作複本變更"
 
 #: tortoisehg/hgtk/synch.py:75
 msgid "Push local changes to selected repository"
-msgstr "推送本地工作目錄變更到選擇的儲存庫"
+msgstr "推送本地工作複本變更到選擇的儲存庫"
 
 #: tortoisehg/hgtk/synch.py:80
 msgid "Email local outgoing changes to one or more recipients"
-msgstr "將變更部份發出電子信件通知一個或多個受文者"
+msgstr ""
 
 #: tortoisehg/hgtk/synch.py:85
 msgid "Shelve uncommited changes"
@@ -11794,7 +11849,7 @@ msgstr "目錄"
 
 #: tortoisehg/hgtk/thgconfig.py:403
 msgid "URL Details"
-msgstr ""
+msgstr "URL 細節"
 
 #: tortoisehg/hgtk/thgconfig.py:544
 msgid "Select Local Folder"
@@ -11918,7 +11973,7 @@ msgid ""
 "Reverting to read-only mode."
 msgstr ""
 "%s\n"
-"回復(Revert)到唯讀模式"
+"Revert到唯讀模式"
 
 #: tortoisehg/hgtk/thgconfig.py:1622
 msgid "Skipped saving path with no alias"
@@ -12117,7 +12172,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:499
 msgid "Uncommitted Local Changes"
-msgstr "未提交的本地工作目錄變更"
+msgstr "未提交的本地工作複本變更"
 
 #: tortoisehg/hgtk/thgpbranch.py:500
 msgid ""
@@ -12647,11 +12702,11 @@ msgstr "加入檔案到版本控制"
 
 #: tortoisehg/util/menuthg.py:34
 msgid "Revert Files..."
-msgstr "回復(Revert)檔案..."
+msgstr "Revert檔案..."
 
 #: tortoisehg/util/menuthg.py:35
 msgid "Revert file changes"
-msgstr "回復(Revert)檔案變更"
+msgstr "Revert檔案變更"
 
 #: tortoisehg/util/menuthg.py:37
 msgid "Forget Files..."
