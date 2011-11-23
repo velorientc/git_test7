@@ -141,7 +141,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         vbox.addLayout(hbox, 0)
         self.buttonHBox = hbox
 
-        if embedded and 'mq' in self.repo.extensions():
+        if 'mq' in self.repo.extensions():
             self.hasmqbutton = True
             pnhbox = QHBoxLayout()
             self.pnlabel = QLabel()
@@ -1100,7 +1100,7 @@ class CommitDialog(QDialog):
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
 
-        commit = CommitWidget(repo, pats, opts, False, self)
+        commit = CommitWidget(repo, pats, opts, False, self, rev='.')
         toplayout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -1109,16 +1109,25 @@ class CommitDialog(QDialog):
         commit.linkActivated.connect(self.linkActivated)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Close|BB.Discard)
-        bb.accepted.connect(self.accept)
+        bb = QDialogButtonBox(BB.Close|BB.Discard)
         bb.rejected.connect(self.reject)
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
         bb.button(BB.Close).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
-        bb.button(BB.Ok).setDefault(True)
-        self.commitButton = bb.button(BB.Ok)
-        self.commitButton.setText(_('Commit', 'action button'))
+        if commit.hasmqbutton:
+            self.commitButton = commit.mqSetupButton()
+            bb.addButton(self.commitButton, BB.AcceptRole)
+        else:
+            self.commitButton = commitbtn = bb.addButton(BB.Ok)
+            commitbtn.setDefault(True)
+            commitbtn.setText(_('Commit', 'action button'))
+            f = commitbtn.font()
+            f.setWeight(QFont.Bold)
+            commitbtn.setFont(f)
+            commit.commitButtonEnable.connect(commitbtn.setEnabled)
+            bb.accepted.connect(self.accept)
+
         self.bb = bb
 
         toplayout.addWidget(self.bb)
@@ -1129,7 +1138,6 @@ class CommitDialog(QDialog):
         commit.loadSettings(s, 'committool')
         repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
-        commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
         self.setWindowTitle(_('%s - commit') % repo.displayname)
         self.commit = commit
