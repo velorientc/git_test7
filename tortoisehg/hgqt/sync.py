@@ -720,7 +720,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
-        if not self.opts['mq']:
+        if not self.opts.get('mq'):
             cmdline.append(cururl)
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
@@ -848,7 +848,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--update', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
-        elif self.opts['mq']:
+        elif self.opts.get('mq'):
             # force the tool to update to the pulled changeset
             cmdline += ['--update', '--config', uimerge]
         self.run(cmdline, ('force', 'branch', 'rev', 'bookmark', 'mq'))
