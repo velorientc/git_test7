@@ -167,9 +167,11 @@ class WctxActions(QObject):
                 notify = func(parent, hu, repo, files)
                 o, e = hu.getdata()
                 if e:
-                    QMessageBox.warning(parent, name + _(' errors'), e)
+                    QMessageBox.warning(parent, name + _(' errors'),
+                        hglib.tounicode(e))
                 elif o:
-                    QMessageBox.information(parent, name + _(' output'), o)
+                    QMessageBox.information(parent, name + _(' output'),
+                        hglib.tounicode(o))
                 elif notify:
                     wfiles = [repo.wjoin(x) for x in files]
                     shlib.shell_notify(wfiles)
