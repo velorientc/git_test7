@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-11-18 10:47-0200\n"
-"PO-Revision-Date: 2011-11-21 11:04+0000\n"
+"POT-Creation-Date: 2011-11-22 11:10-0200\n"
+"PO-Revision-Date: 2011-11-29 03:28+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-11-22 05:04+0000\n"
-"X-Generator: Launchpad (build 14299)\n"
+"X-Launchpad-Export-Date: 2011-11-30 05:38+0000\n"
+"X-Generator: Launchpad (build 14404)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -83,10 +83,10 @@ msgstr "修訂版："
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "此修訂版只有被修改/被建立的檔案"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:68
-#: tortoisehg/hgqt/sync.py:1533
+#: tortoisehg/hgqt/sync.py:1538
 msgid "Recurse into subrepositories"
 msgstr "遞歸到子儲存庫裡面去"
 
@@ -244,44 +244,44 @@ msgstr "\"%s\"目的地已經存在,而且是一個目錄"
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "退回 - %s"
 
 #: tortoisehg/hgqt/backout.py:99
 msgid "Prepare to backout"
-msgstr "準備backout"
+msgstr "準備退回"
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
-msgstr "驗證backout的修訂版,確認你的工作目錄是乾淨的"
+msgstr "驗證退回的修訂版,確認你的工作目錄是乾淨的"
 
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
 #: tortoisehg/hgqt/backout.py:130
 msgid "Unable to backout"
-msgstr "不能backout ><"
+msgstr "不能退回 ><"
 
 #: tortoisehg/hgqt/backout.py:112
 msgid "Backout revision not found"
-msgstr "找不到要backout的修訂版"
+msgstr "找不到要退回的修訂版"
 
 #: tortoisehg/hgqt/backout.py:117
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
+msgstr "退回一個母系修訂版是一個單步操作"
 
 #: tortoisehg/hgqt/backout.py:124
 msgid "Backout requires a parent revision"
-msgstr ""
+msgstr "退回需要一個母系修訂版"
 
 #: tortoisehg/hgqt/backout.py:131
 msgid "Cannot backout change on a different branch"
-msgstr "不能在不同的分支中backout變更"
+msgstr "不能在不同的分支中退回變更"
 
 #: tortoisehg/hgqt/backout.py:137
 msgid "Backout revision"
-msgstr "Backout修訂版"
+msgstr "退回修訂版"
 
 #: tortoisehg/hgqt/backout.py:147
 msgid "Not a head, backout will create a new head!"
-msgstr "沒有標頭,backout操作將建立一個新的標頭!"
+msgstr "沒有標頭,退回操作將建立一個新的標頭!"
 
 #: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
@@ -304,7 +304,7 @@ msgstr "第一個母系: 修訂版 %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:185
 msgid "Backout to the first parent of the merge revision"
-msgstr "Backout 到合併修訂版的第一個母系"
+msgstr "退回到合併修訂版的第一個母系"
 
 #: tortoisehg/hgqt/backout.py:190
 #, python-format
@@ -313,7 +313,7 @@ msgstr "第二個母系: 修訂版 %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:195
 msgid "Backout to the second parent of the merge revision"
-msgstr "Backout 到合併修訂版的第二個母系"
+msgstr "退回到合併修訂版的第二個母系"
 
 #: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
@@ -330,11 +330,11 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
-"backout之前,你必須 <a href=\"commit\"><b>提交</b></a>, <a "
+"退回之前,你必須 <a href=\"commit\"><b>提交</b></a>, <a "
 "href=\"shelve\"><b>shelve</b></a> 到補丁,或 <a href=\"discard\"><b>丟棄</b></a>變更"
 
 #: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:215
-#: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1077
+#: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1082
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
 msgstr "在可能情況下自動解決合併衝突"
@@ -367,7 +367,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
-msgstr "正在backout,然後合併..."
+msgstr "正在退回,然後合併..."
 
 #: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
@@ -376,7 +376,7 @@ msgstr "所有有衝突的檔案將被標示為未解決"
 #: tortoisehg/hgqt/backout.py:341
 msgid ""
 "Automatically advance to next page when backout and merge are complete."
-msgstr ""
+msgstr "退回或合併完成後自動前進到下一個頁面"
 
 #: tortoisehg/hgqt/backout.py:372 tortoisehg/hgqt/merge.py:395
 #, python-format
@@ -391,7 +391,7 @@ msgstr "沒有合併衝突,準備提交"
 
 #: tortoisehg/hgqt/backout.py:412
 msgid "Commit backout and merge results"
-msgstr "提交backout,合併結果"
+msgstr "提交退回,合併結果"
 
 #: tortoisehg/hgqt/backout.py:422 tortoisehg/hgqt/merge.py:449
 #: tortoisehg/hgtk/commit.py:236 tortoisehg/hgtk/history.py:66
@@ -424,7 +424,7 @@ msgstr "Backed out 合併變更集: "
 #: tortoisehg/hgqt/backout.py:511 tortoisehg/hgqt/backout.py:545
 #: tortoisehg/hgtk/backout.py:41
 msgid "Backed out changeset: "
-msgstr "Backed out 變更集: "
+msgstr "退回變更集: "
 
 #: tortoisehg/hgqt/backout.py:514 tortoisehg/hgqt/commit.py:600
 #: tortoisehg/hgqt/mq.py:822 tortoisehg/hgtk/backout.py:139
@@ -434,21 +434,21 @@ msgstr "確認丟棄訊息"
 
 #: tortoisehg/hgqt/backout.py:515 tortoisehg/hgtk/backout.py:140
 msgid "Discard current backout message?"
-msgstr "丟棄目前的backout訊息?"
+msgstr "丟棄目前的退回訊息?"
 
 #: tortoisehg/hgqt/backout.py:524 tortoisehg/hgtk/backout.py:82
 msgid "Use English backout message"
-msgstr "使用英文backout訊息"
+msgstr "使用英文退回訊息"
 
 #: tortoisehg/hgqt/backout.py:553
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
+msgstr "退回合併的修訂版到他的首個母系(%s)"
 
 #: tortoisehg/hgqt/backout.py:556
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
+msgstr "退回合併的修訂版到他的第二個母系(%s)"
 
 #: tortoisehg/hgqt/backout.py:585
 msgid "Backing out and committing..."
@@ -456,7 +456,7 @@ msgstr "Backing out ,然後提交..."
 
 #: tortoisehg/hgqt/backout.py:586
 msgid "Please wait while making backout."
-msgstr "正在backout,請等一下"
+msgstr "正在退回,請等一下"
 
 #: tortoisehg/hgqt/backout.py:594 tortoisehg/hgqt/merge.py:573
 msgid "Committing..."
@@ -473,7 +473,7 @@ msgstr "已完成"
 
 #: tortoisehg/hgqt/backout.py:625
 msgid "Backout changeset"
-msgstr "Backout變更集"
+msgstr "退回變更集"
 
 #: tortoisehg/hgqt/bisect.py:22
 #, python-format
@@ -513,7 +513,7 @@ msgstr "關閉"
 
 #: tortoisehg/hgqt/bisect.py:83
 msgid "Error encountered."
-msgstr ""
+msgstr "發生錯誤"
 
 #: tortoisehg/hgqt/bisect.py:88
 msgid "Culprit found."
@@ -784,7 +784,7 @@ msgstr "目的地:"
 #: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:113
 #: tortoisehg/hgqt/merge.py:202 tortoisehg/hgqt/mq.py:622
 #: tortoisehg/hgqt/postreview_ui.py:170 tortoisehg/hgqt/rebase.py:57
-#: tortoisehg/hgqt/sync.py:161 tortoisehg/hgqt/tag.py:64
+#: tortoisehg/hgqt/sync.py:162 tortoisehg/hgqt/tag.py:64
 #: tortoisehg/hgtk/hgemail.py:64
 msgid "Options"
 msgstr "選項"
@@ -818,7 +818,7 @@ msgstr "使用代理伺服器"
 msgid "Do not verify host certificate"
 msgstr "無法驗證主機憑證"
 
-#: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1552
+#: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1563
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
 msgid "Remote command:"
 msgstr "遠端命令:"
@@ -991,7 +991,7 @@ msgstr "複製常用提交訊息中的一個"
 #: tortoisehg/hgqt/commit.py:123 tortoisehg/hgqt/commit.py:461
 #: tortoisehg/hgqt/settings.py:303
 msgid "Issue Tracker"
-msgstr ""
+msgstr "問題追蹤系統"
 
 #: tortoisehg/hgqt/commit.py:124
 #, python-format
@@ -1053,7 +1053,7 @@ msgstr "分支重新開始(&B)"
 msgid "&Commit to current branch"
 msgstr "提交到目前分支(&C)"
 
-#: tortoisehg/hgqt/commit.py:378 tortoisehg/hgqt/sync.py:947
+#: tortoisehg/hgqt/commit.py:378 tortoisehg/hgqt/sync.py:952
 #: tortoisehg/hgtk/commit.py:1194
 msgid "Confirm New Branch"
 msgstr "確認新分支"
@@ -1192,16 +1192,16 @@ msgid "Unable to save username"
 msgstr "不能儲存使用者名字"
 
 #: tortoisehg/hgqt/commit.py:975 tortoisehg/hgqt/commit.py:998
-#: tortoisehg/hgqt/commit.py:1021 tortoisehg/hgqt/sync.py:1019
-#: tortoisehg/hgqt/sync.py:1117 tortoisehg/hgqt/sync.py:1187
-#: tortoisehg/hgqt/sync.py:1355
+#: tortoisehg/hgqt/commit.py:1021 tortoisehg/hgqt/sync.py:1024
+#: tortoisehg/hgqt/sync.py:1122 tortoisehg/hgqt/sync.py:1192
+#: tortoisehg/hgqt/sync.py:1360
 msgid "Iniparse must be installed."
 msgstr "需要安裝Iniparse"
 
 #: tortoisehg/hgqt/commit.py:990 tortoisehg/hgqt/commit.py:1013
 #: tortoisehg/hgqt/commit.py:1036 tortoisehg/hgqt/settings.py:1271
-#: tortoisehg/hgqt/sync.py:1029 tortoisehg/hgqt/sync.py:1128
-#: tortoisehg/hgqt/sync.py:1205 tortoisehg/hgqt/sync.py:1394
+#: tortoisehg/hgqt/sync.py:1034 tortoisehg/hgqt/sync.py:1133
+#: tortoisehg/hgqt/sync.py:1210 tortoisehg/hgqt/sync.py:1399
 #: tortoisehg/hgtk/thgconfig.py:1654
 msgid "Unable to write configuration file"
 msgstr "不能寫入設定檔"
@@ -1239,7 +1239,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/compress.py:45
 msgid "Onto destination"
-msgstr ""
+msgstr "到目的地"
 
 #: tortoisehg/hgqt/compress.py:63
 msgid "Compress"
@@ -1299,7 +1299,7 @@ msgid "Age:"
 msgstr "時間："
 
 #: tortoisehg/hgqt/csinfo.py:108 tortoisehg/hgqt/csinfo.py:110
-#: tortoisehg/hgqt/sync.py:1558 tortoisehg/hgtk/csinfo.py:214
+#: tortoisehg/hgqt/sync.py:1569 tortoisehg/hgtk/csinfo.py:214
 #: tortoisehg/hgtk/csinfo.py:215
 msgid "Branch:"
 msgstr "分支:"
@@ -1406,11 +1406,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:167
 msgid "Subrepo created and set to initial revision."
-msgstr ""
+msgstr "子儲存庫建立了而且設定成初始修訂版"
 
 #: tortoisehg/hgqt/filedata.py:171
 msgid "Subrepo initialized to revision:"
-msgstr ""
+msgstr "子儲存庫初始畫到修訂版:"
 
 #: tortoisehg/hgqt/filedata.py:174
 msgid "Subrepo removed from repository."
@@ -1418,11 +1418,11 @@ msgstr "從儲存庫裡移除子儲存庫"
 
 #: tortoisehg/hgqt/filedata.py:178
 msgid "Subrepo was not changed."
-msgstr ""
+msgstr "子儲存庫沒有改變."
 
 #: tortoisehg/hgqt/filedata.py:179
 msgid "Subrepo state is:"
-msgstr ""
+msgstr "子儲存庫狀態是:"
 
 #: tortoisehg/hgqt/filedata.py:181 tortoisehg/hgqt/filedata.py:191
 #: tortoisehg/hgqt/filedata.py:196 tortoisehg/hgqt/filedata.py:200
@@ -1446,17 +1446,17 @@ msgstr "在工作目錄裡找不到子儲存庫"
 
 #: tortoisehg/hgqt/filedata.py:203 tortoisehg/hgqt/filedata.py:209
 msgid "Further subrepository revision information cannot be retrieved."
-msgstr ""
+msgstr "找不到更進一步的子儲存庫修訂版資訊."
 
 #: tortoisehg/hgqt/filedata.py:207
 msgid "Subrepository is either damaged or missing some revisions"
-msgstr ""
+msgstr "子儲存庫損壞或遺失某些修訂版"
 
 #: tortoisehg/hgqt/filedata.py:211
 msgid ""
 "You may need to open the missing subrepository and manually\n"
 "pull the missing revisions from its source repository."
-msgstr ""
+msgstr "你可能需要開啟子儲存庫然後手動的從他的來源儲存庫拉收遺失的修訂版"
 
 #: tortoisehg/hgqt/filedata.py:220 tortoisehg/hgqt/settings.py:526
 msgid "Initial revision"
@@ -1501,12 +1501,12 @@ msgstr ""
 #: tortoisehg/hgqt/filedata.py:291
 #, python-format
 msgid " <a href=\"subrepo:%s\">open...</a>"
-msgstr ""
+msgstr " <a href=\"subrepo:%s\">開啟...</a>"
 
 #: tortoisehg/hgqt/filedata.py:294
 #, python-format
 msgid "Error previewing subrepo: %s"
-msgstr ""
+msgstr "預覽子儲存庫錯誤:%s"
 
 #: tortoisehg/hgqt/filedata.py:301
 #, python-format
@@ -2335,20 +2335,20 @@ msgstr "開啟選擇的子儲存庫"
 #: tortoisehg/hgqt/manifestdialog.py:214 tortoisehg/hgqt/revdetails.py:252
 #: tortoisehg/hgqt/wctxactions.py:47
 msgid "Explore subrepository"
-msgstr ""
+msgstr "瀏覽子儲存庫"
 
 #: tortoisehg/hgqt/manifestdialog.py:216
 msgid "Open the selected subrepository in a file browser"
-msgstr ""
+msgstr "在檔案瀏覽器開啟選擇的子儲存庫"
 
 #: tortoisehg/hgqt/manifestdialog.py:218 tortoisehg/hgqt/revdetails.py:255
 #: tortoisehg/hgqt/wctxactions.py:49
 msgid "Open terminal in subrepository"
-msgstr ""
+msgstr "在子儲存庫裡開啟終端機"
 
 #: tortoisehg/hgqt/manifestdialog.py:220 tortoisehg/hgqt/revdetails.py:257
 msgid "Open a shell terminal in the selected subrepository root"
-msgstr ""
+msgstr "在選擇的子儲存庫跟目錄裡開啟終端機"
 
 #: tortoisehg/hgqt/manifestdialog.py:317 tortoisehg/hgqt/revdetails.py:405
 #, python-format
@@ -2767,7 +2767,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/pbranch.py:879
 msgid "Patch message:"
-msgstr ""
+msgstr "補丁訊息:"
 
 #: tortoisehg/hgqt/pbranch.py:880
 msgid "Patch date:"
@@ -3285,7 +3285,7 @@ msgstr ""
 msgid "Checkmark files to remove"
 msgstr ""
 
-#: tortoisehg/hgqt/quickop.py:23 tortoisehg/hgqt/sync.py:573
+#: tortoisehg/hgqt/quickop.py:23 tortoisehg/hgqt/sync.py:574
 #: tortoisehg/hgqt/webconf_ui.py:80 tortoisehg/hgtk/bookmark.py:47
 #: tortoisehg/hgtk/quickop.py:22 tortoisehg/hgtk/tagadd.py:40
 msgid "Remove"
@@ -3648,7 +3648,7 @@ msgstr "節點"
 #: tortoisehg/hgqt/repomodel.py:49
 msgctxt "column header"
 msgid "Age"
-msgstr ""
+msgstr "經歷時間"
 
 #: tortoisehg/hgqt/repomodel.py:50
 msgctxt "column header"
@@ -3763,7 +3763,7 @@ msgstr "拓製..."
 msgid "Clone Repository"
 msgstr "拓製儲存庫"
 
-#: tortoisehg/hgqt/reporegistry.py:422 tortoisehg/hgqt/sync.py:571
+#: tortoisehg/hgqt/reporegistry.py:422 tortoisehg/hgqt/sync.py:572
 #: tortoisehg/hgqt/workbench.py:332
 msgid "Explore"
 msgstr "瀏覽"
@@ -3772,7 +3772,7 @@ msgstr "瀏覽"
 msgid "Open the repository in a file browser"
 msgstr ""
 
-#: tortoisehg/hgqt/reporegistry.py:424 tortoisehg/hgqt/sync.py:572
+#: tortoisehg/hgqt/reporegistry.py:424 tortoisehg/hgqt/sync.py:573
 #: tortoisehg/hgqt/workbench.py:335
 msgid "Terminal"
 msgstr "終端機"
@@ -3791,11 +3791,11 @@ msgstr "新增儲存庫到這個群組"
 
 #: tortoisehg/hgqt/reporegistry.py:428
 msgid "Add a subrepository..."
-msgstr ""
+msgstr "增加一個子儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:429
 msgid "Convert an existing repository into a subrepository"
-msgstr ""
+msgstr "轉換一個存在的儲存庫成為子儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:431 tortoisehg/hgqt/wctxactions.py:52
 msgid "Copy path"
@@ -3826,7 +3826,7 @@ msgstr ""
 #: tortoisehg/hgqt/reporegistry.py:517 tortoisehg/hgqt/reporegistry.py:522
 #: tortoisehg/hgqt/reporegistry.py:527
 msgid "Cannot add subrepository"
-msgstr ""
+msgstr "不能增加子儲存庫"
 
 #: tortoisehg/hgqt/reporegistry.py:518
 #, python-format
@@ -3857,7 +3857,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:552
 msgid "Subrepository already exists"
-msgstr ""
+msgstr "子儲存庫已經存在"
 
 #: tortoisehg/hgqt/reporegistry.py:553
 #, python-format
@@ -3868,7 +3868,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:570
 msgid "Failed to add subrepository"
-msgstr ""
+msgstr "增加子儲存庫失敗"
 
 #: tortoisehg/hgqt/reporegistry.py:571
 #, python-format
@@ -3911,12 +3911,12 @@ msgstr "本地儲存庫 %s"
 #, python-format
 msgid ""
 "An exception happened while loading the subrepos of:<br><br>\"%s\"<br><br>"
-msgstr ""
+msgstr "載入 <br><br>\"%s\"<br><br> 子儲存庫時發生了例外狀況"
 
 #: tortoisehg/hgqt/repotreeitem.py:326
 #, python-format
 msgid "The exception error message was:<br><br>%s<br><br>"
-msgstr ""
+msgstr "例外錯誤訊息是:<br><br>%s<br><br>"
 
 #: tortoisehg/hgqt/repotreeitem.py:327
 msgid "Click OK to continue or Abort to exit."
@@ -3924,7 +3924,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreeitem.py:329
 msgid "Error loading subrepos"
-msgstr ""
+msgstr "載入子儲存庫時錯誤"
 
 #: tortoisehg/hgqt/repotreeitem.py:347
 msgid "Unable to update repository name"
@@ -3940,7 +3940,7 @@ msgid "default"
 msgstr "預設值"
 
 #: tortoisehg/hgqt/repotreemodel.py:164 tortoisehg/hgqt/resolve.py:399
-#: tortoisehg/hgqt/sync.py:251 tortoisehg/hgqt/webconf.py:266
+#: tortoisehg/hgqt/sync.py:252 tortoisehg/hgqt/webconf.py:266
 msgid "Path"
 msgstr "路徑"
 
@@ -3957,7 +3957,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreemodel.py:286
 msgid "Could not open some subrepositories"
-msgstr ""
+msgstr "不能打開一些子儲存庫"
 
 #: tortoisehg/hgqt/repotreemodel.py:287
 #, python-format
@@ -4023,15 +4023,15 @@ msgstr "補丁分支"
 #: tortoisehg/hgqt/repowidget.py:261
 #, python-format
 msgid "%s <incoming>"
-msgstr ""
+msgstr "%s <可拉收>"
 
 #: tortoisehg/hgqt/repowidget.py:429
 msgid "Found incoming changesets"
-msgstr ""
+msgstr "找尋可拉收的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:432
 msgid "Pull incoming changesets into your repository"
-msgstr ""
+msgstr "拉收可拉收的變更集到你的儲存庫"
 
 #: tortoisehg/hgqt/repowidget.py:434 tortoisehg/hgtk/history.py:1881
 msgid "Reject"
@@ -4039,13 +4039,13 @@ msgstr "拒絕"
 
 #: tortoisehg/hgqt/repowidget.py:435
 msgid "Reject incoming changesets"
-msgstr ""
+msgstr "Reject可拉收的變更集"
 
-#: tortoisehg/hgqt/repowidget.py:526 tortoisehg/hgqt/sync.py:979
+#: tortoisehg/hgqt/repowidget.py:526 tortoisehg/hgqt/sync.py:984
 #: tortoisehg/hgtk/history.py:2021
 #, python-format
 msgid "%d outgoing changesets"
-msgstr ""
+msgstr "%d 個可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:528 tortoisehg/hgqt/repowidget.py:1151
 #: tortoisehg/hgqt/workbench.py:375 tortoisehg/hgtk/history.py:444
@@ -4172,7 +4172,7 @@ msgstr "書籤..."
 
 #: tortoisehg/hgqt/repowidget.py:1177 tortoisehg/hgtk/history.py:1290
 msgid "Backout..."
-msgstr ""
+msgstr "退回..."
 
 #: tortoisehg/hgqt/repowidget.py:1181 tortoisehg/hgtk/history.py:1293
 msgid "Export"
@@ -5477,7 +5477,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rupdate.py:65
 msgid "Allow pushing new branches (--new-branch)"
-msgstr ""
+msgstr "允許推送成新分支(--new-branch)"
 
 #: tortoisehg/hgqt/rupdate.py:67
 msgid "Force push to remote location (-f/--force)"
@@ -5746,7 +5746,7 @@ msgstr "任務分頁"
 msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
-msgstr ""
+msgstr "將任務工具列的按鈕化成儲存庫畫面上的分頁標籤,你就不再需要任務工具列.預設: off"
 
 #: tortoisehg/hgqt/settings.py:547 tortoisehg/hgtk/thgconfig.py:135
 msgid "Long Summary"
@@ -5818,7 +5818,7 @@ msgctxt "config item"
 msgid "Commit"
 msgstr "提交"
 
-#: tortoisehg/hgqt/settings.py:579 tortoisehg/hgqt/sync.py:1308
+#: tortoisehg/hgqt/settings.py:579 tortoisehg/hgqt/sync.py:1313
 #: tortoisehg/hgtk/thgconfig.py:90
 msgid "Username"
 msgstr "使用者名稱"
@@ -5889,8 +5889,7 @@ msgid ""
 "variables are set to a non-English language. This setting is used by the "
 "Merge, Tag and Backout dialogs. Default: False"
 msgstr ""
-"假如LANGUAGE or LANG "
-"環境變數是設定成非英語的語言,就建立英文的提交訊息.這個設定將在合併,標籤,和backout對話框被使用.預設:False"
+"假如LANGUAGE or LANG 環境變數是設定成非英語的語言,就建立英文的提交訊息.這個設定將在合併,標籤,和退回對話框被使用.預設:False"
 
 #: tortoisehg/hgqt/settings.py:606
 msgid "Monitor working<br>directory changes"
@@ -5959,7 +5958,7 @@ msgstr "封存格式"
 msgid "Comma separated list of archive formats allowed for downloading"
 msgstr ""
 
-#: tortoisehg/hgqt/settings.py:641 tortoisehg/hgqt/sync.py:240
+#: tortoisehg/hgqt/settings.py:641 tortoisehg/hgqt/sync.py:241
 #: tortoisehg/hgtk/thgconfig.py:195 tortoisehg/hgtk/thgconfig.py:368
 msgid "Port"
 msgstr "通訊埠"
@@ -6067,7 +6066,7 @@ msgid "Optional. User name to authenticate with at the proxy server"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:681 tortoisehg/hgqt/settings.py:805
-#: tortoisehg/hgqt/sync.py:1316 tortoisehg/hgtk/thgconfig.py:234
+#: tortoisehg/hgqt/sync.py:1321 tortoisehg/hgtk/thgconfig.py:234
 #: tortoisehg/hgtk/thgconfig.py:370
 msgid "Password"
 msgstr "密碼"
@@ -6905,275 +6904,275 @@ msgstr ""
 
 #: tortoisehg/hgqt/status.py:831
 msgid "subrepo"
-msgstr ""
+msgstr "子儲存庫"
 
 #: tortoisehg/hgqt/sync.py:39
 msgid "Malformed ssh URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:109
+#: tortoisehg/hgqt/sync.py:110
 msgid "TortoiseHg Sync"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:128
+#: tortoisehg/hgqt/sync.py:129
 msgid "Preview incoming changesets from remote repository"
-msgstr ""
+msgstr "從遠端儲存庫預覽可拉收的變更集"
 
-#: tortoisehg/hgqt/sync.py:131
+#: tortoisehg/hgqt/sync.py:132
 msgid "Pull incoming changesets from remote repository"
-msgstr ""
+msgstr "從遠端儲存庫拉收可拉收的變更集"
 
-#: tortoisehg/hgqt/sync.py:134
+#: tortoisehg/hgqt/sync.py:135
 msgid "Filter outgoing changesets to remote repository"
-msgstr ""
+msgstr "過濾可被推送的變更集到遠端儲存庫"
 
-#: tortoisehg/hgqt/sync.py:137
+#: tortoisehg/hgqt/sync.py:138
 msgid "Push outgoing changesets to remote repository"
-msgstr ""
+msgstr "推送可被推送的變更集到遠端儲存庫"
 
-#: tortoisehg/hgqt/sync.py:139
+#: tortoisehg/hgqt/sync.py:140
 msgid "Email outgoing changesets for remote repository"
-msgstr ""
+msgstr "Email可被推送的變更集到遠端儲存庫"
 
-#: tortoisehg/hgqt/sync.py:144
+#: tortoisehg/hgqt/sync.py:145
 msgid "Manage pending perforce changelists"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:150
+#: tortoisehg/hgqt/sync.py:151
 msgid "Unbundle"
 msgstr "解榜兜"
 
-#: tortoisehg/hgqt/sync.py:154
+#: tortoisehg/hgqt/sync.py:155
 msgid "Stop current operation"
 msgstr "停止目前的操作"
 
-#: tortoisehg/hgqt/sync.py:170 tortoisehg/hgqt/update.py:73
+#: tortoisehg/hgqt/sync.py:171 tortoisehg/hgqt/update.py:73
 #: tortoisehg/hgtk/update.py:78
 msgid "Target:"
 msgstr "目標:"
 
-#: tortoisehg/hgqt/sync.py:187
+#: tortoisehg/hgqt/sync.py:188
 msgid "<b>Selected Options:</b>"
 msgstr "<b>選擇的選項:</b>"
 
-#: tortoisehg/hgqt/sync.py:197
+#: tortoisehg/hgqt/sync.py:198
 msgid "<b>Remote Repository:</b>"
 msgstr "<b>遠端儲存庫:</b>"
 
-#: tortoisehg/hgqt/sync.py:208
+#: tortoisehg/hgqt/sync.py:209
 msgid "Path Edit Toolbar"
 msgstr "路徑編輯工具列"
 
-#: tortoisehg/hgqt/sync.py:219
+#: tortoisehg/hgqt/sync.py:220
 msgid "Security"
 msgstr "安全"
 
-#: tortoisehg/hgqt/sync.py:220
+#: tortoisehg/hgqt/sync.py:221
 msgid "Manage HTTPS connection security and user authentication"
 msgstr "管理HTTPS連線安全以及使用者認證"
 
-#: tortoisehg/hgqt/sync.py:228
+#: tortoisehg/hgqt/sync.py:229
 msgid "Hostname"
 msgstr "主機名稱"
 
-#: tortoisehg/hgqt/sync.py:258 tortoisehg/hgqt/webconf_ui.py:77
+#: tortoisehg/hgqt/sync.py:259 tortoisehg/hgqt/webconf_ui.py:77
 msgid "Save"
 msgstr "儲存"
 
-#: tortoisehg/hgqt/sync.py:259
+#: tortoisehg/hgqt/sync.py:260
 msgid "Save current URL under an alias"
-msgstr ""
+msgstr "用一個別名把目前的URL儲存起來"
 
-#: tortoisehg/hgqt/sync.py:273
+#: tortoisehg/hgqt/sync.py:274
 msgid "Paths in Repository Settings:"
-msgstr ""
+msgstr "在儲存庫設定檔裡的路徑:"
 
-#: tortoisehg/hgqt/sync.py:288
+#: tortoisehg/hgqt/sync.py:289
 msgid "Related Paths:"
-msgstr ""
-
-#: tortoisehg/hgqt/sync.py:344
-#, python-format
-msgid "Preview incoming changesets from %s"
-msgstr ""
+msgstr "相關的路徑:"
 
 #: tortoisehg/hgqt/sync.py:345
 #, python-format
-msgid "Pull incoming changesets from %s"
-msgstr ""
+msgid "Preview incoming changesets from %s"
+msgstr "從%s預覽可拉收的變更集"
 
 #: tortoisehg/hgqt/sync.py:346
 #, python-format
-msgid "Filter outgoing changesets to %s"
-msgstr ""
+msgid "Pull incoming changesets from %s"
+msgstr "從%s拉收可拉收的變更集"
 
 #: tortoisehg/hgqt/sync.py:347
 #, python-format
-msgid "Push outgoing changesets to %s"
-msgstr ""
+msgid "Filter outgoing changesets to %s"
+msgstr "過濾可被推送的變更集到%s"
 
-#: tortoisehg/hgqt/sync.py:354
+#: tortoisehg/hgqt/sync.py:348
+#, python-format
+msgid "Push outgoing changesets to %s"
+msgstr "推送可被推送的變更集到%s"
+
+#: tortoisehg/hgqt/sync.py:355
 #, python-format
 msgid "rev: %d (%s)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:359 tortoisehg/hgtk/commit.py:791
+#: tortoisehg/hgqt/sync.py:360 tortoisehg/hgtk/commit.py:791
 msgid "branch: "
 msgstr "分支: "
 
-#: tortoisehg/hgqt/sync.py:366
+#: tortoisehg/hgqt/sync.py:367
 msgid "bookmark: "
 msgstr "書籤: "
 
-#: tortoisehg/hgqt/sync.py:417 tortoisehg/hgtk/synch.py:157
+#: tortoisehg/hgqt/sync.py:418 tortoisehg/hgtk/synch.py:157
 msgid "Post Pull: "
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:599
+#: tortoisehg/hgqt/sync.py:600
 msgid "Repository not local"
 msgstr "儲存庫不是本地的"
 
-#: tortoisehg/hgqt/sync.py:600
+#: tortoisehg/hgqt/sync.py:601
 msgid "A terminal shell cannot be opened for remote"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:605 tortoisehg/hgqt/sync.py:1428
+#: tortoisehg/hgqt/sync.py:606 tortoisehg/hgqt/sync.py:1433
 msgid "Confirm path delete"
 msgstr "確認路徑刪除"
 
-#: tortoisehg/hgqt/sync.py:606 tortoisehg/hgqt/sync.py:1429
+#: tortoisehg/hgqt/sync.py:607 tortoisehg/hgqt/sync.py:1434
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "從你的儲存庫設定檔裡刪除%s ?"
 
-#: tortoisehg/hgqt/sync.py:696
+#: tortoisehg/hgqt/sync.py:697
 msgid "No URL selected"
 msgstr "沒有URL被選擇"
 
-#: tortoisehg/hgqt/sync.py:697
+#: tortoisehg/hgqt/sync.py:698
 msgid "No URL has been configured for this repository."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:712
+#: tortoisehg/hgqt/sync.py:713
 msgid "Redundant authentication info"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:713
+#: tortoisehg/hgqt/sync.py:714
 msgid ""
 "You have authentication info configured for this host and inside this URL.  "
 "Remove authentication info from this URL?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:736 tortoisehg/hgqt/sync.py:742
-#: tortoisehg/hgqt/sync.py:748 tortoisehg/hgqt/sync.py:754
-#: tortoisehg/hgqt/sync.py:761
+#: tortoisehg/hgqt/sync.py:738 tortoisehg/hgqt/sync.py:744
+#: tortoisehg/hgqt/sync.py:750 tortoisehg/hgqt/sync.py:756
+#: tortoisehg/hgqt/sync.py:763
 msgid "sync command already running"
 msgstr "同步命令已經在執行"
 
-#: tortoisehg/hgqt/sync.py:780
+#: tortoisehg/hgqt/sync.py:782
 #, python-format
 msgid "Getting incoming changesets from %s..."
-msgstr ""
+msgstr "從%s取得可拉收的變更集"
 
-#: tortoisehg/hgqt/sync.py:785 tortoisehg/hgqt/sync.py:803
+#: tortoisehg/hgqt/sync.py:787 tortoisehg/hgqt/sync.py:805
 #, python-format
 msgid "Found incoming changesets from %s"
-msgstr ""
-
-#: tortoisehg/hgqt/sync.py:788 tortoisehg/hgqt/sync.py:805
-#, python-format
-msgid "No incoming changesets from %s"
-msgstr ""
+msgstr "從%s找尋可拉收的變更集"
 
 #: tortoisehg/hgqt/sync.py:790 tortoisehg/hgqt/sync.py:807
+#, python-format
+msgid "No incoming changesets from %s"
+msgstr "%s那邊沒有可拉收的變更集"
+
+#: tortoisehg/hgqt/sync.py:792 tortoisehg/hgqt/sync.py:809
 #, python-format
 msgid "Incoming from %s aborted, ret %d"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:818
+#: tortoisehg/hgqt/sync.py:820
 #, python-format
 msgid "Pull from %s completed"
 msgstr "從%s拉收完成"
 
-#: tortoisehg/hgqt/sync.py:820
+#: tortoisehg/hgqt/sync.py:822
 #, python-format
 msgid "Pull from %s aborted, ret %d"
 msgstr "從%s拉收中止了,返回 %d"
 
-#: tortoisehg/hgqt/sync.py:832 tortoisehg/hgqt/update.py:347
+#: tortoisehg/hgqt/sync.py:834 tortoisehg/hgqt/update.py:347
 msgid "Merge caused file conflicts"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:833 tortoisehg/hgqt/update.py:348
+#: tortoisehg/hgqt/sync.py:835 tortoisehg/hgqt/update.py:348
 msgid "File conflicts need to be resolved"
 msgstr "檔案衝突需要被解決"
 
-#: tortoisehg/hgqt/sync.py:839
+#: tortoisehg/hgqt/sync.py:841
 #, python-format
 msgid "Pulling from %s..."
 msgstr "正在從 %s 拉收中..."
 
-#: tortoisehg/hgqt/sync.py:855
+#: tortoisehg/hgqt/sync.py:860
 #, python-format
 msgid "Finding outgoing changesets to %s..."
-msgstr ""
-
-#: tortoisehg/hgqt/sync.py:867
-#, python-format
-msgid "%d outgoing changesets to %s"
-msgstr ""
-
-#: tortoisehg/hgqt/sync.py:870
-#, python-format
-msgid "No outgoing changesets to %s"
-msgstr ""
+msgstr "尋找可被推送的變更集到%s"
 
 #: tortoisehg/hgqt/sync.py:872
+#, python-format
+msgid "%d outgoing changesets to %s"
+msgstr "%d個可被推送的變更集到%s"
+
+#: tortoisehg/hgqt/sync.py:875
+#, python-format
+msgid "No outgoing changesets to %s"
+msgstr "沒有可被推送的變更集到%s"
+
+#: tortoisehg/hgqt/sync.py:877
 #, python-format
 msgid "Outgoing to %s aborted, ret %d"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:897 tortoisehg/hgtk/history.py:584
+#: tortoisehg/hgqt/sync.py:902 tortoisehg/hgtk/history.py:584
 #, python-format
 msgid "%s (submitted)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:899 tortoisehg/hgtk/history.py:586
+#: tortoisehg/hgqt/sync.py:904 tortoisehg/hgtk/history.py:586
 #: tortoisehg/hgtk/history.py:592
 #, python-format
 msgid "%s (pending)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:904 tortoisehg/hgtk/history.py:595
+#: tortoisehg/hgqt/sync.py:909 tortoisehg/hgtk/history.py:595
 msgid "Unable to parse p4pending output"
 msgstr "不能剖析p4pending的輸出"
 
-#: tortoisehg/hgqt/sync.py:906 tortoisehg/hgtk/history.py:597
+#: tortoisehg/hgqt/sync.py:911 tortoisehg/hgtk/history.py:597
 #, python-format
 msgid "%d pending changelists found"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:908 tortoisehg/hgtk/history.py:599
+#: tortoisehg/hgqt/sync.py:913 tortoisehg/hgtk/history.py:599
 msgid "No pending Perforce changelists"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:910 tortoisehg/hgtk/history.py:601
+#: tortoisehg/hgqt/sync.py:915 tortoisehg/hgtk/history.py:601
 msgid "Aborted p4pending"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:912 tortoisehg/hgtk/history.py:603
+#: tortoisehg/hgqt/sync.py:917 tortoisehg/hgtk/history.py:603
 msgid "Unable to determine pending changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:922
+#: tortoisehg/hgqt/sync.py:927
 msgid "Perforce pending..."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:932 tortoisehg/hgtk/history.py:2623
+#: tortoisehg/hgqt/sync.py:937 tortoisehg/hgtk/history.py:2623
 msgid "Confirm Push to remote Repository"
 msgstr "確認要推送到遠端儲存庫"
 
-#: tortoisehg/hgqt/sync.py:933 tortoisehg/hgtk/history.py:2624
+#: tortoisehg/hgqt/sync.py:938 tortoisehg/hgtk/history.py:2624
 #, python-format
 msgid ""
 "Push to remote repository\n"
@@ -7184,177 +7183,177 @@ msgstr ""
 "%s\n"
 "嗎?"
 
-#: tortoisehg/hgqt/sync.py:936
+#: tortoisehg/hgqt/sync.py:941
 #, python-format
 msgid "Push to %s aborted"
 msgstr "推送到 %s 終止了"
 
-#: tortoisehg/hgqt/sync.py:940
+#: tortoisehg/hgqt/sync.py:945
 #, python-format
 msgid "Pushing to %s..."
 msgstr "推送到 %s ..."
 
-#: tortoisehg/hgqt/sync.py:943
+#: tortoisehg/hgqt/sync.py:948
 #, python-format
 msgid "Push to %s completed"
 msgstr "推送到 %s 完成了"
 
-#: tortoisehg/hgqt/sync.py:945
+#: tortoisehg/hgqt/sync.py:950
 #, python-format
 msgid "Push to %s aborted, ret %d"
 msgstr "推送到 %s 終止了,返回 %d"
 
-#: tortoisehg/hgqt/sync.py:948
+#: tortoisehg/hgqt/sync.py:953
 msgid ""
 "One or more of the changesets that you are attempting to push involve the "
 "creation of a new branch.  Do you want to create a new branch in the remote "
 "repository?"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:975
+#: tortoisehg/hgqt/sync.py:980
 msgid "Determining outgoing changesets to email..."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:989 tortoisehg/hgtk/history.py:2025
+#: tortoisehg/hgqt/sync.py:994 tortoisehg/hgtk/history.py:2025
 msgid "No outgoing changesets"
-msgstr ""
+msgstr "沒有可被推送的變更集"
 
-#: tortoisehg/hgqt/sync.py:991
+#: tortoisehg/hgqt/sync.py:996
 #, python-format
 msgid "Outgoing aborted, ret %d"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:998
+#: tortoisehg/hgqt/sync.py:1003
 msgid "Select bundle file"
 msgstr "選擇綁兜檔(bundle file)"
 
-#: tortoisehg/hgqt/sync.py:999
+#: tortoisehg/hgqt/sync.py:1004
 msgid "Bundle files (*.hg)"
 msgstr "綁兜檔(Bundle files)(*.hg)"
 
-#: tortoisehg/hgqt/sync.py:1018
+#: tortoisehg/hgqt/sync.py:1023
 msgid "Unable to remove URL"
 msgstr "不能移除URL"
 
-#: tortoisehg/hgqt/sync.py:1040
+#: tortoisehg/hgqt/sync.py:1045
 msgid "Post Pull Behavior"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1044
+#: tortoisehg/hgqt/sync.py:1049
 msgid "Select post-pull operation for this repository"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1047
+#: tortoisehg/hgqt/sync.py:1052
 msgid "None - simply pull changesets"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1048
+#: tortoisehg/hgqt/sync.py:1053
 msgid "Update - pull, then try to update"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1054
+#: tortoisehg/hgqt/sync.py:1059
 msgid "Fetch - use fetch (auto merge pulled changes)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1056
+#: tortoisehg/hgqt/sync.py:1061
 msgid "Fetch - use fetch extension (fetch is not active!)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1063
+#: tortoisehg/hgqt/sync.py:1068
 msgid "Rebase - rebase local commits above pulled changes"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1065
+#: tortoisehg/hgqt/sync.py:1070
 msgid "Rebase - use rebase extension (rebase is not active!)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1083
+#: tortoisehg/hgqt/sync.py:1088
 msgid "<a href=\"config\">Launch settings tool...</a>"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1116
+#: tortoisehg/hgqt/sync.py:1121
 msgid "Unable to save post pull operation"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1140
+#: tortoisehg/hgqt/sync.py:1145
 msgid "Save Path"
 msgstr "儲存路徑"
 
-#: tortoisehg/hgqt/sync.py:1150 tortoisehg/hgqt/sync.py:1472
+#: tortoisehg/hgqt/sync.py:1155 tortoisehg/hgqt/sync.py:1477
 #: tortoisehg/hgtk/thgconfig.py:371 tortoisehg/hgtk/thgconfig.py:954
 msgid "Alias"
 msgstr "別名"
 
-#: tortoisehg/hgqt/sync.py:1153 tortoisehg/hgqt/sync.py:1472
+#: tortoisehg/hgqt/sync.py:1158 tortoisehg/hgqt/sync.py:1477
 #: tortoisehg/hgtk/thgconfig.py:368
 msgid "URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1162
+#: tortoisehg/hgqt/sync.py:1167
 msgid "Remove authentication data from URL"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1164
+#: tortoisehg/hgqt/sync.py:1169
 msgid ""
 "User authentication data should be associated with the hostname using the "
 "security dialog."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1186
+#: tortoisehg/hgqt/sync.py:1191
 msgid "Unable to save an URL"
 msgstr "不能儲存一個URL"
 
-#: tortoisehg/hgqt/sync.py:1197
+#: tortoisehg/hgqt/sync.py:1202
 msgid "Confirm URL replace"
 msgstr "確認URL取代"
 
-#: tortoisehg/hgqt/sync.py:1198
+#: tortoisehg/hgqt/sync.py:1203
 #, python-format
 msgid "%s already exists, replace URL?"
 msgstr "%s 已經存在,取代URL?"
 
-#: tortoisehg/hgqt/sync.py:1222
+#: tortoisehg/hgqt/sync.py:1227
 msgid "Certificate Query Error"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1235
+#: tortoisehg/hgqt/sync.py:1240
 msgid "Security: "
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1254
+#: tortoisehg/hgqt/sync.py:1259
 #, python-format
 msgid "<b>Host:</b> %s"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1256
+#: tortoisehg/hgqt/sync.py:1261
 msgid "Secure HTTPS Connection"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1263
+#: tortoisehg/hgqt/sync.py:1268
 msgid "Verify with Certificate Authority certificates (best)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1265
+#: tortoisehg/hgqt/sync.py:1270
 msgid "Verify with stored host fingerprint (good)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1267
+#: tortoisehg/hgqt/sync.py:1272
 msgid "No host validation, but still encrypted (bad)"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1274
+#: tortoisehg/hgqt/sync.py:1279
 msgid "### host certificate fingerprint ###"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1278
+#: tortoisehg/hgqt/sync.py:1283
 msgid "Query"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1297
+#: tortoisehg/hgqt/sync.py:1302
 msgid "User Authentication"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1304
+#: tortoisehg/hgqt/sync.py:1309
 msgid ""
 "Optional. Username to authenticate with. If not given, and the remote\n"
 "site requires basic or digest authentication, the user will be prompted for\n"
@@ -7362,62 +7361,66 @@ msgid ""
 "foo.username = $USER."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1313
+#: tortoisehg/hgqt/sync.py:1318
 msgid ""
 "Optional. Password to authenticate with. If not given, and the remote\n"
 "site requires basic or digest authentication, the user will be prompted for\n"
 "it."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1320
+#: tortoisehg/hgqt/sync.py:1325
 msgid ""
 "Mercurial keyring extension is enabled. Passwords will be stored in a "
 "platform-native secure method."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1326
+#: tortoisehg/hgqt/sync.py:1331
 msgid ""
 "Optional. PEM encoded client certificate key file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1328
+#: tortoisehg/hgqt/sync.py:1333
 msgid "User Certificate Key File"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1332
+#: tortoisehg/hgqt/sync.py:1337
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1334
+#: tortoisehg/hgqt/sync.py:1339
 msgid "User Certificate Chain File"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1354
+#: tortoisehg/hgqt/sync.py:1359
 msgid "Unable to save authentication"
 msgstr "不能儲存認證"
 
-#: tortoisehg/hgqt/sync.py:1516
+#: tortoisehg/hgqt/sync.py:1521
 #, python-format
 msgid "%s - sync options"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1523
-msgid "Allow push of a new branch (--new-branch)"
-msgstr ""
-
 #: tortoisehg/hgqt/sync.py:1528
+msgid "Allow push of a new branch (--new-branch)"
+msgstr "允許新分支的推送(--new-branch)"
+
+#: tortoisehg/hgqt/sync.py:1533
 msgid "Force push or pull (override safety checks, --force)"
 msgstr "強制推送或拉收(覆蓋安全檢查,--force)"
 
-#: tortoisehg/hgqt/sync.py:1538
+#: tortoisehg/hgqt/sync.py:1543
 msgid "Temporarily disable configured HTTP proxy"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:1545
+#: tortoisehg/hgqt/sync.py:1550
 msgid "Emit debugging output (--debug)"
+msgstr "顯示除錯訊息(--debug)"
+
+#: tortoisehg/hgqt/sync.py:1556
+msgid "Work on patch queue (--mq)"
 msgstr ""
 
 #: tortoisehg/hgqt/tag.py:29 tortoisehg/hgtk/tagadd.py:31
@@ -8189,7 +8192,7 @@ msgstr "顯示路徑"
 
 #: tortoisehg/hgqt/workbench.py:249
 msgid "Show Subrepos on Registry"
-msgstr ""
+msgstr "在儲存庫紀錄列表上顯示子儲存庫"
 
 #: tortoisehg/hgqt/workbench.py:254
 msgid "Show Subrepos for remote repositories"
@@ -8326,11 +8329,11 @@ msgstr ""
 #: tortoisehg/hgqt/workbench.py:366 tortoisehg/hgtk/history.py:438
 #: tortoisehg/hgtk/history.py:1856 tortoisehg/hgtk/synch.py:57
 msgid "Incoming"
-msgstr ""
+msgstr "可拉收"
 
 #: tortoisehg/hgqt/workbench.py:367
 msgid "Check for incoming changes from selected URL"
-msgstr ""
+msgstr "從選擇的URL那邊檢查可拉收的變更集"
 
 #: tortoisehg/hgqt/workbench.py:369 tortoisehg/hgtk/history.py:440
 #: tortoisehg/hgtk/history.py:1986
@@ -8339,20 +8342,20 @@ msgstr "拉收"
 
 #: tortoisehg/hgqt/workbench.py:370
 msgid "Pull incoming changes from selected URL"
-msgstr ""
+msgstr "從選擇的URL那邊拉收可拉收的變更集"
 
 #: tortoisehg/hgqt/workbench.py:372 tortoisehg/hgtk/history.py:442
 #: tortoisehg/hgtk/history.py:2029 tortoisehg/hgtk/synch.py:68
 msgid "Outgoing"
-msgstr ""
+msgstr "可被推送的"
 
 #: tortoisehg/hgqt/workbench.py:373
 msgid "Detect outgoing changes to selected URL"
-msgstr ""
+msgstr "偵測可被推送的變更集到選擇的URL"
 
 #: tortoisehg/hgqt/workbench.py:376
 msgid "Push outgoing changes to selected URL"
-msgstr ""
+msgstr "推送可被推送的變更集到選擇的URL"
 
 #: tortoisehg/hgqt/workbench.py:382 tortoisehg/hgqt/workbench.py:383
 msgid "Close tab"
@@ -8468,7 +8471,7 @@ msgstr ""
 #: tortoisehg/hgtk/backout.py:28
 #, python-format
 msgid "Backout changeset - %s"
-msgstr "Backout 變更 - %s"
+msgstr "退回變更 - %s"
 
 #: tortoisehg/hgtk/backout.py:46
 msgid "Changeset Description"
@@ -8476,7 +8479,7 @@ msgstr "變更集說明"
 
 #: tortoisehg/hgtk/backout.py:52
 msgid "Backout commit message"
-msgstr "Backout提交的訊息"
+msgstr "退回提交的訊息"
 
 #: tortoisehg/hgtk/backout.py:78
 msgid ""
@@ -8490,19 +8493,19 @@ msgstr ""
 
 #: tortoisehg/hgtk/backout.py:95
 msgid "Backout"
-msgstr ""
+msgstr "退回"
 
 #: tortoisehg/hgtk/backout.py:114
 msgid "Backed out successfully, you must now commit the results"
-msgstr "backout成功,你必須提交結果"
+msgstr "退回成功,你必須提交結果"
 
 #: tortoisehg/hgtk/backout.py:118
 msgid "Canceled backout"
-msgstr "取消Backout"
+msgstr "取消退回"
 
 #: tortoisehg/hgtk/backout.py:120
 msgid "Failed to backout"
-msgstr "Backout失敗 ><"
+msgstr "退回失敗 ><"
 
 #: tortoisehg/hgtk/bookmark.py:51 tortoisehg/hgtk/bookmark.py:144
 #: tortoisehg/hgtk/merge.py:184
@@ -9481,7 +9484,7 @@ msgstr "配置電子信件設定"
 
 #: tortoisehg/hgtk/hgemail.py:55
 msgid "Email outgoing changes"
-msgstr "變更電子信件發送設定"
+msgstr "Email可被推送的變更"
 
 #: tortoisehg/hgtk/hgemail.py:57
 msgid "Email revisions "
@@ -10385,7 +10388,7 @@ msgstr "載入所有修訂版"
 
 #: tortoisehg/hgtk/history.py:1536
 msgid "Download and view incoming changesets"
-msgstr ""
+msgstr "下載和檢視可拉收的變更集"
 
 #: tortoisehg/hgtk/history.py:1538
 msgid "Accept changes from Bundle preview"
@@ -10397,7 +10400,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1544
 msgid "Pull incoming changesets"
-msgstr ""
+msgstr "拉收可拉收的變更集"
 
 #: tortoisehg/hgtk/history.py:1546
 msgid "Import patches"
@@ -10409,11 +10412,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1551
 msgid "Push outgoing changesets"
-msgstr ""
+msgstr "推送可被推送的變更集"
 
 #: tortoisehg/hgtk/history.py:1553
 msgid "Email outgoing changesets"
-msgstr ""
+msgstr "Email可被推送的變更集"
 
 #: tortoisehg/hgtk/history.py:1556
 msgid "Stop current transaction"
@@ -10456,7 +10459,7 @@ msgstr "請輸入或選擇一個遠端路徑"
 #: tortoisehg/hgtk/history.py:1847
 #, python-format
 msgid "%d incoming changesets"
-msgstr ""
+msgstr "%d個可拉收的變更集"
 
 #: tortoisehg/hgtk/history.py:1849
 msgid "Aborted incoming"
@@ -10464,11 +10467,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:1851
 msgid "No incoming changesets"
-msgstr ""
+msgstr "沒有可拉收的變更集"
 
 #: tortoisehg/hgtk/history.py:1855
 msgid "Checking incoming changesets..."
-msgstr ""
+msgstr "檢查可拉收的變更集..."
 
 #: tortoisehg/hgtk/history.py:1874
 msgid "Accept incoming previewed changesets"
@@ -10520,7 +10523,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:2028
 msgid "Checking outgoing changesets..."
-msgstr ""
+msgstr "檢查可被推送的變更集..."
 
 #: tortoisehg/hgtk/history.py:2037 tortoisehg/hgtk/synch.py:505
 msgid "No repository selected"
@@ -11237,7 +11240,7 @@ msgstr "!: 刪除"
 
 #: tortoisehg/hgtk/status.py:498
 msgid "S: subrepo"
-msgstr ""
+msgstr "S:子儲存庫"
 
 #: tortoisehg/hgtk/status.py:785
 #, python-format
@@ -11485,7 +11488,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/synch.py:216
 msgid "Incoming/Outgoing"
-msgstr ""
+msgstr "可拉收的/可推送的"
 
 #: tortoisehg/hgtk/synch.py:219
 msgid "Show patches"
@@ -12220,7 +12223,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:696
 msgid "Show graph"
-msgstr ""
+msgstr "顯示圖形"
 
 #: tortoisehg/hgtk/thgpbranch.py:697
 msgid "Show status"
@@ -12228,7 +12231,7 @@ msgstr "顯示狀態"
 
 #: tortoisehg/hgtk/thgpbranch.py:698
 msgid "Show name"
-msgstr ""
+msgstr "顯示名稱"
 
 #: tortoisehg/hgtk/thgpbranch.py:699
 msgid "Show title"
@@ -12304,7 +12307,7 @@ msgstr "備份全部(預設)"
 
 #: tortoisehg/hgtk/thgstrip.py:112
 msgid "Backup unrelated changesets (-b/--backup)"
-msgstr ""
+msgstr "備份沒有關聯的變更集(-b/--backup)"
 
 #: tortoisehg/hgtk/thgstrip.py:121
 msgid "Strip"
@@ -12337,6 +12340,8 @@ msgid ""
 "Detected uncommitted local changes.\n"
 "Do you want to discard them and continue?"
 msgstr ""
+"偵測到沒有提交的本地工作複本變更.\n"
+"你想放棄這些變更然後繼續下去?"
 
 #: tortoisehg/hgtk/thgstrip.py:252
 #, python-format
@@ -12365,6 +12370,9 @@ msgid ""
 "Please select to continue:\n"
 "\n"
 msgstr ""
+"偵測到沒有提交的本地工作複本變更.\n"
+"請選擇一個選項來繼續下去:\n"
+"\n"
 
 #: tortoisehg/hgtk/update.py:236
 msgid "Shelve - launch Shelve tool and continue"
@@ -12377,7 +12385,7 @@ msgstr "[被使用者cancel掉]\n"
 #: tortoisehg/hgtk/update.py:285
 #, python-format
 msgid "invalid dialog result: %s"
-msgstr ""
+msgstr "無效的對話框返回:%s"
 
 #: tortoisehg/hgtk/visdiff.py:331
 #, python-format
@@ -12415,7 +12423,7 @@ msgstr "離開(&Q)"
 
 #: tortoisehg/util/hglib.py:345
 msgid "inotify is not supported on this platform"
-msgstr ""
+msgstr "這個平台不支援inotify技術"
 
 #: tortoisehg/util/hglib.py:347
 msgid "eol is incompatible with win32text"
