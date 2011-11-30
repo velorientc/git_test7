@@ -62,7 +62,7 @@ class RepoWidget(QWidget):
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent=None, bundle=None):
         QWidget.__init__(self, parent, acceptDrops=True)
 
         self.repo = repo
@@ -113,6 +113,9 @@ class RepoWidget(QWidget):
         self.createActions()
         self.loadSettings()
         self.setupModels()
+
+        if bundle:
+            self.setBundle(bundle)
 
         self.runner = cmdui.Runner(False, self)
         self.runner.output.connect(self.output)
