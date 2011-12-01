@@ -572,11 +572,13 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                  QMessageBox.Ok | QMessageBox.Cancel)
         if d != QMessageBox.Ok:
             return
-        self.repo.incrementBusyCount()
-        self.repo.rollback()
-        self.repo.decrementBusyCount()
-        self.reload()
-        QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
+        self.currentAction = 'rollback'
+        self.currentProgress = _('Rollback', 'start progress')
+        self.progress.emit(*cmdui.startProgress(self.currentProgress, ''))
+        self.commitButtonEnable.emit(False)
+        self.mqButtonEnable.emit(False)
+        self.runner.run(['rollback'])
+        self.stopAction.setEnabled(True)
 
     def updateRecentMessages(self):
         # Define a menu that lists recent messages
@@ -817,6 +819,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.mqButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            if self.currentAction == 'rollback':
+                shlib.shell_notify([self.repo.root]))
+                return
             self.branchop = None
             umsg = self.msgte.text()
             if self.currentAction != 'qref':
