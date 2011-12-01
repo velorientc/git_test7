@@ -820,7 +820,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.repo.decrementBusyCount()
         if ret == 0:
             if self.currentAction == 'rollback':
-                shlib.shell_notify([self.repo.root]))
+                shlib.shell_notify([self.repo.root])
                 return
             self.branchop = None
             umsg = self.msgte.text()
