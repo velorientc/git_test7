@@ -421,7 +421,7 @@ class RepoWidget(QWidget):
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
         self.repomodel.revset = self.revset
-        self.reload()
+        self.reload(invalidate=False)
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
 
@@ -457,7 +457,7 @@ class RepoWidget(QWidget):
             if len(repo) == len(brepo):
                 # all bundle revisions pulled
                 self.clearBundle()
-                self.reload()
+                self.reload(invalidate=False)
             else:
                 # refresh revset with remaining revisions
                 self.revset = range(len(repo), len(brepo))
@@ -465,7 +465,7 @@ class RepoWidget(QWidget):
                 self.repoview.setRepo(brepo)
                 self.revDetailsWidget.setRepo(brepo)
                 self.manifestDemand.forward('setRepo', brepo)
-                self.reload()
+                self.reload(invalidate=False)
                 self.repomodel.revset = self.revset
                 self.repoview.resetBrowseHistory(self.revset)
                 self._reload_rev = self.revset[0]
@@ -482,7 +482,7 @@ class RepoWidget(QWidget):
 
     def rejectBundle(self):
         self.clearBundle()
-        self.reload()
+        self.reload(invalidate=False)
 
     @pyqtSlot()
     def clearRevisionSet(self):
@@ -824,10 +824,11 @@ class RepoWidget(QWidget):
         else:
             self.visualDiffRevision()
 
-    def reload(self):
+    def reload(self, invalidate=True):
         'Initiate a refresh of the repo model, rebuild graph'
         try:
-            self.repo.thginvalidate()
+            if invalidate:
+                self.repo.thginvalidate()
             self.rebuildGraph()
             self.reloadTaskTab()
         except EnvironmentError, e:
