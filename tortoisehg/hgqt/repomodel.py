@@ -16,6 +16,7 @@
 
 from mercurial import util, error
 from mercurial.util import propertycache
+from mercurial.context import workingctx
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
@@ -478,6 +479,8 @@ class HgRepoListModel(QAbstractTableModel):
         dragflags = Qt.ItemFlags(0)
         if ctx.thgmqunappliedpatch():
             dragflags = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        if isinstance(ctx, workingctx):
+            dragflags |= Qt.ItemIsDropEnabled
         if not self.revset:
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled | dragflags
         if ctx.rev() not in self.revset:
