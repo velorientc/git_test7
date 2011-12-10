@@ -68,12 +68,20 @@ class QuickOpDialog(QDialog):
                 }
         filetypes = types[self.command]
 
+        checktypes = { 'add'    : '?',
+                       'forget' : '',
+                       'revert' : 'MAR!',
+                       'remove' : '',
+                     }
+        defcheck = checktypes[self.command]
+
         opts = {}
         for s, val in status.statusTypes.iteritems():
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
-        stwidget = status.StatusWidget(repo, pats, opts, self)
+        stwidget = status.StatusWidget(repo, pats, opts, self,
+                                       defcheck=defcheck)
         toplayout.addWidget(stwidget, 1)
 
         hbox = QHBoxLayout()

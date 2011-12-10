@@ -48,7 +48,8 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
 
-    def __init__(self, repo, pats, opts, parent=None, checkable=True):
+    def __init__(self, repo, pats, opts, parent=None, checkable=True,
+                 defcheck='MAR!S'):
         QWidget.__init__(self, parent)
 
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
@@ -57,6 +58,7 @@ class StatusWidget(QWidget):
         self.repo = repo
         self.pats = pats
         self.checkable = checkable
+        self.defcheck = defcheck
         self.pctx = None
         self.savechecks = True
         self.refthread = None
@@ -285,7 +287,8 @@ class StatusWidget(QWidget):
                                     parent=self)
         ms = merge.mergestate(self.repo)
         tm = WctxModel(wctx, ms, self.pctx, self.savechecks, self.opts,
-                       checked, self, checkable=self.checkable)
+                       checked, self, checkable=self.checkable,
+                       defcheck=self.defcheck)
         if self.checkable:
             tm.checkToggled.connect(self.updateCheckCount)
 
@@ -550,7 +553,8 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
 
-    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent, checkable=True):
+    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent,
+                 checkable=True, defcheck='MAR!S'):
         QAbstractTableModel.__init__(self, parent)
         self.checkCount = 0
         rows = []
@@ -577,35 +581,39 @@ class WctxModel(QAbstractTableModel):
             pctxmatch = lambda f: True
         if opts['modified']:
             for m in wctx.modified():
-                nchecked[m] = checked.get(m, m not in excludes and pctxmatch(m))
+                nchecked[m] = checked.get(m, 'M' in defcheck and
+                                          m not in excludes and pctxmatch(m))
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                nchecked[a] = checked.get(a, a not in excludes and pctxmatch(a))
+                nchecked[a] = checked.get(a, 'A' in defcheck and
+                                          a not in excludes and pctxmatch(a))
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
-                nchecked[r] = checked.get(r, r not in excludes and pctxmatch(r))
+                nchecked[r] = checked.get(r, 'R' in defcheck and
+                                          r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
-                nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
+                nchecked[d] = checked.get(d, 'D' in defcheck and
+                                          d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown() or []:
-                nchecked[u] = checked.get(u, False)
+                nchecked[u] = checked.get(u, '?' in defcheck)
                 rows.append(mkrow(u, '?'))
         if opts['ignored']:
             for i in wctx.ignored() or []:
-                nchecked[i] = checked.get(i, False)
+                nchecked[i] = checked.get(i, 'I' in defcheck)
                 rows.append(mkrow(i, 'I'))
         if opts['clean']:
             for c in wctx.clean() or []:
-                nchecked[c] = checked.get(c, False)
+                nchecked[c] = checked.get(c, 'C' in defcheck)
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
             for s in wctx.dirtySubrepos:
-                nchecked[s] = checked.get(s, True)
+                nchecked[s] = checked.get(s, 'S' in defcheck)
                 rows.append(mkrow(s, 'S'))
         # include clean unresolved files
         for f in ms:
