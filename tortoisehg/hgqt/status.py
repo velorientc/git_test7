@@ -133,7 +133,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
-        self.actions = wctxactions.WctxActions(self.repo, self)
+        self.actions = wctxactions.WctxActions(self.repo, self, checkable)
         tv = WctxFileTree(self.repo, checkable=checkable)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -632,6 +632,12 @@ class WctxModel(QAbstractTableModel):
             return 0 # no child
         return len(self.rows)
 
+    def check(self, files, state=True):
+        for f in files:
+            self.checked[f] = state
+        self.layoutChanged.emit()
+        self.checkToggled.emit()
+        
     def checkAll(self, state):
         for data in self.rows:
             self.checked[data[0]] = state

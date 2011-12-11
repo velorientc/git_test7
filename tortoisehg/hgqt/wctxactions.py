@@ -18,7 +18,7 @@ from PyQt4.QtGui import *
 class WctxActions(QObject):
     'container class for working context actions'
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
 
         self.menu = QMenu(parent)
@@ -72,6 +72,10 @@ class WctxActions(QObject):
         allactions.append(None)
         make(_('Mark unresolved'), unmark, frozenset('r'))
         make(_('Mark resolved'), mark, frozenset('u'))
+        if checkable:
+            allactions.append(None)
+            make(_('Check'), check, frozenset('MARC?!IS'), '')
+            make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
         self.allactions = allactions
 
     def updateActionSensitivity(self, selrows):
@@ -413,4 +417,12 @@ def resolve_with(tool, repo, files):
     opts = {'tool': tool}
     paths = [repo.wjoin(f) for f in files]
     commands.resolve(repo.ui, repo, *paths, **opts)
+    return True
+
+def check(parent, ui, repo, files):
+    parent.tv.model().check(files)
+    return True
+
+def uncheck(parent, ui, repo, files):
+    parent.tv.model().check(files, False)
     return True
