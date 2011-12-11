@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, error
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt.i18n import _, ngettext
 from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
 
 class StripDialog(QDialog):
@@ -171,7 +171,10 @@ class StripDialog(QDialog):
     def preview(self):
         if self.updatecslist():
             striprevs = self.cslist.curitems
-            cstext = _("<b>%d changesets</b> will be stripped") % len(striprevs)
+            cstext = ngettext(
+                "<b>%d changeset</b> will be stripped",
+                "<b>%d changesets</b> will be stripped",
+                len(striprevs)) % len(striprevs)
             self.status.setText(cstext)
             self.strip_btn.setEnabled(True)
         else:
