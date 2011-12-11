@@ -166,11 +166,13 @@ class PurgeDialog(QDialog):
 
         def completed():
             self.th.wait()
-            if self.th.failures:
-                qtlib.InfoMsgBox(_('Deletion failures'),
-                    _('Unable to delete %d files or folders') %
-                                 len(self.th.failures), parent=self)
-            if self.th.failures is not None:
+            F = self.th.failures
+            if F:
+                qtlib.InfoMsgBox(_('Deletion failures'), ngettext(
+                    'Unable to delete %d file or folder',
+                    'Unable to delete %d files or folders', len(F)) % len(F),
+                    parent=self)
+            if F is not None:
                 self.reject()
 
         opts = dict(unknown=unknown, ignored=ignored, trash=trash,
