@@ -14,6 +14,8 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import binascii
+
 from mercurial import util, error
 from mercurial.util import propertycache
 
@@ -50,6 +52,7 @@ COLUMNHEADERS = (
     ('LocalTime', _('Local Time', 'column header')),
     ('UTCTime', _('UTC Time', 'column header')),
     ('Changes', _('Changes', 'column header')),
+    ('Converted', _('Converted From', 'column header')),
     )
 
 UNAPPLIED_PATCH_COLOR = '#999999'
@@ -654,6 +657,23 @@ class HgRepoListModel(QAbstractTableModel):
             addtotal(R, 'log.removed')
         return ''.join(changes)
 
+    def getconv(self, ctx, gnode):
+        if ctx.rev() is not None:
+            cvt = ctx.extra().get('convert_revision', '')
+            if cvt:
+                if cvt.startswith('svn:'):
+                    return cvt.split('@')[-1]
+                if len(cvt) == 40:
+                    try:
+                        binascii.unhexlify(cvt)
+                        return cvt[:12]
+                    except TypeError:
+                        pass
+            cvt = extra.get('p4', '')
+            if cvt:
+                return cvt
+        return ''
+
     _columnmap = {
         'Rev':      getrev,
         'Node':     lambda self, ctx, gnode: str(ctx),
@@ -667,4 +687,5 @@ class HgRepoListModel(QAbstractTableModel):
         'LocalTime':lambda self, ctx, gnode: hglib.displaytime(ctx.date()),
         'UTCTime':  lambda self, ctx, gnode: hglib.utctime(ctx.date()),
         'Changes':  getchanges,
+        'Converted': getconv,
     }
