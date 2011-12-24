@@ -58,7 +58,7 @@ class UpdateDialog(QDialog):
         combo.setCurrentIndex(0)
 
         for name in repo.namedbranches:
-            combo.addItem(name)
+            combo.addItem(hglib.tounicode(name))
 
         tags = list(self.repo.tags()) + repo._bookmarks.keys()
         tags.sort(reverse=True)
