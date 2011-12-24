@@ -656,7 +656,7 @@ class RepoRegistryView(QDockWidget):
 
     def copyPath(self):
         clip = QApplication.clipboard()
-        clip.setText(self.selitem.internalPointer().rootpath())
+        clip.setText(hglib.tounicode(self.selitem.internalPointer().rootpath()))
 
     def startRename(self):
         self.tview.edit(self.tview.currentIndex())

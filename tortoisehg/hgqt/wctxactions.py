@@ -213,7 +213,7 @@ def copyPath(parent, ui, repo, files):
     clip = QApplication.clipboard()
     absfiles = [hglib.fromunicode(QDir.toNativeSeparators(repo.wjoin(fname)))
          for fname in files]
-    clip.setText(os.linesep.join(absfiles))
+    clip.setText(hglib.tounicode(os.linesep.join(absfiles)))
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})

@@ -381,7 +381,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def copypath(self):
         absfiles = [util.localpath(self.repo.wjoin(hglib.fromunicode(f)))
                     for f in self.filelist.getSelectedFiles()]
-        QApplication.clipboard().setText(os.linesep.join(absfiles))
+        QApplication.clipboard().setText(hglib.tounicode(os.linesep.join(absfiles)))
 
     def revertfile(self):
         fileSelection = self.filelist.getSelectedFiles()
