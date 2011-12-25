@@ -37,14 +37,13 @@ class BfilesPrompt(qtlib.CustomPrompt):
                                       
 def promptForLfiles(parent, ui, repo, files, haskbf=False):
     lfiles = []
-    usekbf = os.path.exists('.kbf')
-    uself = os.path.exists('.hglf')
-    useneither = not usekbf and not uself
-    if haskbf:
+    usekbf = 'kbfiles' in repo.extensions()
+    uself = 'largefiles' in repo.extensions()
+    if usekbf:
         section = 'kilnbfiles'
     else:
         section = 'largefiles'
-    minsize = int(ui.config(section, 'size', default='10'))
+    minsize = int(ui.config(section, 'minsize', default='10'))
     patterns = ui.config(section, 'patterns', default=())
     if patterns:
         patterns = patterns.split(' ')
@@ -52,9 +51,13 @@ def promptForLfiles(parent, ui, repo, files, haskbf=False):
     else:
         matcher = None
     for wfile in files:
-        if not matcher or not matcher(wfile) or useneither:
+        if matcher and matcher(wfile):
+            # patterns have always precedence over size
+            lfiles.append(wfile)
+        else:
+            # check for minimal size        
             filesize = os.path.getsize(repo.wjoin(wfile))
-            if filesize >= 10*1024*1024 and (filesize < minsize*1024*1024 or useneither):
+            if filesize > minsize*1024*1024:
                 lfiles.append(wfile)
     if lfiles:
         if haskbf:
