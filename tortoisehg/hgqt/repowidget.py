@@ -1633,8 +1633,13 @@ class RepoWidget(QWidget):
           repo=self.repo)
 
     def rupdate(self):
-        run.rupdate(self.repo.ui, rev=self.rev,
-          repo=self.repo)
+        import rupdate
+        dlg = rupdate.rUpdateDialog(self.repo, self.rev, self)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.progress.connect(self.progress)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
 
     def emailRevision(self):
         run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
