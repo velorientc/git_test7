@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-12-01 20:05-0200\n"
-"PO-Revision-Date: 2011-12-01 22:32+0000\n"
+"POT-Creation-Date: 2011-12-29 23:16-0200\n"
+"PO-Revision-Date: 2011-12-30 02:01+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-12-02 04:56+0000\n"
-"X-Generator: Launchpad (build 14414)\n"
+"X-Launchpad-Export-Date: 2011-12-30 05:49+0000\n"
+"X-Generator: Launchpad (build 14560)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -157,12 +157,12 @@ msgstr "&Detalhes"
 #: tortoisehg/hgqt/compress.py:150 tortoisehg/hgqt/lfprompt.py:23
 #: tortoisehg/hgqt/lfprompt.py:35 tortoisehg/hgqt/merge.py:100
 #: tortoisehg/hgqt/merge.py:235 tortoisehg/hgqt/merge.py:312
-#: tortoisehg/hgqt/quickop.py:179 tortoisehg/hgqt/rebase.py:237
+#: tortoisehg/hgqt/quickop.py:187 tortoisehg/hgqt/rebase.py:237
 #: tortoisehg/hgqt/rebase.py:258 tortoisehg/hgqt/rename.py:110
 #: tortoisehg/hgqt/reporegistry.py:208 tortoisehg/hgqt/resolve.py:356
 #: tortoisehg/hgqt/settings.py:932 tortoisehg/hgqt/settings.py:1047
-#: tortoisehg/hgqt/wctxactions.py:265 tortoisehg/hgqt/wctxactions.py:278
-#: tortoisehg/hgqt/wctxactions.py:367 tortoisehg/hgtk/shellconf.py:28
+#: tortoisehg/hgqt/wctxactions.py:269 tortoisehg/hgqt/wctxactions.py:282
+#: tortoisehg/hgqt/wctxactions.py:371 tortoisehg/hgtk/shellconf.py:28
 #: tortoisehg/hgtk/thgshelve.py:163
 msgid "Cancel"
 msgstr "Cancelar"
@@ -415,7 +415,7 @@ msgid "Parents"
 msgstr "Pais"
 
 #: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
-#: tortoisehg/hgqt/repomodel.py:587 tortoisehg/hgqt/repomodel.py:589
+#: tortoisehg/hgqt/repomodel.py:590 tortoisehg/hgqt/repomodel.py:592
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:87
 msgid "Working Directory"
 msgstr "Diretório de Trabalho"
@@ -545,8 +545,8 @@ msgstr "Teste esta revisão e informe o reultado. (boa/ruim/desconsiderada)"
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
 #: tortoisehg/hgqt/commit.py:782 tortoisehg/hgqt/commit.py:1052
 #: tortoisehg/hgqt/commit.py:1072 tortoisehg/hgqt/hgignore.py:257
-#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:480
-#: tortoisehg/hgqt/wctxactions.py:183
+#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:483
+#: tortoisehg/hgqt/wctxactions.py:187
 #, python-format
 msgid "%s (hint: %s)"
 msgstr "%s (dica: %s)"
@@ -1167,7 +1167,7 @@ msgstr "Confirmar Adição"
 msgid "Add selected untracked files?"
 msgstr "Adicionar os arquivos não-rastreados marcados?"
 
-#: tortoisehg/hgqt/commit.py:763 tortoisehg/hgqt/quickop.py:174
+#: tortoisehg/hgqt/commit.py:763 tortoisehg/hgqt/quickop.py:182
 msgid "Confirm Remove"
 msgstr "Confirmar Remoção"
 
@@ -1861,7 +1861,7 @@ msgstr "Detecta Cópias/Renomeações em %s"
 msgid "<b>Unrevisioned Files</b>"
 msgstr "<b>Arquivos Não Versionados</b>"
 
-#: tortoisehg/hgqt/guess.py:65 tortoisehg/hgqt/status.py:96
+#: tortoisehg/hgqt/guess.py:65 tortoisehg/hgqt/status.py:98
 msgid "Refresh file list"
 msgstr "Atualizar lista de arquivos"
 
@@ -2438,12 +2438,12 @@ msgid "Hg file log viewer - %s"
 msgstr "Visualizador de arquivo de log do hg - %s"
 
 #: tortoisehg/hgqt/manifestdialog.py:330 tortoisehg/hgqt/revdetails.py:419
-#: tortoisehg/hgqt/wctxactions.py:236
+#: tortoisehg/hgqt/wctxactions.py:240
 msgid "Cannot open subrepository"
 msgstr "Não é possível abrir o sub-repositório"
 
 #: tortoisehg/hgqt/manifestdialog.py:331 tortoisehg/hgqt/revdetails.py:420
-#: tortoisehg/hgqt/wctxactions.py:237
+#: tortoisehg/hgqt/wctxactions.py:241
 msgid "The selected subrepository does not exist on the working directory"
 msgstr "O sub-repositório selecionado não existe no diretório de trabalho"
 
@@ -2480,7 +2480,7 @@ msgstr ""
 "Verifique os alvos da mesclagem e garanta que o diretório de trabalho esteja "
 "limpo"
 
-#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:593
+#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:596
 #: tortoisehg/hgqt/revpanel.py:158 tortoisehg/hgtk/merge.py:73
 msgid "Not a head revision!"
 msgstr "Não é uma revisão de cabeça!"
@@ -3044,25 +3044,27 @@ msgstr "Confirmar remoção de arquivos"
 msgid "Are you sure you want to delete these files and/or folders?"
 msgstr "Tem certeza de que deseja apagar estes arquivos e/ou pastas?"
 
-#: tortoisehg/hgqt/purge.py:170
+#: tortoisehg/hgqt/purge.py:171
 msgid "Deletion failures"
 msgstr "Falhas ao apagar"
 
-#: tortoisehg/hgqt/purge.py:171
+#: tortoisehg/hgqt/purge.py:172
 #, python-format
-msgid "Unable to delete %d files or folders"
-msgstr "Não é possível apagar %d arquivos ou pastas"
+msgid "Unable to delete %d file or folder"
+msgid_plural "Unable to delete %d files or folders"
+msgstr[0] "Incapaz de remover %d arquivo ou pasta"
+msgstr[1] "Incapaz de remover %d arquivos ou pastas"
 
-#: tortoisehg/hgqt/purge.py:209
+#: tortoisehg/hgqt/purge.py:211
 msgid "Deleting trash folder..."
 msgstr "Apagando lixeira..."
 
-#: tortoisehg/hgqt/purge.py:252
+#: tortoisehg/hgqt/purge.py:254
 #, python-format
 msgid "Deleted %d files"
 msgstr "Apagados %d arquivos"
 
-#: tortoisehg/hgqt/purge.py:262
+#: tortoisehg/hgqt/purge.py:264
 #, python-format
 msgid "Deleted %d files and %d folders"
 msgstr "Apagados %d arquivos e %d pastas"
@@ -3409,33 +3411,33 @@ msgstr "Remover"
 msgid "%s - hg %s"
 msgstr "%s - hg %s"
 
-#: tortoisehg/hgqt/quickop.py:82 tortoisehg/hgtk/quickop.py:133
+#: tortoisehg/hgqt/quickop.py:90 tortoisehg/hgtk/quickop.py:133
 msgid "Do not save backup files (*.orig)"
 msgstr "Não salvar cópias de segurança (*.orig)"
 
-#: tortoisehg/hgqt/quickop.py:85
+#: tortoisehg/hgqt/quickop.py:93
 msgid "Force removal of modified files (--force)"
 msgstr "Força a remoção de arquivos modificados (--force)"
 
-#: tortoisehg/hgqt/quickop.py:113
+#: tortoisehg/hgqt/quickop.py:121
 msgid "Add &Largefiles"
 msgstr "Adiciona &Largefiles"
 
-#: tortoisehg/hgqt/quickop.py:115 tortoisehg/hgqt/wctxactions.py:66
+#: tortoisehg/hgqt/quickop.py:123 tortoisehg/hgqt/wctxactions.py:66
 msgid "Add &Bfiles"
 msgstr "Adiciona &Bfiles"
 
-#: tortoisehg/hgqt/quickop.py:157 tortoisehg/hgqt/quickop.py:228
+#: tortoisehg/hgqt/quickop.py:165 tortoisehg/hgqt/quickop.py:236
 #: tortoisehg/hgtk/quickop.py:261
 msgid "No files selected"
 msgstr "Nenhum arquivo selecionado"
 
-#: tortoisehg/hgqt/quickop.py:158 tortoisehg/hgqt/quickop.py:229
+#: tortoisehg/hgqt/quickop.py:166 tortoisehg/hgqt/quickop.py:237
 #: tortoisehg/hgtk/quickop.py:262
 msgid "No operation to perform"
 msgstr "Nenhuma operação a realizar"
 
-#: tortoisehg/hgqt/quickop.py:175
+#: tortoisehg/hgqt/quickop.py:183
 msgid ""
 "You have selected one or more files that have been modified.  By default, "
 "these files will not be removed.  What would you like to do?"
@@ -3443,11 +3445,11 @@ msgstr ""
 "Você selecionou um ou mais arquivos modificados. Por padrão, tais arquivos "
 "não seriam removidos. O que você gostaria de fazer?"
 
-#: tortoisehg/hgqt/quickop.py:178
+#: tortoisehg/hgqt/quickop.py:186
 msgid "Remove &Unmodified Files"
 msgstr "Remover Apenas Arquivos &Não Modificados"
 
-#: tortoisehg/hgqt/quickop.py:179
+#: tortoisehg/hgqt/quickop.py:187
 msgid "Remove &All Selected Files"
 msgstr "Remover &Todos os Arquivos Selecionados"
 
@@ -3748,67 +3750,67 @@ msgstr "Mostrar ramos fechados"
 msgid "Include all ancestors"
 msgstr "Incluir todos os ancestrais"
 
-#: tortoisehg/hgqt/repomodel.py:42
+#: tortoisehg/hgqt/repomodel.py:43
 msgctxt "column header"
 msgid "Graph"
 msgstr "Grafo"
 
-#: tortoisehg/hgqt/repomodel.py:43
+#: tortoisehg/hgqt/repomodel.py:44
 msgctxt "column header"
 msgid "Rev"
 msgstr "Rev"
 
-#: tortoisehg/hgqt/repomodel.py:44
+#: tortoisehg/hgqt/repomodel.py:45
 msgctxt "column header"
 msgid "Branch"
 msgstr "Ramo"
 
-#: tortoisehg/hgqt/repomodel.py:45
+#: tortoisehg/hgqt/repomodel.py:46
 msgctxt "column header"
 msgid "Description"
 msgstr "Descrição"
 
-#: tortoisehg/hgqt/repomodel.py:46
+#: tortoisehg/hgqt/repomodel.py:47
 msgctxt "column header"
 msgid "Author"
 msgstr "Autor"
 
-#: tortoisehg/hgqt/repomodel.py:47
+#: tortoisehg/hgqt/repomodel.py:48
 msgctxt "column header"
 msgid "Tags"
 msgstr "Etiquetas"
 
-#: tortoisehg/hgqt/repomodel.py:48
+#: tortoisehg/hgqt/repomodel.py:49
 msgctxt "column header"
 msgid "Node"
 msgstr "Nó"
 
-#: tortoisehg/hgqt/repomodel.py:49
+#: tortoisehg/hgqt/repomodel.py:50
 msgctxt "column header"
 msgid "Age"
 msgstr "Idade"
 
-#: tortoisehg/hgqt/repomodel.py:50
+#: tortoisehg/hgqt/repomodel.py:51
 msgctxt "column header"
 msgid "Local Time"
 msgstr "Hora Local"
 
-#: tortoisehg/hgqt/repomodel.py:51
+#: tortoisehg/hgqt/repomodel.py:52
 msgctxt "column header"
 msgid "UTC Time"
 msgstr "Hora UTC"
 
-#: tortoisehg/hgqt/repomodel.py:52
+#: tortoisehg/hgqt/repomodel.py:53
 msgctxt "column header"
 msgid "Changes"
 msgstr "Mudanças"
 
-#: tortoisehg/hgqt/repomodel.py:207
+#: tortoisehg/hgqt/repomodel.py:208
 #, python-format
 msgid "filling (%d)"
 msgstr "preenchendo (%d)"
 
-#: tortoisehg/hgqt/repomodel.py:580
+#: tortoisehg/hgqt/repomodel.py:583
 msgid "Mercurial User"
 msgstr "Usuário do Mercurial"
 
@@ -3821,7 +3823,7 @@ msgstr "Tipo de repositório não suportado (%s)"
 msgid "Cannot open non mercurial repositories or subrepositories"
 msgstr "Só é possível abrir repositórios e sub-repositórios do Mercurial"
 
-#: tortoisehg/hgqt/reporegistry.py:207 tortoisehg/hgqt/wctxactions.py:367
+#: tortoisehg/hgqt/reporegistry.py:207 tortoisehg/hgqt/wctxactions.py:371
 msgid "&Delete"
 msgstr "E&xcluir"
 
@@ -4835,7 +4837,7 @@ msgstr "<b>Reverter %d arquivos para seus conteúdos como na revisão %d?</b>"
 msgid "Revert all files to this revision"
 msgstr "Reverter todos os arquivos para esta revisão"
 
-#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:275
+#: tortoisehg/hgqt/revert.py:65 tortoisehg/hgqt/wctxactions.py:279
 #: tortoisehg/hgtk/statusact.py:146
 msgid "Confirm Revert"
 msgstr "Confirmar Reversão"
@@ -7047,8 +7049,8 @@ msgstr "Mover trechos selecionados para a direita"
 msgid "Refresh Toolbar"
 msgstr "Atualizar Barra de Ferramentas"
 
-#: tortoisehg/hgqt/shelve.py:137 tortoisehg/hgqt/status.py:254
-#: tortoisehg/hgqt/status.py:268 tortoisehg/hgtk/commit.py:240
+#: tortoisehg/hgqt/shelve.py:137 tortoisehg/hgqt/status.py:256
+#: tortoisehg/hgqt/status.py:270 tortoisehg/hgtk/commit.py:240
 #: tortoisehg/hgtk/hgignore.py:142 tortoisehg/hgtk/history.py:404
 msgid "Refresh"
 msgstr "Reler"
@@ -7142,158 +7144,158 @@ msgstr "Adiamento: %s"
 msgid "Patch: %s"
 msgstr "Patch: %s"
 
-#: tortoisehg/hgqt/status.py:101
+#: tortoisehg/hgqt/status.py:103
 msgid "### filter text ###"
 msgstr "### texto do filtro ###"
 
-#: tortoisehg/hgqt/status.py:103
+#: tortoisehg/hgqt/status.py:105
 msgid "Filter:"
 msgstr "Filtro:"
 
-#: tortoisehg/hgqt/status.py:115
+#: tortoisehg/hgqt/status.py:117
 msgid "Check all files"
 msgstr "Marcar todos os arquivos"
 
-#: tortoisehg/hgqt/status.py:116
+#: tortoisehg/hgqt/status.py:118
 msgid "Uncheck all files"
 msgstr "Desmarcar todos os arquivos"
 
-#: tortoisehg/hgqt/status.py:121
+#: tortoisehg/hgqt/status.py:123
 msgid "Status File List Toolbar"
 msgstr "Barra de Status de Arquivos"
 
-#: tortoisehg/hgqt/status.py:146 tortoisehg/hgtk/status.py:330
+#: tortoisehg/hgqt/status.py:148 tortoisehg/hgtk/status.py:330
 msgid "Remove filter, show root"
 msgstr "Remover filtro, exibir raiz"
 
-#: tortoisehg/hgqt/status.py:207
+#: tortoisehg/hgqt/status.py:209
 #, python-format
 msgid "%s - status (selection filtered)"
 msgstr "%s - status (selecão filtrada)"
 
-#: tortoisehg/hgqt/status.py:209
+#: tortoisehg/hgqt/status.py:211
 #, python-format
 msgid "%s - status"
 msgstr "%s - status"
 
-#: tortoisehg/hgqt/status.py:254 tortoisehg/hgtk/browse.py:112
+#: tortoisehg/hgqt/status.py:256 tortoisehg/hgtk/browse.py:112
 #: tortoisehg/hgtk/quickop.py:106 tortoisehg/hgtk/status.py:95
 msgid "status"
 msgstr "status"
 
-#: tortoisehg/hgqt/status.py:283 tortoisehg/hgtk/quickop.py:186
+#: tortoisehg/hgqt/status.py:285 tortoisehg/hgtk/quickop.py:186
 msgid "No appropriate files"
 msgstr "Nenhum arquivo apropriado"
 
-#: tortoisehg/hgqt/status.py:284 tortoisehg/hgtk/quickop.py:187
+#: tortoisehg/hgqt/status.py:286 tortoisehg/hgtk/quickop.py:187
 msgid "No files found for this operation"
 msgstr "Nenhum arquivo encontrado para esta operação"
 
-#: tortoisehg/hgqt/status.py:615
+#: tortoisehg/hgqt/status.py:623
 msgid "Stat"
 msgstr "Stat"
 
-#: tortoisehg/hgqt/status.py:615
+#: tortoisehg/hgqt/status.py:623
 msgid "M"
 msgstr "M"
 
-#: tortoisehg/hgqt/status.py:615 tortoisehg/hgtk/datamine.py:140
+#: tortoisehg/hgqt/status.py:623 tortoisehg/hgtk/datamine.py:140
 msgid "Filename"
 msgstr "Nome do arquivo"
 
-#: tortoisehg/hgqt/status.py:616 tortoisehg/hgtk/thgconfig.py:414
+#: tortoisehg/hgqt/status.py:624 tortoisehg/hgtk/thgconfig.py:414
 msgid "Type"
 msgstr "Tipo"
 
-#: tortoisehg/hgqt/status.py:616
+#: tortoisehg/hgqt/status.py:624
 msgid "Size (KB)"
 msgstr "Tamanho (KB)"
 
-#: tortoisehg/hgqt/status.py:653
+#: tortoisehg/hgqt/status.py:667
 #, python-format
 msgid "Checked count: %d"
 msgstr "Marcados: %d"
 
-#: tortoisehg/hgqt/status.py:801
+#: tortoisehg/hgqt/status.py:815
 msgid ", resolved merge"
 msgstr ", mesclagem resolvida"
 
-#: tortoisehg/hgqt/status.py:803
+#: tortoisehg/hgqt/status.py:817
 msgid ", unresolved merge"
 msgstr ", mesclagem não resolvida"
 
-#: tortoisehg/hgqt/status.py:816
+#: tortoisehg/hgqt/status.py:830
 #, python-format
 msgid "%s is modified"
 msgstr "%s é modificado"
 
-#: tortoisehg/hgqt/status.py:817 tortoisehg/hgtk/quickop.py:163
+#: tortoisehg/hgqt/status.py:831 tortoisehg/hgtk/quickop.py:163
 msgid "modified"
 msgstr "modificado"
 
-#: tortoisehg/hgqt/status.py:818
+#: tortoisehg/hgqt/status.py:832
 #, python-format
 msgid "%s is added"
 msgstr "%s é adicionado"
 
-#: tortoisehg/hgqt/status.py:819 tortoisehg/hgtk/quickop.py:166
+#: tortoisehg/hgqt/status.py:833 tortoisehg/hgtk/quickop.py:166
 msgid "added"
 msgstr "adicionado"
 
-#: tortoisehg/hgqt/status.py:820
+#: tortoisehg/hgqt/status.py:834
 #, python-format
 msgid "%s is removed"
 msgstr "%s é removido"
 
-#: tortoisehg/hgqt/status.py:821 tortoisehg/hgtk/quickop.py:169
+#: tortoisehg/hgqt/status.py:835 tortoisehg/hgtk/quickop.py:169
 msgid "removed"
 msgstr "removido"
 
-#: tortoisehg/hgqt/status.py:822
+#: tortoisehg/hgqt/status.py:836
 #, python-format
 msgid "%s is not tracked (unknown)"
 msgstr "%s é não-rastreado (desconhecido)"
 
-#: tortoisehg/hgqt/status.py:823 tortoisehg/hgtk/quickop.py:175
+#: tortoisehg/hgqt/status.py:837 tortoisehg/hgtk/quickop.py:175
 #: tortoisehg/hgtk/quickop.py:255 tortoisehg/hgtk/serve.py:127
 #: tortoisehg/util/version.py:47 tortoisehg/util/version.py:73
 msgid "unknown"
 msgstr "desconhecido"
 
-#: tortoisehg/hgqt/status.py:824
+#: tortoisehg/hgqt/status.py:838
 #, python-format
 msgid "%s is missing!"
 msgstr "%s é ausente!"
 
-#: tortoisehg/hgqt/status.py:825
+#: tortoisehg/hgqt/status.py:839
 msgid "deleted"
 msgstr "apagado"
 
-#: tortoisehg/hgqt/status.py:826
+#: tortoisehg/hgqt/status.py:840
 #, python-format
 msgid "%s is ignored"
 msgstr "%s é ignorado"
 
-#: tortoisehg/hgqt/status.py:827 tortoisehg/hgtk/quickop.py:179
+#: tortoisehg/hgqt/status.py:841 tortoisehg/hgtk/quickop.py:179
 #: tortoisehg/hgtk/quickop.py:255
 msgid "ignored"
 msgstr "ignorado"
 
-#: tortoisehg/hgqt/status.py:828
+#: tortoisehg/hgqt/status.py:842
 #, python-format
 msgid "%s is not modified (clean)"
 msgstr "%s é não-modificado (limpo)"
 
-#: tortoisehg/hgqt/status.py:829 tortoisehg/hgtk/quickop.py:183
+#: tortoisehg/hgqt/status.py:843 tortoisehg/hgtk/quickop.py:183
 msgid "clean"
 msgstr "limpo"
 
-#: tortoisehg/hgqt/status.py:830
+#: tortoisehg/hgqt/status.py:844
 #, python-format
 msgid "%s is a dirty subrepo"
 msgstr "%s é um sub-repositório sujo"
 
-#: tortoisehg/hgqt/status.py:831
+#: tortoisehg/hgqt/status.py:845
 msgid "subrepo"
 msgstr "sub-repositório"
 
@@ -8025,34 +8027,36 @@ msgstr "&Strip"
 msgid "Strip - %s"
 msgstr "Strip - %s"
 
-#: tortoisehg/hgqt/thgstrip.py:174
+#: tortoisehg/hgqt/thgstrip.py:175
 #, python-format
-msgid "<b>%d changesets</b> will be stripped"
-msgstr "<b>%d revisões</b> serão removidas"
+msgid "<b>%d changeset</b> will be stripped"
+msgid_plural "<b>%d changesets</b> will be stripped"
+msgstr[0] "<b>%d revisão</b> será removida"
+msgstr[1] "<b>%d revisões</b> serão removidas"
 
-#: tortoisehg/hgqt/thgstrip.py:180 tortoisehg/hgtk/thgstrip.py:176
+#: tortoisehg/hgqt/thgstrip.py:183 tortoisehg/hgtk/thgstrip.py:176
 msgid "Unknown revision!"
 msgstr "Revisão desconhecida!"
 
-#: tortoisehg/hgqt/thgstrip.py:204
+#: tortoisehg/hgqt/thgstrip.py:207
 msgid "Detected uncommitted local changes."
 msgstr "Mudanças locais não-consolidadas detectadas."
 
-#: tortoisehg/hgqt/thgstrip.py:205
+#: tortoisehg/hgqt/thgstrip.py:208
 msgid "Do you want to discard them and continue?"
 msgstr "Você deseja descartá-las e continuar?"
 
-#: tortoisehg/hgqt/thgstrip.py:206 tortoisehg/hgtk/thgstrip.py:217
+#: tortoisehg/hgqt/thgstrip.py:209 tortoisehg/hgtk/thgstrip.py:217
 msgid "&Yes (--force)"
 msgstr "&Sim (--force)"
 
-#: tortoisehg/hgqt/thgstrip.py:207 tortoisehg/hgtk/commit.py:324
+#: tortoisehg/hgqt/thgstrip.py:210 tortoisehg/hgtk/commit.py:324
 #: tortoisehg/hgtk/commit.py:1192 tortoisehg/hgtk/commit.py:1199
 #: tortoisehg/hgtk/thgstrip.py:217
 msgid "&No"
 msgstr "&Não"
 
-#: tortoisehg/hgqt/thgstrip.py:208 tortoisehg/hgtk/thgstrip.py:214
+#: tortoisehg/hgqt/thgstrip.py:211 tortoisehg/hgtk/thgstrip.py:214
 msgid "Confirm Strip"
 msgstr "Confirma Remoção de Revisões"
 
@@ -8249,100 +8253,100 @@ msgstr "Confirma Atualização"
 msgid "[non-existant]"
 msgstr "[inexistente]"
 
-#: tortoisehg/hgqt/visdiff.py:143 tortoisehg/hgtk/visdiff.py:125
+#: tortoisehg/hgqt/visdiff.py:146 tortoisehg/hgtk/visdiff.py:125
 msgid "Tool launch failure"
 msgstr "Falha ao lançar a ferramenta"
 
-#: tortoisehg/hgqt/visdiff.py:144 tortoisehg/hgtk/visdiff.py:126
+#: tortoisehg/hgqt/visdiff.py:147 tortoisehg/hgtk/visdiff.py:126
 #, python-format
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: tortoisehg/hgqt/visdiff.py:151 tortoisehg/hgqt/visdiff.py:223
+#: tortoisehg/hgqt/visdiff.py:154 tortoisehg/hgqt/visdiff.py:226
 #: tortoisehg/hgtk/visdiff.py:132 tortoisehg/hgtk/visdiff.py:201
 msgid "No diff tool found"
 msgstr "Nenhuma ferramenta de diff encontrada"
 
-#: tortoisehg/hgqt/visdiff.py:152 tortoisehg/hgqt/visdiff.py:224
+#: tortoisehg/hgqt/visdiff.py:155 tortoisehg/hgqt/visdiff.py:227
 #: tortoisehg/hgtk/visdiff.py:133 tortoisehg/hgtk/visdiff.py:202
 msgid "No visual diff tools were detected"
 msgstr "Nenhuma ferramenta de diff visual foi detectada"
 
-#: tortoisehg/hgqt/visdiff.py:157 tortoisehg/hgtk/visdiff.py:138
+#: tortoisehg/hgqt/visdiff.py:160 tortoisehg/hgtk/visdiff.py:138
 msgid "[working copy]"
 msgstr "[cópia de trabalho]"
 
-#: tortoisehg/hgqt/visdiff.py:159 tortoisehg/hgtk/visdiff.py:140
+#: tortoisehg/hgqt/visdiff.py:162 tortoisehg/hgtk/visdiff.py:140
 msgid "[original]"
 msgstr "[original]"
 
-#: tortoisehg/hgqt/visdiff.py:198 tortoisehg/hgtk/visdiff.py:177
+#: tortoisehg/hgqt/visdiff.py:201 tortoisehg/hgtk/visdiff.py:177
 msgid "Unable to find changeset"
 msgstr "Incapaz de localizar revisão"
 
-#: tortoisehg/hgqt/visdiff.py:199 tortoisehg/hgtk/visdiff.py:178
+#: tortoisehg/hgqt/visdiff.py:202 tortoisehg/hgtk/visdiff.py:178
 msgid "You likely need to refresh this application"
 msgstr "Você provavelmente precisa reler os dados"
 
-#: tortoisehg/hgqt/visdiff.py:216 tortoisehg/hgtk/visdiff.py:195
+#: tortoisehg/hgqt/visdiff.py:219 tortoisehg/hgtk/visdiff.py:195
 msgid "No file changes"
 msgstr "Arquivos sem alteração"
 
-#: tortoisehg/hgqt/visdiff.py:217 tortoisehg/hgtk/visdiff.py:196
+#: tortoisehg/hgqt/visdiff.py:220 tortoisehg/hgtk/visdiff.py:196
 msgid "There are no file changes to view"
 msgstr "Não existem alterações de arquivos para ver"
 
-#: tortoisehg/hgqt/visdiff.py:354 tortoisehg/hgtk/visdiff.py:326
+#: tortoisehg/hgqt/visdiff.py:357 tortoisehg/hgtk/visdiff.py:326
 msgid "cleaning up temp directory\n"
 msgstr "limpando diretório temporário\n"
 
-#: tortoisehg/hgqt/visdiff.py:374 tortoisehg/hgtk/visdiff.py:352
+#: tortoisehg/hgqt/visdiff.py:377 tortoisehg/hgtk/visdiff.py:352
 msgid "working changes"
 msgstr "diferenças de trabalho"
 
-#: tortoisehg/hgqt/visdiff.py:376
+#: tortoisehg/hgqt/visdiff.py:379
 #, python-format
 msgid "changeset %d:%s"
 msgstr "revisão %d:%s"
 
-#: tortoisehg/hgqt/visdiff.py:378
+#: tortoisehg/hgqt/visdiff.py:381
 #, python-format
 msgid "revisions %d:%s to %d:%s"
 msgstr "revisões %d:%s a %d:%s"
 
-#: tortoisehg/hgqt/visdiff.py:380 tortoisehg/hgtk/visdiff.py:357
+#: tortoisehg/hgqt/visdiff.py:383 tortoisehg/hgtk/visdiff.py:357
 msgid "Visual Diffs - "
 msgstr "Visual Diffs - "
 
-#: tortoisehg/hgqt/visdiff.py:382 tortoisehg/hgtk/visdiff.py:359
+#: tortoisehg/hgqt/visdiff.py:385 tortoisehg/hgtk/visdiff.py:359
 msgid " filtered"
 msgstr " filtradas"
 
-#: tortoisehg/hgqt/visdiff.py:397 tortoisehg/hgtk/visdiff.py:370
+#: tortoisehg/hgqt/visdiff.py:400 tortoisehg/hgtk/visdiff.py:370
 msgid "Temporary files are removed when this dialog is closed"
 msgstr "Arquivos temporários são removidos ao fechar este diálogo"
 
-#: tortoisehg/hgqt/visdiff.py:415
+#: tortoisehg/hgqt/visdiff.py:418
 msgid "Select Tool:"
 msgstr "Selecionar Ferramenta:"
 
-#: tortoisehg/hgqt/visdiff.py:439 tortoisehg/hgtk/visdiff.py:424
+#: tortoisehg/hgqt/visdiff.py:442 tortoisehg/hgtk/visdiff.py:424
 msgid "Dir diff to p1"
 msgstr "Diff do diretório com pai 1"
 
-#: tortoisehg/hgqt/visdiff.py:441 tortoisehg/hgtk/visdiff.py:426
+#: tortoisehg/hgqt/visdiff.py:444 tortoisehg/hgtk/visdiff.py:426
 msgid "Dir diff to p2"
 msgstr "Diff do diretório com pai 2"
 
-#: tortoisehg/hgqt/visdiff.py:443 tortoisehg/hgtk/visdiff.py:428
+#: tortoisehg/hgqt/visdiff.py:446 tortoisehg/hgtk/visdiff.py:428
 msgid "3-way dir diff"
 msgstr "Diff de diretório de 3 vias"
 
-#: tortoisehg/hgqt/visdiff.py:446 tortoisehg/hgtk/visdiff.py:434
+#: tortoisehg/hgqt/visdiff.py:449 tortoisehg/hgtk/visdiff.py:434
 msgid "Directory diff"
 msgstr "Diff de diretório"
 
-#: tortoisehg/hgqt/visdiff.py:614 tortoisehg/hgtk/visdiff.py:631
+#: tortoisehg/hgqt/visdiff.py:617 tortoisehg/hgtk/visdiff.py:631
 msgid "No repository found here"
 msgstr "Nenhum repositório encontrado aqui"
 
@@ -8399,81 +8403,89 @@ msgstr "Marcar como não resolvido"
 msgid "Mark resolved"
 msgstr "Marcar como resolvido"
 
-#: tortoisehg/hgqt/wctxactions.py:117 tortoisehg/hgtk/status.py:1245
+#: tortoisehg/hgqt/wctxactions.py:77
+msgid "Check"
+msgstr "Marcar"
+
+#: tortoisehg/hgqt/wctxactions.py:78
+msgid "Uncheck"
+msgstr "Desmarcar"
+
+#: tortoisehg/hgqt/wctxactions.py:121 tortoisehg/hgtk/status.py:1245
 msgid "View other"
 msgstr "Ver outro"
 
-#: tortoisehg/hgqt/wctxactions.py:121
+#: tortoisehg/hgqt/wctxactions.py:125
 msgid "&Copy..."
 msgstr "&Copiar..."
 
-#: tortoisehg/hgqt/wctxactions.py:122 tortoisehg/hgtk/status.py:1262
+#: tortoisehg/hgqt/wctxactions.py:126 tortoisehg/hgtk/status.py:1262
 msgid "Rename..."
 msgstr "Renomear..."
 
-#: tortoisehg/hgqt/wctxactions.py:128
+#: tortoisehg/hgqt/wctxactions.py:132
 msgid "Was renamed from"
 msgstr "Foi renomeado de"
 
-#: tortoisehg/hgqt/wctxactions.py:139 tortoisehg/hgtk/status.py:1264
+#: tortoisehg/hgqt/wctxactions.py:143 tortoisehg/hgtk/status.py:1264
 msgid "Restart Merge..."
 msgstr "Reiniciar Mesclagem..."
 
-#: tortoisehg/hgqt/wctxactions.py:141 tortoisehg/hgtk/status.py:1274
+#: tortoisehg/hgqt/wctxactions.py:145 tortoisehg/hgtk/status.py:1274
 msgid "Restart merge with"
 msgstr "Reiniciar mesclagem com"
 
-#: tortoisehg/hgqt/wctxactions.py:170
+#: tortoisehg/hgqt/wctxactions.py:174
 msgid " errors"
 msgstr " erros"
 
-#: tortoisehg/hgqt/wctxactions.py:173
+#: tortoisehg/hgqt/wctxactions.py:177
 msgid " output"
 msgstr " saída"
 
-#: tortoisehg/hgqt/wctxactions.py:180 tortoisehg/hgqt/wctxactions.py:187
-#: tortoisehg/hgqt/wctxactions.py:190 tortoisehg/hgtk/gdialog.py:582
+#: tortoisehg/hgqt/wctxactions.py:184 tortoisehg/hgqt/wctxactions.py:191
+#: tortoisehg/hgqt/wctxactions.py:194 tortoisehg/hgtk/gdialog.py:582
 #: tortoisehg/hgtk/gdialog.py:585
 msgid " Aborted"
 msgstr " Abortado"
 
-#: tortoisehg/hgqt/wctxactions.py:263 tortoisehg/hgtk/statusact.py:125
+#: tortoisehg/hgqt/wctxactions.py:267 tortoisehg/hgtk/statusact.py:125
 msgid "Uncommited merge - please select a parent revision"
 msgstr "Mesclagem não consolidada - por favor selecione uma revisão pai"
 
-#: tortoisehg/hgqt/wctxactions.py:264 tortoisehg/hgtk/statusact.py:126
+#: tortoisehg/hgqt/wctxactions.py:268 tortoisehg/hgtk/statusact.py:126
 msgid "Revert files to local or other parent?"
 msgstr "Reverter arquivos para a revisão local ou para o outro pai?"
 
-#: tortoisehg/hgqt/wctxactions.py:265 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:269 tortoisehg/hgtk/statusact.py:127
 msgid "&Local"
 msgstr "&Local"
 
-#: tortoisehg/hgqt/wctxactions.py:265 tortoisehg/hgtk/statusact.py:127
+#: tortoisehg/hgqt/wctxactions.py:269 tortoisehg/hgtk/statusact.py:127
 msgid "&Other"
 msgstr "&Outro"
 
-#: tortoisehg/hgqt/wctxactions.py:276
+#: tortoisehg/hgqt/wctxactions.py:280
 msgid "Revert local file changes?"
 msgstr "Reverter mudanças locais dos arquivos?"
 
-#: tortoisehg/hgqt/wctxactions.py:277
+#: tortoisehg/hgqt/wctxactions.py:281
 msgid "&Revert with backup"
 msgstr "&Reverter com backup"
 
-#: tortoisehg/hgqt/wctxactions.py:277
+#: tortoisehg/hgqt/wctxactions.py:281
 msgid "&Discard changes"
 msgstr "&Descartar mudanças"
 
-#: tortoisehg/hgqt/wctxactions.py:365
+#: tortoisehg/hgqt/wctxactions.py:369
 msgid "Confirm Delete Unversioned"
 msgstr "Confirmar Remoção de Não-Versionados"
 
-#: tortoisehg/hgqt/wctxactions.py:366
+#: tortoisehg/hgqt/wctxactions.py:370
 msgid "Delete the following unversioned files?"
 msgstr "Remover os seguintes arquivos não-versionados?"
 
-#: tortoisehg/hgqt/wctxactions.py:378 tortoisehg/hgtk/statusact.py:40
+#: tortoisehg/hgqt/wctxactions.py:382 tortoisehg/hgtk/statusact.py:40
 msgid "Copy file to"
 msgstr "Copiar arquivo para"
 
@@ -8810,6 +8822,14 @@ msgstr "%s - Workbench do TortoiseHg - %s"
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg Workbench"
+
+#: tortoisehg/hgqt/workbench.py:731
+msgid "Goto revision"
+msgstr "Ir para revisão"
+
+#: tortoisehg/hgqt/workbench.py:732
+msgid "Enter revision identifier"
+msgstr "Forneça o identificador da revisão"
 
 #: tortoisehg/hgqt/workbench.py:768
 msgid "Select repository directory to open"
@@ -13489,5 +13509,13 @@ msgstr "trecho %d já aplicado na linha %d (indistinção %d)\n"
 msgid "repository %s not found"
 msgstr "repositório %s não encontrado"
 
+#, python-format
+#~ msgid "Unable to delete %d files or folders"
+#~ msgstr "Não é possível apagar %d arquivos ou pastas"
+
 #~ msgid "An URL must be selected for this operation."
 #~ msgstr "Uma URL deve estar selecionada para esta operação"
+
+#, python-format
+#~ msgid "<b>%d changesets</b> will be stripped"
+#~ msgstr "<b>%d revisões</b> serão removidas"
