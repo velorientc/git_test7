@@ -7,7 +7,8 @@
 
 import os
 import cStringIO
-from mercurial import util, config as config_mod
+import ConfigParser
+from mercurial import error, util, config as config_mod
 
 try:
     from iniparse import INIConfig
@@ -178,8 +179,12 @@ class _wconfig(object):
             raise NotImplementedError("wconfig does not support read() more than once")
 
         def newini(fp=None):
-            # TODO: optionxformvalue isn't used by INIConfig ?
-            return INIConfig(fp=fp, optionxformvalue=None)
+            try:
+                # TODO: optionxformvalue isn't used by INIConfig ?
+                return INIConfig(fp=fp, optionxformvalue=None)
+            except ConfigParser.ParsingError, err:
+                raise error.ParseError(err.message.splitlines()[0],
+                                       '%s:%d' % (err.filename, err.lineno))
 
         if not self._readfiles:
             return newini()
