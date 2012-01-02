@@ -484,7 +484,8 @@ class _QtRunner(QObject):
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
-        if len(self.errors) == 1 and etype in self._recoverableexc:
+        if (len(set(e[0] for e in self.errors)) == 1
+            and etype in self._recoverableexc):
             opts['values'] = evalue
             errstr = self._recoverableexc[etype]
             if etype == error.Abort and evalue.hint:
