@@ -488,7 +488,7 @@ class _QtRunner(QObject):
             and etype in self._recoverableexc):
             opts['values'] = evalue
             errstr = self._recoverableexc[etype]
-            if etype == error.Abort and evalue.hint:
+            if etype is error.Abort and evalue.hint:
                 errstr = u''.join([errstr, u'<br><b>', _('hint:'),
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
