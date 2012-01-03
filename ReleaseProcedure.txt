@@ -1,11 +1,11 @@
 Steps for making a release:
 
+* update url in qtlib.openhelpcontents()            (major release only)
+* build pdf hgbook, check into thg-winbuild         (major release only)
 * hg status -ar --rev 1.6:tip  # find new files that WiX needs to know about
 * Pull latest translations from Launchpad
-* update url in qtlib.openhelpcontents()            (major release only)
 * set revision number in doc/source/conf.py
 * tag stable branches of thg and shellext repos, push
-* build pdf hgbook, check into thg-winbuild         (major release only)
 * build release installer
 * commit extension versions, tag, push thg-winbuild
 * create and upload a tarball (python setup.py sdist)
@@ -13,12 +13,11 @@ Steps for making a release:
 * update URLs and front page of thg-web
 * update thg-html curversion.txt, regen thg-web, commit, push
 * update NEWS on wiki front page
-* build html,pdf hgbook, check into thg-web         (major release only)
-* wiki: Move ReleaseNotes to old-release-notes      (major release only)
 * wiki: Move FixedBugs or upcoming-release-notes to ReleaseNotes, empty FixedBugs
 * [ANN] email to tortoisehg-discuss and mercurial@selenic.com
 * Update Mercurial wiki NEWS and Downloads and TortoiseHg pages
-* Add the new version number and new features to the issue tracker
+* build html,pdf hgbook, check into thg-web         (major release only)
+* wiki: Move ReleaseNotes to old-release-notes      (major release only)
 
 Post Major Release:
 * Increment minimum Mercurial version in tortoisehg/util/hgversion.py
