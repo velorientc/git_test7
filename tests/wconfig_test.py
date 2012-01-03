@@ -2,7 +2,7 @@ import os, tempfile, shutil
 from nose.tools import *
 from nose.plugins.skip import SkipTest
 from StringIO import StringIO
-from mercurial import config
+from mercurial import config, error
 from tortoisehg.util import wconfig
 
 def setup():
@@ -224,6 +224,14 @@ def check_read_write():
     s = '[foo]\nbar = baz'
     c.read(path='foo', fp=StringIO(s))
     assert_equals(s, written(c).rstrip())
+
+@with_wconfig
+@raises(error.ParseError)
+def check_read_write_parse_error():
+    c = newwconfig()
+    s = 'bar = baz'  # missing header
+    c.read(path='foo', fp=StringIO(s))
+    c.write(StringIO())
 
 @with_wconfig
 def check_write_after_dict_setitem():

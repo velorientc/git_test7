@@ -100,18 +100,21 @@ def snapshot(repo, files, ctx):
             # File has already been snapshot
             continue
         destdir = os.path.dirname(dest)
-        if not os.path.isdir(destdir):
-            os.makedirs(destdir)
-        data = repo.wwritedata(wfn, ctx[wfn].data())
-        f = open(dest, 'wb')
-        f.write(data)
-        f.close()
-        if ctx.rev() is None:
-            fns_and_mtime.append((dest, repo.wjoin(fn), 
-                                  os.lstat(dest).st_mtime))
-        else:
-            # Make file read/only, to indicate it's static (archival) nature
-            os.chmod(dest, stat.S_IREAD)
+        try:
+            if not os.path.isdir(destdir):
+                os.makedirs(destdir)
+            data = repo.wwritedata(wfn, ctx[wfn].data())
+            f = open(dest, 'wb')
+            f.write(data)
+            f.close()
+            if ctx.rev() is None:
+                fns_and_mtime.append((dest, repo.wjoin(fn), 
+                                    os.lstat(dest).st_mtime))
+            else:
+                # Make file read/only, to indicate it's static (archival) nature
+                os.chmod(dest, stat.S_IREAD)
+        except EnvironmentError:
+            pass
     return base, fns_and_mtime
 
 def launchtool(cmd, opts, replace, block):
