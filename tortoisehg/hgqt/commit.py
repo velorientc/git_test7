@@ -469,7 +469,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def getBugTrackerCommitMessage(self):
         parameters = self.opts['bugtraqparameters']
-        message = self.getMessage()
+        message = self.getMessage(True)
         newMessage = self.bugtraq.get_commit_message(parameters, message)
         self.setMessage(newMessage)
 
@@ -589,13 +589,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             m.addAction(title).triggered.connect(overwriteMsg(s))
         self.recentMessagesButton.setMenu(m)
 
-    def getMessage(self):
+    def getMessage(self, allowreplace):
         text = self.msgte.text()
         try:
-            text = hglib.fromunicode(text, 'strict')
+            return hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
-            pass # TODO
-        return text
+            if allowreplace:
+                return hglib.fromunicode(text, 'replace')
+            else:
+                raise
 
     def msgSelected(self, message):
         if self.msgte.text() and self.msgte.isModified():
@@ -653,8 +655,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.stwidget.saveSettings(s, lpref+'status')
         s.setValue(gpref+'history-'+repoid, self.msghistory)
         s.setValue(gpref+'userhist', self.userhist)
+        msg = self.getMessage(True)
         try:
-            msg = self.getMessage()
             self.repo.opener('cur-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
@@ -676,7 +678,21 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def commit(self):
         repo = self.repo
-        msg = self.getMessage()
+        try:
+            msg = self.getMessage(False)
+        except UnicodeEncodeError:
+            res = qtlib.CustomPrompt(
+                    _('Message Translation Failure'),
+                    _('Unable to translate message to local encoding\n'
+                      'Consider setting HGENCODING environment variable\n'
+                      'Replace untranslatable characters with "?"?\n'), self,
+                     (_('&Replace'), _('Cancel')), 0, 1, []).run()
+            if res == 0:
+                msg = self.getMessage(True)
+                self.msgte.setText(hglib.tounicode(msg))
+            self.msgte.setFocus()
+            return
+
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
                                 _('Please enter commit message'),
@@ -828,7 +844,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 self.lastCommitMsg = ''
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
-                    self.lastmessage = self.getMessage()
+                    self.lastmessage = self.getMessage(True)
                 if umsg:
                     self.addMessageToHistory(umsg)
                 self.setMessage('')
