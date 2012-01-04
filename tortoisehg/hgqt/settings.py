@@ -847,6 +847,8 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
+        _('Show tags at start of commit message.')),
     _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory', genBoolRBGroup,
         _('When committing, require that a reference to an issue be specified.  '
           'If enabled, the regex configured in \'Issue Regex\' must find a match '
