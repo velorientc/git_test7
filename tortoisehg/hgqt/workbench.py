@@ -728,9 +728,9 @@ class Workbench(QMainWindow):
             w.repoview.model().loadall()
 
     def gotorev(self):
-        rev, ok = QInputDialog.getText(self, _("Goto revision"),
-                                       _("Enter revision identifier"),
-                                       flags=Qt.WindowTitleHint)
+        rev, ok = qtlib.getTextInput(self,
+                                     _("Goto revision"),
+                                     _("Enter revision identifier"))
         w = self.repoTabsWidget.currentWidget()
         if ok and w:
             w.repoview.goto(rev)
