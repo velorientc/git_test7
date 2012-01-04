@@ -274,8 +274,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.ctx = ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
+        msg = ctx.description()
+        if ctx.tags():  # and config.showTagsInlineWithCommitMsg:
+            msg = ' '.join(['[%s]' % tag for tag in ctx.tags()]) + ' ' + msg
         self.message.setHtml('<pre>%s</pre>'
-                             % self._deschtmlize(ctx.description()))
+                             % self._deschtmlize(msg))
         real = type(rev) is int
         wd = rev is None
         for act in ['navigate', 'diffnavigate', 'ldiff', 'edit', 'save']:
