@@ -353,7 +353,7 @@ class MQPatchesWidget(QDockWidget):
             uguards = hglib.tounicode(' '.join(item._thgguards))
         else:
             uguards = ''
-        new, ok = QInputDialog.getText(self,
+        new, ok = qtlib.getTextInput(self,
                       _('Configure guards'),
                       _('Input new guards for %s:') % hglib.tounicode(patch),
                       text=uguards)

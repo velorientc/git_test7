@@ -238,13 +238,12 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            dlg = QInputDialog(self.parent(), Qt.Sheet)
-            dlg.setWindowModality(Qt.WindowModal)
-            dlg.setWindowTitle(_('TortoiseHg Prompt'))
-            dlg.setLabelText(prompt.title())
-            dlg.setTextEchoMode(mode)
-            if dlg.exec_():
-                text = hglib.fromunicode(dlg.textValue())
+            text, ok = qtlib.getTextInput(self.parent(),
+                         _('TortoiseHg Prompt'),
+                         prompt.title(),
+                         mode=mode)
+            if ok:
+                text = hglib.fromunicode(text)
             else:
                 text = None
             self.responseq.put(text)

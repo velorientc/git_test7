@@ -253,14 +253,13 @@ class ShelveDialog(QDialog):
         shelve = time.strftime('%Y-%m-%d_%H-%M-%S') + \
                  '_parent_rev_%d' % self.repo['.'].rev()
         if interactive:
-            dlg = QInputDialog(self, Qt.Sheet)
-            dlg.setWindowModality(Qt.WindowModal)
-            dlg.setWindowTitle(_('TortoiseHg New Shelf Name'))
-            dlg.setLabelText(_('Specify name of new shelf'))
-            dlg.setTextValue(shelve)
-            if not dlg.exec_():
+            name, ok = qtlib.getTextInput(self,
+                         _('TortoiseHg New Shelf Name'),
+                         _('Specify name of new shelf'),
+                         text=shelve)
+            if not ok:
                 return
-            shelve = hglib.fromunicode(dlg.textValue())
+            shelve = hglib.fromunicode(name)
         try:
             fn = os.path.join('shelves', shelve)
             shelfpath = self.repo.join(fn)
