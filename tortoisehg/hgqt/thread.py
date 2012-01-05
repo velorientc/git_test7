@@ -10,6 +10,7 @@ import os
 import Queue
 import time
 import urllib2
+import socket
 import errno
 
 from PyQt4.QtCore import *
@@ -327,6 +328,8 @@ class CmdThread(QThread):
                 ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
         except error.RevlogError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
+        except socket.error, inst:
+            ui.warn(local._("abort: %s!\n") % str(inst))
         except IOError, inst:
             if hasattr(inst, "code"):
                 ui.warn(local._("abort: %s\n") % inst)
