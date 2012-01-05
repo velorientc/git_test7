@@ -58,6 +58,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
         opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
         opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
         self.opts = opts # user, date
@@ -810,6 +811,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 if fname:
                     cmdline.extend(['--include', fname])
 
+        if self.opts.get('recurseinsubrepos'):
+            cmdline.append('--subrepos')
+
         commandlines.append(cmdline)
 
         if self.opts.get('pushafter'):
@@ -974,7 +978,22 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.autoincle)
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
-
+        
+        hbox = QHBoxLayout()
+        recursesave = QPushButton(_('Save in Repo'))
+        recursesave.clicked.connect(self.saveRecurseInSubrepos)
+        self.recursecb = QCheckBox(_('Recurse into subrepositories (--subrepos)'))
+        SP = QSizePolicy
+        self.recursecb.setSizePolicy(SP(SP.Expanding, SP.Minimum))
+        #self.recursecb.toggled.connect(recursesave.setEnabled)
+        
+        if opts.get('recurseinsubrepos'):
+            self.recursecb.setChecked(True)
+            
+        hbox.addWidget(self.recursecb)
+        hbox.addWidget(recursesave)
+        layout.addLayout(hbox)
+        
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1057,6 +1076,29 @@ class DetailsDialog(QDialog):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
+    def saveRecurseInSubrepos(self):
+        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        fn, cfg = hgrcutil.loadIniFile([path], self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save recurse in subrepos.'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            state = self.recursecb.isChecked()
+            if state:
+                cfg.set('tortoisehg', 'recurseinsubrepos', state)
+            else:
+                try:
+                    del cfg['tortoisehg']['recurseinsubrepos']
+                except KeyError:
+                    pass
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
     def accept(self):
         outopts = {}
         if self.datecb.isChecked():
@@ -1099,6 +1141,11 @@ class DetailsDialog(QDialog):
         else:
             outopts['pushafter'] = ''
 
+        if self.recursecb.isChecked():
+            outopts['recurseinsubrepos'] = 'true'
+        else:
+            outopts['recurseinsubrepos'] = ''
+        
         self.outopts = outopts
         QDialog.accept(self)
 
