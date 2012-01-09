@@ -213,6 +213,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               _('View file as it appeared at this revision'), self.editfile),
             ('open', _('Open at Revision'), '', 'Alt+Ctrl+O',
               _('Open file as it appeared at this revision'), self.openfile),
+            ('save', _('Save at Revision'), '', 'Alt+Ctrl+S',
+              _('Save file as it appeared at this revision'), self.savefile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
             ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
@@ -300,6 +302,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                                        self._repo[self.rev])
             files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
+
+    def savefile(self):
+        if self.path is None or self.rev is None:
+            return
+        else:
+            qtlib.savefiles(self._repo, [self.path], self.rev, parent=self)
 
     def editlocal(self, editor=None):
         if self.path is None:
@@ -391,7 +399,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+            actionlist = ['diff', 'ldiff', 'edit', 'save', 'ledit', 'revert',
                         'navigate', 'diffnavigate']
 
         if not contextmenu:
