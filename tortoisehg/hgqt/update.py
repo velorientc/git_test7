@@ -281,6 +281,7 @@ class UpdateDialog(QDialog):
                     msg += '\n'
                     msg += desc
                     buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                dlg.setDefaultButton(QMessageBox.Cancel)
                 dlg.setText(msg)
                 dlg.exec_()
                 return buttons, dlg.clickedButton(), opts

@@ -21,7 +21,7 @@
   <?define i18nFolder.guid = {5191051C-742F-470E-AD76-D83C2F1EDE4E} ?>
 
   <!-- templates.wxs -->
-  <?define templates.root.guid = {6A82D0BF-6878-42F3-92FD-AB39F7A97EEF} ?>
+  <?define templates.root.guid = {01A37649-64F4-483B-9E91-FDD8D81D45EB} ?>
   <?define templates.atom.guid = {68D030FA-56A1-4CAF-ADBF-07362B1DDF15} ?>
   <?define templates.coal.guid = {89768AB3-A942-470B-8C1C-9C026B80FF8E} ?>
   <?define templates.gitweb.guid = {516A9A5F-33DF-41EC-B64C-F910251549D7} ?>

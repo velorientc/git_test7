@@ -10,6 +10,7 @@ import os
 import Queue
 import time
 import urllib2
+import socket
 import errno
 
 from PyQt4.QtCore import *
@@ -238,13 +239,12 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            dlg = QInputDialog(self.parent(), Qt.Sheet)
-            dlg.setWindowModality(Qt.WindowModal)
-            dlg.setWindowTitle(_('TortoiseHg Prompt'))
-            dlg.setLabelText(prompt.title())
-            dlg.setTextEchoMode(mode)
-            if dlg.exec_():
-                text = hglib.fromunicode(dlg.textValue())
+            text, ok = qtlib.getTextInput(self.parent(),
+                         _('TortoiseHg Prompt'),
+                         prompt.title(),
+                         mode=mode)
+            if ok:
+                text = hglib.fromunicode(text)
             else:
                 text = None
             self.responseq.put(text)
@@ -328,6 +328,8 @@ class CmdThread(QThread):
                 ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
         except error.RevlogError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
+        except socket.error, inst:
+            ui.warn(local._("abort: %s!\n") % str(inst))
         except IOError, inst:
             if hasattr(inst, "code"):
                 ui.warn(local._("abort: %s\n") % inst)

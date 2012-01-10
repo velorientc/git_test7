@@ -1020,3 +1020,12 @@ def getCurrentUsername(widget, repo, opts=None):
     except error.Abort:
         return None
 
+def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
+  flags=Qt.WindowFlags()):
+    # the flags argument is supported under Qt 4.6, but probably with
+    # a different name (see issue 252), so we simply call everything
+    # positionally
+    return QInputDialog.getText(parent, title, label, mode, text,
+      Qt.CustomizeWindowHint | Qt.WindowTitleHint |
+      Qt.WindowCloseButtonHint | flags)
+

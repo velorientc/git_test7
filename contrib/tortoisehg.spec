@@ -66,7 +66,7 @@ install -m 644 -D contrib/_hgtk $RPM_BUILD_ROOT/%{_datadir}/zsh/site-functions/_
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
-ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/%{name}_logo.svg
+ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/thg_logo.svg
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop --vendor %{name}
 
 %find_lang %{name}

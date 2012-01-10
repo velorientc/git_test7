@@ -58,6 +58,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
         opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
         opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
         self.opts = opts # user, date
@@ -469,7 +470,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def getBugTrackerCommitMessage(self):
         parameters = self.opts['bugtraqparameters']
-        message = self.getMessage()
+        message = self.getMessage(True)
         newMessage = self.bugtraq.get_commit_message(parameters, message)
         self.setMessage(newMessage)
 
@@ -589,13 +590,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             m.addAction(title).triggered.connect(overwriteMsg(s))
         self.recentMessagesButton.setMenu(m)
 
-    def getMessage(self):
+    def getMessage(self, allowreplace):
         text = self.msgte.text()
         try:
-            text = hglib.fromunicode(text, 'strict')
+            return hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
-            pass # TODO
-        return text
+            if allowreplace:
+                return hglib.fromunicode(text, 'replace')
+            else:
+                raise
 
     def msgSelected(self, message):
         if self.msgte.text() and self.msgte.isModified():
@@ -653,8 +656,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.stwidget.saveSettings(s, lpref+'status')
         s.setValue(gpref+'history-'+repoid, self.msghistory)
         s.setValue(gpref+'userhist', self.userhist)
+        msg = self.getMessage(True)
         try:
-            msg = self.getMessage()
             self.repo.opener('cur-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
@@ -676,7 +679,21 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def commit(self):
         repo = self.repo
-        msg = self.getMessage()
+        try:
+            msg = self.getMessage(False)
+        except UnicodeEncodeError:
+            res = qtlib.CustomPrompt(
+                    _('Message Translation Failure'),
+                    _('Unable to translate message to local encoding\n'
+                      'Consider setting HGENCODING environment variable\n'
+                      'Replace untranslatable characters with "?"?\n'), self,
+                     (_('&Replace'), _('Cancel')), 0, 1, []).run()
+            if res == 0:
+                msg = self.getMessage(True)
+                self.msgte.setText(hglib.tounicode(msg))
+            self.msgte.setFocus()
+            return
+
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
                                 _('Please enter commit message'),
@@ -794,6 +811,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 if fname:
                     cmdline.extend(['--include', fname])
 
+        if self.opts.get('recurseinsubrepos'):
+            cmdline.append('--subrepos')
+
         commandlines.append(cmdline)
 
         if self.opts.get('pushafter'):
@@ -828,7 +848,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 self.lastCommitMsg = ''
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
-                    self.lastmessage = self.getMessage()
+                    self.lastmessage = self.getMessage(True)
                 if umsg:
                     self.addMessageToHistory(umsg)
                 self.setMessage('')
@@ -958,7 +978,22 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.autoincle)
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
-
+        
+        hbox = QHBoxLayout()
+        recursesave = QPushButton(_('Save in Repo'))
+        recursesave.clicked.connect(self.saveRecurseInSubrepos)
+        self.recursecb = QCheckBox(_('Recurse into subrepositories (--subrepos)'))
+        SP = QSizePolicy
+        self.recursecb.setSizePolicy(SP(SP.Expanding, SP.Minimum))
+        #self.recursecb.toggled.connect(recursesave.setEnabled)
+        
+        if opts.get('recurseinsubrepos'):
+            self.recursecb.setChecked(True)
+            
+        hbox.addWidget(self.recursecb)
+        hbox.addWidget(recursesave)
+        layout.addLayout(hbox)
+        
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1041,6 +1076,29 @@ class DetailsDialog(QDialog):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
+    def saveRecurseInSubrepos(self):
+        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        fn, cfg = hgrcutil.loadIniFile([path], self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save recurse in subrepos.'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            state = self.recursecb.isChecked()
+            if state:
+                cfg.set('tortoisehg', 'recurseinsubrepos', state)
+            else:
+                try:
+                    del cfg['tortoisehg']['recurseinsubrepos']
+                except KeyError:
+                    pass
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
     def accept(self):
         outopts = {}
         if self.datecb.isChecked():
@@ -1083,6 +1141,11 @@ class DetailsDialog(QDialog):
         else:
             outopts['pushafter'] = ''
 
+        if self.recursecb.isChecked():
+            outopts['recurseinsubrepos'] = 'true'
+        else:
+            outopts['recurseinsubrepos'] = ''
+        
         self.outopts = outopts
         QDialog.accept(self)
 

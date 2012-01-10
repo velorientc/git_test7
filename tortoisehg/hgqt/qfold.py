@@ -120,14 +120,6 @@ class QFoldDialog(QDialog):
               [hglib.tounicode(self.repo.changectx(p).description())
                for p in ['qtip'] + patches])
 
-    def getMessage(self):
-        text = self.msgte.text()
-        try:
-            text = hglib.fromunicode(text, 'strict')
-        except UnicodeEncodeError:
-            pass # TODO (see commit.py)
-        return text
-
     def configChanged(self):
         '''Repository is reporting its config files have changed'''
         self.msgte.refresh(self.repo)
@@ -138,7 +130,8 @@ class QFoldDialog(QDialog):
         cmdline = ['qfold', '--repository', self.repo.root]
         if self.keepchk.isChecked():
             cmdline += ['--keep']
-        cmdline += ['--message', self.getMessage()]
+        msg = hglib.fromunicode(self.msgte.text(), 'replace')
+        cmdline += ['--message', msg]
         cmdline += ['--']
         cmdline += self.ulw.getPatchList()
         def finished():
