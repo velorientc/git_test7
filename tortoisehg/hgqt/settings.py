@@ -832,6 +832,21 @@ INFO = (
         _('Path to the directory where a system-wide cache of largefiles will be stored')),
     )),
 
+({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
+    _fi(_('Require confirmation'), 'projrc.confirm', genBoolRBGroup,
+        _('Ask the user to confirm the update of the local "projrc" configuration file '
+        'when the remote projrc file changes. Default is "True".')),
+    _fi(_('Servers'), 'projrc.servers', genEditCombo,
+        _('List of Servers from which "projrc" configuration files must be pulled. '
+        'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
+        'Default is pull from NO servers.')),
+    _fi(_('Include'), 'projrc.include', genEditCombo,
+        _('List of settings that will be pulled form the project configuration file. Default is include NO settings.')),
+    _fi(_('Exclude'), 'projrc.exclude', genEditCombo,
+        _('List of settings that will NOT be pulled form the project configuration file. '
+        'Default is exclude none of the included settings.')),
+    )),
+
 )
 
 CONF_GLOBAL = 0
@@ -889,6 +904,14 @@ class SettingsDialog(QDialog):
                                   _('no repo at ') + uroot, parent=self)
 
         if repo:
+            if 'projrc' in repo.extensions():
+                projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
+                if os.path.exists(projrcpath):
+                    rtab = SettingsForm(rcpath=projrcpath, focus=focus, readonly=True)
+                    self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
+                                         _('%s project settings (.hg/projrc)') % os.path.basename(repo.displayname))
+                    rtab.restartRequested.connect(self._pushRestartRequest)
+
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
@@ -957,8 +980,11 @@ class SettingsForm(QWidget):
 
     restartRequested = pyqtSignal(unicode)
 
-    def __init__(self, rcpath, focus=None, parent=None):
+    def __init__(self, rcpath, focus=None, parent=None, readonly=False):
         super(SettingsForm, self).__init__(parent)
+
+        # If forcereadonly is false, the settings form will be readonly if the corresponding ini file is readonly
+        self.forcereadonly = readonly
 
         if isinstance(rcpath, (list, tuple)):
             self.rcpath = rcpath
@@ -1057,7 +1083,7 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
-        self.readonly = not (hasattr(self.ini, 'write')
+        self.readonly = self.forcereadonly or not (hasattr(self.ini, 'write')
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))
