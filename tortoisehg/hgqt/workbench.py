@@ -504,6 +504,14 @@ class Workbench(QMainWindow):
                 return
         self._openRepo(root, False)
 
+    @pyqtSlot(QString, QString)
+    def showClonedRepo(self, root, src=None):
+        """Activate the repo tab or open it on if not available [unicode]
+
+        This method simply calls showRepo, ignoring the second argument on the received signal
+        """
+        self.showRepo(root)
+
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
         for i in xrange(self.repoTabsWidget.count()):
@@ -761,7 +769,7 @@ class Workbench(QMainWindow):
             args = []
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.clonedRepository.connect(self.showRepo)
+        dlg.clonedRepository.connect(self.showClonedRepo)
         dlg.exec_()
 
     def openRepository(self):
