@@ -857,7 +857,8 @@ class SettingsDialog(QDialog):
     def __init__(self, configrepo=False, focus=None, parent=None, root=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint |
+            Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         if not hasattr(wconfig.config(), 'write'):
