@@ -345,6 +345,9 @@ class Workbench(QMainWindow):
         self.actionCurrentRev = \
         newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
                   enabled=True, toolbar='edit')
+        self.actionGoTo = \
+        newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
+                  enabled=True, toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
                   enabled=False, toolbar='edit')
