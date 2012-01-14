@@ -62,7 +62,7 @@ class RepoWidget(QWidget):
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent=None, bundle=None):
         QWidget.__init__(self, parent, acceptDrops=True)
 
         self.repo = repo
@@ -113,6 +113,9 @@ class RepoWidget(QWidget):
         self.createActions()
         self.loadSettings()
         self.setupModels()
+
+        if bundle:
+            self.setBundle(bundle)
 
         self.runner = cmdui.Runner(False, self)
         self.runner.output.connect(self.output)
@@ -421,7 +424,7 @@ class RepoWidget(QWidget):
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
         self.repomodel.revset = self.revset
-        self.reload()
+        self.reload(invalidate=False)
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
 
@@ -457,7 +460,7 @@ class RepoWidget(QWidget):
             if len(repo) == len(brepo):
                 # all bundle revisions pulled
                 self.clearBundle()
-                self.reload()
+                self.reload(invalidate=False)
             else:
                 # refresh revset with remaining revisions
                 self.revset = range(len(repo), len(brepo))
@@ -465,7 +468,7 @@ class RepoWidget(QWidget):
                 self.repoview.setRepo(brepo)
                 self.revDetailsWidget.setRepo(brepo)
                 self.manifestDemand.forward('setRepo', brepo)
-                self.reload()
+                self.reload(invalidate=False)
                 self.repomodel.revset = self.revset
                 self.repoview.resetBrowseHistory(self.revset)
                 self._reload_rev = self.revset[0]
@@ -482,7 +485,7 @@ class RepoWidget(QWidget):
 
     def rejectBundle(self):
         self.clearBundle()
-        self.reload()
+        self.reload(invalidate=False)
 
     @pyqtSlot()
     def clearRevisionSet(self):
@@ -653,6 +656,8 @@ class RepoWidget(QWidget):
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-verify'))
         dlg.setWindowTitle(_('%s - verify repository') % self.repo.shortname)
+        dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowMaximizeButtonHint)
+
         dlg.exec_()
 
     def recover(self):
@@ -660,6 +665,7 @@ class RepoWidget(QWidget):
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-recover'))
         dlg.setWindowTitle(_('%s - recover repository') % self.repo.shortname)
+        dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowMaximizeButtonHint)
         dlg.exec_()
 
     def rollback(self):
@@ -824,10 +830,11 @@ class RepoWidget(QWidget):
         else:
             self.visualDiffRevision()
 
-    def reload(self):
+    def reload(self, invalidate=True):
         'Initiate a refresh of the repo model, rebuild graph'
         try:
-            self.repo.thginvalidate()
+            if invalidate:
+                self.repo.thginvalidate()
             self.rebuildGraph()
             self.reloadTaskTab()
         except EnvironmentError, e:

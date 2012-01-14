@@ -8,7 +8,7 @@
 
 import os
 
-from mercurial import commands, util
+from mercurial import util
 
 from tortoisehg.util import hglib
 
@@ -340,31 +340,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         filenames = self.filelist.getSelectedFiles()
         if not filenames:
             return
-        rev = self.ctx.rev()
-        for curfile in filenames:
-            wfile = util.localpath(curfile)
-            wfile, ext = os.path.splitext(os.path.basename(wfile))
-            if wfile:
-                filename = "%s@%d%s" % (wfile, rev, ext)
-            else:
-                filename = "%s@%d" % (ext, rev)
-
-            result = QFileDialog.getSaveFileName(parent=self, caption=_("Save file to"),
-                                                 directory=filename) 
-            if not result:
-                continue
-            cwd = os.getcwd()
-            try:
-                os.chdir(self.repo.root)
-                try:
-                    commands.cat(self.repo.ui, self.repo,
-                        curfile,
-                        rev = rev,
-                        output = hglib.fromunicode(result))
-                except (util.Abort, IOError), e:
-                    QMessageBox.critical(self, _('Unable to save file'), hglib.tounicode(str(e)))
-            finally:
-                os.chdir(cwd)
+        qtlib.savefiles(self.repo, filenames, self.ctx.rev(), self)
 
     def editlocal(self):
         filenames = self.filelist.getSelectedFiles()

@@ -21,7 +21,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 class CloneDialog(QDialog):
 
     cmdfinished = pyqtSignal(int)
-    clonedRepository = pyqtSignal(QString)
+    clonedRepository = pyqtSignal(QString, QString)
 
     def __init__(self, args=None, opts={}, parent=None):
         super(CloneDialog, self).__init__(parent)
@@ -467,7 +467,8 @@ class CloneDialog(QDialog):
         if not ret:
             # Let the workbench know that a repository has been successfully
             # cloned
-            self.clonedRepository.emit(self.dest_combo.currentText())
+            self.clonedRepository.emit(self.dest_combo.currentText(),
+                self.src_combo.currentText())
 
     def onCloseClicked(self):
         if self.ret is 0:

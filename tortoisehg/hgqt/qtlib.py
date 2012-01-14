@@ -15,7 +15,7 @@ import tempfile
 import re
 import weakref
 
-from mercurial import extensions, error, util
+from mercurial import commands, extensions, error, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -158,6 +158,31 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
     return False
+
+def savefiles(repo, files, rev, parent=None):
+    for curfile in files:
+        wfile = util.localpath(curfile)
+        wfile, ext = os.path.splitext(os.path.basename(wfile))
+        if wfile:
+            filename = "%s@%d%s" % (wfile, rev, ext)
+        else:
+            filename = "%s@%d" % (ext, rev)
+        result = QFileDialog.getSaveFileName(parent=parent,
+                                             caption=_("Save file to"),
+                                             directory=filename) 
+        if not result:
+            continue
+        cwd = os.getcwd()
+        try:
+            os.chdir(repo.root)
+            try:
+                commands.cat(repo.ui, repo, curfile, rev=rev,
+                             output=hglib.fromunicode(result))
+            except (util.Abort, IOError), e:
+                QMessageBox.critical(self, _('Unable to save file'),
+                                     hglib.tounicode(str(e)))
+        finally:
+            os.chdir(cwd)
 
 _user_shell = None
 def openshell(root, reponame):
