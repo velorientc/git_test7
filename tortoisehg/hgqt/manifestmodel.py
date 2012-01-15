@@ -234,7 +234,7 @@ class ManifestModel(QAbstractItemModel):
                 return True
             return False
 
-        def getctxtreeinfo(ctx, repo):
+        def getctxtreeinfo(ctx):
             """
             Get the context information that is relevant to populating the tree
             """
@@ -319,7 +319,7 @@ class ManifestModel(QAbstractItemModel):
                             e = addrepocontentstotree(e, sctx, toprelpath)
 
             # Add regular files to the tree
-            status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
+            status, uncleanpaths, files = getctxtreeinfo(ctx)
 
             addfilestotree(roote, files, status, uncleanpaths)
             return roote
