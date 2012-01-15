@@ -739,7 +739,7 @@ class WctxModel(QAbstractTableModel):
             try:
                 rank = sortList.index(value)
             except (IndexError, ValueError):
-                rank = len(shortList) # Set the lowest rank by default
+                rank = len(sortList) # Set the lowest rank by default
 
             return rank
 
@@ -754,7 +754,7 @@ class WctxModel(QAbstractTableModel):
             try:
                 rank = sortList.index(value)
             except (IndexError, ValueError):
-                rank = len(shortList) # Set the lowest rank by default
+                rank = len(sortList) # Set the lowest rank by default
 
             return rank
 
