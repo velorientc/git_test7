@@ -29,8 +29,8 @@ class HgignoreDialog(QDialog):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
         self.setWindowFlags(self.windowFlags()
-            | Qt.WindowMaximizeButtonHint
-            & ~Qt.WindowContextHelpButtonHint)
+            & ~Qt.WindowContextHelpButtonHint
+            | Qt.WindowMaximizeButtonHint)
 
         self.repo = repo
         self.pats = pats

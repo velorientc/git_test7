@@ -657,8 +657,8 @@ class RepoWidget(QWidget):
         dlg.setWindowIcon(qtlib.geticon('hg-verify'))
         dlg.setWindowTitle(_('%s - verify repository') % self.repo.shortname)
         dlg.setWindowFlags(dlg.windowFlags()
-            | Qt.WindowMaximizeButtonHint
-            & ~Qt.WindowContextHelpButtonHint)
+            & ~Qt.WindowContextHelpButtonHint
+            | Qt.WindowMaximizeButtonHint)
 
         dlg.exec_()
 
@@ -668,8 +668,8 @@ class RepoWidget(QWidget):
         dlg.setWindowIcon(qtlib.geticon('hg-recover'))
         dlg.setWindowTitle(_('%s - recover repository') % self.repo.shortname)
         dlg.setWindowFlags(dlg.windowFlags()
-            | Qt.WindowMaximizeButtonHint
-            & ~Qt.WindowContextHelpButtonHint)
+            & ~Qt.WindowContextHelpButtonHint
+            | Qt.WindowMaximizeButtonHint)
 
         dlg.exec_()
 
