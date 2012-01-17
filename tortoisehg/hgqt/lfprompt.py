@@ -1,4 +1,4 @@
-# bfprompt.py - prompt to add large files as bfiles
+# lfprompt.py - prompt to add large files
 #
 # Copyright 2011 Fog Creek Software
 #
