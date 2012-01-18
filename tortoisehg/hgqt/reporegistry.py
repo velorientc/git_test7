@@ -467,14 +467,20 @@ class RepoRegistryView(QDockWidget):
         menulist = selitem.internalPointer().menulist()
         if not menulist:
             return
-        self.contextmenu.clear()
-        for act in menulist:
-            if act:
-                self.contextmenu.addAction(self._actions[act])
-            else:
-                self.contextmenu.addSeparator()
+        self.addtomenu(self.contextmenu, menulist)
         self.selitem = selitem
         self.contextmenu.exec_(point)
+
+    def addtomenu(self, menu, actlist):
+        menu.clear()
+        for act in actlist:
+            if isinstance(act, basestring) and act in self._actions:
+                menu.addAction(self._actions[act])
+            elif isinstance(act, tuple) and len(act) == 2:
+                submenu = menu.addMenu(act[0])
+                self.addtomenu(submenu, act[1])
+            else:
+                menu.addSeparator()
 
     #
     ## Menu action handlers
