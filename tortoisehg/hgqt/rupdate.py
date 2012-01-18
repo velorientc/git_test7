@@ -135,8 +135,8 @@ class rUpdateDialog(UpdateDialog):
 
         # Refer to the revision by the short hash.
         rev = hglib.fromunicode(self.rev_combo.currentText())
-        revShortHash = node.short(self.repo[rev].node())
-        cmdline.append(revShortHash)
+        revHash = self.repo[rev].hex()
+        cmdline.append(revHash)
 
         # start updating
         self.repo.incrementBusyCount()
