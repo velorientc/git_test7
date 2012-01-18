@@ -443,6 +443,10 @@ class RepoRegistryView(QDockWidget):
              ("copypath", _("Copy path"), '',
                 _("Copy the root path of the repository to the clipboard"),
                 self.copyPath),
+             ("sortbyname", _("Sort by name"), '',
+                _("Sort the group by short name"), self.sortbyname),
+             ("sortbypath", _("Sort by path"), '',
+                _("Sort the group by full path"), self.sortbypath),
              ]
         return a
 
@@ -705,6 +709,14 @@ class RepoRegistryView(QDockWidget):
 
         if root is not None:
             self.removeRepo.emit(hglib.tounicode(root))
+
+    def sortbyname(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: x.shortname())
+
+    def sortbypath(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: x.rootpath())
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):

@@ -450,7 +450,8 @@ class RepoGroupItem(RepoTreeItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
-            None, 'reloadRegistry']
+            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            'reloadRegistry']
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
@@ -504,7 +505,8 @@ class AllRepoGroupItem(RepoGroupItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
-            None, 'reloadRegistry']
+            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            'reloadRegistry']
 
     def undump(self, xr):
         a = xr.attributes()
