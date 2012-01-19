@@ -631,11 +631,12 @@ class RepoRegistryView(QDockWidget):
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'
-                            'has been added to the .hgsub file.<br><br>'
+                            'has been added to the .hgsub file of the repository:<br><br><i>%s</i><br><br>'
                             'Remember that in order to finish adding the '
-                            'subrepo<br><i>you must still commit</i> the '
-                            '.hgsub file changes.') \
-                            % root, parent=self)
+                            'subrepo <i>you must still <u>commit</u></i> the '
+                            'changes to the .hgsub file in order to confirm '
+                            'the addition of the subrepo.') \
+                            % (srelroot, root), parent=self)
                     except:
                         qtlib.WarningMsgBox(
                             _('Failed to add repository'),
