@@ -230,8 +230,12 @@ class RepoItem(RepoTreeItem):
         return hglib.tounicode(spath)
 
     def menulist(self):
-        return ['open', 'clone', 'addsubrepo', None, 'explore',
-                'terminal', 'copypath', None, 'rename', 'remove', None, 'settings']
+        acts = ['open', 'clone', 'addsubrepo', None, 'explore',
+                'terminal', 'copypath', None, 'rename', 'remove']
+        if self.childCount() > 0:
+            acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+        acts.extend([None, 'settings'])
+        return acts
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
@@ -402,8 +406,12 @@ class SubrepoItem(RepoItem):
         if isinstance(self._parent, RepoGroupItem):
             return super(SubrepoItem, self).menulist()
         else:
-            return ['open', 'clone', 'addsubrepo', None, 'explore', 'terminal',
-                'copypath', None, 'settings']
+            acts = ['open', 'clone', 'addsubrepo', None, 'explore',
+                    'terminal', 'copypath']
+            if self.childCount() > 0:
+                acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+            acts.extend([None, 'settings'])
+            return acts
 
     def getSupportedDragDropActions(self):
         if issubclass(type(self.parent()), RepoGroupItem):

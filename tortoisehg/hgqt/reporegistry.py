@@ -447,6 +447,8 @@ class RepoRegistryView(QDockWidget):
                 _("Sort the group by short name"), self.sortbyname),
              ("sortbypath", _("Sort by path"), '',
                 _("Sort the group by full path"), self.sortbypath),
+             ("sortbyhgsub", _("Sort by .hgsub"), '',
+                _("Order the subrepos as in .hgsub"), self.sortbyhgsub),
              ]
         return a
 
@@ -717,6 +719,18 @@ class RepoRegistryView(QDockWidget):
     def sortbypath(self):
         childs = self.selitem.internalPointer().childs
         self.tview.model().sortchilds(childs, lambda x: x.rootpath())
+
+    def sortbyhgsub(self):
+        ip = self.selitem.internalPointer()
+        repo = hg.repository(ui.ui(), ip.rootpath())
+        ctx = repo['.']
+        wfile = '.hgsub'
+        if wfile in ctx:
+            data = ctx[wfile].data().strip()
+        data = data.split('\n')
+        hgsuborder = [x.split('=')[0].strip() for x in data]
+        keyfunc = lambda x: hgsuborder.index(x.shortname())
+        self.tview.model().sortchilds(ip.childs, keyfunc)
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):
