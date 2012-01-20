@@ -583,7 +583,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def updateRecentMessages(self):
         # Define a menu that lists recent messages
-        m = QMenu()
+        m = QMenu(self.recentMessagesButton)
         for s in self.msghistory:
             title = s.split('\n', 1)[0][:70]
             def overwriteMsg(newMsg): return lambda: self.msgSelected(newMsg)
