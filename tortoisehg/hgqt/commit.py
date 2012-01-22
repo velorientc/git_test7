@@ -532,9 +532,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # be nicer if csinfo exposed this information, or if csinfo could hold
         # widgets like pnlabel.
         if self.hasmqbutton:
-            parent = hglib.fromunicode(_('Parent:'))
-            patchname = hglib.fromunicode(_('Patch name:'))
-            text = hglib.fromunicode(self.pcsinfo.revlabel.text())
+            parent = _('Parent:')
+            patchname = _('Patch name:')
+            text = unicode(self.pcsinfo.revlabel.text())
             cellend = '</td>'
             firstidx = text.find(cellend) + len(cellend)
             secondidx = text[firstidx:].rfind('</tr>')
