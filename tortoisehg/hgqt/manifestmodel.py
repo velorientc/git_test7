@@ -349,9 +349,15 @@ class ManifestModel(QAbstractItemModel):
         addrepocontentstotree(roote, ctx)
         roote.sort()
 
-        self.beginResetModel()
-        self.__rootentry = roote
-        self.endResetModel()
+        self.layoutAboutToBeChanged.emit()
+        try:
+            oldindexmap = [(i, self.filePath(i))
+                           for i in self.persistentIndexList()]
+            self.__rootentry = roote
+            for oi, path in oldindexmap:
+                self.changePersistentIndex(oi, self.indexFromPath(path))
+        finally:
+            self.layoutChanged.emit()
 
 class _Entry(object):
     """Each file or directory"""
