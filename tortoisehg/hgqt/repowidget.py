@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import revset, error, patch
+from mercurial import revset, error, patch, commands
 
 from tortoisehg.util import hglib, shlib, paths
 
@@ -1208,6 +1208,17 @@ class RepoWidget(QWidget):
               self.copyHash)
         entry(menu)
 
+        # hg >= 2.1
+        if hasattr(commands, 'phase'):
+            submenu = menu.addMenu(_('Change Phase to'))
+            entry(submenu, None, isrev, _('Secret'), None,
+                  lambda: self.changePhase('secret'))
+            entry(submenu, None, isrev, _('Draft'), None,
+                  lambda: self.changePhase('draft'))
+            entry(submenu, None, isrev, _('Public'), None,
+                  lambda: self.changePhase('public'))
+            entry(menu)
+
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
               self.transplantRevisions)
 
@@ -1724,6 +1735,12 @@ class RepoWidget(QWidget):
     def copyHash(self):
         clip = QApplication.clipboard()
         clip.setText(binascii.hexlify(self.repo[self.rev].node()))
+
+    def changePhase(self, phase):
+        cmdlines = []
+        cmdlines.append(['phase', '--rev', '%s' % self.rev,
+                       '--repository', self.repo.root])
+        self.runCommand(*cmdlines)
 
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
