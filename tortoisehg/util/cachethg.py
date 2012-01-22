@@ -35,7 +35,7 @@ try:
         for p in excs.split(';'):
             path = p.strip()
             if path:
-                excludepath.append(path)
+                excludepaths.append(path)
     except EnvironmentError:
         pass
 except ImportError:
