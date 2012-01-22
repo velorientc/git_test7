@@ -125,7 +125,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._initactions()
         self._setupmodel()
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
-
         self.setRev(self._rev)
 
     def _initwidget(self):
@@ -182,6 +181,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         qs.setValue(prefix+'/revpanel.expanded', self.revpanel.is_expanded())
 
     def _initactions(self):
+        self.le = QLineEdit()
+        if hasattr(self.le, 'setPlaceholderText'): # Qt >= 4.7
+            self.le.setPlaceholderText(_('### filter text ###'))
+        else:
+            lbl = QLabel(_('Filter:'))
+            self._toolbar.addWidget(lbl)
+        self._toolbar.addWidget(self.le)
+
         self._statusfilter = status.StatusFilterButton(
           statustext='MASC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
@@ -201,6 +208,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               _('View file as it appeared at this revision'), self.editfile),
             ('open', _('Open at Revision'), '', 'Alt+Ctrl+O',
               _('Open file as it appeared at this revision'), self.openfile),
+            ('save', _('Save at Revision'), '', 'Alt+Ctrl+S',
+              _('Save file as it appeared at this revision'), self.savefile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
             ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
@@ -282,6 +291,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                                        self._repo[self.rev])
             files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
+
+    def savefile(self):
+        if self.path is None or self.rev is None:
+            return
+        else:
+            qtlib.savefiles(self._repo, [self.path], self.rev, parent=self)
 
     def editlocal(self, editor=None):
         if self.path is None:
@@ -373,7 +388,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             actionlist = ['opensubrepo', 'explore', 'terminal']
         else:
             contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+            actionlist = ['diff', 'ldiff', 'edit', 'save', 'ledit', 'revert',
                         'navigate', 'diffnavigate']
 
         if not contextmenu:
@@ -409,6 +424,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._treemodel = ManifestModel(self._repo, self._rev,
                                         statusfilter=self._statusfilter.status(),
                                         parent=self)
+        self._treemodel.setNameFilter(self.le.text())
+
         oldmodel = self._treeview.model()
         oldselmodel = self._treeview.selectionModel()
         self._treeview.setModel(self._treemodel)
@@ -421,6 +438,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         selmodel.currentChanged.connect(self._updatecontent)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
+        self.le.textChanged.connect(self._treemodel.setNameFilter)
         self._statusfilter.statusChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.statusChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
