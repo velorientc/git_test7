@@ -8,7 +8,7 @@
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 
-import os, itertools
+import os, itertools, fnmatch
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -27,13 +27,15 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev=None, statusfilter='MASC', parent=None):
+    def __init__(self, repo, rev=None, namefilter=None, statusfilter='MASC',
+                 parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
         self._rev = rev
         self._subinfo = {}
 
+        self._namefilter = namefilter
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
 
@@ -199,6 +201,19 @@ class ManifestModel(QAbstractItemModel):
     def columnCount(self, parent=QModelIndex()):
         return 1
 
+    @pyqtSlot(unicode)
+    def setNameFilter(self, pattern):
+        """Filter file name by partial match of glob pattern"""
+        if self._namefilter == pattern:
+            return
+        self._namefilter = pattern and unicode(pattern) or None
+        self._buildrootentry()
+
+    @property
+    def nameFilter(self):
+        """Return the current name filter if available; otherwise None"""
+        return self._namefilter
+
     @pyqtSlot(str)
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
@@ -247,6 +262,8 @@ class ManifestModel(QAbstractItemModel):
 
         def addfilestotree(treeroot, files, status, uncleanpaths):
             """Add files to the tree according to their state"""
+            if self._namefilter:
+                files = fnmatch.filter(files, '*%s*' % self._namefilter)
             for path in files:
                 if not pathinstatus(path, status, uncleanpaths):
                     continue
