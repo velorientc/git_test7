@@ -121,14 +121,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
-        # proxy model will hold the sort filter proxy model used to filter the
-        # manifest file tree
-        self._proxymodel = None
-
         self._initwidget()
         self._initactions()
         self._setupmodel()
-        self._treeview.setCurrentIndex(self._proxymodel.index(0, 0))
+        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
         self.setRev(self._rev)
 
     def _initwidget(self):
@@ -192,7 +188,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             lbl = QLabel(_('Filter:'))
             self._toolbar.addWidget(lbl)
         self._toolbar.addWidget(self.le)
-        self.le.textEdited.connect(self.setFilter)
 
         self._statusfilter = status.StatusFilterButton(
           statustext='MASC', text=_('Status'))
@@ -245,12 +240,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
-
-    def getCurrentIndex(self):
-        # We cannot directly return the treeview's current index
-        # Instead we have to map it into the corresponding index
-        # in the proxy model
-        return self._proxymodel.mapToSource(self._treeview.currentIndex())
 
     def navigate(self, filename=None):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
@@ -390,7 +379,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             return
         point = self._treeview.viewport().mapToGlobal(point)
 
-        currentindex = self.getCurrentIndex()
+        currentindex = self._treeview.currentIndex()
         itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
 
         # Subrepos and regular items have different context menus
@@ -435,18 +424,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._treemodel = ManifestModel(self._repo, self._rev,
                                         statusfilter=self._statusfilter.status(),
                                         parent=self)
-
-        # Use a sort filter proxy model to allow the filtering of the manifest
-        self._proxymodel = ProxyFilterModel()
-        self._proxymodel.setSourceModel(self._treemodel)
-        self._proxymodel.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self._proxymodel.setDynamicSortFilter(True)
+        self._treemodel.setNameFilter(self.le.text())
 
         oldmodel = self._treeview.model()
         oldselmodel = self._treeview.selectionModel()
-        self._treeview.setModel(self._proxymodel)
+        self._treeview.setModel(self._treemodel)
         if oldmodel:
-            oldmodel.sourceModel().deleteLater()
             oldmodel.deleteLater()
         if oldselmodel:
             oldselmodel.deleteLater()
@@ -455,11 +438,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         selmodel.currentChanged.connect(self._updatecontent)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
+        self.le.textChanged.connect(self._treemodel.setNameFilter)
         self._statusfilter.statusChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.statusChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
-
-        self.le.textEdited.emit(self.le.text())
 
     @pyqtSlot()
     def _autoexpandtree(self):
@@ -534,28 +516,20 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             else:
                 self._fileview.clearDisplay()
 
-    @pyqtSlot(QString)
-    def setFilter(self, match):
-        """Set the filter that will be applied to the manifest file tree"""
-        if self._proxymodel:
-            self._proxymodel.invalidateFilter()
-            self._proxymodel.setFilterWildcard(match)
-
     @property
     def path(self):
         """Return currently selected path [unicode]"""
-        return self._treemodel.filePath(self.getCurrentIndex())
+        return self._treemodel.filePath(self._treeview.currentIndex())
 
     @property
     def status(self):
         """Return currently selected path"""
-        return self._treemodel.fileStatus(self.getCurrentIndex())
+        return self._treemodel.fileStatus(self._treeview.currentIndex())
 
     @pyqtSlot(unicode)
     def setPath(self, path):
         """Change path to show"""
-        self._treeview.setCurrentIndex(
-            self._proxymodel.mapFromSource(self._treemodel.indexFromPath(path)))
+        self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
 
     def displayFile(self):
         ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
@@ -614,40 +588,3 @@ def run(ui, *pats, **opts):
     QTimer.singleShot(0, init)
 
     return dlg
-
-
-class ProxyFilterModel(QSortFilterProxyModel):
-    """
-    Customized QSortFilterProxyModel which does not apply the filter to
-    elements that have some children.
-
-    This lets the filtered view show items which match the filter but are
-    contained by items that do not match the filter
-    """
-    def filterAcceptsRow(self, sourceRow, sourceParent):
-        if self.filterMatchesRow(sourceRow, sourceParent):
-            # The item matches the filter
-            return True
-        return self.hasAcceptedChildren(sourceRow, sourceParent)
-
-    def filterMatchesRow(self, sourceRow, sourceParent):
-        return super(ProxyFilterModel, self).filterAcceptsRow(sourceRow, sourceParent)
-
-    def hasAcceptedChildren(self, sourceRow, sourceParent):
-        # If the item does not match the filter but it has some children,
-        # show it anyway, so that matching descendants may be shown
-        item = self.sourceModel().index(sourceRow, 0, sourceParent)
-        if not item.isValid():
-             return False;
-        childCount = item.model().rowCount(item)
-        if not childCount:
-            return False
-
-        # Does the current item have any descendant that matches the filter?
-        for c in range(0, childCount):
-            if self.filterMatchesRow(c, item):
-                return True;
-            # Recursive call
-            if self.hasAcceptedChildren(c, item):
-                return True
-        return False
