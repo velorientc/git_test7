@@ -418,7 +418,7 @@ class StatusThread(QThread):
 
     def __init__(self, repo, pctx, pats, opts, parent=None):
         super(StatusThread, self).__init__()
-        self.repo = thgrepo.repository(repo.ui, repo.root)
+        self.repo = hg.repository(repo.ui, repo.root)
         self.pctx = pctx
         self.pats = pats
         self.opts = opts
