@@ -344,7 +344,7 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit')
         self.actionCurrentRev = \
         newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
-                  enabled=True, toolbar='edit')
+                  enabled=True, toolbar='edit', shortcut='Ctrl+.')
         self.actionGoTo = \
         newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
                   enabled=True, toolbar='edit')
