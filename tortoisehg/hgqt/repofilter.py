@@ -39,6 +39,10 @@ class RepoFilterBar(QToolBar):
         self.setFloatable(False)
         self.setMovable(False)
         self._repo = repo
+        self._permanent_queries = list(_permanent_queries)
+        username = repo.ui.config('ui', 'username')
+        if username:
+            self._permanent_queries.insert(0, 'author("%s")' % username)
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo
@@ -130,7 +134,7 @@ class RepoFilterBar(QToolBar):
         if selection not in self.revsethist:
             return
         self.revsethist.remove(selection)
-        full = self.revsethist + list(_permanent_queries)
+        full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
@@ -174,10 +178,10 @@ class RepoFilterBar(QToolBar):
         query = self.revsetcombo.lineEdit().text()
         if query in self.revsethist:
             self.revsethist.remove(query)
-        if query not in _permanent_queries:
+        if query not in self._permanent_queries:
             self.revsethist.insert(0, query)
             self.revsethist = self.revsethist[:20]
-        full = self.revsethist + list(_permanent_queries)
+        full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.lineEdit().setText(query)
@@ -187,7 +191,7 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.restoreGeometry(s.value('revset/' + repoid + '/geom').toByteArray())
         self.revsethist = list(s.value('revset/' + repoid + '/queries').toStringList())
         self.filtercb.setChecked(s.value('revset/' + repoid + '/filter', True).toBool())
-        full = self.revsethist + list(_permanent_queries)
+        full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
