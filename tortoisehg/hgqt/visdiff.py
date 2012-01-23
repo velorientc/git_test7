@@ -202,7 +202,7 @@ def visualdiff(ui, repo, pats, opts):
                        _('You likely need to refresh this application'))
         return None
 
-    pats = hglib.expandpats(pats)
+    pats = scmutil.expandpats(pats)
     m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
