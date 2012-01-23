@@ -20,12 +20,6 @@ from mercurial import dispatch as hgdispatch
 demandimport.disable()
 try:
     # hg >= 1.9
-    from mercurial.util import localpath
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.hg import localpath
-try:
-    # hg >= 1.9
     from mercurial.util import hidepassword, removeauth
 except (ImportError, AttributeError):
     # hg <= 1.8

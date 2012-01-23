@@ -423,7 +423,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if hg.islocal(path):
-                known.add(os.path.abspath(hglib.localpath(path)).lower())
+                known.add(os.path.abspath(util.localpath(path)).lower())
             else:
                 known.add(path)
         related = {}
@@ -447,7 +447,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 continue
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
-                    abs = os.path.abspath(hglib.localpath(path)).lower()
+                    abs = os.path.abspath(util.localpath(path)).lower()
                 else:
                     abs = path
                 if abs not in known:
