@@ -726,11 +726,19 @@ class RepoRegistryView(QDockWidget):
         repo = hg.repository(ui.ui(), ip.rootpath())
         ctx = repo['.']
         wfile = '.hgsub'
-        if wfile in ctx:
-            data = ctx[wfile].data().strip()
+        if wfile not in ctx:
+            return self.sortbypath()
+        data = ctx[wfile].data().strip()
         data = data.split('\n')
-        hgsuborder = [x.split('=')[0].strip() for x in data]
-        keyfunc = lambda x: hgsuborder.index(x.shortname())
+        getsubpath = lambda x: x.split('=')[0].strip()
+        abspath = lambda x: util.normpath(repo.wjoin(x))
+        hgsuborder = [abspath(getsubpath(x)) for x in data]
+        def keyfunc(x):
+            try:
+                return hgsuborder.index(util.normpath(x.rootpath()))
+            except:
+                # If an item is not found, place it at the top
+                return 0
         self.tview.model().sortchilds(ip.childs, keyfunc)
 
     @pyqtSlot(QString, QString)
