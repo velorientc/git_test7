@@ -14,7 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport, scmutil
+from mercurial import hg, ui, url, util, error, demandimport, scmutil, httpconnection
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig, paths
@@ -705,7 +705,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 cmdline.append('--insecure')
             if user:
                 cleanurl = util.removeauth(cururl)
-                res = hglib.readauthforuri(self.repo.ui, cleanurl, user)
+                res = httpconnection.readauthforuri(self.repo.ui, cleanurl,
+                                                    user)
                 if res:
                     group, auth = res
                     if auth.get('username'):
@@ -1243,7 +1244,7 @@ class SecureDialog(QDialog):
 
         # if the already user has an [auth] configuration for this URL, use it
         cleanurl = util.removeauth(origurl)
-        res = hglib.readauthforuri(repo.ui, cleanurl, user)
+        res = httpconnection.readauthforuri(repo.ui, cleanurl, user)
         if res:
             self.alias, auth = res
         else:
