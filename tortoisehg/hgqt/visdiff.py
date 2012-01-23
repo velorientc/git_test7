@@ -14,7 +14,7 @@ import threading
 import tempfile
 import re
 
-from mercurial import hg, cmdutil, util, error, match
+from mercurial import hg, util, error, match, scmutil
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
@@ -191,7 +191,7 @@ def visualdiff(ui, repo, pats, opts):
             else:
                 ctx1a = p[0]
         else:
-            n1, n2 = hglib.revpair(repo, revs)
+            n1, n2 = scmutil.revpair(repo, revs)
             ctx1a, ctx2 = repo[n1], repo[n2]
             p = ctx2.parents()
             if not revs and len(p) > 1:

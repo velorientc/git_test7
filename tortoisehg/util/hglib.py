@@ -20,10 +20,10 @@ from mercurial import dispatch as hgdispatch
 demandimport.disable()
 try:
     # hg >= 1.9
-    from mercurial.scmutil import revrange, expandpats, revpair, match, matchall
+    from mercurial.scmutil import expandpats, match, matchall
 except (ImportError, AttributeError):
     # hg <= 1.8
-    from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
+    from mercurial.cmdutil import expandpats, match, matchall
 try:
     # hg >= 2.1 (0bd17a4bed88)
     from mercurial.copies import mergecopies, pathcopies
