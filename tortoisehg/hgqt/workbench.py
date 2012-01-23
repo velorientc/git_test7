@@ -321,6 +321,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Rollback/Undo..."), self._repofwd('rollback'),
+                  shortcut='Ctrl+u',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Purge..."), self._repofwd('purge'), enabled='repoopen',
