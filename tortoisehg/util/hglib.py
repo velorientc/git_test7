@@ -13,7 +13,7 @@ import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
 from mercurial import encoding, templatefilters, filemerge, error, scmutil
-from mercurial import demandimport, revset
+from mercurial import demandimport
 from mercurial import dispatch as hgdispatch
 
 
@@ -26,14 +26,6 @@ except (ImportError, AttributeError):
     def pathcopies(c1, c2):
         return mergecopies(c1._repo, c1, c2, c1._repo[-1], False)[0]
 demandimport.enable()
-
-def revsetmatch(ui, pattern):
-    try:
-        # hg >= 1.9
-        return revset.match(ui, pattern)
-    except TypeError:
-        # hg <= 1.8
-        return revset.match(pattern)
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
