@@ -152,3 +152,19 @@ def test_status_filter_multi():
     assert_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
     assert_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
     assert_not_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_name_filter():
+    m = newmodel()
+    m.setNameFilter('ax')
+    assert not m.indexFromPath('bar').isValid()
+    assert m.indexFromPath('baz/bax').isValid()
+    assert not m.indexFromPath('baz/box').isValid()
+    assert not m.indexFromPath('foo').isValid()
+
+def test_name_filter_glob():
+    m = newmodel()
+    m.setNameFilter('b*x')
+    assert not m.indexFromPath('bar').isValid()
+    assert m.indexFromPath('baz/bax').isValid()
+    assert m.indexFromPath('baz/box').isValid()
+    assert not m.indexFromPath('foo').isValid()

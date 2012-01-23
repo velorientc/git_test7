@@ -210,6 +210,8 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('View at revision...'))
             a.setIcon(qtlib.getmenuicon('view-at-revision'))
             a.triggered.connect(self.onViewFileAtRevision)
+            a = menu.addAction(_('Save at revision...'))
+            a.triggered.connect(self.onSaveFileAtRevision)
             a = menu.addAction(_('Edit local'))
             a.setIcon(qtlib.getmenuicon('edit-file'))
             a.triggered.connect(self.onEditLocal)
@@ -281,6 +283,14 @@ class FileLogDialog(_AbstractFileDialog):
             files = [os.path.join(base, filename)
                      for filename in filenames]
             qtlib.editfiles(self.repo, files, parent=self)
+
+    def onSaveFileAtRevision(self, rev):
+        rev = self.selection[0]
+        files = [self.filerevmodel.graph.filename(rev)]
+        if not files or rev is None:
+            return
+        else:
+            qtlib.savefiles(self.repo, files, rev, parent=self)
 
     @pyqtSlot(QString)
     def onLinkActivated(self, link):
@@ -686,6 +696,8 @@ class FileDiffDialog(_AbstractFileDialog):
             a = menu.addAction(_('View at revision...'))
             a.setIcon(qtlib.getmenuicon('view-at-revision'))
             a.triggered.connect(self.onViewFileAtRevision)
+            a = menu.addAction(_('Save at revision...'))
+            a.triggered.connect(self.onSaveFileAtRevision)
             a = menu.addAction(_('Edit local'))
             a.setIcon(qtlib.getmenuicon('edit-file'))
             a.triggered.connect(self.onEditLocal)
@@ -757,3 +769,11 @@ class FileDiffDialog(_AbstractFileDialog):
             files = [os.path.join(base, filename)
                      for filename in filenames]
             qtlib.editfiles(self.repo, files, parent=self)
+
+    def onSaveFileAtRevision(self, rev):
+        rev = self.selection[0]
+        files = [self.filerevmodel.graph.filename(rev)]
+        if not files or rev is None:
+            return
+        else:
+            qtlib.savefiles(self.repo, files, rev, parent=self)
