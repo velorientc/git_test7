@@ -275,7 +275,8 @@ class RepoItem(RepoTreeItem):
                 if repo is None:
                     repo = hg.repository(ui.ui(), self._root)
                 wctx = repo['.']
-                for subpath in wctx.substate:
+                sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
+                for subpath in sorted(wctx.substate, key=sortkey):
                     sri = None
                     abssubpath = repo.wjoin(subpath)
                     subtype = wctx.substate[subpath][2]
