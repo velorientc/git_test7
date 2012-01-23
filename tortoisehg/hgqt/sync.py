@@ -704,7 +704,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
             if user:
-                cleanurl = hglib.removeauth(cururl)
+                cleanurl = util.removeauth(cururl)
                 res = hglib.readauthforuri(self.repo.ui, cleanurl, user)
                 if res:
                     group, auth = res
@@ -1159,7 +1159,7 @@ class SaveDialog(QDialog):
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
         if (user or passwd) and scheme in ('http', 'https'):
-            cleanurl = hglib.removeauth(origurl)
+            cleanurl = util.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
@@ -1242,7 +1242,7 @@ class SecureDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        cleanurl = hglib.removeauth(origurl)
+        cleanurl = util.removeauth(origurl)
         res = hglib.readauthforuri(repo.ui, cleanurl, user)
         if res:
             self.alias, auth = res
@@ -1477,7 +1477,7 @@ class PathsModel(QAbstractTableModel):
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
         for alias, path in pathlist:
-            safepath = hglib.hidepassword(path)
+            safepath = util.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
             self.rows.append([ualias, usafepath, path])

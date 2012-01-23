@@ -20,12 +20,6 @@ from mercurial import dispatch as hgdispatch
 demandimport.disable()
 try:
     # hg >= 1.9
-    from mercurial.util import hidepassword, removeauth
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.url import hidepassword, removeauth
-try:
-    # hg >= 1.9
     from mercurial.httpconnection import readauthforuri as hgreadauthforuri
 except (ImportError, AttributeError):
     # hg <= 1.8
@@ -610,7 +604,7 @@ def validate_synch_path(path, repo):
     for alias, path_aux in repo.ui.configitems('paths'):
         if path == alias:
             return_path = path_aux
-        elif path == hidepassword(path_aux):
+        elif path == util.hidepassword(path_aux):
             return_path = path_aux
     return return_path
 
