@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error, extensions
+from mercurial import ui, util, error, extensions, scmutil
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
@@ -885,7 +885,7 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        utab = SettingsForm(rcpath=hglib.user_rcpath(), focus=focus)
+        utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
@@ -1171,7 +1171,7 @@ class SettingsForm(QWidget):
                 w = func(opts)
             w.installEventFilter(self)
             if e.globalonly:
-                w.setEnabled(self.rcpath == hglib.user_rcpath())
+                w.setEnabled(self.rcpath == scmutil.userrcpath())
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)

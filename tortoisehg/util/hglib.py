@@ -12,19 +12,12 @@ import time
 import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
-from mercurial import encoding, templatefilters, filemerge, error
+from mercurial import encoding, templatefilters, filemerge, error, scmutil
 from mercurial import demandimport, revset
 from mercurial import dispatch as hgdispatch
 
 
 demandimport.disable()
-try:
-    # hg >= 1.9
-    from mercurial.scmutil import canonpath, userrcpath
-    user_rcpath = userrcpath
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.util import canonpath, user_rcpath
 try:
     # hg >= 1.9
     from mercurial.util import localpath
@@ -394,13 +387,14 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(canonpath(root, cwd, f))
+            canonpats.append(scmutil.canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
+                canonpats.append(scmutil.canonpath(root, cwd,
+                                                   f[len(cwd+os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)
