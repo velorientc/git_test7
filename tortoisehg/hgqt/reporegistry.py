@@ -719,7 +719,7 @@ class RepoRegistryView(QDockWidget):
 
     def sortbypath(self):
         childs = self.selitem.internalPointer().childs
-        self.tview.model().sortchilds(childs, lambda x: x.rootpath())
+        self.tview.model().sortchilds(childs, lambda x: util.normpath(x.rootpath()))
 
     def sortbyhgsub(self):
         ip = self.selitem.internalPointer()
