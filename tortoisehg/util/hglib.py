@@ -49,6 +49,13 @@ try:
 except (ImportError, AttributeError):
     # hg <= 1.8
     from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
+try:
+    # hg >= 2.1 (0bd17a4bed88)
+    from mercurial.copies import mergecopies, pathcopies
+except (ImportError, AttributeError):
+    from mercurial.copies import copies as mergecopies
+    def pathcopies(c1, c2):
+        return mergecopies(c1._repo, c1, c2, c1._repo[-1], False)[0]
 demandimport.enable()
 
 def readauthforuri(ui, uri, user):

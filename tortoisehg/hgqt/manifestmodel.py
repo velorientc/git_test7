@@ -8,7 +8,7 @@
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 
-import os, itertools
+import os, itertools, fnmatch
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -27,13 +27,15 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev=None, statusfilter='MASC', parent=None):
+    def __init__(self, repo, rev=None, namefilter=None, statusfilter='MASC',
+                 parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
         self._rev = rev
         self._subinfo = {}
 
+        self._namefilter = namefilter
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
 
@@ -199,6 +201,19 @@ class ManifestModel(QAbstractItemModel):
     def columnCount(self, parent=QModelIndex()):
         return 1
 
+    @pyqtSlot(unicode)
+    def setNameFilter(self, pattern):
+        """Filter file name by partial match of glob pattern"""
+        if self._namefilter == pattern:
+            return
+        self._namefilter = pattern and unicode(pattern) or None
+        self._buildrootentry()
+
+    @property
+    def nameFilter(self):
+        """Return the current name filter if available; otherwise None"""
+        return self._namefilter
+
     @pyqtSlot(str)
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
@@ -234,7 +249,7 @@ class ManifestModel(QAbstractItemModel):
                 return True
             return False
 
-        def getctxtreeinfo(ctx, repo):
+        def getctxtreeinfo(ctx):
             """
             Get the context information that is relevant to populating the tree
             """
@@ -247,6 +262,8 @@ class ManifestModel(QAbstractItemModel):
 
         def addfilestotree(treeroot, files, status, uncleanpaths):
             """Add files to the tree according to their state"""
+            if self._namefilter:
+                files = fnmatch.filter(files, '*%s*' % self._namefilter)
             for path in files:
                 if not pathinstatus(path, status, uncleanpaths):
                     continue
@@ -319,7 +336,7 @@ class ManifestModel(QAbstractItemModel):
                             e = addrepocontentstotree(e, sctx, toprelpath)
 
             # Add regular files to the tree
-            status, uncleanpaths, files = getctxtreeinfo(ctx, self._repo)
+            status, uncleanpaths, files = getctxtreeinfo(ctx)
 
             addfilestotree(roote, files, status, uncleanpaths)
             return roote
@@ -332,9 +349,15 @@ class ManifestModel(QAbstractItemModel):
         addrepocontentstotree(roote, ctx)
         roote.sort()
 
-        self.beginResetModel()
-        self.__rootentry = roote
-        self.endResetModel()
+        self.layoutAboutToBeChanged.emit()
+        try:
+            oldindexmap = [(i, self.filePath(i))
+                           for i in self.persistentIndexList()]
+            self.__rootentry = roote
+            for oi, path in oldindexmap:
+                self.changePersistentIndex(oi, self.indexFromPath(path))
+        finally:
+            self.layoutChanged.emit()
 
 class _Entry(object):
     """Each file or directory"""

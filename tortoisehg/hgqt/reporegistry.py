@@ -360,12 +360,24 @@ class RepoRegistryView(QDockWidget):
                 idx = m.index(it.row(), 0, idx)
                 self.tview.expand(idx)
 
-    def addRepo(self, root):
-        'workbench has opened a new repowidget, ensure it is in the registry'
+    def addRepo(self, root, groupname=None):
+        """
+        Add a repo to the repo registry, optionally specifying the parent repository group
+
+        The main use of this method is when the workbench has opened a new repowidget
+        """
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
-            m.addRepo(None, root, -1)
+            group = None
+            if groupname:
+                # Get the group index of the RepoGroup corresponding to the target group name
+                for it in m.rootItem.childs:
+                    if groupname == it.name:
+                        rootidx = self.tview.rootIndex()
+                        group = m.index(it.row(), 0, rootidx)
+                        break
+            m.addRepo(group, root, -1)
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
@@ -431,6 +443,12 @@ class RepoRegistryView(QDockWidget):
              ("copypath", _("Copy path"), '',
                 _("Copy the root path of the repository to the clipboard"),
                 self.copyPath),
+             ("sortbyname", _("Sort by name"), '',
+                _("Sort the group by short name"), self.sortbyname),
+             ("sortbypath", _("Sort by path"), '',
+                _("Sort the group by full path"), self.sortbypath),
+             ("sortbyhgsub", _("Sort by .hgsub"), '',
+                _("Order the subrepos as in .hgsub"), self.sortbyhgsub),
              ]
         return a
 
@@ -455,14 +473,20 @@ class RepoRegistryView(QDockWidget):
         menulist = selitem.internalPointer().menulist()
         if not menulist:
             return
-        self.contextmenu.clear()
-        for act in menulist:
-            if act:
-                self.contextmenu.addAction(self._actions[act])
-            else:
-                self.contextmenu.addSeparator()
+        self.addtomenu(self.contextmenu, menulist)
         self.selitem = selitem
         self.contextmenu.exec_(point)
+
+    def addtomenu(self, menu, actlist):
+        menu.clear()
+        for act in actlist:
+            if isinstance(act, basestring) and act in self._actions:
+                menu.addAction(self._actions[act])
+            elif isinstance(act, tuple) and len(act) == 2:
+                submenu = menu.addMenu(act[0])
+                self.addtomenu(submenu, act[1])
+            else:
+                menu.addSeparator()
 
     #
     ## Menu action handlers
@@ -472,7 +496,7 @@ class RepoRegistryView(QDockWidget):
         root = self.selitem.internalPointer().rootpath()
         d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
         d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self.open)
+        d.clonedRepository.connect(self.openClone)
         d.show()
 
     def explore(self):
@@ -635,7 +659,17 @@ class RepoRegistryView(QDockWidget):
     def openAll(self):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
-    def open(self, root=None):
+
+    def openClone(self, root=None, sourceroot=None):
+        m = self.tview.model()
+        src = m.getRepoItem(hglib.fromunicode(sourceroot))
+        if src:
+            groupname = src.parent().name
+        else:
+            groupname = None
+        self.open(root, groupname)
+
+    def open(self, root=None, groupname=None):
         'open context menu action, open repowidget unconditionally'
         if not root:
             root = self.selitem.internalPointer().rootpath()
@@ -647,6 +681,8 @@ class RepoRegistryView(QDockWidget):
             else:
                 repotype = 'unknown'
         if repotype == 'hg':
+            if groupname:
+                self.addRepo(hglib.tounicode(root), groupname)
             self.openRepo.emit(hglib.tounicode(root), False)
         else:
             qtlib.WarningMsgBox(
@@ -675,6 +711,26 @@ class RepoRegistryView(QDockWidget):
 
         if root is not None:
             self.removeRepo.emit(hglib.tounicode(root))
+
+    def sortbyname(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: x.shortname())
+
+    def sortbypath(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: x.rootpath())
+
+    def sortbyhgsub(self):
+        ip = self.selitem.internalPointer()
+        repo = hg.repository(ui.ui(), ip.rootpath())
+        ctx = repo['.']
+        wfile = '.hgsub'
+        if wfile in ctx:
+            data = ctx[wfile].data().strip()
+        data = data.split('\n')
+        hgsuborder = [x.split('=')[0].strip() for x in data]
+        keyfunc = lambda x: hgsuborder.index(x.shortname())
+        self.tview.model().sortchilds(ip.childs, keyfunc)
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):

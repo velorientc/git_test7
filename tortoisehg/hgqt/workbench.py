@@ -342,6 +342,12 @@ class Workbench(QMainWindow):
                   icon='thg-logo')
 
         newseparator(toolbar='edit')
+        self.actionCurrentRev = \
+        newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
+                  enabled=True, toolbar='edit', shortcut='Ctrl+.')
+        self.actionGoTo = \
+        newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
+                  enabled=True, toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
                   enabled=False, toolbar='edit')
@@ -504,6 +510,14 @@ class Workbench(QMainWindow):
                 return
         self._openRepo(root, False)
 
+    @pyqtSlot(QString, QString)
+    def showClonedRepo(self, root, src=None):
+        """Activate the repo tab or open it on if not available [unicode]
+
+        This method simply calls showRepo, ignoring the second argument on the received signal
+        """
+        self.showRepo(root)
+
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
         for i in xrange(self.repoTabsWidget.count()):
@@ -648,9 +662,9 @@ class Workbench(QMainWindow):
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
 
-    def addRepoTab(self, repo):
+    def addRepoTab(self, repo, bundle):
         '''opens the given repo in a new tab'''
-        rw = RepoWidget(repo, self)
+        rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
         rw.progress.connect(lambda tp, p, i, u, tl:
@@ -685,6 +699,7 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
+
 
 
     def showMessage(self, msg):
@@ -760,7 +775,7 @@ class Workbench(QMainWindow):
             args = []
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.clonedRepository.connect(self.showRepo)
+        dlg.clonedRepository.connect(self.showClonedRepo)
         dlg.exec_()
 
     def openRepository(self):
@@ -777,7 +792,7 @@ class Workbench(QMainWindow):
                                        FD.ShowDirsOnly | FD.ReadOnly)
         self._openRepo(hglib.fromunicode(path), False)
 
-    def _openRepo(self, root, reuse):
+    def _openRepo(self, root, reuse, bundle=None):
         if root and not root.startswith('ssh://'):
             if reuse:
                 for rw in self._findrepowidget(root):
@@ -785,7 +800,7 @@ class Workbench(QMainWindow):
                     return
             try:
                 repo = thgrepo.repository(path=root)
-                self.addRepoTab(repo)
+                self.addRepoTab(repo, bundle)
             except RepoError:
                 upath = hglib.tounicode(root)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
@@ -935,7 +950,12 @@ def run(ui, *pats, **opts):
     w = Workbench()
     if root:
         root = hglib.tounicode(root)
-        w.showRepo(root)
+        bundle = opts.get('bundle')
+        if bundle:
+            w._openRepo(root, False, bundle=bundle)
+        else:
+            w.showRepo(root)
+
         if pats:
             q = []
             for pat in pats:

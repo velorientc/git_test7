@@ -18,7 +18,7 @@ except AttributeError:
 
 def checkhgversion(v):
     """range check the Mercurial version"""
-    reqver = ['1', '9']
+    reqver = ['2', '0']
     v = v.split('+')[0]
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes

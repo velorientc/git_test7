@@ -335,3 +335,7 @@ class RepoTreeModel(QAbstractItemModel):
                 else:
                     grp.updateCommonPath('')
 
+    def sortchilds(self, childs, keyfunc):
+        self.layoutAboutToBeChanged.emit()
+        childs.sort(key=keyfunc)
+        self.layoutChanged.emit()
