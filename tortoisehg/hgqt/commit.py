@@ -827,17 +827,17 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd
-        if len(repo.parents()) == 1:
-            for fname in self.opts.get('autoinc', '').split(','):
-                fname = fname.strip()
-                if fname:
-                    cmdline.extend(['--include', fname])
 
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
 
         cmdline.append('--')
         cmdline.extend([repo.wjoin(f) for f in self.files])
+        if len(repo.parents()) == 1:
+            for fname in self.opts.get('autoinc', '').split(','):
+                fname = fname.strip()
+                if fname:
+                    cmdline.append(repo.wjoin(fname))
         commandlines.append(cmdline)
 
         if self.opts.get('pushafter'):
