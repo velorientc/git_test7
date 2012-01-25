@@ -1163,6 +1163,11 @@ class DetailsDialog(QDialog):
         else:
             outopts['pushafter'] = ''
 
+        if self.autoinccb.isChecked():
+            outopts['autoinc'] = hglib.fromunicode(self.autoincle.text())
+        else:
+            outopts['autoinc'] = ''
+
         if self.recursecb.isChecked():
             outopts['recurseinsubrepos'] = 'true'
         else:
