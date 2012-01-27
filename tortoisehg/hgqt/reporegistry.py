@@ -624,10 +624,8 @@ class RepoRegistryView(QDockWidget):
                         fsub = repo.wopener('.hgsub', 'w')
                         fsub.write(linesep.join(lines))
                         fsub.close()
-
                         if not hasHgsub:
-                            commands.add(ui.ui(), repo, '.hgsub')
-
+                            commands.add(ui.ui(), repo, repo.wjoin('.hgsub'))
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'

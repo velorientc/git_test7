@@ -826,16 +826,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             dcmd = []
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
-        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in self.files]
-        if len(repo.parents()) == 1:
-            for fname in self.opts.get('autoinc', '').split(','):
-                fname = fname.strip()
-                if fname:
-                    cmdline.extend(['--include', fname])
+        cmdline += dcmd + brcmd
 
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
 
+        cmdline.append('--')
+        cmdline.extend([repo.wjoin(f) for f in self.files])
+        if len(repo.parents()) == 1:
+            for fname in self.opts.get('autoinc', '').split(','):
+                fname = fname.strip()
+                if fname:
+                    cmdline.append(repo.wjoin(fname))
         commandlines.append(cmdline)
 
         if self.opts.get('pushafter'):
@@ -1162,6 +1164,11 @@ class DetailsDialog(QDialog):
             outopts['pushafter'] = remote
         else:
             outopts['pushafter'] = ''
+
+        if self.autoinccb.isChecked():
+            outopts['autoinc'] = hglib.fromunicode(self.autoincle.text())
+        else:
+            outopts['autoinc'] = ''
 
         if self.recursecb.isChecked():
             outopts['recurseinsubrepos'] = 'true'
