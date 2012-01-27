@@ -9,6 +9,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import revset as hgrevset
+
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import revset, qtlib
@@ -42,7 +44,7 @@ class RepoFilterBar(QToolBar):
         self._permanent_queries = list(_permanent_queries)
         username = repo.ui.config('ui', 'username')
         if username:
-            self._permanent_queries.insert(0, 'author("%s")' % username)
+            self._permanent_queries.insert(0, hgrevset.formatspec('author(%s)', username))
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo
