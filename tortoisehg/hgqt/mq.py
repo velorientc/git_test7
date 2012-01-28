@@ -12,6 +12,7 @@ import time
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import patch
 from hgext import mq as mqmod
 
 from tortoisehg.util import hglib
