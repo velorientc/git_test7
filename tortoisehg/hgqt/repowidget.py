@@ -322,7 +322,8 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label):
-        if label == 'ui.error':
+        labelslist = unicode(label).split()
+        if 'ui.error' in labelslist:
             self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
 
     @pyqtSlot(unicode)
