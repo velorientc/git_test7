@@ -656,7 +656,7 @@ def _extendchangectx(changectx):
                 if self._repo.lfStandin(file) in self.manifest():
                     return self._repo.lfStandin(file)
             return self._repo.bfStandin(file)
-                    
+
     return thgchangectx
 
 _pctxcache = {}
