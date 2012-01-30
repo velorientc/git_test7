@@ -2,23 +2,23 @@
 # Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the tortoisehg package.
 # Alil Adamov <diagiman@gmail.com>, 2009.
-# Andrei Polushin <polushin@gmail.com>, 2011.
-#
+# Andrei Polushin <polushin@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
 "POT-Creation-Date: 2012-01-23 17:03-0200\n"
-"PO-Revision-Date: 2012-01-11 20:03+0000\n"
+"PO-Revision-Date: 2012-01-29 14:15+0000\n"
 "Last-Translator: Andrei Polushin <polushin@gmail.com>\n"
-"Language-Team: Russian <ru@li.org>\n"
+"Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-01-24 05:37+0000\n"
-"X-Generator: Launchpad (build 14713)\n"
+"X-Launchpad-Export-Date: 2012-01-30 04:46+0000\n"
+"X-Generator: Launchpad (build 14727)\n"
+"Language: ru\n"
 "X-Poedit-Language: Russian\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1381,7 +1381,7 @@ msgstr "Subversion:"
 
 #: tortoisehg/hgqt/csinfo.py:113
 msgid "Converted From:"
-msgstr ""
+msgstr "Преобразовано из:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 #: tortoisehg/hgtk/cslist.py:384
@@ -1627,7 +1627,7 @@ msgstr "Посмотреть в ревизии..."
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:699
 msgid "Save at revision..."
-msgstr ""
+msgstr "Сохранить из ревизии..."
 
 #: tortoisehg/hgqt/filedialogs.py:215 tortoisehg/hgqt/filedialogs.py:701
 msgid "Edit local"
@@ -3865,7 +3865,7 @@ msgstr "Изменения"
 #: tortoisehg/hgqt/repomodel.py:56
 msgctxt "column header"
 msgid "Converted From"
-msgstr ""
+msgstr "Преобразовано из"
 
 #: tortoisehg/hgqt/repomodel.py:211
 #, python-format
@@ -4010,27 +4010,27 @@ msgstr "Копировать корневой путь к хранилищу в 
 
 #: tortoisehg/hgqt/reporegistry.py:446
 msgid "Sort by name"
-msgstr ""
+msgstr "Упорядочить по имени"
 
 #: tortoisehg/hgqt/reporegistry.py:447
 msgid "Sort the group by short name"
-msgstr ""
+msgstr "Упорядочить группу по короткому имени"
 
 #: tortoisehg/hgqt/reporegistry.py:448
 msgid "Sort by path"
-msgstr ""
+msgstr "Упорядочить по пути"
 
 #: tortoisehg/hgqt/reporegistry.py:449
 msgid "Sort the group by full path"
-msgstr ""
+msgstr "Упорядочить группу по полному пути"
 
 #: tortoisehg/hgqt/reporegistry.py:450
 msgid "Sort by .hgsub"
-msgstr ""
+msgstr "Упорядочить по .hgsub"
 
 #: tortoisehg/hgqt/reporegistry.py:451
 msgid "Order the subrepos as in .hgsub"
-msgstr ""
+msgstr "Упорядочить подхранилища как в .hgsub"
 
 #: tortoisehg/hgqt/reporegistry.py:512
 msgid "Select repository directory to add"
@@ -4127,6 +4127,11 @@ msgid ""
 "finish adding the subrepo <i>you must still <u>commit</u></i> the changes to "
 "the .hgsub file in order to confirm the addition of the subrepo."
 msgstr ""
+"Выбранное подхранилище:<br><br><i>%s</i><br><br>было добавлено к  файлу "
+".hgsub хранилища:<br><br><i>%s</i><br><br>Помните, что для того, чтобы "
+"завершить добавление подхранилища, <i>вы всё равно должны "
+"<u>зафиксировать</u></i> изменения в файле .hgsub,  подтверждая таким "
+"образом добавление подхранилища."
 
 #: tortoisehg/hgqt/reporegistry.py:643
 #, python-format
@@ -4141,7 +4146,7 @@ msgstr "\"%s\" не является допустимым хранилищем �
 #: tortoisehg/hgqt/repotreeitem.py:236 tortoisehg/hgqt/repotreeitem.py:412
 #: tortoisehg/hgqt/repotreeitem.py:461 tortoisehg/hgqt/repotreeitem.py:516
 msgid "Sort"
-msgstr ""
+msgstr "Упорядочить"
 
 #: tortoisehg/hgqt/repotreeitem.py:258
 #, python-format
@@ -4364,10 +4369,11 @@ msgstr ""
 #: tortoisehg/hgqt/repowidget.py:856
 msgid "Repository stripped, incoming preview cleared"
 msgstr ""
+"Хранилище урезано, предварительный просмотр входящих изменений очищен"
 
 #: tortoisehg/hgqt/repowidget.py:861
 msgid "Repository stripped, revision set cleared"
-msgstr ""
+msgstr "Хранилище урезано, выборка ревизий очищена"
 
 #: tortoisehg/hgqt/repowidget.py:986
 msgid "Commit tab cannot exit"
@@ -6902,21 +6908,24 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:835
 msgid "Projrc"
-msgstr ""
+msgstr "Projrc"
 
 #: tortoisehg/hgqt/settings.py:836
 msgid "Require confirmation"
-msgstr ""
+msgstr "Требовать подтверждения"
 
 #: tortoisehg/hgqt/settings.py:837
 msgid ""
 "Ask the user to confirm the update of the local \"projrc\" configuration "
 "file when the remote projrc file changes. Default is \"True\"."
 msgstr ""
+"Запрашивать у пользователя подтверждение на обновление локального  файла "
+"конфигурации «projrc» при изменении файла отдалённого projrc. По умолчанию — "
+"«Да»."
 
 #: tortoisehg/hgqt/settings.py:839
 msgid "Servers"
-msgstr ""
+msgstr "Серверы"
 
 #: tortoisehg/hgqt/settings.py:840
 msgid ""
@@ -6924,26 +6933,34 @@ msgid ""
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
 "the default sync path.Default is pull from NO servers."
 msgstr ""
+"Список серверов, с которых нужно затягивать файлы конфигурации «projrc». "
+"Установите значение \"*\", чтобы затягивать со всех серверов. Установите "
+"значение «default», чтобы затягивать из пути синхронизации по умолчанию. По "
+"умолчанию — не затягивать ни с каких серверов."
 
 #: tortoisehg/hgqt/settings.py:843
 msgid "Include"
-msgstr ""
+msgstr "Включить"
 
 #: tortoisehg/hgqt/settings.py:844
 msgid ""
 "List of settings that will be pulled form the project configuration file. "
 "Default is include NO settings."
 msgstr ""
+"Список настроек, которые будут затянуты из файла конфигурации проекта. По "
+"умолчанию — не включать никакие параметры."
 
 #: tortoisehg/hgqt/settings.py:845
 msgid "Exclude"
-msgstr ""
+msgstr "Исключить"
 
 #: tortoisehg/hgqt/settings.py:846
 msgid ""
 "List of settings that will NOT be pulled form the project configuration "
 "file. Default is exclude none of the included settings."
 msgstr ""
+"Список настроек, которые НЕ будут затянуты из файла конфигурации проекта. По "
+"умолчанию — не исключать никакие включённые параметры."
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "TortoiseHg Settings"
@@ -6975,7 +6992,7 @@ msgstr "хранилища нет в "
 #: tortoisehg/hgqt/settings.py:913
 #, python-format
 msgid "%s project settings (.hg/projrc)"
-msgstr ""
+msgstr "параметры проекта %s (.hg/projrc)"
 
 #: tortoisehg/hgqt/settings.py:919 tortoisehg/hgtk/thgconfig.py:671
 #, python-format
@@ -8878,7 +8895,7 @@ msgstr "О TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:346
 msgid "Go to current revision"
-msgstr ""
+msgstr "Перейти к текущей ревизии"
 
 #: tortoisehg/hgqt/workbench.py:360
 msgid "Filter Toolbar"
