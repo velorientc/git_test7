@@ -540,10 +540,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # Update options label
         opts = []
         for opt, value in self.opts.iteritems():
-            if value is True:
-                opts.append('--' + opt)
-            elif value:
-                opts.append('--%s=%s' % (opt, value))
+            if not opt.startswith('bugtraq'):
+                # The "bugtraq" related options are not very interesting as they are not passed to the commit command
+                # The user will already see an "issue tracker" button indicating that the bug tracker is active
+                if value is True:
+                    opts.append('--' + opt)
+                elif value:
+                    opts.append('--%s=%s' % (opt, value))
+
         self.optionslabel.setText(' '.join(opts))
         self.optionslabel.setVisible(bool(opts))
         self.optionslabelhdr.setVisible(bool(opts))
