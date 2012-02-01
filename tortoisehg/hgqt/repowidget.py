@@ -1754,30 +1754,38 @@ class RepoWidget(QWidget):
                 % (self.rev, self.repo['qparent'].rev()))
             return
 
-        revNameSet = set(['%d.diff' % rev for rev in revList])
-        collidingPatchSet = revNameSet.intersection(set(self.repo.mq.series))
+        patchdir = self.repo.join('patches')
+        def patchExists(p):
+            return os.path.exists(os.path.join(patchdir, p))
 
-        if collidingPatchSet:
+        # Note that the following two arrays are both ordered by "rev"
+        defaultPatchNames = ['%d.diff' % rev for rev in revList]
+        defaultPatchesExist = [patchExists(p) for p in defaultPatchNames]
+        if any(defaultPatchesExist):
             # We will qimport each revision one by one, starting from the newest
             # To do so, we will find a valid and unique patch name for each
-            # revision that we must qimport
+            # revision that we must qimport (i.e. a filename that does not
+            # already exist)
             # and then we will import them one by one starting from the newest
             # one, using these unique names
             def getUniquePatchName(baseName):
-                patchName = baseName + '.diff'
-                if patchName in collidingPatchSet:
-                    maxRetries = 99
-                    for n in range(1, maxRetries):
-                        patchName = baseName + '_%02d.diff' % n
-                        if not patchName in collidingPatchSet:
-                            break
-                return patchName
+                maxRetries = 99
+                for n in range(1, maxRetries):
+                    patchName = baseName + '_%02d.diff' % n
+                    if not patchExists(patchName):
+                        return patchName
+                return baseName
 
             patchNames = {}
-            revList.reverse()
-            for rev in revList:
-                patchNames[rev] = getUniquePatchName(str(rev))
+            for n, rev in enumerate(revList):
+                if defaultPatchesExist[n]:
+                    patchNames[rev] = getUniquePatchName(str(rev))
+                else:
+                    # The default name is safe
+                    patchNames[rev] = defaultPatchNames[n]
 
+            # qimport each revision individually, starting from the topmost one
+            revList.reverse()
             cmdlines = []
             for rev in revList:
                 cmdlines.append(['qimport', '--rev', '%s' % rev,
