@@ -882,8 +882,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             def finished(ret, data):
                 if ret == 0:
-                    self.showMessage.emit(_('%d outgoing changesets to %s') %
-                                          (len(nodes), urlu))
+                    self.showMessage.emit(_('outgoing changesets to %s found') % urlu)
                 elif ret == 1:
                     self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
                 else:
