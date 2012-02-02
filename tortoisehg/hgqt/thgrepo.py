@@ -110,14 +110,19 @@ class ThgRepoWrapper(QObject):
         'Add files to watcher that may have been added or replaced'
         existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
         files = [unicode(f) for f in self.watcher.files()]
+        added = False
         for f in existing:
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
+                added = True
         for f in self.repo.uifiles()[1]:
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
+                added = True
+        if added:
+            self.pollStatus()
 
     def pollStatus(self):
         if not os.path.exists(self.repo.path):
@@ -186,7 +191,9 @@ class ThgRepoWrapper(QObject):
             mtime = [os.path.getmtime(wf) for wf in existing]
             if mtime:
                 return max(mtime)
+            dbgoutput('no mtime found')
         except EnvironmentError:
+            dbgoutput('no mtime returned')
             return None
 
     def _checkrepotime(self):
