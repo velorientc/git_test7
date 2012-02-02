@@ -881,7 +881,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                        '--template', '{node}\n']
             self.run(cmdline, ('force', 'branch', 'rev'))
         else:
-            self.finishfunc = None
+            def finished(ret, data):
+                if ret == 0:
+                    self.showMessage.emit(_('%d outgoing changesets to %s') %
+                                          (len(nodes), urlu))
+                elif ret == 1:
+                    self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
+                else:
+                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (urlu, ret))
+            self.finishfunc = finished
             cmdline = ['--repository', self.repo.root, 'outgoing']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
