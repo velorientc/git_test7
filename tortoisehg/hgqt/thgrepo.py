@@ -169,6 +169,7 @@ class ThgRepoWrapper(QObject):
 
     def _getwatchedfiles(self):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
+        watchedfiles.append(self.repo.sjoin('phaseroots'))
         watchedfiles.append(self.repo.join('localtags'))
         watchedfiles.append(self.repo.join('bookmarks'))
         watchedfiles.append(self.repo.join('bookmarks.current'))
