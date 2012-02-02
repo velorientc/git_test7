@@ -1203,6 +1203,10 @@ class RepoWidget(QWidget):
               self.backoutToRevision)
         entry(menu)
 
+        entry(menu, None, isrev, _('Copy hash'), 'copy-hash',
+              self.copyHash)
+        entry(menu)
+
         submenu = menu.addMenu(_('Export'))
         entry(submenu, None, isrev, _('Export patch...'), 'hg-export',
               self.exportRevisions)
@@ -1214,10 +1218,6 @@ class RepoWidget(QWidget):
               self.bundleRevisions)
         entry(submenu, None, isctx, _('Copy patch'), 'copy-patch',
               self.copyPatch)
-        entry(menu)
-
-        entry(menu, None, isrev, _('Copy hash'), 'copy-hash',
-              self.copyHash)
         entry(menu)
 
         # hg >= 2.1
