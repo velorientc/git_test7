@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-01-23 17:03-0200\n"
-"PO-Revision-Date: 2012-01-22 13:41+0000\n"
+"PO-Revision-Date: 2012-01-29 17:46+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-01-24 05:34+0000\n"
-"X-Generator: Launchpad (build 14713)\n"
+"X-Launchpad-Export-Date: 2012-01-30 04:46+0000\n"
+"X-Generator: Launchpad (build 14727)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1401,7 +1401,7 @@ msgstr "Subversion:"
 
 #: tortoisehg/hgqt/csinfo.py:113
 msgid "Converted From:"
-msgstr ""
+msgstr "Umgewandelt aus:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 #: tortoisehg/hgtk/cslist.py:384
@@ -1649,7 +1649,7 @@ msgstr "Anzeigen der Revision..."
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:699
 msgid "Save at revision..."
-msgstr ""
+msgstr "In Revision ... speichern"
 
 #: tortoisehg/hgqt/filedialogs.py:215 tortoisehg/hgqt/filedialogs.py:701
 msgid "Edit local"
@@ -3911,7 +3911,7 @@ msgstr "Änderungen"
 #: tortoisehg/hgqt/repomodel.py:56
 msgctxt "column header"
 msgid "Converted From"
-msgstr ""
+msgstr "Umgewandelt aus"
 
 #: tortoisehg/hgqt/repomodel.py:211
 #, python-format
@@ -4059,27 +4059,27 @@ msgstr "Den Wurzelpfad des Archivs in die Zwischenablage kopieren"
 
 #: tortoisehg/hgqt/reporegistry.py:446
 msgid "Sort by name"
-msgstr ""
+msgstr "Nach Name sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:447
 msgid "Sort the group by short name"
-msgstr ""
+msgstr "Die Gruppe nach Kurznamen sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:448
 msgid "Sort by path"
-msgstr ""
+msgstr "Nach Pfad sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:449
 msgid "Sort the group by full path"
-msgstr ""
+msgstr "Die Gruppe nach vollem Pfad sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:450
 msgid "Sort by .hgsub"
-msgstr ""
+msgstr "Nach .hgsub sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:451
 msgid "Order the subrepos as in .hgsub"
-msgstr ""
+msgstr "Die Unterarchive entsprechend der Reihenfolge in .hgsub sortieren"
 
 #: tortoisehg/hgqt/reporegistry.py:512
 msgid "Select repository directory to add"
@@ -4178,6 +4178,11 @@ msgid ""
 "finish adding the subrepo <i>you must still <u>commit</u></i> the changes to "
 "the .hgsub file in order to confirm the addition of the subrepo."
 msgstr ""
+"Das ausgewählte Unterarchiv:<br><br><i>%s</i><br><br>wurde zur "
+"Projektverwaltungsdatei .hgsub hinzugefügt:<br><br><i>%s</i><br><br>Zur "
+"Erinnerung: Zum Abschluss des Prozesses <i>müssen Sie noch</i> die "
+"Änderungen in der .hgsub-Datei <i><u>übertragen,</u></i> um das Hinzufügen "
+"zu bestätigen."
 
 #: tortoisehg/hgqt/reporegistry.py:643
 #, python-format
@@ -4192,7 +4197,7 @@ msgstr "\"%s\" ist kein gültiges Archiv innerhalb von \"%s\""
 #: tortoisehg/hgqt/repotreeitem.py:236 tortoisehg/hgqt/repotreeitem.py:412
 #: tortoisehg/hgqt/repotreeitem.py:461 tortoisehg/hgqt/repotreeitem.py:516
 msgid "Sort"
-msgstr ""
+msgstr "Sortieren"
 
 #: tortoisehg/hgqt/repotreeitem.py:258
 #, python-format
@@ -7007,21 +7012,23 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:835
 msgid "Projrc"
-msgstr ""
+msgstr "Projrc"
 
 #: tortoisehg/hgqt/settings.py:836
 msgid "Require confirmation"
-msgstr ""
+msgstr "Bestätigung verlangen"
 
 #: tortoisehg/hgqt/settings.py:837
 msgid ""
 "Ask the user to confirm the update of the local \"projrc\" configuration "
 "file when the remote projrc file changes. Default is \"True\"."
 msgstr ""
+"Den Benutzer um Bestätigung bitten, eine entfernte Änderung an der "
+"Konfigurationsdatei \"projrc\" lokal zu übernehmen. Vorgabe ist \"True\"."
 
 #: tortoisehg/hgqt/settings.py:839
 msgid "Servers"
-msgstr ""
+msgstr "Server"
 
 #: tortoisehg/hgqt/settings.py:840
 msgid ""
@@ -7029,26 +7036,34 @@ msgid ""
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
 "the default sync path.Default is pull from NO servers."
 msgstr ""
+"Liste der Server, von denen \"projrc\"-Konfigurationsdateien gezogen werden "
+"müssen. Setzen Sie es auf \"*\", um von allen Servern zu ziehen. Setzen Sie "
+"es auf \"default\", um vom Vorgabe-Synchronisationspfad zu ziehen. Vorgabe "
+"ist, von KEINEM Server zu ziehen."
 
 #: tortoisehg/hgqt/settings.py:843
 msgid "Include"
-msgstr ""
+msgstr "Einschließen"
 
 #: tortoisehg/hgqt/settings.py:844
 msgid ""
 "List of settings that will be pulled form the project configuration file. "
 "Default is include NO settings."
 msgstr ""
+"Eine Liste der Einstellungen, die von der Projektkonfigurationsdatei gezogen "
+"werden. Vorgabe ist, KEINERLEI Einstellungen einzuschließen."
 
 #: tortoisehg/hgqt/settings.py:845
 msgid "Exclude"
-msgstr ""
+msgstr "Ausschließen"
 
 #: tortoisehg/hgqt/settings.py:846
 msgid ""
 "List of settings that will NOT be pulled form the project configuration "
 "file. Default is exclude none of the included settings."
 msgstr ""
+"Eine Liste der Einstellungen, die NICHT von der Projektkonfigurationsdatei "
+"gezogen werden. Vorgabe ist, KEINERLEI Einstellungen auszuschließen."
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "TortoiseHg Settings"
@@ -7080,7 +7095,7 @@ msgstr "Kein Projektverzeichnis bei "
 #: tortoisehg/hgqt/settings.py:913
 #, python-format
 msgid "%s project settings (.hg/projrc)"
-msgstr ""
+msgstr "%s-Projekteinstellungen (.hg/projrc)"
 
 #: tortoisehg/hgqt/settings.py:919 tortoisehg/hgtk/thgconfig.py:671
 #, python-format
@@ -8986,7 +9001,7 @@ msgstr "Über TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:346
 msgid "Go to current revision"
-msgstr ""
+msgstr "Zur aktuellen Revision wechseln"
 
 #: tortoisehg/hgqt/workbench.py:360
 msgid "Filter Toolbar"

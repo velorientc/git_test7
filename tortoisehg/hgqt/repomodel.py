@@ -37,7 +37,7 @@ mqpatchmimetype = 'application/thg-mqunappliedpatch'
 
 # TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
-           "cyan", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
+           "dodgerblue", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
            "darkcyan", "gray", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
@@ -54,6 +54,7 @@ COLUMNHEADERS = (
     ('UTCTime', _('UTC Time', 'column header')),
     ('Changes', _('Changes', 'column header')),
     ('Converted', _('Converted From', 'column header')),
+    ('Phase', _('Phase', 'column header')),
     )
 
 UNAPPLIED_PATCH_COLOR = '#999999'
@@ -80,7 +81,7 @@ class HgRepoListModel(QAbstractTableModel):
     _allcolumns = tuple(h[0] for h in COLUMNHEADERS)
     _allcolnames = dict(COLUMNHEADERS)
 
-    _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
+    _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags', 'Phase',)
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
@@ -677,6 +678,14 @@ class HgRepoListModel(QAbstractTableModel):
                 return cvt
         return ''
 
+    def getphase(self, ctx, gnode):
+        if ctx.rev() is None:
+            return ''
+        try:
+            return ctx.phasestr()
+        except:
+            return 'draft'
+    
     _columnmap = {
         'Rev':      getrev,
         'Node':     lambda self, ctx, gnode: str(ctx),
@@ -691,4 +700,5 @@ class HgRepoListModel(QAbstractTableModel):
         'UTCTime':  lambda self, ctx, gnode: hglib.utctime(ctx.date()),
         'Changes':  getchanges,
         'Converted': getconv,
+        'Phase':    getphase,
     }

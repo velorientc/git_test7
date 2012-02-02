@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import revset, error, patch
+from mercurial import revset, error, patch, commands
 
 from tortoisehg.util import hglib, shlib, paths
 
@@ -322,7 +322,8 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label):
-        if label == 'ui.error':
+        labelslist = unicode(label).split()
+        if 'ui.error' in labelslist:
             self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
 
     @pyqtSlot(unicode)
@@ -1207,6 +1208,17 @@ class RepoWidget(QWidget):
               self.copyHash)
         entry(menu)
 
+        # hg >= 2.1
+        if hasattr(commands, 'phase'):
+            submenu = menu.addMenu(_('Change Phase to'))
+            entry(submenu, None, isrev, _('Secret'), None,
+                  lambda: self.changePhase('secret'))
+            entry(submenu, None, isrev, _('Draft'), None,
+                  lambda: self.changePhase('draft'))
+            entry(submenu, None, isrev, _('Public'), None,
+                  lambda: self.changePhase('public'))
+            entry(menu)
+
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
               self.transplantRevisions)
 
@@ -1724,6 +1736,12 @@ class RepoWidget(QWidget):
         clip = QApplication.clipboard()
         clip.setText(binascii.hexlify(self.repo[self.rev].node()))
 
+    def changePhase(self, phase):
+        cmdlines = []
+        cmdlines.append(['phase', '--rev', '%s' % self.rev,
+                       '--repository', self.repo.root])
+        self.runCommand(*cmdlines)
+
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
         opts = {'source' : self.rev, 'dest': self.repo['.'].rev()}
@@ -1753,30 +1771,38 @@ class RepoWidget(QWidget):
                 % (self.rev, self.repo['qparent'].rev()))
             return
 
-        revNameSet = set(['%d.diff' % rev for rev in revList])
-        collidingPatchSet = revNameSet.intersection(set(self.repo.mq.series))
+        patchdir = self.repo.join('patches')
+        def patchExists(p):
+            return os.path.exists(os.path.join(patchdir, p))
 
-        if collidingPatchSet:
+        # Note that the following two arrays are both ordered by "rev"
+        defaultPatchNames = ['%d.diff' % rev for rev in revList]
+        defaultPatchesExist = [patchExists(p) for p in defaultPatchNames]
+        if any(defaultPatchesExist):
             # We will qimport each revision one by one, starting from the newest
             # To do so, we will find a valid and unique patch name for each
-            # revision that we must qimport
+            # revision that we must qimport (i.e. a filename that does not
+            # already exist)
             # and then we will import them one by one starting from the newest
             # one, using these unique names
             def getUniquePatchName(baseName):
-                patchName = baseName + '.diff'
-                if patchName in collidingPatchSet:
-                    maxRetries = 99
-                    for n in range(1, maxRetries):
-                        patchName = baseName + '_%02d.diff' % n
-                        if not patchName in collidingPatchSet:
-                            break
-                return patchName
+                maxRetries = 99
+                for n in range(1, maxRetries):
+                    patchName = baseName + '_%02d.diff' % n
+                    if not patchExists(patchName):
+                        return patchName
+                return baseName
 
             patchNames = {}
-            revList.reverse()
-            for rev in revList:
-                patchNames[rev] = getUniquePatchName(str(rev))
+            for n, rev in enumerate(revList):
+                if defaultPatchesExist[n]:
+                    patchNames[rev] = getUniquePatchName(str(rev))
+                else:
+                    # The default name is safe
+                    patchNames[rev] = defaultPatchNames[n]
 
+            # qimport each revision individually, starting from the topmost one
+            revList.reverse()
             cmdlines = []
             for rev in revList:
                 cmdlines.append(['qimport', '--rev', '%s' % rev,

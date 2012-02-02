@@ -61,6 +61,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
         opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
+        opts['bugtraqtrigger'] = repo.ui.config('tortoisehg', 'issue.bugtraqtrigger', None)
         self.opts = opts # user, date
 
         self.stwidget = status.StatusWidget(repo, pats, opts, self)
@@ -466,6 +467,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.msgte.lexer().setAPIs(self._apis)
 
     def bugTrackerPostCommit(self):
+        if self.opts['bugtraqtrigger'] != 'commit':
+            return
         # commit already happened, get last message in history
         message = self.lastmessage
         error = self.bugtraq.on_commit_finished(message)
@@ -537,10 +540,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # Update options label
         opts = []
         for opt, value in self.opts.iteritems():
-            if value is True:
-                opts.append('--' + opt)
-            elif value:
-                opts.append('--%s=%s' % (opt, value))
+            if not opt.startswith('bugtraq'):
+                # The "bugtraq" related options are not very interesting as they are not passed to the commit command
+                # The user will already see an "issue tracker" button indicating that the bug tracker is active
+                if value is True:
+                    opts.append('--' + opt)
+                elif value:
+                    opts.append('--%s=%s' % (opt, value))
+
         self.optionslabel.setText(' '.join(opts))
         self.optionslabel.setVisible(bool(opts))
         self.optionslabelhdr.setVisible(bool(opts))

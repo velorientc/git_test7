@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2012-01-23 17:03-0200\n"
-"PO-Revision-Date: 2011-11-12 05:19+0000\n"
+"PO-Revision-Date: 2012-01-26 10:57+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-01-24 05:33+0000\n"
-"X-Generator: Launchpad (build 14713)\n"
+"X-Launchpad-Export-Date: 2012-01-27 05:32+0000\n"
+"X-Generator: Launchpad (build 14727)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -339,7 +339,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1082
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
-msgstr ""
+msgstr "Løs flet-konflikter automatisk hvor det er muligt"
 
 #: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
@@ -419,7 +419,7 @@ msgstr "Integrationsmeddelelse"
 
 #: tortoisehg/hgqt/backout.py:498 tortoisehg/hgqt/merge.py:522
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "Spring over bekræftelsessiden, luk efter intetration."
 
 #: tortoisehg/hgqt/backout.py:509 tortoisehg/hgqt/backout.py:543
 msgid "Backed out merge changeset: "
@@ -2479,11 +2479,13 @@ msgstr "&Afslut"
 
 #: tortoisehg/hgqt/merge.py:118
 msgid "Prepare to merge"
-msgstr ""
+msgstr "Forbered fletning"
 
 #: tortoisehg/hgqt/merge.py:119
 msgid "Verify merge targets and ensure your working directory is clean."
 msgstr ""
+"Kontroller hvilke revisioner der bliver flettet og om arbejdskataloget er "
+"rent."
 
 #: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:599
 #: tortoisehg/hgqt/revpanel.py:159 tortoisehg/hgtk/merge.py:73
@@ -2505,7 +2507,7 @@ msgstr "Flette-revision ikke angivet eller ikke fundet"
 
 #: tortoisehg/hgqt/merge.py:147
 msgid "Merge to (working directory)"
-msgstr ""
+msgstr "Flet med (arbejdskatalog)"
 
 #: tortoisehg/hgqt/merge.py:170
 msgid ""
@@ -2560,7 +2562,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/merge.py:355
 msgid "Automatically advance to next page when merge is complete."
-msgstr ""
+msgstr "Fortsæt automatisk til næste side når flet er færdig."
 
 #: tortoisehg/hgqt/merge.py:400
 #, python-format

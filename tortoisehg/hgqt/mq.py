@@ -12,14 +12,13 @@ import time
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error
-from mercurial import merge as mergemod
+from mercurial import patch
 from hgext import mq as mqmod
 
-from tortoisehg.util import hglib, patchctx
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, qscilib, thgrepo, status
-from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport, messageentry
+from tortoisehg.hgqt import qqueue, qreorder, thgimport, messageentry
 from tortoisehg.hgqt.qtlib import geticon
 
 # TODO
