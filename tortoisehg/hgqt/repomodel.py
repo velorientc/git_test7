@@ -682,10 +682,10 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.rev() is None:
             return ''
         try:
-            return ctx.phasestr()
+            return _(ctx.phasestr())
         except:
-            return 'draft'
-    
+            return _('draft')
+
     _columnmap = {
         'Rev':      getrev,
         'Node':     lambda self, ctx, gnode: str(ctx),

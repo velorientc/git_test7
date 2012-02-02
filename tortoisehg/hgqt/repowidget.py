@@ -8,11 +8,13 @@
 
 import binascii
 import os
-
 from mercurial import revset, error, patch, commands
 
-from tortoisehg.util import hglib, shlib, paths
+# hg >= 2.1
+if hasattr(commands, 'phase'):
+    from mercurial import phases
 
+from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox, WarningMsgBox
@@ -34,6 +36,8 @@ from tortoisehg.hgqt.pbranch import PatchBranchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+import functools
 
 class RepoWidget(QWidget):
 
@@ -388,7 +392,7 @@ class RepoWidget(QWidget):
         sw.showMessage.connect(self._showMessageOnInfoBar)
         sw.incomingBundle.connect(self.setBundle)
         sw.pullCompleted.connect(self.onPullCompleted)
-        sw.pushCompleted.connect(self.clearRevisionSet)
+        sw.pushCompleted.connect(self.pushCompleted)
         sw.showBusyIcon.connect(self.onShowBusyIcon)
         sw.hideBusyIcon.connect(self.onHideBusyIcon)
         sw.refreshTargets(self.rev)
@@ -494,13 +498,15 @@ class RepoWidget(QWidget):
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
         if not self.revset:
-            return
+            return False
         self.revset = []
         if self.revsetfilter:
             self.reload()
+            return True
         else:
             self.repomodel.revset = []
             self.refresh()
+        return False
 
     def setRevisionSet(self, revisions):
         revs = revisions[:]
@@ -1040,6 +1046,12 @@ class RepoWidget(QWidget):
         """
         self.syncDemand.get().push(confirm)
         self.outgoingMode = False
+
+    @pyqtSlot()
+    def pushCompleted(self):
+        if not self.clearRevisionSet():
+            self.reload()
+
     ##
     ## Repoview context menu
     ##
@@ -1210,13 +1222,10 @@ class RepoWidget(QWidget):
 
         # hg >= 2.1
         if hasattr(commands, 'phase'):
-            submenu = menu.addMenu(_('Change Phase to'))
-            entry(submenu, None, isrev, _('Secret'), None,
-                  lambda: self.changePhase('secret'))
-            entry(submenu, None, isrev, _('Draft'), None,
-                  lambda: self.changePhase('draft'))
-            entry(submenu, None, isrev, _('Public'), None,
-                  lambda: self.changePhase('public'))
+            submenu = menu.addMenu(_('Change phase to'))
+            for pnum, pname in enumerate(phases.phasenames):
+                entry(submenu, None, isrev, _(pname), None,
+                      functools.partial(self.changePhase, pnum))
             entry(menu)
 
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
@@ -1737,10 +1746,33 @@ class RepoWidget(QWidget):
         clip.setText(binascii.hexlify(self.repo[self.rev].node()))
 
     def changePhase(self, phase):
-        cmdlines = []
-        cmdlines.append(['phase', '--rev', '%s' % self.rev,
-                       '--repository', self.repo.root])
-        self.runCommand(*cmdlines)
+        currentphase = self.repo[self.rev].phase()
+        if currentphase == phase:
+            # There is nothing to do, we are already in the target phase
+            return
+        phasestr = phases.phasenames[phase]
+        cmdlines = ['phase', '--rev', '%s' % self.rev,
+               '--repository', self.repo.root,
+               ('--%s' % phasestr)]
+        if currentphase < phase:
+            # Ask the user if he wants to force the transition
+            title = _('Backwards phase change requested')
+            main = _('Do you really want to <i>force</i> a backwards phase transition?')
+            text = _('You are trying to move the phase of revision %d backwards, from "<i>%s</i>" to "<i>%s</i>". '
+                    'However, "<i>%s</i>" is a lower phase level than "<i>%s</i>".\n\n'
+                    'Moving the phase backwards is not recommended. '
+                    'For example, it may result in having multiple heads if you '
+                    'modify a revision that you have already pushed to a server.\n\n'
+                    'Please be careful!' % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
+                                            phases.phasenames[currentphase]))
+            labels = ((QMessageBox.Yes, _('&Force')),
+                      (QMessageBox.No, _('&Cancel')))
+            if not qtlib.QuestionMsgBox(title, main, text,
+                    labels=labels, parent=self):
+                return
+            cmdlines.append('--force')
+        self.runCommand(cmdlines)
+        self.reload()
 
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
