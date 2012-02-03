@@ -1224,7 +1224,7 @@ class RepoWidget(QWidget):
         if hasattr(commands, 'phase'):
             submenu = menu.addMenu(_('Change phase to'))
             for pnum, pname in enumerate(phases.phasenames):
-                entry(submenu, None, isrev, _(pname), None,
+                entry(submenu, None, isrev, pname, None,
                       functools.partial(self.changePhase, pnum))
             entry(menu)
 
