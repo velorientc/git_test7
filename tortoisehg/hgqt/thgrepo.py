@@ -175,6 +175,7 @@ class ThgRepoWrapper(QObject):
         watchedfiles.append(self.repo.join('bookmarks'))
         watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
+            watchedfiles.append(self.repo.mq.path)
             watchedfiles.append(self.repo.mq.join('series'))
             watchedfiles.append(self.repo.mq.join('guards'))
             watchedfiles.append(self.repo.join('patches.queue'))
