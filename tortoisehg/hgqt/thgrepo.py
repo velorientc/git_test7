@@ -90,6 +90,7 @@ class ThgRepoWrapper(QObject):
         else:
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
+            self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
