@@ -969,6 +969,24 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                         return
             self.pushCompleted.emit()
         self.finishfunc = finished
+
+        if not rev and not branch:
+            # Read the tortoisehg.defaultpush setting to determine what to push by default
+            defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
+            if defaultpush == 'all':
+                # This is the default
+                pass
+            elif defaultpush == 'branch':
+                branch = '.'
+            elif defaultpush == 'revision':
+                rev = '.'
+            else:
+                self.showMessage.emit(_('Invalid default push revision: %s.'
+                                        'Please check your mercurial configuration '
+                                        '(tortoisehg.defaultpush)') % defaultpush)
+                self.pushCompleted.emit()
+                return
+
         cmdline = ['--repository', self.repo.root, 'push']
         if rev:
             cmdline.extend(['--rev', str(rev)])

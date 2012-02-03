@@ -578,8 +578,16 @@ INFO = (
         _('Operation which is performed directly after a successful pull. '
           'update equates to pull --update, fetch equates to the fetch '
           'extension, rebase equates to pull --rebase.  Default: none')),
+    _fi(_('Default Push'), 'tortoisehg.defaultpush', (genDefaultCombo,
+        ['all', 'branch', 'revision']),
+        _('Select the revisions that will be pushed by default, '
+        'whenever you click the Push button.'
+        '<ul><li><b>all</b>: The default. Push all changes in <i>all branches</i>.'
+        '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
+        '<li><b>revision</b>: Push the changes in the current branch '
+        '<i><u>up to</u> the current revision</i>.</ul><p>'
+        'Default: all')),
     )),
-
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is:<br>'
