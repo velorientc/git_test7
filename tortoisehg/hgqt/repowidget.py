@@ -1224,7 +1224,7 @@ class RepoWidget(QWidget):
         if hasattr(commands, 'phase'):
             submenu = menu.addMenu(_('Change phase to'))
             for pnum, pname in enumerate(phases.phasenames):
-                entry(submenu, None, isrev, _(pname), None,
+                entry(submenu, None, isrev, pname, None,
                       functools.partial(self.changePhase, pnum))
             entry(menu)
 
@@ -1758,11 +1758,12 @@ class RepoWidget(QWidget):
             # Ask the user if he wants to force the transition
             title = _('Backwards phase change requested')
             main = _('Do you really want to <i>force</i> a backwards phase transition?')
-            text = _('You are trying to move the phase of revision %d backwards, from "<i>%s</i>" to "<i>%s</i>". '
+            text = _('You are trying to move the phase of revision %d backwards,\n'
+                    'from "<i>%s</i>" to "<i>%s</i>".\n\n'
                     'However, "<i>%s</i>" is a lower phase level than "<i>%s</i>".\n\n'
-                    'Moving the phase backwards is not recommended. '
-                    'For example, it may result in having multiple heads if you '
-                    'modify a revision that you have already pushed to a server.\n\n'
+                    'Moving the phase backwards is not recommended.\n'
+                    'For example, it may result in having multiple heads\nif you '
+                    'modify a revision that you have already pushed\nto a server.\n\n'
                     'Please be careful!' % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
                                             phases.phasenames[currentphase]))
             labels = ((QMessageBox.Yes, _('&Force')),

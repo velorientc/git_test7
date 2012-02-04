@@ -90,6 +90,7 @@ class ThgRepoWrapper(QObject):
         else:
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
+            self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
@@ -174,6 +175,7 @@ class ThgRepoWrapper(QObject):
         watchedfiles.append(self.repo.join('bookmarks'))
         watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
+            watchedfiles.append(self.repo.mq.path)
             watchedfiles.append(self.repo.mq.join('series'))
             watchedfiles.append(self.repo.mq.join('guards'))
             watchedfiles.append(self.repo.join('patches.queue'))

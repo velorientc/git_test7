@@ -79,6 +79,17 @@ diffmerge.diffargs=--nosplash --title1='$plabel1' --title2='$clabel' $parent $ch
 diffmerge.diff3args=--nosplash --title1='$plabel1' --title2='$clabel' --title3='$plabel2' $parent1 $child $parent2
 diffmerge.dirdiff=True
 
+diffmerge3.regkey=Software\SourceGear\Common\DiffMerge\Installer
+diffmerge3.regkeyalt=Software\Wow6432Node\SourceGear\Common\DiffMerge\Installer
+diffmerge3.regname=Location
+diffmerge3.priority=-7
+diffmerge3.args=-nosplash -merge -title1=local -title2=merged -title3=other $local $base $other -result=$output
+diffmerge3.checkchanged=True
+diffmerge3.gui=True
+diffmerge3.diffargs=--nosplash --title1='$plabel1' --title2='$clabel' $parent $child
+diffmerge3.diff3args=--nosplash --title1='$plabel1' --title2='$clabel' --title3='$plabel2' $parent1 $child $parent2
+diffmerge3.dirdiff=True
+
 p4merge.priority=-8
 p4merge.args=$base $local $other $output
 p4merge.regkey=Software\Perforce\Environment

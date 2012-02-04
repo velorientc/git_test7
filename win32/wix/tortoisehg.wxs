@@ -120,11 +120,6 @@
             />
           </Component>
 
-          <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
-            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
-                  Source='..\contrib\TortoisePlink.exe'
-            />
-          </Component>
           <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
             <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
                   Source='..\contrib\Pageant.exe'
@@ -136,10 +131,20 @@
               <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                     Source='..\contrib\kdiff3x64.exe'/>
             </Component>
+            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
+                    Source='..\contrib\TortoisePlink-x64.exe'
+              />
+          </Component>
           <?else?>
             <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
               <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                     Source='..\contrib\kdiff3.exe'/>
+            </Component>
+            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
+                    Source='..\contrib\TortoisePlink-x86.exe'
+              />
             </Component>
           <?endif?>
 

@@ -249,10 +249,10 @@ class FileData(object):
                     data = []
                 else:
                     _ui.pushbuffer()
-                    commands.status(_ui, srepo)
+                    commands.status(_ui, srepo, modified=True, added=True, removed=True, deleted=True)
                     data = _ui.popbuffer()
                     if data:
-                        out.append(_('File Status:') + u'\n')
+                        out.append(_('The subrepository is dirty.') + u' ' + _('File Status:') + u'\n')
                         out.append(hglib.tounicode(data))
                         out.append(u'\n')
 
