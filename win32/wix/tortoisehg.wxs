@@ -145,6 +145,7 @@
               <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
                     Source='..\contrib\TortoisePlink-x86.exe'
               />
+            </Component>
           <?endif?>
 
           <Directory Id='docFolder' Name='doc'>
