@@ -260,6 +260,12 @@ class ShelveDialog(QDialog):
             if not ok:
                 return
             shelve = hglib.fromunicode(name)
+            invalids = (':', '#', '/', '\\', '<', '>', '|')
+            bads = [c for c in shelve if c in invalids]
+            if bads:
+                qtlib.ErrorMsgBox(_('Bad filename'),
+                                  _('A shelf name cannot contain :#/\\<>|'))
+                return
         try:
             fn = os.path.join('shelves', shelve)
             shelfpath = self.repo.join(fn)
