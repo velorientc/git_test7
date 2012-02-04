@@ -301,7 +301,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
         newaction(_("&Goto revision..."), self.gotorev,
-                  enabled='repoopen', menu='view', shortcut='Ctrl+Shift+G',
+                  enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
         newaction(_("Web Server..."), self.serve, enabled='repoopen',
