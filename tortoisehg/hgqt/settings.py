@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error, extensions, scmutil
+from mercurial import ui, util, error, extensions, scmutil, phases
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
@@ -715,6 +715,9 @@ INFO = (
          'environment variables are set to a non-English language. '
          'This setting is used by the Merge, Tag and Backout dialogs. '
          'Default: False')),
+    _fi(_('New Commit Phase'), 'phases.new-commit', (genDefaultCombo,
+        phases.phasenames),
+        _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
        _('Make MQ patches secret (instead of draft). '
          'Default: False')),
