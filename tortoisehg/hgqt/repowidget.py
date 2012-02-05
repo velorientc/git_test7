@@ -325,10 +325,19 @@ class RepoWidget(QWidget):
             return False
 
     @pyqtSlot(unicode, unicode)
-    def _showOutputOnInfoBar(self, msg, label):
+    def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
         labelslist = unicode(label).split()
         if 'ui.error' in labelslist:
-            self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
+            # Limit the text shown on the info bar to maxlines lines of up to maxwidth chars
+            msglines = unicode(msg).strip().splitlines()
+            infolines = []
+            for line in msglines[0:maxlines]:
+                if len(line) > maxwidth:
+                    line = line[0:maxwidth] + ' ...'
+                infolines.append(line)
+            if len(msglines) > maxlines and not infolines[-1].endswith('...'):
+                infolines[-1] += ' ...'
+            self.setInfoBar(qtlib.CommandErrorInfoBar, '\n'.join(infolines))
 
     @pyqtSlot(unicode)
     def _showMessageOnInfoBar(self, msg):
