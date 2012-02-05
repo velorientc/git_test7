@@ -152,6 +152,7 @@ class RepoWidget(QWidget):
             #       be negative
             if widgetIndex > 0:
                 self.taskTabsWidget.setCurrentIndex(widgetIndex)
+        self.output.connect(self._showOutputOnInfoBar)
 
     def setupUi(self):
         SP = QSizePolicy
@@ -364,7 +365,6 @@ class RepoWidget(QWidget):
         cw.loadSettings(QSettings(), 'workbench')
 
         cw.output.connect(self.output)
-        cw.output.connect(self._showOutputOnInfoBar)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
         cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
@@ -390,7 +390,6 @@ class RepoWidget(QWidget):
     def createSyncWidget(self):
         sw = SyncWidget(self.repo, self)
         sw.output.connect(self.output)
-        sw.output.connect(self._showOutputOnInfoBar)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
         sw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
