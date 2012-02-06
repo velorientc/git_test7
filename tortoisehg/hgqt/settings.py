@@ -151,12 +151,11 @@ class BoolRBGroup(QWidget):
     def isDirty(self):
         return self.value() != self.curvalue
 
-class PasswordEntry(QLineEdit):
+class LineEditBox(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
-        self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
 
     ## common APIs for all edit widgets
@@ -173,6 +172,14 @@ class PasswordEntry(QLineEdit):
 
     def isDirty(self):
         return self.value() != self.curvalue
+
+class PasswordEntry(LineEditBox):
+    def __init__(self, parent=None, **opts):
+        QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setEchoMode(QLineEdit.Password)
+        self.setMinimumWidth(ENTRY_WIDTH)
 
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
@@ -376,6 +383,10 @@ def genIntEditCombo(opts):
     opts['canedit'] = True
     opts['validator'] = QIntValidator()
     return SettingsCombo(**opts)
+
+def genLineEditBox(opts):
+    'Generate a single line text entry box'
+    return LineEditBox(**opts)
 
 def genPasswordEntry(opts):
     'Generate a password entry box'
