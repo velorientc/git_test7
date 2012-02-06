@@ -180,6 +180,40 @@ class PasswordEntry(LineEditBox):
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
+class TextEntry(QTextEdit):
+    def __init__(self, parent=None, **opts):
+        QTextEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setMinimumWidth(ENTRY_WIDTH)
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue:
+            self.setPlainText(hglib.tounicode(curvalue))
+        else:
+            self.setPlainText('')
+
+    def value(self):
+        # It is not possible to set a multi-line value with an empty line
+        utext = self.removeEmptyLines(self.toPlainText())
+        return utext and hglib.fromunicode(utext) or None
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+    def removeEmptyLines(self, text):
+        if not text:
+            return text
+        rawlines = hglib.fromunicode(text).splitlines()
+        lines = []
+        for line in rawlines:
+            if not line.strip():
+                continue
+            lines.append(line)
+        return os.linesep.join(lines)
+
 
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
@@ -391,6 +425,9 @@ def genLineEditBox(opts):
 def genPasswordEntry(opts):
     'Generate a password entry box'
     return PasswordEntry(**opts)
+def genTextEntry(opts):
+    'Generate a multi-line text input entry box'
+    return TextEntry(**opts)
 
 def genDefaultCombo(opts, defaults=[]):
     'user must select from a list'
