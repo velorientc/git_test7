@@ -32,7 +32,7 @@ def hasExtension(extname):
 
 # Detect if hg >= 2.1
 def phasesSupport():
-    import commands
+    from mercurial import commands
     return hasattr(commands, 'phase')
 
 class SettingsCombo(QComboBox):
