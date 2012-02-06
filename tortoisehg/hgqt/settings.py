@@ -330,27 +330,27 @@ class PathBrowser(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
-        
+
         self.lineEdit = QLineEdit()
         completer = QCompleter(self)
         completer.setModel(QDirModel(completer))
         self.lineEdit.setCompleter(completer)
-        
+
         self.browseButton = QPushButton(_('&Browse...'))
         self.browseButton.clicked.connect(self.browse)
-        
+
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.lineEdit)
         layout.addWidget(self.browseButton)
         self.setLayout(layout)
-        
+
     def browse(self):
         dir = QFileDialog.getExistingDirectory(self, directory=self.lineEdit.text(),
                                                options=QFileDialog.ShowDirsOnly)
         if dir:
             self.lineEdit.setText(dir)
-    
+
     ## common APIs for all edit widgets
     def setValue(self, curvalue):
         self.curvalue = curvalue
@@ -358,14 +358,14 @@ class PathBrowser(QWidget):
             self.lineEdit.setText(hglib.tounicode(curvalue))
         else:
             self.lineEdit.setText('')
-            
+
     def value(self):
         utext = self.lineEdit.text()
         return utext and hglib.fromunicode(utext) or None
-    
+
     def isDirty(self):
         return self.value() != self.curvalue
-        
+
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -834,7 +834,7 @@ INFO = (
     _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma separated list of target people')),
     )),
-    
+
 ({'name': 'kbfiles', 'label': _('Kiln Bfiles'), 'icon': 'kiln', 'extension': 'kbfiles'}, (
     _fi(_('Patterns'), 'kilnbfiles.patterns', genEditCombo,
         _('Files with names meeting the specified patterns will be automatically '
