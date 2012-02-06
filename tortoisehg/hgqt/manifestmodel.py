@@ -204,9 +204,10 @@ class ManifestModel(QAbstractItemModel):
     @pyqtSlot(unicode)
     def setNameFilter(self, pattern):
         """Filter file name by partial match of glob pattern"""
+        pattern = pattern and unicode(pattern) or None
         if self._namefilter == pattern:
             return
-        self._namefilter = pattern and unicode(pattern) or None
+        self._namefilter = pattern
         self._rebuildrootentry()
 
     @property
