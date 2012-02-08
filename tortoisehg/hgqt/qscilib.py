@@ -484,7 +484,7 @@ class KeyPressInterceptor(QObject):
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMaximizeButtonHint)
     dialog.setWindowTitle(filename)
     dialog.setLayout(QVBoxLayout())
     editor = Scintilla()
