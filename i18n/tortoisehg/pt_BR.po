@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-05 08:55-0200\n"
-"PO-Revision-Date: 2012-02-03 22:50+0000\n"
+"PO-Revision-Date: 2012-02-06 13:37+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:56+0000\n"
+"X-Launchpad-Export-Date: 2012-02-07 04:55+0000\n"
 "X-Generator: Launchpad (build 14747)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -4727,6 +4727,16 @@ msgid ""
 "\n"
 "Please be careful!"
 msgstr ""
+"Você está tentando mover a fase da revisão %d para trás,\n"
+"de \"<i>%s</i>\" para \"<i>%s</i>\".\n"
+"\n"
+"No entanto, \"<i>%s</i>\" é um nível de fase menor que \"<i>%s</i>\".\n"
+"\n"
+"Mover a fase para trás não é recomendado. Por exemplo,\n"
+"modificar uma revisão que já foi enviada para um servidor\n"
+"pode resultar na criação de múltiplas cabeças.\n"
+"\n"
+"Seja cuidadoso!"
 
 #: tortoisehg/hgqt/repowidget.py:1769
 msgid "&Force"
@@ -6237,7 +6247,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:581
 msgid "Default Push"
-msgstr ""
+msgstr "Push Default"
 
 #: tortoisehg/hgqt/settings.py:583
 msgid ""
@@ -6247,6 +6257,11 @@ msgid ""
 "branch</i>.<li><b>revision</b>: Push the changes in the current branch "
 "<i><u>up to</u> the current revision</i>.</ul><p>Default: all"
 msgstr ""
+"Selecione as revisões que serão por default enviadas em um push, sempre que "
+"você clicar no botão Push.<ul><li><b>all</b>: O padrão. Envia todas as "
+"mudanças em <i>todos os ramos</i>.<li><b>branch</b>: Envia todas as mudanças "
+"no <i>ramo atual</i>.<li><b>revisão</b>: Envia as mudanças no ramo atual, "
+"<i><u>até</u> a revisão atual</i>.</ul><p>Padrão: all"
 
 #: tortoisehg/hgqt/settings.py:591
 msgctxt "config item"
@@ -6344,11 +6359,13 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:619
 msgid "Secret MQ Patches"
-msgstr ""
+msgstr "Patches MQ Secretos"
 
 #: tortoisehg/hgqt/settings.py:620
 msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr ""
+"Faz com que patches MQ permaneçam na fase secreta (ao invés de rascunho). "
+"Padrão: False"
 
 #: tortoisehg/hgqt/settings.py:622
 msgid "Monitor working<br>directory changes"
@@ -7327,11 +7344,11 @@ msgstr "Especifique o nome do novo adiamento"
 
 #: tortoisehg/hgqt/shelve.py:266
 msgid "Bad filename"
-msgstr ""
+msgstr "Nome de arquivo ruim"
 
 #: tortoisehg/hgqt/shelve.py:267
 msgid "A shelf name cannot contain :#/\\<>|"
-msgstr ""
+msgstr "O nome de um arquivo de adiamento não pode conter :#/\\<>|"
 
 #: tortoisehg/hgqt/shelve.py:273
 msgid "File already exists"
@@ -7846,6 +7863,8 @@ msgid ""
 "Invalid default push revision: %s.Please check your mercurial configuration "
 "(tortoisehg.defaultpush)"
 msgstr ""
+"Revisão de push default inválida: %s.Por favor verifique sua configuração do "
+"Mercurial (tortoisehg.defaultpush)"
 
 #: tortoisehg/hgqt/sync.py:1005
 msgid "Determining outgoing changesets to email..."
