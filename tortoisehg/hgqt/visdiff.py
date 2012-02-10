@@ -354,7 +354,7 @@ def visualdiff(ui, repo, pats, opts):
             dodiff()
         finally:
             # cleanup happens atexit
-            ui.note(_('cleaning up temp directory\n'))
+            ui.note('cleaning up temp directory\n')
 
     if opts.get('mainapp'):
         dodiffwrapper()
