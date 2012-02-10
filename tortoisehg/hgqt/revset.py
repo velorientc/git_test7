@@ -379,7 +379,7 @@ class RevsetThread(QThread):
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
-            func = hglib.revsetmatch(self.repo.ui, self.text)
+            func = revset.match(self.repo.ui, self.text)
             l = []
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)
