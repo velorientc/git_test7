@@ -294,7 +294,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
-        if type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev():
+        if (type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev()
+            or (rev not in self.repo
+                and rev not in self.repo.thgmqunappliedpatches)):
             rev = 'tip'
         self.onRevisionSelected(rev)
 
