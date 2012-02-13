@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import re
+import re, os
 
 from mercurial import util
 
@@ -129,6 +129,11 @@ class Scintilla(QsciScintilla):
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
 
+    def read(self, f):
+        result = super(Scintilla, self).read(f)
+        self.setDefaultEolMode()
+        return result
+
     def inputMethodQuery(self, query):
         if query == Qt.ImMicroFocus:
             return self.cursorRect()
@@ -219,8 +224,19 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.eolVisibility() == m)
                 a.triggered.connect(lambda: self.setEolVisibility(m))
             mkaction(name, mode)
+        eolmodemenu = None
         acmenu = None
         if not self.isReadOnly():
+            eolmodemenu = QMenu(_('EOL Mode'), self)
+            for name, mode in ((_('Windows'), qsci.EolWindows),
+                               (_('Unix'), qsci.EolUnix),
+                               (_('Mac'), qsci.EolMac)):
+                def mkaction(n, m):
+                    a = eolmodemenu.addAction(n)
+                    a.setCheckable(True)
+                    a.setChecked(self.eolMode() == m)
+                    a.triggered.connect(lambda: self.setEolMode(m))
+                mkaction(name, mode)
             acmenu = QMenu(_('AutoComplete'), self)
             for name, value in ((_('Enable'), 2),
                                 (_('Disable'), -1)):
@@ -230,9 +246,11 @@ class Scintilla(QsciScintilla):
                     a.setChecked(self.autoCompletionThreshold() == v)
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
+
         self._stdMenu.addMenu(wrapmenu)
         self._stdMenu.addMenu(wsmenu)
         self._stdMenu.addMenu(vsmenu)
+        if (eolmodemenu): self._stdMenu.addMenu(eolmodemenu)
         if (acmenu): self._stdMenu.addMenu(acmenu)
         return self._stdMenu
 
@@ -246,7 +264,9 @@ class Scintilla(QsciScintilla):
         self.setWrapMode(qs.value(prefix+'/wrap').toInt()[0])
         self.setWhitespaceVisibility(qs.value(prefix+'/whitespace').toInt()[0])
         self.setEolVisibility(qs.value(prefix+'/eol').toBool())
+        self.setDefaultEolMode()
         self.setAutoCompletionThreshold(qs.value(prefix+'/autocomplete').toInt()[0])
+
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
@@ -321,6 +341,14 @@ class Scintilla(QsciScintilla):
 
     def showHScrollBar(self, show=True):
         self.SendScintilla(self.SCI_SETHSCROLLBAR, show)
+
+    def setDefaultEolMode(self):
+        if self.lines():
+            mode = qsciEolModeFromLine(hglib.fromunicode(self.text(0)))
+        else:
+            mode = qsciEolModeFromOs()
+        self.setEolMode(mode)
+        return mode
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
@@ -481,6 +509,24 @@ class KeyPressInterceptor(QObject):
             return True
         return False
 
+def qsciEolModeFromOs():
+    if os.name.startswith('nt'):
+        return QsciScintilla.EolWindows
+    elif sys.platform.startswith('darwin'):
+        return QsciScintilla.EolMac
+    else:
+        return QsciScintilla.EolUnix
+    
+def qsciEolModeFromLine(line):
+    if line.endswith('\r\n'):
+        return QsciScintilla.EolWindows
+    elif line.endswith('\r'):
+        return QsciScintilla.EolMac
+    elif line.endswith('\n'):
+        return QsciScintilla.EolUnix
+    else:
+        return qsciEolModeFromOs()
+    
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
@@ -525,6 +571,7 @@ def fileEditor(filename, **opts):
         f.open(QIODevice.ReadOnly)
         editor.read(f)
         editor.setModified(False)
+
         ret = dialog.exec_()
         if ret == QDialog.Accepted:
             f = QFile(filename)
