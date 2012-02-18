@@ -849,10 +849,10 @@ INFO = (
     _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
         _('Files with names meeting the specified patterns will be automatically '
           'added as largefiles')),
-    _fi(_('Size'), 'largefiles.size', genEditCombo,
+    _fi(_('Mininum Size'), 'largefiles.minsize', genEditCombo,
         _('Files of at least the specified size (in megabytes) will be added as largefiles')),
-    _fi(_('System Cache'), 'largefiles.systemcache', genPathBrowser,
-        _('Path to the directory where a system-wide cache of largefiles will be stored')),
+    _fi(_('User Cache'), 'largefiles.usercache', genPathBrowser,
+        _('Path to the directory where a user\'s cache of largefiles will be stored')),
     )),
 
 ({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
