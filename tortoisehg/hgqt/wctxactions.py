@@ -306,7 +306,7 @@ def forget(parent, ui, repo, files):
 def add(parent, ui, repo, files):
     haslf = 'largefiles' in repo.extensions()
     if haslf:
-        result = lfprompt.promptForLfiles(parent, ui, repo, files, False)
+        result = lfprompt.promptForLfiles(parent, ui, repo, files)
         if not result:
             return False
         files, lfiles = result

@@ -238,8 +238,7 @@ class QuickOpDialog(QDialog):
         self.cmd.run(cmdline)
 
     def addWithPrompt(self, files):
-        result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files,
-                                          False)
+        result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files)
         if not result:
             return
         files, lfiles = result

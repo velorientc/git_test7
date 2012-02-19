@@ -22,27 +22,11 @@ class LfilesPrompt(qtlib.CustomPrompt):
                                       'to add these files as largefiles?'), parent,
                                       (_('Add as &Largefiles'), _('Add as &Normal Files'), _('Cancel')),
                                       0, 2, files)
-
-class BfilesPrompt(qtlib.CustomPrompt):
-    def __init__(self, parent, files=None):
-        qtlib.CustomPrompt.__init__(self, _('Confirm Add'),
-                                    _('Some of the files that you have selected are of a size '
-                                      'over 10 MB.  You may make more efficient use of disk space '
-                                      'by adding these files as bfiles, which will store only the '
-                                      'most recent revision of each file in your local repository, '
-                                      'with older revisions available on the server.  Do you wish '
-                                      'to add these files as bfiles?'), parent,
-                                      (_('Add as &Bfiles'), _('Add as &Normal Files'), _('Cancel')),
-                                      0, 2, files)
                                       
-def promptForLfiles(parent, ui, repo, files, haskbf=False):
+def promptForLfiles(parent, ui, repo, files):
     lfiles = []
-    usekbf = 'kbfiles' in repo.extensions()
     uself = 'largefiles' in repo.extensions()
-    if usekbf:
-        section = 'kilnbfiles'
-    else:
-        section = 'largefiles'
+    section = 'largefiles'
     minsize = int(ui.config(section, 'minsize', default='10'))
     patterns = ui.config(section, 'patterns', default=())
     if patterns:
@@ -60,10 +44,7 @@ def promptForLfiles(parent, ui, repo, files, haskbf=False):
             if filesize > minsize*1024*1024:
                 lfiles.append(wfile)
     if lfiles:
-        if haskbf:
-            ret = BfilesPrompt(parent, files).run()
-        else:
-            ret = LfilesPrompt(parent, files).run()
+        ret = LfilesPrompt(parent, files).run()
         if ret == 0:
             # add as largefiles/bfiles
             for lfile in lfiles:

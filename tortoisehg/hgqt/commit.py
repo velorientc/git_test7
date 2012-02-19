@@ -784,7 +784,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 haslf = 'largefiles' in repo.extensions()
                 if haslf:
                     result = lfprompt.promptForLfiles(self, repo.ui, repo,
-                                                      checkedUnknowns, False)
+                                                      checkedUnknowns)
                     if not result:
                         return
                     checkedUnknowns, lfiles = result
