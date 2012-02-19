@@ -10,7 +10,7 @@ import sys, os
 from mercurial import node
 from mercurial import ui, hg, util, error
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, hgrcutil
 
@@ -189,7 +189,10 @@ class RepoItem(RepoTreeItem):
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
-                ico = qtlib.geticon('hg')
+                baseiconname = 'hg'
+                if paths.is_unc_path(self.rootpath()):
+                    baseiconname = 'remote-repo'
+                ico = qtlib.geticon(baseiconname)
                 if not self._valid:
                     ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
                 return QVariant(ico)
