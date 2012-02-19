@@ -782,20 +782,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     checkedUnknowns).run()
             if res == 0:
                 haslf = 'largefiles' in repo.extensions()
-                haskbf = 'kbfiles' in repo.extensions()
-                if haslf or haskbf:
+                if haslf:
                     result = lfprompt.promptForLfiles(self, repo.ui, repo,
-                                                      checkedUnknowns, haskbf)
+                                                      checkedUnknowns, False)
                     if not result:
                         return
                     checkedUnknowns, lfiles = result
                     if lfiles:
-                        if haslf:
-                            cmd = ['add', '--repository', repo.root, '--large'] + \
-                                  [repo.wjoin(f) for f in lfiles]
-                        else:
-                            cmd = ['add', '--repository', repo.root, '--bf'] + \
-                                  [repo.wjoin(f) for f in lfiles]
+                        cmd = ['add', '--repository', repo.root, '--large'] + \
+                            [repo.wjoin(f) for f in lfiles]
                         commandlines.append(cmd)
                 cmd = ['add', '--repository', repo.root] + \
                       [repo.wjoin(f) for f in checkedUnknowns]
