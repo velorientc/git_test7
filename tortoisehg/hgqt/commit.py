@@ -537,12 +537,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             title = _('New Branch: ') + self.branchop
         self.branchbutton.setText(title)
 
-        # Update options label
+        # Update options label, showing only whitelisted options.
         opts = []
         for opt, value in self.opts.iteritems():
-            if not opt.startswith('bugtraq'):
-                # The "bugtraq" related options are not very interesting as they are not passed to the commit command
-                # The user will already see an "issue tracker" button indicating that the bug tracker is active
+            if opt in ['user', 'date', 'pushafter', 'autoinc',
+                       'recurseinsubrepos']:
                 if value is True:
                     opts.append('--' + opt)
                 elif value:
