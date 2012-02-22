@@ -60,7 +60,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
         opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
-        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
+        opts['bugtraqparameters'] = os.path.expandvars(repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None))
         opts['bugtraqtrigger'] = repo.ui.config('tortoisehg', 'issue.bugtraqtrigger', None)
         self.opts = opts # user, date
 
