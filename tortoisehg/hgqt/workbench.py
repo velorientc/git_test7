@@ -843,13 +843,55 @@ class Workbench(QMainWindow):
     def onReadme(self, *args):
         """ Display the README file or URL for the current repo, or the global README if no repo is open"""
         readme = None
+        def getCurrentReadme(repo):
+            """
+            Get the README file that is configured for the current repo.
+
+            README files can be set in 3 ways, which are checked in the following order of decreasing priority:
+            - From the tortoisehg.readme key on the current repo's configuration file
+            - An existing "README" file found on the repository root
+                * Valid README files are those called README and whose extension is one of the following:
+                    ['', '.txt', '.html', '.pdf', '.doc', '.docx', '.ppt', '.pptx',
+                     '.markdown', '.textile', '.rdoc', '.org', '.creole',
+                     '.mediawiki','.rst', '.asciidoc', '.pod']
+                * Note that the match is CASE INSENSITIVE on ALL OSs.
+            - From the tortoisehg.readme key on the user's global configuration file
+            """
+            readme = None
+            if repo:
+                # Try to get the README configured for the repo of the current tab
+                readmeglobal = self.ui.config('tortoisehg', 'readme', None)
+                if readmeglobal:
+                    # Note that repo.ui.config() falls back to the self.ui.config()
+                    # if the key is not set on the current repo's configuration file
+                    readme = repo.ui.config('tortoisehg', 'readme', None)
+                    if readmeglobal != readme:
+                        # The readme is set on the current repo configuration file
+                        return readme
+
+                # Otherwise try to see if there is a file at the root of the repository
+                # that matches any of the valid README file names (in a non case-sensitive way)
+                # Note that we try to match the valid README names in order
+                validreadmes = ['readme.txt', 'read.me', 'readme.html',
+                                'readme.pdf', 'readme.doc', 'readme.docx', 'readme.ppt', 'readme.pptx',
+                                'readme.md', 'readme.markdown', 'readme.mkdn', 'readme.rst', 'readme.textile', 'readme.rdoc',
+                                'readme.asciidoc', 'readme.org', 'readme.creole',
+                                'readme.mediawiki', 'readme.pod', 'readme']
+
+                readmefiles = [filename for filename in os.listdir(repo.root) if filename.lower().startswith('read')]
+                for validname in validreadmes:
+                    for filename in readmefiles:
+                        if filename.lower() == validname:
+                            return repo.wjoin(filename)
+
+            # Otherwise try use the global setting (or None if readme is just not configured)
+            return readmeglobal
+
         w = self.repoTabsWidget.currentWidget()
         if w:
             # Try to get the help doc from the current repo tap
-            readme = w.repo.ui.config('tortoisehg', 'readme', None)
-        if not readme:
-            # Otherwise try to find the doc from the general settings
-            readme = self.ui.config('tortoisehg', 'readme', None)
+            readme = getCurrentReadme(w.repo)
+
         if readme:
             qtlib.openlocalurl(os.path.expandvars(os.path.expandvars(readme)))
         else:
