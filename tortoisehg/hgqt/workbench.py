@@ -347,7 +347,7 @@ class Workbench(QMainWindow):
         visiblereadme = 'repoopen'
         if  self.ui.config('tortoisehg', 'readme', None):
             visiblereadme = True
-        newaction(_("README"), self.onReadme, menu='help',
+        newaction(_("README"), self.onReadme, menu='help', icon='help-readme',
                   visible=visiblereadme, shortcut='Ctrl+F1')
         newseparator(menu='help')
         newaction(_("About Qt"), QApplication.aboutQt, menu='help')
