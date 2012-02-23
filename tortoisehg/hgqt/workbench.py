@@ -137,6 +137,7 @@ class Workbench(QMainWindow):
 
         # availability map of actions; applied by updateMenu()
         self._actionavails = {'repoopen': []}
+        self._actionvisibles = {'repoopen': []}
 
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
@@ -154,13 +155,14 @@ class Workbench(QMainWindow):
 
         def newaction(text, slot=None, icon=None, shortcut=None,
                       checkable=False, tooltip=None, data=None, enabled=None,
-                      menu=None, toolbar=None, parent=self):
+                      visible=None, menu=None, toolbar=None, parent=self):
             """Create new action and register it
 
             :slot: function called if action triggered or toggled.
             :checkable: checkable action. slot will be called on toggled.
             :data: optional data stored on QAction.
             :enabled: bool or group name to enable/disable action.
+            :visible: bool or group name to show/hide action.
             :shortcut: QKeySequence, key sequence or name of standard key.
             :menu: name of menu to add this action.
             :toolbar: name of toolbar to add this action.
@@ -186,6 +188,10 @@ class Workbench(QMainWindow):
                 action.setEnabled(enabled)
             elif enabled:
                 self._actionavails[enabled].append(action)
+            if isinstance(visible, bool):
+                action.setVisible(visible)
+            elif visible:
+                self._actionvisibles[visible].append(action)
             if menu:
                 getattr(self, 'menu%s' % menu.title()).addAction(action)
             if toolbar:
@@ -560,6 +566,8 @@ class Workbench(QMainWindow):
         someRepoOpen = self.repoTabsWidget.count() > 0
         for action in self._actionavails['repoopen']:
             action.setEnabled(someRepoOpen)
+        for action in self._actionvisibles['repoopen']:
+            action.setVisible(someRepoOpen)
 
         # Update actions affected by repo open/close/change
         self.updateTaskViewMenu()
