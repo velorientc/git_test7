@@ -344,6 +344,12 @@ class Workbench(QMainWindow):
                   menu='repository')
 
         newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
+        visiblereadme = 'repoopen'
+        if  self.ui.config('tortoisehg', 'readme', None):
+            visiblereadme = True
+        newaction(_("README"), self.onReadme, menu='help',
+                  visible=visiblereadme, shortcut='Ctrl+F1')
+        newseparator(menu='help')
         newaction(_("About Qt"), QApplication.aboutQt, menu='help')
         newaction(_("About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
@@ -833,6 +839,26 @@ class Workbench(QMainWindow):
     def onHelp(self, *args):
         """ Display online help """
         qtlib.openhelpcontents('workbench.html')
+
+    def onReadme(self, *args):
+        """ Display the README file or URL for the current repo, or the global README if no repo is open"""
+        readme = None
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            # Try to get the help doc from the current repo tap
+            readme = w.repo.ui.config('tortoisehg', 'readme', None)
+        if not readme:
+            # Otherwise try to find the doc from the general settings
+            readme = self.ui.config('tortoisehg', 'readme', None)
+        if readme:
+            qtlib.openlocalurl(os.path.expandvars(os.path.expandvars(readme)))
+        else:
+            qtlib.WarningMsgBox(_("README not configured"),
+                _("A README file is not configured for the current repository.<p>"
+                "To configure a REDME file for a repository, "
+                "open the repository settings file, add a '<i>readme</i>' "
+                "key to the '<i>tortoisehg</i>' section, and set it "
+                "to the filename or URL of your repository's README file."))
 
     def storeSettings(self):
         s = QSettings()
