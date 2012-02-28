@@ -475,7 +475,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 opts.append('--'+opt)
             elif value:
                 opts.append('--'+opt+'='+value)
-        self.optionslabel.setText(' '.join(opts))
+        self.optionslabel.setText(hglib.tounicode(' '.join(opts)))
         self.optionslabel.setVisible(bool(opts))
         self.optionshdrlabel.setVisible(bool(opts))
 
