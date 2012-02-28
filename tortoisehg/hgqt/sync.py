@@ -98,7 +98,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 if opt != 'mq' or 'mq' in self.repo.extensions():
                     self.opts[opt] = val
         for opt in ('remotecmd', 'branch'):
-            val = str(s.value('sync/' + opt, None).toString())
+            val = hglib.fromunicode(s.value('sync/' + opt, None).toString())
             if val:
                 self.opts[opt] = val
 
@@ -400,6 +400,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
             s = QSettings()
             for opt, val in self.opts.iteritems():
+                if isinstance(val, str):
+                    val = hglib.tounicode(val)
                 s.setValue('sync/' + opt, val)
 
     def reload(self):
