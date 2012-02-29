@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-05 08:55-0200\n"
-"PO-Revision-Date: 2012-02-01 11:31+0000\n"
+"PO-Revision-Date: 2012-02-22 11:23+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:51+0000\n"
-"X-Generator: Launchpad (build 14747)\n"
+"X-Launchpad-Export-Date: 2012-02-23 04:41+0000\n"
+"X-Generator: Launchpad (build 14855)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1551,7 +1551,7 @@ msgstr "Kein Unterarchiv im Mercurial-Sinn, daher keine Vorschau möglich"
 
 #: tortoisehg/hgqt/filedata.py:255
 msgid "The subrepository is dirty."
-msgstr ""
+msgstr "Das Unterarchiv hat lokale Änderungen."
 
 #: tortoisehg/hgqt/filedata.py:255
 msgid "File Status:"
@@ -3918,7 +3918,7 @@ msgstr "Umgewandelt aus"
 #: tortoisehg/hgqt/repomodel.py:57
 msgctxt "column header"
 msgid "Phase"
-msgstr ""
+msgstr "Phase"
 
 #: tortoisehg/hgqt/repomodel.py:212
 #, python-format
@@ -4521,7 +4521,7 @@ msgstr "Flicken kopieren"
 
 #: tortoisehg/hgqt/repowidget.py:1225
 msgid "Change phase to"
-msgstr ""
+msgstr "Phase ändern in"
 
 #: tortoisehg/hgqt/repowidget.py:1231
 msgid "Transplant to local"
@@ -4751,11 +4751,12 @@ msgstr "Bündeldatei schreiben"
 
 #: tortoisehg/hgqt/repowidget.py:1759
 msgid "Backwards phase change requested"
-msgstr ""
+msgstr "Rückwärtige Phasenänderung angefordert"
 
 #: tortoisehg/hgqt/repowidget.py:1760
 msgid "Do you really want to <i>force</i> a backwards phase transition?"
 msgstr ""
+"Wollen Sie wirklich eine rückwärtige Phasenänderung <i>erzwingen</i>?"
 
 #: tortoisehg/hgqt/repowidget.py:1761
 #, python-format
@@ -4772,10 +4773,22 @@ msgid ""
 "\n"
 "Please be careful!"
 msgstr ""
+"Sie versuchen, die Phase der Revision %d rückwärts zu verschieben,\n"
+"von \"<i>%s</i>\" zu \"<i>%s</i>\".\n"
+"\n"
+"Achtung,  \"<i>%s</i>\" ist auf niedrigerem Phasenniveau als  "
+"\"<i>%s</i>\".\n"
+"\n"
+"Wir raten davon ab, eine Phase rückwärts zu verschieben.\n"
+"Es kann beispielsweise dazu führen, dass Sie mehrere HEAD-Revisionen \n"
+"haben, wenn Sie eine Revision ändern, die Sie bereits auf einen Server\n"
+"geschoben haben.\n"
+"\n"
+"Sein Sie bitte vorsichtig!"
 
 #: tortoisehg/hgqt/repowidget.py:1769
 msgid "&Force"
-msgstr ""
+msgstr "&Erzwingen"
 
 #: tortoisehg/hgqt/repowidget.py:1770 tortoisehg/hgtk/commit.py:324
 #: tortoisehg/hgtk/commit.py:1192 tortoisehg/hgtk/commit.py:1199
@@ -6314,7 +6327,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:581
 msgid "Default Push"
-msgstr ""
+msgstr "Vorgabemäßig Verteilen"
 
 #: tortoisehg/hgqt/settings.py:583
 msgid ""
@@ -6324,6 +6337,12 @@ msgid ""
 "branch</i>.<li><b>revision</b>: Push the changes in the current branch "
 "<i><u>up to</u> the current revision</i>.</ul><p>Default: all"
 msgstr ""
+"Geben Sie die standardmäßig zu verteilenden Revisionen vor, wann immer Sie "
+"den Verteilen-Knopf betätigen.<ul><ul><b>all</b>: Die Vorgabe. Alle "
+"Änderungen in <i>allen Zweigen</i>.</li><li><b>branch</b>: Alle Änderungen "
+"im <i>aktuellen Zweig</i>.</li><li><b>revision</b>: Alle Änderungen im "
+"aktuellen Zweig <i><u>bis zur</i> aktuellen "
+"Revision</i>.</li></ul><p>Vorgabe: all</p>"
 
 #: tortoisehg/hgqt/settings.py:591
 msgctxt "config item"
@@ -6422,11 +6441,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:619
 msgid "Secret MQ Patches"
-msgstr ""
+msgstr "Geheime MQ-Flicken"
 
 #: tortoisehg/hgqt/settings.py:620
 msgid "Make MQ patches secret (instead of draft). Default: False"
-msgstr ""
+msgstr "MQ-Flicken geheim werden lassen (statt Entwurf). Vorgabe: false"
 
 #: tortoisehg/hgqt/settings.py:622
 msgid "Monitor working<br>directory changes"
@@ -6976,7 +6995,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:813
 msgid "Issue Tracker Trigger"
-msgstr ""
+msgstr "Ablaufverfolger-Auslöser"
 
 #: tortoisehg/hgqt/settings.py:815
 msgid ""
@@ -6985,6 +7004,11 @@ msgid ""
 "state automaticaly.<li><b>commit</b>: Update the Issue Tracker state after a "
 "successful commit.</ol><p>Default: never"
 msgstr ""
+"Legt fest, wann der Status des Ablaufverfolgers von TortoiseHg aktualisisert "
+"wird. Gültige Einstellungen sind:<ul><li><b>never</b>: Den Status des "
+"Ablaufverfolgers nie automatisch ändern.</li><li><b>commit</b>: Den "
+"Ablaufverfolger nach erfolgreicher Übernahme "
+"aktualisieren.</li></ul><p>Vorgabe: never</p>"
 
 #: tortoisehg/hgqt/settings.py:823
 msgid "Server"
@@ -7424,11 +7448,11 @@ msgstr "Geben Sie den neuen Stauraum-Namen an"
 
 #: tortoisehg/hgqt/shelve.py:266
 msgid "Bad filename"
-msgstr ""
+msgstr "Dateiname ungültig"
 
 #: tortoisehg/hgqt/shelve.py:267
 msgid "A shelf name cannot contain :#/\\<>|"
-msgstr ""
+msgstr "Ein Stauraum-Name darf :#/\\<>| nicht enthalten"
 
 #: tortoisehg/hgqt/shelve.py:273
 msgid "File already exists"
@@ -7622,7 +7646,7 @@ msgstr "bereinigen"
 #: tortoisehg/hgqt/status.py:844
 #, python-format
 msgid "%s is a dirty subrepo"
-msgstr "%s ist ein Unterarchiv mit Änderungen"
+msgstr "%s ist ein Unterarchiv mit lokalen Änderungen"
 
 #: tortoisehg/hgqt/status.py:845
 msgid "subrepo"
@@ -7857,7 +7881,7 @@ msgstr "Versand an %s abgebrochen, Rückgabewert %d"
 #: tortoisehg/hgqt/sync.py:885
 #, python-format
 msgid "outgoing changesets to %s found"
-msgstr ""
+msgstr "Ausgehende Änderungslisten für %s gefunden"
 
 #: tortoisehg/hgqt/sync.py:909 tortoisehg/hgtk/history.py:584
 #, python-format
@@ -7946,6 +7970,8 @@ msgid ""
 "Invalid default push revision: %s.Please check your mercurial configuration "
 "(tortoisehg.defaultpush)"
 msgstr ""
+"Ungültige Vorgabe-Übertragungsrevision: %s. Bitte prüfen Sie Ihre Mercurial-"
+"Konfiguration (tortoisehg.defaultpush)"
 
 #: tortoisehg/hgqt/sync.py:1005
 msgid "Determining outgoing changesets to email..."
