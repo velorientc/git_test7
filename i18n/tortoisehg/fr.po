@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-05 08:55-0200\n"
-"PO-Revision-Date: 2012-02-02 20:41+0000\n"
-"Last-Translator: remram44 <remirampin@gmail.com>\n"
+"PO-Revision-Date: 2012-02-26 17:31+0000\n"
+"Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:50+0000\n"
-"X-Generator: Launchpad (build 14747)\n"
+"X-Launchpad-Export-Date: 2012-02-27 04:54+0000\n"
+"X-Generator: Launchpad (build 14868)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -247,11 +247,11 @@ msgstr "\"%s\" existe déjà comme répertoire destination."
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
 msgid "Backout - %s"
-msgstr "Séquence inversée -%s"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:99
 msgid "Prepare to backout"
-msgstr "Préparez-vous à la séquence inversée"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
@@ -260,7 +260,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
 #: tortoisehg/hgqt/backout.py:130
 msgid "Unable to backout"
-msgstr "Incapable de séquence inversée"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:112
 msgid "Backout revision not found"
@@ -1019,7 +1019,7 @@ msgstr "Arrêter"
 
 #: tortoisehg/hgqt/commit.py:162 tortoisehg/hgqt/sync.py:188
 msgid "<b>Selected Options:</b>"
-msgstr ""
+msgstr "<b>Options sélectionnées :</b>"
 
 #: tortoisehg/hgqt/commit.py:249
 msgid "Commit changes"
@@ -1138,7 +1138,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:719
 msgid "&Replace"
-msgstr ""
+msgstr "&Remplacer"
 
 #: tortoisehg/hgqt/commit.py:727 tortoisehg/hgqt/commit.py:740
 #: tortoisehg/hgtk/commit.py:934 tortoisehg/hgtk/commit.py:1078
@@ -1613,15 +1613,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:696
 msgid "View at revision..."
-msgstr ""
+msgstr "Voir à la révision..."
 
 #: tortoisehg/hgqt/filedialogs.py:213 tortoisehg/hgqt/filedialogs.py:699
 msgid "Save at revision..."
-msgstr ""
+msgstr "Enregistrer à la révision..."
 
 #: tortoisehg/hgqt/filedialogs.py:215 tortoisehg/hgqt/filedialogs.py:701
 msgid "Edit local"
-msgstr ""
+msgstr "Éditer la révision locale"
 
 #: tortoisehg/hgqt/filedialogs.py:218 tortoisehg/hgqt/filedialogs.py:704
 msgid "Revert to revision..."
@@ -2122,11 +2122,11 @@ msgstr "Révisions"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "Select &All"
-msgstr ""
+msgstr "Tout sélectionner"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "Select &None"
-msgstr ""
+msgstr "Tout désélectionner"
 
 #: tortoisehg/hgqt/hgemail_ui.py:282 tortoisehg/hgqt/wctxactions.py:42
 #: tortoisehg/hgqt/webconf.py:256 tortoisehg/hgqt/webconf_ui.py:79
@@ -2408,7 +2408,7 @@ msgstr "Voir le fichier tel qu'il apparaît à cette révision"
 
 #: tortoisehg/hgqt/manifestdialog.py:209
 msgid "Open at Revision"
-msgstr ""
+msgstr "Ouvrir à la révision"
 
 #: tortoisehg/hgqt/manifestdialog.py:210
 msgid "Open file as it appeared at this revision"
@@ -2416,11 +2416,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/manifestdialog.py:211 tortoisehg/hgqt/revdetails.py:237
 msgid "Save at Revision"
-msgstr ""
+msgstr "Enregistrer à la révision"
 
 #: tortoisehg/hgqt/manifestdialog.py:212 tortoisehg/hgqt/revdetails.py:238
 msgid "Save file as it appeared at this revision"
-msgstr ""
+msgstr "Enregistrer le fichier tel qu'il est à cette révision"
 
 #: tortoisehg/hgqt/manifestdialog.py:215 tortoisehg/hgqt/revdetails.py:241
 msgid "Open Local"
@@ -3735,7 +3735,7 @@ msgstr "Afficher uniquement le graphe de la branche nommée"
 
 #: tortoisehg/hgqt/repofilter.py:224
 msgid "Display only active branches"
-msgstr ""
+msgstr "Afficher seulement les branches actives"
 
 #: tortoisehg/hgqt/repofilter.py:227
 msgid "Display closed branches"
@@ -3946,7 +3946,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:443 tortoisehg/hgqt/wctxactions.py:52
 msgid "Copy path"
-msgstr ""
+msgstr "Copier le chemin"
 
 #: tortoisehg/hgqt/reporegistry.py:444
 msgid "Copy the root path of the repository to the clipboard"
@@ -4698,7 +4698,7 @@ msgstr "Prendre la révision locale"
 
 #: tortoisehg/hgqt/resolve.py:98
 msgid "Accept the local file version (yours)"
-msgstr "Accepter la version locale du fichier (la votre)"
+msgstr "Accepter la version locale du fichier (la vôtre)"
 
 #: tortoisehg/hgqt/resolve.py:100
 msgid "Take Other"
@@ -4831,11 +4831,11 @@ msgstr "Afficher tous les fichiers et la direction de la fusion"
 
 #: tortoisehg/hgqt/revdetails.py:243
 msgid "Copy Path"
-msgstr ""
+msgstr "Copier le chemin"
 
 #: tortoisehg/hgqt/revdetails.py:244
 msgid "Copy full path of file(s) to the clipboard"
-msgstr ""
+msgstr "Copier le chemin complet du/des fichier(s) dans le presse-papier"
 
 #: tortoisehg/hgqt/revert.py:22 tortoisehg/hgqt/revert.py:26
 msgid "Cannot revert to working directory"
@@ -4858,7 +4858,7 @@ msgstr "<b>Rétablir %s au contenu de la révision %d ?</b>"
 #: tortoisehg/hgqt/revert.py:44
 #, python-format
 msgid "<b>Revert %d files to their contents at revision %d?</b>"
-msgstr ""
+msgstr "<b>Rétablir %d fichiers au contenu de la révision %d ?</b>"
 
 #: tortoisehg/hgqt/revert.py:50
 msgid "Revert all files to this revision"
@@ -5942,12 +5942,16 @@ msgid ""
 "Open new tabs next\n"
 "to the current tab"
 msgstr ""
+"Ouvrir les nouveaux onglets\n"
+"à côté de l'actuel"
 
 #: tortoisehg/hgqt/settings.py:539
 msgid ""
 "Should new tabs be open next to the current tab? If False new tabs will be "
 "open after the last tab. Default: True"
 msgstr ""
+"Ouvrir les nouveaux onglets à côté de l'onglet actuel ? Si False les "
+"nouveaux onglets s'ouvriront après le dernier. Défaut : True"
 
 #: tortoisehg/hgqt/settings.py:542 tortoisehg/hgtk/thgconfig.py:130
 msgid "Author Coloring"
@@ -6074,6 +6078,9 @@ msgid ""
 "length.  CTRL-E will reflow the current paragraph to the specified line "
 "length. Default: 80"
 msgstr ""
+"Longueur suggérée pour les lignes de message de commit. Une ligne rouge "
+"verticale indiquera cette longueur. CTRL-E arrangera le paragraphe actuel à "
+"la longueur indiquée. Valeur par défaut : 80"
 
 #: tortoisehg/hgqt/settings.py:599 tortoisehg/hgtk/thgconfig.py:103
 msgid "Close After Commit"
@@ -8589,7 +8596,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:305 tortoisehg/hgqt/workbench.py:350
 msgid "Go to a specific revision"
-msgstr ""
+msgstr "Aller à une révision précise"
 
 #: tortoisehg/hgqt/workbench.py:307
 msgid "Web Server..."
@@ -8641,7 +8648,7 @@ msgstr "À propos de TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:347
 msgid "Go to current revision"
-msgstr ""
+msgstr "Aller à la révision actuelle"
 
 #: tortoisehg/hgqt/workbench.py:361
 msgid "Filter Toolbar"
@@ -8649,7 +8656,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:364
 msgid "Filter graph with revision sets or branches"
-msgstr ""
+msgstr "Filtrer le graphe avec des ensembles de révisions ou des branches"
 
 #: tortoisehg/hgqt/workbench.py:373 tortoisehg/hgtk/history.py:438
 #: tortoisehg/hgtk/history.py:1856 tortoisehg/hgtk/synch.py:57
