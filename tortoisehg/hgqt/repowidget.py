@@ -152,6 +152,7 @@ class RepoWidget(QWidget):
             #       be negative
             if widgetIndex > 0:
                 self.taskTabsWidget.setCurrentIndex(widgetIndex)
+        self.output.connect(self._showOutputOnInfoBar)
 
     def setupUi(self):
         SP = QSizePolicy
@@ -325,10 +326,19 @@ class RepoWidget(QWidget):
             return False
 
     @pyqtSlot(unicode, unicode)
-    def _showOutputOnInfoBar(self, msg, label):
+    def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
         labelslist = unicode(label).split()
         if 'ui.error' in labelslist:
-            self.setInfoBar(qtlib.CommandErrorInfoBar, unicode(msg).strip())
+            # Limit the text shown on the info bar to maxlines lines of up to maxwidth chars
+            msglines = unicode(msg).strip().splitlines()
+            infolines = []
+            for line in msglines[0:maxlines]:
+                if len(line) > maxwidth:
+                    line = line[0:maxwidth] + ' ...'
+                infolines.append(line)
+            if len(msglines) > maxlines and not infolines[-1].endswith('...'):
+                infolines[-1] += ' ...'
+            self.setInfoBar(qtlib.CommandErrorInfoBar, '\n'.join(infolines))
 
     @pyqtSlot(unicode)
     def _showMessageOnInfoBar(self, msg):
@@ -355,7 +365,6 @@ class RepoWidget(QWidget):
         cw.loadSettings(QSettings(), 'workbench')
 
         cw.output.connect(self.output)
-        cw.output.connect(self._showOutputOnInfoBar)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
         cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
@@ -381,7 +390,6 @@ class RepoWidget(QWidget):
     def createSyncWidget(self):
         sw = SyncWidget(self.repo, self)
         sw.output.connect(self.output)
-        sw.output.connect(self._showOutputOnInfoBar)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
         sw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
