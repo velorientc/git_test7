@@ -78,7 +78,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self._schemes = ['local', 'ssh', 'http', 'https']
         if 'hgsubversion' in repo.extensions():
             self._schemes.append('svn+https')
-        if 'hggit' in repo.extensions():
+        if 'hggit' in repo.extensions() or 'git' in repo.extensions():
             self._schemes.append('git')
 
         self.repo = repo
