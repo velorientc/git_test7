@@ -467,9 +467,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
+        scheme = self._schemes[schemeIndex]
         for w in self.hostAndPortActions:
             w.setVisible(schemeIndex != 0)
-        self.securebutton.setVisible(schemeIndex >= 3)
+        self.securebutton.setVisible(scheme.endswith('https'))
 
         opts = []
         for opt, value in self.opts.iteritems():
