@@ -537,12 +537,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             title = _('New Branch: ') + self.branchop
         self.branchbutton.setText(title)
 
-        # Update options label
+        # Update options label, showing only whitelisted options.
         opts = []
         for opt, value in self.opts.iteritems():
-            if not opt.startswith('bugtraq'):
-                # The "bugtraq" related options are not very interesting as they are not passed to the commit command
-                # The user will already see an "issue tracker" button indicating that the bug tracker is active
+            if opt in ['user', 'date', 'pushafter', 'autoinc',
+                       'recurseinsubrepos']:
                 if value is True:
                     opts.append('--' + opt)
                 elif value:
@@ -783,20 +782,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     checkedUnknowns).run()
             if res == 0:
                 haslf = 'largefiles' in repo.extensions()
-                haskbf = 'kbfiles' in repo.extensions()
-                if haslf or haskbf:
+                if haslf:
                     result = lfprompt.promptForLfiles(self, repo.ui, repo,
-                                                      checkedUnknowns, haskbf)
+                                                      checkedUnknowns)
                     if not result:
                         return
                     checkedUnknowns, lfiles = result
                     if lfiles:
-                        if haslf:
-                            cmd = ['add', '--repository', repo.root, '--large'] + \
-                                  [repo.wjoin(f) for f in lfiles]
-                        else:
-                            cmd = ['add', '--repository', repo.root, '--bf'] + \
-                                  [repo.wjoin(f) for f in lfiles]
+                        cmd = ['add', '--repository', repo.root, '--large'] + \
+                            [repo.wjoin(f) for f in lfiles]
                         commandlines.append(cmd)
                 cmd = ['add', '--repository', repo.root] + \
                       [repo.wjoin(f) for f in checkedUnknowns]

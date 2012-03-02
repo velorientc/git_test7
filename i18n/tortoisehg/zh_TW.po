@@ -8,19 +8,19 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-05 08:55-0200\n"
-"PO-Revision-Date: 2011-12-29 06:52+0000\n"
-"Last-Translator: leolarrel Wang <Unknown>\n"
+"PO-Revision-Date: 2012-02-28 17:22+0000\n"
+"Last-Translator: Lionheart <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:56+0000\n"
-"X-Generator: Launchpad (build 14747)\n"
+"X-Launchpad-Export-Date: 2012-02-29 04:45+0000\n"
+"X-Generator: Launchpad (build 14874)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
-msgstr ""
+msgstr "TortoiseHg Overlay 圖標服務"
 
 #: TortoiseHgOverlayServer.py:162
 msgid "Exit"
@@ -32,11 +32,11 @@ msgstr "關於"
 
 #: tortoisehg/hgqt/about.py:56
 msgid "Copyright 2008-2011 Steve Borho and others"
-msgstr ""
+msgstr "版權所有 2008-2011 Steve Borho和其他開發者"
 
 #: tortoisehg/hgqt/about.py:61 tortoisehg/hgtk/about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr "有些圖示是由 TortoiseSVN 計劃所提供"
+msgstr "一些圖標由 TortoiseSVN 項目友情提供"
 
 #: tortoisehg/hgqt/about.py:71
 msgid "You can visit our site here"
@@ -61,11 +61,11 @@ msgstr "版本 %s"
 #: tortoisehg/hgqt/about.py:107
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr ""
+msgstr "附 Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #: tortoisehg/hgqt/about.py:156 tortoisehg/hgtk/about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
-msgstr "已有新版的 TortoiseHG 可供下載！"
+msgstr "新版 TortoiseHg 已經可以下載了！"
 
 #: tortoisehg/hgqt/archive.py:20 tortoisehg/hgtk/archive.py:18
 msgid "= Working Directory Parent ="
@@ -83,7 +83,7 @@ msgstr "修訂版："
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr "此修訂版只有被修改/被建立的檔案"
+msgstr "僅當前修訂版中被修改/建立的檔案"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:68
 #: tortoisehg/hgqt/sync.py:1563
@@ -244,44 +244,44 @@ msgstr "\"%s\"目的地已經存在,而且是一個目錄"
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "回退 - %s"
 
 #: tortoisehg/hgqt/backout.py:99
 msgid "Prepare to backout"
-msgstr "準備backout"
+msgstr "準備回退"
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
-msgstr "驗證backout的修訂版,確認你的工作目錄是乾淨的"
+msgstr "驗證回退修訂版並確認你的工作目錄是乾淨的。"
 
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
 #: tortoisehg/hgqt/backout.py:130
 msgid "Unable to backout"
-msgstr "不能backout ><"
+msgstr "不能回退"
 
 #: tortoisehg/hgqt/backout.py:112
 msgid "Backout revision not found"
-msgstr "找不到要backout的修訂版"
+msgstr "找不到要回退的修訂版"
 
 #: tortoisehg/hgqt/backout.py:117
 msgid "Backing out a parent revision is a single step operation"
-msgstr "退回一個母系修訂版是一個單步操作"
+msgstr "回退母系修訂版是一個單步操作"
 
 #: tortoisehg/hgqt/backout.py:124
 msgid "Backout requires a parent revision"
-msgstr "Backout需要一個母系修訂版"
+msgstr "回退需要一個母系修訂版"
 
 #: tortoisehg/hgqt/backout.py:131
 msgid "Cannot backout change on a different branch"
-msgstr "不能在不同的分支中backout變更"
+msgstr "不能在不同的分支中回退變更"
 
 #: tortoisehg/hgqt/backout.py:137
 msgid "Backout revision"
-msgstr "Backout修訂版"
+msgstr "回退修訂版"
 
 #: tortoisehg/hgqt/backout.py:147
 msgid "Not a head, backout will create a new head!"
-msgstr "沒有標頭,backout操作將建立一個新的標頭!"
+msgstr "不是HEAD修訂版，回退操作將會創建新的Head修訂版！"
 
 #: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
@@ -289,13 +289,13 @@ msgstr "目前的本地工作複本所在的修訂版"
 
 #: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
-msgstr ""
+msgstr "回退到合併的母系"
 
 #: tortoisehg/hgqt/backout.py:174
 msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
+msgstr "要回退<b>合併</b>修訂版，你必須選擇需要回退到的母系（即：變更會<i>保留</i>的）"
 
 #: tortoisehg/hgqt/backout.py:179
 #, python-format
@@ -304,7 +304,7 @@ msgstr "第一個母系: 修訂版 %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:185
 msgid "Backout to the first parent of the merge revision"
-msgstr "backout到合併修訂版的第一個母系"
+msgstr "回退到合併修訂版的第一個母系"
 
 #: tortoisehg/hgqt/backout.py:190
 #, python-format
@@ -313,7 +313,7 @@ msgstr "第二個母系: 修訂版 %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:195
 msgid "Backout to the second parent of the merge revision"
-msgstr "backout到合併修訂版的第二個母系"
+msgstr "回退到合併修訂版的第二個母系"
 
 #: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
@@ -330,8 +330,8 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
-"backout之前,你必須 <a href=\"commit\"><b>提交</b></a>, <a "
-"href=\"shelve\"><b>shelve</b></a> 到補丁,或 <a href=\"discard\"><b>丟棄</b></a>變更"
+"回退之前,你必須 <a href=\"commit\"><b>提交</b></a>, <a "
+"href=\"shelve\"><b>shelve</b></a> 到補丁,或 <a href=\"discard\"><b>丟棄</b></a>變更。"
 
 #: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:215
 #: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1107
@@ -345,7 +345,7 @@ msgstr "<b>偵測到有未提交的本地工作複本變更</b>"
 
 #: tortoisehg/hgqt/backout.py:278 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
-msgstr "清除"
+msgstr "乾淨"
 
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:149
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
@@ -367,7 +367,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
-msgstr "backout中,然後合併..."
+msgstr "回退中，然后合并..."
 
 #: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
@@ -376,22 +376,22 @@ msgstr "所有有衝突的檔案將被標示為未解決"
 #: tortoisehg/hgqt/backout.py:341
 msgid ""
 "Automatically advance to next page when backout and merge are complete."
-msgstr "backout或合併完成後自動前進到下一個頁面"
+msgstr "回退和合併完成後自動前進到下一個頁面。"
 
 #: tortoisehg/hgqt/backout.py:372 tortoisehg/hgqt/merge.py:395
 #, python-format
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr "%d 個檔案有<b>合併衝突</b>必須被<a href=\"resolve\"><b>解決</b></a>"
+msgstr "有%d個需要<b>合併衝突</b>的檔案要<a href=\"resolve\"><b>解決</b></a>"
 
 #: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
-msgstr "沒有合併衝突,準備提交"
+msgstr "沒有合併衝突，可以提交"
 
 #: tortoisehg/hgqt/backout.py:412
 msgid "Commit backout and merge results"
-msgstr "提交backout,合併結果"
+msgstr "提交回退並合併"
 
 #: tortoisehg/hgqt/backout.py:422 tortoisehg/hgqt/merge.py:449
 #: tortoisehg/hgtk/commit.py:236 tortoisehg/hgtk/history.py:66
@@ -415,16 +415,16 @@ msgstr "提交訊息"
 
 #: tortoisehg/hgqt/backout.py:498 tortoisehg/hgqt/merge.py:522
 msgid "Skip final confirmation page, close after commit."
-msgstr "跳過最後確認頁,提交後關閉"
+msgstr "提交後關閉，跳過最後的確認頁。"
 
 #: tortoisehg/hgqt/backout.py:509 tortoisehg/hgqt/backout.py:543
 msgid "Backed out merge changeset: "
-msgstr "Backed out 合併變更集: "
+msgstr "回退合併後的變更集： "
 
 #: tortoisehg/hgqt/backout.py:511 tortoisehg/hgqt/backout.py:545
 #: tortoisehg/hgtk/backout.py:41
 msgid "Backed out changeset: "
-msgstr "backout變更集: "
+msgstr "回退的變更集： "
 
 #: tortoisehg/hgqt/backout.py:514 tortoisehg/hgqt/commit.py:634
 #: tortoisehg/hgqt/mq.py:821 tortoisehg/hgtk/backout.py:139
@@ -434,29 +434,29 @@ msgstr "確認丟棄訊息"
 
 #: tortoisehg/hgqt/backout.py:515 tortoisehg/hgtk/backout.py:140
 msgid "Discard current backout message?"
-msgstr "丟棄目前的backout訊息?"
+msgstr "丟棄目前的回退訊息?"
 
 #: tortoisehg/hgqt/backout.py:524 tortoisehg/hgtk/backout.py:82
 msgid "Use English backout message"
-msgstr "使用英文backout訊息"
+msgstr "使用英文回退訊息"
 
 #: tortoisehg/hgqt/backout.py:553
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr "退回合併的修訂版到他的首個母系(%s)"
+msgstr "回退合併的修訂版到他的第一個母系(%s)"
 
 #: tortoisehg/hgqt/backout.py:556
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr "退回合併的修訂版到他的第二個母系(%s)"
+msgstr "回退合併的修訂版到他的第二個母系(%s)"
 
 #: tortoisehg/hgqt/backout.py:585
 msgid "Backing out and committing..."
-msgstr "Backing out ,然後提交..."
+msgstr "回退並提交..."
 
 #: tortoisehg/hgqt/backout.py:586
 msgid "Please wait while making backout."
-msgstr "正在backout,請等一下"
+msgstr "回退中，請稍等..."
 
 #: tortoisehg/hgqt/backout.py:594 tortoisehg/hgqt/merge.py:573
 msgid "Committing..."
@@ -464,7 +464,7 @@ msgstr "提交中..."
 
 #: tortoisehg/hgqt/backout.py:595 tortoisehg/hgqt/merge.py:574
 msgid "Please wait while committing merged files."
-msgstr "正在提交已合併的檔案請等等"
+msgstr "正在提交合併的文件，請稍等..."
 
 #: tortoisehg/hgqt/backout.py:620 tortoisehg/hgqt/cmdui.py:313
 #: tortoisehg/hgqt/merge.py:602 tortoisehg/hgtk/p4pending.py:101

@@ -195,6 +195,9 @@ class RebaseDialog(QDialog):
             msg = _('Rebase is complete')
             if self.aborted:
                 msg = _('Rebase aborted')
+            elif ret == 255:
+                msg = _('Rebase failed')
+                self.cmd.setShowOutput(True)  # contains hint
             self.showMessage.emit(msg)
             self.rebasebtn.setEnabled(True)
             self.rebasebtn.setText(_('Close'))

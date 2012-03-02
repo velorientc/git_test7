@@ -119,8 +119,6 @@ class QuickOpDialog(QDialog):
         if self.command == 'add':
             if 'largefiles' in self.repo.extensions():
                 self.addLfilesButton = QPushButton(_('Add &Largefiles'))
-            elif 'kbfiles' in self.repo.extensions():
-                self.addLfilesButton = QPushButton(_("Add &Bfiles"))
             else:
                 self.addLfilesButton = None
             if self.addLfilesButton:
@@ -200,7 +198,7 @@ class QuickOpDialog(QDialog):
                         pass
                     files.remove(wfile)
         elif self.command == 'add':
-            if 'largefiles' in self.repo.extensions() or 'kbfiles' in self.repo.extensions():
+            if 'largefiles' in self.repo.extensions():
                 self.addWithPrompt(files)
                 return
         if files:
@@ -227,9 +225,7 @@ class QuickOpDialog(QDialog):
             QDialog.reject(self)
 
     def addLfiles(self):
-        if 'kbfiles' in self.repo.extensions():
-            cmdline = ['add', '--bf']
-        else:
+        if 'largefiles' in self.repo.extensions():
             cmdline = ['add', '--large']
         files = self.stwidget.getChecked()
         if not files:
@@ -242,23 +238,20 @@ class QuickOpDialog(QDialog):
         self.cmd.run(cmdline)
 
     def addWithPrompt(self, files):
-        result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files,
-                                          'kbfiles' in self.repo.extensions())
+        result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files)
         if not result:
             return
-        files, bfiles = result
+        files, lfiles = result
         if files:
             cmdline = ['add']
             cmdline.extend(files)
             self.files = files
             self.cmd.run(cmdline)
-        if bfiles:
-            if 'kbfiles' in self.repo.extensions():
-                cmdline = ['add', '--bf']
-            else:
+        if lfiles:
+            if 'largefiles' in self.repo.extensions():
                 cmdline = ['add', '--large']
-            cmdline.extend(bfiles)
-            self.files = bfiles
+            cmdline.extend(lfiles)
+            self.files = lfiles
             self.cmd.run(cmdline)
 
 instance = None

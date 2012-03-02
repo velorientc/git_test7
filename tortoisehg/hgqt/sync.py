@@ -38,7 +38,7 @@ def parseurl(path):
         else:
             qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
             host, port, folder = '', '', ''
-    elif path.startswith(('http://', 'https://', 'svn+https://')):
+    elif path.startswith(('http://', 'https://', 'svn+https://', 'git://')):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
         host, port, user, passwd = hglib.netlocsplit(netloc)
@@ -78,6 +78,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self._schemes = ['local', 'ssh', 'http', 'https']
         if 'hgsubversion' in repo.extensions():
             self._schemes.append('svn+https')
+        if 'hggit' in repo.extensions() or 'git' in repo.extensions():
+            self._schemes.append('git')
 
         self.repo = repo
         self.finishfunc = None
@@ -465,9 +467,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
+        scheme = self._schemes[schemeIndex]
         for w in self.hostAndPortActions:
             w.setVisible(schemeIndex != 0)
-        self.securebutton.setVisible(schemeIndex >= 3)
+        self.securebutton.setVisible(scheme.endswith('https'))
 
         opts = []
         for opt, value in self.opts.iteritems():
