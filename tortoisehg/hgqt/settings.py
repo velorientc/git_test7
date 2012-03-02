@@ -849,7 +849,7 @@ INFO = (
     _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
         _('Files with names meeting the specified patterns will be automatically '
           'added as largefiles')),
-    _fi(_('Mininum Size'), 'largefiles.minsize', genEditCombo,
+    _fi(_('Minimum Size'), 'largefiles.minsize', genEditCombo,
         _('Files of at least the specified size (in megabytes) will be added as largefiles')),
     _fi(_('User Cache'), 'largefiles.usercache', genPathBrowser,
         _('Path to the directory where a user\'s cache of largefiles will be stored')),
