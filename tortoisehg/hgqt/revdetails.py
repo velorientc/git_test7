@@ -253,7 +253,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
               'Alt+Ctrl+E', _('Open the selected subrepository'),
               self.explore),
             ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T', 
+              'utilities-terminal', 'Alt+Ctrl+T',
               _('Open a shell terminal in the selected subrepository root'),
               self.terminal),
             ]:
