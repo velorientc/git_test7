@@ -824,7 +824,6 @@ class RepoWidget(QWidget):
             self.showMessage(hglib.tounicode(str(e)))
 
     def gotoParent(self):
-        self.repoview.clearSelection()
         self.goto('.')
 
     def gotoTip(self):
