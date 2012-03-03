@@ -133,6 +133,9 @@ else: # Not Windows
         """
         return False
 
+    def is_unc_path(path):
+        return False
+
     def is_on_fixed_drive(path):
         return True
 
