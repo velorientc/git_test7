@@ -15,10 +15,10 @@
   <?define doc.style.css = {F42E2E5F-6329-4269-B6D8-805C6CFD8D5E} ?>
 
   <!-- help.wxs -->
-  <?define helpFolder.guid = {0CD881E3-815A-4227-9F7C-B9D70C1191EF} ?>
+  <?define helpFolder.guid = {16F9D587-71F9-4111-8B4B-359D6E3C3C48} ?>
   
   <!-- i18n.wxs -->
-  <?define i18nFolder.guid = {5191051C-742F-470E-AD76-D83C2F1EDE4E} ?>
+  <?define i18nFolder.guid = {2B6800BE-EF02-4431-868D-BBC8F0CFFE44} ?>
 
   <!-- templates.wxs -->
   <?define templates.root.guid = {01A37649-64F4-483B-9E91-FDD8D81D45EB} ?>
