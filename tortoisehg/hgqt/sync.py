@@ -958,6 +958,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         def finished(ret, output):
             if ret == 0:
                 self.showMessage.emit(_('Push to %s completed') % urlu)
+            elif ret == 1:
+                self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
                 if self.needNewBranch:
