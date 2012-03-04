@@ -137,6 +137,7 @@ class Workbench(QMainWindow):
 
         # availability map of actions; applied by updateMenu()
         self._actionavails = {'repoopen': []}
+        self._actionvisibles = {'repoopen': []}
 
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
@@ -154,13 +155,14 @@ class Workbench(QMainWindow):
 
         def newaction(text, slot=None, icon=None, shortcut=None,
                       checkable=False, tooltip=None, data=None, enabled=None,
-                      menu=None, toolbar=None, parent=self):
+                      visible=None, menu=None, toolbar=None, parent=self):
             """Create new action and register it
 
             :slot: function called if action triggered or toggled.
             :checkable: checkable action. slot will be called on toggled.
             :data: optional data stored on QAction.
             :enabled: bool or group name to enable/disable action.
+            :visible: bool or group name to show/hide action.
             :shortcut: QKeySequence, key sequence or name of standard key.
             :menu: name of menu to add this action.
             :toolbar: name of toolbar to add this action.
@@ -186,6 +188,10 @@ class Workbench(QMainWindow):
                 action.setEnabled(enabled)
             elif enabled:
                 self._actionavails[enabled].append(action)
+            if isinstance(visible, bool):
+                action.setVisible(visible)
+            elif visible:
+                self._actionvisibles[visible].append(action)
             if menu:
                 getattr(self, 'menu%s' % menu.title()).addAction(action)
             if toolbar:
@@ -338,6 +344,12 @@ class Workbench(QMainWindow):
                   menu='repository')
 
         newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
+        visiblereadme = 'repoopen'
+        if  self.ui.config('tortoisehg', 'readme', None):
+            visiblereadme = True
+        newaction(_("README"), self.onReadme, menu='help', icon='help-readme',
+                  visible=visiblereadme, shortcut='Ctrl+F1')
+        newseparator(menu='help')
         newaction(_("About Qt"), QApplication.aboutQt, menu='help')
         newaction(_("About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
@@ -560,6 +572,8 @@ class Workbench(QMainWindow):
         someRepoOpen = self.repoTabsWidget.count() > 0
         for action in self._actionavails['repoopen']:
             action.setEnabled(someRepoOpen)
+        for action in self._actionvisibles['repoopen']:
+            action.setVisible(someRepoOpen)
 
         # Update actions affected by repo open/close/change
         self.updateTaskViewMenu()
@@ -825,6 +839,68 @@ class Workbench(QMainWindow):
     def onHelp(self, *args):
         """ Display online help """
         qtlib.openhelpcontents('workbench.html')
+
+    def onReadme(self, *args):
+        """ Display the README file or URL for the current repo, or the global README if no repo is open"""
+        readme = None
+        def getCurrentReadme(repo):
+            """
+            Get the README file that is configured for the current repo.
+
+            README files can be set in 3 ways, which are checked in the following order of decreasing priority:
+            - From the tortoisehg.readme key on the current repo's configuration file
+            - An existing "README" file found on the repository root
+                * Valid README files are those called README and whose extension is one of the following:
+                    ['', '.txt', '.html', '.pdf', '.doc', '.docx', '.ppt', '.pptx',
+                     '.markdown', '.textile', '.rdoc', '.org', '.creole',
+                     '.mediawiki','.rst', '.asciidoc', '.pod']
+                * Note that the match is CASE INSENSITIVE on ALL OSs.
+            - From the tortoisehg.readme key on the user's global configuration file
+            """
+            readme = None
+            if repo:
+                # Try to get the README configured for the repo of the current tab
+                readmeglobal = self.ui.config('tortoisehg', 'readme', None)
+                if readmeglobal:
+                    # Note that repo.ui.config() falls back to the self.ui.config()
+                    # if the key is not set on the current repo's configuration file
+                    readme = repo.ui.config('tortoisehg', 'readme', None)
+                    if readmeglobal != readme:
+                        # The readme is set on the current repo configuration file
+                        return readme
+
+                # Otherwise try to see if there is a file at the root of the repository
+                # that matches any of the valid README file names (in a non case-sensitive way)
+                # Note that we try to match the valid README names in order
+                validreadmes = ['readme.txt', 'read.me', 'readme.html',
+                                'readme.pdf', 'readme.doc', 'readme.docx', 'readme.ppt', 'readme.pptx',
+                                'readme.md', 'readme.markdown', 'readme.mkdn', 'readme.rst', 'readme.textile', 'readme.rdoc',
+                                'readme.asciidoc', 'readme.org', 'readme.creole',
+                                'readme.mediawiki', 'readme.pod', 'readme']
+
+                readmefiles = [filename for filename in os.listdir(repo.root) if filename.lower().startswith('read')]
+                for validname in validreadmes:
+                    for filename in readmefiles:
+                        if filename.lower() == validname:
+                            return repo.wjoin(filename)
+
+            # Otherwise try use the global setting (or None if readme is just not configured)
+            return readmeglobal
+
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            # Try to get the help doc from the current repo tap
+            readme = getCurrentReadme(w.repo)
+
+        if readme:
+            qtlib.openlocalurl(os.path.expandvars(os.path.expandvars(readme)))
+        else:
+            qtlib.WarningMsgBox(_("README not configured"),
+                _("A README file is not configured for the current repository.<p>"
+                "To configure a REDME file for a repository, "
+                "open the repository settings file, add a '<i>readme</i>' "
+                "key to the '<i>tortoisehg</i>' section, and set it "
+                "to the filename or URL of your repository's README file."))
 
     def storeSettings(self):
         s = QSettings()

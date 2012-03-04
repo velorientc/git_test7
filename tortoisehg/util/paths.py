@@ -73,12 +73,17 @@ if os.name == 'nt':
                 pass
         return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-    def is_on_fixed_drive(path):
+    def is_unc_path(path):
         if hasattr(os.path, 'splitunc'):
             unc, rest = os.path.splitunc(path)
             if unc:
-                # All UNC paths (\\host\mount) are considered not-fixed
-                return False
+                return True
+        return False
+
+    def is_on_fixed_drive(path):
+        if is_unc_path(path):
+            # All UNC paths (\\host\mount) are considered not-fixed
+            return False
         drive, remain = os.path.splitdrive(path)
         if drive:
             return win32file.GetDriveType(drive) == win32file.DRIVE_FIXED
