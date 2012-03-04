@@ -74,11 +74,8 @@ if os.name == 'nt':
         return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
     def is_unc_path(path):
-        if hasattr(os.path, 'splitunc'):
-            unc, rest = os.path.splitunc(path)
-            if unc:
-                return True
-        return False
+        unc, rest = os.path.splitunc(path)
+        return bool(unc)
 
     def is_on_fixed_drive(path):
         if is_unc_path(path):
