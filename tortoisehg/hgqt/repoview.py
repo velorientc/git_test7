@@ -281,7 +281,9 @@ class HgRepoView(QTableView):
             if idx is not None:
                 # avoid unwanted selection change (#1019)
                 if self.currentIndex().row() != idx.row():
-                    self.setCurrentIndex(idx)
+                    flags = (QItemSelectionModel.ClearAndSelect
+                             | QItemSelectionModel.Rows)
+                    self.selectionModel().setCurrentIndex(idx, flags)
                 self.scrollTo(idx)
 
     def saveSettings(self, s = None):
