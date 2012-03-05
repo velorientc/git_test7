@@ -65,6 +65,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     endSuppressPrompt = pyqtSignal()
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
+    switchToRequest = pyqtSignal(QString)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -326,6 +327,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.default_user = self.curuser
         self.lastsshuser = self.curuser
+        QTimer.singleShot(0, lambda:self.pathentry.setFocus())
 
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
@@ -699,12 +701,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         cururl = self.currentUrl(False)
         if not cururl:
-            qtlib.InfoMsgBox(_('No URL selected'),
-                    _('No URL has been configured for this repository.'),
+            host = ''
+            folder = ''
+        else:
+            user, host, port, folder, passwd, scheme = parseurl(cururl)
+
+        if not host and not folder:
+            self.switchToRequest.emit('sync')
+            qtlib.WarningMsgBox(_('No remote repository URL or path set'),
+                    _('No valid <i>default</i> remote repository URL or path has been configured for this repository.<p>'
+                    'Please type and save a remote repository path on the Sync widget.'),
                     parent=self)
             return
 
-        user, host, port, folder, passwd, scheme = parseurl(cururl)
         if scheme == 'https':
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')

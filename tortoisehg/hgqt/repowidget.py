@@ -252,7 +252,9 @@ class RepoWidget(QWidget):
         else:
             self.pbranchTabIndex = -1
 
+    @pyqtSlot(QString)
     def switchToNamedTaskTab(self, tabname):
+        tabname = str(tabname)
         if tabname in self.namedTabs:
             idx = self.namedTabs[tabname]
             if tabname == 'commit':
@@ -404,6 +406,7 @@ class RepoWidget(QWidget):
         sw.showBusyIcon.connect(self.onShowBusyIcon)
         sw.hideBusyIcon.connect(self.onHideBusyIcon)
         sw.refreshTargets(self.rev)
+        sw.switchToRequest.connect(self.switchToNamedTaskTab)
         return sw
 
     @pyqtSlot(QString)
