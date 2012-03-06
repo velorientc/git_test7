@@ -116,22 +116,33 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         tbar.setIconSize(QSize(16,16))
 
         if self.opts['bugtraqplugin'] != None:
-            self.bugtraq = self.createBugTracker()
-            try:
-                parameters = self.opts['bugtraqparameters']
-                linktext = self.bugtraq.get_link_text(parameters)
-            except Exception, e:
-                tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
-                qtlib.ErrorMsgBox(_('Issue Tracker'),
-                                  _('Failed to load issue tracker \'%s\': %s')
-                                    % (tracker, hglib.tounicode(str(e))),
-                                  parent=self)
-                self.bugtraq = None
-            else:
-                # connect UI because we have a valid bug tracker
-                self.commitComplete.connect(self.bugTrackerPostCommit)
-                tbar.addAction(linktext).triggered.connect(
-                    self.getBugTrackerCommitMessage)
+            # We create the "Show Issues" button, but we delay its setup
+            # because creating the bugtraq object is slow and blocks the GUI,
+            # which would result in a noticeable slow down while creating the commit widget
+            self.showIssues = tbar.addAction(_('Show Issues'))
+            self.showIssues.setEnabled(False)
+            self.showIssues.setToolTip(_('Please wait...'))
+            def setupBugTraqButton():
+                self.bugtraq = self.createBugTracker()
+                try:
+                    parameters = self.opts['bugtraqparameters']
+                    linktext = self.bugtraq.get_link_text(parameters)
+                except Exception, e:
+                    tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
+                    errormsg =  _('Failed to load issue tracker \'%s\': %s') \
+                                 % (tracker, hglib.tounicode(str(e)))
+                    self.showIssues.setToolTip(errormsg)
+                    qtlib.ErrorMsgBox(_('Issue Tracker'), errormsg,
+                                      parent=self)
+                    self.bugtraq = None
+                else:
+                    # connect UI because we have a valid bug tracker
+                    self.commitComplete.connect(self.bugTrackerPostCommit)
+                    self.showIssues.setText(linktext)
+                    self.showIssues.triggered.connect(self.getBugTrackerCommitMessage)
+                    self.showIssues.setToolTip(_('Show Issues...'))
+                    self.showIssues.setEnabled(True)
+            QTimer.singleShot(100, setupBugTraqButton)
 
         self.stopAction = tbar.addAction(_('Stop'))
         self.stopAction.triggered.connect(self.stop)
