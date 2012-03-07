@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, util, cmdutil, error, context, merge
+from mercurial import hg, util, error, context, merge, scmutil
 
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
@@ -438,7 +438,7 @@ class StatusThread(QThread):
                 else:
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
-                m = hglib.match(self.repo[None], self.pats)
+                m = scmutil.match(self.repo[None], self.pats)
                 self.repo.bfstatus = True
                 self.repo.lfstatus = True
                 status = self.repo.status(match=m, **stopts)
