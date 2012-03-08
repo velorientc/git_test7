@@ -269,6 +269,9 @@ def runcommand(ui, args):
     if options['help']:
         return help_(ui, cmd)
 
+    if options['newworkbench']:
+        cmdoptions['newworkbench'] = True
+
     path = options['repository']
     if path:
         if path.startswith('bundle:'):
@@ -1040,6 +1043,7 @@ globalopts = [
     ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
     ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
+    ('', 'newworkbench', None, _('open a new workbench window')),
 ]
 
 table = {

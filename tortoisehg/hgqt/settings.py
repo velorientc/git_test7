@@ -571,6 +571,11 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
+    _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single', genBoolRBGroup,
+        _('Select whether you want to have a single workbench window. '
+        'If you disable this setting you will get a new workbench window everytime that you use the "Hg Workbench"'
+        'command on the explorer context menu. Default: True'),
+        restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
         ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
         _('Select the initial widget that will be shown when opening a '

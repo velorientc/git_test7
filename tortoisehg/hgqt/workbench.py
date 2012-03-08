@@ -10,6 +10,7 @@ Main Qt4 application for TortoiseHg
 
 import os
 import sys
+import getpass # used to get the username on the workbench server
 from mercurial import ui
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
@@ -24,6 +25,7 @@ from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.QtNetwork import QLocalServer, QLocalSocket
 
 class ThgTabBar(QTabBar):
     def mouseReleaseEvent(self, event):
@@ -38,7 +40,7 @@ class Workbench(QMainWindow):
     finished = pyqtSignal(int)
     activeRepoChanged = pyqtSignal(QString)
 
-    def __init__(self):
+    def __init__(self, createserver=False):
         QMainWindow.__init__(self)
         self.progressDialog = QProgressDialog('TortoiseHg - Initializing Workbench', QString(), 0, 100)
         self.progressDialog.setAutoClose(False)
@@ -92,6 +94,11 @@ class Workbench(QMainWindow):
         self.lastClosedRepoRootList = []
         self.progressDialog.close()
         self.progressDialog = None
+
+        self.server = None
+        if createserver:
+            # Enable the Workbench Server that is used to maintain a single workbench instance
+            self.createWorkbenchServer()
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -1037,6 +1044,8 @@ class Workbench(QMainWindow):
         else:
             self.storeSettings()
             self.reporegistry.close()
+            if self.server:
+                self.server.close()
             # mimic QDialog exit
             self.finished.emit(0)
 
@@ -1072,6 +1081,47 @@ class Workbench(QMainWindow):
                             parent=self, root=twrepo)
         sd.exec_()
 
+    def createWorkbenchServer(self):
+        self.server = QLocalServer()
+        self.server.newConnection.connect(self.newConnection)
+        self.server.listen(qApp.applicationName()+ '-' + getpass.getuser())
+
+    def newConnection(self):
+        socket = self.server.nextPendingConnection()
+        if socket:
+            socket.waitForReadyRead(10000)
+            root = socket.readAll()
+            if root and root != '[echo]':
+                self.openRepo(root, reuse=True)
+            socket.write(QByteArray(root))
+            socket.flush()
+
+def connectToExistingWorkbench(root=None):
+    """
+    Connect and send data to an existing workbench server
+
+    For the connection to be successful, the server must loopback the data
+    that we send to it.
+
+    Normally the data that is sent will be a repository root path, but we can
+    also send "echo" to check that the connection works (i.e. that there is a
+    server)
+    """
+    if root:
+        data = root
+    else:
+        data = '[echo]'
+    socket = QLocalSocket()
+    socket.connectToServer(qApp.applicationName() + '-' + getpass.getuser(),
+        QIODevice.ReadWrite)
+    if socket.waitForConnected(10000):
+        socket.write(QByteArray(data))
+        socket.flush()
+        socket.waitForReadyRead(10000)
+        reply = socket.readAll()
+        if data == reply:
+            return True
+    return False
 
 def run(ui, *pats, **opts):
     root = opts.get('root') or paths.find_root()
@@ -1086,7 +1136,30 @@ def run(ui, *pats, **opts):
             dlg.setWindowTitle(_('Hg file log viewer [%s] - %s') % (
                 repo.displayname, ufname))
             return dlg
-    w = Workbench()
+
+    # Before starting the workbench, we must check if we must try to reuse an
+    # existing workbench window (we don't by default)
+    # Note that if the "single workbench mode" is enable, and there is no
+    # existing workbench window, we must tell the Workbench object to create
+    # the workbench server
+    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', False)
+    mustcreateserver = False
+    if singleworkbenchmode:
+        newworkbench = opts.get('newworkbench')
+        if root and not newworkbench:
+            if connectToExistingWorkbench(root):
+                # The were able to connect to an existing workbench server, and
+                # it confirmed that it has opened the selected repo for us
+                exit(0)
+            # there is no pre-existing workbench server
+            serverexists = False
+        else:
+            serverexists = connectToExistingWorkbench('[echo]')
+        # When in " single workbench mode", we must create a server if there
+        # is not one already
+        mustcreateserver = not serverexists
+
+    w = Workbench(createserver=mustcreateserver)
     if root:
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
