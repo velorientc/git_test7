@@ -16,7 +16,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import error, extensions, cmdutil
+from mercurial import error, extensions, scmutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo
@@ -195,8 +195,7 @@ class PostReviewDialog(QDialog):
 
     def initChangesets(self, revs, selected_revs=None):
         def purerevs(revs):
-            return hglib.revrange(self.repo,
-                                  iter(str(e) for e in revs))
+            return scmutil.revrange(self.repo, iter(str(e) for e in revs))
         if selected_revs:
             selectedrevs = purerevs(selected_revs)
         else:
