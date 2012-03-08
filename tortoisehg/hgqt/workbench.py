@@ -22,6 +22,7 @@ from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.docklog import LogDockWidget
 from tortoisehg.hgqt.settings import SettingsDialog
+from tortoisehg.hgqt.run import portable_start_fork
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -81,6 +82,8 @@ class Workbench(QMainWindow):
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
         if sys.platform == 'darwin':
             self.dockMenu = QMenu(self)
+            self.dockMenu.addAction(_('New Workbench...'),
+                                    self.newWorkbench)
             self.dockMenu.addAction(_('New Repository...'),
                                     self.newRepository)
             self.dockMenu.addAction(_('Clone Repository...'),
@@ -220,6 +223,9 @@ class Workbench(QMainWindow):
             if toolbar:
                 getattr(self, '%stbar' % toolbar).addSeparator()
 
+        newaction(_("New &Workbench..."), self.newWorkbench,
+                  shortcut='Ctrl+Alt+N', menu='file', icon='hg-log')
+        newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
         newaction(_("Clone Repository..."), self.cloneRepository,
@@ -824,6 +830,9 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if ok and w:
             w.repoview.goto(rev)
+
+    def newWorkbench(self):
+        portable_start_fork(['--new'])
 
     def newRepository(self):
         """ Run init dialog """

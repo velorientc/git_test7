@@ -92,18 +92,23 @@ def portable_fork(ui, opts):
             return
     elif config_nofork:
         return
+    portable_start_fork()
+    sys.exit(0)
+
+def portable_start_fork(extraargs=None):
     os.environ['THG_GUI_SPAWN'] = '1'
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
         args = sys.argv
     else:
         args = [sys.executable] + sys.argv
+    if extraargs:
+        args += extraargs
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
                      creationflags=qtlib.openflags,
                      shell=True)
-    sys.exit(0)
 
 # Windows and Nautilus shellext execute
 # "thg subcmd --listfile TMPFILE" or "thg subcmd --listfileutf8 TMPFILE"(planning) .
