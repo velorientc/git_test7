@@ -213,6 +213,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         tbar.setStyleSheet(qtlib.tbstylesheet)
         tbar.setIconSize(QSize(16, 16))
         hbox.addWidget(tbar)
+
+        style = QApplication.style()
+        a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
+                          _('Save'))
+        a.setToolTip(_('Save current URL under an alias'))
+        self.savebutton = a
+
         self.schemecombo = QComboBox()
         for s in self._schemes:
             self.schemecombo.addItem(s)
@@ -256,12 +263,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.pathentry)
         tbar.addWidget(qtlib.Spacer(2, 2))
-
-        style = QApplication.style()
-        a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
-                          _('Save'))
-        a.setToolTip(_('Save current URL under an alias'))
-        self.savebutton = a
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
