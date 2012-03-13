@@ -134,6 +134,8 @@ class Workbench(QMainWindow):
         self.addToolBar(self.synctbar)
         self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
+        self.customtbar = QToolBar(_('Custom Toolbar'), objectName='custombar')
+        self.addToolBar(self.customtbar)
 
         # availability map of actions; applied by updateMenu()
         self._actionavails = {'repoopen': []}
@@ -380,6 +382,7 @@ class Workbench(QMainWindow):
         menu.addAction(self.docktbar.toggleViewAction())
         menu.addAction(self.synctbar.toggleViewAction())
         menu.addAction(self.tasktbar.toggleViewAction())
+        menu.addAction(self.customtbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
@@ -395,6 +398,31 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
 
+        def _setupCustomTools():
+            customtools = {}
+            customtoolnames = []
+            for key, value in self.ui.configitems('tortoisehg-tools'):
+                toolname, field = key.split('.')
+                if toolname not in customtools:
+                    customtools[toolname] = {}
+                    customtoolnames.append(toolname)
+                customtools[toolname][field] = value
+
+            for toolname in customtoolnames:
+                info = customtools[toolname]
+                command = info.get('command', None)
+                if not command:
+                    continue
+                label = info.get('label', toolname)
+                tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
+                icon = info.get('icon', 'tools-spanner-hammer')
+
+                newaction(label, self._repofwd('runCustomCommand', [command]),
+                    icon=icon, tooltip=tooltip,
+                    enabled=True, toolbar='custom')
+
+        _setupCustomTools()
+        
         self.updateMenu()
 
     def _action_defs(self):
@@ -738,12 +766,13 @@ class Workbench(QMainWindow):
                 getattr(w, name)(checked)
         return forwarder
 
-    def _repofwd(self, name):
+    def _repofwd(self, name, params=[], namedparams={}):
         """Return function to forward action to the current repo tab"""
         def forwarder():
             w = self.repoTabsWidget.currentWidget()
             if w:
-                getattr(w, name)()
+                getattr(w, name)(*params, **namedparams)
+
         return forwarder
 
     def serve(self):

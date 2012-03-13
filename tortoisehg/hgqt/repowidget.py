@@ -8,6 +8,7 @@
 
 import binascii
 import os
+import shlex, subprocess # used by runCustomCommand
 from mercurial import revset, error, patch, commands
 
 # hg >= 2.1
@@ -1926,6 +1927,37 @@ class RepoWidget(QWidget):
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
         shlib.shell_notify(self.repo.root)
+
+
+    def runCustomCommand(self, command):
+        """Execute 'custom commands', on the selected repository"""
+        # Perform variable expansion
+        # This is done in two steps:
+        # 1. Expand environment variables
+        command = os.path.expandvars(command).strip()
+        if not command:
+            InfoMsgBox(_('Invalid command'),
+                       _('The selected command is empty'))
+            return
+
+        # 2. Expand internal workbench variables
+        vars = {
+            'ROOT': self.repo.root,
+            'REV': self.rev
+        }
+        for var in vars:
+            command = command.replace('{%s}' % var, str(vars[var]))
+
+        # If the use wants to run mercurial, do so via our usual runCommand method
+        cmd = shlex.split(command)
+        if cmd[0].lower() == 'hg':
+            cmd = cmd[1:]
+            if '--repository' not in cmd:
+                cmd += ['--repository', self.repo.root]
+            return self.runCommand(cmd)
+
+        # Otherwise, run the selected command in the brackground
+        return subprocess.Popen(command, cwd=self.repo.root)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
