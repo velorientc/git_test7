@@ -399,26 +399,21 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
 
         def _setupCustomTools():
-            customtools = {}
-            customtoolnames = []
-            for key, value in self.ui.configitems('tortoisehg-tools'):
-                toolname, field = key.split('.')
-                if toolname not in customtools:
-                    customtools[toolname] = {}
-                    customtoolnames.append(toolname)
-                customtools[toolname][field] = value
-
-            for toolname in customtoolnames:
-                info = customtools[toolname]
+            tools, toolnames = hglib.tortoisehgtools(self.ui)
+            for name in toolnames:
+                info = tools[name]
+                location = info.get('location', '').split()
+                if location and 'workbench' not in location:
+                    continue
                 command = info.get('command', None)
                 if not command:
                     continue
-                label = info.get('label', toolname)
+                label = info.get('label', name)
                 tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
                 icon = info.get('icon', 'tools-spanner-hammer')
 
-                newaction(label, self._repofwd('runCustomCommand', [command]),
-                    icon=icon, tooltip=tooltip,
+                newaction(label, self._repofwd('runCustomCommand', [command]), icon=icon,
+                    tooltip=tooltip,
                     enabled=True, toolbar='custom')
 
         _setupCustomTools()

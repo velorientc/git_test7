@@ -456,6 +456,16 @@ def difftools(ui):
     _difftools = tools
     return tools
 
+def tortoisehgtools(ui):
+    tools = {}
+    toolnames = []
+    for key, value in ui.configitems('tortoisehg-tools'):
+        toolname, field = key.split('.')
+        if toolname not in tools:
+            tools[toolname] = {}
+            toolnames.append(toolname)
+        tools[toolname][field] = value
+    return tools, toolnames
 
 def hgcmd_toq(q, label, args):
     '''

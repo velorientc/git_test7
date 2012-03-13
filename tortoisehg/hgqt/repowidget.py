@@ -8,7 +8,7 @@
 
 import binascii
 import os
-import shlex, subprocess # used by runCustomCommand
+import shlex, subprocess, functools # used by runCustomCommand
 from mercurial import revset, error, patch, commands
 
 # hg >= 2.1
@@ -1155,12 +1155,14 @@ class RepoWidget(QWidget):
         # This menu will never be opened for an unapplied patch, they
         # have their own menu.
         #
+        # iswd = working directory
         # isrev = the changeset has an integer revision number
         # isctx = changectx or workingctx
         # fixed = the changeset is considered permanent
         # applied = an applied patch
         # qgoto = applied patch or qparent
         isrev   = lambda ap, wd, tags: not wd
+        iswd   = lambda ap, wd, tags: bool(wd)
         isctx   = lambda ap, wd, tags: True
         fixed   = lambda ap, wd, tags: not (ap or wd)
         applied = lambda ap, wd, tags: ap
@@ -1264,6 +1266,40 @@ class RepoWidget(QWidget):
 
         entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
               self.rupdate)
+
+        def _setupCustomSubmenu(menu):
+            tools, toolnames = hglib.tortoisehgtools(self.repo.ui)
+            if not tools:
+                return
+
+            istrue = lambda ap, wd, tags: True
+            enablefuncs = {
+                'istrue': istrue, 'iswd': iswd, 'isrev': isrev, 'isctx': isctx,
+                'fixed': fixed, 'applied': applied, 'qgoto': qgoto
+            }
+
+            entry(menu)
+            submenu = menu.addMenu(_('Custom Tools'))
+            for name in toolnames:
+                info = tools[name]
+                location = info.get('location', '').split()
+                if 'repowidget' not in location:
+                    continue
+                command = info.get('command', None)
+                if not command:
+                    continue
+                label = info.get('label', name)
+                icon = info.get('icon', 'tools-spanner-hammer')
+                enable = info.get('enable', 'istrue').lower()
+                if enable in enablefuncs:
+                    enable = enablefuncs[enable]
+                else:
+                    continue
+                menufunc = functools.partial(self.runCustomCommand, command)
+                entry(submenu, None, enable, label, icon, menufunc)
+
+        _setupCustomSubmenu(menu)
+
         if mode == 'outgoing':
             self.outgoingcmenu = menu
             self.outgoingcmenuitems = items
