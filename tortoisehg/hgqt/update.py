@@ -220,6 +220,33 @@ class UpdateDialog(QDialog):
         cmdline += ['--config', 'ui.merge=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         rev = hglib.fromunicode(self.rev_combo.currentText())
+        bookmarks = self.repo[rev].bookmarks()
+        if bookmarks and rev not in bookmarks:
+            # The revision that we are updating into has bookmarks,
+            # but the user did not refer to the revision by one of them
+            # (probably used a revision number or hash)
+            # Ask the user if it wants to update to one of these bookmarks
+            # instead
+            selectedbookmark = None
+            if len(bookmarks) == 1:
+                activatebookmark = qtlib.QuestionMsgBox(
+                    _('Activate bookmark?'),
+                    _('The selected revision (%s) has a bookmark on it called '
+                    '"<i>%s</i>".<p>Do you want to activate it?') \
+                    % (str(rev), bookmarks[0]))
+                if activatebookmark:
+                    selectedbookmark = bookmarks[0]
+            else:
+                selectedbookmark = qtlib.ChoicePrompt(
+                    _('Activate bookmark?'),
+                    _('The selected revision (<i>%s</i>) has <i>%d</i> '
+                    'bookmarks on it.<p>Select the bookmark that you want to '
+                    'activate and click <i>OK</i>.<p>Click <i>Cancel</i> if '
+                    'you don\'t want to activate any of them.<p>') \
+                    % (str(rev), len(bookmarks)),
+                    self, bookmarks).run()
+            if selectedbookmark:
+                rev = selectedbookmark
         cmdline.append('--rev')
         cmdline.append(rev)
 
