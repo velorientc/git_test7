@@ -201,7 +201,8 @@ class UpdateDialog(QDialog):
             return
         try:
             new_ctx = self.repo[new_rev]
-            if not merge and new_ctx.rev() == self.ctxs[0].rev():
+            if not merge and new_ctx.rev() == self.ctxs[0].rev() \
+                    and not new_ctx.bookmarks():
                 self.target_info.setText(_('(same as parent)'))
                 clean = self.discard_chk.isChecked()
                 self.update_btn.setEnabled(clean)
@@ -244,9 +245,23 @@ class UpdateDialog(QDialog):
                     'activate and click <i>OK</i>.<p>Click <i>Cancel</i> if '
                     'you don\'t want to activate any of them.<p>') \
                     % (str(rev), len(bookmarks)),
-                    self, bookmarks).run()
+                    self, bookmarks, self.repo._bookmarkcurrent).run()
             if selectedbookmark:
                 rev = selectedbookmark
+            elif self.repo[rev] == self.repo[self.repo._bookmarkcurrent]:
+                deactivatebookmark = qtlib.QuestionMsgBox(
+                    _('Deactivate current bookmark?'),
+                    _('Do you really want to deactivate the <i>%s</i> bookmark?') \
+                    % self.repo._bookmarkcurrent)
+                if deactivatebookmark:
+                    cmdline = ['bookmark', '--repository', self.repo.root]
+                    if self.verbose_chk.isChecked():
+                        cmdline += ['--verbose']
+                    cmdline += ['-i', self.repo._bookmarkcurrent]
+                    self.repo.incrementBusyCount()
+                    self.cmd.run(cmdline)
+                return
+
         cmdline.append('--rev')
         cmdline.append(rev)
 
