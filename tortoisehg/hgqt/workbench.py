@@ -40,6 +40,9 @@ class Workbench(QMainWindow):
 
     def __init__(self):
         QMainWindow.__init__(self)
+        self.progressDialog = QProgressDialog('TortoiseHg - Initializing Workbench', QString(), 0, 100)
+        self.progressDialog.setAutoClose(False)
+
         self.ui = ui.ui()
 
         self.setupUi()
@@ -49,6 +52,7 @@ class Workbench(QMainWindow):
         rr.showMessage.connect(self.showMessage)
         rr.openRepo.connect(self.openRepo)
         rr.removeRepo.connect(self.removeRepo)
+        rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
         self.activeRepoChanged.connect(rr.setActiveTabRepo)
@@ -86,6 +90,8 @@ class Workbench(QMainWindow):
         # Create the actions that will be displayed on the context menu
         self.createActions()
         self.lastClosedRepoRootList = []
+        self.progressDialog.close()
+        self.progressDialog = None
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -681,10 +687,15 @@ class Workbench(QMainWindow):
                 self.lastClosedRepoRootList = [reporoot]
 
     def reopenLastClosedTabs(self):
-        for reporoot in self.lastClosedRepoRootList:
+        progress = None
+        for n, reporoot in enumerate(self.lastClosedRepoRootList):
+            self.progress(_('Reopening tabs'), n,
+                _('Reopening repository %s') % reporoot, '', len(self.lastClosedRepoRootList))
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
         self.lastClosedRepoRootList = []
+        self.progress('Reopening tabs', len(self.lastClosedRepoRootList),
+            _('All repositories open'), '', len(self.lastClosedRepoRootList))
 
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
@@ -742,6 +753,24 @@ class Workbench(QMainWindow):
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)
+
+    @pyqtSlot(QString, object, QString, QString, object)
+    def progress(self, topic, pos, item, unit, total=100, root=None):
+        if self.progressDialog:
+            if pos is None:
+                self.progressDialog.close()
+                return
+            if total is None:
+                total = 100
+            pos = round(pos)
+            total = round(total)
+            self.progressDialog.setWindowTitle('TortoiseHg - %s' % topic)
+            self.progressDialog.setLabelText('%s (%d / %d)' % (item, pos, total))
+            self.progressDialog.setMaximum(total)
+            self.progressDialog.show()
+            self.progressDialog.setValue(pos)
+        else:
+            self.statusbar.progress(topic, pos, item, unit, total, root)
 
     def setHistoryColumns(self, *args):
         """Display the column selection dialog"""
@@ -982,8 +1011,17 @@ class Workbench(QMainWindow):
 
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
-        for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
+
+        # Reload the all the repos that were open on the last session
+        # This may be a lengthy operation, which happens before the Workbench GUI is open
+        # We use a progress dialog to let the user know that the workbench is being loaded
+        openrepos = hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(',')
+        for n, path in enumerate(openrepos):
+            self.progress(_('Reopening tabs'), n, _('Reopening repository %s') % path, '', len(openrepos))
+            QCoreApplication.processEvents()
             self._openRepo(path, False)
+            QCoreApplication.processEvents()
+        self.progress(_('Reopening tabs'), len(openrepos),  _('All repositories open'), '', len(openrepos))
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
