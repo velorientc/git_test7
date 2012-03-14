@@ -216,7 +216,7 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
-        vsmenu = QMenu(_('EolnVisibility'), self)
+        vsmenu = QMenu(_('EOL Visibility'), self)
         for name, mode in ((_('Visible'), True),
                            (_('Invisible'), False)):
             def mkaction(n, m):
@@ -250,7 +250,7 @@ class Scintilla(QsciScintilla):
                         (self.autoUseTabs and n == 'Auto'))
                     a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
                 mkaction(name, mode)
-            acmenu = QMenu(_('AutoComplete'), self)
+            acmenu = QMenu(_('Auto-Complete'), self)
             for name, value in ((_('Enable'), 2),
                                 (_('Disable'), -1)):
                 def mkaction(n, v):
@@ -262,10 +262,13 @@ class Scintilla(QsciScintilla):
 
         editoptsmenu = QMenu(_('Editor Options'), self)
         editoptsmenu.addMenu(wrapmenu)
+        editoptsmenu.addSeparator()
         editoptsmenu.addMenu(wsmenu)
+        if (tabindentsmenu): editoptsmenu.addMenu(tabindentsmenu)
+        editoptsmenu.addSeparator()
         editoptsmenu.addMenu(vsmenu)
         if (eolmodemenu): editoptsmenu.addMenu(eolmodemenu)
-        if (tabindentsmenu): editoptsmenu.addMenu(tabindentsmenu)
+        editoptsmenu.addSeparator()
         if (acmenu): editoptsmenu.addMenu(acmenu)
         self._stdMenu.addMenu(editoptsmenu)
         return self._stdMenu
