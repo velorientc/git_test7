@@ -616,6 +616,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             parent=self):
             self.removeAlias(self.menualias)
 
+    def closeEvent(self, event):
+        if self.cmd.core.running():
+            if not qtlib.QuestionMsgBox(_('TortoiseHg Sync'),
+                _('Are you sure that you want to cancel synchronization?'),
+                parent=self):
+                event.ignore()
+
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
             self.reload()
