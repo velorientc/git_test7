@@ -260,12 +260,14 @@ class Scintilla(QsciScintilla):
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
 
-        self._stdMenu.addMenu(wrapmenu)
-        self._stdMenu.addMenu(wsmenu)
-        self._stdMenu.addMenu(vsmenu)
-        if (eolmodemenu): self._stdMenu.addMenu(eolmodemenu)
-        if (tabindentsmenu): self._stdMenu.addMenu(tabindentsmenu)
-        if (acmenu): self._stdMenu.addMenu(acmenu)
+        editoptsmenu = QMenu(_('Editor Options'), self)
+        editoptsmenu.addMenu(wrapmenu)
+        editoptsmenu.addMenu(wsmenu)
+        editoptsmenu.addMenu(vsmenu)
+        if (eolmodemenu): editoptsmenu.addMenu(eolmodemenu)
+        if (tabindentsmenu): editoptsmenu.addMenu(tabindentsmenu)
+        if (acmenu): editoptsmenu.addMenu(acmenu)
+        self._stdMenu.addMenu(editoptsmenu)
         return self._stdMenu
 
     def saveSettings(self, qs, prefix):
