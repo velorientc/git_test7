@@ -53,5 +53,10 @@ class LogDockWidget(QDockWidget):
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
 
+    def setVisible(self, visible):
+        super(LogDockWidget, self).setVisible(visible)
+        if visible:
+            self.raise_()
+
     def hideEvent(self, event):
         self.visibilityChanged.emit(False)
