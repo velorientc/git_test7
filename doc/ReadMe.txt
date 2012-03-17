@@ -28,7 +28,7 @@ Please follow this rules when hacking the doc source files.
 
 - As suggested by Sphinx (see http://sphinx.pocoo.org/rest.html#sections)
   use:
-  
+
   *************
   Chapter title
   *************
@@ -45,8 +45,8 @@ Please follow this rules when hacking the doc source files.
 - To indicate a key or a combination of keys use :kbd:, for example:
 
   :kbd:`Ctrl-A`
-  
-- To indicate a label, button or anything that appears in user interfaces 
+
+- To indicate a label, button or anything that appears in user interfaces
   use :guilabel:, for example:
 
   :guilabel:`Commit`
@@ -54,11 +54,11 @@ Please follow this rules when hacking the doc source files.
 - To indicate a menu choice use :menuselection: and -->, for example:
 
   :menuselection:`TortoiseHg... --> About`
-  
+
 - To indicate a file use :file:, for example:
 
   :file:`.hg/hgrc`
- 
+
 - To indicate a command to enter into command window use :command:, for example:
 
   :command:`hgtk log`
