@@ -112,11 +112,11 @@ class HgRepoListModel(QAbstractTableModel):
             self.reloadConfig()
             self.updateColumns()
             self.setBranch(branch)
-    
+
     def initBranchColors(self):
         # Set all the branch colors once on a fixed order,
         # which should make the branch colors more stable
-        
+
         # Always assign the first color to the default branch
         self.namedbranch_color('default')
         # Then assign colors to all branches in alphabetical order
