@@ -464,7 +464,7 @@ INFO = (
         _('Graphical merge program for resolving merge conflicts.  If left '
         'unspecified, Mercurial will use the first applicable tool it finds '
         'on your system or use its internal merge tool that leaves conflict '
-        'markers in place.  Chose internal:merge to force conflict markers ,'
+        'markers in place.  Choose internal:merge to force conflict markers, '
         'internal:prompt to always select local or other, or internal:dump '
         'to leave files in the working directory for manual merging')),
     _fi(_('Visual Diff Tool'), 'tortoisehg.vdiff',
