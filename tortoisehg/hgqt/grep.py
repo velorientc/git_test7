@@ -414,6 +414,7 @@ class HistorySearchThread(QThread):
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (addremove, text)
+                        user = hglib.tounicode(user)
                         row = [fname, int(rev), int(line), user, text]
                         emitrow(row)
                     except ValueError:
