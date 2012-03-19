@@ -1300,15 +1300,28 @@ class CommitDialog(QDialog):
                 self.commit.stwidget.refthread.wait()
                 QTimer.singleShot(0, self.reject)
 
+    def promptExit(self):
+        exit = self.commit.canExit()
+        if not exit:
+            exit = qtlib.QuestionMsgBox(_('TortoiseHg Commit'),
+                _('Are you sure that you want to cancel the commit operation?'),
+                parent=self)
+        if exit:
+            s = QSettings()
+            s.setValue('commit/geom', self.saveGeometry())
+            self.commit.saveSettings(s, 'committool')
+        return exit
+    
     def accept(self):
         self.commit.commit()
 
     def reject(self):
-        if self.commit.canExit():
-            s = QSettings()
-            s.setValue('commit/geom', self.saveGeometry())
-            self.commit.saveSettings(s, 'committool')
+        if self.promptExit():
             QDialog.reject(self)
+
+    def closeEvent(self, event):
+        if not self.promptExit():
+            event.ignore()
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
