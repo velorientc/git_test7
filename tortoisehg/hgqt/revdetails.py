@@ -454,7 +454,10 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             else:
                 self.filecontextmenu = contextmenu
 
-        if len(self.filelist.getSelectedFiles()) > 1 and not itemissubrepo:
+        ln = len(self.filelist.getSelectedFiles())
+        if ln == 0:
+            return
+        if ln > 1 and not itemissubrepo:
             singlefileactions = False
         else:
             singlefileactions = True
