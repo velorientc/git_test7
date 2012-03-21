@@ -74,6 +74,8 @@ class CompressDialog(QDialog):
         self.resize(0, 340)
         self.setWindowTitle(_('Compress - %s') % repo.displayname)
 
+        self.restoreSettings()
+
     def checkStatus(self):
         repo = self.repo
         class CheckThread(QThread):
@@ -111,7 +113,7 @@ class CompressDialog(QDialog):
         self.cancelbtn.setShown(False)
         uc = ['update', '--repository', self.repo.root, '--clean', '--rev',
               str(self.revs[1])]
-        rc = ['revert', '--repository', self.repo.root, '--all', '--rev', 
+        rc = ['revert', '--repository', self.repo.root, '--all', '--rev',
               str(self.revs[0])]
         self.repo.incrementBusyCount()
         self.cmd.run(uc, rc)
@@ -162,3 +164,19 @@ class CompressDialog(QDialog):
             self.runner.commandFinished.connect(finished)
             self.repo.incrementBusyCount()
             self.runner.run(cmdline)
+
+    def storeSettings(self):
+        s = QSettings()
+        s.setValue('compress/geometry', self.saveGeometry())
+
+    def restoreSettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('compress/geometry').toByteArray())
+
+    def accept(self):
+        self.storeSettings()
+        super(CompressDialog, self).accept()
+
+    def reject(self):
+        self.storeSettings()
+        super(CompressDialog, self).reject()
