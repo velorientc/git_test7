@@ -83,7 +83,7 @@ class ShellConfigWindow(QDialog):
         cmenuwidget = QWidget()
         grid = QGridLayout()
         cmenuwidget.setLayout(grid)
-        tw.addTab(cmenuwidget, _("Contex Menu"))
+        tw.addTab(cmenuwidget, _("Context Menu"))
 
         w = QLabel(_("Top menu items:"))
         grid.addWidget(w, 0, 0)
