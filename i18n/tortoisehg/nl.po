@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-03-19 21:15-0300\n"
-"PO-Revision-Date: 2012-03-18 12:36+0000\n"
+"PO-Revision-Date: 2012-03-23 22:46+0000\n"
 "Last-Translator: Johan Samyn <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-03-20 05:00+0000\n"
-"X-Generator: Launchpad (build 14969)\n"
+"X-Launchpad-Export-Date: 2012-03-24 05:04+0000\n"
+"X-Generator: Launchpad (build 14981)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -466,7 +466,7 @@ msgstr "Gereed"
 
 #: tortoisehg/hgqt/backout.py:625
 msgid "Backout changeset"
-msgstr ""
+msgstr "Backout changeset"
 
 #: tortoisehg/hgqt/bisect.py:22
 #, python-format
@@ -1572,7 +1572,7 @@ msgstr "Vooruit"
 #: tortoisehg/hgqt/filedialogs.py:196 tortoisehg/hgqt/filedialogs.py:682
 #: tortoisehg/hgqt/repowidget.py:1197 tortoisehg/hgqt/repowidget.py:1476
 msgid "Visual diff..."
-msgstr ""
+msgstr "Visuaele diff..."
 
 #: tortoisehg/hgqt/filedialogs.py:199 tortoisehg/hgqt/filedialogs.py:685
 #: tortoisehg/hgqt/repowidget.py:1199
@@ -1581,7 +1581,7 @@ msgstr "Diff met lokale versie..."
 
 #: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:689
 msgid "Visual diff file..."
-msgstr ""
+msgstr "Visuele diff van bestand..."
 
 #: tortoisehg/hgqt/filedialogs.py:206 tortoisehg/hgqt/filedialogs.py:692
 msgid "Diff file to local..."
@@ -4829,7 +4829,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revdetails.py:243
 msgid "Copy Path"
-msgstr ""
+msgstr "Pad Kopiëren"
 
 #: tortoisehg/hgqt/revdetails.py:244
 msgid "Copy full path of file(s) to the clipboard"
@@ -4883,30 +4883,35 @@ msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:164
 msgid "Head is closed!"
-msgstr ""
+msgstr "Head is gesloten!"
 
 #: tortoisehg/hgqt/revset.py:28
 msgid "Changesets where username contains string."
-msgstr ""
+msgstr "Changeset waarin de gebruikersnaam de tekenreeks bevat."
 
 #: tortoisehg/hgqt/revset.py:30
 msgid ""
 "Search commit message, user name, and names of changed files for string."
 msgstr ""
+"Zoek in het commmit bericht, de gebruikersnaam, an de namen van gewijzigde "
+"bestanden af naar tekenreeks."
 
 #: tortoisehg/hgqt/revset.py:33
 msgid "Like \"keyword(string)\" but accepts a regex."
 msgstr ""
+"Zoals \"keyword(tekenreeks)\" maar aanvaardt een reguliere expressie."
 
 #: tortoisehg/hgqt/revset.py:35
 msgid ""
 "Changesets not found in the specified destination repository, or the default "
 "push location."
 msgstr ""
+"Geen changesets gevonden in de opgegeven repository of in de standaard push "
+"lokatie."
 
 #: tortoisehg/hgqt/revset.py:38
 msgid "The named bookmark or all bookmarks."
-msgstr ""
+msgstr "De genoemde bladwijzer of alle bladwijzers."
 
 #: tortoisehg/hgqt/revset.py:40
 msgid "The named tag or all tags."
@@ -4918,25 +4923,27 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:44
 msgid "Changeset is a named branch head."
-msgstr ""
+msgstr "Changeset is een benoemde branch."
 
 #: tortoisehg/hgqt/revset.py:46
 msgid "Changeset is a merge changeset."
-msgstr ""
+msgstr "Changeset is een samenvoeg changeset."
 
 #: tortoisehg/hgqt/revset.py:48
 msgid "Changeset is closed."
-msgstr ""
+msgstr "Changeset is gesloten."
 
 #: tortoisehg/hgqt/revset.py:50
 msgid ""
 "Changesets within the interval, see <a "
 "href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">help dates</a>"
 msgstr ""
+"Changesets binnen het interval, zie <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">help dates</a>"
 
 #: tortoisehg/hgqt/revset.py:53
 msgid "Greatest common ancestor of the two changesets."
-msgstr ""
+msgstr "Grootste gezamenlijke voorouder van de twee changesets."
 
 #: tortoisehg/hgqt/revset.py:58
 msgid ""
@@ -4944,124 +4951,136 @@ msgid ""
 "href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help "
 "patterns</a>"
 msgstr ""
+"Changesets die bestanden bevatten die met het patroon overeenkomen.  Zie <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help "
+"patterns</a>"
 
 #: tortoisehg/hgqt/revset.py:62
 msgid "Changesets which modify files matched by pattern."
-msgstr ""
+msgstr "Changesets die bestanden wijzigen die overeenkomen met het patroon."
 
 #: tortoisehg/hgqt/revset.py:64
 msgid "Changesets which add files matched by pattern."
-msgstr ""
+msgstr "Changesets die bestanden toevoegen die overeenkomen met het patroon."
 
 #: tortoisehg/hgqt/revset.py:66
 msgid "Changesets which remove files matched by pattern."
 msgstr ""
+"Changesets die bestanden verwijderen die overeenkomen met het patroon."
 
 #: tortoisehg/hgqt/revset.py:68
 msgid "Changesets containing files matched by pattern."
-msgstr ""
+msgstr "Changesets die bestanden bevatten die met het patroon overeenkomen."
 
 #: tortoisehg/hgqt/revset.py:73
 msgid "All changesets belonging to the branches of changesets in set."
 msgstr ""
+"Alle changesets die behoren tot de branches van changesets in the set."
 
 #: tortoisehg/hgqt/revset.py:75
 msgid "Members of a set with no children in set."
-msgstr ""
+msgstr "Leden van een set die geen kinderen in de set hebben."
 
 #: tortoisehg/hgqt/revset.py:77
 msgid "Changesets which are descendants of changesets in set."
-msgstr ""
+msgstr "Changesets die afstammelingen zijn van changesets in de set."
 
 #: tortoisehg/hgqt/revset.py:79
 msgid "Changesets that are ancestors of a changeset in set."
-msgstr ""
+msgstr "Changesetsz die voorouders zijn van een changeset in de set."
 
 #: tortoisehg/hgqt/revset.py:81
 msgid "Child changesets of changesets in set."
-msgstr ""
+msgstr "Changesets die kinderen zijn van changesets in de set."
 
 #: tortoisehg/hgqt/revset.py:83
 msgid "The set of all parents for all changesets in set."
-msgstr ""
+msgstr "De set van alle parents van alle changesets in de set."
 
 #: tortoisehg/hgqt/revset.py:85
 msgid "First parent for all changesets in set, or the working directory."
-msgstr ""
+msgstr "Eerste parent voor alle changesets in de set of in de werkmap."
 
 #: tortoisehg/hgqt/revset.py:87
 msgid "Second parent for all changesets in set, or the working directory."
-msgstr ""
+msgstr "Tweede parent voor alle changesets in de set of in de werkmap."
 
 #: tortoisehg/hgqt/revset.py:89
 msgid "Changesets whith no parent changeset in set."
-msgstr ""
+msgstr "Changesets die geen parent changeset in de set hebben."
 
 #: tortoisehg/hgqt/revset.py:91
 msgid ""
 "An empty set, if any revision in set isn't found; otherwise, all revisions "
 "in set."
 msgstr ""
+"Een lege set, als er geen enkele revisie in de set gevonden is; anders alle "
+"revisies in de set."
 
 #: tortoisehg/hgqt/revset.py:97
 msgid "Changeset with lowest revision number in set."
-msgstr ""
+msgstr "Changeset met het laagste revisienummer in de set."
 
 #: tortoisehg/hgqt/revset.py:99
 msgid "Changeset with highest revision number in set."
-msgstr ""
+msgstr "Changeset met het hoogste revisienummer in de set."
 
 #: tortoisehg/hgqt/revset.py:101
 msgid "First n members of a set."
-msgstr ""
+msgstr "Eerste n leden van een set."
 
 #: tortoisehg/hgqt/revset.py:103
 msgid ""
 "Sort set by keys.  The default sort order is ascending, specify a key as \"-"
 "key\" to sort in descending order."
 msgstr ""
+"Sorteer de set volgens sleutels.  De standaard sorteervolgorde is oplopend, "
+"geef een sleutel als \"-sleutel\" op voor dalende volgorde."
 
 #: tortoisehg/hgqt/revset.py:106
 msgid "An alias for \"::.\" (ancestors of the working copy's first parent)."
 msgstr ""
+"An alias voor \"::\" (voorouders van de eerste parent van de werkmap)."
 
 #: tortoisehg/hgqt/revset.py:108
 msgid "All changesets, the same as 0:tip."
-msgstr ""
+msgstr "Alle changesets, hetzelfde als 0:tip."
 
 #: tortoisehg/hgqt/revset.py:123
 msgid "Revision Set Query"
-msgstr ""
+msgstr "Revisie Set Query"
 
 #: tortoisehg/hgqt/revset.py:134
 msgid "all revisions converted from subversion"
-msgstr ""
+msgstr "alle revisies geconverteerd vanuit Subversion"
 
 #: tortoisehg/hgqt/revset.py:136
 msgid "changeset which represents converted svn revision"
-msgstr ""
+msgstr "changeset die een geconverteerde Subversion revisie voorstelt"
 
 #: tortoisehg/hgqt/revset.py:147
 msgid "Common sets"
-msgstr ""
+msgstr "Gemeenschappelijke sets"
 
 #: tortoisehg/hgqt/revset.py:159
 msgid "File pattern sets"
-msgstr ""
+msgstr "Bestandspatroon sets"
 
 #: tortoisehg/hgqt/revset.py:171
 msgid "Set Ancestry"
-msgstr ""
+msgstr "Set Voorouders"
 
 #: tortoisehg/hgqt/revset.py:183
 msgid "Set Logic"
-msgstr ""
+msgstr "Set Logica"
 
 #: tortoisehg/hgqt/revset.py:210
 msgid ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
 "revsets</a>"
 msgstr ""
+"<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
+"revsets</a>"
 
 #: tortoisehg/hgqt/revset.py:221
 msgid "Searching..."
@@ -5069,23 +5088,23 @@ msgstr "Bezig met zoeken ..."
 
 #: tortoisehg/hgqt/revset.py:222 tortoisehg/hgqt/revset.py:234
 msgid "Running"
-msgstr ""
+msgstr "Bezig"
 
 #: tortoisehg/hgqt/revset.py:222
 msgid "query"
-msgstr ""
+msgstr "query"
 
 #: tortoisehg/hgqt/revset.py:374
 msgid "found revision"
-msgstr ""
+msgstr "revisie gevonden"
 
 #: tortoisehg/hgqt/revset.py:397
 msgid "Parse Error: "
-msgstr ""
+msgstr "Fout bij Ontleden: "
 
 #: tortoisehg/hgqt/revset.py:401
 msgid "Invalid query: "
-msgstr ""
+msgstr "Ongeldige Query: "
 
 #: tortoisehg/hgqt/run.py:64 tortoisehg/hgqt/run.py:429
 #, python-format
@@ -5093,17 +5112,21 @@ msgid ""
 "Error string \"%(arg0)s\" at %(arg1)s<br>Please <a "
 "href=\"#edit:%(arg1)s\">edit</a> your config"
 msgstr ""
+"Fout tekst \"%(arg0)s\" in %(arg1)s<br>Wil aub uw instellingen <a "
+"href=\"#edit:%(arg1)s\"aanpassen</a>"
 
 #: tortoisehg/hgqt/run.py:82
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
+"\n"
+"Onderbreken door klavier, wordt afgebroken.\n"
 
 #: tortoisehg/hgqt/run.py:142
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
-msgstr ""
+msgstr "kan bestand \"%s\" niet lezen. Genegeerd.\n"
 
 #: tortoisehg/hgqt/run.py:246
 #, python-format
@@ -5111,31 +5134,33 @@ msgid ""
 "thg: command '%s' is ambiguous:\n"
 "    %s\n"
 msgstr ""
+"thg: opdracht '%s' is tweeslachtig:\n"
+"    %s\n"
 
 #: tortoisehg/hgqt/run.py:249
 #, python-format
 msgid "thg: unknown command '%s'\n"
-msgstr ""
+msgstr "thg: onbekende opdracht '%s'\n"
 
 #: tortoisehg/hgqt/run.py:253
 #, python-format
 msgid "thg %s: %s\n"
-msgstr ""
+msgstr "thg %s: %s\n"
 
 #: tortoisehg/hgqt/run.py:256
 #, python-format
 msgid "thg: %s\n"
-msgstr ""
+msgstr "thg: %s\n"
 
 #: tortoisehg/hgqt/run.py:259 tortoisehg/hgqt/thread.py:320
 #: tortoisehg/hgqt/thread.py:330 tortoisehg/hgqt/thread.py:332
 #, python-format
 msgid "abort: %s!\n"
-msgstr ""
+msgstr "afbreken: %s\n"
 
 #: tortoisehg/hgqt/run.py:310
 msgid "There is no Mercurial repository here (.hg not found)"
-msgstr ""
+msgstr "Er is hier geen Mercurial repository (.hg niet gevonden)"
 
 #: tortoisehg/hgqt/run.py:322
 msgid "invalid arguments"
@@ -5154,7 +5179,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:427 tortoisehg/hgqt/run.py:428
 msgid "Try refreshing your repository."
-msgstr ""
+msgstr "Probeer uw repository te verversen."
 
 #: tortoisehg/hgqt/run.py:431
 #, python-format
@@ -5162,23 +5187,25 @@ msgid ""
 "Configuration Error: \"%(arg0)s\",<br>Please <a "
 "href=\"#fix:%(arg0)s\">fix</a> your config"
 msgstr ""
+"Fout in Instellingen: \"%(arg0)s\",<br><a "
+"href=\"#fix:%(arg0)s\"Corrigeer</a> uw instellingen aub"
 
 #: tortoisehg/hgqt/run.py:433
 #, python-format
 msgid "Operation aborted:<br><br>%(arg0)s."
-msgstr ""
+msgstr "Operatie afgebroken:<br><br>%(arg0)s."
 
 #: tortoisehg/hgqt/run.py:434
 msgid "Repository is locked"
-msgstr ""
+msgstr "De repository is gelockt"
 
 #: tortoisehg/hgqt/run.py:492
 msgid "hint:"
-msgstr ""
+msgstr "hint:"
 
 #: tortoisehg/hgqt/run.py:499
 msgid "Keyboard interrupt"
-msgstr ""
+msgstr "Klavier onderbreking"
 
 #: tortoisehg/hgqt/run.py:500
 msgid "Close this application?"
@@ -5186,7 +5213,7 @@ msgstr "Deze toepassing sluiten?"
 
 #: tortoisehg/hgqt/run.py:783
 msgid "annotate requires a single filename\n"
-msgstr ""
+msgstr "annotate vereist één enkel bestand\n"
 
 #: tortoisehg/hgqt/run.py:840
 msgid "global options:"
@@ -5194,28 +5221,32 @@ msgstr "globale opties:"
 
 #: tortoisehg/hgqt/run.py:842
 msgid "use \"thg help\" for the full list of commands"
-msgstr ""
+msgstr "gebruik \"thg help\" om de volledige lijst met opdrachten te zien"
 
 #: tortoisehg/hgqt/run.py:846
 msgid ""
 "use \"thg help\" for the full list of commands or \"thg -v\" for details"
 msgstr ""
+"gebruik \"thg help\" om de volledige lijst met opdrachten te zien of \"thg -"
+"v\" voor details"
 
 #: tortoisehg/hgqt/run.py:849
 #, python-format
 msgid "use \"thg -v help%s\" to show aliases and global options"
-msgstr ""
+msgstr "gebruik \"thg -v help%s\" om aliases en algemene opties te zien"
 
 #: tortoisehg/hgqt/run.py:852
 #, python-format
 msgid "use \"thg -v help %s\" to show global options"
-msgstr ""
+msgstr "gebruik \"thg -v help %s\" om algemene opties te zien"
 
 #: tortoisehg/hgqt/run.py:864 tortoisehg/hgqt/run.py:973
 msgid ""
 "list of commands:\n"
 "\n"
 msgstr ""
+"lijst met opdrachten:\n"
+"\n"
 
 #: tortoisehg/hgqt/run.py:872
 #, python-format
@@ -5223,79 +5254,83 @@ msgid ""
 "\n"
 "aliases: %s\n"
 msgstr ""
+"\n"
+"aliases: %s\n"
 
 #: tortoisehg/hgqt/run.py:877 tortoisehg/hgqt/run.py:909
 #: tortoisehg/hgqt/run.py:942
 msgid "(no help text available)"
-msgstr ""
+msgstr "(geen help tekst beschikbaar)"
 
 #: tortoisehg/hgqt/run.py:885
 msgid "options:\n"
-msgstr ""
+msgstr "opties:\n"
 
 #: tortoisehg/hgqt/run.py:914
 msgid "no commands defined\n"
-msgstr ""
+msgstr "geen opdrachten gedefiniëerd\n"
 
 #: tortoisehg/hgqt/run.py:966
 msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
-msgstr ""
+msgstr "Thg - TortoiseHg's GUI programma's voor Mercurial SCM (Hg)\n"
 
 #: tortoisehg/hgqt/run.py:971
 msgid ""
 "basic commands:\n"
 "\n"
 msgstr ""
+"basis opdrachten:\n"
+"\n"
 
 #: tortoisehg/hgqt/run.py:987
 #, python-format
 msgid " (default: %s)"
-msgstr ""
+msgstr " (standaard: %s)"
 
 #: tortoisehg/hgqt/run.py:1004
 #, python-format
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
-msgstr ""
+msgstr "TortoiseHg Schermen (versie %s), Mercurial (versie %s)\n"
 
 #: tortoisehg/hgqt/run.py:1033
 msgid "repository root directory or symbolic path name"
-msgstr ""
+msgstr "repository basis map of symbolische padnaam"
 
 #: tortoisehg/hgqt/run.py:1034
 msgid "enable additional output"
-msgstr ""
+msgstr "extra resultaten activeren"
 
 #: tortoisehg/hgqt/run.py:1035
 msgid "suppress output"
-msgstr ""
+msgstr "resultaten onderdrukken"
 
 #: tortoisehg/hgqt/run.py:1036
 msgid "display help and exit"
-msgstr ""
+msgstr "toon hulp en sluit af"
 
 #: tortoisehg/hgqt/run.py:1037
 msgid "start debugger"
-msgstr ""
+msgstr "start de debugger"
 
 #: tortoisehg/hgqt/run.py:1038
 msgid "print command execution profile"
-msgstr ""
+msgstr "afdrukken uitvoeringsprofiel van opdracht"
 
 #: tortoisehg/hgqt/run.py:1039
 msgid "do not fork GUI process"
-msgstr ""
+msgstr "GUI proces niet afsplitsen"
 
 #: tortoisehg/hgqt/run.py:1040
 msgid "always fork GUI process"
-msgstr ""
+msgstr "GUI proces altijd afsplitsen"
 
 #: tortoisehg/hgqt/run.py:1041
 msgid "read file list from file"
-msgstr ""
+msgstr "bestandslijst uitlezen bestand"
 
 #: tortoisehg/hgqt/run.py:1042
 msgid "read file list from file encoding utf-8"
-msgstr ""
+msgstr "bestandslijst uitlezen uit utf-8 gecodeerd bestand"
 
 #: tortoisehg/hgqt/run.py:1046
 msgid "thg about"
@@ -5303,31 +5338,31 @@ msgstr "thg about"
 
 #: tortoisehg/hgqt/run.py:1047
 msgid "thg add [FILE]..."
-msgstr ""
+msgstr "thg add [BESTAND]..."
 
 #: tortoisehg/hgqt/run.py:1049
 msgid "revision to annotate"
-msgstr ""
+msgstr "revisie om te annoteren"
 
 #: tortoisehg/hgqt/run.py:1050 tortoisehg/hgqt/run.py:1103
 msgid "open to line"
-msgstr ""
+msgstr "openen op regel"
 
 #: tortoisehg/hgqt/run.py:1051 tortoisehg/hgqt/run.py:1104
 msgid "initial search pattern"
-msgstr ""
+msgstr "initiëel zoekpatroon"
 
 #: tortoisehg/hgqt/run.py:1052
 msgid "thg annotate"
-msgstr ""
+msgstr "thg annotate"
 
 #: tortoisehg/hgqt/run.py:1054
 msgid "revision to archive"
-msgstr ""
+msgstr "revisie om te archiveren"
 
 #: tortoisehg/hgqt/run.py:1055
 msgid "thg archive"
-msgstr ""
+msgstr "thg archive"
 
 #: tortoisehg/hgqt/run.py:1058
 msgid "merge with old dirstate parent after backout"
@@ -5347,11 +5382,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1062
 msgid "thg bisect"
-msgstr ""
+msgstr "thg bisect"
 
 #: tortoisehg/hgqt/run.py:1066
 msgid "the clone will include an empty working copy (only a repository)"
-msgstr ""
+msgstr "de kloon zal een lege werkmap hebben (enkel een repository)"
 
 #: tortoisehg/hgqt/run.py:1069
 msgid "revision, tag or branch to check out"
@@ -5359,195 +5394,196 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1070
 msgid "include the specified changeset"
-msgstr ""
+msgstr "de opgegeven changeset insluiten"
 
 #: tortoisehg/hgqt/run.py:1072
 msgid "clone only the specified branch"
-msgstr ""
+msgstr "enkel de opgegeven branch klonen"
 
 #: tortoisehg/hgqt/run.py:1073
 msgid "use pull protocol to copy metadata"
-msgstr ""
+msgstr "gebruik pull protocol om gegevens te kopiëren"
 
 #: tortoisehg/hgqt/run.py:1075
 msgid "use uncompressed transfer (fast over LAN)"
-msgstr ""
+msgstr "gebruik ongecomprimeerde overdracht (snel over LAN)"
 
 #: tortoisehg/hgqt/run.py:1076
 msgid "thg clone [OPTION]... SOURCE [DEST]"
-msgstr ""
+msgstr "thg clone [OPTIES]... BRON [DOEL]"
 
 #: tortoisehg/hgqt/run.py:1078
 msgid "record user as committer"
-msgstr ""
+msgstr "registreer de gebruiker als de committer"
 
 #: tortoisehg/hgqt/run.py:1079
 msgid "record datecode as commit date"
-msgstr ""
+msgstr "registreer de datumcode als de commit datum"
 
 #: tortoisehg/hgqt/run.py:1080
 msgid "thg commit [OPTIONS] [FILE]..."
-msgstr ""
+msgstr "thg commit [OPTIES] [BESTAND]..."
 
 #: tortoisehg/hgqt/run.py:1081
 msgid "thg drag_move SOURCE... DEST"
-msgstr ""
+msgstr "thg drag_move BRON... DOEL"
 
 #: tortoisehg/hgqt/run.py:1082
 msgid "thg drag_copy SOURCE... DEST"
-msgstr ""
+msgstr "thg drag_copy BRON... DOEL"
 
 #: tortoisehg/hgqt/run.py:1084
 msgid "ignore case during search"
-msgstr ""
+msgstr "negeer grote/kleine letters tijdens zoeken"
 
 #: tortoisehg/hgqt/run.py:1085
 msgid "thg grep"
-msgstr ""
+msgstr "thg grep"
 
 #: tortoisehg/hgqt/run.py:1086
 msgid "thg guess"
-msgstr ""
+msgstr "thg guess"
 
 #: tortoisehg/hgqt/run.py:1087
 msgid "thg hgignore [FILE]"
-msgstr ""
+msgstr "thg hgignore [BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1089
 msgid "import to the patch queue (MQ)"
-msgstr ""
+msgstr "importeren in de patch queue (MQ)"
 
 #: tortoisehg/hgqt/run.py:1090
 msgid "thg import [OPTION] [SOURCE]..."
-msgstr ""
+msgstr "thg import [OPTIES] [DOEL]..."
 
 #: tortoisehg/hgqt/run.py:1091
 msgid "thg init [DEST]"
-msgstr ""
+msgstr "thg init [DOEL]"
 
 #: tortoisehg/hgqt/run.py:1094
 msgid "a revision to send"
-msgstr ""
+msgstr "een revisie om te verzenden"
 
 #: tortoisehg/hgqt/run.py:1095
 msgid "thg email [REVS]"
-msgstr ""
+msgstr "thg email [REVS]"
 
 #: tortoisehg/hgqt/run.py:1098
 msgid "limit number of changes displayed"
-msgstr ""
+msgstr "beperk aantal getoonde wijzigingen"
 
 #: tortoisehg/hgqt/run.py:1099
 msgid "thg log [OPTIONS] [FILE]"
-msgstr ""
+msgstr "thg log [OPTIES] [BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1102
 msgid "revision to display"
-msgstr ""
+msgstr "revisie om te tonen"
 
 #: tortoisehg/hgqt/run.py:1105
 msgid "thg manifest [-r REV] [FILE]"
-msgstr ""
+msgstr "thg manifest [-r REV] [BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1108
 msgid "revision to merge"
-msgstr ""
+msgstr "revisie om samen te voegen"
 
 #: tortoisehg/hgqt/run.py:1109
 msgid "thg merge [[-r] REV]"
-msgstr ""
+msgstr "thg merge [[-r] REV]"
 
 #: tortoisehg/hgqt/run.py:1110
 msgid "thg remove [FILE]..."
-msgstr ""
+msgstr "thg remove [BESTAND]..."
 
 #: tortoisehg/hgqt/run.py:1111
 msgid "thg mq"
-msgstr ""
+msgstr "thg mq"
 
 #: tortoisehg/hgqt/run.py:1112
 msgid "thg resolve"
-msgstr ""
+msgstr "thg resolve"
 
 #: tortoisehg/hgqt/run.py:1113
 msgid "thg revert [FILE]..."
-msgstr ""
+msgstr "thg revert [BESTAND]..."
 
 #: tortoisehg/hgqt/run.py:1114
 msgid "thg forget [FILE]..."
-msgstr ""
+msgstr "thg forget [BESTAND]..."
 
 #: tortoisehg/hgqt/run.py:1115
 msgid "thg rename SOURCE [DEST]..."
-msgstr ""
+msgstr "thg rename BRON [DOEL]..."
 
 #: tortoisehg/hgqt/run.py:1119
 msgid "name of the hgweb config file (serve more than one repository)"
 msgstr ""
+"naam van het hgweb instellingenbestand (serve meer dan een repository)"
 
 #: tortoisehg/hgqt/run.py:1121
 msgid "name of the hgweb config file (DEPRECATED)"
-msgstr ""
+msgstr "naam van het hgweb instgellingenbestand (AFGERADEN)"
 
 #: tortoisehg/hgqt/run.py:1122
 msgid "thg serve [--web-conf FILE]"
-msgstr ""
+msgstr "thg serve [--web-conf BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1123
 msgid "thg sync"
-msgstr ""
+msgstr "thg sync"
 
 #: tortoisehg/hgqt/run.py:1125
 msgid "show files without changes"
-msgstr ""
+msgstr "toon bestanden zonder wijzigingen"
 
 #: tortoisehg/hgqt/run.py:1126
 msgid "show ignored files"
-msgstr ""
+msgstr "toon genegeerde bestanden"
 
 #: tortoisehg/hgqt/run.py:1127
 msgid "thg status [OPTIONS] [FILE]"
-msgstr ""
+msgstr "thg status [OPTIES] [BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1129 tortoisehg/hgqt/run.py:1160
 msgid "discard uncommitted changes (no backup)"
-msgstr ""
+msgstr "verwerp niet-gecommitte wijzigingen (geen backup)"
 
 #: tortoisehg/hgqt/run.py:1130
 msgid "do not back up stripped revisions"
-msgstr ""
+msgstr "maak geen backup van de gestripte revisies"
 
 #: tortoisehg/hgqt/run.py:1131
 msgid "revision to strip"
-msgstr ""
+msgstr "revisie om te strippen"
 
 #: tortoisehg/hgqt/run.py:1132
 msgid "thg strip [-f] [-n] [[-r] REV]"
-msgstr ""
+msgstr "thg strip [-f] [-n] [[-r] REV]"
 
 #: tortoisehg/hgqt/run.py:1134
 msgid "keep original changesets"
-msgstr ""
+msgstr "behoudt de originele changesets"
 
 #: tortoisehg/hgqt/run.py:1135
 msgid "keep original branch names"
-msgstr ""
+msgstr "behoudt de originele branch namen"
 
 #: tortoisehg/hgqt/run.py:1136
 msgid "force detaching of source from its original branch"
-msgstr ""
+msgstr "forceer losmaken van de bron van zijn originele branch"
 
 #: tortoisehg/hgqt/run.py:1139
 msgid "rebase from the specified changeset"
-msgstr ""
+msgstr "rebase vanaf de opgegeven changeset"
 
 #: tortoisehg/hgqt/run.py:1141
 msgid "rebase onto the specified changeset"
-msgstr ""
+msgstr "rebase naar de ogegeven changeset"
 
 #: tortoisehg/hgqt/run.py:1142
 msgid "thg rebase -s REV -d REV [--keep] [--detach]"
-msgstr ""
+msgstr "thg rebase -s REV -d REV [--keep] [--detach]"
 
 #: tortoisehg/hgqt/run.py:1145
 msgid "replace existing tag"
@@ -5567,107 +5603,107 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1149
 msgid "use <text> as commit message"
-msgstr ""
+msgstr "gebruik <tekst> als commit bericht"
 
 #: tortoisehg/hgqt/run.py:1150
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
-msgstr ""
+msgstr "thg tag [-f] [-l] [-m TEKST] [-r REV] [NAAM]"
 
 #: tortoisehg/hgqt/run.py:1151
 msgid "thg shelve"
-msgstr ""
+msgstr "thg shelve"
 
 #: tortoisehg/hgqt/run.py:1152
 msgid "thg rejects [FILE]"
-msgstr ""
+msgstr "thg rejects [BESTAND]"
 
 #: tortoisehg/hgqt/run.py:1153
 msgid "thg test"
-msgstr ""
+msgstr "thg test"
 
 #: tortoisehg/hgqt/run.py:1154
 msgid "thg help [COMMAND]"
-msgstr ""
+msgstr "thg help [OPDRACHT]"
 
 #: tortoisehg/hgqt/run.py:1155
 msgid "thg purge"
-msgstr ""
+msgstr "thg purge"
 
 #: tortoisehg/hgqt/run.py:1156
 msgid "thg qreorder"
-msgstr ""
+msgstr "thg qreorder"
 
 #: tortoisehg/hgqt/run.py:1157
 msgid "thg qqueue"
-msgstr ""
+msgstr "thg qqueue"
 
 #: tortoisehg/hgqt/run.py:1161
 msgid "revision to update"
-msgstr ""
+msgstr "revisie om bij te werken"
 
 #: tortoisehg/hgqt/run.py:1162
 msgid "thg update [-C] [[-r] REV]"
-msgstr ""
+msgstr "thg update [-C] [[-r] REV]"
 
 #: tortoisehg/hgqt/run.py:1164 tortoisehg/hgqt/run.py:1167
 msgid "field to give initial focus"
-msgstr ""
+msgstr "veld om initële focus te geven"
 
 #: tortoisehg/hgqt/run.py:1165
 msgid "thg userconfig"
-msgstr ""
+msgstr "thg userconfig"
 
 #: tortoisehg/hgqt/run.py:1168
 msgid "thg repoconfig"
-msgstr ""
+msgstr "thg repoconfig"
 
 #: tortoisehg/hgqt/run.py:1170
 msgid "changeset to view in diff tool"
-msgstr ""
+msgstr "changeset om te bekijken in diff programma"
 
 #: tortoisehg/hgqt/run.py:1171
 msgid "revisions to view in diff tool"
-msgstr ""
+msgstr "revisies om te bekijken in diff programma"
 
 #: tortoisehg/hgqt/run.py:1172
 msgid "bundle file to preview"
-msgstr ""
+msgstr "bundel bestand om vooraf te bekijken"
 
 #: tortoisehg/hgqt/run.py:1173
 msgid "launch visual diff tool"
-msgstr ""
+msgstr "lanceer visueel diff programma"
 
 #: tortoisehg/hgqt/run.py:1175
 msgid "print license"
-msgstr ""
+msgstr "afdrukken licentie"
 
 #: tortoisehg/hgqt/run.py:1176
 msgid "thg version [OPTION]"
-msgstr ""
+msgstr "thg versie [OPTIES]"
 
 #: tortoisehg/hgqt/run.py:1181
 msgid "thg shellconfig"
-msgstr ""
+msgstr "thg shellconfig"
 
 #: tortoisehg/hgqt/rupdate.py:57
 msgid "Location:"
-msgstr ""
+msgstr "Lokatie:"
 
 #: tortoisehg/hgqt/rupdate.py:61
 msgid "Discard remote changes, no backup (-C/--clean)"
-msgstr ""
+msgstr "Verwerp remote wijzigingen, geen backup (-C/--clean)"
 
 #: tortoisehg/hgqt/rupdate.py:63
 msgid "Perform a push before updating (-p/--push)"
-msgstr ""
+msgstr "Voer een push uit vooraleer bij te werken (-p/--push)"
 
 #: tortoisehg/hgqt/rupdate.py:65
 msgid "Allow pushing new branches (--new-branch)"
-msgstr ""
+msgstr "Laat toe om nieuwe branches te pushen (--new-branch)"
 
 #: tortoisehg/hgqt/rupdate.py:67
 msgid "Force push to remote location (-f/--force)"
-msgstr ""
+msgstr "Forceer een push naar de remote lokatie (-f/--force)"
 
 #: tortoisehg/hgqt/serve.py:40
 msgid "Log"
@@ -5680,7 +5716,7 @@ msgstr "Repositories"
 #: tortoisehg/hgqt/serve.py:68
 #, python-format
 msgid "Running at %s"
-msgstr ""
+msgstr "Bezig met lopen op %s"
 
 #: tortoisehg/hgqt/serve.py:70
 msgid "Stopped"
@@ -5800,7 +5836,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:481
 msgid "Shell"
-msgstr ""
+msgstr "Shell"
 
 #: tortoisehg/hgqt/settings.py:482
 #, python-format
@@ -6015,13 +6051,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:560
 msgid "Dead Branches"
-msgstr ""
+msgstr "Dode Branches"
 
 #: tortoisehg/hgqt/settings.py:561
 msgid ""
 "Comma separated list of branch names that should be ignored when building a "
 "list of branch names for a repository. Default: None (leave blank)"
 msgstr ""
+"Komma-gescheiden lijst van branch namen die genegeerd moeten worden als een "
+"lijst met branch namen opgebouwd wordt voor een repository. Standaard: Geen "
+"(blank laten)"
 
 #: tortoisehg/hgqt/settings.py:564
 msgid "Branch Colors"
@@ -6071,7 +6110,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:581
 msgid "Default Push"
-msgstr ""
+msgstr "Standaard Push"
 
 #: tortoisehg/hgqt/settings.py:583
 msgid ""
@@ -6141,7 +6180,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:606
 msgid "Auto Commit List"
-msgstr ""
+msgstr "Auto Commit Lijst"
 
 #: tortoisehg/hgqt/settings.py:607
 msgid ""
@@ -6155,7 +6194,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:610
 msgid "Auto Exclude List"
-msgstr ""
+msgstr "Auto Uitsluit Lijst"
 
 #: tortoisehg/hgqt/settings.py:611
 msgid ""
@@ -6295,6 +6334,8 @@ msgid ""
 "How many lines a \"zebra stripe\" should span in multiline output. Default "
 "is 1; set to 0 to disable."
 msgstr ""
+"Hoeveel regels moet een \"zebrastreep\" overspannen in resultaten met "
+"meerdere lijnen. Standaard is 1; zet op 0 om uit te schakelen."
 
 #: tortoisehg/hgqt/settings.py:664
 msgid "Max Files"
@@ -6303,18 +6344,20 @@ msgstr "Max Bestanden"
 #: tortoisehg/hgqt/settings.py:665
 msgid "Maximum number of files to list per changeset. Default: 10"
 msgstr ""
+"Maximum aantal bestanden om op te lijsten per changeset. Standaard: 10"
 
 #: tortoisehg/hgqt/settings.py:666
 msgid "Max Changes"
-msgstr ""
+msgstr "Max Wijzigingen"
 
 #: tortoisehg/hgqt/settings.py:667
 msgid "Maximum number of changes to list on the changelog. Default: 10"
 msgstr ""
+"Maxmimum aantal wijzigingen om op te lijsten voor de changeset. Standaard: 10"
 
 #: tortoisehg/hgqt/settings.py:669
 msgid "Allow Push"
-msgstr ""
+msgstr "Push Toelaten"
 
 #: tortoisehg/hgqt/settings.py:670
 msgid ""
@@ -6328,7 +6371,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:677
 msgid "Deny Push"
-msgstr ""
+msgstr "Push Weigeren"
 
 #: tortoisehg/hgqt/settings.py:678
 msgid ""
@@ -6349,16 +6392,18 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:688
 msgid "Proxy"
-msgstr ""
+msgstr "Proxy"
 
 #: tortoisehg/hgqt/settings.py:689
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: tortoisehg/hgqt/settings.py:690
 msgid ""
 "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
 msgstr ""
+"Host naam en (optionele) poort van de proxy server, bijvoorbeeld "
+"\"mijnproxy:8000\""
 
 #: tortoisehg/hgqt/settings.py:692
 msgid "Bypass List"
@@ -6368,51 +6413,54 @@ msgstr ""
 msgid ""
 "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr ""
+"Optioneel. Komme-gescheiden lijst van host namen die door de proxy zouden "
+"moeten overgeslagen worden."
 
 #: tortoisehg/hgqt/settings.py:696
 msgid "Optional. User name to authenticate with at the proxy server"
-msgstr ""
+msgstr "Optioneel. Gebruikersnaam voor authenticatie met de proxy server."
 
 #: tortoisehg/hgqt/settings.py:697 tortoisehg/hgqt/settings.py:828
 #: tortoisehg/hgqt/sync.py:1362
 msgid "Password"
-msgstr ""
+msgstr "Paswoord"
 
 #: tortoisehg/hgqt/settings.py:698
 msgid "Optional. Password to authenticate with at the proxy server"
-msgstr ""
+msgstr "Optioneel. Paswoord voor authenticatie met de proxy server"
 
 #: tortoisehg/hgqt/settings.py:702
 msgid "From"
-msgstr ""
+msgstr "Van"
 
 #: tortoisehg/hgqt/settings.py:703
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr ""
+"Email adres om te gebruiken in de \"Van\" hoofding en voor de SMTP enveloppe"
 
 #: tortoisehg/hgqt/settings.py:705
 msgid "To"
-msgstr ""
+msgstr "Aan"
 
 #: tortoisehg/hgqt/settings.py:706
 msgid "Comma-separated list of recipient email addresses"
-msgstr ""
+msgstr "Komme-gescheiden lijst van email adressen van ontvangers"
 
 #: tortoisehg/hgqt/settings.py:707
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: tortoisehg/hgqt/settings.py:708
 msgid "Comma-separated list of carbon copy recipient email addresses"
-msgstr ""
+msgstr "Komma-gescheiden lijst van email adressen van Cc ontvangers"
 
 #: tortoisehg/hgqt/settings.py:709
 msgid "Bcc"
-msgstr ""
+msgstr "Bcc"
 
 #: tortoisehg/hgqt/settings.py:710
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
-msgstr ""
+msgstr "Komma-gescheiden lijst van email adressen van Bcc ontvangers"
 
 #: tortoisehg/hgqt/settings.py:712
 msgid "method"
@@ -6430,59 +6478,61 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:719
 msgid "SMTP Host"
-msgstr ""
+msgstr "SMTP Host"
 
 #: tortoisehg/hgqt/settings.py:720
 msgid "Host name of mail server"
-msgstr ""
+msgstr "Host naam van de mail server"
 
 #: tortoisehg/hgqt/settings.py:721
 msgid "SMTP Port"
-msgstr ""
+msgstr "SMTP Port"
 
 #: tortoisehg/hgqt/settings.py:722
 msgid "Port to connect to on mail server. Default: 25"
-msgstr ""
+msgstr "Poort om naar te conneceteren op de mail server. Standaard: 25"
 
 #: tortoisehg/hgqt/settings.py:724
 msgid "SMTP TLS"
-msgstr ""
+msgstr "SMTP TLS"
 
 #: tortoisehg/hgqt/settings.py:725
 msgid "Connect to mail server using TLS. Default: False"
-msgstr ""
+msgstr "Connecteer naar de mail server met TLS. Standaard: Nee"
 
 #: tortoisehg/hgqt/settings.py:727
 msgid "SMTP Username"
-msgstr ""
+msgstr "SMTP Gebruikersnaam"
 
 #: tortoisehg/hgqt/settings.py:728
 msgid "Username to authenticate to mail server with"
-msgstr ""
+msgstr "Gebruikersnaam voor authenticatie op de mail server"
 
 #: tortoisehg/hgqt/settings.py:729
 msgid "SMTP Password"
-msgstr ""
+msgstr "SMTP Paswoord"
 
 #: tortoisehg/hgqt/settings.py:730
 msgid "Password to authenticate to mail server with"
-msgstr ""
+msgstr "Paswoord voor authenticatie op de mail server"
 
 #: tortoisehg/hgqt/settings.py:731
 msgid "Local Hostname"
-msgstr ""
+msgstr "Lokale Hostnaam"
 
 #: tortoisehg/hgqt/settings.py:732
 msgid "Hostname the sender can use to identify itself to the mail server."
 msgstr ""
+"Hostnaam die de afzender kan gebruiken om zichzelf te identificeren op de "
+"mail server"
 
 #: tortoisehg/hgqt/settings.py:736
 msgid "Diff"
-msgstr ""
+msgstr "Diff"
 
 #: tortoisehg/hgqt/settings.py:738
 msgid "Patch EOL"
-msgstr ""
+msgstr "Patch EOL"
 
 #: tortoisehg/hgqt/settings.py:740
 msgid ""
@@ -6493,15 +6543,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:744
 msgid "Git Format"
-msgstr ""
+msgstr "Git Formaat"
 
 #: tortoisehg/hgqt/settings.py:745
 msgid "Use git extended diff header format. Default: False"
-msgstr ""
+msgstr "Gebruik git uitgebreid header formaat. Standaard: Nee"
 
 #: tortoisehg/hgqt/settings.py:747
 msgid "MQ Git Format"
-msgstr ""
+msgstr "MQ Git Formaat"
 
 #: tortoisehg/hgqt/settings.py:749
 msgid ""
@@ -6513,7 +6563,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:753
 msgid "No Dates"
-msgstr ""
+msgstr "Geen Datums"
 
 #: tortoisehg/hgqt/settings.py:754
 msgid "Do not include modification dates in diff headers. Default: False"
@@ -6529,7 +6579,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:759
 msgid "Ignore White Space"
-msgstr ""
+msgstr "Witruimte Negeren"
 
 #: tortoisehg/hgqt/settings.py:760
 msgid "Ignore white space when comparing lines. Default: False"
@@ -6537,7 +6587,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:762
 msgid "Ignore WS Amount"
-msgstr ""
+msgstr "Aantal Witruimte Negeren"
 
 #: tortoisehg/hgqt/settings.py:763
 msgid "Ignore changes in the amount of white space. Default: False"
@@ -6545,7 +6595,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:765
 msgid "Ignore Blank Lines"
-msgstr ""
+msgstr "Blano Regels Negeren"
 
 #: tortoisehg/hgqt/settings.py:766
 msgid "Ignore changes whose lines are all blank. Default: False"
@@ -6553,11 +6603,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:770
 msgid "Fonts"
-msgstr ""
+msgstr "Lettertypes"
 
 #: tortoisehg/hgqt/settings.py:771
 msgid "Message Font"
-msgstr ""
+msgstr "Bericht Lettertype"
 
 #: tortoisehg/hgqt/settings.py:772
 msgid "Font used to display commit messages. Default: monospace 10"
@@ -6565,7 +6615,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:774
 msgid "Diff Font"
-msgstr ""
+msgstr "Diff Lettertype"
 
 #: tortoisehg/hgqt/settings.py:775
 msgid "Font used to display text differences. Default: monospace 10"
@@ -6573,7 +6623,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:777
 msgid "List Font"
-msgstr ""
+msgstr "Lijst Letterytpe"
 
 #: tortoisehg/hgqt/settings.py:778
 msgid "Font used to display file lists. Default: sans 9"
@@ -6581,7 +6631,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:780
 msgid "ChangeLog Font"
-msgstr ""
+msgstr "Historiek Lettertype"
 
 #: tortoisehg/hgqt/settings.py:781
 msgid "Font used to display changelog data. Default: monospace 10"
@@ -6589,7 +6639,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:783
 msgid "Output Font"
-msgstr ""
+msgstr "Resultaten Lettertype"
 
 #: tortoisehg/hgqt/settings.py:784
 msgid "Font used to display output messages. Default: sans 8"
@@ -6597,7 +6647,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:788 tortoisehg/hgqt/settings.py:1330
 msgid "Extensions"
-msgstr ""
+msgstr "Uitbreidingen"
 
 #: tortoisehg/hgqt/settings.py:791
 msgid "Issue Tracking"
@@ -6667,7 +6717,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:823
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 #: tortoisehg/hgqt/settings.py:824
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -6683,7 +6733,7 @@ msgstr "Paswoord voor authenticatie met review board"
 
 #: tortoisehg/hgqt/settings.py:830
 msgid "Server Repository ID"
-msgstr ""
+msgstr "Server Repository ID"
 
 #: tortoisehg/hgqt/settings.py:831
 msgid "The default repository id for this repo on the review board server"
@@ -6707,11 +6757,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:838
 msgid "Kiln Bfiles"
-msgstr ""
+msgstr "Kiln Bfiles"
 
 #: tortoisehg/hgqt/settings.py:839 tortoisehg/hgqt/settings.py:849
 msgid "Patterns"
-msgstr ""
+msgstr "Patronen"
 
 #: tortoisehg/hgqt/settings.py:840
 msgid ""
@@ -6721,7 +6771,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:842
 msgid "Size"
-msgstr ""
+msgstr "Grootte"
 
 #: tortoisehg/hgqt/settings.py:843
 msgid ""
@@ -6730,7 +6780,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:844
 msgid "System Cache"
-msgstr ""
+msgstr "Systeem Cache"
 
 #: tortoisehg/hgqt/settings.py:845
 msgid ""
@@ -6739,7 +6789,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:848
 msgid "Largefiles"
-msgstr ""
+msgstr "Largefiles"
 
 #: tortoisehg/hgqt/settings.py:850
 msgid ""
@@ -6749,7 +6799,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:852
 msgid "Minimum Size"
-msgstr ""
+msgstr "Minimum Grootte"
 
 #: tortoisehg/hgqt/settings.py:853
 msgid ""
@@ -6768,11 +6818,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:858
 msgid "Projrc"
-msgstr ""
+msgstr "Projrc"
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "Require confirmation"
-msgstr ""
+msgstr "Bevestiging vereisen"
 
 #: tortoisehg/hgqt/settings.py:860
 msgid ""
@@ -6782,7 +6832,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:862
 msgid "Servers"
-msgstr ""
+msgstr "Servers"
 
 #: tortoisehg/hgqt/settings.py:863
 msgid ""
@@ -6813,11 +6863,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:882
 msgid "TortoiseHg Settings"
-msgstr ""
+msgstr "TortoiseHg Instellingen"
 
 #: tortoisehg/hgqt/settings.py:888
 msgid "Iniparse package not found"
-msgstr ""
+msgstr "Iniparse package niet gevonden"
 
 #: tortoisehg/hgqt/settings.py:889
 msgid "Can't change settings without iniparse package - view is readonly."
@@ -6826,34 +6876,36 @@ msgstr ""
 #: tortoisehg/hgqt/settings.py:913
 #, python-format
 msgid "%s's global settings"
-msgstr ""
+msgstr "%s's globale instellingen"
 
 #: tortoisehg/hgqt/settings.py:927
 msgid "No repository found"
-msgstr ""
+msgstr "Geen repository gevonden"
 
 #: tortoisehg/hgqt/settings.py:928
 msgid "no repo at "
-msgstr ""
+msgstr "geen repo in "
 
 #: tortoisehg/hgqt/settings.py:936
 #, python-format
 msgid "%s project settings (.hg/projrc)"
-msgstr ""
+msgstr "%s project instellingen (.hg/projrc)"
 
 #: tortoisehg/hgqt/settings.py:942
 #, python-format
 msgid "%s repository settings"
-msgstr ""
+msgstr "%s repository instellingen"
 
 #: tortoisehg/hgqt/settings.py:969
 msgid ""
 "Restart all TortoiseHg applications for the following changes to take effect:"
 msgstr ""
+"Herstart alle TortoiseHg toepassingen om de volgende wijzigingen te "
+"activeren:"
 
 #: tortoisehg/hgqt/settings.py:977
 msgid "Apply changes before exit?"
-msgstr ""
+msgstr "Wijzigingen toepassen vooraleer te verlaten?"
 
 #: tortoisehg/hgqt/settings.py:978
 msgid "&Yes"
@@ -6873,7 +6925,7 @@ msgstr "Bevestig Bewaren"
 
 #: tortoisehg/hgqt/settings.py:1096
 msgid "Save changes before editing?"
-msgstr ""
+msgstr "Wijzigingen bewaren vooraleer aan te passen?"
 
 #: tortoisehg/hgqt/settings.py:1097
 msgid "&Save"
@@ -6888,18 +6940,21 @@ msgid ""
 "Unsaved changes will be lost.\n"
 "Do you want to reload?"
 msgstr ""
+"Onbewaarde wijzigingen zullen verloren gaan.\n"
+"Wilt u herladen?"
 
 #: tortoisehg/hgqt/settings.py:1280
 msgid "Unable to create a Mercurial.ini file"
-msgstr ""
+msgstr "Kan geen Mercurial.ini bestand aanmaken"
 
 #: tortoisehg/hgqt/settings.py:1281
 msgid "Insufficient access rights, reverting to read-only mode."
 msgstr ""
+"Onvoldoende toegangsrechten, bezig met omkeren naar alleen-lezen modus."
 
 #: tortoisehg/hgqt/shellconf.py:86
 msgid "Contex Menu"
-msgstr ""
+msgstr "Context Menu"
 
 #: tortoisehg/hgqt/shellconf.py:88
 msgid "Top menu items:"
@@ -8773,7 +8828,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:807
 msgid "Failed to open repository"
-msgstr ""
+msgstr "Openen van de repository mislukt"
 
 #: tortoisehg/hgqt/workbench.py:948
 #, python-format
@@ -9116,7 +9171,7 @@ msgstr "Bekijk historiek van wijzigingen van de gekozen bestanden"
 
 #: tortoisehg/util/menuthg.py:52
 msgid "Synchronize"
-msgstr ""
+msgstr "Synchroniseren"
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Synchronize with remote repository"

@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-03-19 21:15-0300\n"
-"PO-Revision-Date: 2011-08-01 15:44+0000\n"
-"Last-Translator: Yuya Nishihara <Unknown>\n"
+"PO-Revision-Date: 2012-03-22 15:59+0000\n"
+"Last-Translator: Takumi Iino <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-03-20 05:01+0000\n"
-"X-Generator: Launchpad (build 14969)\n"
+"X-Launchpad-Export-Date: 2012-03-23 04:56+0000\n"
+"X-Generator: Launchpad (build 14996)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -8744,7 +8744,7 @@ msgstr "シェルフには何もありません\n"
 
 #: tortoisehg/util/hgshelve.py:593
 msgid "unshelve backup aborted\n"
-msgstr ""
+msgstr "シェルフのバックアップファイル作成に失敗しました\n"
 
 #: tortoisehg/util/hgshelve.py:597
 msgid "applying shelved patch\n"
@@ -8764,19 +8764,19 @@ msgstr "シェルフから戻しました\n"
 
 #: tortoisehg/util/hgshelve.py:630
 msgid "abandoning shelved file\n"
-msgstr ""
+msgstr "シェルフを破棄します\n"
 
 #: tortoisehg/util/hgshelve.py:632
 msgid "shelved file abandoned\n"
-msgstr ""
+msgstr "シェルフを破棄しました\n"
 
 #: tortoisehg/util/hgshelve.py:634
 msgid "nothing to abandon\n"
-msgstr ""
+msgstr "破棄するシェルフが存在しません\n"
 
 #: tortoisehg/util/hgshelve.py:636
 msgid "abandon failed\n"
-msgstr ""
+msgstr "シェルフの破棄に失敗しました\n"
 
 #: tortoisehg/util/hgshelve.py:643
 msgid "mark new/missing files as added/removed before shelving"
@@ -9043,7 +9043,7 @@ msgstr "有効なハンクがありません"
 #: tortoisehg/util/prej.py:846
 #, python-format
 msgid "hunk %d already applied at line %d (fuzz %d)\n"
-msgstr ""
+msgstr "%d番目のハンクが%d行目で適用済み(あいまいさは%d文字)\n"
 
 #: tortoisehg/util/version.py:17
 #, python-format
