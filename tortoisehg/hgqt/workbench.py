@@ -966,7 +966,7 @@ class Workbench(QMainWindow):
         else:
             qtlib.WarningMsgBox(_("README not configured"),
                 _("A README file is not configured for the current repository.<p>"
-                "To configure a REDME file for a repository, "
+                "To configure a README file for a repository, "
                 "open the repository settings file, add a '<i>readme</i>' "
                 "key to the '<i>tortoisehg</i>' section, and set it "
                 "to the filename or URL of your repository's README file."))
