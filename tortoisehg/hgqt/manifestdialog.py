@@ -285,7 +285,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if self.rev is None:
             qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
                             parent=self)
-        else:
+        elif self.path in self._repo[self.rev]:
             base, _ = visdiff.snapshot(self._repo,
                                        [hglib.fromunicode(self.path)],
                                        self._repo[self.rev])
