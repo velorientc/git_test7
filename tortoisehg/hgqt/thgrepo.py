@@ -215,8 +215,9 @@ class ThgRepoWrapper(QObject):
             return False
         if mtime <= self._dirstatemtime:
             return False
+        changed = self._checkparentchanges() or self._checkbranch()
         self._dirstatemtime = mtime
-        return self._checkparentchanges() or self._checkbranch()
+        return changed
 
     def _checkparentchanges(self):
         nodes = self._getrawparents()
@@ -237,8 +238,9 @@ class ThgRepoWrapper(QObject):
             return False
         if mtime <= self._branchmtime:
             return False
+        changed = self._checkbranchcontent()
         self._branchmtime = mtime
-        return self._checkbranchcontent()
+        return changed
 
     def _checkbranchcontent(self):
         try:
