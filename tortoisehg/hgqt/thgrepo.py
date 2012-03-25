@@ -211,6 +211,9 @@ class ThgRepoWrapper(QObject):
         if mtime <= self._dirstatemtime:
             return False
         self._dirstatemtime = mtime
+        return self._checkparentchanges() or self._checkbranch()
+
+    def _checkparentchanges(self):
         nodes = self._getrawparents()
         if nodes != self._parentnodes:
             dbgoutput('dirstate change found')
@@ -221,6 +224,9 @@ class ThgRepoWrapper(QObject):
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
             return True
+        return False
+
+    def _checkbranch(self):
         try:
             mtime = os.path.getmtime(self.repo.join('branch'))
         except EnvironmentError:
@@ -228,6 +234,9 @@ class ThgRepoWrapper(QObject):
         if mtime <= self._branchmtime:
             return False
         self._branchmtime = mtime
+        return self._checkbranchcontent()
+
+    def _checkbranchcontent(self):
         try:
             newbranch = self.repo.opener('branch').read()
         except EnvironmentError:
