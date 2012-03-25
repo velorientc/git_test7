@@ -63,6 +63,9 @@ def repository(_ui=None, path='', create=False, bundle=None):
         raise error.RepoError('%s is not a valid repository' % path)
     return _repocache[path]
 
+class _LockStillHeld(Exception):
+    'Raised to abort status check due to lock existence'
+
 class ThgRepoWrapper(QObject):
 
     configChanged = pyqtSignal()
@@ -137,11 +140,14 @@ class ThgRepoWrapper(QObject):
         if self.locked():
             dbgoutput('locked, aborting')
             return
-        if self._checkdirstate():
-            dbgoutput('dirstate changed, exiting')
-            return
-        self._checkrepotime()
-        self._checkuimtime()
+        try:
+            if self._checkdirstate():
+                dbgoutput('dirstate changed, exiting')
+                return
+            self._checkrepotime()
+            self._checkuimtime()
+        except _LockStillHeld:
+            dbgoutput('lock still held - ignoring for now')
 
     def locked(self):
         if os.path.lexists(self.repo.join('wlock')):
@@ -196,8 +202,7 @@ class ThgRepoWrapper(QObject):
         if self._repomtime < self._getrepomtime():
             dbgoutput('detected repository change')
             if self.locked():
-                dbgoutput('lock still held - ignoring for now')
-                return
+                raise _LockStillHeld
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
@@ -218,8 +223,7 @@ class ThgRepoWrapper(QObject):
         if nodes != self._parentnodes:
             dbgoutput('dirstate change found')
             if self.locked():
-                dbgoutput('lock still held - ignoring for now')
-                return True
+                raise _LockStillHeld
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
@@ -244,8 +248,7 @@ class ThgRepoWrapper(QObject):
         if newbranch != self._rawbranch:
             dbgoutput('branch time change')
             if self.locked():
-                dbgoutput('lock still held - ignoring for now')
-                return True
+                raise _LockStillHeld
             self._rawbranch = newbranch
             self.repo.thginvalidate()
             self.workingBranchChanged.emit()
