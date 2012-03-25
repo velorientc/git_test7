@@ -148,7 +148,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._toolbar = QToolBar()
         self._toolbar.setIconSize(QSize(16,16))
         self._toolbar.setStyleSheet(qtlib.tbstylesheet)
-        self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
+        self._treeview = QManifestTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
         self._treeview.doubleClicked.connect(self.onDoubleClick)
@@ -191,12 +191,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         qs.setValue(prefix+'/revpanel.expanded', self.revpanel.is_expanded())
 
     def _initactions(self):
-        self.le = QLineEdit()
+        self.le = QManifestLineEdit() #QLineEdit()
         if hasattr(self.le, 'setPlaceholderText'): # Qt >= 4.7
             self.le.setPlaceholderText(_('### filter text ###'))
         else:
             lbl = QLabel(_('Filter:'))
             self._toolbar.addWidget(lbl)
+        self.le.keypressed.connect(self._treeview.setFocus)
+        self._treeview.topreached.connect(self.le.setFocus)
         self._toolbar.addWidget(self.le)
 
         self._statusfilter = status.StatusFilterButton(
@@ -598,3 +600,28 @@ def run(ui, *pats, **opts):
     QTimer.singleShot(0, init)
 
     return dlg
+
+# In order to let the user seamlessly switch between the filterbox and the treeview
+# we subclas the QLineEdit and QTreeView widgets. We add some keypress related signals
+# will be used by the ManifestWidget to change the focus between these two widgets
+class QManifestLineEdit(QLineEdit):
+    keypressed = pyqtSignal(int)
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Down:
+            # must go down to the tree view
+            self.keypressed.emit(event)
+        else:
+            # default handler for event
+            super(QManifestLineEdit, self).keyPressEvent(event)
+
+class QManifestTreeView(QTreeView):
+    topreached = pyqtSignal(int)
+    def keyPressEvent(self, event):
+        if self.currentIndex().row() == 0 \
+                and not self.currentIndex().parent().isValid():
+            if event.key() == Qt.Key_Up:
+                # must go up to the filter box
+                self.topreached.emit(event)
+                return
+        # default handler for event
+        super(QManifestTreeView, self).keyPressEvent(event)
