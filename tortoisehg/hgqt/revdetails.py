@@ -275,9 +275,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
         msg = ctx.description()
-        inlinetags = self.repo.ui.config('tortoisehg', 'issue.inlinetags', False)
-        if inlinetags == 'False':
-            inlinetags = False
+        inlinetags = self.repo.ui.configbool('tortoisehg', 'issue.inlinetags')
         if ctx.tags() and inlinetags:
             msg = ' '.join(['[%s]' % tag for tag in ctx.tags()]) + ' ' + msg
         self.message.setHtml('<pre>%s</pre>'
