@@ -24,7 +24,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 import mercurial.ui as uimod
-from mercurial import util, fancyopts, cmdutil, extensions, error
+from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
@@ -92,18 +92,23 @@ def portable_fork(ui, opts):
             return
     elif config_nofork:
         return
+    portable_start_fork()
+    sys.exit(0)
+
+def portable_start_fork(extraargs=None):
     os.environ['THG_GUI_SPAWN'] = '1'
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
         args = sys.argv
     else:
         args = [sys.executable] + sys.argv
+    if extraargs:
+        args += extraargs
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
                      creationflags=qtlib.openflags,
                      shell=True)
-    sys.exit(0)
 
 # Windows and Nautilus shellext execute
 # "thg subcmd --listfile TMPFILE" or "thg subcmd --listfileutf8 TMPFILE"(planning) .
@@ -175,7 +180,7 @@ def get_files_from_listfile():
     files = []
     for f in lines:
         try:
-            cpath = hglib.canonpath(root, cwd, f)
+            cpath = scmutil.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
         except util.Abort:
             continue
@@ -268,6 +273,9 @@ def runcommand(ui, args):
 
     if options['help']:
         return help_(ui, cmd)
+
+    if options['newworkbench']:
+        cmdoptions['newworkbench'] = True
 
     path = options['repository']
     if path:
@@ -1040,6 +1048,7 @@ globalopts = [
     ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
     ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
+    ('', 'newworkbench', None, _('open a new workbench window')),
 ]
 
 table = {

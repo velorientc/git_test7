@@ -222,6 +222,7 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
     removeRepo = pyqtSignal(QString)
+    progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
             showShortPaths=False):
@@ -764,3 +765,12 @@ class RepoRegistryView(QDockWidget):
             return r1.startswith(r2) or r2.startswith(r1)
 
         m.loadSubrepos(m.rootItem, isAboveOrBelowUroot)
+
+    @pyqtSlot(int, int, QString, QString)
+    def updateProgress(self, pos, max, topic, item):
+        if pos == max:
+            #self.progressReceived.emit('Updating repository registry', None, '', '', None)
+            self.progressReceived.emit(topic, None, item, '', None)
+        else:
+            #self.progressReceived.emit('Updating repository registry', pos, 'reporegistry-%s' % topic, '', max)
+            self.progressReceived.emit(topic, pos, item, '', max)

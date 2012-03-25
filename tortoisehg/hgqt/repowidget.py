@@ -8,6 +8,7 @@
 
 import binascii
 import os
+import shlex, subprocess, functools # used by runCustomCommand
 from mercurial import revset, error, patch, commands
 
 # hg >= 2.1
@@ -1154,12 +1155,14 @@ class RepoWidget(QWidget):
         # This menu will never be opened for an unapplied patch, they
         # have their own menu.
         #
+        # iswd = working directory
         # isrev = the changeset has an integer revision number
         # isctx = changectx or workingctx
         # fixed = the changeset is considered permanent
         # applied = an applied patch
         # qgoto = applied patch or qparent
         isrev   = lambda ap, wd, tags: not wd
+        iswd   = lambda ap, wd, tags: bool(wd)
         isctx   = lambda ap, wd, tags: True
         fixed   = lambda ap, wd, tags: not (ap or wd)
         applied = lambda ap, wd, tags: ap
@@ -1263,6 +1266,40 @@ class RepoWidget(QWidget):
 
         entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
               self.rupdate)
+
+        def _setupCustomSubmenu(menu):
+            tools, toolnames = hglib.tortoisehgtools(self.repo.ui)
+            if not tools:
+                return
+
+            istrue = lambda ap, wd, tags: True
+            enablefuncs = {
+                'istrue': istrue, 'iswd': iswd, 'isrev': isrev, 'isctx': isctx,
+                'fixed': fixed, 'applied': applied, 'qgoto': qgoto
+            }
+
+            entry(menu)
+            submenu = menu.addMenu(_('Custom Tools'))
+            for name in toolnames:
+                info = tools[name]
+                location = info.get('location', '').split()
+                if 'repowidget' not in location:
+                    continue
+                command = info.get('command', None)
+                if not command:
+                    continue
+                label = info.get('label', name)
+                icon = info.get('icon', 'tools-spanner-hammer')
+                enable = info.get('enable', 'istrue').lower()
+                if enable in enablefuncs:
+                    enable = enablefuncs[enable]
+                else:
+                    continue
+                menufunc = functools.partial(self.runCustomCommand, command)
+                entry(submenu, None, enable, label, icon, menufunc)
+
+        _setupCustomSubmenu(menu)
+
         if mode == 'outgoing':
             self.outgoingcmenu = menu
             self.outgoingcmenuitems = items
@@ -1277,7 +1314,7 @@ class RepoWidget(QWidget):
                 B, A = self.menuselection
             else:
                 A, B = self.menuselection
-            func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (A, B))
+            func = revset.match(self.repo.ui, '%s::%s' % (A, B))
             return [c for c in func(self.repo, range(len(self.repo)))]
 
         def exportPair():
@@ -1801,7 +1838,7 @@ class RepoWidget(QWidget):
 
         # Check whether there are existing patches in the MQ queue whose name
         # collides with the revisions that are going to be imported
-        func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (self.rev, endrev))
+        func = revset.match(self.repo.ui, '%s::%s' % (self.rev, endrev))
         revList = [c for c in func(self.repo, range(len(self.repo)))]
 
         if endrev and not revList:
@@ -1926,6 +1963,37 @@ class RepoWidget(QWidget):
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
         shlib.shell_notify(self.repo.root)
+
+
+    def runCustomCommand(self, command):
+        """Execute 'custom commands', on the selected repository"""
+        # Perform variable expansion
+        # This is done in two steps:
+        # 1. Expand environment variables
+        command = os.path.expandvars(command).strip()
+        if not command:
+            InfoMsgBox(_('Invalid command'),
+                       _('The selected command is empty'))
+            return
+
+        # 2. Expand internal workbench variables
+        vars = {
+            'ROOT': self.repo.root,
+            'REV': self.rev
+        }
+        for var in vars:
+            command = command.replace('{%s}' % var, str(vars[var]))
+
+        # If the use wants to run mercurial, do so via our usual runCommand method
+        cmd = shlex.split(command)
+        if cmd[0].lower() == 'hg':
+            cmd = cmd[1:]
+            if '--repository' not in cmd:
+                cmd += ['--repository', self.repo.root]
+            return self.runCommand(cmd)
+
+        # Otherwise, run the selected command in the brackground
+        return subprocess.Popen(command, cwd=self.repo.root)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():

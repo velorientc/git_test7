@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import re
+import re, os
 
 from mercurial import util
 
@@ -125,9 +125,15 @@ class Scintilla(QsciScintilla):
 
     def __init__(self, parent=None):
         super(Scintilla, self).__init__(parent)
+        self.autoUseTabs = True
         self.setUtf8(True)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
+
+    def read(self, f):
+        result = super(Scintilla, self).read(f)
+        self.setDefaultEolMode()
+        return result
 
     def inputMethodQuery(self, query):
         if query == Qt.ImMicroFocus:
@@ -210,7 +216,7 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
-        vsmenu = QMenu(_('EolnVisibility'), self)
+        vsmenu = QMenu(_('EOL Visibility'), self)
         for name, mode in ((_('Visible'), True),
                            (_('Invisible'), False)):
             def mkaction(n, m):
@@ -219,9 +225,32 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.eolVisibility() == m)
                 a.triggered.connect(lambda: self.setEolVisibility(m))
             mkaction(name, mode)
+        eolmodemenu = None
+        tabindentsmenu = None
         acmenu = None
         if not self.isReadOnly():
-            acmenu = QMenu(_('AutoComplete'), self)
+            eolmodemenu = QMenu(_('EOL Mode'), self)
+            for name, mode in ((_('Windows'), qsci.EolWindows),
+                               (_('Unix'), qsci.EolUnix),
+                               (_('Mac'), qsci.EolMac)):
+                def mkaction(n, m):
+                    a = eolmodemenu.addAction(n)
+                    a.setCheckable(True)
+                    a.setChecked(self.eolMode() == m)
+                    a.triggered.connect(lambda: self.setEolMode(m))
+                mkaction(name, mode)
+            tabindentsmenu = QMenu(_('TAB inserts'), self)
+            for name, mode in ((_('Auto'), -1),
+                               (_('TAB'), True),
+                               (_('Spaces'), False)):
+                def mkaction(n, m):
+                    a = tabindentsmenu.addAction(n)
+                    a.setCheckable(True)
+                    a.setChecked(self.indentationsUseTabs() == m or \
+                        (self.autoUseTabs and n == 'Auto'))
+                    a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
+                mkaction(name, mode)
+            acmenu = QMenu(_('Auto-Complete'), self)
             for name, value in ((_('Enable'), 2),
                                 (_('Disable'), -1)):
                 def mkaction(n, v):
@@ -230,23 +259,38 @@ class Scintilla(QsciScintilla):
                     a.setChecked(self.autoCompletionThreshold() == v)
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
-        self._stdMenu.addMenu(wrapmenu)
-        self._stdMenu.addMenu(wsmenu)
-        self._stdMenu.addMenu(vsmenu)
-        if (acmenu): self._stdMenu.addMenu(acmenu)
+
+        editoptsmenu = QMenu(_('Editor Options'), self)
+        editoptsmenu.addMenu(wrapmenu)
+        editoptsmenu.addSeparator()
+        editoptsmenu.addMenu(wsmenu)
+        if (tabindentsmenu): editoptsmenu.addMenu(tabindentsmenu)
+        editoptsmenu.addSeparator()
+        editoptsmenu.addMenu(vsmenu)
+        if (eolmodemenu): editoptsmenu.addMenu(eolmodemenu)
+        editoptsmenu.addSeparator()
+        if (acmenu): editoptsmenu.addMenu(acmenu)
+        self._stdMenu.addMenu(editoptsmenu)
         return self._stdMenu
 
     def saveSettings(self, qs, prefix):
         qs.setValue(prefix+'/wrap', self.wrapMode())
         qs.setValue(prefix+'/whitespace', self.whitespaceVisibility())
         qs.setValue(prefix+'/eol', self.eolVisibility())
+        if self.autoUseTabs:
+            qs.setValue(prefix+'/usetabs', -1)
+        else:
+            qs.setValue(prefix+'/usetabs', self.indentationsUseTabs())
         qs.setValue(prefix+'/autocomplete', self.autoCompletionThreshold())
 
     def loadSettings(self, qs, prefix):
         self.setWrapMode(qs.value(prefix+'/wrap').toInt()[0])
         self.setWhitespaceVisibility(qs.value(prefix+'/whitespace').toInt()[0])
         self.setEolVisibility(qs.value(prefix+'/eol').toBool())
+        self.setIndentationsUseTabs(qs.value(prefix+'/usetabs').toInt()[0])
+        self.setDefaultEolMode()
         self.setAutoCompletionThreshold(qs.value(prefix+'/autocomplete').toInt()[0])
+
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
@@ -321,6 +365,20 @@ class Scintilla(QsciScintilla):
 
     def showHScrollBar(self, show=True):
         self.SendScintilla(self.SCI_SETHSCROLLBAR, show)
+
+    def setDefaultEolMode(self):
+        if self.lines():
+            mode = qsciEolModeFromLine(hglib.fromunicode(self.text(0)))
+        else:
+            mode = qsciEolModeFromOs()
+        self.setEolMode(mode)
+        return mode
+
+    def setIndentationsUseTabs(self, tabs):
+        self.autoUseTabs = (tabs == -1)
+        if self.autoUseTabs and self.lines():
+            tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
+        super(Scintilla, self).setIndentationsUseTabs(tabs)
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
@@ -481,6 +539,30 @@ class KeyPressInterceptor(QObject):
             return True
         return False
 
+def qsciEolModeFromOs():
+    if os.name.startswith('nt'):
+        return QsciScintilla.EolWindows
+    else:
+        return QsciScintilla.EolUnix
+
+def qsciEolModeFromLine(line):
+    if line.endswith('\r\n'):
+        return QsciScintilla.EolWindows
+    elif line.endswith('\r'):
+        return QsciScintilla.EolMac
+    elif line.endswith('\n'):
+        return QsciScintilla.EolUnix
+    else:
+        return qsciEolModeFromOs()
+
+def findTabIndentsInLines(lines, linestocheck=100):
+    for line in lines[:linestocheck]:
+        if line.startswith(' '):
+            return False
+        elif line.startswith('\t'):
+            return True
+    return False # Use spaces for indents default
+    
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
@@ -525,6 +607,7 @@ def fileEditor(filename, **opts):
         f.open(QIODevice.ReadOnly)
         editor.read(f)
         editor.setModified(False)
+
         ret = dialog.exec_()
         if ret == QDialog.Accepted:
             f = QFile(filename)

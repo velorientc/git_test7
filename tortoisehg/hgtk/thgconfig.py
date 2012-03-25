@@ -330,6 +330,9 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    (_('Inline Tags'), 'tortoisehg.issue.inlinetags',
+        ['False', 'True'],
+        _('Show tags at start of commit message')),
     (_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory',
         ['False', 'True'],
         _('When commiting an issue, force the user to specify a reference '

@@ -11,7 +11,7 @@ import os, sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util, error
+from mercurial import util, error, scmutil
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
@@ -47,8 +47,8 @@ class RenameDialog(QDialog):
                       'from folder<p>%s</p>' % cwd))
             return ('', '')
         try:
-            fname = hglib.canonpath(self.root, cwd, pats[0])
-            target = hglib.canonpath(self.root, cwd, pats[1])
+            fname = scmutil.canonpath(self.root, cwd, pats[0])
+            target = scmutil.canonpath(self.root, cwd, pats[1])
         except:
             pass
         os.chdir(self.root)

@@ -127,7 +127,7 @@ class CompressDialog(QDialog):
 
     def commit(self):
         tip, base = self.revs
-        func = hglib.revsetmatch(self.repo.ui, '%s::%s' % (base, tip))
+        func = revset.match(self.repo.ui, '%s::%s' % (base, tip))
         revcount = len(self.repo)
         revs = [c for c in func(self.repo, range(revcount)) if c != base]
         descs = [self.repo[c].description() for c in revs]

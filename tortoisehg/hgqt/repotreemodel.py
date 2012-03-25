@@ -73,10 +73,12 @@ def getRepoItemList(root, includeSubRepos=False):
 
 class RepoTreeModel(QAbstractItemModel):
 
+    updateProgress = pyqtSignal(int, int, QString, QString)
+
     def __init__(self, filename, parent, showSubrepos=False,
             showNetworkSubrepos=False, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
-
+        self.updateProgress.connect(parent.updateProgress)
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
@@ -317,13 +319,22 @@ class RepoTreeModel(QAbstractItemModel):
             count += 1
 
     def loadSubrepos(self, root, filterFunc=(lambda r: True)):
-        for c in getRepoItemList(root):
+        repoList = getRepoItemList(root)
+        for n, c in enumerate(repoList):
+            QCoreApplication.processEvents()
             if filterFunc(c.rootpath()):
                 if self.showNetworkSubrepos \
                         or not paths.netdrive_status(c.rootpath()):
+                    self.updateProgress.emit(n, len(repoList),
+                        _('Updating repository registry'),
+                        _('Loading repository %s') % c.rootpath())
+                    QCoreApplication.processEvents()
                     self.removeRows(0, c.childCount(),
                         self.createIndex(c.row(), 0, c))
                     c.appendSubrepos()
+        self.updateProgress.emit(len(repoList), len(repoList),
+            _('Updating repository registry'),
+            _('Repository Registry updated'))
 
     def updateCommonPaths(self, showShortPaths=None):
         if not showShortPaths is None:
