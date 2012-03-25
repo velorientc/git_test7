@@ -542,11 +542,9 @@ class KeyPressInterceptor(QObject):
 def qsciEolModeFromOs():
     if os.name.startswith('nt'):
         return QsciScintilla.EolWindows
-    elif sys.platform.startswith('darwin'):
-        return QsciScintilla.EolMac
     else:
         return QsciScintilla.EolUnix
-    
+
 def qsciEolModeFromLine(line):
     if line.endswith('\r\n'):
         return QsciScintilla.EolWindows
