@@ -47,7 +47,7 @@ class ManifestDialog(QMainWindow):
 
         self.setStatusBar(QStatusBar())
         self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
-        self._manifest_widget.linkActivated.connect(self.linkActivated)
+        self._manifest_widget.linkActivated.connect(self._linkHandler)
 
         self._readsettings()
         self._updatewindowtitle()
@@ -88,6 +88,16 @@ class ManifestDialog(QMainWindow):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
         from tortoisehg.hgqt import run
         run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
+
+    @pyqtSlot(QString)
+    def _linkHandler(self, link):
+        ulink = unicode(link)
+        if ulink.startswith('cset:'):
+            rev = ulink[len('cset:'):]
+            self._manifest_widget.setRev(rev)
+        else:
+            self.linkActivated.emit(link)
+
 
 class ManifestWidget(QWidget, qtlib.TaskWidget):
     """Display file tree and contents at the specified revision"""
