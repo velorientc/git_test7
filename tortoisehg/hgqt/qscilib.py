@@ -280,7 +280,7 @@ class Scintilla(QsciScintilla):
         if self.autoUseTabs:
             qs.setValue(prefix+'/usetabs', -1)
         else:
-            qs.setValue(prefix+'/usetabs', self.indentationUseTabs())
+            qs.setValue(prefix+'/usetabs', self.indentationsUseTabs())
         qs.setValue(prefix+'/autocomplete', self.autoCompletionThreshold())
 
     def loadSettings(self, qs, prefix):
