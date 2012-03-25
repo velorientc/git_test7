@@ -169,16 +169,16 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             self.hasmqbutton = False
 
-        hbox = QHBoxLayout()
-        vbox.addLayout(hbox)
-        hbox.setContentsMargins(2, 0, 2, 2)
-        self.optionslabelhdr = QLabel(_('<b>Selected Options:</b>'))
-        self.optionslabelhdr.setContentsMargins(0, 0, 4, 0)
-        self.optionslabel = QLabel()
+        class TruncLabel(QLabel):
+            def __init__(self):
+                QLabel.__init__(self)
+            def minimumSizeHint(self):
+                s = QLabel.minimumSizeHint(self)
+                return QSize(0, s.height())
+
+        self.optionslabel = TruncLabel()
         self.optionslabel.setAcceptDrops(False)
-        hbox.addWidget(self.optionslabelhdr)
-        hbox.addWidget(self.optionslabel)
-        hbox.addStretch()
+        vbox.addWidget(self.optionslabel, 0)
 
         self.pcsinfo = revpanel.ParentWidget(repo)
         vbox.addWidget(self.pcsinfo, 0)
@@ -560,9 +560,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 elif value:
                     opts.append('--%s=%s' % (opt, value))
 
-        self.optionslabel.setText(' '.join(opts))
+        self.optionslabelfmt = _('<b>Selected Options:</b> %s')
+        self.optionslabel.setText(self.optionslabelfmt % ' '.join(opts))
         self.optionslabel.setVisible(bool(opts))
-        self.optionslabelhdr.setVisible(bool(opts))
 
         # Update parent csinfo widget
         self.pcsinfo.set_revision(None)
