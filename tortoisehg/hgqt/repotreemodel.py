@@ -327,7 +327,8 @@ class RepoTreeModel(QAbstractItemModel):
                         or not paths.netdrive_status(c.rootpath()):
                     self.updateProgress.emit(n, len(repoList),
                         _('Updating repository registry'),
-                        _('Loading repository %s') % c.rootpath())
+                        _('Loading repository %s')
+                        % hglib.tounicode(c.rootpath()))
                     QCoreApplication.processEvents()
                     self.removeRows(0, c.childCount(),
                         self.createIndex(c.row(), 0, c))
