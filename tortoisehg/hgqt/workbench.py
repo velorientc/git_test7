@@ -1159,7 +1159,7 @@ def run(ui, *pats, **opts):
             if connectToExistingWorkbench(root):
                 # The were able to connect to an existing workbench server, and
                 # it confirmed that it has opened the selected repo for us
-                exit(0)
+                sys.exit(0)
             # there is no pre-existing workbench server
             serverexists = False
         else:
