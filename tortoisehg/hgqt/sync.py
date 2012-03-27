@@ -1201,6 +1201,7 @@ class SaveDialog(QDialog):
 
         self.aliasentry = QLineEdit(hglib.tounicode(alias))
         self.aliasentry.selectAll()
+        self.aliasentry.textChanged.connect(self.aliasChanged)
         self.layout().addRow(_('Alias'), self.aliasentry)
 
         self.urllabel = QLabel(hglib.tounicode(safeurl))
@@ -1263,6 +1264,9 @@ class SaveDialog(QDialog):
 
     def reject(self):
         super(SaveDialog, self).reject()
+
+    def aliasChanged(self, text):
+        self.bb.button(QDialogButtonBox.Save).setEnabled(len(text) > 0)
 
 class SecureDialog(QDialog):
     def __init__(self, repo, origurl, parent):
