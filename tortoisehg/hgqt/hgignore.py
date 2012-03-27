@@ -172,7 +172,7 @@ class HgignoreDialog(QDialog):
         self.contextmenu.exec_(point)
 
     def unknownDoubleClicked(self, item):
-        self.insertFilters([str(item.text())])
+        self.insertFilters([hglib.fromunicode(item.text())])
 
     def insertFilters(self, pats=False, isregexp=False):
         if pats is False:
