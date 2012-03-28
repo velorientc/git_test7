@@ -561,7 +561,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     opts.append('--%s=%s' % (opt, value))
 
         self.optionslabelfmt = _('<b>Selected Options:</b> %s')
-        self.optionslabel.setText(self.optionslabelfmt % ' '.join(opts))
+        self.optionslabel.setText(self.optionslabelfmt
+                                  % hglib.tounicode(' '.join(opts)))
         self.optionslabel.setVisible(bool(opts))
 
         # Update parent csinfo widget

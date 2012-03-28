@@ -414,6 +414,7 @@ class HistorySearchThread(QThread):
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (addremove, text)
+                        fname = hglib.tounicode(fname)
                         user = hglib.tounicode(user)
                         row = [fname, int(rev), int(line), user, text]
                         emitrow(row)
@@ -511,7 +512,7 @@ class CtxSearchThread(QThread):
                 if pos:
                     self.hu.write(line[pos:], label='ui.status')
                     path = os.path.join(prefix, wfile)
-                    row = [path, i + 1, ctx.rev(), None,
+                    row = [hglib.tounicode(path), i + 1, ctx.rev(), None,
                            hglib.tounicode(self.hu.getdata()[0])]
                     w = DataWrapper(row)
                     self.matchedRow.emit(w)
