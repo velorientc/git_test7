@@ -351,7 +351,7 @@ class RepoItem(RepoTreeItem):
             if not hgrcutil.setConfigValue(abshgrcpath, 'web.name', shortname):
                 qtlib.WarningMsgBox(_('Unable to update repository name'),
                     _('An error occurred while updating the repository hgrc '
-                    'file (%s)' % abshgrcpath))
+                      'file (%s)') % hglib.tounicode(abshgrcpath))
                 return False
             self.setShortName(shortname)
             return True
