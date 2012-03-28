@@ -153,8 +153,9 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
         return
 
     cmdline = util.quotecommand(cmdline)
+    shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
-        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+        subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                          stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
