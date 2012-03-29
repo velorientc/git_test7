@@ -579,6 +579,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             for text, cb, icon in (
                 (_('Explore'), self.exploreurl, 'system-file-manager'),
                 (_('Terminal'), self.terminalurl, 'utilities-terminal'),
+                (_('Edit...'), self.editurl, 'general'),
                 (_('Remove'), self.removeurl, 'menudelete')):
                 act = QAction(text, self)
                 act.setIcon(qtlib.getmenuicon(icon))
@@ -609,6 +610,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                         _('A terminal shell cannot be opened for remote'))
             return
         qtlib.openshell(folder, 'repo ' + folder)
+
+    def editurl(self):
+        alias = str(self.menualias)
+        url = str(self.menuurl)
+        dlg = SaveDialog(self.repo, alias, url, url, self, edit=True)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
+            self.curalias = hglib.fromunicode(dlg.aliasentry.text())
+            self.setUrl(str(dlg.urlentry.text()))
 
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
@@ -1188,7 +1199,7 @@ class PostPullDialog(QDialog):
         super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
-    def __init__(self, repo, alias, origurl, safeurl, parent):
+    def __init__(self, repo, alias, origurl, safeurl, parent, edit=False):
         super(SaveDialog, self).__init__(parent)
 
         self.setWindowTitle(_('Save Path'))
@@ -1199,13 +1210,20 @@ class SaveDialog(QDialog):
         self.origurl = origurl
         self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
 
-        self.aliasentry = QLineEdit(hglib.tounicode(alias))
+        self.origalias = hglib.tounicode(alias)
+        self.aliasentry = QLineEdit(self.origalias)
         self.aliasentry.selectAll()
         self.aliasentry.textChanged.connect(self.aliasChanged)
         self.layout().addRow(_('Alias'), self.aliasentry)
 
-        self.urllabel = QLabel(hglib.tounicode(safeurl))
-        self.layout().addRow(_('URL'), self.urllabel)
+        self.edit = edit
+        if edit:
+            self.urlentry = QLineEdit(hglib.tounicode(origurl))
+            self.urlentry.textChanged.connect(self.urlChanged)
+            self.layout().addRow(_('URL'), self.urlentry)
+        else:
+            self.urllabel = QLabel(hglib.tounicode(safeurl))
+            self.layout().addRow(_('URL'), self.urllabel)
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
         if (user or passwd) and scheme in ('http', 'https'):
@@ -1243,16 +1261,20 @@ class SaveDialog(QDialog):
             return
         if fn is None:
             return
-        alias = hglib.fromunicode(self.aliasentry.text())
-        if self.clearcb and self.clearcb.isChecked():
+        alias = self.aliasentry.text()
+        if self.edit:
+            path = self.urlentry.text()
+        elif self.clearcb and self.clearcb.isChecked():
             path = self.cleanurl
         else:
             path = self.origurl
-        if alias in cfg['paths']:
+        if (not self.edit or path != self.origurl) and alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                     _('%s already exists, replace URL?') % alias, parent=self):
                 return
         cfg.set('paths', alias, path)
+        if self.edit and alias != self.origalias:
+            cfg.remove('paths', self.origalias)
         self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
@@ -1266,7 +1288,14 @@ class SaveDialog(QDialog):
         super(SaveDialog, self).reject()
 
     def aliasChanged(self, text):
-        self.bb.button(QDialogButtonBox.Save).setEnabled(len(text) > 0)
+        enabled = len(text) > 0
+        if self.edit:
+           enabled = enabled and len(self.urlentry.text()) > 0
+        self.bb.button(QDialogButtonBox.Save).setEnabled(enabled)
+
+    def urlChanged(self, text):
+        enabled = len(text) > 0 and len(self.aliasentry.text()) > 0
+        self.bb.button(QDialogButtonBox.Save).setEnabled(enabled)
 
 class SecureDialog(QDialog):
     def __init__(self, repo, origurl, parent):

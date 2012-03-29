@@ -164,6 +164,10 @@ class _wconfig(object):
         else:
             self[section][item] = value
 
+    def remove(self, section, item):
+        del self[section][item]
+        self[section]._logdel(item)
+
     def read(self, path, fp=None, sections=None, remap=None):
         self._config.read(path, fp, sections, remap)
         self._readfiles.append((path, fp, sections, remap))
