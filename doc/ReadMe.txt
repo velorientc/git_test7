@@ -1,25 +1,25 @@
 TortoiseHg Documentation
 
-To build this documentation you need sphinx installed.  On Ubuntu this
-is the python-sphinx package.   On Windows your best bet is
-easy_install.  To build without warnings, you need sphinx 0.6 or later.
+To build this documentation you need Sphinx installed.  On Ubuntu this
+is the python-sphinx package.   On Windows your best bet is easy_install
+or pip.  To build without warnings, you need Sphinx 0.6 or later.
 
 To build PDF files you need LaTeX packages.  On Ubuntu these are
 texlive-latex-extra, texlive-fonts-recommended and all of their
 dependencies.  On Windows the best choice is MiKTeX.
 
 Once all of the prerequisites are in place, you can use the makefile to
-build targets: html htmlhelp latex
+build targets: 'make tml htmlhelp latex'.
 
-Once LaTeX is built, you have to cd into that output directory and run
-make all-pdf to build the actual PDF file.
+Once 'latex' is built, you have to cd into that output directory and run
+'make all-pdf' to build the actual PDF file.
 
-Once htmlhelp is built, you have to run the actual help compiler on a
+Once 'htmlhelp' is built, you have to run the actual HTML Help Compiler on a
 Windows machine.
 
-On Windows, if you have no make tool you can use build.bat. If HTML
-compiler and miktex are installed you can directly generate chm
-(build chm) and pdf (build pdf).
+On Windows, if you have no make tool you can use build.bat. If the HTML Help 
+Compiler and MiKTeX are installed you can directly generate the CHM file 
+('build chm') and PDF file ('build pdf').
 
 Hacking the source
 ==================
@@ -53,7 +53,7 @@ Please follow this rules when hacking the doc source files.
 
 - To indicate a menu choice use :menuselection: and -->, for example:
 
-  :menuselection:`TortoiseHg... --> About`
+  :menuselection:`File --> Settings...`
 
 - To indicate a file use :file:, for example:
 
@@ -61,7 +61,7 @@ Please follow this rules when hacking the doc source files.
 
 - To indicate a command to enter into command window use :command:, for example:
 
-  :command:`hgtk log`
+  :command:`thg log`
 
 - To indicate a text to enter into a text input field in the GUI use ``, for example:
 
