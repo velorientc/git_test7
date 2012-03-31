@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error, extensions
+from mercurial import ui, util, error, extensions, scmutil
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
@@ -151,12 +151,11 @@ class BoolRBGroup(QWidget):
     def isDirty(self):
         return self.value() != self.curvalue
 
-class PasswordEntry(QLineEdit):
+class LineEditBox(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
-        self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
 
     ## common APIs for all edit widgets
@@ -173,6 +172,48 @@ class PasswordEntry(QLineEdit):
 
     def isDirty(self):
         return self.value() != self.curvalue
+
+class PasswordEntry(LineEditBox):
+    def __init__(self, parent=None, **opts):
+        QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setEchoMode(QLineEdit.Password)
+        self.setMinimumWidth(ENTRY_WIDTH)
+class TextEntry(QTextEdit):
+    def __init__(self, parent=None, **opts):
+        QTextEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setMinimumWidth(ENTRY_WIDTH)
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue:
+            self.setPlainText(hglib.tounicode(curvalue))
+        else:
+            self.setPlainText('')
+
+    def value(self):
+        # It is not possible to set a multi-line value with an empty line
+        utext = self.removeEmptyLines(self.toPlainText())
+        return utext and hglib.fromunicode(utext) or None
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+    def removeEmptyLines(self, text):
+        if not text:
+            return text
+        rawlines = hglib.fromunicode(text).splitlines()
+        lines = []
+        for line in rawlines:
+            if not line.strip():
+                continue
+            lines.append(line)
+        return os.linesep.join(lines)
+
 
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
@@ -377,9 +418,16 @@ def genIntEditCombo(opts):
     opts['validator'] = QIntValidator()
     return SettingsCombo(**opts)
 
+def genLineEditBox(opts):
+    'Generate a single line text entry box'
+    return LineEditBox(**opts)
+
 def genPasswordEntry(opts):
     'Generate a password entry box'
     return PasswordEntry(**opts)
+def genTextEntry(opts):
+    'Generate a multi-line text input entry box'
+    return TextEntry(**opts)
 
 def genDefaultCombo(opts, defaults=[]):
     'user must select from a list'
@@ -523,6 +571,11 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
+    _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single', genBoolRBGroup,
+        _('Select whether you want to have a single workbench window. '
+        'If you disable this setting you will get a new workbench window everytime that you use the "Hg Workbench"'
+        'command on the explorer context menu. Default: True'),
+        restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
         ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
         _('Select the initial widget that will be shown when opening a '
@@ -799,6 +852,8 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
+        _('Show tags at start of commit message.')),
     _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory', genBoolRBGroup,
         _('When committing, require that a reference to an issue be specified.  '
           'If enabled, the regex configured in \'Issue Regex\' must find a match '
@@ -908,7 +963,7 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        utab = SettingsForm(rcpath=hglib.user_rcpath(), focus=focus)
+        utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
@@ -1194,7 +1249,7 @@ class SettingsForm(QWidget):
                 w = func(opts)
             w.installEventFilter(self)
             if e.globalonly:
-                w.setEnabled(self.rcpath == hglib.user_rcpath())
+                w.setEnabled(self.rcpath == scmutil.userrcpath())
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)

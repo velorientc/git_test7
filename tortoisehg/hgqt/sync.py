@@ -14,7 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport
+from mercurial import hg, ui, url, util, error, demandimport, scmutil, httpconnection
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig, paths
@@ -430,7 +430,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if hg.islocal(path):
-                known.add(os.path.abspath(hglib.localpath(path)).lower())
+                known.add(os.path.abspath(util.localpath(path)).lower())
             else:
                 known.add(path)
         related = {}
@@ -454,7 +454,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 continue
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
-                    abs = os.path.abspath(hglib.localpath(path)).lower()
+                    abs = os.path.abspath(util.localpath(path)).lower()
                 else:
                     abs = path
                 if abs not in known:
@@ -737,8 +737,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
             if user:
-                cleanurl = hglib.removeauth(cururl)
-                res = hglib.readauthforuri(self.repo.ui, cleanurl, user)
+                cleanurl = util.removeauth(cururl)
+                res = httpconnection.readauthforuri(self.repo.ui, cleanurl,
+                                                    user)
                 if res:
                     group, auth = res
                     if auth.get('username'):
@@ -1227,7 +1228,7 @@ class SaveDialog(QDialog):
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
         if (user or passwd) and scheme in ('http', 'https'):
-            cleanurl = hglib.removeauth(origurl)
+            cleanurl = util.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
@@ -1324,8 +1325,8 @@ class SecureDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        cleanurl = hglib.removeauth(origurl)
-        res = hglib.readauthforuri(repo.ui, cleanurl, user)
+        cleanurl = util.removeauth(origurl)
+        res = httpconnection.readauthforuri(repo.ui, cleanurl, user)
         if res:
             self.alias, auth = res
         else:
@@ -1435,7 +1436,7 @@ are expanded in the filename.'''))
         qtlib.openhelpcontents('sync.html#security')
 
     def accept(self):
-        path = hglib.user_rcpath()
+        path = scmutil.userrcpath()
         fn, cfg = hgrcutil.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
@@ -1559,7 +1560,7 @@ class PathsModel(QAbstractTableModel):
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
         for alias, path in pathlist:
-            safepath = hglib.hidepassword(path)
+            safepath = util.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
             self.rows.append([ualias, usafepath, path])

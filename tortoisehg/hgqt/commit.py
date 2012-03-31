@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, util, error
+from mercurial import ui, util, error, scmutil
 
 from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 
@@ -1045,7 +1045,7 @@ class DetailsDialog(QDialog):
         self.saveToPath([fn])
 
     def saveGlobal(self):
-        self.saveToPath(hglib.user_rcpath())
+        self.saveToPath(scmutil.userrcpath())
 
     def saveToPath(self, path):
         fn, cfg = hgrcutil.loadIniFile(path, self)

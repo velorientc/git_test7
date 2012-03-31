@@ -27,10 +27,15 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
+    _fileiconprovider = QFileIconProvider()
+    _icons = {}
+
     def __init__(self, repo, rev=None, namefilter=None, statusfilter='MASC',
                  parent=None):
         QAbstractItemModel.__init__(self, parent)
 
+        self._diricon = QApplication.style().standardIcon(QStyle.SP_DirIcon)
+        self._fileicon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
         self._repo = repo
         self._rev = rev
         self._subinfo = {}
@@ -89,11 +94,29 @@ class ManifestModel(QAbstractItemModel):
             return None
 
     def fileIcon(self, index):
-        ic = QApplication.style().standardIcon(
-            self.isDir(index) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
         if not index.isValid():
-            return ic
+            if self.isDir(index):
+                return self._diricon
+            else:
+                return self._fileicon
         e = index.internalPointer()
+        ic = e.icon
+        if not ic:
+            if self.isDir(index):
+                ic = self._diricon
+            else:
+                ext = os.path.splitext(e.path)[1]
+                if not ext:
+                    ic = self._fileicon
+                else:
+                    ic = self._icons.get(ext, None)
+                    if not ic:
+                        ic = self._fileiconprovider.icon(QFileInfo(self._repo.wjoin(e.path)))
+                        if not ic.availableSizes():
+                            ic = self._fileicon
+                        self._icons[ext] = ic
+            e.seticon(ic)
+
         if not e.status:
             return ic
         st = status.statusTypes[e.status]
@@ -371,6 +394,7 @@ class _Entry(object):
         self._name = name
         self._parent = parent
         self._status = None
+        self._icon = None
         self._child = {}
         self._nameindex = []
 
@@ -388,6 +412,13 @@ class _Entry(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def icon(self):
+        return self._icon
+
+    def seticon(self, icon):
+        self._icon = icon
 
     @property
     def status(self):

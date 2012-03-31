@@ -9,7 +9,7 @@ import os
 import stat
 import shutil
 
-from mercurial import hg, ui
+from mercurial import hg, scmutil, ui
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, ngettext
@@ -216,7 +216,7 @@ class PurgeThread(QThread):
                 failures.append(trashcan)
 
         self.showMessage.emit('')
-        match = hglib.matchall(repo)
+        match = scmutil.matchall(repo)
         match.dir = directories.append
         repo.bfstatus = True
         repo.lfstatus = True

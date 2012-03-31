@@ -11,7 +11,7 @@ import os, tempfile, re
 from StringIO import StringIO
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import error, extensions, util, cmdutil
+from mercurial import error, extensions, util, scmutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers, qtlib, thgrepo
@@ -19,6 +19,9 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
+
+    _hasbodyflag = float(hglib.hgversion[0]) > 2.1
+
     def __init__(self, repo, revs, parent=None, outgoing=False,
                  outgoingrevs=None):
         """Create EmailDialog for the given repo and revs
@@ -42,6 +45,9 @@ class EmailDialog(QDialog):
         self._initpreviewtab()
         self._initenvelopebox()
         self._qui.bundle_radio.toggled.connect(self._updateforms)
+        self._qui.body_check.toggled.connect(self._body_mode_clicked)
+        self._qui.attach_check.toggled.connect(self._attach_mode_clicked)
+        self._qui.inline_check.toggled.connect(self._inline_mode_clicked)
         self._initintrobox()
         self._readhistory()
         self._filldefaults()
@@ -88,8 +94,7 @@ class EmailDialog(QDialog):
 
     def _initchangesets(self, revs):
         def purerevs(revs):
-            return hglib.revrange(self._repo,
-                                  iter(str(e) for e in revs))
+            return scmutil.revrange(self._repo, iter(str(e) for e in revs))
 
         self._changesets = _ChangesetsModel(self._repo,
                                             # TODO: [':'] is inefficient
@@ -152,7 +157,12 @@ class EmailDialog(QDialog):
         for e in self._qui.extra_frame.children():
             m = re.match(r'(\w+)_check', str(e.objectName()))
             if m:
-                opts[m.group(1)] = e.isChecked()
+                option = m.group(1)
+                if not self._hasbodyflag:
+                    # hg <= 2.1 -> Ignore the --body flag
+                    if option == 'body':
+                        continue
+                opts[option] = e.isChecked()
 
         return opts
 
@@ -237,6 +247,49 @@ class EmailDialog(QDialog):
 
         if self._introrequired():
             self._qui.writeintro_check.setChecked(True)
+
+    def _body_mode_clicked(self):
+        # Only allow a single attachment type to be active at a time
+        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
+        if self._hasbodyflag:
+            if not sendattachment:
+                # If no attachment, ensure that the body mode is enabled
+                self._qui.body_check.setChecked(True)
+        else:
+            # hg <= 2.1
+            if self._qui.body_check.isChecked():
+                self._qui.attach_check.setChecked(False)
+                self._qui.inline_check.setChecked(False)
+            elif not sendattachment:
+                self._qui.attach_check.setChecked(True)
+
+    def _attach_mode_clicked(self):
+        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
+        self._qui.body_check.setDisabled(not sendattachment)
+        if self._hasbodyflag:
+            if not sendattachment:
+                self._qui.body_check.setChecked(True)
+        else:
+            # hg <= 2.1
+            self._qui.body_check.setChecked(not sendattachment)
+
+        # Only allow a single attachment type to be active at a time
+        if self._qui.attach_check.isChecked():
+            self._qui.inline_check.setChecked(False)
+
+    def _inline_mode_clicked(self):
+        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
+        self._qui.body_check.setDisabled(not sendattachment)
+        if self._hasbodyflag:
+            if not sendattachment:
+                self._qui.body_check.setChecked(True)
+        else:
+            # hg <= 2.1
+            self._qui.body_check.setChecked(not sendattachment)
+
+        # Only allow a single attachment type to be active at a time
+        if self._qui.inline_check.isChecked():
+            self._qui.attach_check.setChecked(False)
 
     def _initenvelopebox(self):
         for e in ('to_edit', 'from_edit'):

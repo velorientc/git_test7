@@ -440,12 +440,17 @@ _iconcache = {}
 
 def _findicon(name):
     # TODO: icons should be placed at single location before release
-    for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
-                paths.get_icon_path()):
-        for ext in ('svg', 'png', 'ico'):
-            path = '%s/%s.%s' % (pfx, name, ext)
-            if QFile.exists(path):
-                return QIcon(path)
+    if os.path.isabs(name):
+        path = name
+        if QFile.exists(path):
+            return QIcon(path)
+    else:
+        for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
+                    paths.get_icon_path()):
+            for ext in ('svg', 'png', 'ico'):
+                path = '%s/%s.%s' % (pfx, name, ext)
+                if QFile.exists(path):
+                    return QIcon(path)
 
     return None
 
