@@ -94,7 +94,11 @@ def openfiles(repo, files, parent=None):
 
 def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
     if len(files) == 1:
-        path = repo.wjoin(files[0])
+        filename = files[0].strip()
+        if not filename:
+            return
+        files = [filename]
+        path = repo.wjoin(filename)
         cwd = os.path.dirname(path)
         files = [os.path.basename(path)]
     else:
