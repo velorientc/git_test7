@@ -42,6 +42,7 @@ class patchctx(object):
         self._mtime = None
         self._fsize = 0
         self._parseerror = None
+        self._phase = 'draft'
 
         try:
             self._mtime = os.path.getmtime(patchpath)
@@ -58,6 +59,8 @@ class patchctx(object):
         try:
             self._branch = ph.branch or ''
             self._node = binascii.unhexlify(ph.nodeid)
+            if self._repo.ui.configbool('mq', 'secret'):
+                self._phase = 'secret'
         except TypeError:
             pass
         except AttributeError:
@@ -66,6 +69,9 @@ class patchctx(object):
             ph.diffstartline = len(ph.comments)
             if ph.message:
                 ph.diffstartline += 1
+        except error.ConfigError:
+            pass
+
         self._user = ph.user or ''
         self._desc = ph.message and '\n'.join(ph.message).strip() or ''
         try:
@@ -174,6 +180,9 @@ class patchctx(object):
                 chunk.write(buf)
             return buf.getvalue()
         return ''
+
+    def phasestr(self):
+        return self._phase
 
     @propertycache
     def _files(self):
