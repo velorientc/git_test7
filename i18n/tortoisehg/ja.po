@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-03-27 21:18-0300\n"
-"PO-Revision-Date: 2012-03-22 15:59+0000\n"
-"Last-Translator: Takumi Iino <Unknown>\n"
+"PO-Revision-Date: 2012-03-28 16:40+0000\n"
+"Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-03-28 04:50+0000\n"
-"X-Generator: Launchpad (build 15027)\n"
+"X-Launchpad-Export-Date: 2012-03-29 04:39+0000\n"
+"X-Generator: Launchpad (build 15032)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -372,7 +372,7 @@ msgstr ""
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr ""
+msgstr "%d つのファイルで <b>マージ衝突</b> - <a href=\"resolve\"><b>解決する</b></a>"
 
 #: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
@@ -900,7 +900,7 @@ msgstr "終了"
 
 #: tortoisehg/hgqt/cmdui.py:315
 msgid "Failed!"
-msgstr ""
+msgstr "失敗!"
 
 #: tortoisehg/hgqt/cmdui.py:543
 msgid "failed to run command\n"
@@ -1041,7 +1041,7 @@ msgstr "このコミットで「%s」という名前付きブランチを開始�
 
 #: tortoisehg/hgqt/commit.py:408
 msgid "Create &Branch"
-msgstr ""
+msgstr "ブランチ作成(&B)"
 
 #: tortoisehg/hgqt/commit.py:439
 msgctxt "start progress"
@@ -1098,6 +1098,9 @@ msgid ""
 "Consider setting HGENCODING environment variable\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
+"メッセージをローカルエンコーディングへ変換できませんでした。\n"
+"HGENCODING 環境変数を設定してみてください。\n"
+"変換できない文字を \"?\" へ置き換えますか?\n"
 
 #: tortoisehg/hgqt/commit.py:731
 msgid "&Replace"
@@ -1330,7 +1333,7 @@ msgstr "Subversion:"
 
 #: tortoisehg/hgqt/csinfo.py:113
 msgid "Converted From:"
-msgstr ""
+msgstr "変換元:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 msgid "No items to display"
@@ -1367,7 +1370,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:51
 msgid "File is binary"
-msgstr ""
+msgstr "バイナリファイル"
 
 #: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
 #, python-format
@@ -1591,7 +1594,7 @@ msgstr ""
 #: tortoisehg/hgqt/filerevmodel.py:23
 msgctxt "column header"
 msgid "Filename"
-msgstr ""
+msgstr "ファイル名"
 
 #: tortoisehg/hgqt/fileview.py:62
 msgid "Diff Toolbar"
