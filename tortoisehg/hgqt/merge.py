@@ -511,6 +511,8 @@ class CommitPage(BasePage):
         self.cmd.setShowOutput(False)
         self.layout().addWidget(self.cmd)
 
+        self.delayednext = False
+
         def tryperform():
             if self.isComplete():
                 self.wizard().next()
@@ -558,13 +560,15 @@ class CommitPage(BasePage):
         return len(self.repo.parents()) == 2 and len(self.msgEntry.text()) > 0
 
     def validatePage(self):
+
+        if self.cmd.core.running():
+            return False
+
         if len(self.repo.parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
             if self.skiplast.isChecked():
                 self.wizard().close()
             return True
-        if self.cmd.core.running():
-            return False
 
         user = qtlib.getCurrentUsername(self, self.repo)
         if not user:
@@ -589,10 +593,17 @@ class CommitPage(BasePage):
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
         if len(self.repo.parents()) == 1:
-            self.wizard().next()
+            if self.cmd.core.running():
+                # call self.wizard().next() after the current command finishes
+                self.delayednext = True
+            else:
+                self.wizard().next()
 
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
+        if self.delayednext:
+            self.delayednext = False
+            self.wizard().next()
         self.completeChanged.emit()
 
 
