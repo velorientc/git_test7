@@ -640,6 +640,19 @@ INFO = (
         '<li><b>revision</b>: Push the changes in the current branch '
         '<i><u>up to</u> the current revision</i>.</ul><p>'
         'Default: all')),
+    _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks', (genDefaultCombo,
+        ['auto', 'prompt', 'never']),
+        _('Select when TortoiseHg will show a prompt to activate a bookmark '
+        'when updating to a revision that has one or more bookmarks.'
+        '<ul><li><b>auto</b>: Try to automatically activate bookmarks. When '
+        'updating to a revision that has a single bookmark it will be activated '
+        'automatically. Show a prompt if there is more than one bookmark on the '
+        'revision that is being updated to.'
+        '<li><b>prompt</b>: The default. Show a prompt when updating to a '
+        'revision that has one or more bookmarks.'
+        '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
+        '</ul><p>'
+        'Default: prompt')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
