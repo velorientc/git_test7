@@ -1298,6 +1298,7 @@ class RepoWidget(QWidget):
                 command = info.get('command', None)
                 if not command:
                     continue
+                showoutput = info.get('showoutput', False)
                 label = info.get('label', name)
                 icon = info.get('icon', 'tools-spanner-hammer')
                 enable = info.get('enable', 'istrue').lower()
@@ -1305,7 +1306,8 @@ class RepoWidget(QWidget):
                     enable = enablefuncs[enable]
                 else:
                     continue
-                menufunc = functools.partial(self.runCustomCommand, command)
+                menufunc = functools.partial(self.runCustomCommand, command,
+                    showoutput)
                 entry(submenu, None, enable, label, icon, menufunc)
 
         _setupCustomSubmenu(menu)
@@ -1975,7 +1977,7 @@ class RepoWidget(QWidget):
         shlib.shell_notify(self.repo.root)
 
 
-    def runCustomCommand(self, command):
+    def runCustomCommand(self, command, showoutput=False):
         """Execute 'custom commands', on the selected repository"""
         # Perform variable expansion
         # This is done in two steps:
@@ -1993,6 +1995,10 @@ class RepoWidget(QWidget):
         }
         for var in vars:
             command = command.replace('{%s}' % var, str(vars[var]))
+
+        # Show the Output Log if configured to do so
+        if showoutput:
+            self.makeLogVisible.emit(True)
 
         # If the use wants to run mercurial, do so via our usual runCommand method
         cmd = shlex.split(command)

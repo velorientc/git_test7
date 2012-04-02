@@ -427,12 +427,14 @@ class Workbench(QMainWindow):
                 command = info.get('command', None)
                 if not command:
                     continue
+                showoutput = info.get('showoutput', False)
                 label = info.get('label', name)
                 tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
                 icon = info.get('icon', 'tools-spanner-hammer')
 
-                newaction(label, self._repofwd('runCustomCommand', [command]), icon=icon,
-                    tooltip=tooltip,
+                newaction(label,
+                    self._repofwd('runCustomCommand', [command, showoutput]),
+                    icon=icon, tooltip=tooltip,
                     enabled=True, toolbar='custom')
 
         _setupCustomTools()
