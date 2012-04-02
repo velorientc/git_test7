@@ -546,7 +546,17 @@ class RepoWidget(QWidget):
         w = self.setInfoBar(qtlib.ConfirmInfoBar,
                             _('%d outgoing changesets') % len(nodes))
         assert w
-        w.acceptButton.setText(_('Push'))
+
+        # Read the tortoisehg.defaultpush setting to determine what to push
+        # by default
+        acceptbuttontext = _('Push')
+        defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
+        if defaultpush == 'branch':
+            acceptbuttontext = _('Push current branch')
+        elif defaultpush == 'revision':
+            acceptbuttontext = _('Push current revision')
+
+        w.acceptButton.setText(acceptbuttontext)
         w.accepted.connect(lambda: self.push(False))  # TODO: to the same URL
         w.rejected.connect(self.clearRevisionSet)
 
