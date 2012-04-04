@@ -1292,7 +1292,7 @@ class RepoWidget(QWidget):
             submenu = menu.addMenu(_('Custom Tools'))
             for name in toolnames:
                 info = tools[name]
-                location = info.get('location', '').split()
+                location = info.get('location', '').split(',')
                 if 'repowidget' not in location:
                     continue
                 command = info.get('command', None)

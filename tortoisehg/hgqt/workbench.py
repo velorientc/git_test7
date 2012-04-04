@@ -421,7 +421,7 @@ class Workbench(QMainWindow):
             tools, toolnames = hglib.tortoisehgtools(self.ui)
             for name in toolnames:
                 info = tools[name]
-                location = info.get('location', '').split()
+                location = info.get('location', '').split(',')
                 if location and 'workbench' not in location:
                     continue
                 command = info.get('command', None)
