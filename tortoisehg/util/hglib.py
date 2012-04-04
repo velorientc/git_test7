@@ -445,6 +445,24 @@ def difftools(ui):
     return tools
 
 def tortoisehgtools(ui):
+    '''
+    Parse 'tortoisehg-tools' section of ini file. Changes
+    
+    [tortoisehg-tools]
+    update_to_tip.ico = hg-update
+    update_to_tip.command = hg update tip
+    update_to_tip.tooltip = Update to tip
+    update_to_tip.location = workbench,repowidget
+    
+    into following dictionary
+    
+    {'update_to_tip': 
+        {'ico': 'hg-update', 
+         'command': 'hg update tip', 
+         'tooltip': 'Update to tip',
+         'location': 'workbench,repowidget'}
+    }
+    '''
     tools = {}
     toolnames = []
     for key, value in ui.configitems('tortoisehg-tools'):
