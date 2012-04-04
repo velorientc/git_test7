@@ -789,11 +789,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
-            res = qtlib.CustomPrompt(
-                    _('Confirm Add'),
-                    _('Add selected untracked files?'), self,
-                    (_('&Add'), _('Cancel')), 0, 1,
-                    checkedUnknowns).run()
+            confirm = self.repo.ui.configbool('tortoisehg', 'confirmaddfiles', True)
+            if confirm:
+                res = qtlib.CustomPrompt(
+                        _('Confirm Add'),
+                        _('Add selected untracked files?'), self,
+                        (_('&Add'), _('Cancel')), 0, 1,
+                        checkedUnknowns).run()
+            else:
+                res = 0
             if res == 0:
                 haslf = 'largefiles' in repo.extensions()
                 if haslf:
@@ -813,11 +817,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 return
         checkedMissing = self.stwidget.getChecked('!')
         if checkedMissing:
-            res = qtlib.CustomPrompt(
-                    _('Confirm Remove'),
-                    _('Remove selected deleted files?'), self,
-                    (_('&Remove'), _('Cancel')), 0, 1,
-                    checkedMissing).run()
+            confirm = self.repo.ui.configbool('tortoisehg', 'confirmdeletefiles', True)
+            if confirm:
+                res = qtlib.CustomPrompt(
+                        _('Confirm Remove'),
+                        _('Remove selected deleted files?'), self,
+                        (_('&Remove'), _('Cancel')), 0, 1,
+                        checkedMissing).run()
+            else:
+                res = 0
             if res == 0:
                 cmd = ['remove', '--repository', repo.root] + \
                       [repo.wjoin(f) for f in checkedMissing]
