@@ -273,9 +273,10 @@ class HgRepoView(QTableView):
         try:
             rev = self.repo.changectx(rev).rev()
         except error.RepoError:
-            self.showMessage.emit(_("Can't find revision '%s'") % rev)
+            self.showMessage.emit(_("Can't find revision '%s'")
+                                  % hglib.tounicode(str(rev)))
         except LookupError, e:
-            self.showMessage.emit(hglib.fromunicode(str(e)))
+            self.showMessage.emit(hglib.tounicode(str(e)))
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
