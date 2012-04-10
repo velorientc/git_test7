@@ -464,6 +464,9 @@ def tortoisehgtools(ui):
         if toolname not in tools:
             tools[toolname] = {}
             toolnames.append(toolname)
+        bvalue = util.parsebool(value)
+        if bvalue is not None:
+            value = bvalue
         tools[toolname][field] = value
     return tools, toolnames
 
