@@ -322,6 +322,7 @@ class ImportDialog(QDialog):
             self.close_btn.setAutoDefault(True)
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
+            self.import_btn.setHidden(False)
         else:
             self.accept()
 
