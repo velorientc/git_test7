@@ -84,6 +84,10 @@ class CppLexerSelector(_FilenameLexerSelector):
     extensions = ('.c', '.cpp', '.cxx', '.h', '.hpp', '.hxx')
     _lexer = Qsci.QsciLexerCPP
 
+class DLexerSelector(_FilenameLexerSelector):
+    extensions = ('.d',)
+    _lexer = Qsci.QsciLexerD
+
 class CSSLexerSelector(_FilenameLexerSelector):
     extensions = ('.css',)
     _lexer = Qsci.QsciLexerCSS
