@@ -544,7 +544,7 @@ class RepoRegistryView(QDockWidget):
                 return
             elif not os.path.isdir(sroot):
                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
-                    _('"%s" is not a folder' % sroot),
+                    _('"%s" is not a folder') % sroot,
                     parent=self)
                 return
             elif sroot == root:
