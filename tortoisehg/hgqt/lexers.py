@@ -104,6 +104,10 @@ class HTMLLexerSelector(_FilenameLexerSelector):
     extensions = ('.htm', '.html')
     _lexer = Qsci.QsciLexerHTML
 
+class YAMLLexerSelector(_FilenameLexerSelector):
+    extensions = ('.yml',)
+    _lexer = Qsci.QsciLexerYAML
+
 class VerilogLexerSelector(_FilenameLexerSelector):
     extensions = ('.v', '.vh')
     _lexer = Qsci.QsciLexerVerilog
