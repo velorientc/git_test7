@@ -148,6 +148,10 @@ class MatlabLexerSelector(_FilenameLexerSelector):
         # Python lexer is quite similar
         _lexer = Qsci.QsciLexerPython
 
+class SpiceLexerSelector(_FilenameLexerSelector):
+    extensions = ('.cir', '.sp',)
+    _lexer = Qsci.QsciLexerSpice
+
 class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
     _lexer = Qsci.QsciLexerDiff
