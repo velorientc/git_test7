@@ -133,7 +133,7 @@ class SQLLexerSelector(_FilenameLexerSelector):
     _lexer = Qsci.QsciLexerSQL
 
 class JSLexerSelector(_FilenameLexerSelector):
-    extensions = ('.js',)
+    extensions = ('.js', '.json')
     _lexer = Qsci.QsciLexerJavaScript
 
 class JavaLexerSelector(_FilenameLexerSelector):
