@@ -132,6 +132,14 @@ class CSharpLexerSelector(_FilenameLexerSelector):
     extensions = ('.cs',)
     _lexer = Qsci.QsciLexerCSharp
 
+class MatlabLexerSelector(_FilenameLexerSelector):
+    extensions = ('.m',)
+    try:
+        _lexer = Qsci.QsciLexerMatlab
+    except AttributeError:  # QScintilla<2.5.1
+        # Python lexer is quite similar
+        _lexer = Qsci.QsciLexerPython
+
 class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
     _lexer = Qsci.QsciLexerDiff
