@@ -88,6 +88,10 @@ class DLexerSelector(_FilenameLexerSelector):
     extensions = ('.d',)
     _lexer = Qsci.QsciLexerD
 
+class PascalLexerSelector(_FilenameLexerSelector):
+    extensions = ('.pas',)
+    _lexer = Qsci.QsciLexerPascal
+
 class CSSLexerSelector(_FilenameLexerSelector):
     extensions = ('.css',)
     _lexer = Qsci.QsciLexerCSS
