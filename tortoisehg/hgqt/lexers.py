@@ -132,6 +132,10 @@ class CSharpLexerSelector(_FilenameLexerSelector):
     extensions = ('.cs',)
     _lexer = Qsci.QsciLexerCSharp
 
+class TCLLexerSelector(_FilenameLexerSelector):
+    extensions = ('.tcl', '.do', '.fdo', '.udo')
+    _lexer = Qsci.QsciLexerTCL
+
 class MatlabLexerSelector(_FilenameLexerSelector):
     extensions = ('.m',)
     try:
