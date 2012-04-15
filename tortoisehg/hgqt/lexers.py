@@ -148,6 +148,14 @@ class MatlabLexerSelector(_FilenameLexerSelector):
         # Python lexer is quite similar
         _lexer = Qsci.QsciLexerPython
 
+class FortranLexerSelector(_FilenameLexerSelector):
+    extensions = ('.f90', '.f95', '.f03',)
+    _lexer = Qsci.QsciLexerFortran
+
+class Fortran77LexerSelector(_FilenameLexerSelector):
+    extensions = ('.f', '.f77',)
+    _lexer = Qsci.QsciLexerFortran77
+
 class SpiceLexerSelector(_FilenameLexerSelector):
     extensions = ('.cir', '.sp',)
     _lexer = Qsci.QsciLexerSpice
