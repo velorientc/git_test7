@@ -184,8 +184,8 @@ projrc
 that makes Mercurial look for and parse .hg/projrc for additional
 configuration settings.The file is transferred on clone and on pull
 (but never on push), after confirmation by the user, from a list of servers
-that '''must '''be configured by the user. For security reasons the user
-'''must '''also select which ''`projrc`''  configuration settings will be
+that '''must''' be configured by the user. For security reasons the user
+'''must''' also select which ''`projrc`''  configuration settings will be
 transferred (i.e. no settings are transferred from any servers by default).
 The user can also configure the extension to automatically accept all changes
 to the .hg/projrc file.
@@ -236,6 +236,27 @@ following settings:
         The exclude list has the same syntax as the include list. If an exclusion
         list is set but the inclusion list is empty or not set all non excluded
         keys will be included.
+
+    :guilabel:`Update on incoming`
+        Control whether the .hg/projrc file will be updated on incoming.
+        It can have the following values:
+
+        * never: The default. Show whether the remote projrc file has changed,
+          but do not update (nor ask to update) the local projrc file.
+        * prompt: Look for changes to the projrc file.
+          If there are changes _always_ show a confirmation prompt,
+          asking the user if it wants to update its local projrc file.
+        * auto: Look for changes to the projrc file.
+          Use the value of the "''`projrc.confirm`''" configuration key to
+          determine whether to show a confirmation dialog or not
+          before updating the local projrc file.
+
+        If False (the default) you'll get a prompt whenever
+        the extension detects changes to the remote server's
+        .hg/projrc file.
+        If false, the extension will automatically accept any change to the
+        remote .hg/projrc file.
+
 
 If both an include and an exclude lists are set, and a key matches both
 the include and the exclude list, priority is given to the most explicit
