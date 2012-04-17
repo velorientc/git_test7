@@ -927,7 +927,7 @@ INFO = (
         _('Let the user update the projrc on incoming:'
         '<ul><li><b>never</b>: [<i>default</i>] '
         'Show whether the remote projrc file has changed,'
-        'but do not upate (nor ask to update) the local projrc file.'
+        'but do not update (nor ask to update) the local projrc file.'
         '<li><b>prompt</b>: Look for changes to the projrc file. '
         'If there are changes _always_ show a confirmation prompt, '
         'asking the user if it wants to update its local projrc file.'
