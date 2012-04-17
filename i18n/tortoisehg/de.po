@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-04-15 20:58-0300\n"
-"PO-Revision-Date: 2012-04-12 14:43+0000\n"
+"PO-Revision-Date: 2012-04-16 12:46+0000\n"
 "Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-16 04:44+0000\n"
+"X-Launchpad-Export-Date: 2012-04-17 05:05+0000\n"
 "X-Generator: Launchpad (build 15099)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -190,7 +190,7 @@ msgstr "TAR-GZIP-Archive"
 
 #: tortoisehg/hgqt/archive.py:236 tortoisehg/hgqt/archive.py:239
 msgid "Zip archives"
-msgstr "ZIP-archive"
+msgstr "ZIP-Archive"
 
 #: tortoisehg/hgqt/archive.py:314 tortoisehg/hgqt/archive.py:332
 msgid "Duplicate Name"
@@ -2565,8 +2565,8 @@ msgid ""
 "\n"
 "Are you sure this is what you want to do?"
 msgstr ""
-"Die verwirft die Änderungen seit Revision %s und alle nicht "
-"zusammengeführten Vorgänger.\n"
+"Die Änderungen seit Revision %s und alle nicht zusammengeführten Vorgänger "
+"werden verworfen.\n"
 "\n"
 "Sind Sie sicher, dass Sie so vorgehen sollen?"
 
@@ -4301,11 +4301,11 @@ msgstr "Verteilen"
 
 #: tortoisehg/hgqt/repowidget.py:555
 msgid "Push current branch"
-msgstr ""
+msgstr "aktuellen Zweig verteilen"
 
 #: tortoisehg/hgqt/repowidget.py:557
 msgid "Push current revision"
-msgstr ""
+msgstr "aktuelle Revision verteilen"
 
 #: tortoisehg/hgqt/repowidget.py:686
 #, python-format
@@ -4617,7 +4617,7 @@ msgid ""
 "\n"
 "%s\n"
 msgstr ""
-"Kann die Revision %s nicht in die Datei folgenden Namens exportieren:\n"
+"Kann die Revision %s nicht in die folgende Datei exportieren:\n"
 "\n"
 "%s\n"
 
@@ -4750,7 +4750,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1942
 msgid "Unable to start"
-msgstr "Nicht zu starten imstande"
+msgstr "Starten nicht möglich"
 
 #: tortoisehg/hgqt/repowidget.py:1943
 msgid "Previous command is still running"
@@ -4779,7 +4779,7 @@ msgstr "Mercurial-Konfliktauflösung"
 
 #: tortoisehg/hgqt/resolve.py:92
 msgid "Attempt automatic (trivial) merge"
-msgstr "Automatisches zu verschmelzen versuchen (nur triviale Fälle)"
+msgstr "Automatisches verschmelzen versuchen (nur triviale Fälle)"
 
 #: tortoisehg/hgqt/resolve.py:94
 msgid "Tool Resolve"
@@ -4803,7 +4803,7 @@ msgstr "Andere Version wählen"
 
 #: tortoisehg/hgqt/resolve.py:101
 msgid "Accept the other file version (theirs)"
-msgstr "Die lokale Dateiversion mit ihren jeweiligen Änderungen übernehmen"
+msgstr "Die andere Dateiversion mit ihren jeweiligen Änderungen übernehmen"
 
 #: tortoisehg/hgqt/resolve.py:103
 msgid "Mark as Resolved"
@@ -4811,11 +4811,11 @@ msgstr "Konflikt als aufgelöst kennzeichnen"
 
 #: tortoisehg/hgqt/resolve.py:104
 msgid "Mark this file as resolved"
-msgstr "Konfliktdatei als aufgelöst kennzeichnen"
+msgstr "Datei als aufgelöst kennzeichnen"
 
 #: tortoisehg/hgqt/resolve.py:114
 msgid "Resolved conflicts"
-msgstr "Konflikte auflösen"
+msgstr "aufgelöste Konflikte"
 
 #: tortoisehg/hgqt/resolve.py:129
 msgid "Edit resolved file"
@@ -4854,7 +4854,7 @@ msgstr "Konflikt als nicht aufgelöst kennzeichnen"
 
 #: tortoisehg/hgqt/resolve.py:141
 msgid "Mark this file as unresolved"
-msgstr "Konfliktdatei als nicht aufgelöst kennzeichnen"
+msgstr "Datei als nicht aufgelöst kennzeichnen"
 
 #: tortoisehg/hgqt/resolve.py:158
 msgid "Detected merge/diff tools:"
@@ -4890,7 +4890,7 @@ msgstr "Es gibt keine Dateiverschmelzungen mit Konflikten."
 
 #: tortoisehg/hgqt/resolve.py:353
 msgid "Exit without finishing resolve?"
-msgstr "Ohne die Konfliktauflösung abzuschließen beenden?"
+msgstr "Beenden ohne die Konfliktauflösung abzuschließen?"
 
 #: tortoisehg/hgqt/resolve.py:354
 msgid "Unresolved conflicts remain. Are you sure?"
@@ -4918,7 +4918,7 @@ msgstr "Dateilisten-Werkzeugleiste"
 
 #: tortoisehg/hgqt/revdetails.py:196
 msgid "Update to this revision"
-msgstr "Bis zu dieser Revision aktualisieren"
+msgstr "Auf diese Revision aktualisieren"
 
 #: tortoisehg/hgqt/revdetails.py:199
 msgid "Show All"
@@ -4940,7 +4940,7 @@ msgstr "Den vollständigen Dateipfad in die Zwischenablage kopieren"
 
 #: tortoisehg/hgqt/revert.py:22 tortoisehg/hgqt/revert.py:26
 msgid "Cannot revert to working directory"
-msgstr "Der Arbeitsstand kann nicht wiederhergestellt werden"
+msgstr "Das Arbeitsverzeichnis kann nicht wiederhergestellt werden"
 
 #: tortoisehg/hgqt/revert.py:23
 msgid "Reverting to the working directory revision does not make sense"
@@ -5008,8 +5008,7 @@ msgstr ""
 #: tortoisehg/hgqt/revset.py:33
 msgid "Like \"keyword(string)\" but accepts a regex."
 msgstr ""
-"Entsprechend \"schluesselwort(zeichenkette)\", aber lässt reguläre Ausdrücke "
-"zu."
+"Entsprechend \"keyword(zeichenkette)\", aber lässt reguläre Ausdrücke zu."
 
 #: tortoisehg/hgqt/revset.py:35
 msgid ""
@@ -5233,7 +5232,7 @@ msgstr "Analysierfehler: "
 
 #: tortoisehg/hgqt/revset.py:401
 msgid "Invalid query: "
-msgstr "Ungültige Anfrage: "
+msgstr "Ungültige Abfrage: "
 
 #: tortoisehg/hgqt/run.py:64 tortoisehg/hgqt/run.py:429
 #, python-format
@@ -5543,7 +5542,7 @@ msgstr "Pull-Protokol verwenden um Metadaten zu kopieren"
 
 #: tortoisehg/hgqt/run.py:1075
 msgid "use uncompressed transfer (fast over LAN)"
-msgstr "Nicht komprimierten Transfer einsetzen (im LAN schneller)"
+msgstr "unkomprimierten Transfer verwenden (im LAN schneller)"
 
 #: tortoisehg/hgqt/run.py:1076
 msgid "thg clone [OPTION]... SOURCE [DEST]"
@@ -5599,7 +5598,7 @@ msgstr "thg init [Ziel]"
 
 #: tortoisehg/hgqt/run.py:1094
 msgid "a revision to send"
-msgstr "Die zu sendende Revision"
+msgstr "Eine zu sendende Revision"
 
 #: tortoisehg/hgqt/run.py:1095
 msgid "thg email [REVS]"
@@ -5661,7 +5660,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1121
 msgid "name of the hgweb config file (DEPRECATED)"
-msgstr "Name der hgweb-Konfigurationsdatei (abempfohlen)"
+msgstr "Name der hgweb-Konfigurationsdatei (veraltet)"
 
 #: tortoisehg/hgqt/run.py:1122
 msgid "thg serve [--web-conf FILE]"

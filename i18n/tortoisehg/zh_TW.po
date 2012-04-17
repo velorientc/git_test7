@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-04-15 20:58-0300\n"
-"PO-Revision-Date: 2012-04-13 02:54+0000\n"
+"PO-Revision-Date: 2012-04-16 17:45+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-16 04:48+0000\n"
+"X-Launchpad-Export-Date: 2012-04-17 05:09+0000\n"
 "X-Generator: Launchpad (build 15099)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -332,7 +332,7 @@ msgstr "<b>偵測到有未提交的本地工作複本變更</b>"
 
 #: tortoisehg/hgqt/backout.py:278
 msgid "Clean"
-msgstr "清除"
+msgstr "乾淨的"
 
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
@@ -2462,7 +2462,7 @@ msgstr ""
 #: tortoisehg/hgqt/merge.py:290
 msgctxt "working dir state"
 msgid "Clean"
-msgstr "清除"
+msgstr "乾淨的"
 
 #: tortoisehg/hgqt/merge.py:341
 msgid "Merging..."
@@ -4232,7 +4232,7 @@ msgstr "書籤..."
 
 #: tortoisehg/hgqt/repowidget.py:1222
 msgid "Backout..."
-msgstr ""
+msgstr "回退 ..."
 
 #: tortoisehg/hgqt/repowidget.py:1226
 msgid "Copy hash"
@@ -4663,7 +4663,7 @@ msgstr "全部的衝突都被解決了"
 
 #: tortoisehg/hgqt/resolve.py:346
 msgid "There are no conflicting file merges."
-msgstr ""
+msgstr "沒有衝突的檔案"
 
 #: tortoisehg/hgqt/resolve.py:353
 msgid "Exit without finishing resolve?"
@@ -5756,7 +5756,7 @@ msgstr "在對話框標題列上顯示儲存庫的完整路徑,而非只是顯�
 
 #: tortoisehg/hgqt/settings.py:515
 msgid "Auto-resolve merges"
-msgstr ""
+msgstr "合併時自動解決衝突"
 
 #: tortoisehg/hgqt/settings.py:516
 msgid ""
@@ -5953,7 +5953,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:610
 msgid "Auto Exclude List"
-msgstr ""
+msgstr "自動展開列表"
 
 #: tortoisehg/hgqt/settings.py:611
 msgid ""
@@ -7037,7 +7037,7 @@ msgstr "%s 沒有被修改(乾淨的)"
 
 #: tortoisehg/hgqt/status.py:843
 msgid "clean"
-msgstr ""
+msgstr "乾淨的"
 
 #: tortoisehg/hgqt/status.py:844
 #, python-format
@@ -8427,7 +8427,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:305 tortoisehg/hgqt/workbench.py:350
 msgid "Go to a specific revision"
-msgstr ""
+msgstr "前往一個指定的修訂版"
 
 #: tortoisehg/hgqt/workbench.py:307
 msgid "Web Server..."
@@ -8479,7 +8479,7 @@ msgstr "關於 TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:347
 msgid "Go to current revision"
-msgstr ""
+msgstr "前往目前的修訂版"
 
 #: tortoisehg/hgqt/workbench.py:361
 msgid "Filter Toolbar"
@@ -8553,7 +8553,7 @@ msgstr "%s - TortoiseHg工作台"
 
 #: tortoisehg/hgqt/workbench.py:748
 msgid "Goto revision"
-msgstr ""
+msgstr "前往修訂版"
 
 #: tortoisehg/hgqt/workbench.py:749
 msgid "Enter revision identifier"
