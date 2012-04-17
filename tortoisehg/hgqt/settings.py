@@ -911,9 +911,15 @@ INFO = (
     )),
 
 ({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
-    _fi(_('Require confirmation'), 'projrc.confirm', genBoolRBGroup,
-        _('Ask the user to confirm the update of the local "projrc" configuration file '
-        'when the remote projrc file changes. Default is "True".')),
+    _fi(_('Require confirmation'), 'projrc.confirm', (genDefaultCombo, ['always', 'first', 'never']),
+        _('When to ask the user to confirm the update of the local "projrc" configuration file '
+        'when the remote projrc file changes. Possible values are:'
+        '<ul><li><b>always</b>: [<i>default</i>] '
+        'Always show a confirmation prompt before updating the local .hg/projrc file.'
+        '<li><b>first</b>: Show a confirmation dialog when the repository is cloned '
+        'or when a remote projrc file is found for the first time.'
+        '<li><b>never</b>: Update the local .h/projrc file automatically, '
+        'without requiring any user confirmation.</ul>')),
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
         _('List of Servers from which "projrc" configuration files must be pulled. '
         'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
