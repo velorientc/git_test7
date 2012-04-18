@@ -129,7 +129,7 @@ class TeXLexerSelector(_FilenameLexerSelector):
     _lexer = Qsci.QsciLexerTeX
 
 class CSharpLexerSelector(_FilenameLexerSelector):
-    extensions = ('.cs')
+    extensions = ('.cs',)
     _lexer = Qsci.QsciLexerCSharp
 
 class DiffLexerSelector(_ScriptLexerSelector):
