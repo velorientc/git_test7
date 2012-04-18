@@ -153,7 +153,7 @@ class SpiceLexerSelector(_FilenameLexerSelector):
     _lexer = Qsci.QsciLexerSpice
 
 class PropertyLexerSelector(_FilenameLexerSelector):
-    extensions = ('.ini',)
+    extensions = ('.ini', '.properties')
     _lexer = Qsci.QsciLexerProperties
 
 class DiffLexerSelector(_ScriptLexerSelector):
