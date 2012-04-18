@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-04-15 20:58-0300\n"
+"POT-Creation-Date: 2012-04-17 14:40-0300\n"
 "PO-Revision-Date: 2012-02-04 19:58+0000\n"
 "Last-Translator: Max_ym <kontact.cat@gmail.com>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-16 04:47+0000\n"
-"X-Generator: Launchpad (build 15099)\n"
+"X-Launchpad-Export-Date: 2012-04-18 04:53+0000\n"
+"X-Generator: Launchpad (build 15108)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -341,7 +341,7 @@ msgstr "Чиста"
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
 #: tortoisehg/hgqt/rebase.py:239 tortoisehg/hgqt/settings.py:1097
-#: tortoisehg/hgqt/update.py:263
+#: tortoisehg/hgqt/update.py:265
 msgid "&Discard"
 msgstr "&Відкинути"
 
@@ -2801,7 +2801,7 @@ msgstr "потрібно оновити з різниці базової до в
 msgid "&Goto (update workdir)"
 msgstr "&Перейти (оновити робочий каталог)"
 
-#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:267
+#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:269
 msgid "&Merge"
 msgstr "&Об’єднати"
 
@@ -6667,8 +6667,8 @@ msgstr ""
 msgid ""
 "Determines when the issue tracker state will be updated by TortoiseHg. Valid "
 "settings values are:<ul><li><b>never</b>: Do not update the Issue Tracker "
-"state automaticaly.<li><b>commit</b>: Update the Issue Tracker state after a "
-"successful commit.</ol><p>Default: never"
+"state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
+"a successful commit.</ul><p>Default: never"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:823
@@ -7490,11 +7490,11 @@ msgstr "Отримання з %s завершено"
 msgid "Pull from %s aborted, ret %d"
 msgstr "Отримання з %s перервано, ret %d"
 
-#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:351
+#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:353
 msgid "Merge caused file conflicts"
 msgstr "Об'єднання призвело до конфліктів файлів"
 
-#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:352
+#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:354
 msgid "File conflicts need to be resolved"
 msgstr "Конфлікти в файлах повинні бути вирішені"
 
@@ -8193,15 +8193,15 @@ msgstr "&Оновити"
 msgid "Update - %s"
 msgstr "Оновити - %s"
 
-#: tortoisehg/hgqt/update.py:203
+#: tortoisehg/hgqt/update.py:205
 msgid "(same as parent)"
 msgstr "(декілька попередників)"
 
-#: tortoisehg/hgqt/update.py:210
+#: tortoisehg/hgqt/update.py:212
 msgid "unknown revision!"
 msgstr "невідома редакціяя!"
 
-#: tortoisehg/hgqt/update.py:261
+#: tortoisehg/hgqt/update.py:263
 msgid ""
 "Detected uncommitted local changes in working tree.\n"
 "Please select to continue:\n"
@@ -8209,23 +8209,23 @@ msgstr ""
 "Знайдено незафіксовані локальні зміни.\n"
 "будь-ласка оберіть для продовження:\n"
 
-#: tortoisehg/hgqt/update.py:264
+#: tortoisehg/hgqt/update.py:266
 msgid "Discard - discard local changes, no backup"
 msgstr "Відкинути - відкинуті локальні зміни, без резервного копіювання"
 
-#: tortoisehg/hgqt/update.py:265
+#: tortoisehg/hgqt/update.py:267
 msgid "&Shelve"
 msgstr "&Замороження"
 
-#: tortoisehg/hgqt/update.py:266
+#: tortoisehg/hgqt/update.py:268
 msgid "Shelve - move local changes to a patch"
 msgstr "Замороження - переміщення локальних змін до латки"
 
-#: tortoisehg/hgqt/update.py:268
+#: tortoisehg/hgqt/update.py:270
 msgid "Merge - allow to merge with local changes"
 msgstr "Об’єднати - дозволяє об’єднати з локальними змінами"
 
-#: tortoisehg/hgqt/update.py:276
+#: tortoisehg/hgqt/update.py:278
 msgid "Confirm Update"
 msgstr "Підтвердіть оновлення"
 

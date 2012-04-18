@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-04-15 20:58-0300\n"
+"POT-Creation-Date: 2012-04-17 14:40-0300\n"
 "PO-Revision-Date: 2012-04-16 17:45+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-17 05:09+0000\n"
-"X-Generator: Launchpad (build 15099)\n"
+"X-Launchpad-Export-Date: 2012-04-18 04:54+0000\n"
+"X-Generator: Launchpad (build 15108)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -337,7 +337,7 @@ msgstr "乾淨的"
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
 #: tortoisehg/hgqt/rebase.py:239 tortoisehg/hgqt/settings.py:1097
-#: tortoisehg/hgqt/update.py:263
+#: tortoisehg/hgqt/update.py:265
 msgid "&Discard"
 msgstr "丟棄(&D)"
 
@@ -2743,7 +2743,7 @@ msgstr ""
 msgid "&Goto (update workdir)"
 msgstr ""
 
-#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:267
+#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:269
 msgid "&Merge"
 msgstr "合併&M"
 
@@ -6435,8 +6435,8 @@ msgstr ""
 msgid ""
 "Determines when the issue tracker state will be updated by TortoiseHg. Valid "
 "settings values are:<ul><li><b>never</b>: Do not update the Issue Tracker "
-"state automaticaly.<li><b>commit</b>: Update the Issue Tracker state after a "
-"successful commit.</ol><p>Default: never"
+"state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
+"a successful commit.</ul><p>Default: never"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:823
@@ -7251,11 +7251,11 @@ msgstr "從%s拉收完成"
 msgid "Pull from %s aborted, ret %d"
 msgstr "從%s拉收中止了,返回 %d"
 
-#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:351
+#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:353
 msgid "Merge caused file conflicts"
 msgstr ""
 
-#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:352
+#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:354
 msgid "File conflicts need to be resolved"
 msgstr "檔案衝突需要被解決"
 
@@ -7951,37 +7951,37 @@ msgstr ""
 msgid "Update - %s"
 msgstr "更新 - %s"
 
-#: tortoisehg/hgqt/update.py:203
+#: tortoisehg/hgqt/update.py:205
 msgid "(same as parent)"
 msgstr ""
 
-#: tortoisehg/hgqt/update.py:210
+#: tortoisehg/hgqt/update.py:212
 msgid "unknown revision!"
 msgstr "未知的修訂版!"
 
-#: tortoisehg/hgqt/update.py:261
+#: tortoisehg/hgqt/update.py:263
 msgid ""
 "Detected uncommitted local changes in working tree.\n"
 "Please select to continue:\n"
 msgstr ""
 
-#: tortoisehg/hgqt/update.py:264
+#: tortoisehg/hgqt/update.py:266
 msgid "Discard - discard local changes, no backup"
 msgstr "放棄本地工作複本變更,不備份"
 
-#: tortoisehg/hgqt/update.py:265
+#: tortoisehg/hgqt/update.py:267
 msgid "&Shelve"
 msgstr ""
 
-#: tortoisehg/hgqt/update.py:266
+#: tortoisehg/hgqt/update.py:268
 msgid "Shelve - move local changes to a patch"
 msgstr ""
 
-#: tortoisehg/hgqt/update.py:268
+#: tortoisehg/hgqt/update.py:270
 msgid "Merge - allow to merge with local changes"
 msgstr "合併 - 允許跟本地工作複本變更作合併"
 
-#: tortoisehg/hgqt/update.py:276
+#: tortoisehg/hgqt/update.py:278
 msgid "Confirm Update"
 msgstr "確認更新"
 

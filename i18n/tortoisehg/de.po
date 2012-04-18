@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-04-15 20:58-0300\n"
-"PO-Revision-Date: 2012-04-16 12:46+0000\n"
+"POT-Creation-Date: 2012-04-17 14:40-0300\n"
+"PO-Revision-Date: 2012-04-17 13:58+0000\n"
 "Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-17 05:05+0000\n"
-"X-Generator: Launchpad (build 15099)\n"
+"X-Launchpad-Export-Date: 2012-04-18 04:50+0000\n"
+"X-Generator: Launchpad (build 15108)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -349,7 +349,7 @@ msgstr "Bereinigen"
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
 #: tortoisehg/hgqt/rebase.py:239 tortoisehg/hgqt/settings.py:1097
-#: tortoisehg/hgqt/update.py:263
+#: tortoisehg/hgqt/update.py:265
 msgid "&Discard"
 msgstr "&Verwerfen"
 
@@ -2865,7 +2865,7 @@ msgstr ""
 msgid "&Goto (update workdir)"
 msgstr "&Wechsle (aktualisiert Arbeitsverzeichnis)"
 
-#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:267
+#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:269
 msgid "&Merge"
 msgstr "&Zusammenführen"
 
@@ -3298,7 +3298,7 @@ msgstr "Alle auswählen"
 
 #: tortoisehg/hgqt/qscilib.py:193
 msgid "Wrap"
-msgstr "Zyklisch"
+msgstr "Zeilenumbruch"
 
 #: tortoisehg/hgqt/qscilib.py:194
 msgctxt "wrap mode"
@@ -6915,14 +6915,9 @@ msgstr "Auslöser des Ticketing-Systems"
 msgid ""
 "Determines when the issue tracker state will be updated by TortoiseHg. Valid "
 "settings values are:<ul><li><b>never</b>: Do not update the Issue Tracker "
-"state automaticaly.<li><b>commit</b>: Update the Issue Tracker state after a "
-"successful commit.</ol><p>Default: never"
+"state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
+"a successful commit.</ul><p>Default: never"
 msgstr ""
-"Legt fest, wann der Status des Ticketing-Systems von TortoiseHg "
-"aktualisisert wird. Gültige Einstellungen sind:<ul><li><b>never</b>: Den "
-"Status des Ticketing-Systems nie automatisch ändern.</li><li><b>commit</b>: "
-"Das Ticketing-System nach erfolgreicher Übernahme "
-"aktualisieren.</li></ul><p>Vorgabe: never</p>"
 
 #: tortoisehg/hgqt/settings.py:823
 msgid "Server"
@@ -7775,11 +7770,11 @@ msgstr "Ziehen von %s abgeschlossen"
 msgid "Pull from %s aborted, ret %d"
 msgstr "Ziehen von %s abgebrochen, Rückgabewert %d"
 
-#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:351
+#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:353
 msgid "Merge caused file conflicts"
 msgstr "Die Verschmelzung hat Dateikonflikte verursache"
 
-#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:352
+#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:354
 msgid "File conflicts need to be resolved"
 msgstr "Es gibt aufzulösende Dateikonflikte"
 
@@ -8513,15 +8508,15 @@ msgstr "&Aktualisieren"
 msgid "Update - %s"
 msgstr "Aktualisieren - %s"
 
-#: tortoisehg/hgqt/update.py:203
+#: tortoisehg/hgqt/update.py:205
 msgid "(same as parent)"
 msgstr "(wie beim Vorgänger)"
 
-#: tortoisehg/hgqt/update.py:210
+#: tortoisehg/hgqt/update.py:212
 msgid "unknown revision!"
 msgstr "Unbekannte Revision!"
 
-#: tortoisehg/hgqt/update.py:261
+#: tortoisehg/hgqt/update.py:263
 msgid ""
 "Detected uncommitted local changes in working tree.\n"
 "Please select to continue:\n"
@@ -8529,23 +8524,23 @@ msgstr ""
 "Nicht übernommene lokale Änderungen in der Arbeitskopie festgestellt.\n"
 "Zum Fortfahren wählen Sie bitte:\n"
 
-#: tortoisehg/hgqt/update.py:264
+#: tortoisehg/hgqt/update.py:266
 msgid "Discard - discard local changes, no backup"
 msgstr "Verwerfen - lokale Änderungen ungesichert verwerfen"
 
-#: tortoisehg/hgqt/update.py:265
+#: tortoisehg/hgqt/update.py:267
 msgid "&Shelve"
 msgstr "Ver&stauen"
 
-#: tortoisehg/hgqt/update.py:266
+#: tortoisehg/hgqt/update.py:268
 msgid "Shelve - move local changes to a patch"
 msgstr "Stauraum - lokale Änderungen in einen Flicken verschieben"
 
-#: tortoisehg/hgqt/update.py:268
+#: tortoisehg/hgqt/update.py:270
 msgid "Merge - allow to merge with local changes"
 msgstr "Verschmelzen - Verschmelzung mit allen lokalen Änderungen erlauben"
 
-#: tortoisehg/hgqt/update.py:276
+#: tortoisehg/hgqt/update.py:278
 msgid "Confirm Update"
 msgstr "Aktualisierung bestätigen"
 

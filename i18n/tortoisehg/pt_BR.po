@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-04-15 20:58-0300\n"
-"PO-Revision-Date: 2012-04-16 03:16+0000\n"
+"POT-Creation-Date: 2012-04-17 14:40-0300\n"
+"PO-Revision-Date: 2012-04-17 22:38+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-04-16 04:47+0000\n"
-"X-Generator: Launchpad (build 15099)\n"
+"X-Launchpad-Export-Date: 2012-04-18 04:53+0000\n"
+"X-Generator: Launchpad (build 15108)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -348,7 +348,7 @@ msgstr "Limpo"
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
 #: tortoisehg/hgqt/rebase.py:239 tortoisehg/hgqt/settings.py:1097
-#: tortoisehg/hgqt/update.py:263
+#: tortoisehg/hgqt/update.py:265
 msgid "&Discard"
 msgstr "&Descartar"
 
@@ -2835,7 +2835,7 @@ msgstr "é necessário atualizar a base do diff com a tip de %s\n"
 msgid "&Goto (update workdir)"
 msgstr "&Ir Para (atualiza diretório de trabalho)"
 
-#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:267
+#: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:269
 msgid "&Merge"
 msgstr "&Mesclar"
 
@@ -6808,13 +6808,13 @@ msgstr "Gatilho do Rastreador de Tíquetes"
 msgid ""
 "Determines when the issue tracker state will be updated by TortoiseHg. Valid "
 "settings values are:<ul><li><b>never</b>: Do not update the Issue Tracker "
-"state automaticaly.<li><b>commit</b>: Update the Issue Tracker state after a "
-"successful commit.</ol><p>Default: never"
+"state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
+"a successful commit.</ul><p>Default: never"
 msgstr ""
 "Determina quando o rastreador de tíquetes será atualizado pelo TortoiseHg. "
 "As configurações possíveis são:<ul><li><b>never</b>: Não atualiza o "
 "rastreador de tíquetes automaticamente.<li><b>commit</b>: Atualiza o "
-"rastreador de tíquetes após um commit realizado com sucesso.</ol><p>Padrão: "
+"rastreador de tíquetes após um commit realizado com sucesso.</ul><p>Padrão: "
 "never"
 
 #: tortoisehg/hgqt/settings.py:823
@@ -7668,11 +7668,11 @@ msgstr "Pull de %s completado"
 msgid "Pull from %s aborted, ret %d"
 msgstr "Pull de %s abortado, retornou %d"
 
-#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:351
+#: tortoisehg/hgqt/sync.py:867 tortoisehg/hgqt/update.py:353
 msgid "Merge caused file conflicts"
 msgstr "A mesclagem causou conflitos de arquivos"
 
-#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:352
+#: tortoisehg/hgqt/sync.py:868 tortoisehg/hgqt/update.py:354
 msgid "File conflicts need to be resolved"
 msgstr "Conflitos de arquivos precisam ser resolvidos"
 
@@ -8394,15 +8394,15 @@ msgstr "At&ualizar"
 msgid "Update - %s"
 msgstr "Atualizar - %s"
 
-#: tortoisehg/hgqt/update.py:203
+#: tortoisehg/hgqt/update.py:205
 msgid "(same as parent)"
 msgstr "(mesma que a pai)"
 
-#: tortoisehg/hgqt/update.py:210
+#: tortoisehg/hgqt/update.py:212
 msgid "unknown revision!"
 msgstr "revisão desconhecida!"
 
-#: tortoisehg/hgqt/update.py:261
+#: tortoisehg/hgqt/update.py:263
 msgid ""
 "Detected uncommitted local changes in working tree.\n"
 "Please select to continue:\n"
@@ -8410,23 +8410,23 @@ msgstr ""
 "Mudanças não consolidadas foram detectadas no diretório de trabalho.\n"
 "Para continuar, por favor selecione:\n"
 
-#: tortoisehg/hgqt/update.py:264
+#: tortoisehg/hgqt/update.py:266
 msgid "Discard - discard local changes, no backup"
 msgstr "Descartar - descartas mudanças locais, sem backup"
 
-#: tortoisehg/hgqt/update.py:265
+#: tortoisehg/hgqt/update.py:267
 msgid "&Shelve"
 msgstr "&Adiar"
 
-#: tortoisehg/hgqt/update.py:266
+#: tortoisehg/hgqt/update.py:268
 msgid "Shelve - move local changes to a patch"
 msgstr "Shelve - adia mudanças locais para um patch"
 
-#: tortoisehg/hgqt/update.py:268
+#: tortoisehg/hgqt/update.py:270
 msgid "Merge - allow to merge with local changes"
 msgstr "Mesclar - mescla a revisão com as mudanças locais"
 
-#: tortoisehg/hgqt/update.py:276
+#: tortoisehg/hgqt/update.py:278
 msgid "Confirm Update"
 msgstr "Confirma Atualização"
 
