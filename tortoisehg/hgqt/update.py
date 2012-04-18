@@ -173,7 +173,9 @@ class UpdateDialog(QDialog):
             self.rev_combo.lineEdit().selectAll()  # need to change rev
 
         # expand options if a hidden one is checked
-        self.show_options(self.hiddenSettingIsChecked())
+        hiddenOptionsChecked = self.hiddenSettingIsChecked()
+        self.show_options(hiddenOptionsChecked)
+        expander.set_expanded(hiddenOptionsChecked)
 
     ### Private Methods ###
     def hiddenSettingIsChecked(self):

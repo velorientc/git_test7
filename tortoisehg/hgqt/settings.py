@@ -868,8 +868,8 @@ INFO = (
     _fi(_('Issue Tracker Trigger'), 'tortoisehg.issue.bugtraqtrigger', (genDefaultCombo,
         ['never', 'commit']),
         _('Determines when the issue tracker state will be updated by TortoiseHg. Valid settings values are:'
-        '<ul><li><b>never</b>: Do not update the Issue Tracker state automaticaly.'
-        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ol><p>'
+        '<ul><li><b>never</b>: Do not update the Issue Tracker state automatically.'
+        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ul><p>'
         'Default: never'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
