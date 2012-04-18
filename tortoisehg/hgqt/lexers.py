@@ -113,7 +113,7 @@ class MakeLexerSelector(_FilenameLexerSelector):
     _lexer = Qsci.QsciLexerMakefile
 
 class CMakeLexerSelector(_FilenameLexerSelector):
-    extensions = ('.cmake',)
+    extensions = ('.cmake', 'cmakelists.txt')
     _lexer = Qsci.QsciLexerCMake
 
 class SQLLexerSelector(_FilenameLexerSelector):
