@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-04-17 14:40-0300\n"
-"PO-Revision-Date: 2012-03-21 01:13+0000\n"
-"Last-Translator: Fang Zhang <zhangfang.thu@gmail.com>\n"
+"PO-Revision-Date: 2012-04-20 03:38+0000\n"
+"Last-Translator: mozillazg <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-18 04:54+0000\n"
-"X-Generator: Launchpad (build 15108)\n"
+"X-Launchpad-Export-Date: 2012-04-20 04:49+0000\n"
+"X-Generator: Launchpad (build 15120)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -108,23 +108,23 @@ msgstr "文件所在目录"
 
 #: tortoisehg/hgqt/archive.py:70
 msgid "Uncompressed tar archive"
-msgstr "未压缩的 tar 文档"
+msgstr "未压缩的 tar 文件"
 
 #: tortoisehg/hgqt/archive.py:71
 msgid "Tar archive compressed using bzip2"
-msgstr "使用 bzip2 压缩的 tar 文档"
+msgstr "使用 bzip2 压缩的 tar 文件"
 
 #: tortoisehg/hgqt/archive.py:72
 msgid "Tar archive compressed using gzip"
-msgstr "使用 gzip 压缩的 tar 文档"
+msgstr "使用 gzip 压缩的 tar 文件"
 
 #: tortoisehg/hgqt/archive.py:73
 msgid "Uncompressed zip archive"
-msgstr "未压缩的 zip 文档"
+msgstr "未压缩的 zip 文件"
 
 #: tortoisehg/hgqt/archive.py:74
 msgid "Zip archive compressed using deflate"
-msgstr "使用 deflate 压缩的 zip 文档"
+msgstr "使用 deflate 压缩的 zip 文件"
 
 #: tortoisehg/hgqt/archive.py:84 tortoisehg/hgqt/clone.py:157
 #: tortoisehg/hgqt/hginit.py:67 tortoisehg/hgqt/rename.py:84
