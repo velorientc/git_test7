@@ -424,8 +424,8 @@ class RepoWidget(QWidget):
         else:
             self.showIcon.emit(QIcon())
 
-    @pyqtSlot(QString)
-    def setBundle(self, bfile):
+    @pyqtSlot(QString, QString)
+    def setBundle(self, bfile, bsource=None):
         if self.bundle:
             self.clearBundle()
         self.bundle = hglib.fromunicode(bfile)
@@ -453,7 +453,7 @@ class RepoWidget(QWidget):
                                     'your repository'))
         w.rejectButton.setText(_('Reject'))
         w.rejectButton.setToolTip(_('Reject incoming changesets'))
-        w.accepted.connect(self.acceptBundle)
+        w.accepted.connect(lambda: self.acceptBundle(bsource))
         w.rejected.connect(self.rejectBundle)
 
     def clearBundle(self):
@@ -490,10 +490,10 @@ class RepoWidget(QWidget):
                 self.repoview.resetBrowseHistory(self.revset)
                 self._reload_rev = self.revset[0]
 
-    def acceptBundle(self):
+    def acceptBundle(self, bsource=None):
         if self.bundle:
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, None)
+            self.syncDemand.pullBundle(self.bundle, None, bsource)
 
     def pullBundleToRev(self):
         if self.bundle:

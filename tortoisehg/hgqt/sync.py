@@ -53,7 +53,7 @@ def parseurl(path):
 class SyncWidget(QWidget, qtlib.TaskWidget):
     syncStarted = pyqtSignal()  # incoming/outgoing/pull/push started
     outgoingNodes = pyqtSignal(object)
-    incomingBundle = pyqtSignal(QString)
+    incomingBundle = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(unicode)
     pullCompleted = pyqtSignal()
     pushCompleted = pyqtSignal()
@@ -791,7 +791,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             self.pushclicked(confirm, rev, branch)
 
-    def pullBundle(self, bundle, rev):
+    def pullBundle(self, bundle, rev, bsource=None):
         'accept bundle changesets'
         if self.cmd.core.running():
             self.output.emit(_('sync command already running'), 'control')
@@ -801,7 +801,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.setUrl(bundle)
         if rev is not None:
             self.opts['rev'] = str(rev)
-        self.pullclicked()
+        self.pullclicked(bsource)
         self.setUrl(save)
         self.opts['rev'] = orev
 
@@ -819,7 +819,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             def finished(ret, output):
                 if ret == 0 and os.path.exists(bfile):
                     self.showMessage.emit(_('Found incoming changesets from %s') % urlu)
-                    self.incomingBundle.emit(hglib.tounicode(bfile))
+                    self.incomingBundle.emit(hglib.tounicode(bfile), urlu)
                 elif ret == 1:
                     self.showMessage.emit(_('No incoming changesets from %s') % urlu)
                 else:
@@ -845,15 +845,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline = ['--repository', self.repo.root, 'incoming']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
-    def pullclicked(self):
+    def pullclicked(self, urltoshow=None):
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
+        if urltoshow is None:
+            urltoshow = urlu
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Pull from %s completed') % urlu)
+                self.showMessage.emit(_('Pull from %s completed') % urltoshow)
             else:
-                self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
+                self.showMessage.emit(_('Pull from %s aborted, ret %d')
+                                      % (urltoshow, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
             if self.opts.get('rebase'):
