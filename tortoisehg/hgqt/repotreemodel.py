@@ -262,6 +262,9 @@ class RepoTreeModel(QAbstractItemModel):
         if row < 0:
             row = rgi.childCount()
 
+        # make sure all paths are properly normalized
+        root = os.path.normpath(root)
+
         # Check whether the repo that we are adding is a subrepo
         # This check could be expensive, particularly for network repositories
         # Thus, only perform this check on network repos if the showNetworkSubrepos
