@@ -13,19 +13,7 @@ import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
 from mercurial import encoding, templatefilters, filemerge, error, scmutil
-from mercurial import demandimport
 from mercurial import dispatch as hgdispatch
-
-
-demandimport.disable()
-try:
-    # hg >= 2.1 (0bd17a4bed88)
-    from mercurial.copies import mergecopies, pathcopies
-except (ImportError, AttributeError):
-    from mercurial.copies import copies as mergecopies
-    def pathcopies(c1, c2):
-        return mergecopies(c1._repo, c1, c2, c1._repo[-1], False)[0]
-demandimport.enable()
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
