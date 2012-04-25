@@ -1282,7 +1282,7 @@ class RepoWidget(QWidget):
               self.rupdate)
 
         def _setupCustomSubmenu(menu):
-            tools, toolnames = hglib.tortoisehgtools(self.repo.ui)
+            tools, toolnames = hglib.tortoisehgtools(self.repo.ui, 'repowidget')
             if not tools:
                 return
 

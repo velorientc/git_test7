@@ -418,12 +418,11 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
 
         def _setupCustomTools():
-            tools, toolnames = hglib.tortoisehgtools(self.ui)
+            tools, toolnames = hglib.tortoisehgtools(self.ui, 'workbench')
+            if not tools:
+                return
             for name in toolnames:
                 info = tools[name]
-                location = info.get('location', '').replace(' ', '').split(',')
-                if location and 'workbench' not in location:
-                    continue
                 command = info.get('command', None)
                 if not command:
                     continue
