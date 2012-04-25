@@ -136,12 +136,12 @@ class SummaryPage(BasePage):
         self.layout().addWidget(other_sep)
         try:
             otherCsInfo = create(self.wizard().otherrev)
+            self.layout().addWidget(otherCsInfo)
+            self.otherCsInfo = otherCsInfo
         except error.RepoLookupError:
             qtlib.InfoMsgBox(_('Unable to merge'),
                              _('Merge revision not specified or not found'))
             QTimer.singleShot(0, self.wizard().close)
-        self.layout().addWidget(otherCsInfo)
-        self.otherCsInfo = otherCsInfo
 
         ## current revision
         local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
