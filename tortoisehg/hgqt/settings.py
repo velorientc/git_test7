@@ -930,7 +930,7 @@ INFO = (
         'Always show a confirmation prompt before updating the local .hg/projrc file.'
         '<li><b>first</b>: Show a confirmation dialog when the repository is cloned '
         'or when a remote projrc file is found for the first time.'
-        '<li><b>never</b>: Update the local .h/projrc file automatically, '
+        '<li><b>never</b>: Update the local .hg/projrc file automatically, '
         'without requiring any user confirmation.</ul>')),
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
         _('List of Servers from which "projrc" configuration files must be pulled. '
@@ -944,13 +944,13 @@ INFO = (
     _fi(_('Update on incoming'), 'projrc.updateonincoming', (genDefaultCombo, ['never', 'prompt', 'auto']),
         _('Let the user update the projrc on incoming:'
         '<ul><li><b>never</b>: [<i>default</i>] '
-        'Show whether the remote projrc file has changed,'
+        'Show whether the remote projrc file has changed, '
         'but do not update (nor ask to update) the local projrc file.'
         '<li><b>prompt</b>: Look for changes to the projrc file. '
         'If there are changes _always_ show a confirmation prompt, '
         'asking the user if it wants to update its local projrc file.'
         '<li><b>auto</b>: Look for changes to the projrc file. '
-        ' Use the value of the "projrc.confirm" configuration key to '
+        'Use the value of the "projrc.confirm" configuration key to '
         'determine whether to show a confirmation dialog or not '
         'before updating the local projrc file.</ul><p>'
         'Default: never')),
