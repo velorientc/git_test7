@@ -692,14 +692,14 @@ INFO = (
         _('Determines if TortoiseHg should show a confirmation dialog '
         'before adding new files in a commit. '
         'If True, a confirmation dialog will be showed. '
-        'If False, selected new files will be included in the', 
-          'commit with no confirmation dialog.  Default: True')),
+        'If False, selected new files will be included in the '
+        'commit with no confirmation dialog.  Default: True')),
     _fi(_('Confirm deleting files'), 'tortoisehg.confirmdeletefiles', genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
         'before removing files in a commit. '
         'If True, a confirmation dialog will be showed. '
-        'If False, selected deleted files will be included in the', 
-          'commit with no confirmation dialog.  Default: True')),
+        'If False, selected deleted files will be included in the '
+        'commit with no confirmation dialog.  Default: True')),
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
