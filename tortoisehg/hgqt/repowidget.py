@@ -448,7 +448,7 @@ class RepoWidget(QWidget):
         self._reload_rev = self.revset[0]
 
         w = self.setInfoBar(qtlib.ConfirmInfoBar,
-                            _('Found incoming changesets'))
+            _('Found %d incoming changesets') % len(self.revset))
         assert w
         w.acceptButton.setText(_('Accept'))
         w.acceptButton.setToolTip(_('Pull incoming changesets into '
