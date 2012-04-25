@@ -76,7 +76,8 @@ class RepoWidget(QWidget):
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
         self.ubranch = u''
-        self.bundle = None
+        self.bundle = None  # bundle file name [local encoding]
+        self.bundlesource = None  # source URL of incoming bundle [unicode]
         self.outgoingMode = False
         self.revset = []
         self.busyIcons = []
@@ -429,6 +430,7 @@ class RepoWidget(QWidget):
         if self.bundle:
             self.clearBundle()
         self.bundle = hglib.fromunicode(bfile)
+        self.bundlesource = bsource
         oldlen = len(self.repo)
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
                                        bundle=self.bundle)
@@ -453,7 +455,7 @@ class RepoWidget(QWidget):
                                     'your repository'))
         w.rejectButton.setText(_('Reject'))
         w.rejectButton.setToolTip(_('Reject incoming changesets'))
-        w.accepted.connect(lambda: self.acceptBundle(bsource))
+        w.accepted.connect(self.acceptBundle)
         w.rejected.connect(self.rejectBundle)
 
     def clearBundle(self):
@@ -462,6 +464,7 @@ class RepoWidget(QWidget):
         self.revset = []
         self.repomodel.revset = self.revset
         self.bundle = None
+        self.bundlesource = None
         self.titleChanged.emit(self.title())
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self.repoview.setRepo(self.repo)
@@ -490,15 +493,16 @@ class RepoWidget(QWidget):
                 self.repoview.resetBrowseHistory(self.revset)
                 self._reload_rev = self.revset[0]
 
-    def acceptBundle(self, bsource=None):
+    def acceptBundle(self):
         if self.bundle:
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, None, bsource)
+            self.syncDemand.pullBundle(self.bundle, None, self.bundlesource)
 
     def pullBundleToRev(self):
         if self.bundle:
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, self.rev)
+            self.syncDemand.pullBundle(self.bundle, self.rev,
+                                       self.bundlesource)
 
     def rejectBundle(self):
         self.clearBundle()
