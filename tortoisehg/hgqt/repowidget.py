@@ -1341,15 +1341,15 @@ class RepoWidget(QWidget):
             if not file:
                 return
             diff = self.copyPatch(returnval=True)
-            f = None
             try:
                 f = open(file, "wb")
-                f.write(diff)
+                try:
+                    f.write(diff)
+                finally:
+                    f.close()
             except Exception, e:
                 WarningMsgBox(_('Repository Error'),
                               _('Unable to write diff file'))
-            finally:
-                if f: f.close()
         def exportDagRange():
             l = dagrange()
             if l:
