@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2012-04-23 22:50-0300\n"
+"POT-Creation-Date: 2012-04-24 22:07-0300\n"
 "PO-Revision-Date: 2012-04-19 19:46+0000\n"
 "Last-Translator: Andrei Polushin <polushin@gmail.com>\n"
 "Language-Team: Russian\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-24 05:03+0000\n"
-"X-Generator: Launchpad (build 15135)\n"
+"X-Launchpad-Export-Date: 2012-04-26 04:49+0000\n"
+"X-Generator: Launchpad (build 15149)\n"
 "Language: ru\n"
 "X-Poedit-Language: Russian\n"
 
@@ -6399,11 +6399,11 @@ msgid "Confirm adding unknown files"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:692
-msgctxt "commit with no confirmation dialog.  Default: True"
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before adding new "
 "files in a commit. If True, a confirmation dialog will be showed. If False, "
-"selected new files will be included in the"
+"selected new files will be included in the commit with no confirmation "
+"dialog.  Default: True"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:697
@@ -6411,11 +6411,11 @@ msgid "Confirm deleting files"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:698
-msgctxt "commit with no confirmation dialog.  Default: True"
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before removing "
 "files in a commit. If True, a confirmation dialog will be showed. If False, "
-"selected deleted files will be included in the"
+"selected deleted files will be included in the commit with no confirmation "
+"dialog.  Default: True"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:705 tortoisehg/util/menuthg.py:55
@@ -7067,7 +7067,7 @@ msgid ""
 "prompt before updating the local .hg/projrc file.<li><b>first</b>: Show a "
 "confirmation dialog when the repository is cloned or when a remote projrc "
 "file is found for the first time.<li><b>never</b>: Update the local "
-".h/projrc file automatically, without requiring any user confirmation.</ul>"
+".hg/projrc file automatically, without requiring any user confirmation.</ul>"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:935
@@ -7116,11 +7116,11 @@ msgstr ""
 #: tortoisehg/hgqt/settings.py:945
 msgid ""
 "Let the user update the projrc on incoming:<ul><li><b>never</b>: "
-"[<i>default</i>] Show whether the remote projrc file has changed,but do not "
+"[<i>default</i>] Show whether the remote projrc file has changed, but do not "
 "update (nor ask to update) the local projrc file.<li><b>prompt</b>: Look for "
 "changes to the projrc file. If there are changes _always_ show a "
 "confirmation prompt, asking the user if it wants to update its local projrc "
-"file.<li><b>auto</b>: Look for changes to the projrc file.  Use the value of "
+"file.<li><b>auto</b>: Look for changes to the projrc file. Use the value of "
 "the \"projrc.confirm\" configuration key to determine whether to show a "
 "confirmation dialog or not before updating the local projrc "
 "file.</ul><p>Default: never"
@@ -12102,9 +12102,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Changeset Description"
 #~ msgstr "Описание набора изменений"
 
-#~ msgid "EolnVisibility"
-#~ msgstr "Концы строк"
-
 #, python-format
 #~ msgid "unexpected response id: %s"
 #~ msgstr "неожиданный id ответа: %s"
@@ -12745,17 +12742,6 @@ msgstr "хранилище %s не найдено"
 #, python-format
 #~ msgid "%s will be stripped"
 #~ msgstr "%s будут срезаны"
-
-#~ msgid "AutoComplete"
-#~ msgstr "АвтоЗавершение"
-
-#~ msgid ""
-#~ "Ask the user to confirm the update of the local \"projrc\" configuration "
-#~ "file when the remote projrc file changes. Default is \"True\"."
-#~ msgstr ""
-#~ "Запрашивать у пользователя подтверждение на обновление локального  файла "
-#~ "конфигурации «projrc» при изменении файла отдалённого projrc. По умолчанию — "
-#~ "«Да»."
 
 #~ msgid ""
 #~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues\n"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-04-23 22:50-0300\n"
+"POT-Creation-Date: 2012-04-24 22:07-0300\n"
 "PO-Revision-Date: 2012-04-17 13:58+0000\n"
 "Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-24 05:00+0000\n"
-"X-Generator: Launchpad (build 15135)\n"
+"X-Launchpad-Export-Date: 2012-04-26 04:47+0000\n"
+"X-Generator: Launchpad (build 15149)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -6491,11 +6491,11 @@ msgid "Confirm adding unknown files"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:692
-msgctxt "commit with no confirmation dialog.  Default: True"
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before adding new "
 "files in a commit. If True, a confirmation dialog will be showed. If False, "
-"selected new files will be included in the"
+"selected new files will be included in the commit with no confirmation "
+"dialog.  Default: True"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:697
@@ -6503,11 +6503,11 @@ msgid "Confirm deleting files"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:698
-msgctxt "commit with no confirmation dialog.  Default: True"
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before removing "
 "files in a commit. If True, a confirmation dialog will be showed. If False, "
-"selected deleted files will be included in the"
+"selected deleted files will be included in the commit with no confirmation "
+"dialog.  Default: True"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:705 tortoisehg/util/menuthg.py:55
@@ -7165,7 +7165,7 @@ msgid ""
 "prompt before updating the local .hg/projrc file.<li><b>first</b>: Show a "
 "confirmation dialog when the repository is cloned or when a remote projrc "
 "file is found for the first time.<li><b>never</b>: Update the local "
-".h/projrc file automatically, without requiring any user confirmation.</ul>"
+".hg/projrc file automatically, without requiring any user confirmation.</ul>"
 msgstr ""
 
 #: tortoisehg/hgqt/settings.py:935
@@ -7214,11 +7214,11 @@ msgstr ""
 #: tortoisehg/hgqt/settings.py:945
 msgid ""
 "Let the user update the projrc on incoming:<ul><li><b>never</b>: "
-"[<i>default</i>] Show whether the remote projrc file has changed,but do not "
+"[<i>default</i>] Show whether the remote projrc file has changed, but do not "
 "update (nor ask to update) the local projrc file.<li><b>prompt</b>: Look for "
 "changes to the projrc file. If there are changes _always_ show a "
 "confirmation prompt, asking the user if it wants to update its local projrc "
-"file.<li><b>auto</b>: Look for changes to the projrc file.  Use the value of "
+"file.<li><b>auto</b>: Look for changes to the projrc file. Use the value of "
 "the \"projrc.confirm\" configuration key to determine whether to show a "
 "confirmation dialog or not before updating the local projrc "
 "file.</ul><p>Default: never"
@@ -10808,9 +10808,6 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ "Mercurial-Queues-Erweiterung hinzugefügten Standardetiketten auszublenden. "
 #~ "Vorgabe: keine (leere Liste)"
 
-#~ msgid "EolnVisibility"
-#~ msgstr "Zeilenende-Sichtbarkeit"
-
 #~ msgid "New Patch Name"
 #~ msgstr "Neuer Flicken-Name"
 
@@ -12847,9 +12844,6 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgid "_Forget"
 #~ msgstr "_Vergessen"
 
-#~ msgid "AutoComplete"
-#~ msgstr "Auto-Vervollständigen"
-
 #~ msgid "Browse"
 #~ msgstr "Betrachten"
 
@@ -12998,13 +12992,6 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ "formatieren. Außerdem wird ein Hinweis ausgegeben, wenn irgendeine Zeile "
 #~ "länger als gewünscht ist. Vorgabe: 0 (keine Überprüfung, keine "
 #~ "Formatierungshilfe)"
-
-#~ msgid ""
-#~ "Ask the user to confirm the update of the local \"projrc\" configuration "
-#~ "file when the remote projrc file changes. Default is \"True\"."
-#~ msgstr ""
-#~ "Den Benutzer um Bestätigung bitten, eine entfernte Änderung an der "
-#~ "Konfigurationsdatei \"projrc\" lokal zu übernehmen. Vorgabe ist \"True\"."
 
 #, python-format
 #~ msgid "Revert %s to contents at revision %d?"
