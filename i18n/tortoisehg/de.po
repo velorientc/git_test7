@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-04-24 22:07-0300\n"
-"PO-Revision-Date: 2012-04-17 13:58+0000\n"
+"PO-Revision-Date: 2012-04-27 19:38+0000\n"
 "Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-26 04:47+0000\n"
+"X-Launchpad-Export-Date: 2012-04-28 04:58+0000\n"
 "X-Generator: Launchpad (build 15149)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -398,7 +398,7 @@ msgstr "Rücksetzen übernehmen und Resultate verschmelzen"
 
 #: tortoisehg/hgqt/backout.py:422 tortoisehg/hgqt/merge.py:449
 msgid "Parents"
-msgstr "Übergeordnete Elemente"
+msgstr "Vorgänger"
 
 #: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
 #: tortoisehg/hgqt/repomodel.py:594 tortoisehg/hgqt/repomodel.py:596
@@ -1100,7 +1100,7 @@ msgstr "<b>Ausgewählte Optionen:</b> %s"
 #: tortoisehg/hgqt/commit.py:577 tortoisehg/hgqt/revpanel.py:24
 #: tortoisehg/hgqt/update.py:87
 msgid "Parent:"
-msgstr "Übergeordnetes Element:"
+msgstr "Vorgänger:"
 
 #: tortoisehg/hgqt/commit.py:578 tortoisehg/hgqt/pbranch.py:879
 msgid "Patch name:"
@@ -2071,11 +2071,11 @@ msgstr "Einzelne binäre Bündeldatei senden, keine Flicken"
 
 #: tortoisehg/hgqt/hgemail_ui.py:276
 msgid "send patches as part of the email body"
-msgstr ""
+msgstr "Flicken im Text der E-Mail versenden"
 
 #: tortoisehg/hgqt/hgemail_ui.py:277
 msgid "body"
-msgstr ""
+msgstr "E-Mail-Text"
 
 #: tortoisehg/hgqt/hgemail_ui.py:278
 msgid "send patches as attachments"
@@ -3339,43 +3339,43 @@ msgstr "Einrückung danach"
 
 #: tortoisehg/hgqt/qscilib.py:219
 msgid "EOL Visibility"
-msgstr ""
+msgstr "Zeilenendezeichen-Sichtbarkeit"
 
 #: tortoisehg/hgqt/qscilib.py:232
 msgid "EOL Mode"
-msgstr ""
+msgstr "Zeilenendezeichen-Modus"
 
 #: tortoisehg/hgqt/qscilib.py:233
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: tortoisehg/hgqt/qscilib.py:234
 msgid "Unix"
-msgstr ""
+msgstr "Unix"
 
 #: tortoisehg/hgqt/qscilib.py:235
 msgid "Mac"
-msgstr ""
+msgstr "Mac"
 
 #: tortoisehg/hgqt/qscilib.py:242
 msgid "TAB inserts"
-msgstr ""
+msgstr "TAB fügt ein"
 
 #: tortoisehg/hgqt/qscilib.py:243
 msgid "Auto"
-msgstr ""
+msgstr "Automatisch"
 
 #: tortoisehg/hgqt/qscilib.py:244
 msgid "TAB"
-msgstr ""
+msgstr "TAB"
 
 #: tortoisehg/hgqt/qscilib.py:245
 msgid "Spaces"
-msgstr ""
+msgstr "Leerzeichen"
 
 #: tortoisehg/hgqt/qscilib.py:253
 msgid "Auto-Complete"
-msgstr ""
+msgstr "Auto-Vervollständigung"
 
 #: tortoisehg/hgqt/qscilib.py:254
 msgid "Enable"
@@ -3387,7 +3387,7 @@ msgstr "Nicht verwenden"
 
 #: tortoisehg/hgqt/qscilib.py:263
 msgid "Editor Options"
-msgstr ""
+msgstr "Editor-Einstellungen"
 
 #: tortoisehg/hgqt/qscilib.py:403
 msgid "### regular expression ###"
@@ -4164,10 +4164,10 @@ msgid ""
 "finish adding the subrepo <i>you must still <u>commit</u></i> the changes to "
 "the .hgsub file in order to confirm the addition of the subrepo."
 msgstr ""
-"Das ausgewählte Unterarchiv:<br><br><i>%s</i><br><br>wurde zur "
+"Das ausgewählte Unterarchiv: <br><br><i>%s</i><br><br>wurde zur "
 "Projektverwaltungsdatei .hgsub hinzugefügt:<br><br><i>%s</i><br><br>Zur "
 "Erinnerung: Zum Abschluss des Prozesses <i>müssen Sie noch</i> die "
-"Änderungen in der .hgsub-Datei <i><u>übertragen,</u></i> um das Hinzufügen "
+"Änderungen in der .hgsub-Datei <i><u>übernehmen,</u></i> um das Hinzufügen "
 "zu bestätigen."
 
 #: tortoisehg/hgqt/reporegistry.py:647
@@ -4261,16 +4261,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreemodel.py:349 tortoisehg/hgqt/repotreemodel.py:357
 msgid "Updating repository registry"
-msgstr ""
+msgstr "Aktualisiere Archivregistrierung"
 
 #: tortoisehg/hgqt/repotreemodel.py:350
 #, python-format
 msgid "Loading repository %s"
-msgstr ""
+msgstr "Lade Archiv %s"
 
 #: tortoisehg/hgqt/repotreemodel.py:358
 msgid "Repository Registry updated"
-msgstr ""
+msgstr "Archivregistrierung aktualisiert"
 
 #: tortoisehg/hgqt/repoview.py:95
 msgid "Choose log columns..."
@@ -4564,7 +4564,7 @@ msgstr "Entferntes Archiv aktualisieren..."
 
 #: tortoisehg/hgqt/repowidget.py:1292
 msgid "Custom Tools"
-msgstr ""
+msgstr "Benutzerdefinierte Werkzeuge"
 
 #: tortoisehg/hgqt/repowidget.py:1339
 msgid "Write diff file"
@@ -4811,11 +4811,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1987
 msgid "Invalid command"
-msgstr ""
+msgstr "Ungültige Anweisung"
 
 #: tortoisehg/hgqt/repowidget.py:1988
 msgid "The selected command is empty"
-msgstr ""
+msgstr "Die ausgewählte Anweisung ist leer"
 
 #: tortoisehg/hgqt/repowidget.py:2016
 msgid "Unable to start"
@@ -4955,7 +4955,7 @@ msgstr "Alle Konflikte wurden aufgelöst."
 
 #: tortoisehg/hgqt/resolve.py:346
 msgid "There are no conflicting file merges."
-msgstr "Es gibt keine Dateiverschmelzungen mit Konflikten."
+msgstr "Es gibt keine Verschmelzungen mit Konflikten."
 
 #: tortoisehg/hgqt/resolve.py:353
 msgid "Exit without finishing resolve?"
@@ -5297,7 +5297,7 @@ msgstr "Gefundene Revision"
 
 #: tortoisehg/hgqt/revset.py:397
 msgid "Parse Error: "
-msgstr "Analysierfehler: "
+msgstr "Analysefehler: "
 
 #: tortoisehg/hgqt/revset.py:401
 msgid "Invalid query: "
@@ -5537,7 +5537,7 @@ msgstr "Dateiliste mit Kodierung UTF-8 einlesen"
 
 #: tortoisehg/hgqt/run.py:1051
 msgid "open a new workbench window"
-msgstr ""
+msgstr "Ein neues Werkbank-Fenster öffnen"
 
 #: tortoisehg/hgqt/run.py:1055
 msgid "thg about"
@@ -6175,7 +6175,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:574
 msgid "Single Workbench Window"
-msgstr ""
+msgstr "Einzelnes Werkbank-Fenster"
 
 #: tortoisehg/hgqt/settings.py:575
 msgid ""
@@ -6183,6 +6183,9 @@ msgid ""
 "this setting you will get a new workbench window everytime that you use the "
 "\"Hg Workbench\"command on the explorer context menu. Default: True"
 msgstr ""
+"Wählen Sie, ob Sie genau ein Werkbankfenster haben möchten. Wenn Sie dies "
+"ausschalten, öffnet sich bei jeder Auswahl von \"Hg-Werkbank\" aus dem "
+"Kontextmenü des Explorers ein neues Fenster. Vorgabe: True"
 
 #: tortoisehg/hgqt/settings.py:579
 msgid "Default widget"
@@ -6488,7 +6491,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:691
 msgid "Confirm adding unknown files"
-msgstr ""
+msgstr "Hinzufügen von nicht versionierten Dateien bestätigen"
 
 #: tortoisehg/hgqt/settings.py:692
 msgid ""
@@ -6497,10 +6500,14 @@ msgid ""
 "selected new files will be included in the commit with no confirmation "
 "dialog.  Default: True"
 msgstr ""
+"Bestimmt, ob TortoiseHg einen Bestätigungsdialog zeigt, bevor nicht "
+"versionierten Dateien bei einer Übernahme hinzugefügt werden. Wenn "
+"ausgewählt, wird ein Dialog angezeigt, ansonsten werden die ausgewählten "
+"neuen Dateien ohne weiter Nachfrage mit übernommen. Vorgabe: True"
 
 #: tortoisehg/hgqt/settings.py:697
 msgid "Confirm deleting files"
-msgstr ""
+msgstr "Löschen bestätigen"
 
 #: tortoisehg/hgqt/settings.py:698
 msgid ""
@@ -6509,6 +6516,10 @@ msgid ""
 "selected deleted files will be included in the commit with no confirmation "
 "dialog.  Default: True"
 msgstr ""
+"Bestimmt, ob TortoiseHg einen Bestätigungsdialog zeigt, bevor Dateien bei "
+"einer Übernahme gelöscht werden. Wenn ausgewählt, wird der Dialog angezeigt, "
+"ansonsten werden die ausgewählten Dateien ohne weiter Nachfrage als gelöscht "
+"übernommen. Vorgabe: True"
 
 #: tortoisehg/hgqt/settings.py:705 tortoisehg/util/menuthg.py:55
 msgid "Web Server"
@@ -6982,11 +6993,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:867
 msgid "Inline Tags"
-msgstr ""
+msgstr "Eingereihte Markierer"
 
 #: tortoisehg/hgqt/settings.py:868
 msgid "Show tags at start of commit message."
-msgstr ""
+msgstr "Zeigt die Markierer am Anfang der Übernahmemeldung."
 
 #: tortoisehg/hgqt/settings.py:869
 msgid "Mandatory Issue Reference"
@@ -7034,6 +7045,11 @@ msgid ""
 "state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
 "a successful commit.</ul><p>Default: never"
 msgstr ""
+"Bestimmt, wann der Status des Ablaufverfolgers durch TortoiseHg aktualisiert "
+"wird. Zulässige Auswahlen sind:<ul><li><b>never</b>: Den Ablaufverfolger-"
+"Status nie automatisch aktualisieren.</li><li><b>commit</b>: Den "
+"Ablaufverfolger-Status nach einer erfolgreichen Übernahme "
+"aktualisieren.</li></ul><p>Vorgabe: never"
 
 #: tortoisehg/hgqt/settings.py:890
 msgid "Server"
@@ -7167,6 +7183,14 @@ msgid ""
 "file is found for the first time.<li><b>never</b>: Update the local "
 ".hg/projrc file automatically, without requiring any user confirmation.</ul>"
 msgstr ""
+"Wann der Benutzer gebeten werden soll, die Aktualisierung der lokalen "
+"Projektkonfigurationsdatei \"projrc\" zu bestätigen bei Änderungen an der "
+"entfernten projrc-Datei. Zulässige Werte sind:<ul><li><b>always</b>: "
+"[<i>Vorgabe</i>] Grundsätzlich eine Bestätigung vor Aktualisierungen der "
+"lokalen Datei .hg/projrc anfordern.</li><li><b>first</b>: Einen "
+"Bestätigungsdialog beim erstmaligen Klonen oder erstmaligen entfernten "
+"Anlegen der .projrc-Datei erfragen.</li><li><b>never</b>: Die lokale Datei "
+".hg/projrc file automatisch ohne Benutzerinteraktion aktualisieren.</li></ul>"
 
 #: tortoisehg/hgqt/settings.py:935
 msgid "Servers"
@@ -7209,7 +7233,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:944
 msgid "Update on incoming"
-msgstr ""
+msgstr "Aktualisierung bei Eingang"
 
 #: tortoisehg/hgqt/settings.py:945
 msgid ""
@@ -7223,6 +7247,17 @@ msgid ""
 "confirmation dialog or not before updating the local projrc "
 "file.</ul><p>Default: never"
 msgstr ""
+"Lass den Benutzer die projrc beim Eingang "
+"aktualisieren:<ul><li><b>never</b>: [<i>Vorgabe</i>] Anzeigen, ob sich die "
+"entfernte projrc-Date geändert hat, aber die loakle projrc-Datei nicht "
+"ändern und auch nicht nachfragen.</li><li><b>prompt</b>: Prüfe auf "
+"Änderungen an der projrc-Datei. Wenn es Änderungen gibt, grundsätzlich einen "
+"Bestätigungsdialog anzeigen mit der Frage, ob der Benutzer seine lokale "
+"projrc-Datei aktualisieren möchte.</li><li><b>auto</b>: Nach Änderungen in "
+"der projrc-Datei suchen. Auf Basis des Konfigurationsschlüssels "
+"\"projrc.confirm\" entscheiden, ob ein Bestägigungdialog vor Aktualisierung "
+"der lokalen projrc-Datei angezeigt werden solll oder "
+"nicht.</li></ul><p>Vorgabe: never"
 
 #: tortoisehg/hgqt/settings.py:968
 msgid "TortoiseHg Settings"
@@ -7614,7 +7649,7 @@ msgstr "Größe (KiB)"
 #: tortoisehg/hgqt/status.py:667
 #, python-format
 msgid "Checked count: %d"
-msgstr "Kreuzchenzahl: %d"
+msgstr "Anzahl Kreuzchen: %d"
 
 #: tortoisehg/hgqt/status.py:815
 msgid ", resolved merge"
@@ -8965,7 +9000,7 @@ msgstr "TortoiseHg-Werkbank"
 
 #: tortoisehg/hgqt/workbench.py:85
 msgid "New Workbench..."
-msgstr ""
+msgstr "Neue Werkbank..."
 
 #: tortoisehg/hgqt/workbench.py:87
 msgid "New Repository..."
@@ -9017,11 +9052,11 @@ msgstr "&Aufgaben-Werkzeugleiste"
 
 #: tortoisehg/hgqt/workbench.py:153
 msgid "Custom Toolbar"
-msgstr ""
+msgstr "Benutzerdefinierte Symbolleiste"
 
 #: tortoisehg/hgqt/workbench.py:226
 msgid "New &Workbench..."
-msgstr ""
+msgstr "Neue &Werkbank..."
 
 #: tortoisehg/hgqt/workbench.py:229
 msgid "&New Repository..."
@@ -9181,7 +9216,7 @@ msgstr "&Hilfe"
 
 #: tortoisehg/hgqt/workbench.py:371
 msgid "README"
-msgstr ""
+msgstr "LIESMICH"
 
 #: tortoisehg/hgqt/workbench.py:374
 msgid "About Qt"
@@ -9234,7 +9269,7 @@ msgstr "Ausgehende Änderungen an die ausgewählte URL verteilen"
 #: tortoisehg/hgqt/workbench.py:432
 #, python-format
 msgid "Execute custom tool '%s'"
-msgstr ""
+msgstr "Benutzerdefiniertes Werkzeug '%s' ausführen"
 
 #: tortoisehg/hgqt/workbench.py:445 tortoisehg/hgqt/workbench.py:446
 msgid "Close tab"
@@ -9273,16 +9308,16 @@ msgstr "%s - TortoiseHg-Werkbank"
 #: tortoisehg/hgqt/workbench.py:707 tortoisehg/hgqt/workbench.py:1038
 #: tortoisehg/hgqt/workbench.py:1042
 msgid "Reopening tabs"
-msgstr ""
+msgstr "Öffne Reiter wieder"
 
 #: tortoisehg/hgqt/workbench.py:708 tortoisehg/hgqt/workbench.py:1038
 #, python-format
 msgid "Reopening repository %s"
-msgstr ""
+msgstr "Öffne Archiv %s wieder"
 
 #: tortoisehg/hgqt/workbench.py:713 tortoisehg/hgqt/workbench.py:1042
 msgid "All repositories open"
-msgstr ""
+msgstr "Alle Archive sind offen"
 
 #: tortoisehg/hgqt/workbench.py:830
 msgid "Goto revision"
@@ -9302,7 +9337,7 @@ msgstr "Das Projektarchiv konnte nicht geöffnet werden"
 
 #: tortoisehg/hgqt/workbench.py:969
 msgid "README not configured"
-msgstr ""
+msgstr "LIESMICH ist nicht konfiguriert"
 
 #: tortoisehg/hgqt/workbench.py:970
 msgid ""
@@ -9311,6 +9346,11 @@ msgid ""
 "'<i>readme</i>' key to the '<i>tortoisehg</i>' section, and set it to the "
 "filename or URL of your repository's README file."
 msgstr ""
+"Eine LIESMICH-Datei ist für das aktuelle Archiv nicht konfiguriert.<p>Um "
+"eine Liesmich-Datei für ein Archiv zu konfigurieren, öffnen Sie die "
+"Einstellungsdatei des Archivs, fügen den Schlüssel '<i>readme</i>' dem "
+"Abschnitt '<i>tortoisehg</i>' hinzu, und setzen es auf den Dateinamen oder "
+"die URL der LIESMICH-Datei Ihres Archivs."
 
 #: tortoisehg/hgqt/workbench.py:1147
 #, python-format
