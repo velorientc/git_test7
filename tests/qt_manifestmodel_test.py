@@ -1,15 +1,21 @@
 from nose.tools import *
 from PyQt4.QtCore import QModelIndex, QString
+from PyQt4.QtGui import QApplication
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tests import get_fixture_repo, with_encoding
 
 _aloha_ja = u'\u3042\u308d\u306f\u30fc'
 
 def setup():
-    global _repos
+    global _app, _repos
+    _app = QApplication([])  # for style().standardIcon()
     _repos = {}
     for name in ('subdirs', 'euc-jp-path'):
         _repos[name] = get_fixture_repo(name)
+
+def teardown():
+    global _app
+    del _app
 
 def newmodel(name='subdirs', rev=0):
     return ManifestModel(_repos[name], rev=rev)
