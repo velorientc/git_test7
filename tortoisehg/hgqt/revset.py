@@ -51,6 +51,9 @@ _common = (
        'mercurial/hg.1.html#dates">help dates</a>')),
     ('ancestor(single, single)',
      _('Greatest common ancestor of the two changesets.')),
+    ('matching(revset [, ''field(s) to match''])',
+     _('Find revisions that "match" one or more fields of the given set of '
+       'revisions.')),
 )
 
 _filepatterns = (
