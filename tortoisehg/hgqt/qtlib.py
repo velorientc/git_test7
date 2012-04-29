@@ -201,9 +201,12 @@ def openshell(root, reponame):
         try:
             shellcmd = _user_shell % {'reponame': reponame}
             os.chdir(root)
-            QProcess.startDetached(shellcmd)
+            started = QProcess.startDetached(shellcmd)
         finally:
             os.chdir(cwd)
+        if not started:
+            ErrorMsgBox(_('Failed to open path in terminal'),
+                        _('Unable to start the following command:'), shellcmd)
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
