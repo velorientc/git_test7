@@ -1294,7 +1294,7 @@ class SaveDialog(QDialog):
     def aliasChanged(self, text):
         enabled = len(text) > 0
         if self.edit:
-           enabled = enabled and len(self.urlentry.text()) > 0
+            enabled = enabled and len(self.urlentry.text()) > 0
         self.bb.button(QDialogButtonBox.Save).setEnabled(enabled)
 
     def urlChanged(self, text):
