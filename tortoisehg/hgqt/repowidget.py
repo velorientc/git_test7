@@ -1222,8 +1222,6 @@ class RepoWidget(QWidget):
               self.visualDiffRevision)
         entry(menu, None, isrev, _('Diff to local...'), 'ldiff',
               self.visualDiffToLocal)
-        entry(menu, None, isctx, _('Browse at rev...'), 'hg-annotate',
-              self.manifestRevision)
         entry(menu, None, isrev, _('Similar revisions...'), 'view-filter',
               self.matchRevision)
         entry(menu)
@@ -1707,9 +1705,6 @@ class RepoWidget(QWidget):
         # Do not ask for confirmation
         self.syncDemand.forward('push', False,
             branch=self.repo[self.rev].branch())
-
-    def manifestRevision(self):
-        run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
 
     def mergeWithRevision(self):
         dlg = merge.MergeDialog(self.rev, self.repo, self)
