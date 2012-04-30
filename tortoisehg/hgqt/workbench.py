@@ -437,7 +437,7 @@ class Workbench(QMainWindow):
                     enabled=True, toolbar='custom')
 
         _setupCustomTools()
-        
+
         self.updateMenu()
 
     def _action_defs(self):
