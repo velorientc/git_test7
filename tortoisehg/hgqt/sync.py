@@ -1230,7 +1230,7 @@ class SaveDialog(QDialog):
             self.layout().addRow(_('URL'), self.urllabel)
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
-        if (user or passwd) and scheme in ('http', 'https'):
+        if not edit and (user or passwd) and scheme in ('http', 'https'):
             cleanurl = util.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
