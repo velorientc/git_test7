@@ -9,7 +9,7 @@ texlive-latex-extra, texlive-fonts-recommended and all of their
 dependencies.  On Windows the best choice is MiKTeX.
 
 Once all of the prerequisites are in place, you can use the makefile to
-build targets: 'make tml htmlhelp latex'.
+build targets: 'make html htmlhelp latex'.
 
 Once 'latex' is built, you have to cd into that output directory and run
 'make all-pdf' to build the actual PDF file.
