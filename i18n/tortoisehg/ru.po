@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
 "POT-Creation-Date: 2012-04-29 18:15-0300\n"
-"PO-Revision-Date: 2012-04-19 19:46+0000\n"
+"PO-Revision-Date: 2012-04-30 21:30+0000\n"
 "Last-Translator: Andrei Polushin <polushin@gmail.com>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-30 04:56+0000\n"
+"X-Launchpad-Export-Date: 2012-05-01 05:38+0000\n"
 "X-Generator: Launchpad (build 15171)\n"
 "Language: ru\n"
 "X-Poedit-Language: Russian\n"
@@ -3300,23 +3300,23 @@ msgstr "Показывать после отступа"
 
 #: tortoisehg/hgqt/qscilib.py:219
 msgid "EOL Visibility"
-msgstr ""
+msgstr "Показывать концы строк"
 
 #: tortoisehg/hgqt/qscilib.py:232
 msgid "EOL Mode"
-msgstr ""
+msgstr "Формат концов строк"
 
 #: tortoisehg/hgqt/qscilib.py:233
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: tortoisehg/hgqt/qscilib.py:234
 msgid "Unix"
-msgstr ""
+msgstr "Unix"
 
 #: tortoisehg/hgqt/qscilib.py:235
 msgid "Mac"
-msgstr ""
+msgstr "Mac"
 
 #: tortoisehg/hgqt/qscilib.py:242
 msgid "TAB inserts"
@@ -3324,7 +3324,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:243
 msgid "Auto"
-msgstr ""
+msgstr "Автоматически"
 
 #: tortoisehg/hgqt/qscilib.py:244
 msgid "TAB"
@@ -3332,11 +3332,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:245
 msgid "Spaces"
-msgstr ""
+msgstr "Пробелы"
 
 #: tortoisehg/hgqt/qscilib.py:253
 msgid "Auto-Complete"
-msgstr ""
+msgstr "Автозавершение"
 
 #: tortoisehg/hgqt/qscilib.py:254
 msgid "Enable"
@@ -3348,7 +3348,7 @@ msgstr "Выключить"
 
 #: tortoisehg/hgqt/qscilib.py:263
 msgid "Editor Options"
-msgstr ""
+msgstr "Параметры редактора"
 
 #: tortoisehg/hgqt/qscilib.py:403
 msgid "### regular expression ###"
@@ -3397,7 +3397,7 @@ msgstr "\"%s\" не является подходящим каталогом"
 
 #: tortoisehg/hgqt/qtlib.py:209
 msgid "Unable to start the following command:"
-msgstr ""
+msgstr "Не удаётся запустить команду:"
 
 #: tortoisehg/hgqt/qtlib.py:211
 msgid "No shell configured"
@@ -4215,16 +4215,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/repotreemodel.py:349 tortoisehg/hgqt/repotreemodel.py:357
 msgid "Updating repository registry"
-msgstr ""
+msgstr "Обновляем реестр хранилищ"
 
 #: tortoisehg/hgqt/repotreemodel.py:350
 #, python-format
 msgid "Loading repository %s"
-msgstr ""
+msgstr "Загружаем хранилище %s"
 
 #: tortoisehg/hgqt/repotreemodel.py:358
 msgid "Repository Registry updated"
-msgstr ""
+msgstr "Реестр хранилищ обновлён"
 
 #: tortoisehg/hgqt/repoview.py:95
 msgid "Choose log columns..."
@@ -4287,7 +4287,7 @@ msgstr "%s <входящий>"
 #: tortoisehg/hgqt/repowidget.py:451
 #, python-format
 msgid "Found %d incoming changesets"
-msgstr ""
+msgstr "Найдено %d входящих наборов изменений"
 
 #: tortoisehg/hgqt/repowidget.py:454
 msgid "Pull incoming changesets into your repository"
@@ -4519,7 +4519,7 @@ msgstr "Отдалённое обновление..."
 
 #: tortoisehg/hgqt/repowidget.py:1296
 msgid "Custom Tools"
-msgstr ""
+msgstr "Дополнительные инструменты"
 
 #: tortoisehg/hgqt/repowidget.py:1343
 msgid "Write diff file"
@@ -4764,7 +4764,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1991
 msgid "Invalid command"
-msgstr ""
+msgstr "Неверная команда"
 
 #: tortoisehg/hgqt/repowidget.py:1992
 msgid "The selected command is empty"
@@ -5459,7 +5459,7 @@ msgstr "прочитать список файлов из файла в коди
 
 #: tortoisehg/hgqt/run.py:1051
 msgid "open a new workbench window"
-msgstr ""
+msgstr "открыть новое окно рабочей среды"
 
 #: tortoisehg/hgqt/run.py:1055
 msgid "thg about"
@@ -6093,7 +6093,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:574
 msgid "Single Workbench Window"
-msgstr ""
+msgstr "Одиночное окно рабочей среды"
 
 #: tortoisehg/hgqt/settings.py:575
 msgid ""
@@ -6401,7 +6401,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:691
 msgid "Confirm adding unknown files"
-msgstr ""
+msgstr "Подтверждать добавление неизвестных файлов"
 
 #: tortoisehg/hgqt/settings.py:692
 msgid ""
@@ -6413,7 +6413,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:697
 msgid "Confirm deleting files"
-msgstr ""
+msgstr "Подтверждать удаление файлов"
 
 #: tortoisehg/hgqt/settings.py:698
 msgid ""
@@ -6885,11 +6885,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:867
 msgid "Inline Tags"
-msgstr ""
+msgstr "Внутристрочные метки"
 
 #: tortoisehg/hgqt/settings.py:868
 msgid "Show tags at start of commit message."
-msgstr ""
+msgstr "Показывать метки в начале сообщения фиксации"
 
 #: tortoisehg/hgqt/settings.py:869
 msgid "Mandatory Issue Reference"
@@ -8869,7 +8869,7 @@ msgstr "Рабочая среда TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:85
 msgid "New Workbench..."
-msgstr ""
+msgstr "Новая рабочая среда..."
 
 #: tortoisehg/hgqt/workbench.py:87
 msgid "New Repository..."
@@ -8925,7 +8925,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:226
 msgid "New &Workbench..."
-msgstr ""
+msgstr "Новая &рабочая среда..."
 
 #: tortoisehg/hgqt/workbench.py:229
 msgid "&New Repository..."
@@ -9085,7 +9085,7 @@ msgstr "Справка"
 
 #: tortoisehg/hgqt/workbench.py:371
 msgid "README"
-msgstr ""
+msgstr "README"
 
 #: tortoisehg/hgqt/workbench.py:374
 msgid "About Qt"
@@ -9177,16 +9177,16 @@ msgstr "%s - Рабочая среда TortoiseHg"
 #: tortoisehg/hgqt/workbench.py:706 tortoisehg/hgqt/workbench.py:1037
 #: tortoisehg/hgqt/workbench.py:1041
 msgid "Reopening tabs"
-msgstr ""
+msgstr "Снова открываем вкладки"
 
 #: tortoisehg/hgqt/workbench.py:707 tortoisehg/hgqt/workbench.py:1037
 #, python-format
 msgid "Reopening repository %s"
-msgstr ""
+msgstr "Снова открываем хранилище %s"
 
 #: tortoisehg/hgqt/workbench.py:712 tortoisehg/hgqt/workbench.py:1041
 msgid "All repositories open"
-msgstr ""
+msgstr "Все хранилища открыты"
 
 #: tortoisehg/hgqt/workbench.py:829
 msgid "Goto revision"
