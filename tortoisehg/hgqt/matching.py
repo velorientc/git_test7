@@ -199,7 +199,9 @@ class MatchDialog(QDialog):
             return
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             pass
+
         # If we get this far, assume we are matching a revision set
+        validrevset = False
         try:
             func = revset.match(self.repo.ui, new_rev)
             rset = [c for c in func(self.repo, range(len(self.repo)))]
@@ -210,10 +212,13 @@ class MatchDialog(QDialog):
             else:
                 self.rev_to_match_info_lbl.setText(_('Revision to Match:'))
                 csinfo_update(rset[0])
-            self.match_btn.setEnabled(True)
+            validrevset = True
         except (error.LookupError, error.RepoLookupError):
             csinfo_set_text(_('<b>Unknown revision!</b>'))
             self.match_btn.setDisabled(True)
+        except (error.ParseError):
+            csinfo_set_text(_('<b>Parse Error!</b>'))
+        self.match_btn.setDisabled(validrevset)
 
     def match(self):
         self.saveSettings()
