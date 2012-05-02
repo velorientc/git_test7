@@ -1,4 +1,4 @@
-﻿
+
  .. TortoiseHg documentation master file, created by
     sphinx-quickstart on Tue Jul 21 13:14:26 2009.
     Poslední editace překladu 30. dubna 2012   

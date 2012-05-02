@@ -1,4 +1,4 @@
-﻿Verpánek
+Verpánek
 =========
 
 .. module:: workbench.dialog
