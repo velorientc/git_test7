@@ -34,7 +34,7 @@ class ThgTabBar(QTabBar):
         if event.button() == Qt.MidButton:
             self.tabCloseRequested.emit(self.tabAt(event.pos()))
 
-        super(QTabBar, self).mouseReleaseEvent(event)
+        super(ThgTabBar, self).mouseReleaseEvent(event)
 
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
@@ -110,6 +110,7 @@ class Workbench(QMainWindow):
         self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
+        # FIXME setTabBar() is protected method
         tw.setTabBar(ThgTabBar())
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
