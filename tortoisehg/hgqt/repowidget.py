@@ -1440,12 +1440,14 @@ class RepoWidget(QWidget):
             menu.addAction(a)
 
         if 'transplant' in self.repo.extensions():
+            menu.addSeparator()
             a = QAction(_('Transplant Selected to local'), self)
             a.setIcon(qtlib.getmenuicon('hg-transplant'))
             a.triggered.connect(self.transplantRevisions)
             menu.addAction(a)
 
         if 'reviewboard' in self.repo.extensions():
+            menu.addSeparator()
             a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
@@ -1511,6 +1513,9 @@ class RepoWidget(QWidget):
                 (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
                 ):
+            if name is None:
+                menu.addSeparator()
+                continue
             a = QAction(name, self)
             if icon:
                 a.setIcon(qtlib.getmenuicon(icon))
@@ -1518,6 +1523,7 @@ class RepoWidget(QWidget):
             menu.addAction(a)
 
         if 'transplant' in self.repo.extensions():
+            menu.addSeparator()
             a = QAction(_('Transplant Selected to local'), self)
             a.setIcon(qtlib.getmenuicon('hg-transplant'))
             a.triggered.connect(self.transplantRevisions)
