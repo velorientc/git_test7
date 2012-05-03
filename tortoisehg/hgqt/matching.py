@@ -215,10 +215,12 @@ class MatchDialog(QDialog):
             validrevset = True
         except (error.LookupError, error.RepoLookupError):
             csinfo_set_text(_('<b>Unknown revision!</b>'))
-            self.match_btn.setDisabled(True)
         except (error.ParseError):
             csinfo_set_text(_('<b>Parse Error!</b>'))
-        self.match_btn.setDisabled(validrevset)
+        if validrevset:
+            self.match_btn.setEnabled(True)
+        else:
+            self.match_btn.setDisabled(True)
 
     def match(self):
         self.saveSettings()
