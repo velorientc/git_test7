@@ -25,6 +25,7 @@ from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
+from tortoisehg.hgqt import matching
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -76,7 +77,8 @@ class RepoWidget(QWidget):
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
         self.ubranch = u''
-        self.bundle = None
+        self.bundle = None  # bundle file name [local encoding]
+        self.bundlesource = None  # source URL of incoming bundle [unicode]
         self.outgoingMode = False
         self.revset = []
         self.busyIcons = []
@@ -424,11 +426,18 @@ class RepoWidget(QWidget):
         else:
             self.showIcon.emit(QIcon())
 
-    @pyqtSlot(QString)
-    def setBundle(self, bfile):
+    @pyqtSlot(QString, QString)
+    def setFilter(self, filter):
+        self.filterbar.revsetle.setText(filter)
+        self.filterbar.setVisible(True)
+        self.filterbar.returnPressed()
+
+    @pyqtSlot(QString, QString)
+    def setBundle(self, bfile, bsource=None):
         if self.bundle:
             self.clearBundle()
         self.bundle = hglib.fromunicode(bfile)
+        self.bundlesource = bsource
         oldlen = len(self.repo)
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
                                        bundle=self.bundle)
@@ -446,7 +455,7 @@ class RepoWidget(QWidget):
         self._reload_rev = self.revset[0]
 
         w = self.setInfoBar(qtlib.ConfirmInfoBar,
-                            _('Found incoming changesets'))
+            _('Found %d incoming changesets') % len(self.revset))
         assert w
         w.acceptButton.setText(_('Accept'))
         w.acceptButton.setToolTip(_('Pull incoming changesets into '
@@ -462,6 +471,7 @@ class RepoWidget(QWidget):
         self.revset = []
         self.repomodel.revset = self.revset
         self.bundle = None
+        self.bundlesource = None
         self.titleChanged.emit(self.title())
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self.repoview.setRepo(self.repo)
@@ -493,12 +503,13 @@ class RepoWidget(QWidget):
     def acceptBundle(self):
         if self.bundle:
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, None)
+            self.syncDemand.pullBundle(self.bundle, None, self.bundlesource)
 
     def pullBundleToRev(self):
         if self.bundle:
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, self.rev)
+            self.syncDemand.pullBundle(self.bundle, self.rev,
+                                       self.bundlesource)
 
     def rejectBundle(self):
         self.clearBundle()
@@ -1213,6 +1224,8 @@ class RepoWidget(QWidget):
               self.visualDiffToLocal)
         entry(menu, None, isctx, _('Browse at rev...'), 'hg-annotate',
               self.manifestRevision)
+        entry(menu, None, isrev, _('Similar revisions...'), 'view-filter',
+              self.matchRevision)
         entry(menu)
         entry(menu, None, fixed, _('Merge with local...'), 'hg-merge',
               self.mergeWithRevision)
@@ -1278,7 +1291,7 @@ class RepoWidget(QWidget):
               self.rupdate)
 
         def _setupCustomSubmenu(menu):
-            tools, toolnames = hglib.tortoisehgtools(self.repo.ui)
+            tools, toolnames = hglib.tortoisehgtools(self.repo.ui, 'repowidget')
             if not tools:
                 return
 
@@ -1292,7 +1305,7 @@ class RepoWidget(QWidget):
             submenu = menu.addMenu(_('Custom Tools'))
             for name in toolnames:
                 info = tools[name]
-                location = info.get('location', '').split(',')
+                location = info.get('location', '').replace(' ', '').split(',')
                 if 'repowidget' not in location:
                     continue
                 command = info.get('command', None)
@@ -1341,15 +1354,15 @@ class RepoWidget(QWidget):
             if not file:
                 return
             diff = self.copyPatch(returnval=True)
-            f = None
             try:
                 f = open(file, "wb")
-                f.write(diff)
+                try:
+                    f.write(diff)
+                finally:
+                    f.close()
             except Exception, e:
                 WarningMsgBox(_('Repository Error'),
                               _('Unable to write diff file'))
-            finally:
-                if f: f.close()
         def exportDagRange():
             l = dagrange()
             if l:
@@ -1664,6 +1677,24 @@ class RepoWidget(QWidget):
         dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
+
+    def matchRevision(self):
+        hasmatching = True
+        try:
+            # hg >= 2.2
+            from mercurial.revset import matching as matchingkeyword
+        except:
+            hasmatching = False
+        if hasmatching:
+            dlg = matching.MatchDialog(self.repo, self.rev, self)
+            if dlg.exec_():
+                self.setFilter(dlg.revsetexpression)
+        else:
+            # We cannot find similar revisions
+            # without the matching revset keyword
+            qtlib.WarningMsgBox(_('Incorrect Mercurial version'),
+                _('In order to use the "Find Similar revisions" '
+                'functionality, you must use a mercurial version above 2.1.'))
 
     def pushAll(self):
         self.syncDemand.forward('push', True)

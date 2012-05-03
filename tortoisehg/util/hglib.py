@@ -444,12 +444,12 @@ def difftools(ui):
     _difftools = tools
     return tools
 
-def tortoisehgtools(ui):
+def tortoisehgtools(ui, selectedlocation=None):
     '''
-    Parse 'tortoisehg-tools' section of ini file. Changes
+    Parse 'tortoisehg-tools' section of ini file. Changes:
     
     [tortoisehg-tools]
-    update_to_tip.ico = hg-update
+    update_to_tip.icon = hg-update
     update_to_tip.command = hg update tip
     update_to_tip.tooltip = Update to tip
     update_to_tip.location = workbench,repowidget
@@ -457,11 +457,16 @@ def tortoisehgtools(ui):
     into following dictionary
     
     {'update_to_tip': 
-        {'ico': 'hg-update', 
+        {'icon': 'hg-update', 
          'command': 'hg update tip', 
          'tooltip': 'Update to tip',
          'location': 'workbench,repowidget'}
     }
+    
+    If selectedlocation is set, only return those tools whose
+    location matches the selected location.
+    If a tool has no location set, it will be assumed that it must be
+    shown on the 'workbench' toolbar
     '''
     tools = {}
     toolnames = []
@@ -474,7 +479,19 @@ def tortoisehgtools(ui):
         if bvalue is not None:
             value = bvalue
         tools[toolname][field] = value
-    return tools, toolnames
+    
+    if selectedlocation is None:
+        return tools, toolnames
+    # Only return the tools that are linked to the selected location
+    selectedtools = {}
+    selectedtoolnames = []
+    for name in toolnames:
+        info = tools[name]
+        location = info.get('location', 'workbench').replace(' ', '').split(',')
+        if selectedlocation in location:
+            selectedtools[name] = info
+            selectedtoolnames.append(name)
+    return selectedtools, selectedtoolnames
 
 def hgcmd_toq(q, label, args):
     '''

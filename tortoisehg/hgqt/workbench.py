@@ -34,7 +34,7 @@ class ThgTabBar(QTabBar):
         if event.button() == Qt.MidButton:
             self.tabCloseRequested.emit(self.tabAt(event.pos()))
 
-        super(QTabBar, self).mouseReleaseEvent(event)
+        super(ThgTabBar, self).mouseReleaseEvent(event)
 
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
@@ -110,6 +110,7 @@ class Workbench(QMainWindow):
         self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
+        # FIXME setTabBar() is protected method
         tw.setTabBar(ThgTabBar())
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
@@ -378,9 +379,11 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit')
         self.actionCurrentRev = \
         newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
+                  tooltip=_('Go to current revision'),
                   enabled=True, toolbar='edit', shortcut='Ctrl+.')
         self.actionGoTo = \
         newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
+                  tooltip=_('Go to a specific revision'),
                   enabled=True, toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
@@ -418,12 +421,11 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
 
         def _setupCustomTools():
-            tools, toolnames = hglib.tortoisehgtools(self.ui)
+            tools, toolnames = hglib.tortoisehgtools(self.ui, 'workbench')
+            if not tools:
+                return
             for name in toolnames:
                 info = tools[name]
-                location = info.get('location', '').split(',')
-                if location and 'workbench' not in location:
-                    continue
                 command = info.get('command', None)
                 if not command:
                     continue
@@ -438,7 +440,7 @@ class Workbench(QMainWindow):
                     enabled=True, toolbar='custom')
 
         _setupCustomTools()
-        
+
         self.updateMenu()
 
     def _action_defs(self):

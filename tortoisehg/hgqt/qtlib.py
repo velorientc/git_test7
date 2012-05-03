@@ -201,9 +201,12 @@ def openshell(root, reponame):
         try:
             shellcmd = _user_shell % {'reponame': reponame}
             os.chdir(root)
-            QProcess.startDetached(shellcmd)
+            started = QProcess.startDetached(shellcmd)
         finally:
             os.chdir(cwd)
+        if not started:
+            ErrorMsgBox(_('Failed to open path in terminal'),
+                        _('Unable to start the following command:'), shellcmd)
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
@@ -621,6 +624,50 @@ class CustomPrompt(QMessageBox):
             if event.text() == k:
                 btn.clicked.emit(False)
         super(CustomPrompt, self).keyPressEvent(event)
+
+class ChoicePrompt(QDialog):
+    def __init__(self, title, message, parent, choices, default=None,
+                 esc=None, files=None):
+        QDialog.__init__(self, parent)
+
+        self.setWindowIcon(geticon('thg_logo'))
+        self.setWindowTitle(hglib.tounicode(title))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        self.box = QHBoxLayout()
+        self.vbox = QVBoxLayout()
+        self.vbox.setSpacing(8)
+
+        self.message_lbl = QLabel()
+        self.message_lbl.setText(message)
+        self.vbox.addWidget(self.message_lbl)
+
+        self.choice_combo = combo = QComboBox()
+        self.choices = choices
+        combo.addItems([hglib.tounicode(item) for item in choices])
+        if default:
+            try:
+                combo.setCurrentIndex(choices.index(default))
+            except:
+                # Ignore a missing default value
+                pass
+        self.vbox.addWidget(combo)
+        self.box.addLayout(self.vbox)
+        vbox = QVBoxLayout()
+        self.ok = QPushButton('&OK')
+        self.ok.clicked.connect(self.accept)
+        vbox.addWidget(self.ok)
+        self.cancel = QPushButton('&Cancel')
+        self.cancel.clicked.connect(self.reject)
+        vbox.addWidget(self.cancel)
+        vbox.addStretch()
+        self.box.addLayout(vbox)
+        self.setLayout(self.box)
+
+    def run(self):
+        if self.exec_():
+            return self.choices[self.choice_combo.currentIndex()]
+        return None
 
 def setup_font_substitutions():
     QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
