@@ -20,7 +20,8 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
 
-    _hasbodyflag = float(hglib.hgversion[0]) > 2.1
+    # hg >= 2.2
+    _hasbodyflag = hglib.hgversion > "2.1"
 
     def __init__(self, repo, revs, parent=None, outgoing=False,
                  outgoingrevs=None):
