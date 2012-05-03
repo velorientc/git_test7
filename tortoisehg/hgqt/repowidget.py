@@ -1428,7 +1428,8 @@ class RepoWidget(QWidget):
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
                 (_('Compress History...'), compressDlg, 'hg-compress'),
                 (None, None, None),
-                (_('Goto common ancestor'), gotoAncestor, 'hg-merge')
+                (_('Goto common ancestor'), gotoAncestor, 'hg-merge'),
+                (_('Similar revisions...'), self.matchRevision, 'view-filter')
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1512,6 +1513,8 @@ class RepoWidget(QWidget):
         for name, cb, icon in (
                 (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
+                (None, None, None),
+                (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1690,7 +1693,10 @@ class RepoWidget(QWidget):
         except:
             hasmatching = False
         if hasmatching:
-            dlg = matching.MatchDialog(self.repo, self.rev, self)
+            revlist = self.rev
+            if len(self.menuselection) > 1:
+                revlist = '|'.join([str(rev) for rev in self.menuselection])
+            dlg = matching.MatchDialog(self.repo, revlist, self)
             if dlg.exec_():
                 self.setFilter(dlg.revsetexpression)
         else:
