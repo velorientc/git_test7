@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, util, error, scmutil
+from mercurial import ui, util, error, scmutil, phases
 
 from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 
@@ -16,6 +16,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt import hgrcutil, mq, lfprompt
+from tortoisehg.util.hgversion import hgversion
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -258,8 +259,21 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def mqSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
         notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
+        canamend = lambda r: False
+        # hg >= 2.2 has amend capabilities
+        if hgversion >= '2.2':
+            def canamend(r):
+                if ispatch(r):
+                    return False
+                ctx = r.changectx('.')
+                return not ctx.children() \
+                    and ctx.phase() != phases.public \
+                    and len(ctx.parents()) < 2 \
+                    and len(r.changectx(None).parents()) < 2
+
         acts = (
             ('commit', _('Commit changes'), _('Commit'), notpatch),
+            ('amend', _('Amend current revision'), _('Amend'), canamend),
             ('qnew', _('Create a new patch'), _('QNew'), None),
             ('qref', _('Refresh current patch'), _('QRefresh'), ispatch),
         )
@@ -353,18 +367,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 curraction = switchAction(curraction, 'commit')
             elif curraction._name == 'commit' and ispatch:
                 curraction = switchAction(curraction, 'qref')
-            if curraction._name == 'qref':
+            if curraction._name in ('qref', 'amend'):
                 refreshwctx = refresh
                 self.stwidget.setPatchContext(pctx)
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
-        if curraction._name == 'qref':
-            if self.lastAction != 'qref':
+        if curraction._name in ('qref', 'amend'):
+            if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
             self.setMessage(hglib.tounicode(pctx.description()))
         else:
-            if self.lastAction == 'qref':
+            if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
         if refreshwctx:
             self.stwidget.refreshWctx()
@@ -421,6 +435,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         curraction = self.mqgroup.checkedAction()
         if curraction._name == 'commit':
             return self.commit()
+        elif curraction._name == 'amend':
+            return self.commit(amend=True)
 
         # Check if we need to change branch first
         commandlines = []
@@ -719,7 +735,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.userhist.insert(0, user)
         self.userhist = self.userhist[:10]
 
-    def commit(self):
+    def commit(self, amend=False):
         repo = self.repo
         try:
             msg = self.getMessage(False)
@@ -854,6 +870,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
 
+        if amend:
+            cmdline.append('--amend')
+
         cmdline.append('--')
         cmdline.extend([repo.wjoin(f) for f in self.files])
         if len(repo.parents()) == 1:
@@ -891,7 +910,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 return
             self.branchop = None
             umsg = self.msgte.text()
-            if self.currentAction != 'qref':
+            if self.currentAction not in ('qref', 'amend'):
                 self.lastCommitMsg = ''
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
