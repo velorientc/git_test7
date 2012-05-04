@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-03 10:57-0300\n"
+"POT-Creation-Date: 2012-05-04 08:12-0300\n"
 "PO-Revision-Date: 2012-04-20 03:38+0000\n"
 "Last-Translator: mozillazg <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-05-04 04:56+0000\n"
+"X-Launchpad-Export-Date: 2012-05-04 11:45+0000\n"
 "X-Generator: Launchpad (build 15195)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -74,7 +74,7 @@ msgstr "= 工作目录的上层目录 ="
 #: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:420
 #: tortoisehg/hgqt/bookmark.py:50 tortoisehg/hgqt/csinfo.py:105
 #: tortoisehg/hgqt/csinfo.py:106 tortoisehg/hgqt/cslist.py:86
-#: tortoisehg/hgqt/merge.py:447 tortoisehg/hgqt/tag.py:49
+#: tortoisehg/hgqt/merge.py:454 tortoisehg/hgqt/tag.py:49
 msgid "Revision:"
 msgstr "修订版本:"
 
@@ -144,11 +144,11 @@ msgid "&Detail"
 msgstr "详细(&D)"
 
 #: tortoisehg/hgqt/archive.py:114 tortoisehg/hgqt/backout.py:300
-#: tortoisehg/hgqt/commit.py:402 tortoisehg/hgqt/commit.py:410
-#: tortoisehg/hgqt/commit.py:732 tortoisehg/hgqt/commit.py:797
-#: tortoisehg/hgqt/commit.py:825 tortoisehg/hgqt/compress.py:152
-#: tortoisehg/hgqt/lfprompt.py:23 tortoisehg/hgqt/merge.py:100
-#: tortoisehg/hgqt/merge.py:235 tortoisehg/hgqt/merge.py:312
+#: tortoisehg/hgqt/commit.py:416 tortoisehg/hgqt/commit.py:424
+#: tortoisehg/hgqt/commit.py:748 tortoisehg/hgqt/commit.py:813
+#: tortoisehg/hgqt/commit.py:841 tortoisehg/hgqt/compress.py:152
+#: tortoisehg/hgqt/lfprompt.py:23 tortoisehg/hgqt/merge.py:105
+#: tortoisehg/hgqt/merge.py:241 tortoisehg/hgqt/merge.py:319
 #: tortoisehg/hgqt/quickop.py:185 tortoisehg/hgqt/rebase.py:240
 #: tortoisehg/hgqt/rebase.py:261 tortoisehg/hgqt/rename.py:110
 #: tortoisehg/hgqt/reporegistry.py:208 tortoisehg/hgqt/resolve.py:356
@@ -302,12 +302,12 @@ msgstr "第二个父版本: %s (%s)"
 msgid "Backout to the second parent of the merge revision"
 msgstr "回退到合并版本的第二个父版本"
 
-#: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:154
+#: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:160
 msgid "Working directory status"
 msgstr "工作目录状态"
 
 #: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
-#: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:113
+#: tortoisehg/hgqt/merge.py:168 tortoisehg/hgqt/rebase.py:113
 msgid "Checking..."
 msgstr "正在检查..."
 
@@ -320,13 +320,13 @@ msgstr ""
 "回退前，你必须<a href=\"commit\"><b>提交</b></a>，<a "
 "href=\"shelve\"><b>shelve</b></a>补丁，或者<a href=\"discard\"><b>丢弃</b></a>修改。"
 
-#: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:215
+#: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/merge.py:221
 #: tortoisehg/hgqt/rebase.py:76 tortoisehg/hgqt/sync.py:1146
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
 msgstr "尽量自动解决合并的冲突"
 
-#: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
+#: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:291
 msgid "<b>Uncommitted local changes are detected</b>"
 msgstr "<b>检测到未提交的本地修改</b>"
 
@@ -335,19 +335,19 @@ msgid "Clean"
 msgstr "可以合并"
 
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:151
-#: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
+#: tortoisehg/hgqt/merge.py:240 tortoisehg/hgqt/merge.py:318
 #: tortoisehg/hgqt/rebase.py:239 tortoisehg/hgqt/settings.py:1196
 #: tortoisehg/hgqt/update.py:320
 msgid "&Discard"
 msgstr "丢弃(&D)"
 
 #: tortoisehg/hgqt/backout.py:301 tortoisehg/hgqt/compress.py:153
-#: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:241
+#: tortoisehg/hgqt/merge.py:320 tortoisehg/hgqt/rebase.py:241
 msgid "Confirm Discard"
 msgstr "确认丢弃"
 
 #: tortoisehg/hgqt/backout.py:302 tortoisehg/hgqt/compress.py:154
-#: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:242
+#: tortoisehg/hgqt/merge.py:321 tortoisehg/hgqt/rebase.py:242
 msgid "Discard outstanding changes to working directory?"
 msgstr "丢弃工作目录未提交的修改？"
 
@@ -355,7 +355,7 @@ msgstr "丢弃工作目录未提交的修改？"
 msgid "Backing out, then merging..."
 msgstr "回退中，然后合并..."
 
-#: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
+#: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:349
 msgid "All conflicting files will be marked unresolved."
 msgstr "所有冲突文件都将被标记为未解决。"
 
@@ -364,14 +364,14 @@ msgid ""
 "Automatically advance to next page when backout and merge are complete."
 msgstr "回退和合并完成后自动前进到下一个页面。"
 
-#: tortoisehg/hgqt/backout.py:372 tortoisehg/hgqt/merge.py:395
+#: tortoisehg/hgqt/backout.py:372 tortoisehg/hgqt/merge.py:402
 #, python-format
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr "有%d个需要<b>合并冲突</b>的文件要<a href\"resolve\"><b>解决</b></a>"
 
-#: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:405
+#: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:412
 msgid "No merge conflicts, ready to commit"
 msgstr "没有合并冲突，可以提交"
 
@@ -380,25 +380,25 @@ msgid "Commit backout and merge results"
 msgstr "提交回退并合并"
 
 #: tortoisehg/hgqt/backout.py:422 tortoisehg/hgqt/matching.py:100
-#: tortoisehg/hgqt/merge.py:449
+#: tortoisehg/hgqt/merge.py:456
 msgid "Parents"
 msgstr "父版本"
 
-#: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
+#: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:460
 #: tortoisehg/hgqt/repomodel.py:594 tortoisehg/hgqt/repomodel.py:596
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:88
 msgid "Working Directory"
 msgstr "工作目录"
 
-#: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:490
+#: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:497
 msgid "Working Directory (merged)"
 msgstr "工作目录 (已合并)"
 
-#: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:498
+#: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:505
 msgid "Commit message"
 msgstr "提交说明"
 
-#: tortoisehg/hgqt/backout.py:498 tortoisehg/hgqt/merge.py:524
+#: tortoisehg/hgqt/backout.py:498 tortoisehg/hgqt/merge.py:531
 msgid "Skip final confirmation page, close after commit."
 msgstr "提交后关闭，跳过最后的确认页"
 
@@ -410,7 +410,7 @@ msgstr "回退合并后的修订集: "
 msgid "Backed out changeset: "
 msgstr "回退的修订集: "
 
-#: tortoisehg/hgqt/backout.py:514 tortoisehg/hgqt/commit.py:647
+#: tortoisehg/hgqt/backout.py:514 tortoisehg/hgqt/commit.py:663
 #: tortoisehg/hgqt/mq.py:821
 msgid "Confirm Discard Message"
 msgstr "确认丢弃改动说明"
@@ -441,16 +441,16 @@ msgstr "回退并提交..."
 msgid "Please wait while making backout."
 msgstr "正在回退，请稍等..."
 
-#: tortoisehg/hgqt/backout.py:594 tortoisehg/hgqt/merge.py:577
+#: tortoisehg/hgqt/backout.py:594 tortoisehg/hgqt/merge.py:584
 msgid "Committing..."
 msgstr "正在提交..."
 
-#: tortoisehg/hgqt/backout.py:595 tortoisehg/hgqt/merge.py:578
+#: tortoisehg/hgqt/backout.py:595 tortoisehg/hgqt/merge.py:585
 msgid "Please wait while committing merged files."
 msgstr "请稍等，正在提交合并的文件..."
 
 #: tortoisehg/hgqt/backout.py:620 tortoisehg/hgqt/cmdui.py:313
-#: tortoisehg/hgqt/merge.py:613
+#: tortoisehg/hgqt/merge.py:620
 msgid "Finished"
 msgstr "完成"
 
@@ -510,8 +510,8 @@ msgid "Test this revision and report findings. (good/bad/skip)"
 msgstr "测试这个修订版本并报告结果。(无bug/有bug/跳过)"
 
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
-#: tortoisehg/hgqt/commit.py:844 tortoisehg/hgqt/commit.py:1157
-#: tortoisehg/hgqt/commit.py:1177 tortoisehg/hgqt/hgignore.py:258
+#: tortoisehg/hgqt/commit.py:860 tortoisehg/hgqt/commit.py:1176
+#: tortoisehg/hgqt/commit.py:1196 tortoisehg/hgqt/hgignore.py:258
 #: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:483
 #: tortoisehg/hgqt/wctxactions.py:185
 #, python-format
@@ -526,7 +526,7 @@ msgstr "书签"
 msgid "New Name:"
 msgstr "新名称:"
 
-#: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:797
+#: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:813
 #: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:56
 #: tortoisehg/hgqt/wctxactions.py:62
 msgid "&Add"
@@ -536,7 +536,7 @@ msgstr "添加(&A)"
 msgid "Re&name"
 msgstr "重命名(&N)"
 
-#: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:825
+#: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:841
 #: tortoisehg/hgqt/tag.py:99
 msgid "&Remove"
 msgstr "移除(&R)"
@@ -761,8 +761,8 @@ msgstr "源:"
 msgid "Destination:"
 msgstr "目标:"
 
-#: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:117
-#: tortoisehg/hgqt/merge.py:202 tortoisehg/hgqt/mq.py:621
+#: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:118
+#: tortoisehg/hgqt/merge.py:208 tortoisehg/hgqt/mq.py:621
 #: tortoisehg/hgqt/postreview_ui.py:170 tortoisehg/hgqt/rebase.py:57
 #: tortoisehg/hgqt/sync.py:165 tortoisehg/hgqt/tag.py:64
 msgid "Options"
@@ -924,7 +924,7 @@ msgstr "没有找到匹配项: %s"
 msgid "TortoiseHg Command Dialog"
 msgstr "TortoiseHg 命令对话"
 
-#: tortoisehg/hgqt/cmdui.py:793 tortoisehg/hgqt/merge.py:101
+#: tortoisehg/hgqt/cmdui.py:793 tortoisehg/hgqt/merge.py:106
 #: tortoisehg/hgqt/rebase.py:262 tortoisehg/hgqt/resolve.py:357
 #: tortoisehg/hgqt/settings.py:1075
 msgid "Confirm Exit"
@@ -942,159 +942,167 @@ msgstr ""
 msgid "TortoiseHg"
 msgstr "TortoiseHg"
 
-#: tortoisehg/hgqt/commit.py:76
+#: tortoisehg/hgqt/commit.py:77
 msgctxt "window title"
 msgid "Commit"
 msgstr "提交"
 
-#: tortoisehg/hgqt/commit.py:98
+#: tortoisehg/hgqt/commit.py:99
 msgid "Commit Dialog Toolbar"
 msgstr "提交对话工具栏"
 
-#: tortoisehg/hgqt/commit.py:102 tortoisehg/hgqt/commit.py:546
+#: tortoisehg/hgqt/commit.py:103 tortoisehg/hgqt/commit.py:562
 msgid "Branch: "
 msgstr "分支: "
 
-#: tortoisehg/hgqt/commit.py:110
+#: tortoisehg/hgqt/commit.py:111
 msgid "Copy message"
 msgstr "复制提交说明"
 
-#: tortoisehg/hgqt/commit.py:112
+#: tortoisehg/hgqt/commit.py:113
 msgid "Copy one of the recent commit messages"
 msgstr "复制最近使用过的一个提交说明"
 
-#: tortoisehg/hgqt/commit.py:124
+#: tortoisehg/hgqt/commit.py:125
 msgid "Show Issues"
 msgstr "显示问题"
 
-#: tortoisehg/hgqt/commit.py:126
+#: tortoisehg/hgqt/commit.py:127
 msgid "Please wait..."
 msgstr "请稍候..."
 
-#: tortoisehg/hgqt/commit.py:134
+#: tortoisehg/hgqt/commit.py:135
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
 msgstr "加载问题追踪器失败 '%s': %s"
 
-#: tortoisehg/hgqt/commit.py:137 tortoisehg/hgqt/commit.py:489
+#: tortoisehg/hgqt/commit.py:138 tortoisehg/hgqt/commit.py:505
 #: tortoisehg/hgqt/settings.py:349
 msgid "Issue Tracker"
 msgstr "问题追踪器"
 
-#: tortoisehg/hgqt/commit.py:145
+#: tortoisehg/hgqt/commit.py:146
 msgid "Show Issues..."
 msgstr "显示问题..."
 
-#: tortoisehg/hgqt/commit.py:149 tortoisehg/hgqt/grep.py:53
+#: tortoisehg/hgqt/commit.py:150 tortoisehg/hgqt/grep.py:53
 #: tortoisehg/hgqt/serve_ui.py:87
 msgid "Stop"
 msgstr "停止"
 
-#: tortoisehg/hgqt/commit.py:262
+#: tortoisehg/hgqt/commit.py:275
 msgid "Commit changes"
 msgstr "提交修改"
 
-#: tortoisehg/hgqt/commit.py:262
+#: tortoisehg/hgqt/commit.py:275
 msgid "Commit"
 msgstr "提交"
 
-#: tortoisehg/hgqt/commit.py:263
+#: tortoisehg/hgqt/commit.py:276
+msgid "Amend current revision"
+msgstr ""
+
+#: tortoisehg/hgqt/commit.py:276
+msgid "Amend"
+msgstr ""
+
+#: tortoisehg/hgqt/commit.py:277
 msgid "Create a new patch"
 msgstr "创建新的补丁"
 
-#: tortoisehg/hgqt/commit.py:263 tortoisehg/hgqt/mq.py:975
+#: tortoisehg/hgqt/commit.py:277 tortoisehg/hgqt/mq.py:975
 msgid "QNew"
 msgstr "QNew"
 
-#: tortoisehg/hgqt/commit.py:264
+#: tortoisehg/hgqt/commit.py:278
 msgid "Refresh current patch"
 msgstr "刷新当前补丁"
 
-#: tortoisehg/hgqt/commit.py:264 tortoisehg/hgqt/mq.py:604
+#: tortoisehg/hgqt/commit.py:278 tortoisehg/hgqt/mq.py:604
 #: tortoisehg/hgqt/mq.py:984
 msgid "QRefresh"
 msgstr "QRefresh"
 
-#: tortoisehg/hgqt/commit.py:395
+#: tortoisehg/hgqt/commit.py:409
 msgid "Confirm Branch Change"
 msgstr "验证分支修改"
 
-#: tortoisehg/hgqt/commit.py:396
+#: tortoisehg/hgqt/commit.py:410
 #, python-format
 msgid "Named branch \"%s\" already exists, last used in revision %d\n"
 msgstr "分支“%s”已存在，最后一次在版本%d中使用\n"
 
-#: tortoisehg/hgqt/commit.py:400
+#: tortoisehg/hgqt/commit.py:414
 msgid "Restart &Branch"
 msgstr "重新打开分支(&B)"
 
-#: tortoisehg/hgqt/commit.py:401 tortoisehg/hgqt/commit.py:409
+#: tortoisehg/hgqt/commit.py:415 tortoisehg/hgqt/commit.py:423
 msgid "&Commit to current branch"
 msgstr "提交到当前分支(&C)"
 
-#: tortoisehg/hgqt/commit.py:404 tortoisehg/hgqt/sync.py:998
+#: tortoisehg/hgqt/commit.py:418 tortoisehg/hgqt/sync.py:998
 msgid "Confirm New Branch"
 msgstr "确认新分支"
 
-#: tortoisehg/hgqt/commit.py:405
+#: tortoisehg/hgqt/commit.py:419
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
 msgstr "是否要在本次提交创建新的分支“%s”？\n"
 
-#: tortoisehg/hgqt/commit.py:408
+#: tortoisehg/hgqt/commit.py:422
 msgid "Create &Branch"
 msgstr "创建分支(&B)"
 
-#: tortoisehg/hgqt/commit.py:439
+#: tortoisehg/hgqt/commit.py:455
 msgctxt "start progress"
 msgid "MQ Action"
 msgstr "MQ动作"
 
-#: tortoisehg/hgqt/commit.py:548
+#: tortoisehg/hgqt/commit.py:564
 msgid "Close Branch: "
 msgstr "关闭分支: "
 
-#: tortoisehg/hgqt/commit.py:550
+#: tortoisehg/hgqt/commit.py:566
 msgid "New Branch: "
 msgstr "新建分支: "
 
-#: tortoisehg/hgqt/commit.py:563
+#: tortoisehg/hgqt/commit.py:579
 #, python-format
 msgid "<b>Selected Options:</b> %s"
 msgstr ""
 
-#: tortoisehg/hgqt/commit.py:577 tortoisehg/hgqt/revpanel.py:24
+#: tortoisehg/hgqt/commit.py:593 tortoisehg/hgqt/revpanel.py:24
 #: tortoisehg/hgqt/update.py:87
 msgid "Parent:"
 msgstr "父版本:"
 
-#: tortoisehg/hgqt/commit.py:578 tortoisehg/hgqt/pbranch.py:879
+#: tortoisehg/hgqt/commit.py:594 tortoisehg/hgqt/pbranch.py:879
 msgid "Patch name:"
 msgstr "补丁名称:"
 
-#: tortoisehg/hgqt/commit.py:605
+#: tortoisehg/hgqt/commit.py:621
 #, python-format
 msgid "Rollback commit to revision %d"
 msgstr "回滚到修订版本 %d"
 
-#: tortoisehg/hgqt/commit.py:614
+#: tortoisehg/hgqt/commit.py:630
 msgid "Confirm Undo"
 msgstr "验证撤销"
 
-#: tortoisehg/hgqt/commit.py:619
+#: tortoisehg/hgqt/commit.py:635
 msgctxt "start progress"
 msgid "Rollback"
 msgstr "回滚"
 
-#: tortoisehg/hgqt/commit.py:648 tortoisehg/hgqt/mq.py:822
+#: tortoisehg/hgqt/commit.py:664 tortoisehg/hgqt/mq.py:822
 msgid "Discard current commit message?"
 msgstr "要丢弃当前的提交说明吗?"
 
-#: tortoisehg/hgqt/commit.py:728
+#: tortoisehg/hgqt/commit.py:744
 msgid "Message Translation Failure"
 msgstr "说明翻译失败"
 
-#: tortoisehg/hgqt/commit.py:729
+#: tortoisehg/hgqt/commit.py:745
 msgid ""
 "Unable to translate message to local encoding\n"
 "Consider setting HGENCODING environment variable\n"
@@ -1104,147 +1112,147 @@ msgstr ""
 "请考虑设置 HGENCODING 环境变量\n"
 "使用“?”替换不能翻译的字符？\n"
 
-#: tortoisehg/hgqt/commit.py:732
+#: tortoisehg/hgqt/commit.py:748
 msgid "&Replace"
 msgstr "替换(&R)"
 
-#: tortoisehg/hgqt/commit.py:740 tortoisehg/hgqt/commit.py:753
+#: tortoisehg/hgqt/commit.py:756 tortoisehg/hgqt/commit.py:769
 msgid "Nothing Commited"
 msgstr "未提交"
 
-#: tortoisehg/hgqt/commit.py:741
+#: tortoisehg/hgqt/commit.py:757
 msgid "Please enter commit message"
 msgstr "请输入提交说明"
 
-#: tortoisehg/hgqt/commit.py:754
+#: tortoisehg/hgqt/commit.py:770
 msgid ""
 "No issue link was found in the commit message.  The commit message should "
 "contain an issue link.  Configure this in the 'Issue Tracking' section of "
 "the settings."
 msgstr ""
 
-#: tortoisehg/hgqt/commit.py:777
+#: tortoisehg/hgqt/commit.py:793
 msgid "No files checked"
 msgstr "没有选择文件"
 
-#: tortoisehg/hgqt/commit.py:778
+#: tortoisehg/hgqt/commit.py:794
 msgid "No modified files checkmarked for commit"
 msgstr "没有已修改的文件被选中"
 
-#: tortoisehg/hgqt/commit.py:795 tortoisehg/hgqt/lfprompt.py:16
+#: tortoisehg/hgqt/commit.py:811 tortoisehg/hgqt/lfprompt.py:16
 msgid "Confirm Add"
 msgstr "确认添加"
 
-#: tortoisehg/hgqt/commit.py:796
+#: tortoisehg/hgqt/commit.py:812
 msgid "Add selected untracked files?"
 msgstr "开始跟踪这些文件？"
 
-#: tortoisehg/hgqt/commit.py:823 tortoisehg/hgqt/quickop.py:180
+#: tortoisehg/hgqt/commit.py:839 tortoisehg/hgqt/quickop.py:180
 msgid "Confirm Remove"
 msgstr "确认删除"
 
-#: tortoisehg/hgqt/commit.py:824
+#: tortoisehg/hgqt/commit.py:840
 msgid "Remove selected deleted files?"
 msgstr "删除选中的文件？"
 
-#: tortoisehg/hgqt/commit.py:872
+#: tortoisehg/hgqt/commit.py:891
 msgctxt "start progress"
 msgid "Commit"
 msgstr "提交"
 
-#: tortoisehg/hgqt/commit.py:910
+#: tortoisehg/hgqt/commit.py:929
 #, python-format
 msgid "%s - commit options"
 msgstr "%s - 提交选项"
 
-#: tortoisehg/hgqt/commit.py:917
+#: tortoisehg/hgqt/commit.py:936
 msgid "Set username:"
 msgstr "设置用户名:"
 
-#: tortoisehg/hgqt/commit.py:944 tortoisehg/hgqt/commit.py:991
-#: tortoisehg/hgqt/commit.py:1014 tortoisehg/hgqt/commit.py:1030
+#: tortoisehg/hgqt/commit.py:963 tortoisehg/hgqt/commit.py:1010
+#: tortoisehg/hgqt/commit.py:1033 tortoisehg/hgqt/commit.py:1049
 msgid "Save in Repo"
 msgstr "保存到仓库"
 
-#: tortoisehg/hgqt/commit.py:949
+#: tortoisehg/hgqt/commit.py:968
 msgid "Save Global"
 msgstr "保存到全局"
 
-#: tortoisehg/hgqt/commit.py:961
+#: tortoisehg/hgqt/commit.py:980
 msgid "Set Date:"
 msgstr "设置日期"
 
-#: tortoisehg/hgqt/commit.py:965
+#: tortoisehg/hgqt/commit.py:984
 msgid "Update"
 msgstr "更新"
 
-#: tortoisehg/hgqt/commit.py:984
+#: tortoisehg/hgqt/commit.py:1003
 msgid "Push After Commit:"
 msgstr "提交后推送:"
 
-#: tortoisehg/hgqt/commit.py:1007
+#: tortoisehg/hgqt/commit.py:1026
 msgid "Auto Includes:"
 msgstr "自动包含:"
 
-#: tortoisehg/hgqt/commit.py:1032
+#: tortoisehg/hgqt/commit.py:1051
 msgid "Recurse into subrepositories (--subrepos)"
 msgstr "递归到子仓库 (--subrepos)"
 
-#: tortoisehg/hgqt/commit.py:1061
+#: tortoisehg/hgqt/commit.py:1080
 msgid "Unable to save username"
 msgstr "无法保存用户名"
 
-#: tortoisehg/hgqt/commit.py:1062 tortoisehg/hgqt/commit.py:1085
-#: tortoisehg/hgqt/commit.py:1108 tortoisehg/hgqt/commit.py:1131
+#: tortoisehg/hgqt/commit.py:1081 tortoisehg/hgqt/commit.py:1104
+#: tortoisehg/hgqt/commit.py:1127 tortoisehg/hgqt/commit.py:1150
 #: tortoisehg/hgqt/sync.py:1088 tortoisehg/hgqt/sync.py:1186
 #: tortoisehg/hgqt/sync.py:1264 tortoisehg/hgqt/sync.py:1446
 msgid "Iniparse must be installed."
 msgstr "需要安裝ini解释器。"
 
-#: tortoisehg/hgqt/commit.py:1077 tortoisehg/hgqt/commit.py:1100
-#: tortoisehg/hgqt/commit.py:1123 tortoisehg/hgqt/commit.py:1146
+#: tortoisehg/hgqt/commit.py:1096 tortoisehg/hgqt/commit.py:1119
+#: tortoisehg/hgqt/commit.py:1142 tortoisehg/hgqt/commit.py:1165
 #: tortoisehg/hgqt/settings.py:1420 tortoisehg/hgqt/sync.py:1098
 #: tortoisehg/hgqt/sync.py:1197 tortoisehg/hgqt/sync.py:1286
 #: tortoisehg/hgqt/sync.py:1485
 msgid "Unable to write configuration file"
 msgstr "无法写入配置文件"
 
-#: tortoisehg/hgqt/commit.py:1084
+#: tortoisehg/hgqt/commit.py:1103
 msgid "Unable to save after commit push"
 msgstr "无法在提交推送后保存"
 
-#: tortoisehg/hgqt/commit.py:1107
+#: tortoisehg/hgqt/commit.py:1126
 msgid "Unable to save auto include list"
 msgstr "无法保存自动导入列表"
 
-#: tortoisehg/hgqt/commit.py:1130
+#: tortoisehg/hgqt/commit.py:1149
 msgid "Unable to save recurse in subrepos."
 msgstr "无法保存子仓库的递归"
 
-#: tortoisehg/hgqt/commit.py:1161
+#: tortoisehg/hgqt/commit.py:1180
 msgid "Invalid date format"
 msgstr "日期格式无效"
 
-#: tortoisehg/hgqt/commit.py:1181
+#: tortoisehg/hgqt/commit.py:1200
 msgid "No username configured"
 msgstr "没有设置用户名"
 
-#: tortoisehg/hgqt/commit.py:1244 tortoisehg/hgqt/compress.py:124
+#: tortoisehg/hgqt/commit.py:1263 tortoisehg/hgqt/compress.py:124
 #: tortoisehg/hgqt/pbranch.py:872 tortoisehg/hgqt/repowidget.py:362
 msgctxt "action button"
 msgid "Commit"
 msgstr "提交"
 
-#: tortoisehg/hgqt/commit.py:1262
+#: tortoisehg/hgqt/commit.py:1281
 #, python-format
 msgid "%s - commit"
 msgstr "%s - 提交"
 
-#: tortoisehg/hgqt/commit.py:1315
+#: tortoisehg/hgqt/commit.py:1334
 msgid "TortoiseHg Commit"
 msgstr ""
 
-#: tortoisehg/hgqt/commit.py:1316
+#: tortoisehg/hgqt/commit.py:1335
 msgid "Are you sure that you want to cancel the commit operation?"
 msgstr ""
 
@@ -1555,7 +1563,7 @@ msgid "Forward"
 msgstr "前进"
 
 #: tortoisehg/hgqt/filedialogs.py:196 tortoisehg/hgqt/filedialogs.py:682
-#: tortoisehg/hgqt/repowidget.py:1221 tortoisehg/hgqt/repowidget.py:1538
+#: tortoisehg/hgqt/repowidget.py:1221 tortoisehg/hgqt/repowidget.py:1545
 msgid "Visual diff..."
 msgstr "可视化工具查看差异..."
 
@@ -2392,7 +2400,7 @@ msgid "Find revisions matching fields of:"
 msgstr ""
 
 #: tortoisehg/hgqt/matching.py:73 tortoisehg/hgqt/matching.py:192
-#: tortoisehg/hgqt/matching.py:211
+#: tortoisehg/hgqt/matching.py:213
 msgid "Revision to Match:"
 msgstr ""
 
@@ -2441,17 +2449,21 @@ msgstr ""
 msgid "Find matches - %s"
 msgstr ""
 
-#: tortoisehg/hgqt/matching.py:207
+#: tortoisehg/hgqt/matching.py:209
 msgid "Revisions to Match:"
 msgstr ""
 
-#: tortoisehg/hgqt/matching.py:208
+#: tortoisehg/hgqt/matching.py:210
 #, python-format
 msgid "Match any of <b><i>%d</i></b> revisions"
 msgstr ""
 
-#: tortoisehg/hgqt/matching.py:215
+#: tortoisehg/hgqt/matching.py:217
 msgid "<b>Unknown revision!</b>"
+msgstr ""
+
+#: tortoisehg/hgqt/matching.py:219
+msgid "<b>Parse Error!</b>"
 msgstr ""
 
 #: tortoisehg/hgqt/merge.py:31
@@ -2459,48 +2471,48 @@ msgstr ""
 msgid "Merge - %s"
 msgstr "合并 - %s"
 
-#: tortoisehg/hgqt/merge.py:96
+#: tortoisehg/hgqt/merge.py:101
 msgid "Do you want to exit?"
 msgstr "确定要退出？"
 
-#: tortoisehg/hgqt/merge.py:97
+#: tortoisehg/hgqt/merge.py:102
 msgid "To finish merging, you need to commit the working directory."
 msgstr "你需要提交工作目录才能完成合并。"
 
-#: tortoisehg/hgqt/merge.py:99 tortoisehg/hgqt/rebase.py:260
+#: tortoisehg/hgqt/merge.py:104 tortoisehg/hgqt/rebase.py:260
 msgid "&Exit"
 msgstr "退出(&E)"
 
-#: tortoisehg/hgqt/merge.py:118
+#: tortoisehg/hgqt/merge.py:124
 msgid "Prepare to merge"
 msgstr "准备合并"
 
-#: tortoisehg/hgqt/merge.py:119
+#: tortoisehg/hgqt/merge.py:125
 msgid "Verify merge targets and ensure your working directory is clean."
 msgstr "验证合并目标并确认您的工作目录是干净的。"
 
-#: tortoisehg/hgqt/merge.py:128 tortoisehg/hgqt/repomodel.py:600
+#: tortoisehg/hgqt/merge.py:134 tortoisehg/hgqt/repomodel.py:600
 #: tortoisehg/hgqt/revpanel.py:159
 msgid "Not a head revision!"
 msgstr "不是头版本！"
 
-#: tortoisehg/hgqt/merge.py:135
+#: tortoisehg/hgqt/merge.py:141
 msgid "Merge from (other revision)"
 msgstr "合并自 (要并入的修订版本)"
 
-#: tortoisehg/hgqt/merge.py:142 tortoisehg/hgqt/merge.py:663
+#: tortoisehg/hgqt/merge.py:148 tortoisehg/hgqt/merge.py:670
 msgid "Unable to merge"
 msgstr "无法合并"
 
-#: tortoisehg/hgqt/merge.py:143 tortoisehg/hgqt/merge.py:664
+#: tortoisehg/hgqt/merge.py:149 tortoisehg/hgqt/merge.py:671
 msgid "Merge revision not specified or not found"
 msgstr ""
 
-#: tortoisehg/hgqt/merge.py:147
+#: tortoisehg/hgqt/merge.py:153
 msgid "Merge to (working directory)"
 msgstr "合并到 (工作目录)"
 
-#: tortoisehg/hgqt/merge.py:170
+#: tortoisehg/hgqt/merge.py:176
 msgid ""
 "The working directory is already <b>merged</b>. <a "
 "href=\"skip\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> "
@@ -2509,7 +2521,7 @@ msgstr ""
 "工作目录已被<b>合并</b>。<a href=\"skip\"><b>继续</b></a>或<a "
 "href=\"discard\"><b>丢弃</b></a>已存在的合并。"
 
-#: tortoisehg/hgqt/merge.py:179
+#: tortoisehg/hgqt/merge.py:185
 msgid ""
 "Before merging, you must <a href=\"commit\"><b>commit</b></a>, <a "
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
@@ -2518,23 +2530,23 @@ msgstr ""
 "在合并前，您必须<a href=\"commit\"><b>提交</b></a>，将修订<a "
 "href=\"shelve\"><b>剥离</b></a>为补丁，或 <a href=\"discard\"><b>放弃</b></a>所做更改。"
 
-#: tortoisehg/hgqt/merge.py:191
+#: tortoisehg/hgqt/merge.py:197
 msgid "Or use:"
 msgstr "或使用:"
 
-#: tortoisehg/hgqt/merge.py:194
+#: tortoisehg/hgqt/merge.py:200
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "强制合并 (-f/--force)"
 
-#: tortoisehg/hgqt/merge.py:208
+#: tortoisehg/hgqt/merge.py:214
 msgid "Discard all changes from merge target (other) revision"
 msgstr "丢弃目标修订版本所做的全部更改"
 
-#: tortoisehg/hgqt/merge.py:236
+#: tortoisehg/hgqt/merge.py:242
 msgid "Confirm Discard Changes"
 msgstr "确认放弃修改"
 
-#: tortoisehg/hgqt/merge.py:237
+#: tortoisehg/hgqt/merge.py:243
 #, python-format
 msgid ""
 "The changes from revision %s and all unmerged parents will be discarded.\n"
@@ -2545,40 +2557,40 @@ msgstr ""
 "\n"
 "您确实是要这样做吗？"
 
-#: tortoisehg/hgqt/merge.py:290
+#: tortoisehg/hgqt/merge.py:296
 msgctxt "working dir state"
 msgid "Clean"
 msgstr "可以合并"
 
-#: tortoisehg/hgqt/merge.py:341
+#: tortoisehg/hgqt/merge.py:348
 msgid "Merging..."
 msgstr "正在合并..."
 
-#: tortoisehg/hgqt/merge.py:355
+#: tortoisehg/hgqt/merge.py:362
 msgid "Automatically advance to next page when merge is complete."
 msgstr "合并完成时自动前进到下一页"
 
-#: tortoisehg/hgqt/merge.py:400
+#: tortoisehg/hgqt/merge.py:407
 #, python-format
 msgid ""
 "%d files were modified on both branches and must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr "%d个文件在两个分支中均被修改，您需要<a href=\"resolve\"><b>解决合并冲突</b></a>"
 
-#: tortoisehg/hgqt/merge.py:439
+#: tortoisehg/hgqt/merge.py:446
 msgid "Commit merge results"
 msgstr "提交合并结果"
 
-#: tortoisehg/hgqt/merge.py:542
+#: tortoisehg/hgqt/merge.py:549
 msgid "Merge"
 msgstr "合并"
 
-#: tortoisehg/hgqt/merge.py:546
+#: tortoisehg/hgqt/merge.py:553
 #, python-format
 msgid "Merge with %s"
 msgstr "与 %s 合并"
 
-#: tortoisehg/hgqt/merge.py:618
+#: tortoisehg/hgqt/merge.py:625
 msgid "Merge changeset"
 msgstr "合并修改集"
 
@@ -2676,7 +2688,7 @@ msgid "%s had rejected chunks, edit patched file together with rejects?"
 msgstr ""
 
 #: tortoisehg/hgqt/mq.py:335 tortoisehg/hgqt/mq.py:784
-#: tortoisehg/hgqt/repowidget.py:1470
+#: tortoisehg/hgqt/repowidget.py:1471
 msgid ""
 "<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
 "them.<br><br>Continue?</p>"
@@ -3506,7 +3518,7 @@ msgid "Rebase"
 msgstr "重定位"
 
 #: tortoisehg/hgqt/rebase.py:101 tortoisehg/hgqt/rebase.py:274
-#: tortoisehg/hgqt/repowidget.py:1600 tortoisehg/hgqt/repowidget.py:1627
+#: tortoisehg/hgqt/repowidget.py:1607 tortoisehg/hgqt/repowidget.py:1634
 msgid "Abort"
 msgstr "中止"
 
@@ -4287,7 +4299,7 @@ msgstr ""
 msgid "Rollback to revision %d (undo %s)?"
 msgstr "回滚到修订版本 %d (撤消 %s)？"
 
-#: tortoisehg/hgqt/repowidget.py:745 tortoisehg/hgqt/repowidget.py:1364
+#: tortoisehg/hgqt/repowidget.py:745 tortoisehg/hgqt/repowidget.py:1362
 #: tortoisehg/hgqt/run.py:553
 msgid "Repository Error"
 msgstr "仓库错误"
@@ -4353,211 +4365,208 @@ msgstr "推送选中分支"
 msgid "Update..."
 msgstr "更新..."
 
-#: tortoisehg/hgqt/repowidget.py:1225
-msgid "Browse at rev..."
-msgstr "浏览分支文件..."
-
-#: tortoisehg/hgqt/repowidget.py:1227
+#: tortoisehg/hgqt/repowidget.py:1225 tortoisehg/hgqt/repowidget.py:1432
+#: tortoisehg/hgqt/repowidget.py:1517
 msgid "Similar revisions..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1230
+#: tortoisehg/hgqt/repowidget.py:1228
 msgid "Merge with local..."
 msgstr "合并到本地..."
 
-#: tortoisehg/hgqt/repowidget.py:1233
+#: tortoisehg/hgqt/repowidget.py:1231
 msgid "Tag..."
 msgstr "标签..."
 
-#: tortoisehg/hgqt/repowidget.py:1235
+#: tortoisehg/hgqt/repowidget.py:1233
 msgid "Bookmark..."
 msgstr "书签..."
 
-#: tortoisehg/hgqt/repowidget.py:1238
+#: tortoisehg/hgqt/repowidget.py:1236
 msgid "Backout..."
 msgstr "撤销..."
 
-#: tortoisehg/hgqt/repowidget.py:1242
+#: tortoisehg/hgqt/repowidget.py:1240
 msgid "Copy hash"
 msgstr "复制hash"
 
-#: tortoisehg/hgqt/repowidget.py:1246
+#: tortoisehg/hgqt/repowidget.py:1244
 msgid "Export"
 msgstr "导出"
 
-#: tortoisehg/hgqt/repowidget.py:1247
+#: tortoisehg/hgqt/repowidget.py:1245
 msgid "Export patch..."
 msgstr "导出补丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1249
+#: tortoisehg/hgqt/repowidget.py:1247
 msgid "Email patch..."
 msgstr "邮寄补丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1251
+#: tortoisehg/hgqt/repowidget.py:1249
 msgid "Archive..."
 msgstr "存档..."
 
-#: tortoisehg/hgqt/repowidget.py:1253
+#: tortoisehg/hgqt/repowidget.py:1251
 msgid "Bundle rev to tip..."
 msgstr "从本修订到tip之间的修订打包..."
 
-#: tortoisehg/hgqt/repowidget.py:1255 tortoisehg/hgqt/wctxactions.py:41
+#: tortoisehg/hgqt/repowidget.py:1253 tortoisehg/hgqt/wctxactions.py:41
 msgid "Copy patch"
 msgstr "复制补丁"
 
-#: tortoisehg/hgqt/repowidget.py:1261
+#: tortoisehg/hgqt/repowidget.py:1259
 msgid "Change phase to"
 msgstr "更改开发阶段为"
 
-#: tortoisehg/hgqt/repowidget.py:1267
+#: tortoisehg/hgqt/repowidget.py:1265
 msgid "Transplant to local"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1271
+#: tortoisehg/hgqt/repowidget.py:1269
 msgid "Modify history"
 msgstr "修改历史"
 
-#: tortoisehg/hgqt/repowidget.py:1272
+#: tortoisehg/hgqt/repowidget.py:1270
 msgid "Unapply patch (QGoto parent)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1274
+#: tortoisehg/hgqt/repowidget.py:1272
 msgid "Import to MQ"
 msgstr "导出到MQ"
 
-#: tortoisehg/hgqt/repowidget.py:1276
+#: tortoisehg/hgqt/repowidget.py:1274
 msgid "Finish patch"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1278 tortoisehg/hgqt/repowidget.py:1496
+#: tortoisehg/hgqt/repowidget.py:1276 tortoisehg/hgqt/repowidget.py:1497
 msgid "Rename patch..."
 msgstr "重命名补丁..."
 
-#: tortoisehg/hgqt/repowidget.py:1281
+#: tortoisehg/hgqt/repowidget.py:1279
 msgid "Rebase..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1284
+#: tortoisehg/hgqt/repowidget.py:1282
 msgid "Strip..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1287
+#: tortoisehg/hgqt/repowidget.py:1285
 msgid "Post to Review Board..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1290
+#: tortoisehg/hgqt/repowidget.py:1288
 msgid "Remote Update..."
 msgstr "远程更新..."
 
-#: tortoisehg/hgqt/repowidget.py:1305
+#: tortoisehg/hgqt/repowidget.py:1303
 msgid "Custom Tools"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1352
+#: tortoisehg/hgqt/repowidget.py:1350
 msgid "Write diff file"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1365
+#: tortoisehg/hgqt/repowidget.py:1363
 msgid "Unable to write diff file"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1406
+#: tortoisehg/hgqt/repowidget.py:1404
 msgid "Unable to compress history"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1407
+#: tortoisehg/hgqt/repowidget.py:1405
 msgid "Selected changeset pair not related"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1419
+#: tortoisehg/hgqt/repowidget.py:1417
 msgid "Visual Diff..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1420
+#: tortoisehg/hgqt/repowidget.py:1418
 msgid "Export Diff..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1422 tortoisehg/hgqt/repowidget.py:1513
+#: tortoisehg/hgqt/repowidget.py:1420 tortoisehg/hgqt/repowidget.py:1514
 msgid "Export Selected..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1423 tortoisehg/hgqt/repowidget.py:1514
+#: tortoisehg/hgqt/repowidget.py:1421 tortoisehg/hgqt/repowidget.py:1515
 msgid "Email Selected..."
 msgstr "邮寄选中的..."
 
-#: tortoisehg/hgqt/repowidget.py:1425
+#: tortoisehg/hgqt/repowidget.py:1423
 msgid "Export DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1426
+#: tortoisehg/hgqt/repowidget.py:1424
 msgid "Email DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1427
+#: tortoisehg/hgqt/repowidget.py:1425
 msgid "Bundle DAG Range..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1429
+#: tortoisehg/hgqt/repowidget.py:1427
 msgid "Bisect - Good, Bad..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1430
+#: tortoisehg/hgqt/repowidget.py:1428
 msgid "Bisect - Bad, Good..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1431
+#: tortoisehg/hgqt/repowidget.py:1429
 msgid "Compress History..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1433
+#: tortoisehg/hgqt/repowidget.py:1431
 msgid "Goto common ancestor"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1445 tortoisehg/hgqt/repowidget.py:1523
+#: tortoisehg/hgqt/repowidget.py:1445 tortoisehg/hgqt/repowidget.py:1530
 msgid "Transplant Selected to local"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1451 tortoisehg/hgqt/repowidget.py:1529
+#: tortoisehg/hgqt/repowidget.py:1452 tortoisehg/hgqt/repowidget.py:1536
 msgid "Post Selected to Review Board..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1491
+#: tortoisehg/hgqt/repowidget.py:1492
 msgid "Apply patch (QGoto)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1492
+#: tortoisehg/hgqt/repowidget.py:1493
 msgid "QPush --move"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1493
+#: tortoisehg/hgqt/repowidget.py:1494
 msgid "Fold patches..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1494
+#: tortoisehg/hgqt/repowidget.py:1495
 msgid "Delete patches..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1495
+#: tortoisehg/hgqt/repowidget.py:1496
 msgid "Reorder patches..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1537
+#: tortoisehg/hgqt/repowidget.py:1544
 msgid "Pull to here..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1558 tortoisehg/hgqt/repowidget.py:1568
+#: tortoisehg/hgqt/repowidget.py:1565 tortoisehg/hgqt/repowidget.py:1575
 msgid "Export patch"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1560
+#: tortoisehg/hgqt/repowidget.py:1567
 msgid "Patch Files (*.patch)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1591
+#: tortoisehg/hgqt/repowidget.py:1598
 msgid "Cannot export revision"
 msgstr "无法导出修订版本"
 
-#: tortoisehg/hgqt/repowidget.py:1592
+#: tortoisehg/hgqt/repowidget.py:1599
 #, python-format
 msgid ""
 "Cannot export revision %s into the file named:\n"
@@ -4568,19 +4577,19 @@ msgstr ""
 "\n"
 "%s\n"
 
-#: tortoisehg/hgqt/repowidget.py:1594
+#: tortoisehg/hgqt/repowidget.py:1601
 msgid "There is already an existing folder with that same name."
 msgstr "已存在同名文件夹。"
 
-#: tortoisehg/hgqt/repowidget.py:1600 tortoisehg/hgqt/repowidget.py:1620
+#: tortoisehg/hgqt/repowidget.py:1607 tortoisehg/hgqt/repowidget.py:1627
 msgid "Replace"
 msgstr "替换"
 
-#: tortoisehg/hgqt/repowidget.py:1600
+#: tortoisehg/hgqt/repowidget.py:1607
 msgid "Append"
 msgstr "追加"
 
-#: tortoisehg/hgqt/repowidget.py:1603
+#: tortoisehg/hgqt/repowidget.py:1610
 #, python-format
 msgid ""
 "There are existing patch files for %d revisions (%s) in the selected "
@@ -4588,31 +4597,31 @@ msgid ""
 "\n"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1610
+#: tortoisehg/hgqt/repowidget.py:1617
 msgid "What do you want to do?\n"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1611
+#: tortoisehg/hgqt/repowidget.py:1618
 msgid "Replace the existing patch files.\n"
 msgstr "替换已存在的补丁文件。\n"
 
-#: tortoisehg/hgqt/repowidget.py:1612
+#: tortoisehg/hgqt/repowidget.py:1619
 msgid "Append the changes to the existing patch files.\n"
 msgstr "最佳修改到已存在的补丁。\n"
 
-#: tortoisehg/hgqt/repowidget.py:1613
+#: tortoisehg/hgqt/repowidget.py:1620
 msgid "Abort the export operation.\n"
 msgstr "中止导出操作。\n"
 
-#: tortoisehg/hgqt/repowidget.py:1615
+#: tortoisehg/hgqt/repowidget.py:1622
 msgid "Patch files already exist"
 msgstr "补丁文件已存在"
 
-#: tortoisehg/hgqt/repowidget.py:1641
+#: tortoisehg/hgqt/repowidget.py:1648
 msgid "Patch exported"
 msgstr "导出补丁成功"
 
-#: tortoisehg/hgqt/repowidget.py:1642
+#: tortoisehg/hgqt/repowidget.py:1649
 #, python-format
 msgid ""
 "Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a "
@@ -4621,38 +4630,38 @@ msgstr ""
 "修订版本 #%d (%s) 导出到:<p><a href=\"file:///%s\">%s</a>%s<a "
 "href=\"file:///%s\">%s</a>"
 
-#: tortoisehg/hgqt/repowidget.py:1650
+#: tortoisehg/hgqt/repowidget.py:1657
 msgid "Patches exported"
 msgstr "导出补丁成功"
 
-#: tortoisehg/hgqt/repowidget.py:1651
+#: tortoisehg/hgqt/repowidget.py:1658
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d 补丁导出到:<p><a href=\"file:///%s\">%s</a>"
 
-#: tortoisehg/hgqt/repowidget.py:1695
+#: tortoisehg/hgqt/repowidget.py:1705
 msgid "Incorrect Mercurial version"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1696
+#: tortoisehg/hgqt/repowidget.py:1706
 msgid ""
 "In order to use the \"Find Similar revisions\" functionality, you must use a "
 "mercurial version above 2.1."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1789
+#: tortoisehg/hgqt/repowidget.py:1796
 msgid "Write bundle"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1849
+#: tortoisehg/hgqt/repowidget.py:1856
 msgid "Backwards phase change requested"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1850
+#: tortoisehg/hgqt/repowidget.py:1857
 msgid "Do you really want to <i>force</i> a backwards phase transition?"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1851
+#: tortoisehg/hgqt/repowidget.py:1858
 #, python-format
 msgid ""
 "You are trying to move the phase of revision %d backwards,\n"
@@ -4668,38 +4677,38 @@ msgid ""
 "Please be careful!"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1859
+#: tortoisehg/hgqt/repowidget.py:1866
 msgid "&Force"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1860
+#: tortoisehg/hgqt/repowidget.py:1867
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: tortoisehg/hgqt/repowidget.py:1891
+#: tortoisehg/hgqt/repowidget.py:1898
 msgid "Cannot import selected revision"
 msgstr "无法导入选中修订版本"
 
-#: tortoisehg/hgqt/repowidget.py:1892
+#: tortoisehg/hgqt/repowidget.py:1899
 #, python-format
 msgid ""
 "The selected revision (rev #%d) cannot be imported because it is not a "
 "descendant of qparent (rev #%d)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2018
+#: tortoisehg/hgqt/repowidget.py:2025
 msgid "Invalid command"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2019
+#: tortoisehg/hgqt/repowidget.py:2026
 msgid "The selected command is empty"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2047
+#: tortoisehg/hgqt/repowidget.py:2054
 msgid "Unable to start"
 msgstr "无法开始"
 
-#: tortoisehg/hgqt/repowidget.py:2048
+#: tortoisehg/hgqt/repowidget.py:2055
 msgid "Previous command is still running"
 msgstr "前一个命令仍在执行"
 
@@ -11768,6 +11777,9 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "_Copy Hash"
 #~ msgstr "复制校验码(_C)"
+
+#~ msgid "Browse at rev..."
+#~ msgstr "浏览分支文件..."
 
 #, python-format
 #~ msgid "Backout changeset - %s"
