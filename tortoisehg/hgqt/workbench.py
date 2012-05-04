@@ -711,7 +711,7 @@ class Workbench(QMainWindow):
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
         self.lastClosedRepoRootList = []
-        self.progress('Reopening tabs', len(self.lastClosedRepoRootList),
+        self.progress(_('Reopening tabs'), len(self.lastClosedRepoRootList),
             _('All repositories open'), '', len(self.lastClosedRepoRootList))
 
     def repoTabChanged(self, index=0):
