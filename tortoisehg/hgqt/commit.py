@@ -759,8 +759,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.msgte.setFocus()
             return
 
-        linkmandatory = self.repo.ui.config('tortoisehg',
-                                            'issue.linkmandatory', False)
+        linkmandatory = self.repo.ui.configbool('tortoisehg',
+                                                'issue.linkmandatory', False)
         if linkmandatory:
             issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
             if issueregex:
