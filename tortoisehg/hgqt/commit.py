@@ -887,7 +887,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
-        self.currentAction = 'commit'
+        if amend:
+            self.currentAction = 'amend'
+        else:
+            self.currentAction = 'commit'
         self.currentProgress = _('Commit', 'start progress')
         self.progress.emit(*cmdui.startProgress(self.currentProgress, ''))
         self.commitButtonEnable.emit(False)
