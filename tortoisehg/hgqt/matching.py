@@ -253,7 +253,7 @@ class MatchDialog(QDialog):
         for chk in self._hideable_chks:
             chk.setShown(visible)
 
-    @pyqtSlot(object)
+    @pyqtSlot(QAbstractButton)
     def _selectSummaryOrDescription(self, btn):
         # Uncheck all other buttons
         for b in self.desc_btngroup.buttons():
