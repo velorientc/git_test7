@@ -1861,8 +1861,8 @@ class RepoWidget(QWidget):
                     'Moving the phase backwards is not recommended.\n'
                     'For example, it may result in having multiple heads\nif you '
                     'modify a revision that you have already pushed\nto a server.\n\n'
-                    'Please be careful!' % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
-                                            phases.phasenames[currentphase]))
+                    'Please be careful!') % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
+                                            phases.phasenames[currentphase])
             labels = ((QMessageBox.Yes, _('&Force')),
                       (QMessageBox.No, _('&Cancel')))
             if not qtlib.QuestionMsgBox(title, main, text,
