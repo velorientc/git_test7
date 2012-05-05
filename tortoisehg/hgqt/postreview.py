@@ -355,10 +355,10 @@ class PostReviewDialog(QDialog):
         if (saved or published):
             if saved:
                 url = output.split('saved: ').pop().strip()
-                msg = _('Review draft posted to %s\n' % url)
+                msg = _('Review draft posted to %s\n') % url
             else:
                 url = output.split('published: ').pop().strip()
-                msg = _('Review published to %s\n' % url)
+                msg = _('Review published to %s\n') % url
 
             QDesktopServices.openUrl(QUrl(url))
 
