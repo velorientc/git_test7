@@ -3,8 +3,8 @@ from nose.tools import *
 from nose.plugins.skip import SkipTest
 from PyQt4.QtCore import QModelIndex, QString
 from PyQt4.QtGui import QApplication
+from tortoisehg.hgqt import thgrepo
 from tortoisehg.hgqt.manifestmodel import ManifestModel
-from tests import get_fixture_repo
 
 import helpers
 
@@ -14,8 +14,27 @@ def setup():
     global _app, _repos
     _app = QApplication([])  # for style().standardIcon()
     _repos = {}
-    for name in ('subdirs', 'euc-jp-path'):
-        _repos[name] = get_fixture_repo(name)
+
+    tmpdir = helpers.mktmpdir(__name__)
+
+    hg = helpers.HgClient(os.path.join(tmpdir, 'subdirs'))
+    hg.init()
+    hg.ftouch('foo', 'bar', 'baz/bax', 'baz/box')
+    hg.addremove()
+    hg.commit('-m', 'foobar')
+    hg.fwrite('bar', 'hello\n')
+    hg.remove('baz/box')
+    hg.ftouch('zzz')
+    hg.addremove()
+    hg.commit('-m', 'remove baz/box, add zzz, modify bar')
+    _repos['subdirs'] = thgrepo.repository(path=hg.path)
+
+    hg = helpers.HgClient(os.path.join(tmpdir, 'euc-jp-path'))
+    hg.init()
+    hg.ftouch(_aloha_ja.encode('euc-jp'))
+    hg.addremove()
+    hg.commit('-m', 'add aloha')
+    _repos['euc-jp-path'] = thgrepo.repository(path=hg.path)
 
 def teardown():
     global _app
