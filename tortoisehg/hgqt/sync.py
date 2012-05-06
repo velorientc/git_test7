@@ -133,7 +133,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
              'hg-incoming', self.inclicked)
         self.pullAction = \
         newaction(_('Pull incoming changesets from remote repository'),
-             'hg-pull', self.pullclicked)
+             'hg-pull', lambda: self.pullclicked())
         self.outgoingAction = \
         newaction(_('Filter outgoing changesets to remote repository'),
              'hg-outgoing', self.outclicked)
