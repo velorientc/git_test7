@@ -3,6 +3,14 @@ import sys
 from nose.tools import *
 from tortoisehg.util import colormap
 
+def setup():
+    global _origmaxint
+    _origmaxint = sys.maxint
+    sys.maxint = int((1 << 31) - 1)
+
+def teardown():
+    sys.maxint = _origmaxint
+
 def fakectx(userhash, date, tz=0):
     # AnnotateColorSaturation uses hash() for mapping user to hue
     class user(object):
@@ -23,7 +31,7 @@ def test_user_hue():
 
     samples = {0x0: '#ffaaaa', 0x1: '#ffaac9', 0x2: '#ffaae9', 0x3: '#f4aaff',
                0x4: '#d4aaff', 0x5: '#b4aaff', 0x6: '#aabfff', 0x7: '#aadfff',
-               0x8: '#aaffff', 0x9: '#aaffdf', 0xa: '#aaffbf', 0xb: '#b4ffaa',
+               0x8: '#aafeff', 0x9: '#aaffdf', 0xa: '#aaffbf', 0xb: '#b4ffaa',
                0xc: '#d4ffaa', 0xd: '#f4ffaa', 0xe: '#ffe9aa', 0xf: '#ffc9aa'}
     for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
         assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
@@ -31,10 +39,10 @@ def test_user_hue():
 def test_user_hue_limit():
     cm = colormap.AnnotateColorSaturation(maxhues=8)
 
-    samples = {0x0: '#ffaaaa', 0x1: '#ffaaaa', 0x2: '#ffaae9', 0x3: '#ffaae9',
-               0x4: '#d4aaff', 0x5: '#d4aaff', 0x6: '#aabfff', 0x7: '#aabfff',
-               0x8: '#aaffff', 0x9: '#aaffff', 0xa: '#aaffbf', 0xb: '#aaffbf',
-               0xc: '#d4ffaa', 0xd: '#d4ffaa', 0xe: '#ffe9aa', 0xf: '#ffe9aa'}
+    samples = {0x0: '#ffaaaa', 0x1: '#ffaaaa', 0x2: '#ffaaaa', 0x3: '#ffaae9',
+               0x4: '#ffaae9', 0x5: '#d4aaff', 0x6: '#d4aaff', 0x7: '#aabfff',
+               0x8: '#aabfff', 0x9: '#aaffff', 0xa: '#aaffff', 0xb: '#aaffbf',
+               0xc: '#aaffbf', 0xd: '#d4ffaa', 0xe: '#d4ffaa', 0xf: '#ffe9aa'}
     for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
         assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
 
@@ -93,10 +101,10 @@ def test_makeannotatepalette_fold_same_color():
                 fakectx(4 * userstep, 0)]
     palette = colormap.makeannotatepalette(filectxs, now=0,
                                            maxcolors=4, maxhues=8)
-    assert_equals(3, len(palette))
-    assert_equals(set([filectxs[0], filectxs[1]]), set(palette['#ffaaaa']))
-    assert_equals(set([filectxs[2], filectxs[3]]), set(palette['#ffaae9']))
-    assert_equals(set([filectxs[4]]), set(palette['#d4aaff']))
+    assert_equals(2, len(palette))
+    assert_equals(set([filectxs[0], filectxs[1], filectxs[2]]),
+                  set(palette['#ffaaaa']))
+    assert_equals(set([filectxs[3], filectxs[4]]), set(palette['#ffaae9']))
 
 def test_makeannotatepalette_mindate_included():
     agestep = 10 * SECS_PER_DAY
