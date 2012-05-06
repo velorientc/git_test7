@@ -366,7 +366,7 @@ def check_write_copied_conflict():
     assert_equals('y', cr.get('foo', 'bar'))
 
 @with_wconfig
-def test_write_copied_rconfig():
+def check_write_copied_rconfig():
     c0 = newrconfig({'foo.bar': 'x'})
     c1 = wconfig.config(c0)
     assert_equals('[foo]\nbar = x', written(c1).rstrip())
