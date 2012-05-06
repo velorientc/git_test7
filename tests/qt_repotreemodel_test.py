@@ -2,7 +2,8 @@ import os
 from nose.tools import *
 from mercurial import node
 from tortoisehg.hgqt.repotreemodel import *
-from tests import FIXTURES_DIR
+
+FIXTURES_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 def openfixture(name, mode=QIODevice.ReadOnly):
     path = os.path.join(FIXTURES_DIR, name)
