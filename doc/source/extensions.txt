@@ -59,17 +59,6 @@ page.
 This extension is documented in :ref:`perfarce-perforce` section of
 :doc:`nonhg` chapter.
  
-HGEOL
-=====
-
-The hgeol extension is the eventual successor to the win32text
-extension.  It tries to resolve the EOLN compatibility problems in a
-more complete and robust fashion.  Instead of documenting it here, we
-will link to it's online documents which are continually evolving.
-
-* `EOLTranslationPlan <http://mercurial.selenic.com/wiki/EOLTranslationPlan>`_
-* `Source code <http://bitbucket.org/mg/hg-eol/>`_
-
 Mercurial-Keyring
 =================
 
