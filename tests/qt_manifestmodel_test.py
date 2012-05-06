@@ -1,4 +1,6 @@
+import os
 from nose.tools import *
+from nose.plugins.skip import SkipTest
 from PyQt4.QtCore import QModelIndex, QString
 from PyQt4.QtGui import QApplication
 from tortoisehg.hgqt.manifestmodel import ManifestModel
@@ -38,6 +40,8 @@ def test_data_inexistent():
 
 @with_encoding('euc-jp')
 def test_data_eucjp():
+    if os.name != 'posix':
+        raise SkipTest
     m = newmodel(name='euc-jp-path')
     assert_equals(_aloha_ja, m.data(m.index(0, 0)))
 
@@ -68,6 +72,8 @@ def test_pathfromindex():
 
 @with_encoding('euc-jp')
 def test_pathfromindex_eucjp():
+    if os.name != 'posix':
+        raise SkipTest
     m = newmodel(name='euc-jp-path')
     assert_equals(_aloha_ja, m.filePath(m.index(0, 0)))
 
@@ -84,6 +90,8 @@ def test_indexfrompath_qstr():
 
 @with_encoding('euc-jp')
 def test_indexfrompath_eucjp():
+    if os.name != 'posix':
+        raise SkipTest
     m = newmodel(name='euc-jp-path')
     assert_equals(m.index(0, 0), m.indexFromPath(_aloha_ja))
 
