@@ -226,7 +226,7 @@ clients.  TortoiseHg recommends the use of HTTPS for Windows clients.
 
 See the FAQ_ for help if you have trouble connecting to ssh servers.
 
-.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+.. _FAQ: http://bitbucket.org/tortoisehg/hgtk/wiki/FAQ#tortoisehg-faq
 
 Email
 -----
