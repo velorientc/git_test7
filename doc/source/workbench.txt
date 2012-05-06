@@ -506,7 +506,7 @@ Examples::
 
 	BitBucket:
 	issue.regex = #(\d+)\b
-	issue.link = http://bitbucket.org/<your project and repo>/issue/{1}/
+	issue.link = https://bitbucket.org/<your project and repo>/issue/{1}/
 
 	Mercurial:
 	issue.regex = \bissue\d+\b
