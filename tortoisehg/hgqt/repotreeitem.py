@@ -191,7 +191,7 @@ class RepoItem(RepoTreeItem):
             if column == 0:
                 baseiconname = 'hg'
                 if paths.is_unc_path(self.rootpath()):
-                    baseiconname = 'remote-repo'
+                    baseiconname = 'thg-remote-repo'
                 ico = qtlib.geticon(baseiconname)
                 if not self._valid:
                     ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
