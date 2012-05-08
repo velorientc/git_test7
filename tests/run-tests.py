@@ -14,7 +14,8 @@ For details, please see:
 import os, sys
 import nose
 
-import nosehgenv
+import nosecaptureexc, nosehgenv
 
 if __name__ == '__main__':
-    nose.main(addplugins=[nosehgenv.HgEnvPlugin()])
+    nose.main(addplugins=[nosecaptureexc.CaptureExcPlugin(),
+                          nosehgenv.HgEnvPlugin()])
