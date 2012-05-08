@@ -77,4 +77,12 @@ class HgEnvPlugin(plugins.Plugin):
 
     def finalize(self, result):
         if not self.keep_tmpdir:
+            # TODO: workaround for file lock problem on Windows
+            # https://bitbucket.org/tortoisehg/thg/issue/1783/
+            from tortoisehg.hgqt import thgrepo
+            for e in thgrepo._repocache.itervalues():
+                w = e._pyqtobj.watcher
+                w.removePaths(w.directories())
+                w.removePaths(w.files())
+
             shutil.rmtree(self.tmpdir)
