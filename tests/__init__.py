@@ -28,19 +28,3 @@ def get_fixture_repo(name):
         return thgrepo.repository(ui.ui(), path)
     except error.RepoError:
         return create_fixture_repo(name)
-
-
-def with_encoding(encoding, fallbackencoding=None):
-    """Change locale encoding temporarily"""
-    orig_encoding = hglib._encoding
-    orig_fallbackencoding = hglib._fallbackencoding
-
-    def setenc():
-        hglib._encoding = encoding
-        hglib._fallbackencoding = fallbackencoding or encoding
-
-    def restoreenc():
-        hglib._encoding = orig_encoding
-        hglib._fallbackencoding = orig_fallbackencoding
-
-    return with_setup(setenc, restoreenc)
