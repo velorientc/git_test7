@@ -1,16 +1,15 @@
-import os, tempfile, shutil
+import os, tempfile
 from nose.tools import *
 from nose.plugins.skip import SkipTest
 from StringIO import StringIO
 from mercurial import config, error
 from tortoisehg.util import wconfig
 
+import helpers
+
 def setup():
     global _tempdir
-    _tempdir = tempfile.mkdtemp()
-
-def teardown():
-    shutil.rmtree(_tempdir)
+    _tempdir = helpers.mktmpdir(__name__)
 
 
 def newrconfig(vals={}):

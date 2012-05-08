@@ -4,16 +4,13 @@ from mercurial import ui, commands, error
 from tortoisehg.util import hglib
 from tortoisehg.hgqt import thgrepo
 
+import helpers
+
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 def setup():
-    global _tempdir, _reposdir
-    _tempdir = tempfile.mkdtemp()
-    _reposdir = os.path.join(_tempdir, 'repos')
-    os.mkdir(_reposdir)
-
-def teardown():
-    shutil.rmtree(_tempdir)
+    global _reposdir
+    _reposdir = helpers.mktmpdir('repos')
 
 
 def create_fixture_repo(name, dirname=None):
