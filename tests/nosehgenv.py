@@ -1,6 +1,7 @@
 """Nose plugin to set up test environment"""
-import os, shutil, tempfile
+import os, shutil, sys, tempfile
 from nose import plugins
+# don't import mercurial or tortoisehg before setting up test environment
 
 class HgEnvPlugin(plugins.Plugin):
     """Set up temporary environment"""
@@ -19,7 +20,27 @@ class HgEnvPlugin(plugins.Plugin):
         self.tmpdir = options.tmpdir
 
     def begin(self):
+        if 'mercurial' in sys.modules:
+            raise Exception('loaded mercurial module before setting up '
+                            'test environment')
+        self._setupsyspath()
         self._setuptmpdir()
+        self._setuphgrc()
+        self._setupmiscenv()
+
+    def _setupsyspath(self):
+        hgpath = os.environ.get('HGPATH')
+        if hgpath:
+            hgpath = os.path.abspath(hgpath)
+            sys.path.insert(1, hgpath)
+            os.environ['HGPATH'] = hgpath
+
+        thgpath = os.environ.get('THGPATH')
+        if not thgpath:
+            thgpath = os.path.join(os.path.dirname(__file__), '..')
+        thgpath = os.path.abspath(thgpath)
+        sys.path.insert(1, thgpath)
+        os.environ['THGPATH'] = thgpath
 
     def _setuptmpdir(self):
         if self.tmpdir:
@@ -29,6 +50,30 @@ class HgEnvPlugin(plugins.Plugin):
         else:
             self.tmpdir = tempfile.mkdtemp('', 'thgtests.')
         os.environ['HGTMP'] = self.tmpdir
+
+    def _setuphgrc(self):
+        """Create a fresh hgrc for repeatable result"""
+        os.environ['HGRCPATH'] = hgrcpath = os.path.join(self.tmpdir, '.hgrc')
+        f = open(hgrcpath, 'w')
+        try:
+            f.write('[defaults]\n')
+            f.write('backout = -d "0 0"\n')
+            f.write('commit = -d "0 0"\n')
+            f.write('tag = -d "0 0"\n')
+        finally:
+            f.close()
+
+    def _setupmiscenv(self):
+        """Reset some common environment variables for repeatable result"""
+        os.environ['LANG'] = os.environ['LC_ALL'] = os.environ['LANGUAGE'] = 'C'
+        os.environ['TZ'] = 'GMT'
+        os.environ['HOME'] = self.tmpdir
+        os.environ['APPDATA'] = self.tmpdir  # for QSettings on Windows
+        os.environ['EMAIL'] = 'Foo Bar <foo.bar@example.com>'
+        os.environ['http_proxy'] = ''
+        os.environ['HGUSER'] = 'test'
+        os.environ['HGENCODING'] = 'ascii'
+        os.environ['HGENCODINGMODE'] = 'strict'
 
     def finalize(self, result):
         if not self.keep_tmpdir:

@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 """Run a set of tests by nosetests
 
+To run all tests::
+
+    % HGPATH=path/to/mercurial ./run-tests.py
+
 For details, please see:
 
 - `./run-tests.py --help`
