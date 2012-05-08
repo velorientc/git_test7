@@ -89,7 +89,7 @@ _ancestry = (
     ('p2(set)',
      _('Second parent for all changesets in set, or the working directory.')),
     ('roots(set)',
-     _('Changesets whith no parent changeset in set.')),
+     _('Changesets with no parent changeset in set.')),
     ('present(set)',
      _('An empty set, if any revision in set isn\'t found; otherwise, '
        'all revisions in set.')),
