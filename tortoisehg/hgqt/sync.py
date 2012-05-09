@@ -612,14 +612,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         qtlib.openshell(folder, 'repo ' + folder)
 
     def editurl(self):
-        alias = str(self.menualias)
-        url = str(self.menuurl)
+        alias = hglib.fromunicode(self.menualias)
+        url = hglib.fromunicode(self.menuurl)
         dlg = SaveDialog(self.repo, alias, url, url, self, edit=True)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
-            self.setUrl(str(dlg.urlentry.text()))
+            self.setUrl(hglib.fromunicode(dlg.urlentry.text()))
 
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
