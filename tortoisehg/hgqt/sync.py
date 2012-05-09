@@ -1214,8 +1214,8 @@ class SaveDialog(QDialog):
         self.origurl = origurl
         self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
 
-        self.origalias = hglib.tounicode(alias)
-        self.aliasentry = QLineEdit(self.origalias)
+        self.origalias = alias
+        self.aliasentry = QLineEdit(hglib.tounicode(self.origalias))
         self.aliasentry.selectAll()
         self.aliasentry.textChanged.connect(self.aliasChanged)
         self.layout().addRow(_('Alias'), self.aliasentry)
@@ -1265,16 +1265,17 @@ class SaveDialog(QDialog):
             return
         if fn is None:
             return
-        alias = self.aliasentry.text()
+        alias = hglib.fromunicode(self.aliasentry.text())
         if self.edit:
-            path = self.urlentry.text()
+            path = hglib.fromunicode(self.urlentry.text())
         elif self.clearcb and self.clearcb.isChecked():
             path = self.cleanurl
         else:
             path = self.origurl
         if (not self.edit or path != self.origurl) and alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
-                    _('%s already exists, replace URL?') % alias, parent=self):
+                _('%s already exists, replace URL?') % hglib.tounicode(alias),
+                parent=self):
                 return
         cfg.set('paths', alias, path)
         if self.edit and alias != self.origalias:
