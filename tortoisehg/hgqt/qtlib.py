@@ -904,7 +904,9 @@ class StatusInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
         self._msglabel = QLabel(message, self, wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel, stretch=1)
 
 class CommandErrorInfoBar(InfoBar):
@@ -915,7 +917,9 @@ class CommandErrorInfoBar(InfoBar):
         super(CommandErrorInfoBar, self).__init__(parent)
 
         self._msglabel = QLabel(message, self, wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel, stretch=1)
 
         self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
@@ -934,7 +938,9 @@ class ConfirmInfoBar(InfoBar):
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
         self._msglabel = QLabel(message, self,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel)
 
         self._buttons = QDialogButtonBox(self)

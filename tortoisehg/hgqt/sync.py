@@ -50,6 +50,13 @@ def parseurl(path):
         scheme = 'local'
     return user, host, port, folder, passwd, scheme
 
+def linkify(urlu):
+    scheme = parseurl(hglib.fromunicode(urlu))[5].lower()
+    if scheme in ('local', 'http', 'https'):
+        return u'<a href="%s">%s</a>' % (urlu, urlu)
+    else:
+        return urlu
+
 class SyncWidget(QWidget, qtlib.TaskWidget):
     syncStarted = pyqtSignal()  # incoming/outgoing/pull/push started
     outgoingNodes = pyqtSignal(object)
@@ -817,17 +824,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
-        self.showMessage.emit(_('Getting incoming changesets from %s...') % urlu)
+        link = linkify(urlu)
+        self.showMessage.emit(_('Getting incoming changesets from %s...') % link)
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
             def finished(ret, output):
                 if ret == 0 and os.path.exists(bfile):
-                    self.showMessage.emit(_('Found incoming changesets from %s') % urlu)
+                    self.showMessage.emit(_('Found incoming changesets from %s') % link)
                     self.incomingBundle.emit(hglib.tounicode(bfile), urlu)
                 elif ret == 1:
-                    self.showMessage.emit(_('No incoming changesets from %s') % urlu)
+                    self.showMessage.emit(_('No incoming changesets from %s') % link)
                 else:
-                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (urlu, ret))
+                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (link, ret))
             bfile = url
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
@@ -840,11 +848,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             def finished(ret, output):
                 if ret == 0:
-                    self.showMessage.emit(_('Found incoming changesets from %s') % urlu)
+                    self.showMessage.emit(_('Found incoming changesets from %s') % link)
                 elif ret == 1:
-                    self.showMessage.emit(_('No incoming changesets from %s') % urlu)
+                    self.showMessage.emit(_('No incoming changesets from %s') % link)
                 else:
-                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (urlu, ret))
+                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (link, ret))
             self.finishfunc = finished
             cmdline = ['--repository', self.repo.root, 'incoming']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
@@ -853,14 +861,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
+        link = linkify(urlu)
         if urltoshow is None:
             urltoshow = urlu
+        linktoshow = linkify(urltoshow)
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Pull from %s completed') % urltoshow)
+                self.showMessage.emit(_('Pull from %s completed') % linktoshow)
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d')
-                                      % (urltoshow, ret))
+                                      % (linktoshow, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
             if self.opts.get('rebase'):
@@ -879,7 +889,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     dlg.exec_()
                     return
         self.finishfunc = finished
-        self.showMessage.emit(_('Pulling from %s...') % urlu)
+        self.showMessage.emit(_('Pulling from %s...') % link)
         cmdline = ['--repository', self.repo.root, 'pull', '--verbose']
         uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
             and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
@@ -898,7 +908,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
-        self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
+        link = linkify(urlu)
+        self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
         if self.embedded and not self.opts.get('subrepos'):
             def verifyhash(hash):
                 if len(hash) != 40:
@@ -911,11 +922,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     if nodes:
                         self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets to %s') %
-                                          (len(nodes), urlu))
+                                          (len(nodes), link))
                 elif ret == 1:
-                    self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
+                    self.showMessage.emit(_('No outgoing changesets to %s') % link)
                 else:
-                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (urlu, ret))
+                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (link, ret))
             self.finishfunc = outputnodes
             cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                        '--template', '{node}\n']
@@ -923,11 +934,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             def finished(ret, data):
                 if ret == 0:
-                    self.showMessage.emit(_('outgoing changesets to %s found') % urlu)
+                    self.showMessage.emit(_('outgoing changesets to %s found') % link)
                 elif ret == 1:
-                    self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
+                    self.showMessage.emit(_('No outgoing changesets to %s') % link)
                 else:
-                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (urlu, ret))
+                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (link, ret))
             self.finishfunc = finished
             cmdline = ['--repository', self.repo.root, 'outgoing']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
@@ -980,24 +991,25 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
+        link = linkify(urlu)
         if (not hg.islocal(self.currentUrl(False)) and confirm
             and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
                                      % urlu, parent=self)
             if not r:
-                self.showMessage.emit(_('Push to %s aborted') % urlu)
+                self.showMessage.emit(_('Push to %s aborted') % link)
                 self.pushCompleted.emit()
                 return
 
-        self.showMessage.emit(_('Pushing to %s...') % urlu)
+        self.showMessage.emit(_('Pushing to %s...') % link)
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Push to %s completed') % urlu)
+                self.showMessage.emit(_('Push to %s completed') % link)
             elif ret == 1:
-                self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
+                self.showMessage.emit(_('No outgoing changesets to %s') % link)
             else:
-                self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
+                self.showMessage.emit(_('Push to %s aborted, ret %d') % (link, ret))
                 if self.needNewBranch:
                     r = qtlib.QuestionMsgBox(_('Confirm New Branch'),
                                              _('One or more of the changesets that you '

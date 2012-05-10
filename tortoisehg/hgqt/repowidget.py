@@ -297,8 +297,10 @@ class RepoWidget(QWidget):
             hdr = handlers.get(scheme)
             if hdr:
                 return hdr(param)
-
-        QDesktopServices.openUrl(QUrl(link))
+        if os.path.isabs(link):
+            qtlib.openlocalurl(link)
+        else:
+            QDesktopServices.openUrl(QUrl(link))
 
     def setInfoBar(self, cls, *args, **kwargs):
         """Show the given infobar at top of RepoWidget
