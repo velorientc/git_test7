@@ -12,21 +12,41 @@ def mktmpdir(prefix):
     """Create temporary directory under HGTMP"""
     return tempfile.mkdtemp('', prefix, os.environ['HGTMP'])
 
+class EncodingPatcher(object):
+    """Temporarily change locale encoding"""
+
+    def __init__(self, encoding, fallbackencoding=None):
+        self._newencoding = encoding
+        self._newfallbackencoding = fallbackencoding or encoding
+        self._patched = False
+
+    def patch(self):
+        if self._patched:
+            raise Exception('encoding already patched')
+        self._orighglibencoding = hglib._encoding
+        self._orighglibfallbackencoding = hglib._fallbackencoding
+        hglib._encoding = self._newencoding
+        hglib._fallbackencoding = self._newfallbackencoding
+        self._patched = True
+
+    def restore(self):
+        if not self._patched:
+            raise Exception('encoding not patched')
+        hglib._encoding = self._orighglibencoding
+        hglib._fallbackencoding = self._orighglibfallbackencoding
+        self._patched = False
+
+def patchencoding(encoding, fallbackencoding=None):
+    """Change locale encoding and return object to restore"""
+    patcher = EncodingPatcher(encoding, fallbackencoding)
+    patcher.patch()
+    return patcher
+
 # TODO: make this usable for unittest.TestCase?
 def with_encoding(encoding, fallbackencoding=None):
     """Decorator for test function to change locale encoding temporarily"""
-    orig_encoding = hglib._encoding
-    orig_fallbackencoding = hglib._fallbackencoding
-
-    def setenc():
-        hglib._encoding = encoding
-        hglib._fallbackencoding = fallbackencoding or encoding
-
-    def restoreenc():
-        hglib._encoding = orig_encoding
-        hglib._fallbackencoding = orig_fallbackencoding
-
-    return tools.with_setup(setenc, restoreenc)
+    patcher = EncodingPatcher(encoding, fallbackencoding)
+    return tools.with_setup(patcher.patch, patcher.restore)
 
 class HgClient(object):
     """Mercurial client to set up fixture repository
