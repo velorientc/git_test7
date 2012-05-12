@@ -5,7 +5,8 @@ try:
 except ImportError:
     import StringIO
 from nose import tools
-from mercurial import dispatch, ui as uimod
+from PyQt4.QtCore import QTextCodec
+from mercurial import dispatch, encoding as encodingmod, ui as uimod
 from tortoisehg.util import hglib
 
 def mktmpdir(prefix):
@@ -23,17 +24,32 @@ class EncodingPatcher(object):
     def patch(self):
         if self._patched:
             raise Exception('encoding already patched')
+        self._origenvencoding = os.environ.get('HGENCODING')
+        self._origencoding = encodingmod.encoding
+        self._origfallbackencoding = encodingmod.fallbackencoding
         self._orighglibencoding = hglib._encoding
         self._orighglibfallbackencoding = hglib._fallbackencoding
+        self._origqtextcodec = QTextCodec.codecForLocale()
+
+        os.environ['HGENCODING'] = self._newencoding
+        encodingmod.encoding = self._newencoding
+        encodingmod.fallbackencoding = self._newfallbackencoding
         hglib._encoding = self._newencoding
         hglib._fallbackencoding = self._newfallbackencoding
+        QTextCodec.setCodecForLocale(
+            QTextCodec.codecForName(self._newencoding))
         self._patched = True
 
     def restore(self):
         if not self._patched:
             raise Exception('encoding not patched')
+        if self._origenvencoding is not None:
+            os.environ['HGENCODING'] = self._origenvencoding
+        encodingmod.encoding = self._origencoding
+        encodingmod.fallbackencoding = self._origfallbackencoding
         hglib._encoding = self._orighglibencoding
         hglib._fallbackencoding = self._orighglibfallbackencoding
+        QTextCodec.setCodecForLocale(self._origqtextcodec)
         self._patched = False
 
 def patchencoding(encoding, fallbackencoding=None):
