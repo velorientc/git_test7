@@ -118,9 +118,9 @@ class QtUi(uimod.ui):
     def flush(self):
         pass
 
-    def prompt(self, msg, choices=None, default='y'):
+    def prompt(self, msg, default='y'):
         if not self.interactive(): return default
-        return self.sig.prompt(msg, choices, default)
+        return self.sig.prompt(msg, None, default)
 
     def promptchoice(self, msg, choices, default=0):
         if not self.interactive(): return default
