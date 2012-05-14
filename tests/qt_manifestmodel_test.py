@@ -180,9 +180,12 @@ class ManifestModelEucjpTest(unittest.TestCase):
             raise SkipTest
         cls.encodingpatch = helpers.patchencoding('euc-jp')
 
-        hg = helpers.HgClient(os.path.join(_tmpdir, cls.__name__))
+        # include non-ascii char in repo path to test concatenation
+        hg = helpers.HgClient(os.path.join(
+            _tmpdir, cls.__name__ + _aloha_ja.encode('euc-jp')))
         hg.init()
         hg.ftouch(_aloha_ja.encode('euc-jp'))
+        hg.ftouch(_aloha_ja.encode('euc-jp') + '.txt')
         hg.addremove()
         hg.commit('-m', 'add aloha')
         cls.repo = thgrepo.repository(path=hg.path)
@@ -203,3 +206,7 @@ class ManifestModelEucjpTest(unittest.TestCase):
     def test_indexfrompath(self):
         m = ManifestModel(self.repo, rev=0)
         self.assertEqual(m.index(0, 0), m.indexFromPath(_aloha_ja))
+
+    def test_fileicon_path_concat(self):
+        m = ManifestModel(self.repo, rev=0)
+        m.fileIcon(m.indexFromPath(_aloha_ja + '.txt'))  # no unicode error
