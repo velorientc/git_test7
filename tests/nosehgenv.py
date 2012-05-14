@@ -1,6 +1,7 @@
 """Nose plugin to set up test environment"""
 import os, shutil, sys, tempfile
 from nose import plugins
+from PyQt4.QtGui import QApplication
 # don't import mercurial or tortoisehg before setting up test environment
 
 class HgEnvPlugin(plugins.Plugin):
@@ -27,6 +28,7 @@ class HgEnvPlugin(plugins.Plugin):
         self._setuptmpdir()
         self._setuphgrc()
         self._setupmiscenv()
+        self._setupqapp()
 
         # TODO: workaround for "no module named comtypes" error
         # https://bitbucket.org/tortoisehg/thg/issue/1726/
@@ -80,7 +82,14 @@ class HgEnvPlugin(plugins.Plugin):
         os.environ['HGENCODING'] = 'ascii'
         os.environ['HGENCODINGMODE'] = 'strict'
 
+    def _setupqapp(self):
+        # Make sure to hold single QApplication instance on memory. Multiple
+        # instances will lead crash.
+        self._qapp = QApplication([])
+
     def finalize(self, result):
+        del self._qapp
+
         if not self.keep_tmpdir:
             # TODO: workaround for file lock problem on Windows
             # https://bitbucket.org/tortoisehg/thg/issue/1783/

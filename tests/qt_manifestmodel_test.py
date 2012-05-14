@@ -2,7 +2,6 @@ import os
 from nose.tools import *
 from nose.plugins.skip import SkipTest
 from PyQt4.QtCore import QModelIndex, QString
-from PyQt4.QtGui import QApplication
 from tortoisehg.hgqt import thgrepo
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -11,8 +10,7 @@ import helpers
 _aloha_ja = u'\u3042\u308d\u306f\u30fc'
 
 def setup():
-    global _app, _repos
-    _app = QApplication([])  # for style().standardIcon()
+    global _repos
     _repos = {}
 
     tmpdir = helpers.mktmpdir(__name__)
@@ -35,10 +33,6 @@ def setup():
     hg.addremove()
     hg.commit('-m', 'add aloha')
     _repos['euc-jp-path'] = thgrepo.repository(path=hg.path)
-
-def teardown():
-    global _app
-    del _app
 
 def newmodel(name='subdirs', rev=0):
     return ManifestModel(_repos[name], rev=rev)

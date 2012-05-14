@@ -1,6 +1,5 @@
 import mock, unittest
 from nose.plugins.skip import SkipTest
-from PyQt4.QtGui import QApplication
 from tortoisehg.hgqt import sync, thgrepo
 from tortoisehg.util import wconfig
 
@@ -8,11 +7,7 @@ import helpers
 
 class SyncSaveDialogTest(unittest.TestCase):
     def setUp(self):
-        self.app = QApplication([])
         self.repo = None  # use mock instead?
-
-    def tearDown(self):
-        del self.app
 
     def test_clearcb_save(self):
         origurl = 'http://foo:bar@example.org/baz'
@@ -44,12 +39,8 @@ class SyncSaveDialogWriteTest(unittest.TestCase):
     def setUp(self):
         if not hasattr(wconfig.config(), 'write'):
             raise SkipTest
-        self.app = QApplication([])
         self.hg = helpers.HgClient(helpers.mktmpdir(__name__))
         self.hg.init()
-
-    def tearDown(self):
-        del self.app
 
     def test_save_new(self):
         url = 'http://example.org/'
