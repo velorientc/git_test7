@@ -81,6 +81,8 @@ class HgEnvPlugin(plugins.Plugin):
         os.environ['HGUSER'] = 'test'
         os.environ['HGENCODING'] = 'ascii'
         os.environ['HGENCODINGMODE'] = 'strict'
+        # suppress "Session management error" on X11
+        os.environ['SESSION_MANAGER'] = ''
 
     def _setupqapp(self):
         # Make sure to hold single QApplication instance on memory. Multiple
