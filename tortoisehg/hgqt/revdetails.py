@@ -315,7 +315,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         filenames = self.filelist.getSelectedFiles()
         if not filenames:
             return
-        opts = {'change':self.ctx.rev()}
+        rev = self.ctx.rev()
+        if rev in self.repo.thgmqunappliedpatches:
+            QMessageBox.warning(self,
+                _("Cannot display visual diff"),
+                _("Visual diffs are not supported for unapplied patches"))
+            return
+        opts = {'change': rev}
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
         if dlg:
             dlg.exec_()
