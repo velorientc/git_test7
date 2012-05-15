@@ -1,4 +1,4 @@
-import os, unittest
+import os, sys, unittest
 from nose.plugins.skip import SkipTest
 from PyQt4.QtCore import QModelIndex, QString
 from tortoisehg.hgqt import thgrepo
@@ -176,7 +176,8 @@ _aloha_ja = u'\u3042\u308d\u306f\u30fc'
 class ManifestModelEucjpTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        if os.name != 'posix':
+        # TODO: make this compatible with binary-unsafe filesystem
+        if os.name != 'posix' or sys.platform == 'darwin':
             raise SkipTest
         cls.encodingpatch = helpers.patchencoding('euc-jp')
 
