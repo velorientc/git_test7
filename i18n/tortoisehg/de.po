@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-05-04 08:12-0300\n"
-"PO-Revision-Date: 2012-04-29 11:43+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"PO-Revision-Date: 2012-05-10 06:24+0000\n"
+"Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-05-04 11:45+0000\n"
-"X-Generator: Launchpad (build 15195)\n"
+"X-Launchpad-Export-Date: 2012-05-11 05:17+0000\n"
+"X-Generator: Launchpad (build 15225)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -244,7 +244,7 @@ msgstr "Rücksetzen vorbereiten"
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
-"Prüfen Sie die Rücksetzversion und stellen Sie sicher, dass Ihr "
+"Prüfen Sie die Rücksetz-Reversion und stellen Sie sicher, dass Ihr "
 "Arbeitsverzeichnis sauber ist."
 
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
@@ -328,7 +328,7 @@ msgid ""
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
 "Vor dem Rücksetzen müssen Sie Ihre Änderungen <a "
-"href=\"commit\"><b>übernehmen</b></a>, in einem Flicken <a "
+"href=\"commit\"><b>übernehmen</b></a>, in einem Patch <a "
 "href=\"shelve\"><b>verstauen</b></a> oder <a "
 "href=\"discard\"><b>verwerfen</b></a>."
 
@@ -480,7 +480,7 @@ msgstr "Abgeschlossen"
 
 #: tortoisehg/hgqt/backout.py:625
 msgid "Backout changeset"
-msgstr "Änderungsliste rücksetzen"
+msgstr "zurückgenommene Revision"
 
 #: tortoisehg/hgqt/bisect.py:22
 #, python-format
@@ -715,7 +715,7 @@ msgstr "Den Dateiinhalt dieser Revision wiederherstellen"
 
 #: tortoisehg/hgqt/chunks.py:195
 msgid "Patch failed to apply"
-msgstr "Der Flicken konnte nicht angewandt werden"
+msgstr "Der Patch konnte nicht angewandt werden"
 
 #: tortoisehg/hgqt/chunks.py:201 tortoisehg/hgqt/mq.py:244
 #: tortoisehg/hgqt/mq.py:749
@@ -753,8 +753,8 @@ msgstr "Blöcke konnten nicht verschmolzen werden"
 #: tortoisehg/hgqt/chunks.py:313
 msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
-"Ergänzungs- oder Lösch-Flicken müssen im Arbeitsverzeichnis zusammengeführt "
-"werden"
+"Patches welche Dateien hinzufügen oder löschen müssen im Arbeitsverzeichnis "
+"zusammengeführt werden"
 
 #: tortoisehg/hgqt/chunks.py:399
 msgid "Unable to remove"
@@ -818,7 +818,7 @@ msgstr "Unkomprimierten Transfer verwenden"
 
 #: tortoisehg/hgqt/clone.py:138
 msgid "Include patch queue"
-msgstr "Flickenschlange einschließen"
+msgstr "Patch-Reihe einschließen"
 
 #: tortoisehg/hgqt/clone.py:141
 msgid "Use proxy server"
@@ -894,12 +894,12 @@ msgstr "Wählen Sie das Zielarchiv"
 
 #: tortoisehg/hgqt/clone.py:424
 msgid "Select patch folder"
-msgstr "Wählen SIe ein Verzeichnis für den Flicken"
+msgstr "Wählen SIe ein Verzeichnis für den Patch"
 
 #: tortoisehg/hgqt/clone.py:432
 msgid "The selected patch folder is not under the source repository."
 msgstr ""
-"Das ausgewählte Flickenverzeichnis ist nicht innerhalb des Quellarchivs."
+"Das ausgewählte Patchverzeichnis ist nicht innerhalb des Quellarchivs."
 
 #: tortoisehg/hgqt/cmdui.py:232 tortoisehg/hgqt/thread.py:371
 #, python-format
@@ -1033,15 +1033,15 @@ msgstr "Übernehmen"
 
 #: tortoisehg/hgqt/commit.py:276
 msgid "Amend current revision"
-msgstr ""
+msgstr "Aktuelle Revision ergänzen"
 
 #: tortoisehg/hgqt/commit.py:276
 msgid "Amend"
-msgstr ""
+msgstr "Ergänzen"
 
 #: tortoisehg/hgqt/commit.py:277
 msgid "Create a new patch"
-msgstr "Neuen Flicken erstellen"
+msgstr "Neuen Patch erstellen"
 
 #: tortoisehg/hgqt/commit.py:277 tortoisehg/hgqt/mq.py:975
 msgid "QNew"
@@ -1049,7 +1049,7 @@ msgstr "QNew"
 
 #: tortoisehg/hgqt/commit.py:278
 msgid "Refresh current patch"
-msgstr "Aktuellen Flicken aktualisieren"
+msgstr "Aktuellen Patch aktualisieren"
 
 #: tortoisehg/hgqt/commit.py:278 tortoisehg/hgqt/mq.py:604
 #: tortoisehg/hgqt/mq.py:984
@@ -1113,7 +1113,7 @@ msgstr "Vorgänger:"
 
 #: tortoisehg/hgqt/commit.py:594 tortoisehg/hgqt/pbranch.py:879
 msgid "Patch name:"
-msgstr "Flickenname:"
+msgstr "Patch-Name:"
 
 #: tortoisehg/hgqt/commit.py:621
 #, python-format
@@ -1296,7 +1296,7 @@ msgstr "Wollen Sie die Übernahme wirklich abbrechen?"
 
 #: tortoisehg/hgqt/compress.py:38
 msgid "Compress changesets up to and including"
-msgstr "Änderungslisten komprimieren bis einschließlich"
+msgstr "Änderungssätze komprimieren bis einschließlich"
 
 #: tortoisehg/hgqt/compress.py:45
 msgid "Onto destination"
@@ -1397,7 +1397,7 @@ msgstr "Die kompakte Darstellung verwenden"
 #: tortoisehg/hgqt/cslist.py:87 tortoisehg/hgqt/revpanel.py:21
 #: tortoisehg/hgqt/revpanel.py:28
 msgid "Patch:"
-msgstr "Flicken:"
+msgstr "Patch:"
 
 #: tortoisehg/hgqt/cslist.py:133
 #, python-format
@@ -1488,7 +1488,7 @@ msgstr "Der Zustand des Unterarchivs ist:"
 #: tortoisehg/hgqt/filedata.py:206
 #, python-format
 msgid "changeset: %s"
-msgstr "Änderungsliste: %s"
+msgstr "Änderungssatz: %s"
 
 #: tortoisehg/hgqt/filedata.py:188
 msgid "Revision has changed to:"
@@ -1856,7 +1856,7 @@ msgstr "Datei anzeigen"
 
 #: tortoisehg/hgqt/grep.py:567
 msgid "View Changeset"
-msgstr "Änderungsliste anzeigen"
+msgstr "Änderungssatz anzeigen"
 
 #: tortoisehg/hgqt/grep.py:569
 msgid "Annotate file"
@@ -2028,13 +2028,13 @@ msgid ""
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
-"Hg-Flicken (als Ergebnis des Befehls export) sind mit den meisten "
-"Flickprogrammen (patch etc.) kompatibel. Sie enthalten einen Dateikopf, der "
-"die wichtigsten Metadaten der Änderungsliste enthält."
+"Hg-Patch-Dateien (als Ergebnis des Befehls export) sind mit den meisten "
+"Patch-Programmen (patch etc.) kompatibel. Sie enthalten einen Dateikopf, der "
+"die wichtigsten Metadaten der Änderung enthält."
 
 #: tortoisehg/hgqt/hgemail_ui.py:269
 msgid "Send changesets as Hg patches"
-msgstr "Änderungsliste als Hg-Flicken verschicken"
+msgstr "Änderungen als Hg-Patches verschicken"
 
 #: tortoisehg/hgqt/hgemail_ui.py:270
 msgid ""
@@ -2042,13 +2042,13 @@ msgid ""
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
-"Git-Flicken können Binärdateien, Kopien und Berechtigungsänderungen "
+"Git-Paches können Binärdateien, Kopien und Berechtigungsänderungen "
 "enthalten. Möglicherweise können Ihre Empfänger diese nicht verwenden, wenn "
 "sie ein anderes Werkzeug als git bzw. Mercurial einsetzen."
 
 #: tortoisehg/hgqt/hgemail_ui.py:271
 msgid "Use extended (git) patch format"
-msgstr "Erweitertes Flickenformat (von git) verwenden"
+msgstr "Erweitertes Patch-Format (git) verwenden"
 
 #: tortoisehg/hgqt/hgemail_ui.py:272
 msgid ""
@@ -2070,17 +2070,18 @@ msgid ""
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
-"Bündeldateien enthalten vollständige Änderungslisten in binärer Form. "
-"Vorgelagerte Benutzer können diese ziehen. Dies ist die sicherste Art, um "
-"Änderungen an andere Benutzer von Mercurial zu senden."
+"Bündeldateien enthalten vollständige Änderungssätze in binärer Form. "
+"Entfernte Benutzer können diese als Quelle für ziehen (pull) verwenden. Dies "
+"ist die sicherste Art, um Änderungen an andere Benutzer von Mercurial zu "
+"senden."
 
 #: tortoisehg/hgqt/hgemail_ui.py:275
 msgid "Send single binary bundle, not patches"
-msgstr "Einzelne binäre Bündeldatei senden, keine Flicken"
+msgstr "Einzelne binäre Bündeldatei senden, keine Patches"
 
 #: tortoisehg/hgqt/hgemail_ui.py:276
 msgid "send patches as part of the email body"
-msgstr "Flicken im Text der E-Mail versenden"
+msgstr "Patches im Text der E-Mail versenden"
 
 #: tortoisehg/hgqt/hgemail_ui.py:277
 msgid "body"
@@ -2088,7 +2089,7 @@ msgstr "E-Mail-Text"
 
 #: tortoisehg/hgqt/hgemail_ui.py:278
 msgid "send patches as attachments"
-msgstr "Flicken als Anhänge senden"
+msgstr "Patches als Anhänge senden"
 
 #: tortoisehg/hgqt/hgemail_ui.py:279
 msgid "attach"
@@ -2096,7 +2097,7 @@ msgstr "Anhängen"
 
 #: tortoisehg/hgqt/hgemail_ui.py:280
 msgid "send patches as inline attachments"
-msgstr "Flicken als eingebettete Anhänge senden"
+msgstr "Patches als eingebettete Anhänge senden"
 
 #: tortoisehg/hgqt/hgemail_ui.py:281
 msgid "inline"
@@ -2118,12 +2119,12 @@ msgid ""
 "Flags is a comma separated list of tags which are inserted into the message "
 "subject prefix."
 msgstr ""
-"Die Flieckenserie-Beschreibung wird in einer ersten Zusammenfassungs-E-Mail "
-"versandt, deren Betreff [PATCH 0 of N] lautet. Es sollte die Auswirkungen "
-"der gesamten Flickenserie darstellen. Wenn ein Bündel verschickt wird werden "
-"diese Informationen für den Kommentarbetreff und seinen Inhalt verwendet. "
-"Die Schalter sind eine kommagetrennte Liste von Etiketten, welche am Anfang "
-"des Kommentarbetreffs eingefügt werden."
+"Die Beschreibung der Patch-Reihe wird als Zusammenfassung in einer ersten E-"
+"Mail versandt, deren Betreff [PATCH 0 of N] lautet. Die Beschreibung sollte "
+"die Auswirkungen der gesamten Patch-Reihe darstellen. Wenn ein Bündel "
+"verschickt wird, werden diese Informationen für den Betreff und die "
+"Nachricht der Mail verwendet. Die Schalter sind eine kommagetrennte Liste "
+"von Etiketten, welche am Anfang des Betreffs eingefügt werden."
 
 #: tortoisehg/hgqt/hgemail_ui.py:285
 msgid "Write patch series (bundle) description"
@@ -2135,7 +2136,7 @@ msgstr "Betreff:"
 
 #: tortoisehg/hgqt/hgemail_ui.py:287 tortoisehg/hgqt/postreview_ui.py:174
 msgid "Changesets"
-msgstr "Änderungslisten"
+msgstr "Änderungssätze"
 
 #: tortoisehg/hgqt/hgemail_ui.py:288
 msgid "Select &All"
@@ -2486,20 +2487,20 @@ msgstr "Öffnen des Inhaltsverzeichnis-Dialogs gescheitert"
 
 #: tortoisehg/hgqt/matching.py:42
 msgid "Find revisions matching fields of:"
-msgstr ""
+msgstr "Finde Revisionen mit passenden Feldern zu:"
 
 #: tortoisehg/hgqt/matching.py:73 tortoisehg/hgqt/matching.py:192
 #: tortoisehg/hgqt/matching.py:213
 msgid "Revision to Match:"
-msgstr ""
+msgstr "Vergleichs-Revision"
 
 #: tortoisehg/hgqt/matching.py:81
 msgid "Fields to match:"
-msgstr ""
+msgstr "Vergleichs-Felder:"
 
 #: tortoisehg/hgqt/matching.py:87
 msgid "Summary (first description line)"
-msgstr ""
+msgstr "Zusammenfassung (erste Zeile des Übernahme-Kommentars)"
 
 #: tortoisehg/hgqt/matching.py:88 tortoisehg/hgqt/settings.py:722
 msgid "Description"
@@ -2507,7 +2508,7 @@ msgstr "Beschreibung"
 
 #: tortoisehg/hgqt/matching.py:95
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: tortoisehg/hgqt/matching.py:96
 msgid "Date"
@@ -2519,7 +2520,7 @@ msgstr "Dateien"
 
 #: tortoisehg/hgqt/matching.py:98
 msgid "Subrepo states"
-msgstr ""
+msgstr "Stati der Unterarchive"
 
 #: tortoisehg/hgqt/matching.py:99 tortoisehg/hgqt/repofilter.py:219
 msgid "Branch"
@@ -2527,11 +2528,11 @@ msgstr "Zweig"
 
 #: tortoisehg/hgqt/matching.py:101
 msgid "Phase"
-msgstr ""
+msgstr "Phase"
 
 #: tortoisehg/hgqt/matching.py:132
 msgid "&Match"
-msgstr ""
+msgstr "&Suchen"
 
 #: tortoisehg/hgqt/matching.py:143
 #, python-format
@@ -2540,20 +2541,20 @@ msgstr ""
 
 #: tortoisehg/hgqt/matching.py:209
 msgid "Revisions to Match:"
-msgstr ""
+msgstr "Revisionen zum Vergleichen:"
 
 #: tortoisehg/hgqt/matching.py:210
 #, python-format
 msgid "Match any of <b><i>%d</i></b> revisions"
-msgstr ""
+msgstr "kann zu irgend einer der <i>%d</i> Revisionen passen"
 
 #: tortoisehg/hgqt/matching.py:217
 msgid "<b>Unknown revision!</b>"
-msgstr ""
+msgstr "<b>Unbekannte Revision!</b>"
 
 #: tortoisehg/hgqt/matching.py:219
 msgid "<b>Parse Error!</b>"
-msgstr ""
+msgstr "<b>Syntax-Fehler!</b>"
 
 #: tortoisehg/hgqt/merge.py:31
 #, python-format
@@ -2622,8 +2623,8 @@ msgid ""
 "href=\"shelve\"><b>shelve</b></a> to patch, or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
-"Vor dem Zusammenführen ist es notwendig, dass Sie <a href=\"commit\"><b>alle "
-"Änderungen übernehmen,</b></a> in Flicken <a "
+"Vor dem Zusammenführen ist es notwendig, dass Sie alle Änderungen <a "
+"href=\"commit\"><b>übernehmen,</b></a> in einem Patch <a "
 "href=\"shelve\"><b>verstauen</b></a> oder <a "
 "href=\"discard\"><b>verwerfen.</b></a>"
 
@@ -2697,7 +2698,7 @@ msgstr "Mit %s zusammenführen"
 
 #: tortoisehg/hgqt/merge.py:625
 msgid "Merge changeset"
-msgstr "Mit Änderungsliste zusammenführen"
+msgstr "Revision mit Zusammenführung"
 
 #: tortoisehg/hgqt/messageentry.py:78
 msgid "Paste &Filenames"
@@ -2713,19 +2714,19 @@ msgstr "%Formatierung einstellen"
 
 #: tortoisehg/hgqt/mq.py:35
 msgid "### patch name ###"
-msgstr "### Flicken-Name ###"
+msgstr "### Patch-Name ###"
 
 #: tortoisehg/hgqt/mq.py:57
 msgid "Patch Name Required"
-msgstr "Der Name des Flicken fehlt"
+msgstr "Der Name des Paches fehlt"
 
 #: tortoisehg/hgqt/mq.py:58
 msgid "You must enter a patch name"
-msgstr "Sie müssen einen Flicken-Namen eingeben"
+msgstr "Sie müssen einen Namen für den Patch eingeben"
 
 #: tortoisehg/hgqt/mq.py:95
 msgid "Patch Queue"
-msgstr "Flickenschlange"
+msgstr "Patch-Reihe"
 
 #: tortoisehg/hgqt/mq.py:111
 msgctxt "MQ QPush"
@@ -2734,7 +2735,7 @@ msgstr "Alle verteilen"
 
 #: tortoisehg/hgqt/mq.py:112
 msgid "Apply all patches"
-msgstr "Alle Flicken anwenden"
+msgstr "Alle Patches anwenden"
 
 #: tortoisehg/hgqt/mq.py:114
 msgctxt "MQ QPush"
@@ -2743,7 +2744,7 @@ msgstr "Verteilen"
 
 #: tortoisehg/hgqt/mq.py:115
 msgid "Apply one patch"
-msgstr "Einen Flicken anwenden"
+msgstr "Einen Patch anwenden"
 
 #: tortoisehg/hgqt/mq.py:117
 msgid "Guards"
@@ -2751,11 +2752,11 @@ msgstr "Wächter"
 
 #: tortoisehg/hgqt/mq.py:118
 msgid "Configure guards for selected patch"
-msgstr "Wachen für den ausgewählten Flicken aufstellen"
+msgstr "Wachen für den ausgewählten Patch konfigurieren"
 
 #: tortoisehg/hgqt/mq.py:120 tortoisehg/hgqt/mq.py:121
 msgid "Reorder patches"
-msgstr "Flicken umsortieren"
+msgstr "Patches umsortieren"
 
 #: tortoisehg/hgqt/mq.py:123 tortoisehg/hgqt/qqueue.py:97
 #: tortoisehg/hgqt/qscilib.py:191 tortoisehg/hgqt/shelve.py:68
@@ -2765,7 +2766,7 @@ msgstr "Entfernen"
 
 #: tortoisehg/hgqt/mq.py:124
 msgid "Delete selected patches"
-msgstr "Die ausgewählten Flicken löschen"
+msgstr "Die ausgewählten Patches löschen"
 
 #: tortoisehg/hgqt/mq.py:126
 msgid "Pop"
@@ -2773,7 +2774,7 @@ msgstr "Ziehen"
 
 #: tortoisehg/hgqt/mq.py:127
 msgid "Unapply one patch"
-msgstr "Einen Flicken rückwärts anwenden"
+msgstr "Einen Patch rückwärts anwenden"
 
 #: tortoisehg/hgqt/mq.py:129
 msgid "Pop all"
@@ -2781,7 +2782,7 @@ msgstr "Alle ziehen"
 
 #: tortoisehg/hgqt/mq.py:130
 msgid "Unapply all patches"
-msgstr "Alle Flicken rückwärts anwenden"
+msgstr "Alle Patches rückwärts anwenden"
 
 #: tortoisehg/hgqt/mq.py:131
 msgid "Patch Queue Actions Toolbar"
@@ -2800,8 +2801,8 @@ msgid ""
 "<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
 "them.<br><br>Continue?</p>"
 msgstr ""
-"<p>ACHTUNG!<br>Wache oder Kommentar gefunden.<br>Die Umsortierung der "
-"Flicken wird sie/ihn zerstören.<br><br>Fortfahren?</p>"
+"<p>ACHTUNG!<br>Wache oder Kommentar gefunden.<br>\r\n"
+"Umsortieren der Patches wird diese zerstören.<br><br>Fortfahren?</p>"
 
 #: tortoisehg/hgqt/mq.py:356
 msgid "Configure guards"
@@ -2832,15 +2833,15 @@ msgstr "Warteschlangen"
 
 #: tortoisehg/hgqt/mq.py:649
 msgid "New Patch"
-msgstr "Neuer Flicken"
+msgstr "Neuer Patch"
 
 #: tortoisehg/hgqt/mq.py:703
 msgid "TortoiseHg Patch Queue"
-msgstr "TortoiseHg-Flickenschlange"
+msgstr "TortoiseHg Patch-Reihe"
 
 #: tortoisehg/hgqt/mq.py:947
 msgid "QCommit"
-msgstr "Flickenschlangen-Übernahme"
+msgstr "Patch-Übernahme"
 
 #: tortoisehg/hgqt/mq.py:949
 msgid "Create MQ repo"
@@ -2885,7 +2886,7 @@ msgstr "Geben Sie explizit einen Autor an:"
 #: tortoisehg/hgqt/p4pending.py:66
 #, python-format
 msgid "Pending Perforce Changelists - %s"
-msgstr "Ausstehende Perforce-Änderungslisten - %s"
+msgstr "Ausstehende Perforce-Änderungssätze - %s"
 
 #: tortoisehg/hgqt/p4pending.py:96
 msgid "Submitting p4 changelist..."
@@ -2913,7 +2914,7 @@ msgstr "Den aktuellen Flickzweig rücksetzen"
 
 #: tortoisehg/hgqt/pbranch.py:76
 msgid "Backport part of a changeset to a dependency"
-msgstr "Teile einer Änderungsliste in in verwandtes Archiv rückportieren"
+msgstr "Teile eines Änderungssatzes in ein verwandtes Archiv rückportieren"
 
 #: tortoisehg/hgqt/pbranch.py:82
 msgid "Start a new patch branch"
@@ -2959,7 +2960,7 @@ msgstr "&Zusammenführen"
 
 #: tortoisehg/hgqt/pbranch.py:498
 msgid "No patch branch selected"
-msgstr "Kein Flickenzweig ausgewählt"
+msgstr "Kein Patch-Zweig ausgewählt"
 
 #: tortoisehg/hgqt/pbranch.py:549
 msgid "No editor found"
@@ -2991,7 +2992,7 @@ msgstr "Kommentar"
 
 #: tortoisehg/hgqt/pbranch.py:845
 msgid "New Patch Branch"
-msgstr "Neuer Flickenzweig"
+msgstr "Neuer Patch-Zweig"
 
 #: tortoisehg/hgqt/pbranch.py:880
 msgid "Patch message:"
@@ -3204,16 +3205,16 @@ msgstr "Flicken entfernen - %s"
 
 #: tortoisehg/hgqt/qdelete.py:33
 msgid "Remove patches from queue?"
-msgstr "Flicken aus der Warteschlange entfernen?"
+msgstr "Patch aus der Reihe entfernen?"
 
 #: tortoisehg/hgqt/qdelete.py:38 tortoisehg/hgqt/qfold.py:42
 msgid "Keep patch files"
-msgstr "Flicken aufbewahren"
+msgstr "Patch aufbewahren"
 
 #: tortoisehg/hgqt/qfold.py:28
 #, python-format
 msgid "Patch fold - %s"
-msgstr "Flicken verschmelzen - %s"
+msgstr "Patch verschmelzen - %s"
 
 #: tortoisehg/hgqt/qfold.py:36
 msgid "New patch message:"
@@ -3516,7 +3517,7 @@ msgstr "\"%s\" ist kein gültiges Verzeichnis"
 
 #: tortoisehg/hgqt/qtlib.py:209
 msgid "Unable to start the following command:"
-msgstr ""
+msgstr "Konnte den folgenden Befehl nicht ausführen:"
 
 #: tortoisehg/hgqt/qtlib.py:211
 msgid "No shell configured"
@@ -3618,7 +3619,7 @@ msgstr "&Alle ausgewählten Dateien entfernen"
 
 #: tortoisehg/hgqt/rebase.py:40
 msgid "Rebase changeset and descendants"
-msgstr "Basis der Änderungsliste und seine Abhängigkeiten wechseln"
+msgstr "Basis der Revision und seiner Nachfahren verscheiben"
 
 #: tortoisehg/hgqt/rebase.py:48
 msgid "To rebase destination"
@@ -3626,7 +3627,7 @@ msgstr "Neue Basis"
 
 #: tortoisehg/hgqt/rebase.py:60
 msgid "Keep original changesets"
-msgstr "Ursprüngliche Änderungslisten beibehalten"
+msgstr "Ursprüngliche Änderungssätze beibehalten"
 
 #: tortoisehg/hgqt/rebase.py:64
 msgid "Keep original branch names"
@@ -3640,7 +3641,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rebase.py:72
 msgid "Collapse the rebased changesets "
-msgstr "Die Änderungslisten nach dem Basiswechsel zusammenklappen "
+msgstr "Nach dem Verschieben die Änderungssätze zu einem zusammenklappen "
 
 #: tortoisehg/hgqt/rebase.py:83
 msgid ""
@@ -3896,7 +3897,7 @@ msgstr "Filter"
 
 #: tortoisehg/hgqt/repofilter.py:105
 msgid "Toggle filtering of non-matched changesets"
-msgstr "Filtern der unpassenden Änderungslisten an-/ausschalten"
+msgstr "Anzeigen der unpassenden Revisionen ein- oder ausschalten"
 
 #: tortoisehg/hgqt/repofilter.py:220
 msgid "Display graph the named branch only"
@@ -4413,11 +4414,11 @@ msgstr "%s <eingehend>"
 #: tortoisehg/hgqt/repowidget.py:458
 #, python-format
 msgid "Found %d incoming changesets"
-msgstr ""
+msgstr "%d eingehende Änderungssätze gefunden"
 
 #: tortoisehg/hgqt/repowidget.py:461
 msgid "Pull incoming changesets into your repository"
-msgstr "Eingehende Änderungslisten in Ihr Projektarchiv ziehen"
+msgstr "Eingehende Änderungssätze in Ihr Projektarchiv ziehen"
 
 #: tortoisehg/hgqt/repowidget.py:463
 msgid "Reject"
@@ -4425,12 +4426,12 @@ msgstr "Verwerfen"
 
 #: tortoisehg/hgqt/repowidget.py:464
 msgid "Reject incoming changesets"
-msgstr "Eingehende Änderungslisten zurückweisen"
+msgstr "Eingehende Änderungssätze verwerfen"
 
 #: tortoisehg/hgqt/repowidget.py:559 tortoisehg/hgqt/sync.py:1048
 #, python-format
 msgid "%d outgoing changesets"
-msgstr "%d ausgehende Änderungslisten"
+msgstr "%d ausgehende Änderungssätze"
 
 #: tortoisehg/hgqt/repowidget.py:564 tortoisehg/hgqt/repowidget.py:1210
 #: tortoisehg/hgqt/workbench.py:419
@@ -4554,7 +4555,7 @@ msgstr "Aktualisieren..."
 #: tortoisehg/hgqt/repowidget.py:1225 tortoisehg/hgqt/repowidget.py:1432
 #: tortoisehg/hgqt/repowidget.py:1517
 msgid "Similar revisions..."
-msgstr ""
+msgstr "Ähnliche Revisionen..."
 
 #: tortoisehg/hgqt/repowidget.py:1228
 msgid "Merge with local..."
@@ -4831,13 +4832,15 @@ msgstr "%d Flicken wurden exportiert in:<p><a href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1705
 msgid "Incorrect Mercurial version"
-msgstr ""
+msgstr "Falsche Version von Mercurial"
 
 #: tortoisehg/hgqt/repowidget.py:1706
 msgid ""
 "In order to use the \"Find Similar revisions\" functionality, you must use a "
 "mercurial version above 2.1."
 msgstr ""
+"Um \"Finde ähnliche Revisionen\" zu nutzen muss mercurial neuer als die "
+"Version 2.1 sein."
 
 #: tortoisehg/hgqt/repowidget.py:1796
 msgid "Write bundle"
@@ -5145,7 +5148,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:22
 msgid "Changeset:"
-msgstr "Änderungsliste:"
+msgstr "Änderungssatz:"
 
 #: tortoisehg/hgqt/revpanel.py:26
 msgid "Child:"
@@ -5157,7 +5160,7 @@ msgstr "Die Kopfrevision ist abgeschlossen!"
 
 #: tortoisehg/hgqt/revset.py:28
 msgid "Changesets where username contains string."
-msgstr "Änderungslisten, bei denen der Benutzername einen Text enthält."
+msgstr "Revisionen, bei denen der Autor den Text enthält."
 
 #: tortoisehg/hgqt/revset.py:30
 msgid ""
@@ -5176,7 +5179,7 @@ msgid ""
 "Changesets not found in the specified destination repository, or the default "
 "push location."
 msgstr ""
-"Die Änderungsliste wurde weder im angegebenen Zielarchiv noch im Standard-"
+"einige Revisionen wurde weder im angegebenen Zielarchiv noch im Standard-"
 "Verteilort gefünden"
 
 #: tortoisehg/hgqt/revset.py:38
@@ -5189,15 +5192,15 @@ msgstr "Das beschriftete Etikett oder alle Etiketten."
 
 #: tortoisehg/hgqt/revset.py:42
 msgid "Changeset is tagged."
-msgstr "Die Änderungsliste ist etikettiert."
+msgstr "Die Revision ist etikettiert."
 
 #: tortoisehg/hgqt/revset.py:44
 msgid "Changeset is a named branch head."
-msgstr "Die Änderungsliste ist Kopf eines benannten Zweigs."
+msgstr "Die Revision ist Kopf eines benannten Zweigs."
 
 #: tortoisehg/hgqt/revset.py:46
 msgid "Changeset is a merge changeset."
-msgstr "Die Änderungsliste dient zum Zusammenführen."
+msgstr "Die Revision dient zum Zusammenführen."
 
 #: tortoisehg/hgqt/revset.py:48
 msgid "Changeset is closed."
@@ -5214,13 +5217,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:53
 msgid "Greatest common ancestor of the two changesets."
-msgstr "Der größte gemeinsame Vorfahre von zwei Änderungslisten"
+msgstr "Der größte gemeinsame Vorfahre von zwei Revisionen"
 
 #: tortoisehg/hgqt/revset.py:55
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
 "revisions."
 msgstr ""
+"Finde Revisionen, die zu mindestens einem Feld der angegebenen Revisionen "
+"passen."
 
 #: tortoisehg/hgqt/revset.py:61
 msgid ""
@@ -5919,7 +5924,7 @@ msgstr "thg tag [-f] [-l] [-m Text] [-r Revision] [Name]"
 
 #: tortoisehg/hgqt/run.py:1160
 msgid "thg shelve"
-msgstr "TortoiseHg-Stauraum"
+msgstr "thg shelve"
 
 #: tortoisehg/hgqt/run.py:1161
 msgid "thg rejects [FILE]"
@@ -6457,7 +6462,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:643
 msgid "Activate Bookmarks"
-msgstr ""
+msgstr "Aktive Lezezeichen"
 
 #: tortoisehg/hgqt/settings.py:645
 msgid ""
@@ -6470,6 +6475,16 @@ msgid ""
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
 msgstr ""
+"Wann TortoiseHg beim aktualisieren einen Dialog zum aktivieren der "
+"Lesezeichen zeigt.<ul><li>\r\n"
+"<b>auto</b>: Versuche Lesezeichen automatisch zu aktivieren. Bei einer "
+"aktualisierung zu einer Revision mit einem Lesezeichen wird diese "
+"automatisch aktiviert. Ein Dialog wird angezeigt wenn die Revision mehr als "
+"ein Lesezeichen hat.<li>\r\n"
+"<b>prompt</b>: Voreingestellt. Zeigt einen Dialog an wenn auf eine Revision "
+"aktualisiert wird, die ein oder mehrere Lesezeichen enthält.<li>\r\n"
+"<b>never</b>: Nie einen Dialog zum aktivieren der Lesezeichen anzeigen.\r\n"
+"<p>Voreinstellung : prompt"
 
 #: tortoisehg/hgqt/settings.py:657
 msgctxt "config item"
@@ -7852,11 +7867,11 @@ msgstr "TortoiseHg-Synchronisation"
 
 #: tortoisehg/hgqt/sync.py:132
 msgid "Preview incoming changesets from remote repository"
-msgstr "Vorschau der eingehenden Änderungslisten aus dem entfernten Archiv"
+msgstr "Vorschau der eingehenden Änderungssätzen aus dem entfernten Archiv"
 
 #: tortoisehg/hgqt/sync.py:135
 msgid "Pull incoming changesets from remote repository"
-msgstr "Eingehende Änderungslisten aus dem entfernten Archiv ziehen"
+msgstr "Eingehende Änderungssätze aus dem entfernten Archiv ziehen"
 
 #: tortoisehg/hgqt/sync.py:138
 msgid "Filter outgoing changesets to remote repository"
@@ -7930,7 +7945,7 @@ msgstr "Verwandte Pfade:"
 #: tortoisehg/hgqt/sync.py:350
 #, python-format
 msgid "Preview incoming changesets from %s"
-msgstr "Vorschau der eingehenden Änderungslisten von %s"
+msgstr "Vorschau der eingehenden Änderungssätze von %s"
 
 #: tortoisehg/hgqt/sync.py:351
 #, python-format
@@ -8799,7 +8814,7 @@ msgstr "Unbekannte Revision!"
 
 #: tortoisehg/hgqt/update.py:241 tortoisehg/hgqt/update.py:253
 msgid "Activate bookmark?"
-msgstr ""
+msgstr "Lesezeichen aktivieren?"
 
 #: tortoisehg/hgqt/update.py:242
 #, python-format
@@ -8808,6 +8823,11 @@ msgid ""
 "you want to activate it?<br></b><i>You can disable this prompt by "
 "configuring Settings/Workbench/Activate Bookmarks</i>"
 msgstr ""
+"Die gewählte Revision (%s) hat ein Lesezeichen namens \"<i>%s</i>\". Soll es "
+"aktiviert werden?\r\n"
+"<br><br>\r\n"
+"<i>Diese Nachfrage kann in den Einstellungen (in "
+"\"Einstellungen/Werkbank/Aktuelle Lesezeichen\") deaktiviert werden.</i>"
 
 #: tortoisehg/hgqt/update.py:254
 #, python-format
@@ -8818,15 +8838,21 @@ msgid ""
 "disable this prompt by configuring Settings/Workbench/Activate "
 "Bookmarks</i><p>"
 msgstr ""
+"Die gewählte Revision (<i>%s</i>) hat <i>%d</d> Lesezeichen.<p>\r\n"
+"Die Lesezeichen, die aktiviert werden sollen, auswählen und auf <i>OK</i> "
+"klicken.<p>\r\n"
+"Auf <i>Abbrechen</i> klicken um keines zu aktivieren.<p><p>\r\n"
+"<i>Dieser Dialog kann in den Einstellungen  (in "
+"\"Einstellungen/Werkbank/Aktuelle Lesezeichen\") deaktiviert werden.<i><p>"
 
 #: tortoisehg/hgqt/update.py:266
 msgid "Deactivate current bookmark?"
-msgstr ""
+msgstr "Aktuelles Lesezeichen deaktivieren?"
 
 #: tortoisehg/hgqt/update.py:267
 #, python-format
 msgid "Do you really want to deactivate the <i>%s</i> bookmark?"
-msgstr ""
+msgstr "Sollen die <i>%s</i> Lesezeichen wirklich deaktiviert werden?"
 
 #: tortoisehg/hgqt/update.py:318
 msgid ""
@@ -8846,7 +8872,7 @@ msgstr "Ver&stauen"
 
 #: tortoisehg/hgqt/update.py:323
 msgid "Shelve - move local changes to a patch"
-msgstr "Stauraum - lokale Änderungen in einen Flicken verschieben"
+msgstr "Stauraum - lokale Änderungen in einen Patch verschieben"
 
 #: tortoisehg/hgqt/update.py:325
 msgid "Merge - allow to merge with local changes"
@@ -9322,7 +9348,7 @@ msgstr "&Web-Server..."
 
 #: tortoisehg/hgqt/workbench.py:338
 msgid "Shelve..."
-msgstr "Ver&stauen..."
+msgstr "Verstauen..."
 
 #: tortoisehg/hgqt/workbench.py:340
 msgid "Import..."
@@ -13220,3 +13246,26 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #, python-format
 #~ msgid "Revert files to revision %s?"
 #~ msgstr "Dateien in Revision %s wiederherstellen?"
+
+#~ msgid ""
+#~ "Let the user update the projrc on incoming:<ul><li><b>never</b>: "
+#~ "[<i>default</i>] Show whether the remote projrc file has changed,but do not "
+#~ "update (nor ask to update) the local projrc file.<li><b>prompt</b>: Look for "
+#~ "changes to the projrc file. If there are changes _always_ show a "
+#~ "confirmation prompt, asking the user if it wants to update its local projrc "
+#~ "file.<li><b>auto</b>: Look for changes to the projrc file.  Use the value of "
+#~ "the \"projrc.confirm\" configuration key to determine whether to show a "
+#~ "confirmation dialog or not before updating the local projrc "
+#~ "file.</ul><p>Default: never"
+#~ msgstr ""
+#~ "Den Benutzer die Konfigurationsdatei »projrc« bei eingehenden Änderungen "
+#~ "aktualisieren lassen:<ul><li><b>never</b>: [<i>Vorgabe</i>] Anzeigen, ob "
+#~ "sich die entfernte projrc-Datei geändert hat, jedoch weder die lokale projrc-"
+#~ "Datei aktualisieren noch dazu auffordern.<li><b>prompt</b>: Auf Änderungen "
+#~ "der projrc-Datei reagieren. Falls Änderungen vorhanden sind, _immer_ einen "
+#~ "Bestätigungsdialog anzeigen und den Benutzer fragen, ob seine lokale projrc-"
+#~ "Datei aktualisiert werden soll.<li><b>auto</b>: Auf Änderungen der projrc-"
+#~ "Datei reagieren. Anhand des Wertes des Konfigurationsschlüssels "
+#~ "»projrc.confirm« entscheiden, ob ein Bestätigungsdialog angezeigt werden "
+#~ "soll oder nicht, bevor die lokale projrc-Datei aktualisiert "
+#~ "wird.</ul><p>Vorgabe: »never«"
