@@ -719,6 +719,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.append('--debug')
 
         cururl = self.currentUrl(False)
+        if ('push' in cmdline or 'outgoing' in cmdline) and \
+           self.curalias + '-push' in self.paths:
+            cururl = self.paths[self.curalias + '-push']
+            
         if not cururl:
             host = ''
             folder = ''
