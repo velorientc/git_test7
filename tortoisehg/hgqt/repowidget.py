@@ -355,7 +355,7 @@ class RepoWidget(QWidget):
     def createCommitWidget(self):
         pats, opts = {}, {}
         cw = CommitWidget(self.repo, pats, opts, True, self, rev=self.rev)
-        cw.buttonHBox.addWidget(cw.commitSetupButton(cw.hasmqbutton))
+        cw.buttonHBox.addWidget(cw.commitSetupButton())
         cw.loadSettings(QSettings(), 'workbench')
 
         cw.output.connect(self.output)

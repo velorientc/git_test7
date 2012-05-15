@@ -255,7 +255,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 # Set the button to QRefresh
                 return 'qref'
 
-    def commitSetupButton(self, showmqactions=True):
+    def commitSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
         notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
         canamend = lambda r: False
@@ -274,7 +274,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             ('commit', _('Commit changes'), _('Commit'), notpatch),
             ('amend', _('Amend current revision'), _('Amend'), canamend),
         ]
-        if showmqactions:
+        if self.hasmqbutton:
             acts += [
                 ('qnew', _('Create a new patch'), _('QNew'), None),
                 ('qref', _('Refresh current patch'), _('QRefresh'), ispatch),
@@ -1258,7 +1258,7 @@ class CommitDialog(QDialog):
         bb.button(BB.Discard).clicked.connect(commit.rollback)
         bb.button(BB.Close).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
-        self.commitButton = commit.commitSetupButton(commit.hasmqbutton)
+        self.commitButton = commit.commitSetupButton()
         bb.addButton(self.commitButton, BB.AcceptRole)
 
         self.bb = bb
