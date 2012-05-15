@@ -209,11 +209,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
-        if not self.hasmqbutton:
-            QShortcut(QKeySequence('Ctrl+Return'), self,
-                      self.commit).setContext(Qt.WidgetWithChildrenShortcut)
-            QShortcut(QKeySequence('Ctrl+Enter'), self,
-                      self.commit).setContext(Qt.WidgetWithChildrenShortcut)
 
     @property
     def rev(self):
