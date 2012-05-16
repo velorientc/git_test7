@@ -1257,6 +1257,9 @@ class RepoWidget(QWidget):
                       functools.partial(self.changePhase, pnum))
             entry(menu)
 
+        entry(menu, None, fixed, _('Graft to local'), None,
+              self.graftRevisions)
+
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
               self.transplantRevisions)
 
@@ -1424,7 +1427,9 @@ class RepoWidget(QWidget):
                 (_('Compress History...'), compressDlg, 'hg-compress'),
                 (None, None, None),
                 (_('Goto common ancestor'), gotoAncestor, 'hg-merge'),
-                (_('Similar revisions...'), self.matchRevision, 'view-filter')
+                (_('Similar revisions...'), self.matchRevision, 'view-filter'),
+                (None, None, None),
+                (_('Graft Selected to local'), self.graftRevisions, None),
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1436,7 +1441,6 @@ class RepoWidget(QWidget):
             menu.addAction(a)
 
         if 'transplant' in self.repo.extensions():
-            menu.addSeparator()
             a = QAction(_('Transplant Selected to local'), self)
             a.setIcon(qtlib.getmenuicon('hg-transplant'))
             a.triggered.connect(self.transplantRevisions)
@@ -1510,6 +1514,8 @@ class RepoWidget(QWidget):
                 (_('Email Selected...'), emailSel, 'mail-forward'),
                 (None, None, None),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
+                (None, None, None),
+                (_('Graft Selected to local'), self.graftRevisions, None),
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1521,7 +1527,6 @@ class RepoWidget(QWidget):
             menu.addAction(a)
 
         if 'transplant' in self.repo.extensions():
-            menu.addSeparator()
             a = QAction(_('Transplant Selected to local'), self)
             a.setIcon(qtlib.getmenuicon('hg-transplant'))
             a.triggered.connect(self.transplantRevisions)
@@ -1736,6 +1741,12 @@ class RepoWidget(QWidget):
 
     def transplantRevisions(self):
         cmdline = ['transplant', '--repository', self.repo.root]
+        for rev in self.repoview.selectedRevisions():
+            cmdline.append(str(rev))
+        self.runCommand(cmdline)
+
+    def graftRevisions(self):
+        cmdline = ['graft', '--repository', self.repo.root]
         for rev in self.repoview.selectedRevisions():
             cmdline.append(str(rev))
         self.runCommand(cmdline)
