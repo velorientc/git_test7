@@ -397,22 +397,20 @@ class GarbageCollector(QObject):
         #gc.set_debug(gc.DEBUG_SAVEALL)
 
     def check(self):
-        #return self.debug_cycles()
         l0, l1, l2 = gc.get_count()
-        if self.debug:
-            print 'gc_check called:', l0, l1, l2
         if l0 > self.threshold[0]:
             num = gc.collect(0)
             if self.debug:
-                print 'collecting gen 0, found:', num, 'unreachable'
+                print 'GarbageCollector.check:', l0, l1, l2
+                print 'collected gen 0, found', num, 'unreachable'
             if l1 > self.threshold[1]:
                 num = gc.collect(1)
                 if self.debug:
-                    print 'collecting gen 1, found:', num, 'unreachable'
+                    print 'collected gen 1, found', num, 'unreachable'
                 if l2 > self.threshold[2]:
                     num = gc.collect(2)
                     if self.debug:
-                        print 'collecting gen 2, found:', num, 'unreachable'
+                        print 'collected gen 2, found', num, 'unreachable'
 
     def debug_cycles(self):
         gc.collect()
