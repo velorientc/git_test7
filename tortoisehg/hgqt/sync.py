@@ -210,6 +210,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.urllabel.setAcceptDrops(False)
         hbox.addWidget(self.urllabel)
+        self.pushlabel = QLabel(_('<b>Remote Push Repository:</b>'))
+        hbox.addWidget(self.pushlabel)
+        self.pushlabel.hide()
+        self.pushurllabel = QLabel()
+        self.pushurllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.pushurllabel.setAcceptDrops(False)
+        hbox.addWidget(self.pushurllabel)
         hbox.addStretch()
 
         hbox = QHBoxLayout()
@@ -478,6 +485,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.updateInProgress:
             return
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
+        if self.curalias and self.curalias + '-push' in self.paths:
+            self.pushlabel.show()
+            self.pushurllabel.setText(hglib.tounicode(self.currentPushUrl()))
+        else:
+            self.pushlabel.hide()
+            self.pushurllabel.setText('')
+
         schemeIndex = self.schemecombo.currentIndex()
         scheme = self._schemes[schemeIndex]
         for w in self.hostAndPortActions:
