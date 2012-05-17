@@ -68,7 +68,7 @@ def data_func(widget, item, ctx):
                 branch = cctx.branch()
             children.append(revline_data(cctx, branch=branch))
         return children
-    elif item in ('transplant', 'p4', 'svn', 'converted'):
+    elif item in ('graft', 'transplant', 'p4', 'svn', 'converted'):
         ts = widget.get_data(item, usepreset=True)
         if not ts:
             return None
@@ -118,7 +118,7 @@ def markup_func(widget, item, value):
             if branch:
                 return '%s - %s %s' % (revnum, branch, summary)
             return '%s - %s' % (revnum, summary)
-    if item in ('cset', 'transplant', 'patch', 'p4', 'svn', 'converted'):
+    if item in ('cset', 'graft', 'transplant', 'patch', 'p4', 'svn', 'converted'):
         link = item != 'cset'
         if isinstance(value, basestring):
             return revid_markup(value)
@@ -138,7 +138,7 @@ def RevPanelWidget(repo):
     custom = csinfo.custom(data=data_func, label=label_func,
                            markup=markup_func)
     style = csinfo.panelstyle(contents=('cset', 'branch', 'close', 'user',
-                   'dateage', 'parents', 'children', 'tags', 'transplant',
+                   'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                    'p4', 'svn', 'converted'), selectable=True,
                    expandable=True)
     return csinfo.create(repo, style=style, custom=custom)

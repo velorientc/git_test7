@@ -65,7 +65,7 @@ class MatchDialog(QDialog):
         self.rev_to_match_info_text = QLabel()
         self.rev_to_match_info_text.setShown(False)
         style = csinfo.panelstyle(contents=('cset', 'branch', 'close', 'user',
-               'dateage', 'parents', 'children', 'tags', 'transplant',
+               'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                'p4', 'svn', 'converted'), selectable=True,
                expandable=True)
         factory = csinfo.factory(self.repo, style=style)
