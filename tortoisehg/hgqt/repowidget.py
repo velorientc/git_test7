@@ -2003,7 +2003,7 @@ class RepoWidget(QWidget):
 
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
-        shlib.shell_notify(self.repo.root)
+        shlib.shell_notify([self.repo.root])
 
 
     def runCustomCommand(self, command, showoutput=False):
