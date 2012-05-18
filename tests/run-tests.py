@@ -11,7 +11,6 @@ For details, please see:
 - http://readthedocs.org/docs/nose/en/latest/
 - http://docs.python.org/library/unittest.html
 """
-import os, sys
 import nose
 
 import nosecaptureexc, nosehgenv
