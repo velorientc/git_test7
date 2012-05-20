@@ -1037,11 +1037,14 @@ class Workbench(QMainWindow):
         # We use a progress dialog to let the user know that the workbench is being loaded
         openrepos = hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(',')
         for n, path in enumerate(openrepos):
-            self.progress(_('Reopening tabs'), n, _('Reopening repository %s') % path, '', len(openrepos))
+            self.progress(_('Reopening tabs'), n,
+                          _('Reopening repository %s') % path, '',
+                          len(openrepos))
             QCoreApplication.processEvents()
             self._openRepo(path, False)
             QCoreApplication.processEvents()
-        self.progress(_('Reopening tabs'), len(openrepos),  _('All repositories open'), '', len(openrepos))
+        self.progress(_('Reopening tabs'), len(openrepos),
+                      _('All repositories open'), '', len(openrepos))
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
