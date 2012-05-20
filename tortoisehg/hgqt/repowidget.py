@@ -255,12 +255,17 @@ class RepoWidget(QWidget):
         else:
             self.pbranchTabIndex = -1
 
+        self.taskTabsWidget.currentChanged.connect(
+            self._refreshCommitTabIfNeeded)
+
     @pyqtSlot(QString)
     def switchToNamedTaskTab(self, tabname):
         tabname = str(tabname)
         if tabname in self.namedTabs:
             idx = self.namedTabs[tabname]
-            if tabname == 'commit':
+            # refresh status even if current widget is already a 'commit'
+            if (tabname == 'commit'
+                and self.taskTabsWidget.currentIndex() == idx):
                 self._refreshCommitTabIfNeeded()
             self.taskTabsWidget.setCurrentIndex(idx)
 
@@ -807,7 +812,6 @@ class RepoWidget(QWidget):
         ctx = self.repo.changectx(rev)
         if rev is None or ('mq' in self.repo.extensions() and 'qtip' in ctx.tags()):
             # Clicking on working copy switches to commit tab
-            self._refreshCommitTabIfNeeded()
             tw.setCurrentIndex(self.commitTabIndex)
         else:
             # Clicking on a normal revision switches from commit tab
@@ -2048,8 +2052,12 @@ class RepoWidget(QWidget):
         self.repo.incrementBusyCount()
         self.runner.run(*cmdlines)
 
+    @pyqtSlot()
     def _refreshCommitTabIfNeeded(self):
         """Refresh the Commit tab if the user settings require it"""
+        if self.taskTabsWidget.currentIndex() != self.commitTabIndex:
+            return
+
         refreshwd = self.repo.ui.config('tortoisehg', 'refreshwdstatus', 'auto')
         # Valid refreshwd values are 'auto', 'always' and 'alwayslocal'
         if refreshwd != 'auto':
