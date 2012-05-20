@@ -1035,13 +1035,13 @@ class Workbench(QMainWindow):
         # Reload the all the repos that were open on the last session
         # This may be a lengthy operation, which happens before the Workbench GUI is open
         # We use a progress dialog to let the user know that the workbench is being loaded
-        openrepos = hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(',')
-        for n, path in enumerate(openrepos):
+        openrepos = unicode(s.value(wb + 'openrepos').toString()).split(',')
+        for n, upath in enumerate(openrepos):
             self.progress(_('Reopening tabs'), n,
-                          _('Reopening repository %s') % path, '',
+                          _('Reopening repository %s') % upath, '',
                           len(openrepos))
             QCoreApplication.processEvents()
-            self._openRepo(path, False)
+            self._openRepo(hglib.fromunicode(upath), False)
             QCoreApplication.processEvents()
         self.progress(_('Reopening tabs'), len(openrepos),
                       _('All repositories open'), '', len(openrepos))
