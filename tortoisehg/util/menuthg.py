@@ -73,7 +73,7 @@ thgcmenu = {
     'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
-    'vdiff':      { 'label': _('Visual Diff'),
+    'vdiff':      { 'label': _('Diff to parent'),
                     'help':  _('View changes using GUI diff tool'),
                     'icon':  'TortoiseMerge.ico'},
     'hgignore':   { 'label': _('Edit Ignore Filter'),

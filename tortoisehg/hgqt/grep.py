@@ -565,7 +565,7 @@ class MatchTree(QTableView):
         for key, name, func, shortcut in (
             ('edit',  _('View file'),      self.onViewFile,      'CTRL+E'),
             ('ctx',   _('View Changeset'), self.onViewChangeset, 'CTRL+V'),
-            ('vdiff', _('Visual Diff'),    self.onVisualDiff,    'CTRL+D'),
+            ('vdiff', _('Diff to parent'), self.onVisualDiff,    'CTRL+D'),
             ('ann',   _('Annotate file'),  self.onAnnotateFile,  'CTRL+F')):
             action = QAction(name, self)
             action.triggered.connect(func)

@@ -193,14 +193,14 @@ class FileLogDialog(_AbstractFileDialog):
             return
         if self.menu is None:
             self.menu = menu = QMenu(self)
-            a = menu.addAction(_('Visual diff...'))
+            a = menu.addAction(_('Diff to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
             a = menu.addAction(_('Diff to local...'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
-            a = menu.addAction(_('Visual diff file...'))
+            a = menu.addAction(_('Diff file to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiffFile)
             a = menu.addAction(_('Diff file to local...'))
@@ -679,14 +679,14 @@ class FileDiffDialog(_AbstractFileDialog):
             return
         if self.menu is None:
             self.menu = menu = QMenu(self)
-            a = menu.addAction(_('Visual diff...'))
+            a = menu.addAction(_('Diff to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
             a = menu.addAction(_('Diff to local...'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
-            a = menu.addAction(_('Visual diff file...'))
+            a = menu.addAction(_('Diff file to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiffFile)
             a = menu.addAction(_('Diff file to local...'))
