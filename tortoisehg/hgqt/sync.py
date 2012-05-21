@@ -327,11 +327,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.reload()
         if 'default' in self.paths:
-            self.setUrl(self.paths['default'])
             self.curalias = 'default'
+            self.setUrl(self.paths['default'])
         else:
-            self.setUrl('')
             self.curalias = None
+            self.setUrl('')
 
         self.default_user = self.curuser
         self.lastsshuser = self.curuser
@@ -356,6 +356,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         urlu = hglib.tounicode(url)
         self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % urlu)
         self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % urlu)
+        url = self.currentPushUrl()
+        urlu = hglib.tounicode(url)
         self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % urlu)
         self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % urlu)
 
@@ -517,12 +519,34 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             parts.extend(['/', hglib.fromunicode(path)])
             return ''.join(parts)
 
+    def currentPushUrl(self):
+        if self.curalias and self.curalias + '-push' in self.paths:
+            url = self.paths[self.curalias + '-push']
+            user, host, port, folder, passwd, scheme = parseurl(url)
+            parts = [scheme, '://']
+            if scheme == 'local':
+                return folder
+            if scheme == 'ssh' and '@' in host:
+                user, host = host.split('@', 1)
+            if user:
+                parts.append(user)
+                if passwd:
+                    parts.append(':***')
+                parts.append('@')
+            parts.append(host)
+            if port:
+                parts.extend([':', port])
+            parts.extend(['/', folder])
+            return ''.join(parts)
+        else:
+            return self.currentUrl(True)
+
     def pathSelected(self, index):
-        path = index.model().realUrl(index)
-        self.setUrl(path)
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
         self.curalias = hglib.fromunicode(alias)
+        path = index.model().realUrl(index)
+        self.setUrl(path)
 
     def setUrl(self, newurl):
         'User has selected a new URL: newurl is expected in local encoding'
@@ -726,10 +750,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.append('--debug')
 
         cururl = self.currentUrl(False)
+        implicitpushrepo = False
         if ('push' in cmdline or 'outgoing' in cmdline) and \
            self.curalias + '-push' in self.paths:
+            implicitpushrepo = True
             cururl = self.paths[self.curalias + '-push']
-            
+
         if not cururl:
             host = ''
             folder = ''
@@ -764,6 +790,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                             self.saveclicked()
 
         safeurl = self.currentUrl(True)
+        if implicitpushrepo:
+            safeurl = self.currentPushUrl()
+
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         if not self.opts.get('mq'):
             cmdline.append(cururl)
@@ -906,7 +935,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def outclicked(self):
         self.syncStarted.emit()
-        url = self.currentUrl(True)
+        url = self.currentPushUrl()
         urlu = hglib.tounicode(url)
         link = linkify(urlu)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
@@ -989,10 +1018,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def pushclicked(self, confirm, rev=None, branch=None):
         validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark', 'mq')
         self.syncStarted.emit()
-        url = self.currentUrl(True)
+        url = self.currentPushUrl()
         urlu = hglib.tounicode(url)
         link = linkify(urlu)
-        if (not hg.islocal(self.currentUrl(False)) and confirm
+        if (not hg.islocal(self.currentPushUrl()) and confirm
             and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
