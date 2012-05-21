@@ -1058,6 +1058,12 @@ class Workbench(QMainWindow):
         if lastactiverepo != '':
             self._openRepo(lastactiverepo, True)
 
+        # Clear the lastactiverepo and the openrepos list once the workbench state
+        # has been reload, so that opening additional workbench windows does not
+        # reopen these repos again
+        s.setValue(wb + 'openrepos', '')
+        s.setValue(wb + 'lastactiverepo', '')
+
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
