@@ -1204,7 +1204,7 @@ class RepoWidget(QWidget):
         if mode == 'outgoing':
             submenu = menu.addMenu(_('Push'))
             entry(submenu, None, isrev, _('Push all'), 'hg-push',
-                  self.pushToRevision)
+                  self.pushAll)
             entry(submenu, None, isrev, _('Push to here'), '',
                   self.pushToRevision)
             entry(submenu, None, isrev, _('Push selected branch'), '',
