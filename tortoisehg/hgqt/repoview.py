@@ -329,9 +329,10 @@ class HgRepoViewStyle(QStyle):
     def drawPrimitive(self, element, option, painter, widget=None):
         if element == QStyle.PE_IndicatorItemViewItemDrop:
             # Drop indicators should be painted using the full viewport width
-            vp = widget.viewport().rect()
-            painter.drawRect(vp.x(), option.rect.y(),
-                             vp.width() - 1, 0.5)
+            if option.rect.height() != 0:
+                vp = widget.viewport().rect()
+                painter.drawRect(vp.x(), option.rect.y(),
+                                 vp.width() - 1, 0.5)
         else:
             self._style.drawPrimitive(element, option, painter, widget)
     # Delegate all other methods overridden by QProxyStyle to the base class
