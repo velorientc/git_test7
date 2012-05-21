@@ -987,11 +987,16 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'showShortPaths', self.actionShowShortPaths.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
+        lastactiverepo = ''
         if self.actionSaveRepos.isChecked():
             tw = self.repoTabsWidget
             for idx in range(tw.count()):
                 rw = tw.widget(idx)
                 repostosave.append(hglib.tounicode(rw.repo.root))
+            cw = tw.currentWidget()
+            if cw is not None:
+                lastactiverepo = hglib.tounicode(cw.repo.root)
+        s.setValue(wb + 'lastactiverepo', lastactiverepo)
         s.setValue(wb + 'openrepos', (',').join(repostosave))
 
     def restoreSettings(self):
@@ -1045,6 +1050,13 @@ class Workbench(QMainWindow):
             QCoreApplication.processEvents()
         self.progress(_('Reopening tabs'), len(openrepos),
                       _('All repositories open'), '', len(openrepos))
+
+        # Activate the tab that was last active on the last session (if any)
+        # Note that if a "root" has been passed to the "thg" command,
+        # this will have no effect
+        lastactiverepo = hglib.fromunicode(s.value(wb + 'lastactiverepo').toString())
+        if lastactiverepo != '':
+            self._openRepo(lastactiverepo, True)
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
