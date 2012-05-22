@@ -1243,8 +1243,8 @@ class RepoWidget(QWidget):
               self.emailRevision)
         entry(submenu, None, isrev, _('Archive...'), 'hg-archive',
               self.archiveRevision)
-        entry(submenu, None, isrev, _('Bundle rev to tip...'), 'menurelocate',
-              self.bundleRevisions)
+        entry(submenu, None, isrev, _('Bundle rev and descendants...'),
+              'menurelocate', self.bundleRevisions)
         entry(submenu, None, isctx, _('Copy patch'), 'copy-patch',
               self.copyPatch)
         entry(menu)
@@ -1783,7 +1783,7 @@ class RepoWidget(QWidget):
             base = self.rev
         data = dict(name=os.path.basename(root), base=base)
         if tip is None:
-            filename = '%(name)s_%(base)s_to_tip.hg' % data
+            filename = '%(name)s_%(base)s_and_descendants.hg' % data
         else:
             data.update(rev=tip)
             filename = '%(name)s_%(base)s_to_%(rev)s.hg' % data
