@@ -2181,9 +2181,12 @@ class RepoWidget(QWidget):
         # If unapplySelected is true and rev is an applied patch
         # it will be unapplied (qgoto its parent)
         # Otherwise, qgoto the selected revision
+        tti = self.taskTabsWidget.currentIndex()
+        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+
         def qpopAll(repo):
-            cmdline = ['qpop', '--all', '--repository', repo.root]
-            self.runCommand(cmdline)
+            self.mqDemand.forward('popAll')
+            self.taskTabsWidget.setCurrentIndex(tti)
 
         ctx = self.repo.changectx(self.rev)
         if 'qparent'in ctx.tags():

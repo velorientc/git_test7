@@ -630,6 +630,14 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
+    def popAll(self):
+        if self.cmd.running():
+            return
+        self.repo.incrementBusyCount()
+        cmdline = ['qpop', '-R', self.repo.root, '--all']
+        cmdline += self.getUserOptions('force')
+        self.cmd.run(cmdline)
+
     @pyqtSlot(int)
     def onMessageSelected(self, row):
         if self.messageEditor.text() and self.messageEditor.isModified():
