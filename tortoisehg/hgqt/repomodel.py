@@ -663,7 +663,8 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getconv(self, ctx, gnode):
         if ctx.rev() is not None:
-            cvt = ctx.extra().get('convert_revision', '')
+            extra = ctx.extra()
+            cvt = extra.get('convert_revision', '')
             if cvt:
                 if cvt.startswith('svn:'):
                     return cvt.split('@')[-1]
