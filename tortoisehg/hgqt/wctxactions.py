@@ -230,7 +230,7 @@ def openfile(parent, ui, repo, files):
 
 def opensubrepo(parent, ui, repo, files):
     for filename in files:
-        path = os.path.join(repo.root, files[0])
+        path = os.path.join(repo.root, filename)
         if os.path.isdir(path):
             parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
