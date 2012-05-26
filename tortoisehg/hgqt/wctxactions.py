@@ -234,7 +234,7 @@ def opensubrepo(parent, ui, repo, files):
         if os.path.isdir(path):
             parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
-            QMessageBox.warning(self,
+            QMessageBox.warning(parent,
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
 
