@@ -90,10 +90,10 @@ class FileData(object):
         if isinstance(ctx, patchctx.patchctx):
             self.diff = ctx.thgmqpatchdata(wfile)
             flags = ctx.flags(wfile)
-            if flags in ('x', '-'):
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                change = (flags == 'x') and _('set') or _('unset')
-                self.elabel = lbl % change
+            if flags == 'x':
+                self.elabel = _("exec mode has been <font color='red'>set</font>")
+            elif flags == '-':
+                self.elabel = _("exec mode has been <font color='red'>unset</font>")
             elif flags == 'l':
                 self.flabel += _(' <i>(is a symlink)</i>')
             return
@@ -349,15 +349,11 @@ class FileData(object):
                 return
             fctx, newdata = res
             self.contents = newdata
-            change = None
             for pctx in ctx.parents():
                 if 'x' in fctx.flags() and 'x' not in pctx.flags(wfile):
-                    change = _('set')
+                    self.elabel = _("exec mode has been <font color='red'>set</font>")
                 elif 'x' not in fctx.flags() and 'x' in pctx.flags(wfile):
-                    change = _('unset')
-            if change:
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                self.elabel = lbl % change
+                    self.elabel = _("exec mode has been <font color='red'>unset</font>")
 
         if status == 'A':
             renamed = fctx.renamed()
