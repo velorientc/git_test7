@@ -15,7 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mq, lfprompt
+from tortoisehg.hgqt import hgrcutil, mq, lfprompt, i18n
 from tortoisehg.util.hgversion import hgversion
 
 from PyQt4.QtCore import *
@@ -608,6 +608,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         d.setWindowModality(Qt.WindowModal)
         if d.exec_() == QDialog.Accepted:
             self.branchop = d.branchop
+            if self.branchop is False:
+                if not self.getMessage(True).strip():
+                    engmsg = self.repo.ui.configbool(
+                        'tortoisehg', 'engmsg', False)
+                    msgset = i18n.keepgettext()._('Close %s branch')
+                    text = engmsg and msgset['id'] or msgset['str']
+                    self.setMessage(unicode(text) %
+                                    hglib.tounicode(self.repo[None].branch()))
             self.refresh()
 
     def canUndo(self):
