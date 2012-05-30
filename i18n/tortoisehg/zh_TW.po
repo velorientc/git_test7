@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-04-16 17:45+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:21+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:30+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1386,28 +1386,23 @@ msgstr ""
 msgid "File is binary"
 msgstr "是二進位檔"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(已從%s更名)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(已被新增)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr "設定"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
-msgstr "取消設定"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
@@ -8984,187 +8979,6 @@ msgstr "未來"
 msgid "now"
 msgstr "現在"
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "不支援的行結束類型: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "這是一個二進位檔案\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "使用者退出"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " 和 "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "備份 %r 從 %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "移除備份檔中: %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "套用補丁\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "儲存 %r 到 %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "終止:備份儲存失敗,%s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "儲存備份檔中\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr ""
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "提交..."
@@ -10195,6 +10009,22 @@ msgstr "找不到版本庫 %s"
 #~ msgid "Try &Again"
 #~ msgstr "再試一次(&A)"
 
+#~ msgid "this is a binary file\n"
+#~ msgstr "這是一個二進位檔案\n"
+
+#~ msgid "user quit"
+#~ msgstr "使用者退出"
+
+#~ msgid " and "
+#~ msgstr " 和 "
+
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "備份 %r 從 %r\n"
+
+#~ msgid "applying patch\n"
+#~ msgstr "套用補丁\n"
+
 #~ msgid "File is binary.\n"
 #~ msgstr "檔案是二進位檔案\n"
 
@@ -10476,6 +10306,21 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "Commit failed"
 #~ msgstr "提交失敗"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "終止:備份儲存失敗,%s\n"
+
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "移除備份檔中: %r\n"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "儲存 %r 到 %r\n"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "儲存備份檔中\n"
 
 #~ msgid "Refresh required"
 #~ msgstr "刷新要求"
@@ -10979,6 +10824,12 @@ msgstr "找不到版本庫 %s"
 #~ msgid "%s will be stripped"
 #~ msgstr "%s將被剝除"
 
+#~ msgid "set"
+#~ msgstr "設定"
+
+#~ msgid "unset"
+#~ msgstr "取消設定"
+
 #~ msgid "Font used in command output window. Default: monospace 10"
 #~ msgstr "指令輸出視窗的字型.預設:monospace 10"
 
@@ -11020,6 +10871,10 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "Please select diff chunks to shelve"
 #~ msgstr "請選擇不同的區塊去shelve"
+
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "不支援的行結束類型: %s"
 
 #, python-format
 #~ msgid "revisions %d to %d"

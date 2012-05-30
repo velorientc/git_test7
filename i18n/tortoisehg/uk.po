@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-05-09 17:14+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:21+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:30+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1399,28 +1399,23 @@ msgstr ""
 msgid "File is binary"
 msgstr "Файл є бінарним"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(зміна назви для %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(був доданий)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
-msgstr "exec режим був <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
+msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr "група"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
-msgstr "встановлена"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
@@ -9242,190 +9237,6 @@ msgstr "в майбутньому"
 msgid "now"
 msgstr "зараз"
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "Непідтримуваний тип закінчення рядків: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "латка невідомого змісту: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "це зміна двійкового файлу (все або нічого)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "це двійковий файл\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"разом: %d частин (%d рядків змінено); відмічено: %d частин (%d рядків "
-"змінено)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d частин, %d рядків змінено\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "необроблений перехід: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "вихід користувача"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "заморозити цю зміну у %s?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " та "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "заморозити цю зміну у %r?"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "резервна копія %r як %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr "помилка копіювання файлу %s\n"
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "видалити резервну копію файла : %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr "видалення замороженої резервної копію з помилками"
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr "погана назва каталогу у замороженій резерній копії"
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "замороження можливе лише у інтерактивному режимі роботи"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "заморожені дані вже існують"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "заморожені зміни відсутні\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "прийняти латку\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "збережена латка заморожена\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "відновлюється %r до %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "видалення замороженого файлу\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "перервано: помилка під час відновлення копії, %s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "нічого розморожувати\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr "розмороження резервної копії перервано\n"
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "прийняти заморожену латку\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "відновити резервні файли\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "видалити заморожені латки\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "розмороження завершено\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr "відмова від замороженого файлу\n"
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr "відмовлено у заморожуванні файлу\n"
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr "нічого не залишити\n"
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr "відмовитися не вдалося\n"
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-"відмітити нові/відсутні файли, як додані/вилучені перед відкладенням на потім"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "перезаписати існуючі заморожені дані"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "додати до існуючих заморожених даних"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [ПАРАМЕТР]... [ФАЙЛ]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "переглядати лише заморожені зміни"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr "діяти, якщо навіть латки не розморожені повністю"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [ПАРАМЕТР]... [ФАЙЛ]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "Фіксувати..."
@@ -9744,6 +9555,18 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Створити сховище сумісне з Mercurial 1.0"
 
+#~ msgid "applying patch\n"
+#~ msgstr "прийняти латку\n"
+
+#~ msgid "user quit"
+#~ msgstr "вихід користувача"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
+
+#~ msgid " and "
+#~ msgstr " та "
+
 #, python-format
 #~ msgid "hgtk: unknown command '%s'\n"
 #~ msgstr "hgtk: невідома команда '%s'\n"
@@ -9796,6 +9619,33 @@ msgstr "сховище %s не знайдено"
 #~ msgstr ""
 #~ "== %s та %s однакові ==\n"
 #~ "\n"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "це зміна двійкового файлу (все або нічого)\n"
+
+#, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "латка невідомого змісту: %r"
+
+#~ msgid "this is a binary file\n"
+#~ msgstr "це двійковий файл\n"
+
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "необроблений перехід: %s -> %s"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "відновлюється %r до %r\n"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "відновити резервні файли\n"
+
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [ПАРАМЕТР]... [ФАЙЛ]..."
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [ПАРАМЕТР]... [ФАЙЛ]..."
 
 #~ msgid "Rename error"
 #~ msgstr "Помилка зміни назви"
@@ -10729,6 +10579,14 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Try &Again"
 #~ msgstr "Спробувати &Знову"
 
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "Непідтримуваний тип закінчення рядків: %s"
+
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "резервна копія %r як %r\n"
+
 #~ msgid "Repository Explorer"
 #~ msgstr "Оглядач сховища"
 
@@ -11071,6 +10929,10 @@ msgstr "сховище %s не знайдено"
 
 #~ msgid "St"
 #~ msgstr "St"
+
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "видалити резервну копію файла : %r\n"
 
 #~ msgid "Confirm Undo Commit"
 #~ msgstr "Підтвердіть відмову від фіксації"
@@ -11466,6 +11328,10 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Show graph"
 #~ msgstr "Показати граф"
 
+#, python-format
+#~ msgid "file copy of %s failed\n"
+#~ msgstr "помилка копіювання файлу %s\n"
+
 #~ msgid "Annotate Second Parent"
 #~ msgstr "Аннотація другого попередника"
 
@@ -11628,6 +11494,17 @@ msgstr "сховище %s не знайдено"
 #~ "Знайдено незафіксовані локальні зміни у робочому дереві.\n"
 #~ "Оберіть для продовження:\n"
 #~ "\n"
+
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr ""
+#~ "разом: %d частин (%d рядків змінено); відмічено: %d частин (%d рядків "
+#~ "змінено)"
+
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d частин, %d рядків змінено\n"
 
 #~ msgid "Bookmark input is empty"
 #~ msgstr "Вхідна закладка порожня"
@@ -11908,6 +11785,16 @@ msgstr "сховище %s не знайдено"
 #~ "Ви не можете закінчити цією латкою гілки, якщо ви pmerge це перший.\n"
 #~ "pmerge буде вирішувати такі питання з %(patch)s:\n"
 #~ "* %(issuelist)s"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "перервано: помилка під час відновлення копії, %s\n"
+
+#~ msgid "nothing to abandon\n"
+#~ msgstr "нічого не залишити\n"
+
+#~ msgid "abandon failed\n"
+#~ msgstr "відмовитися не вдалося\n"
 
 #~ msgid "Auto-includes:"
 #~ msgstr "Включено автоматично:"
@@ -12235,6 +12122,12 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Patch branch finished"
 #~ msgstr "Накладання латок на гілку завершено"
 
+#~ msgid "set"
+#~ msgstr "група"
+
+#~ msgid "unset"
+#~ msgstr "встановлена"
+
 #~ msgid "Bundle rev to tip..."
 #~ msgstr "Зв'язка ревізія до вершини..."
 
@@ -12477,6 +12370,10 @@ msgstr "сховище %s не знайдено"
 #~ msgid "revisions %d to %d"
 #~ msgstr "редакції з %d по %d"
 
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr ""
+#~ "відмітити нові/відсутні файли, як додані/вилучені перед відкладенням на потім"
+
 #~ msgid "Canceled backout"
 #~ msgstr "Повернення скасовано"
 
@@ -12704,6 +12601,68 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Close diff tools and try again, or quit to leak files?"
 #~ msgstr "Закрити приладдя порівнянь та продовжити, або вийти втративши файл?"
 
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "заморозити цю зміну у %s?"
+
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "заморозити цю зміну у %r?"
+
+#~ msgid "delete of shelve backup failed"
+#~ msgstr "видалення замороженої резервної копію з помилками"
+
+#~ msgid "bad shelve backup directory name"
+#~ msgstr "погана назва каталогу у замороженій резерній копії"
+
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "замороження можливе лише у інтерактивному режимі роботи"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "заморожені дані вже існують"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "заморожені зміни відсутні\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "збережена латка заморожена\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "видалення замороженого файлу\n"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "нічого розморожувати\n"
+
+#~ msgid "unshelve backup aborted\n"
+#~ msgstr "розмороження резервної копії перервано\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "прийняти заморожену латку\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "видалити заморожені латки\n"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "розмороження завершено\n"
+
+#~ msgid "abandoning shelved file\n"
+#~ msgstr "відмова від замороженого файлу\n"
+
+#~ msgid "shelved file abandoned\n"
+#~ msgstr "відмовлено у заморожуванні файлу\n"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "перезаписати існуючі заморожені дані"
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "додати до існуючих заморожених даних"
+
+#~ msgid "inspect shelved changes only"
+#~ msgstr "переглядати лише заморожені зміни"
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr "діяти, якщо навіть латки не розморожені повністю"
+
 #~ msgid "Found incoming changesets"
 #~ msgstr "Знайдено незафіксований набір змін"
 
@@ -12731,6 +12690,10 @@ msgstr "сховище %s не знайдено"
 #~ msgstr ""
 #~ "Вкладка з станом та інструментами фіксації будуть відкриті. 0 - TextDiff, 1 -"
 #~ " Частковий вибір, 2 - Commit Preview. Відпочатково: 0"
+
+#, python-format
+#~ msgid "exec mode has been <font color='red'>%s</font>"
+#~ msgstr "exec режим був <font color='red'>%s</font>"
 
 #~ msgid "Changesets whith no parent changeset in set."
 #~ msgstr "Сховище ти немає батька змін в наборі."

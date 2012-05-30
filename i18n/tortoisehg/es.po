@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-03-09 13:42+0000\n"
 "Last-Translator: Juan Francisco Miranda <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:20+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:29+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1378,27 +1378,22 @@ msgstr ""
 msgid "File is binary"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr ""
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
 msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
@@ -9049,190 +9044,6 @@ msgstr ""
 msgid "now"
 msgstr ""
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "Tipo de finales de línea no soportado: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "Contenido del parche es desconocido: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "Esto modifica un archivo binario (todo o nada)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "este es un archivo binario\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"total: %d pedazos (%d lineas cambiadas); seleccionados: %d pedazos (%d "
-"lineas cambiadas)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d pedazos, %d lineas cambiadas\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "transicion no manejada: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "Salir de usuario"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "arrinconar cambios en %s?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " y "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "arrinconar este cambio en %r?"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "Respaldo %r como %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "arrinconar revisión sólo se puede ejecutar en modo interactivo"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "Datos arrinconados ya existen"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "sin cambios a arrinconar\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "aplicando parche\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "salvando revisión a arrinconar\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "restaurando %r a %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "quitando fichero\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "nada a desacer\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "aplicando revisión arrinconada\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "restaurando archivos de copia\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "quitando revisiones arrinconadas\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "desacer arrinconar completado\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-"macar archivos nuevos/ausentes como añadido/eliminado antes de seguir"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "sobreescribe datos existentes"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "Anexar a datos existentes"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [OPCIÓN]... [ARCHIVO]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "inspeccionar sólo cambios arrinconados"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr "proceder aunque las revisiones no de dejen desacer limpiamente"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [OPCIÓN]... [ARCHIVO]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "Realizar..."
@@ -9523,8 +9334,19 @@ msgstr "repositorio %s no encontrado"
 #~ msgid "Save commit message at exit?"
 #~ msgstr "¿Guardar mensaje de consignación al salir?"
 
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "Respaldo %r como %r\n"
+
 #~ msgid "Unable to apply patch"
 #~ msgstr "Incapaz de aplicar parche"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "restaurando %r a %r\n"
+
+#~ msgid "applying patch\n"
+#~ msgstr "aplicando parche\n"
 
 #~ msgid "Errors during rollback!"
 #~ msgstr "¡Errores durante la reversión!"
@@ -9702,6 +9524,18 @@ msgstr "repositorio %s no encontrado"
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Hacer repositorio compatible con Mercurial 1.0"
 
+#~ msgid "user quit"
+#~ msgstr "Salir de usuario"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "Esto modifica un archivo binario (todo o nada)\n"
+
+#~ msgid "this is a binary file\n"
+#~ msgstr "este es un archivo binario\n"
+
+#~ msgid " and "
+#~ msgstr " y "
+
 #~ msgid "Changeset Description"
 #~ msgstr "Descripcion del conjunto de cambios"
 
@@ -9755,6 +9589,13 @@ msgstr "repositorio %s no encontrado"
 #~ "[comando interrumpido]"
 
 #, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "Contenido del parche es desconocido: %r"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "restaurando archivos de copia\n"
+
+#, python-format
 #~ msgid "hgtk %s: %s\n"
 #~ msgstr "hgtk %s: %s\n"
 
@@ -9782,6 +9623,10 @@ msgstr "repositorio %s no encontrado"
 
 #~ msgid "changeset "
 #~ msgstr "grupo de cambios "
+
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "transicion no manejada: %s -> %s"
 
 #~ msgid "revisions to compare"
 #~ msgstr "revisiones para comparar"
@@ -9830,6 +9675,12 @@ msgstr "repositorio %s no encontrado"
 
 #~ msgid "All files"
 #~ msgstr "Todos los archivos"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
+
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [OPCIÓN]... [ARCHIVO]..."
 
 #~ msgid "hgtk about"
 #~ msgstr "hgtk about"
@@ -10219,8 +10070,66 @@ msgstr "repositorio %s no encontrado"
 #~ msgid "use \"hgtk -v help%s\" to show aliases and global options"
 #~ msgstr "use \"hgtk -v help%s\" para mostrar los alias y opciones globales"
 
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d pedazos, %d lineas cambiadas\n"
+
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "arrinconar este cambio en %r?"
+
 #~ msgid "Patch Series (Bundle) Description"
 #~ msgstr "Descripción Serie de parche (Paquete)"
+
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr ""
+#~ "total: %d pedazos (%d lineas cambiadas); seleccionados: %d pedazos (%d "
+#~ "lineas cambiadas)"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "Datos arrinconados ya existen"
+
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "arrinconar cambios en %s?"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "desacer arrinconar completado\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "quitando revisiones arrinconadas\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "aplicando revisión arrinconada\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "salvando revisión a arrinconar\n"
+
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "arrinconar revisión sólo se puede ejecutar en modo interactivo"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "sin cambios a arrinconar\n"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "nada a desacer\n"
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "Anexar a datos existentes"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "sobreescribe datos existentes"
+
+#~ msgid "inspect shelved changes only"
+#~ msgstr "inspeccionar sólo cambios arrinconados"
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [OPCIÓN]... [ARCHIVO]..."
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr "proceder aunque las revisiones no de dejen desacer limpiamente"
 
 #~ msgid "No changes to shelve"
 #~ msgstr "Sin cambios a arrinconar"
@@ -10237,6 +10146,13 @@ msgstr "repositorio %s no encontrado"
 #, python-format
 #~ msgid "hgtk: %s\n"
 #~ msgstr "hgtk: %s\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "quitando fichero\n"
+
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr ""
+#~ "macar archivos nuevos/ausentes como añadido/eliminado antes de seguir"
 
 #~ msgid "wait until the second ticks over"
 #~ msgstr "espera hasta que pase un segundo"
@@ -10541,6 +10457,10 @@ msgstr "repositorio %s no encontrado"
 #, python-format
 #~ msgid "Repository Error:  %s, refresh suggested"
 #~ msgstr "Error en el repositorio: %s, se sugiere refrescar (refresh)"
+
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "Tipo de finales de línea no soportado: %s"
 
 #~ msgid "revision to merge with"
 #~ msgstr "revisión con la que combinar"

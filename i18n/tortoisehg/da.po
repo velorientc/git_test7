@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-04-08 04:48+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:16+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:25+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1394,27 +1394,22 @@ msgstr ""
 msgid "File is binary"
 msgstr "Filen er binær"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(omdøbt fra %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(blev tilføjet)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
-msgstr "exec-tilstand er blevet <font color='red'>%s</font>"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
 msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
@@ -9102,190 +9097,6 @@ msgstr ""
 msgid "now"
 msgstr ""
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "Ikke-understøttede type af linieendelser: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "ukendt lap-indhold: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "dette ændrer en binær fil (alt eller intet)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "dette er en binær fil\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"total: %d stumper (%d ændrede linjer); selected: %d stumper (%d ændrede "
-"linjer)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d stumper, %d linjer ændret\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "unhandled transition: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "user quit"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "læg ændringer til %s på hylden?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " og "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "læg denne ændring til %r på hylden?"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "sikkerhedskopier %r som %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr "Filkopi af %s mislykkedes\n"
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "fjerner sikkerhedskopifil: %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr "sletning af hyldesikkerhedskopi mislykkedes"
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr "dårligt katalognavn på hyldesikkerhedskopi"
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "hylden kan kun anvendes interaktivt"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "hylden er allerede i brug"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "ingen ændringer til hylden\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "tilføjer lap\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "læg lap på hylden\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "gendanner %r som %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "fjerner hylde-filer\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "afbryd: genskabelse af sikkerhedskopi mislykkedes, %s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "intet på hylden\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr "Kunne ikke lave sikkerhedskopier før tag-fra-hylden\n"
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "anvender lap fra hylden\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "gendanner sikkerhedskopi-filer\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "fjerner lapper fra hylden\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "hylden er tømt\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr "forlader fil som er lagt på hylde\n"
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr "fil som er lagt på hylde er forladt\n"
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr "intet af forlade\n"
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr "mislykkedes med at forlade\n"
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-"marker nye/manglende filer som tilføjede/fjernede før de lægges på hylden"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "overskriv eksitsterende hylde-data"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "tilføj til eksisterende hylde-data"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [OPTION]... [FILE]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "inspicer ændringer på hylden"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr "fortsæt selv om lapper ikke kommer korrekt fra hylden"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [OPTION]... [FILE]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "Integrér..."
@@ -9534,12 +9345,27 @@ msgstr "depot %s ikke fundet"
 #~ msgid "edit failed"
 #~ msgstr "redigering fejlede"
 
+#~ msgid "this is a binary file\n"
+#~ msgstr "dette er en binær fil\n"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "dette ændrer en binær fil (alt eller intet)\n"
+
+#~ msgid " and "
+#~ msgstr " og "
+
 #~ msgid "cannot start server: "
 #~ msgstr "kan ikke starte serveren: "
 
 #, python-format
 #~ msgid "listening at http://%s%s/%s (%s:%d)\n"
 #~ msgstr "lytter på http://%s%s/%s (%s:%d)\n"
+
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [OPTION]... [FILE]..."
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [OPTION]... [FILE]..."
 
 #~ msgid "_Undo"
 #~ msgstr "_Fortryd"
@@ -10087,6 +9913,45 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Remove Selected"
 #~ msgstr "Fjern valgte"
+
+#, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "ukendt lap-indhold: %r"
+
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr ""
+#~ "total: %d stumper (%d ændrede linjer); selected: %d stumper (%d ændrede "
+#~ "linjer)"
+
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d stumper, %d linjer ændret\n"
+
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "unhandled transition: %s -> %s"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
+
+#~ msgid "user quit"
+#~ msgstr "user quit"
+
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "sikkerhedskopier %r som %r\n"
+
+#~ msgid "applying patch\n"
+#~ msgstr "tilføjer lap\n"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "gendanner %r som %r\n"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "gendanner sikkerhedskopi-filer\n"
 
 #~ msgid "rename takes one or two path arguments"
 #~ msgstr "rename skal have et eller to argumenter"
@@ -10892,6 +10757,10 @@ msgstr "depot %s ikke fundet"
 #~ msgid "Repository Error:  %s, refresh suggested"
 #~ msgstr "Opbevaringslager Fejl: %s, opfrisk foreslåede"
 
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "Ikke-understøttede type af linieendelser: %s"
+
 #~ msgid "Branch Name"
 #~ msgstr "Gren Navn"
 
@@ -11506,6 +11375,57 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Failed to update"
 #~ msgstr "Opdatering fejlede"
+
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "læg ændringer til %s på hylden?"
+
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "læg denne ændring til %r på hylden?"
+
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "hylden kan kun anvendes interaktivt"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "hylden er allerede i brug"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "ingen ændringer til hylden\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "læg lap på hylden\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "fjerner hylde-filer\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "anvender lap fra hylden\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "fjerner lapper fra hylden\n"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "hylden er tømt\n"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "intet på hylden\n"
+
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr ""
+#~ "marker nye/manglende filer som tilføjede/fjernede før de lægges på hylden"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "overskriv eksitsterende hylde-data"
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "tilføj til eksisterende hylde-data"
+
+#~ msgid "inspect shelved changes only"
+#~ msgstr "inspicer ændringer på hylden"
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr "fortsæt selv om lapper ikke kommer korrekt fra hylden"
 
 #~ msgid "Repository Explorer"
 #~ msgstr "Depot-stifinder"
@@ -12533,6 +12453,36 @@ msgstr "depot %s ikke fundet"
 #~ msgid "revisions %d to %d"
 #~ msgstr "revisioner %d til %d"
 
+#, python-format
+#~ msgid "file copy of %s failed\n"
+#~ msgstr "Filkopi af %s mislykkedes\n"
+
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "fjerner sikkerhedskopifil: %r\n"
+
+#~ msgid "delete of shelve backup failed"
+#~ msgstr "sletning af hyldesikkerhedskopi mislykkedes"
+
+#~ msgid "bad shelve backup directory name"
+#~ msgstr "dårligt katalognavn på hyldesikkerhedskopi"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "afbryd: genskabelse af sikkerhedskopi mislykkedes, %s\n"
+
+#~ msgid "abandoning shelved file\n"
+#~ msgstr "forlader fil som er lagt på hylde\n"
+
+#~ msgid "shelved file abandoned\n"
+#~ msgstr "fil som er lagt på hylde er forladt\n"
+
+#~ msgid "nothing to abandon\n"
+#~ msgstr "intet af forlade\n"
+
+#~ msgid "abandon failed\n"
+#~ msgstr "mislykkedes med at forlade\n"
+
 #~ msgid "Subversion"
 #~ msgstr "Subversion"
 
@@ -12557,6 +12507,9 @@ msgstr "depot %s ikke fundet"
 #~ msgid "Force"
 #~ msgstr "Tving"
 
+#~ msgid "unshelve backup aborted\n"
+#~ msgstr "Kunne ikke lave sikkerhedskopier før tag-fra-hylden\n"
+
 #~ msgid "St"
 #~ msgstr "St"
 
@@ -12572,6 +12525,10 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Use merge tool:"
 #~ msgstr "Brug flet-værktøj:"
+
+#, python-format
+#~ msgid "exec mode has been <font color='red'>%s</font>"
+#~ msgstr "exec-tilstand er blevet <font color='red'>%s</font>"
 
 #, python-format
 #~ msgid "Bookmark \"%s\" has been renamed to \"%s\""

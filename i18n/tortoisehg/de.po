@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-05-25 19:00+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-05-26 05:13+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:26+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1428,28 +1428,23 @@ msgstr ""
 msgid "File is binary"
 msgstr "Die Datei enthält Binärdaten"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(wurde umgenannt, hieß zuvor %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(wurde hinzugefügt)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
-msgstr "Die Ausführungsart war <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
+msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr "Festlegen"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
-msgstr "Aufheben"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
@@ -9616,192 +9611,6 @@ msgstr "in der Zukunft"
 msgid "now"
 msgstr "jetzt"
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "Nicht unterstützte Zeilenendearaten: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "Unbekannter Inhalt im Flicken: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "Dies verändert eine binäre Datei (alles oder nichts)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "das ist eine binäre Datei\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"Summe: %d Schnipsel (%d geänderte Zeilen); Auswahl: %d Schnipsel (%d "
-"geänderte Zeilen)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d Schnipsel, %d Zeilen geändert\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "Unbehandelter Übergang: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "benutzer beenden"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "Änderungen in %s verstauen?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " und "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "Diese Änderung in %r verstauen?"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "Sicherheitskopie von %r als %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr "Kopierend er Datei %s gescheitert\n"
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "Entferne Sicherheitskopie: %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr "Entfernen des Stauraum-Sicherung gescheitert"
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr "Verzeichnisname für die Stauraum-Sicherung ungeeignet"
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "Verstauen kann nur interaktiv durchgeführt werden"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "Der Stauraum ist bereits gefüllt"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "Keine Änderungen zu verstauen\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "Flicken wird angewendet\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "Speichere die Flicken im Stauraum\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "Stelle %r als %r wieder her\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "Entferne die Stauraum-Datei\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "Abbruch: Wiederherstellung gescheitert, %s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "Nichts auszuräumen\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr "Sicherung des Stauraums abgebrochen\n"
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "Wende gestauten Flicken an\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "stelle Dateien aus der Sicherung wieder her\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "Entferne gestaute Flicken\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "Ausräumen abgeschlossen\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr "Verwerfe gestaute Datei\n"
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr "Gestaute Datei verworfen\n"
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr "Nichts zu verwerfen\n"
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr "Verwerfen gescheitert\n"
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-"Vor dem zwischenlagern neue und fehlende Dateien als hinzugefügt, respektive "
-"entfernt, markieren"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "Daten im Stauraum überschreiben"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "Daten im Stauraum ergänzen"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [Parameter]... [Datei]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "Gestaute Änderungen nur prüfen"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr ""
-"Fortfahren, selbst wenn die Flicken sich nicht sauber ausräumen lassen"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [Parameter]... [Datei]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "Übernehmen..."
@@ -10049,6 +9858,18 @@ msgstr "Schnipsel %d bereits auf Zeile %d (mit Unschärfe %d) angewandt\n"
 msgid "repository %s not found"
 msgstr "Das Projektarchiv %s existiert nicht"
 
+#~ msgid "this is a binary file\n"
+#~ msgstr "das ist eine binäre Datei\n"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
+
+#~ msgid "user quit"
+#~ msgstr "benutzer beenden"
+
+#~ msgid " and "
+#~ msgstr " und "
+
 #~ msgid "cannot start server: "
 #~ msgstr "server kann nicht gestartet werden: "
 
@@ -10274,6 +10095,13 @@ msgstr "Das Projektarchiv %s existiert nicht"
 
 #~ msgid "Remove Selected"
 #~ msgstr "Gewählte entfernen"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "Dies verändert eine binäre Datei (alles oder nichts)\n"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "Stelle %r als %r wieder her\n"
 
 #~ msgid "rename takes one or two path arguments"
 #~ msgstr "rename brauht ein oder zwei Argumente"
@@ -10586,6 +10414,10 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgid "Envelope"
 #~ msgstr "Umschlag"
 
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "Unbehandelter Übergang: %s -> %s"
+
 #~ msgid "Bundle:"
 #~ msgstr "Bündel:"
 
@@ -10605,6 +10437,11 @@ msgstr "Das Projektarchiv %s existiert nicht"
 
 #~ msgid "File is unrevisioned"
 #~ msgstr "Datei wird nicht verwaltet"
+
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr ""
+#~ "Vor dem zwischenlagern neue und fehlende Dateien als hinzugefügt, respektive "
+#~ "entfernt, markieren"
 
 #~ msgid "Repo:"
 #~ msgstr "Proj.arch.:"
@@ -10848,6 +10685,16 @@ msgstr "Das Projektarchiv %s existiert nicht"
 
 #~ msgid "File is larger than the specified max size.\n"
 #~ msgstr "Die Dateigröße überschreitet den vorgegebenen Maximalwert.\n"
+
+#~ msgid "set"
+#~ msgstr "Festlegen"
+
+#, python-format
+#~ msgid "exec mode has been <font color='red'>%s</font>"
+#~ msgstr "Die Ausführungsart war <font color='red'>%s</font>"
+
+#~ msgid "unset"
+#~ msgstr "Aufheben"
 
 #~ msgid "Repository Explorer"
 #~ msgstr "Archiv-Explorer"
@@ -11161,6 +11008,13 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgid "Patch branch finished"
 #~ msgstr "Flickzweig abgeschlossen"
 
+#~ msgid "applying patch\n"
+#~ msgstr "Flicken wird angewendet\n"
+
+#, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "Unbekannter Inhalt im Flicken: %r"
+
 #~ msgid "_Visual Diff"
 #~ msgstr "Interaktiver :Vergleich"
 
@@ -11227,14 +11081,74 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgid "Shelve - launch Shelve tool and continue"
 #~ msgstr "Verstauen - Stauwerkzeug starten und fortsetzen"
 
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "Änderungen in %s verstauen?"
+
 #~ msgid "Unshelve Abort"
 #~ msgstr "Ausräumen abgebrochen"
 
 #~ msgid "<b>Shelve file exists!</b>"
 #~ msgstr "<b>Stauraum-Datei bereits vorhanden!</b>"
 
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "Diese Änderung in %r verstauen?"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "Der Stauraum ist bereits gefüllt"
+
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "Verstauen kann nur interaktiv durchgeführt werden"
+
 #~ msgid "Unshelve Error"
 #~ msgstr "Ausräum-Fehler"
+
+#~ msgid "abandoning shelved file\n"
+#~ msgstr "Verwerfe gestaute Datei\n"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "Nichts auszuräumen\n"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "Ausräumen abgeschlossen\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "Entferne gestaute Flicken\n"
+
+#~ msgid "shelved file abandoned\n"
+#~ msgstr "Gestaute Datei verworfen\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "Wende gestauten Flicken an\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "Entferne die Stauraum-Datei\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "Speichere die Flicken im Stauraum\n"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "Keine Änderungen zu verstauen\n"
+
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [Parameter]... [Datei]..."
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "Daten im Stauraum ergänzen"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "Daten im Stauraum überschreiben"
+
+#~ msgid "inspect shelved changes only"
+#~ msgstr "Gestaute Änderungen nur prüfen"
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [Parameter]... [Datei]..."
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr ""
+#~ "Fortfahren, selbst wenn die Flicken sich nicht sauber ausräumen lassen"
 
 #~ msgid "Toolbar Style"
 #~ msgstr "Werkzeugleistenstil"
@@ -12506,8 +12420,19 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgid "Sub ->"
 #~ msgstr "Nach unten ->"
 
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr ""
+#~ "Summe: %d Schnipsel (%d geänderte Zeilen); Auswahl: %d Schnipsel (%d "
+#~ "geänderte Zeilen)"
+
 #~ msgid "Hunk selection is disabled for this file.\n"
 #~ msgstr "Die Auswahl von Schnipseln aus dieser Datei wird verhindert.\n"
+
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d Schnipsel, %d Zeilen geändert\n"
 
 #~ msgid "_Delete unversioned"
 #~ msgstr "Nicht versionierte _löschen"
@@ -12902,6 +12827,24 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ msgstr "Revision/ID"
 
 #, python-format
+#~ msgid "file copy of %s failed\n"
+#~ msgstr "Kopierend er Datei %s gescheitert\n"
+
+#~ msgid "abandon failed\n"
+#~ msgstr "Verwerfen gescheitert\n"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "Abbruch: Wiederherstellung gescheitert, %s\n"
+
+#~ msgid "nothing to abandon\n"
+#~ msgstr "Nichts zu verwerfen\n"
+
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "Nicht unterstützte Zeilenendearaten: %s"
+
+#, python-format
 #~ msgid "Abort: %s\n"
 #~ msgstr "Abbruch: %s\n"
 
@@ -13051,6 +12994,18 @@ msgstr "Das Projektarchiv %s existiert nicht"
 
 #~ msgid "Found incoming changesets"
 #~ msgstr "Eingehende Änderungslisten gefunden"
+
+#~ msgid "delete of shelve backup failed"
+#~ msgstr "Entfernen des Stauraum-Sicherung gescheitert"
+
+#~ msgid "unshelve backup aborted\n"
+#~ msgstr "Sicherung des Stauraums abgebrochen\n"
+
+#~ msgid "bad shelve backup directory name"
+#~ msgstr "Verzeichnisname für die Stauraum-Sicherung ungeeignet"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "stelle Dateien aus der Sicherung wieder her\n"
 
 #~ msgid "Insufficient access rights, reverting to read-onlymode."
 #~ msgstr "Unzureichende Zugriffsrechte, wechsle in Nur-Lesen-Modus."
@@ -13286,6 +13241,14 @@ msgstr "Das Projektarchiv %s existiert nicht"
 #~ "»projrc.confirm« entscheiden, ob ein Bestätigungsdialog angezeigt werden "
 #~ "soll oder nicht, bevor die lokale projrc-Datei aktualisiert "
 #~ "wird.</ul><p>Vorgabe: »never«"
+
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "Sicherheitskopie von %r als %r\n"
+
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "Entferne Sicherheitskopie: %r\n"
 
 #~ msgid "Bundle rev to tip..."
 #~ msgstr "Von der angegebenen Revision bis zur Spitze zusammenfassen..."

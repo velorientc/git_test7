@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-04-20 03:38+0000\n"
 "Last-Translator: mozillazg <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:22+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:31+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1389,28 +1389,23 @@ msgstr ""
 msgid "File is binary"
 msgstr "文件是二进制的"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(原名 %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(已添加)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr "设置"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
-msgstr "取消设置"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
@@ -9033,187 +9028,6 @@ msgstr "未来"
 msgid "now"
 msgstr "现在"
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "未支持的换行符类型: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "未知的补丁内容: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "这次操作修改了一个二进制文件(所有或没有)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "这是一个二进制文件\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr "总共:%d 差分块 (%d行被修改); 选中:%d 差分块 (%d行被修改)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d 差分块, %d 行被修改\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "未处理的转换: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "用户退出"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "要剥离改动到%s吗?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " 和 "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "要剥离当前改动到%r吗？"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "备份 %r 为 %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr "复制文件%s失败\n"
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "删除备份文件: %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "剥离操作只能以交互的方式进行"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "剥离出的数据已存在"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "没有可剥离的改动\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "打上补丁\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "在剥离前将改动保存成补丁\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "恢复 %r 到 %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "移除保存剥离数据的文件\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "终止: 恢复备份失败, %s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "无可重置的改动\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "应用剥离出来的补丁\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "恢复备份文件\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "移除剥离出来的补丁\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "重置完成\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr ""
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr "在剥离操作之前把新增的和缺失的文件标为已添加和已删除状态"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "覆盖既存的剥离数据"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "附加到既存的剥离数据中"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [OPTION]... [FILE]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "仅检查被剥离的改动"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr "在重置改动未完全时也继续操作"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [OPTION]... [FILE]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "提交..."
@@ -9464,6 +9278,10 @@ msgstr "仓库 %s 未找到"
 #~ msgid "_Commit"
 #~ msgstr "提交(_C)"
 
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "备份 %r 为 %r\n"
+
 #~ msgid "_Remove"
 #~ msgstr "移除(_R)"
 
@@ -9522,6 +9340,12 @@ msgstr "仓库 %s 未找到"
 #~ msgid "Unknown Files"
 #~ msgstr "未知文件"
 
+#~ msgid "this is a binary file\n"
+#~ msgstr "这是一个二进制文件\n"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "恢复备份文件\n"
+
 #~ msgid "use \"hgtk help\" for the full list of commands"
 #~ msgstr "使用\"hgtk help\"来获取所有命令的列表"
 
@@ -9536,6 +9360,16 @@ msgstr "仓库 %s 未找到"
 #, python-format
 #~ msgid "use \"hgtk -v help%s\" to show aliases and global options"
 #~ msgstr "使用\"hgtk -v help%s\"来显示别名和全局选项"
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "恢复 %r 到 %r\n"
+
+#~ msgid "user quit"
+#~ msgstr "用户退出"
+
+#~ msgid " and "
+#~ msgstr " 和 "
 
 #~ msgid "show the command options"
 #~ msgstr "显示命令参数选项"
@@ -9682,6 +9516,9 @@ msgstr "仓库 %s 未找到"
 #~ msgid "History"
 #~ msgstr "历史记录"
 
+#~ msgid "applying patch\n"
+#~ msgstr "打上补丁\n"
+
 #~ msgid "hgtk repoconfig"
 #~ msgstr "hgtk repoconfig"
 
@@ -9712,6 +9549,9 @@ msgstr "仓库 %s 未找到"
 #, python-format
 #~ msgid "hgtk %s: %s\n"
 #~ msgstr "hgtk %s: %s\n"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
 
 #, python-format
 #~ msgid "hgtk: %s\n"
@@ -10036,6 +9876,10 @@ msgstr "仓库 %s 未找到"
 #~ msgid "Try &Again"
 #~ msgstr "重试(&A)"
 
+#, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "未知的补丁内容: %r"
+
 #~ msgid "Select Local Folder"
 #~ msgstr "选择本地文件夹"
 
@@ -10188,6 +10032,50 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "Filters"
 #~ msgstr "过滤名单"
+
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr "总共:%d 差分块 (%d行被修改); 选中:%d 差分块 (%d行被修改)"
+
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "剥离操作只能以交互的方式进行"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "没有可剥离的改动\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "在剥离前将改动保存成补丁\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "移除保存剥离数据的文件\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "应用剥离出来的补丁\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "移除剥离出来的补丁\n"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "重置完成\n"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "无可重置的改动\n"
+
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr "在剥离操作之前把新增的和缺失的文件标为已添加和已删除状态"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "覆盖既存的剥离数据"
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "附加到既存的剥离数据中"
+
+#~ msgid "inspect shelved changes only"
+#~ msgstr "仅检查被剥离的改动"
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr "在重置改动未完全时也继续操作"
 
 #, python-format
 #~ msgid "hgtk: unknown command '%s'\n"
@@ -10474,6 +10362,28 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "You must configure SMTP"
 #~ msgstr "您必须配置SMTP"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "这次操作修改了一个二进制文件(所有或没有)\n"
+
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d 差分块, %d 行被修改\n"
+
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "未处理的转换: %s -> %s"
+
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "要剥离改动到%s吗?"
+
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "要剥离当前改动到%r吗？"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "剥离出的数据已存在"
 
 #, python-format
 #~ msgid ""
@@ -10764,6 +10674,10 @@ msgstr "仓库 %s 未找到"
 #, python-format
 #~ msgid "unknown mode name: %s"
 #~ msgstr "未知的模式名称: %s"
+
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "未支持的换行符类型: %s"
 
 #~ msgid "Confirm Abort"
 #~ msgstr "确认中止"
@@ -11783,6 +11697,12 @@ msgstr "仓库 %s 未找到"
 #~ "at commit. Default: 0 (unenforced)"
 #~ msgstr "提交说明的自动换行长度。如果设置，弹出菜单可以使用格式化的说明，并且会在有过长的行提交时警告。默认：0 (非强制)"
 
+#~ msgid "set"
+#~ msgstr "设置"
+
+#~ msgid "unset"
+#~ msgstr "取消设置"
+
 #~ msgid "TortoiseHg Configure User-Global Settings"
 #~ msgstr "TortoiseHg 配置用户全局设置"
 
@@ -12052,8 +11972,26 @@ msgstr "仓库 %s 未找到"
 #~ msgid "changeset "
 #~ msgstr "修订集 "
 
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [OPTION]... [FILE]..."
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [OPTION]... [FILE]..."
+
 #~ msgid "Allow pushing a new branch"
 #~ msgstr "允许推送新分支"
+
+#, python-format
+#~ msgid "file copy of %s failed\n"
+#~ msgstr "复制文件%s失败\n"
+
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "删除备份文件: %r\n"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "终止: 恢复备份失败, %s\n"
 
 #~ msgid "Found incoming changesets"
 #~ msgstr "找到可拉取的修订集"

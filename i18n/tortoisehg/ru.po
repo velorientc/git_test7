@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2012-05-23 12:15-0300\n"
+"POT-Creation-Date: 2012-05-29 10:13-0300\n"
 "PO-Revision-Date: 2012-04-30 21:30+0000\n"
 "Last-Translator: Andrei Polushin <polushin@gmail.com>\n"
 "Language-Team: Russian\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-05-24 11:20+0000\n"
-"X-Generator: Launchpad (build 15288)\n"
+"X-Launchpad-Export-Date: 2012-05-30 05:29+0000\n"
+"X-Generator: Launchpad (build 15316)\n"
 "Language: ru\n"
 "X-Poedit-Language: Russian\n"
 
@@ -1408,28 +1408,23 @@ msgstr ""
 msgid "File is binary"
 msgstr "Файл является двоичным"
 
-#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:370
+#: tortoisehg/hgqt/filedata.py:59 tortoisehg/hgqt/filedata.py:366
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(переименован из %s)</i>"
 
-#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:365
-#: tortoisehg/hgqt/filedata.py:375
+#: tortoisehg/hgqt/filedata.py:61 tortoisehg/hgqt/filedata.py:361
+#: tortoisehg/hgqt/filedata.py:371
 msgid " <i>(was added)</i>"
 msgstr " <i>(был добавлен)</i>"
 
-#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:359
-#, python-format
-msgid "exec mode has been <font color='red'>%s</font>"
-msgstr "режим исполнения был <font color='red'>%s</font>"
+#: tortoisehg/hgqt/filedata.py:94 tortoisehg/hgqt/filedata.py:354
+msgid "exec mode has been <font color='red'>set</font>"
+msgstr ""
 
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:355
-msgid "set"
-msgstr "установлен"
-
-#: tortoisehg/hgqt/filedata.py:95 tortoisehg/hgqt/filedata.py:357
-msgid "unset"
-msgstr "не установлен"
+#: tortoisehg/hgqt/filedata.py:96 tortoisehg/hgqt/filedata.py:356
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:98 tortoisehg/hgqt/filedata.py:118
 msgid " <i>(is a symlink)</i>"
@@ -9457,190 +9452,6 @@ msgstr "в будущем"
 msgid "now"
 msgstr "сейчас"
 
-#: tortoisehg/util/hgshelve.py:48
-#, python-format
-msgid "Unsupported line endings type: %s"
-msgstr "Неподдерживаемый тип переносов строк: %s"
-
-#: tortoisehg/util/hgshelve.py:102
-#, python-format
-msgid "unknown patch content: %r"
-msgstr "неизвестное содержимое заплатки: %r"
-
-#: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
-msgid "this modifies a binary file (all or nothing)\n"
-msgstr "это изменение двоичного файла (всё или ничего)\n"
-
-#: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
-msgid "this is a binary file\n"
-msgstr "это двоичный файл\n"
-
-#: tortoisehg/util/hgshelve.py:139
-#, python-format
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"всего: %d лоскутов (%d изменённых строк); выбрано: %d лоскутов (%d "
-"изменённых строк)"
-
-#: tortoisehg/util/hgshelve.py:158
-#, python-format
-msgid "%d hunks, %d lines changed\n"
-msgstr "%d лоскутов, %d строк изменилось\n"
-
-#: tortoisehg/util/hgshelve.py:304
-#, python-format
-msgid "unhandled transition: %s -> %s"
-msgstr "необработанный переход: %s -> %s"
-
-#: tortoisehg/util/hgshelve.py:330
-msgid " [Ynsfdaq?] "
-msgstr " [Ynsfdaq?] "
-
-#: tortoisehg/util/hgshelve.py:346
-msgid "user quit"
-msgstr "пользовательский выход"
-
-#: tortoisehg/util/hgshelve.py:360
-#, python-format
-msgid "shelve changes to %s?"
-msgstr "отложить изменения в %s?"
-
-#: tortoisehg/util/hgshelve.py:361
-msgid " and "
-msgstr " и "
-
-#: tortoisehg/util/hgshelve.py:371
-#, python-format
-msgid "shelve this change to %r?"
-msgstr "отложить это изменение в %r?"
-
-#: tortoisehg/util/hgshelve.py:410
-#, python-format
-msgid "backup %r as %r\n"
-msgstr "Сохранить резервную копию %r как %r\n"
-
-#: tortoisehg/util/hgshelve.py:414
-#, python-format
-msgid "file copy of %s failed\n"
-msgstr "копирование файла %s не удалось\n"
-
-#: tortoisehg/util/hgshelve.py:433
-#, python-format
-msgid "removing backup file : %r\n"
-msgstr "удаление резервного файла : %r\n"
-
-#: tortoisehg/util/hgshelve.py:437
-msgid "delete of shelve backup failed"
-msgstr "удаление резервной копии долгого ящика не удалось"
-
-#: tortoisehg/util/hgshelve.py:440
-msgid "bad shelve backup directory name"
-msgstr "неверное имя каталога для резервных копий долгих ящиков"
-
-#: tortoisehg/util/hgshelve.py:470
-msgid "shelve can only be run interactively"
-msgstr "откладывание выполняется только в интерактивном режиме"
-
-#: tortoisehg/util/hgshelve.py:474
-msgid "shelve data already exists"
-msgstr "отложенные данные уже существуют"
-
-#: tortoisehg/util/hgshelve.py:505
-msgid "no changes to shelve\n"
-msgstr "нет изменений для откладывания\n"
-
-#: tortoisehg/util/hgshelve.py:539
-msgid "applying patch\n"
-msgstr "наложение заплатки\n"
-
-#: tortoisehg/util/hgshelve.py:546
-msgid "saving patch to shelve\n"
-msgstr "заплатка сохраняется в долгий ящик\n"
-
-#: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
-#, python-format
-msgid "restoring %r to %r\n"
-msgstr "восстанавливается %r в %r\n"
-
-#: tortoisehg/util/hgshelve.py:559
-msgid "removing shelve file\n"
-msgstr "удаляется файл отложений\n"
-
-#: tortoisehg/util/hgshelve.py:562
-#, python-format
-msgid "abort: backup restore failed, %s\n"
-msgstr "прервано: восстановление резервной копии не удалось, %s\n"
-
-#: tortoisehg/util/hgshelve.py:579
-msgid "nothing to unshelve\n"
-msgstr "нечего отложить\n"
-
-#: tortoisehg/util/hgshelve.py:593
-msgid "unshelve backup aborted\n"
-msgstr "восстановление отложенных изменений из резервной копии прервано\n"
-
-#: tortoisehg/util/hgshelve.py:597
-msgid "applying shelved patch\n"
-msgstr "накладывается отложенная заплатка\n"
-
-#: tortoisehg/util/hgshelve.py:610
-msgid "restoring backup files\n"
-msgstr "восстанавливаются резервные файлы\n"
-
-#: tortoisehg/util/hgshelve.py:619
-msgid "removing shelved patches\n"
-msgstr "удаляются отложенные заплатки\n"
-
-#: tortoisehg/util/hgshelve.py:621
-msgid "unshelve completed\n"
-msgstr "откладывание завершено\n"
-
-#: tortoisehg/util/hgshelve.py:630
-msgid "abandoning shelved file\n"
-msgstr "выбрасываем отложенный файл\n"
-
-#: tortoisehg/util/hgshelve.py:632
-msgid "shelved file abandoned\n"
-msgstr "отложенный файл выброшен\n"
-
-#: tortoisehg/util/hgshelve.py:634
-msgid "nothing to abandon\n"
-msgstr "нечего выбрасывать\n"
-
-#: tortoisehg/util/hgshelve.py:636
-msgid "abandon failed\n"
-msgstr "выбрасывание не удалось\n"
-
-#: tortoisehg/util/hgshelve.py:643
-msgid "mark new/missing files as added/removed before shelving"
-msgstr ""
-"пометить новые/отсутствующие файлы как добавленные/удалённые до отложения"
-
-#: tortoisehg/util/hgshelve.py:645
-msgid "overwrite existing shelve data"
-msgstr "переписать существующие отложенные данные"
-
-#: tortoisehg/util/hgshelve.py:647
-msgid "append to existing shelve data"
-msgstr "добавить к существующим отложенным данным"
-
-#: tortoisehg/util/hgshelve.py:649
-msgid "hg shelve [OPTION]... [FILE]..."
-msgstr "hg shelve [ПАРАМЕТР]... [ФАЙЛ]..."
-
-#: tortoisehg/util/hgshelve.py:652
-msgid "inspect shelved changes only"
-msgstr "рассматривать только отложенные изменения"
-
-#: tortoisehg/util/hgshelve.py:654
-msgid "proceed even if patches do not unshelve cleanly"
-msgstr "продолжать даже если не всё гладко с применением заплаток"
-
-#: tortoisehg/util/hgshelve.py:656
-msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr "hg unshelve [ПАРАМЕТР]... [ФАЙЛ]..."
-
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
 msgstr "Фиксировать..."
@@ -9896,6 +9707,10 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Save commit message at exit?"
 #~ msgstr "Сохранить сообщение фиксации при выходе?"
 
+#, python-format
+#~ msgid "backup %r as %r\n"
+#~ msgstr "Сохранить резервную копию %r как %r\n"
+
 #~ msgid "Unable to create "
 #~ msgstr "Невозможно создать "
 
@@ -10083,6 +9898,23 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Сделать хранилище совместимым с Mercurial 1.0"
 
+#, python-format
+#~ msgid "unknown patch content: %r"
+#~ msgstr "неизвестное содержимое заплатки: %r"
+
+#~ msgid "this is a binary file\n"
+#~ msgstr "это двоичный файл\n"
+
+#~ msgid " and "
+#~ msgstr " и "
+
+#, python-format
+#~ msgid "restoring %r to %r\n"
+#~ msgstr "восстанавливается %r в %r\n"
+
+#~ msgid "restoring backup files\n"
+#~ msgstr "восстанавливаются резервные файлы\n"
+
 #~ msgid "(No help text available)"
 #~ msgstr "(Нет текстовой справки)"
 
@@ -10255,6 +10087,45 @@ msgstr "хранилище %s не найдено"
 #~ msgid "%d selected, %d total"
 #~ msgstr "%d выбрано, %d всего"
 
+#~ msgid "shelve can only be run interactively"
+#~ msgstr "откладывание выполняется только в интерактивном режиме"
+
+#, python-format
+#~ msgid "shelve changes to %s?"
+#~ msgstr "отложить изменения в %s?"
+
+#, python-format
+#~ msgid "shelve this change to %r?"
+#~ msgstr "отложить это изменение в %r?"
+
+#~ msgid "shelve data already exists"
+#~ msgstr "отложенные данные уже существуют"
+
+#~ msgid "no changes to shelve\n"
+#~ msgstr "нет изменений для откладывания\n"
+
+#~ msgid "mark new/missing files as added/removed before shelving"
+#~ msgstr ""
+#~ "пометить новые/отсутствующие файлы как добавленные/удалённые до отложения"
+
+#~ msgid "nothing to unshelve\n"
+#~ msgstr "нечего отложить\n"
+
+#~ msgid "unshelve completed\n"
+#~ msgstr "откладывание завершено\n"
+
+#~ msgid "removing shelved patches\n"
+#~ msgstr "удаляются отложенные заплатки\n"
+
+#~ msgid "removing shelve file\n"
+#~ msgstr "удаляется файл отложений\n"
+
+#~ msgid "append to existing shelve data"
+#~ msgstr "добавить к существующим отложенным данным"
+
+#~ msgid "overwrite existing shelve data"
+#~ msgstr "переписать существующие отложенные данные"
+
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "обновить все хранилища в текущем каталоге"
 
@@ -10383,6 +10254,12 @@ msgstr "хранилище %s не найдено"
 #~ msgid "hgtk %s: %s\n"
 #~ msgstr "hgtk %s: %s\n"
 
+#~ msgid "hg shelve [OPTION]... [FILE]..."
+#~ msgstr "hg shelve [ПАРАМЕТР]... [ФАЙЛ]..."
+
+#~ msgid "hg unshelve [OPTION]... [FILE]..."
+#~ msgstr "hg unshelve [ПАРАМЕТР]... [ФАЙЛ]..."
+
 #~ msgid "rename takes one or two path arguments"
 #~ msgstr "rename требует одного или двух аргументов"
 
@@ -10499,6 +10376,9 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Message Line Length"
 #~ msgstr "Длина Строки Заметки"
 
+#~ msgid "inspect shelved changes only"
+#~ msgstr "рассматривать только отложенные изменения"
+
 #~ msgid "User global settings"
 #~ msgstr "Пользовательские глобальные настройки"
 
@@ -10534,6 +10414,16 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Glob:"
 #~ msgstr "Маска:"
+
+#, python-format
+#~ msgid "unhandled transition: %s -> %s"
+#~ msgstr "необработанный переход: %s -> %s"
+
+#~ msgid " [Ynsfdaq?] "
+#~ msgstr " [Ynsfdaq?] "
+
+#~ msgid "user quit"
+#~ msgstr "пользовательский выход"
 
 #~ msgid ""
 #~ "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
@@ -10627,6 +10517,9 @@ msgstr "хранилище %s не найдено"
 #, python-format
 #~ msgid "The summary line length of %i is greater than %i"
 #~ msgstr "Длина %i строки сводки больше чем %i"
+
+#~ msgid "proceed even if patches do not unshelve cleanly"
+#~ msgstr "продолжать даже если не всё гладко с применением заплаток"
 
 #~ msgid "remove the status cache"
 #~ msgstr "удалить кэш статуса"
@@ -11164,6 +11057,10 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Failed to update"
 #~ msgstr "Неудача при обновлении"
+
+#, python-format
+#~ msgid "Unsupported line endings type: %s"
+#~ msgstr "Неподдерживаемый тип переносов строк: %s"
 
 #~ msgid "Show line numbers"
 #~ msgstr "Отображать номера строк"
@@ -12400,6 +12297,10 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Unable to delete temp files"
 #~ msgstr "Не удалось удалить временные файлы"
 
+#, python-format
+#~ msgid "removing backup file : %r\n"
+#~ msgstr "удаление резервного файла : %r\n"
+
 #~ msgid "Refresh required"
 #~ msgstr "Требуется обновить изображение"
 
@@ -12517,6 +12418,17 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "<b>Shelve file exists!</b>"
 #~ msgstr "<b>Файл долгого ящика существует!</b>"
+
+#, python-format
+#~ msgid ""
+#~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+#~ msgstr ""
+#~ "всего: %d лоскутов (%d изменённых строк); выбрано: %d лоскутов (%d "
+#~ "изменённых строк)"
+
+#, python-format
+#~ msgid "%d hunks, %d lines changed\n"
+#~ msgstr "%d лоскутов, %d строк изменилось\n"
 
 #~ msgid ""
 #~ "Comma separated list of inclusion patterns.  By default, the entire "
@@ -12640,6 +12552,16 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Universal Date"
 #~ msgstr "Время по Гринвичу"
+
+#, python-format
+#~ msgid "exec mode has been <font color='red'>%s</font>"
+#~ msgstr "режим исполнения был <font color='red'>%s</font>"
+
+#~ msgid "set"
+#~ msgstr "установлен"
+
+#~ msgid "unset"
+#~ msgstr "не установлен"
 
 #~ msgid "Bundle rev to tip..."
 #~ msgstr "Укомплектовать от этой ревизии до оконечной..."
@@ -12812,6 +12734,15 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Delete the shelf contents?"
 #~ msgstr "Уничтожить содержимое долгого ящика?"
 
+#~ msgid "applying patch\n"
+#~ msgstr "наложение заплатки\n"
+
+#~ msgid "saving patch to shelve\n"
+#~ msgstr "заплатка сохраняется в долгий ящик\n"
+
+#~ msgid "applying shelved patch\n"
+#~ msgstr "накладывается отложенная заплатка\n"
+
 #~ msgid "Starting Revision:"
 #~ msgstr "Начальная ревизия:"
 
@@ -12905,6 +12836,38 @@ msgstr "хранилище %s не найдено"
 #, python-format
 #~ msgid "%s will be stripped"
 #~ msgstr "%s будут срезаны"
+
+#~ msgid "this modifies a binary file (all or nothing)\n"
+#~ msgstr "это изменение двоичного файла (всё или ничего)\n"
+
+#, python-format
+#~ msgid "file copy of %s failed\n"
+#~ msgstr "копирование файла %s не удалось\n"
+
+#~ msgid "delete of shelve backup failed"
+#~ msgstr "удаление резервной копии долгого ящика не удалось"
+
+#~ msgid "bad shelve backup directory name"
+#~ msgstr "неверное имя каталога для резервных копий долгих ящиков"
+
+#, python-format
+#~ msgid "abort: backup restore failed, %s\n"
+#~ msgstr "прервано: восстановление резервной копии не удалось, %s\n"
+
+#~ msgid "unshelve backup aborted\n"
+#~ msgstr "восстановление отложенных изменений из резервной копии прервано\n"
+
+#~ msgid "abandoning shelved file\n"
+#~ msgstr "выбрасываем отложенный файл\n"
+
+#~ msgid "shelved file abandoned\n"
+#~ msgstr "отложенный файл выброшен\n"
+
+#~ msgid "nothing to abandon\n"
+#~ msgstr "нечего выбрасывать\n"
+
+#~ msgid "abandon failed\n"
+#~ msgstr "выбрасывание не удалось\n"
 
 #~ msgid ""
 #~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues\n"
