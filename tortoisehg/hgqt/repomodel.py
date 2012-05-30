@@ -119,6 +119,12 @@ class HgRepoListModel(QAbstractTableModel):
 
         # Always assign the first color to the default branch
         self.namedbranch_color('default')
+
+        # Set the colors specified in the tortoisehg.brachcolors config key
+        for colorspec in self.repo.ui.configlist('tortoisehg', 'branchcolors'):
+            branch, color = colorspec.split(':')
+            self._branch_colors[branch] = color
+
         # Then assign colors to all branches in alphabetical order
         # Note that re-assigning the color to the default branch
         # is not expensive
