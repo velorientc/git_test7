@@ -11,10 +11,29 @@ For details, please see:
 - http://readthedocs.org/docs/nose/en/latest/
 - http://docs.python.org/library/unittest.html
 """
-import nose
+import nose, os
 
 import nosecaptureexc, nosehgenv
 
-if __name__ == '__main__':
-    nose.main(addplugins=[nosecaptureexc.CaptureExcPlugin(),
+ignorefiles = [
+    r'^[._]',
+    r'^setup\.py$',
+    r'^TortoiseHgOverlayServer\.py$',
+    r'^prej\.py$',  # TODO broken module; maybe unused?
+    # exclude platform-dependent modules
+    r'^bugtraq\.py$',
+    r'^shellconf\.py$',
+    ]
+
+def main():
+    env = os.environ.copy()
+    if 'NOSE_IGNORE_FILES' not in env:
+        env['NOSE_IGNORE_FILES'] = ignorefiles
+    if 'NOSE_WITH_DOCTEST' not in env:
+        env['NOSE_WITH_DOCTEST'] = 't'
+    nose.main(env=env,
+              addplugins=[nosecaptureexc.CaptureExcPlugin(),
                           nosehgenv.HgEnvPlugin()])
+
+if __name__ == '__main__':
+    main()
