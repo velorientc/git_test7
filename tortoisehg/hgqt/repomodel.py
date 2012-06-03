@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import binascii
+import binascii, re
 
 from mercurial import util, error
 from mercurial.util import propertycache
@@ -70,6 +70,46 @@ def get_color(n, ignore=()):
         colors = COLORS
     return colors[n % len(colors)]
 
+def _parsebranchcolors(value):
+    r"""Parse tortoisehg.branchcolors setting
+
+    >>> _parsebranchcolors('foo:#123456  bar:#789abc ')
+    [('foo', '#123456'), ('bar', '#789abc')]
+    >>> _parsebranchcolors(r'foo\ bar:black foo\:bar:white')
+    [('foo bar', 'black'), ('foo:bar', 'white')]
+
+    >>> _parsebranchcolors(r'\u00c0:black')
+    [('\xc0', 'black')]
+    >>> _parsebranchcolors('\xc0:black')
+    [('\xc0', 'black')]
+
+    >>> _parsebranchcolors(None)
+    []
+    >>> _parsebranchcolors('ill:formed:value no-value')
+    []
+    >>> _parsebranchcolors(r'\ubad:unicode-repr')
+    []
+    """
+    if not value:
+        return []
+
+    colors = []
+    for e in re.split(r'(?:(?<=\\\\)|(?<!\\)) ', value):
+        pair = re.split(r'(?:(?<=\\\\)|(?<!\\)):', e)
+        if len(pair) != 2:
+            continue # ignore ill-formed
+        key, val = pair
+        key = key.replace('\\:', ':').replace('\\ ', ' ')
+        if r'\u' in key:
+            # apply unicode_escape only if \u found, so that raw non-ascii
+            # value isn't always mangled.
+            try:
+                key = hglib.fromunicode(key.decode('unicode_escape'))
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                continue
+        colors.append((key, val))
+    return colors
+
 class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
@@ -121,9 +161,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.namedbranch_color('default')
 
         # Set the colors specified in the tortoisehg.brachcolors config key
-        for colorspec in self.repo.ui.configlist('tortoisehg', 'branchcolors'):
-            branch, color = colorspec.split(':')
-            self._branch_colors[branch] = color
+        self._branch_colors.update(_parsebranchcolors(
+            self.repo.ui.config('tortoisehg', 'branchcolors')))
 
         # Then assign colors to all branches in alphabetical order
         # Note that re-assigning the color to the default branch
