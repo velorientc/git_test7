@@ -71,6 +71,12 @@ class HgClient(object):
     >>> def dummydispatch(args):
     ...     print ' '.join(['hg'] + list(args))
     >>> hg._dispatch = dummydispatch
+    >>> if os.name == 'nt':
+    ...     hg.path = hg.path[2:].replace(os.sep, '/')
+    ...     _wjoin = hg.wjoin
+    ...     def wjoin(path):
+    ...         return _wjoin(path).replace(os.sep, '/')
+    ...     hg.wjoin = wjoin
 
     >>> hg.init()
     hg init /tmp/foo/
