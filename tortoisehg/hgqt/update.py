@@ -196,7 +196,7 @@ class UpdateDialog(QDialog):
         if merge:
             self.p2_info.update(self.ctxs[1])
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
-        if new_rev.lower() == 'null':
+        if new_rev == 'null':
             self.target_info.setText(_('remove working directory'))
             self.update_btn.setEnabled(True)
             return
