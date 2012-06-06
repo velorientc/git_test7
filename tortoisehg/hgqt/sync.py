@@ -39,6 +39,11 @@ def parseurl(path):
             qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
             host, port, folder = '', '', ''
     elif path.startswith(('http://', 'https://', 'svn+https://', 'git://')):
+        # work around http://bugs.python.org/issue7904
+        if 'svn+https' not in urlparse.uses_netloc:
+            urlparse.uses_netloc.append('svn+https')
+        if 'git' not in urlparse.uses_netloc:
+            urlparse.uses_netloc.append('git')
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
         host, port, user, passwd = hglib.netlocsplit(netloc)
