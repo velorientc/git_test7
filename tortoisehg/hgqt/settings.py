@@ -833,7 +833,7 @@ INFO = (
           'mail server.')),
     )),
 
-({'name': 'diff', 'label': _('Diff'),
+({'name': 'diff', 'label': _('Diff and Annotate'),
   'icon': QStyle.SP_FileDialogContentsView}, (
     _fi(_('Patch EOL'), 'patch.eol', (genDefaultCombo,
         ['auto', 'strict', 'crlf', 'lf']),
@@ -857,13 +857,23 @@ INFO = (
         _('Show which function each change is in. '
           'Default: False')),
     _fi(_('Ignore White Space'), 'diff.ignorews', genBoolRBGroup,
-        _('Ignore white space when comparing lines. '
+        _('Ignore white space when comparing lines in diff views. '
           'Default: False')),
     _fi(_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolRBGroup,
-        _('Ignore changes in the amount of white space. '
+        _('Ignore changes in the amount of white space in diff views. '
           'Default: False')),
     _fi(_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolRBGroup,
-        _('Ignore changes whose lines are all blank. '
+        _('Ignore changes whose lines are all blank in diff views. '
+          'Default: False')),
+    _fi(_('<b>Annotate:</b>'), None, genSpacer, ''),
+    _fi(_('Ignore White Space'), 'annotate.ignorews', genBoolRBGroup,
+        _('Ignore white space when comparing lines in the annotate view. '
+          'Default: False')),
+    _fi(_('Ignore WS Amount'), 'annotate.ignorewsamount', genBoolRBGroup,
+        _('Ignore changes in the amount of white space in the annotate view. '
+          'Default: False')),
+    _fi(_('Ignore Blank Lines'), 'annotate.ignoreblanklines', genBoolRBGroup,
+        _('Ignore changes whose lines are all blank in the annotate view. '
           'Default: False')),
     )),
 
