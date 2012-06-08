@@ -9,7 +9,7 @@ import os
 import difflib
 import re
 
-from mercurial import error, util
+from mercurial import error, util, patch
 
 from tortoisehg.util import hglib, patchctx, colormap, thread2
 from tortoisehg.hgqt.i18n import _
@@ -718,7 +718,8 @@ class AnnotateView(qscilib.Scintilla):
         self._revmarkers = {}  # by rev
         self._lastrev = None
 
-        self._thread = AnnotateThread(self)
+        diffopts = patch.diffopts(repo.ui, section='annotate')
+        self._thread = AnnotateThread(self, diffopts=diffopts)
         self._thread.finished.connect(self.fillModel)
 
         self.repo = repo
@@ -857,9 +858,10 @@ class AnnotateView(qscilib.Scintilla):
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, diffopts=None):
         super(AnnotateThread, self).__init__(parent)
         self._threadid = None
+        self._diffopts = diffopts
 
     @pyqtSlot(object)
     def start(self, fctx):
@@ -883,7 +885,8 @@ class AnnotateThread(QThread):
         try:
             try:
                 data = []
-                for (fctx, line), _text in self._fctx.annotate(True, True):
+                for (fctx, line), _text in \
+                        self._fctx.annotate(True, True, self._diffopts):
                     data.append((fctx, line))
                 self.data = data
             except KeyboardInterrupt:
