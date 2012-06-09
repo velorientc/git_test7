@@ -37,6 +37,8 @@ def tounicode(s):
         return None
     if isinstance(s, unicode):
         return s
+    if isinstance(s, encoding.localstr):
+        return s._utf8.decode('utf-8')
     for e in ('utf-8', _encoding):
         try:
             return s.decode(e, 'strict')
@@ -58,11 +60,15 @@ def fromunicode(s, errors='strict'):
     s = unicode(s)  # s can be QtCore.QString
     for enc in (_encoding, _fallbackencoding):
         try:
-            return s.encode(enc)
+            l = s.encode(enc)
+            if s == l.decode(enc):
+                return l  # non-lossy encoding
+            return encoding.localstr(s.encode('utf-8'), l)
         except UnicodeEncodeError:
             pass
 
-    return s.encode(_encoding, errors)  # last ditch
+    l = s.encode(_encoding, errors)  # last ditch
+    return encoding.localstr(s.encode('utf-8'), l)
 
 def toutf(s):
     """
@@ -72,6 +78,8 @@ def toutf(s):
     """
     if s is None:
         return None
+    if isinstance(s, encoding.localstr):
+        return s._utf8
     return tounicode(s).encode('utf-8').replace('\0','')
 
 def fromutf(s):
@@ -85,7 +93,8 @@ def fromutf(s):
     try:
         return fromunicode(s.decode('utf-8'), 'replace')
     except UnicodeDecodeError:
-        return fromunicode(s.decode('utf-8', 'replace'), 'replace')
+        # can't round-trip
+        return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 _tabwidth = None
 def gettabwidth(ui):
