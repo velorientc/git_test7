@@ -99,6 +99,11 @@ class FilectxActions(QObject):
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
 
+    def setPaths(self, selectedfiles, currentfile=None, itemissubrepo=False):
+        """Set selected files [unicode]"""
+        self.setPaths_(map(hglib.fromunicode, selectedfiles),
+                       hglib.fromunicode(currentfile), itemissubrepo)
+
     def setPaths_(self, selectedfiles, currentfile=None, itemissubrepo=False):
         """Set selected files [local encoding]"""
         if not currentfile and selectedfiles:
