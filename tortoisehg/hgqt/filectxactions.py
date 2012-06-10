@@ -229,8 +229,13 @@ class FilectxActions(QObject):
             filename = self._selectedfiles[0]
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
-                dlg = dlgclass(self.repo, filename,
-                               repoviewer=self.parent().window())
+                # dirty hack to pass workbench only if available
+                from tortoisehg.hgqt import workbench  # avoid cyclic dep
+                repoviewer = None
+                if self.parent() and isinstance(self.parent().window(),
+                                                workbench.Workbench):
+                    repoviewer = self.parent().window()
+                dlg = dlgclass(self.repo, filename, repoviewer=repoviewer)
                 dlgdict[filename] = dlg
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
