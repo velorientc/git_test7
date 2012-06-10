@@ -368,7 +368,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         qtlib.openfiles(self.repo, filenames)
 
     def copypath(self):
-        absfiles = [util.localpath(self.repo.wjoin(hglib.fromunicode(f)))
+        absfiles = [util.localpath(self.repo.wjoin(f))
                     for f in self.filelist.getSelectedFiles()]
         QApplication.clipboard().setText(hglib.tounicode(os.linesep.join(absfiles)))
 
