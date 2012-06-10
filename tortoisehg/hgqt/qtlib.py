@@ -172,9 +172,9 @@ def savefiles(repo, files, rev, parent=None):
             filename = "%s@%d%s" % (wfile, rev, ext)
         else:
             filename = "%s@%d" % (ext, rev)
-        result = QFileDialog.getSaveFileName(parent=parent,
-                                             caption=_("Save file to"),
-                                             directory=filename) 
+        result = QFileDialog.getSaveFileName(
+            parent=parent, caption=_("Save file to"),
+            directory=hglib.tounicode(filename))
         if not result:
             continue
         cwd = os.getcwd()
