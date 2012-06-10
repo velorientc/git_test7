@@ -312,7 +312,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
     def vdiff(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         rev = self.ctx.rev()
@@ -327,7 +327,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             dlg.exec_()
 
     def vdifflocal(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         assert type(self.ctx.rev()) is int
@@ -337,7 +337,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             dlg.exec_()
 
     def editfile(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         rev = self.ctx.rev()
@@ -350,30 +350,30 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             qtlib.editfiles(self.repo, files, parent=self)
 
     def savefile(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         qtlib.savefiles(self.repo, filenames, self.ctx.rev(), self)
 
     def editlocal(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         qtlib.editfiles(self.repo, filenames, parent=self)
 
     def openlocal(self):
-        filenames = self.filelist.getSelectedFiles()
+        filenames = self._selectedfiles
         if not filenames:
             return
         qtlib.openfiles(self.repo, filenames)
 
     def copypath(self):
         absfiles = [util.localpath(self.repo.wjoin(f))
-                    for f in self.filelist.getSelectedFiles()]
+                    for f in self._selectedfiles]
         QApplication.clipboard().setText(hglib.tounicode(os.linesep.join(absfiles)))
 
     def revertfile(self):
-        fileSelection = self.filelist.getSelectedFiles()
+        fileSelection = self._selectedfiles
         if len(fileSelection) == 0:
             return
         rev = self.ctx.rev()
@@ -384,7 +384,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
-            filename = self.filelist.getSelectedFiles()[0]
+            filename = self._selectedfiles[0]
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 dlg = dlgclass(self.repo, filename,
@@ -400,7 +400,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             dlg.activateWindow()
 
     def opensubrepo(self):
-        path = os.path.join(self.repo.root, self.filelist.currentFile())
+        path = os.path.join(self.repo.root, self._currentfile)
         if os.path.isdir(path):
             self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
@@ -409,14 +409,22 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                 _("The selected subrepository does not exist on the working directory"))
 
     def explore(self):
-        root = self.repo.wjoin(self.filelist.currentFile())
+        root = self.repo.wjoin(self._currentfile)
         if os.path.isdir(root):
             qtlib.openlocalurl(root)
 
     def terminal(self):
-        root = self.repo.wjoin(self.filelist.currentFile())
+        root = self.repo.wjoin(self._currentfile)
         if os.path.isdir(root):
-            qtlib.openshell(root, self.filelist.currentFile())
+            qtlib.openshell(root, self._currentfile)
+
+    @property
+    def _selectedfiles(self):
+        return self.filelist.getSelectedFiles()
+
+    @property
+    def _currentfile(self):
+        return self.filelist.currentFile()
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
@@ -464,7 +472,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             else:
                 self.filecontextmenu = contextmenu
 
-        ln = len(self.filelist.getSelectedFiles())
+        ln = len(self._selectedfiles)
         if ln == 0:
             return
         if ln > 1 and not itemissubrepo:
