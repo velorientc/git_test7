@@ -99,8 +99,10 @@ class FilectxActions(QObject):
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
 
-    def setPaths_(self, selectedfiles, currentfile, itemissubrepo=False):
+    def setPaths_(self, selectedfiles, currentfile=None, itemissubrepo=False):
         """Set selected files [local encoding]"""
+        if not currentfile and selectedfiles:
+            currentfile = selectedfiles[0]
         self._selectedfiles = list(selectedfiles)
         self._currentfile = currentfile
         self._itemissubrepo = itemissubrepo
