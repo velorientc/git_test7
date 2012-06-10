@@ -27,7 +27,10 @@ def promptForLfiles(parent, ui, repo, files):
     lfiles = []
     uself = 'largefiles' in repo.extensions()
     section = 'largefiles'
-    minsize = int(ui.config(section, 'minsize', default='10'))
+    try:
+        minsize = int(ui.config(section, 'minsize', default='10'))
+    except ValueError:
+        minsize = 10
     patterns = ui.config(section, 'patterns', default=())
     if patterns:
         patterns = patterns.split(' ')
