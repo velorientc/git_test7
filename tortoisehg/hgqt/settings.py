@@ -306,6 +306,25 @@ class SettingsCheckBox(QCheckBox):
     def isDirty(self):
         return self.value() != self.curvalue
 
+# When redesigning the structure of SettingsForm, consider to replace Spacer
+# by QGroupBox.
+class Spacer(QWidget):
+    """Dummy widget for group separator"""
+
+    def __init__(self, parent=None, **opts):
+        super(Spacer, self).__init__(parent)
+        if opts.get('cpath'):
+            raise ValueError('do not set cpath for spacer')
+        self.opts = opts
+
+    def setValue(self, curvalue):
+        raise NotImplementedError
+
+    def value(self):
+        raise NotImplementedError
+
+    def isDirty(self):
+        return False
 
 class BugTraqConfigureEntry(QPushButton):
     def __init__(self, parent=None, **opts):
@@ -447,6 +466,9 @@ def genDeferredCombo(opts, func):
 
 def genFontEdit(opts):
     return FontEntry(**opts)
+
+def genSpacer(opts):
+    return Spacer(**opts)
 
 def genBugTraqEdit(opts):
     return BugTraqConfigureEntry(**opts)
@@ -1242,6 +1264,8 @@ class SettingsForm(QWidget):
                 self.validateextensions()
         else:
             for row, e in enumerate(info):
+                if not e.cpath:
+                    continue  # a dummy field
                 curvalue = self.readCPath(e.cpath)
                 widgets[row].setValue(curvalue)
 
@@ -1409,6 +1433,8 @@ class SettingsForm(QWidget):
                 self.applyChangesForExtensions()
             else:
                 for row, e in enumerate(info):
+                    if not e.cpath:
+                        continue  # a dummy field
                     newvalue = widgets[row].value()
                     changed = self.recordNewValue(e.cpath, newvalue)
                     if changed and e.restartneeded:
