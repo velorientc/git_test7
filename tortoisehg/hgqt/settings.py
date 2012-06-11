@@ -306,6 +306,25 @@ class SettingsCheckBox(QCheckBox):
     def isDirty(self):
         return self.value() != self.curvalue
 
+# When redesigning the structure of SettingsForm, consider to replace Spacer
+# by QGroupBox.
+class Spacer(QWidget):
+    """Dummy widget for group separator"""
+
+    def __init__(self, parent=None, **opts):
+        super(Spacer, self).__init__(parent)
+        if opts.get('cpath'):
+            raise ValueError('do not set cpath for spacer')
+        self.opts = opts
+
+    def setValue(self, curvalue):
+        raise NotImplementedError
+
+    def value(self):
+        raise NotImplementedError
+
+    def isDirty(self):
+        return False
 
 class BugTraqConfigureEntry(QPushButton):
     def __init__(self, parent=None, **opts):
@@ -447,6 +466,9 @@ def genDeferredCombo(opts, func):
 
 def genFontEdit(opts):
     return FontEntry(**opts)
+
+def genSpacer(opts):
+    return Spacer(**opts)
 
 def genBugTraqEdit(opts):
     return BugTraqConfigureEntry(**opts)
@@ -811,7 +833,7 @@ INFO = (
           'mail server.')),
     )),
 
-({'name': 'diff', 'label': _('Diff'),
+({'name': 'diff', 'label': _('Diff and Annotate'),
   'icon': QStyle.SP_FileDialogContentsView}, (
     _fi(_('Patch EOL'), 'patch.eol', (genDefaultCombo,
         ['auto', 'strict', 'crlf', 'lf']),
@@ -835,13 +857,23 @@ INFO = (
         _('Show which function each change is in. '
           'Default: False')),
     _fi(_('Ignore White Space'), 'diff.ignorews', genBoolRBGroup,
-        _('Ignore white space when comparing lines. '
+        _('Ignore white space when comparing lines in diff views. '
           'Default: False')),
     _fi(_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolRBGroup,
-        _('Ignore changes in the amount of white space. '
+        _('Ignore changes in the amount of white space in diff views. '
           'Default: False')),
     _fi(_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolRBGroup,
-        _('Ignore changes whose lines are all blank. '
+        _('Ignore changes whose lines are all blank in diff views. '
+          'Default: False')),
+    _fi(_('<b>Annotate:</b>'), None, genSpacer, ''),
+    _fi(_('Ignore White Space'), 'annotate.ignorews', genBoolRBGroup,
+        _('Ignore white space when comparing lines in the annotate view. '
+          'Default: False')),
+    _fi(_('Ignore WS Amount'), 'annotate.ignorewsamount', genBoolRBGroup,
+        _('Ignore changes in the amount of white space in the annotate view. '
+          'Default: False')),
+    _fi(_('Ignore Blank Lines'), 'annotate.ignoreblanklines', genBoolRBGroup,
+        _('Ignore changes whose lines are all blank in the annotate view. '
           'Default: False')),
     )),
 
@@ -1242,6 +1274,8 @@ class SettingsForm(QWidget):
                 self.validateextensions()
         else:
             for row, e in enumerate(info):
+                if not e.cpath:
+                    continue  # a dummy field
                 curvalue = self.readCPath(e.cpath)
                 widgets[row].setValue(curvalue)
 
@@ -1409,6 +1443,8 @@ class SettingsForm(QWidget):
                 self.applyChangesForExtensions()
             else:
                 for row, e in enumerate(info):
+                    if not e.cpath:
+                        continue  # a dummy field
                     newvalue = widgets[row].value()
                     changed = self.recordNewValue(e.cpath, newvalue)
                     if changed and e.restartneeded:

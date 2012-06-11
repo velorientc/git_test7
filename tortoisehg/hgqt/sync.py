@@ -771,7 +771,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cururl = self.currentUrl(False)
         implicitpushrepo = False
         if ('push' in cmdline or 'outgoing' in cmdline) and \
-           self.curalias + '-push' in self.paths:
+           self.curalias and self.curalias + '-push' in self.paths:
             implicitpushrepo = True
             cururl = self.paths[self.curalias + '-push']
 
