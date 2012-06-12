@@ -313,7 +313,6 @@ class Workbench(QMainWindow):
             'pbranch': ('branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'manifest': ('hg-annotate', _('&Manifest')),
-            'search': ('hg-grep', _('&Search')),
             'grep': ('hg-grep', _('&Search')),
             'sync': ('thg-sync', _('S&ynchronize')),
         }
@@ -321,7 +320,7 @@ class Workbench(QMainWindow):
             'tortoisehg', 'workbench.task-toolbar', [])
         if tasklist == []:
             tasklist = ['log', 'commit', 'mq', 'sync', 'manifest',
-                'search', 'pbranch']
+                'grep', 'pbranch']
 
         self.actionSelectTaskMQ = None
         self.actionSelectTaskPbranch = None
