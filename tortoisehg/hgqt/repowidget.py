@@ -422,7 +422,7 @@ class RepoWidget(QWidget):
         else:
             self.showIcon.emit(QIcon())
 
-    @pyqtSlot(QString, QString)
+    @pyqtSlot(QString)
     def setFilter(self, filter):
         self.filterbar.revsetle.setText(filter)
         self.filterbar.setVisible(True)
