@@ -982,9 +982,9 @@ INFO = (
         'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
         'Default is pull from NO servers.')),
     _fi(_('Include'), 'projrc.include', genEditCombo,
-        _('List of settings that will be pulled form the project configuration file. Default is include NO settings.')),
+        _('List of settings that will be pulled from the project configuration file. Default is include NO settings.')),
     _fi(_('Exclude'), 'projrc.exclude', genEditCombo,
-        _('List of settings that will NOT be pulled form the project configuration file. '
+        _('List of settings that will NOT be pulled from the project configuration file. '
         'Default is exclude none of the included settings.')),
     _fi(_('Update on incoming'), 'projrc.updateonincoming', (genDefaultCombo, ['never', 'prompt', 'auto']),
         _('Let the user update the projrc on incoming:'
