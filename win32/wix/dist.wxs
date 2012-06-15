@@ -20,9 +20,9 @@
         <File Name="PyQt4.QtCore.pyd" />
         <File Name="PyQt4.QtGui.pyd" />
         <File Name="PyQt4.QtNetwork.pyd" />
-        <File Name="python26.dll" />
-        <File Name="pythoncom26.dll" />
-        <File Name="pywintypes26.dll" />
+        <File Name="python27.dll" />
+        <File Name="pythoncom27.dll" />
+        <File Name="pywintypes27.dll" />
         <File Name="QtCore4.dll" />
         <File Name="QtGui4.dll" />
         <File Name="QtNetwork4.dll" />
@@ -53,7 +53,7 @@
         <File Name="libsvn_swig_py-1.dll" />
         <?if $(var.Platform) = "x86" ?>
           <File Name="intl3_svn.dll" />
-          <File Name="libdb44.dll" />
+          <File Name="libdb48.dll" />
           <File Name="libsasl.dll" />
         <?endif?>
         <File Name="select.pyd" />
