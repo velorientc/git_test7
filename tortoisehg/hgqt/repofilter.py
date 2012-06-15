@@ -266,7 +266,9 @@ class RepoFilterBar(QToolBar):
             self._branchCombo.setItemData(self._branchCombo.count() - 1,
                                           hglib.tounicode(branch),
                                           Qt.ToolTipRole)
-        self._branchCombo.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
+        self._branchCombo.setEnabled(self.filterEnabled
+                                     and (len(branches) > 1
+                                          or self._abranchAction.isChecked()))
         self._branchReloading = False
 
         if not curbranch:
