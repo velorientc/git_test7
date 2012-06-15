@@ -319,7 +319,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def openlocal(self):
         if self.path is None:
             return
-        qtlib.openfiles(self.repo, [hglib.fromunicode(self.path)])
+        qtlib.openfiles(self._repo, [hglib.fromunicode(self.path)])
 
     def revertfile(self):
         if self.path is None:
