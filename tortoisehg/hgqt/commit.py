@@ -794,15 +794,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
-        self.files = self.stwidget.getChecked('MAR?!S')
-        if not (self.files or brcmd or newbranch):
+        if len(repo.parents()) > 1:
+            merge = True
+            self.files = []
+        else:
+            merge = False
+            self.files = self.stwidget.getChecked('MAR?!S')
+        if not (self.files or brcmd or newbranch or merge):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
-        if len(repo.parents()) > 1:
-            self.files = []
 
         user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
