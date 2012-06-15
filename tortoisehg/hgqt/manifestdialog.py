@@ -114,6 +114,9 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     linkActivated = pyqtSignal(QString)
     """Emitted (path) when user clicks on link"""
 
+    revsetFilterRequested = pyqtSignal(QString)
+    """Ask the repowidget to change its revset filter"""
+
     def canswitch(self):
         return False
 
@@ -200,6 +203,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._fileactions = filectxactions.FilectxActions(self._repo, self,
                                                           rev=self._rev)
         self._fileactions.linkActivated.connect(self.linkActivated)
+        self._fileactions.filterRequested.connect(self.revsetFilterRequested)
         self.addActions(self._fileactions.actions())
 
     def showEvent(self, event):

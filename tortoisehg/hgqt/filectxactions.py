@@ -24,7 +24,7 @@ _actionsbytype = {
                 'revert'],
     'file': ['diff', 'ldiff', None, 'edit', 'save', None, 'ledit', 'lopen',
              'copypath', None, 'revert', None, 'navigate', 'diffnavigate'],
-    'dir': ['diff', 'ldiff', None, 'revert',
+    'dir': ['diff', 'ldiff', None, 'revert', None, 'filter',
             None, 'explore', 'terminal', 'copypath'],
     }
 
@@ -32,6 +32,9 @@ class FilectxActions(QObject):
     """Container for repository file actions"""
 
     linkActivated = pyqtSignal(unicode)
+    filterRequested = pyqtSignal(QString)
+    """Ask the repowidget to change its revset filter"""
+
 
     def __init__(self, repo, parent=None, rev=None):
         super(FilectxActions, self).__init__(parent)
@@ -52,6 +55,8 @@ class FilectxActions(QObject):
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
             ('navigate', _('File history'), 'hg-log', 'Shift+Return',
+             _('Show the history of the selected file'), self.navigate),
+            ('filter', _('Folder history'), 'hg-log', None,
              _('Show the history of the selected file'), self.navigate),
             ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
              _('Compare revisions of the selected file'), self.diffNavigate),
@@ -245,6 +250,10 @@ class FilectxActions(QObject):
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self._selectedfiles[0]
+        if self._itemisdir:
+            # ask the main repowidget to only show the revisions in which files
+            # on that folder are present
+            return self.filterRequested.emit("file('%s/**')" % filename)
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 # dirty hack to pass workbench only if available

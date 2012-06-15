@@ -386,6 +386,7 @@ class RepoWidget(QWidget):
         w.linkActivated.connect(self._openLink)
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
+        w.revsetFilterRequested.connect(self.setFilter)
         return w
 
     def createSyncWidget(self):
