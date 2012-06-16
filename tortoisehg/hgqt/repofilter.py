@@ -34,7 +34,7 @@ class RepoFilterBar(QToolBar):
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setIconSize(QSize(16,16))
