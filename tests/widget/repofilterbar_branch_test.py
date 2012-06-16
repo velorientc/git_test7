@@ -73,6 +73,12 @@ class RepoFilterBarBranchTest(unittest.TestCase):
         self.assertEqual('foo', self.widget.branch())
         self.branchchanged.assert_called_once_with('foo', False)
 
+    def test_label_for_all_branches(self):
+        self.widget.setBranch('')  # all branches
+        self.assertEqual('', self.widget.branch())
+        self.assertEqual(self.widget._allBranchesLabel,
+                         unicode(self.widget._branchCombo.currentText()))
+
 class RepoFilterBarEmptyBranchTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

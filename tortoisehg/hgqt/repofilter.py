@@ -271,21 +271,24 @@ class RepoFilterBar(QToolBar):
                                           or self._abranchAction.isChecked()))
         self._branchReloading = False
 
-        if not curbranch:
-            curbranch = self._allBranchesLabel
         self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
-        self._branchCombo.setCurrentIndex(self._branchCombo.findText(branch))
+        if not branch:
+            index = 0
+        else:
+            index = self._branchCombo.findText(branch)
+        if index >= 0:
+            self._branchCombo.setCurrentIndex(index)
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        curbranch = self._branchCombo.currentText()
-        if curbranch == self._allBranchesLabel:
-            curbranch = ''
-        return unicode(curbranch)
+        if self._branchCombo.currentIndex() == 0:
+            return ''
+        else:
+            return unicode(self._branchCombo.currentText())
 
     @pyqtSlot()
     def _emitBranchChanged(self):
