@@ -79,6 +79,23 @@ class RepoFilterBarBranchTest(unittest.TestCase):
         self.assertEqual(self.widget._allBranchesLabel,
                          unicode(self.widget._branchCombo.currentText()))
 
+    def test_selected_inactive_branch_removed_from_list(self):
+        self.widget.setBranch('default')
+        self.branchchanged.reset_mock()
+        self.widget._abranchAction.setChecked(False)
+        self.widget._abranchAction.trigger()  # checked
+        self.assertEqual('', self.widget.branch())  # fall back
+        self.branchchanged.assert_called_once_with('', False)
+
+    def test_selected_closed_branch_removed_from_list(self):
+        self.widget._cbranchAction.setChecked(False)
+        self.widget._cbranchAction.trigger()  # checked
+        self.widget.setBranch('baz')
+        self.branchchanged.reset_mock()
+        self.widget._cbranchAction.trigger()  # unchecked
+        self.assertEqual('', self.widget.branch())  # fall back
+        self.branchchanged.assert_called_once_with('', False)
+
 class RepoFilterBarEmptyBranchTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -271,7 +271,10 @@ class RepoFilterBar(QToolBar):
                                           or self._abranchAction.isChecked()))
         self._branchReloading = False
 
-        self.setBranch(curbranch)
+        if curbranch and curbranch not in branches:
+            self._emitBranchChanged()  # falls back to "show all"
+        else:
+            self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
     def setBranch(self, branch):
