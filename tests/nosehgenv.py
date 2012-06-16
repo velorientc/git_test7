@@ -95,7 +95,9 @@ class HgEnvPlugin(plugins.Plugin):
     def _setupqapp(self):
         # Make sure to hold single QApplication instance on memory. Multiple
         # instances will lead crash.
-        self._qapp = QApplication([])
+        guienabled = (os.name == 'nt' or sys.platform == 'darwin'
+                      or bool(os.environ.get('DISPLAY')))
+        self._qapp = QApplication([], guienabled)
 
         # settings will be saved at $HGTMP/.config/TortoiseHg/TortoiseHgQt.ini
         self._qapp.setApplicationName('TortoiseHgQt')
