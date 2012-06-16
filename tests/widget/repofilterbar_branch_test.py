@@ -105,8 +105,6 @@ class RepoFilterBarEmptyBranchTest(unittest.TestCase):
         hg.addremove()
         hg.commit('-m', 'commit to default')
         hg.commit('--close-branch', '-m', 'close default branch')
-        hg.branch('foo')
-        hg.commit('-m', 'create foo branch')
         cls.repo = thgrepo.repository(path=hg.path)
 
     @classmethod
