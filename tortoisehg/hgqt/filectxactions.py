@@ -218,7 +218,8 @@ class FilectxActions(QObject):
     def copypath(self):
         absfiles = [util.localpath(self.repo.wjoin(f))
                     for f in self._selectedfiles]
-        QApplication.clipboard().setText(hglib.tounicode(os.linesep.join(absfiles)))
+        QApplication.clipboard().setText(
+            hglib.tounicode(os.linesep.join(absfiles)))
 
     def revertfile(self):
         fileSelection = self._selectedfiles
@@ -260,7 +261,8 @@ class FilectxActions(QObject):
         else:
             QMessageBox.warning(self,
                 _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
+                _("The selected subrepository does not exist on the working "
+                  "directory"))
 
     def explore(self):
         root = self.repo.wjoin(self._currentfile)
