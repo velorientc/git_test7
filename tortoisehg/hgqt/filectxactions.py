@@ -19,6 +19,13 @@ from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
 
+_actionsbytype = {
+    'subrepo': ['opensubrepo', 'explore', 'terminal', 'copypath', None,
+                'revert'],
+    'file': ['diff', 'ldiff', None, 'edit', 'save', None, 'ledit', 'lopen',
+             'copypath', None, 'revert', None, 'navigate', 'diffnavigate'],
+    }
+
 class FilectxActions(QObject):
     """Container for repository file actions"""
 
@@ -119,13 +126,10 @@ class FilectxActions(QObject):
         # Subrepos and regular items have different context menus
         if self._itemissubrepo:
             contextmenu = self._contextmenus.get('subrepo')
-            actionlist = ['opensubrepo', 'explore', 'terminal', 'copypath',
-                          None, 'revert']
+            actionlist = _actionsbytype['subrepo']
         else:
             contextmenu = self._contextmenus.get('file')
-            actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
-                          'ledit', 'lopen', 'copypath', None, 'revert', None,
-                          'navigate', 'diffnavigate']
+            actionlist = _actionsbytype['file']
 
         if not contextmenu:
             contextmenu = QMenu(self.parent())
