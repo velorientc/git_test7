@@ -229,7 +229,9 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
         currentindex = self._treeview.currentIndex()
         itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
-        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo)
+        itemisdir = self._treemodel.isDir(currentindex)
+        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo,
+                                   itemisdir=itemisdir)
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(point)

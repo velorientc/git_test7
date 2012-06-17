@@ -24,6 +24,8 @@ _actionsbytype = {
                 'revert'],
     'file': ['diff', 'ldiff', None, 'edit', 'save', None, 'ledit', 'lopen',
              'copypath', None, 'revert', None, 'navigate', 'diffnavigate'],
+    'dir': ['diff', 'ldiff', None, 'revert',
+            None, 'explore', 'terminal', 'copypath'],
     }
 
 class FilectxActions(QObject):
@@ -41,6 +43,7 @@ class FilectxActions(QObject):
         self._selectedfiles = []  # local encoding
         self._currentfile = None  # local encoding
         self._itemissubrepo = False
+        self._itemisdir = False
 
         self._diff_dialogs = {}
         self._nav_dialogs = {}
@@ -73,12 +76,12 @@ class FilectxActions(QObject):
             ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
              'Alt+Ctrl+O', _('Open the selected subrepository'),
              self.opensubrepo),
-            ('explore', _('Explore subrepository'), 'system-file-manager',
-             'Alt+Ctrl+E', _('Open the selected subrepository'),
+            ('explore', _('Explore folder'), 'system-file-manager',
+             'Alt+Ctrl+E', _('Open the selected folder in the system file manager'),
              self.explore),
-            ('terminal', _('Open terminal in subrepository'),
+            ('terminal', _('Open terminal here'),
              'utilities-terminal', 'Alt+Ctrl+T',
-             _('Open a shell terminal in the selected subrepository root'),
+             _('Open a shell terminal in the selected folder'),
              self.terminal),
             ]:
             act = QAction(desc, self)
@@ -104,18 +107,21 @@ class FilectxActions(QObject):
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
 
-    def setPaths(self, selectedfiles, currentfile=None, itemissubrepo=False):
+    def setPaths(self, selectedfiles, currentfile=None, itemissubrepo=False,
+                 itemisdir=False):
         """Set selected files [unicode]"""
         self.setPaths_(map(hglib.fromunicode, selectedfiles),
-                       hglib.fromunicode(currentfile), itemissubrepo)
+                       hglib.fromunicode(currentfile), itemissubrepo, itemisdir)
 
-    def setPaths_(self, selectedfiles, currentfile=None, itemissubrepo=False):
+    def setPaths_(self, selectedfiles, currentfile=None, itemissubrepo=False,
+                  itemisdir=False):
         """Set selected files [local encoding]"""
         if not currentfile and selectedfiles:
             currentfile = selectedfiles[0]
         self._selectedfiles = list(selectedfiles)
         self._currentfile = currentfile
         self._itemissubrepo = itemissubrepo
+        self._itemisdir = itemisdir
 
     def actions(self):
         """List of the actions; The owner widget should register them"""
@@ -126,6 +132,8 @@ class FilectxActions(QObject):
         # Subrepos and regular items have different context menus
         if self._itemissubrepo:
             contextmenu = self._cachedcontextmenu('subrepo')
+        elif self._itemisdir:
+            contextmenu = self._cachedcontextmenu('dir')
         else:
             contextmenu = self._cachedcontextmenu('file')
 
