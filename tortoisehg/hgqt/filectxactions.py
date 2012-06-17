@@ -121,7 +121,8 @@ class FilectxActions(QObject):
         # Subrepos and regular items have different context menus
         if self._itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo', 'explore', 'terminal', None, 'revert']
+            actionlist = ['opensubrepo', 'explore', 'terminal', 'copypath',
+                          None, 'revert']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
