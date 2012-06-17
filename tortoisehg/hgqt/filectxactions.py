@@ -125,24 +125,9 @@ class FilectxActions(QObject):
         """Menu for the current selection if available; otherwise None"""
         # Subrepos and regular items have different context menus
         if self._itemissubrepo:
-            contextmenu = self._contextmenus.get('subrepo')
-            actionlist = _actionsbytype['subrepo']
+            contextmenu = self._cachedcontextmenu('subrepo')
         else:
-            contextmenu = self._contextmenus.get('file')
-            actionlist = _actionsbytype['file']
-
-        if not contextmenu:
-            contextmenu = QMenu(self.parent())
-            for act in actionlist:
-                if act:
-                    contextmenu.addAction(self._actions[act])
-                else:
-                    contextmenu.addSeparator()
-
-            if self._itemissubrepo:
-                self._contextmenus['subrepo'] = contextmenu
-            else:
-                self._contextmenus['file'] = contextmenu
+            contextmenu = self._cachedcontextmenu('file')
 
         ln = len(self._selectedfiles)
         if ln == 0:
@@ -153,6 +138,20 @@ class FilectxActions(QObject):
             singlefileactions = True
         self._actions['navigate'].setEnabled(singlefileactions)
         self._actions['diffnavigate'].setEnabled(singlefileactions)
+        return contextmenu
+
+    def _cachedcontextmenu(self, key):
+        contextmenu = self._contextmenus.get(key)
+        if contextmenu:
+            return contextmenu
+
+        contextmenu = QMenu(self.parent())
+        for act in _actionsbytype[key]:
+            if act:
+                contextmenu.addAction(self._actions[act])
+            else:
+                contextmenu.addSeparator()
+        self._contextmenus[key] = contextmenu
         return contextmenu
 
     def navigate(self, filename=None):
