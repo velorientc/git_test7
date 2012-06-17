@@ -37,8 +37,7 @@ class FilectxActions(QObject):
 
         self._diff_dialogs = {}
         self._nav_dialogs = {}
-        self.filecontextmenu = None
-        self.subrepocontextmenu = None
+        self._contextmenus = {}
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
@@ -119,11 +118,11 @@ class FilectxActions(QObject):
         """Menu for the current selection if available; otherwise None"""
         # Subrepos and regular items have different context menus
         if self._itemissubrepo:
-            contextmenu = self.subrepocontextmenu
+            contextmenu = self._contextmenus.get('subrepo')
             actionlist = ['opensubrepo', 'explore', 'terminal', 'copypath',
                           None, 'revert']
         else:
-            contextmenu = self.filecontextmenu
+            contextmenu = self._contextmenus.get('file')
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
                           'ledit', 'lopen', 'copypath', None, 'revert', None,
                           'navigate', 'diffnavigate']
@@ -137,9 +136,9 @@ class FilectxActions(QObject):
                     contextmenu.addSeparator()
 
             if self._itemissubrepo:
-                self.subrepocontextmenu = contextmenu
+                self._contextmenus['subrepo'] = contextmenu
             else:
-                self.filecontextmenu = contextmenu
+                self._contextmenus['file'] = contextmenu
 
         ln = len(self._selectedfiles)
         if ln == 0:
