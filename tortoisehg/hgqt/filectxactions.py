@@ -43,38 +43,37 @@ class FilectxActions(QObject):
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
             ('navigate', _('File history'), 'hg-log', 'Shift+Return',
-              _('Show the history of the selected file'), self.navigate),
+             _('Show the history of the selected file'), self.navigate),
             ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
-              _('Compare revisions of the selected file'), self.diffNavigate),
+             _('Compare revisions of the selected file'), self.diffNavigate),
             ('diff', _('Diff to parent'), 'visualdiff', 'Ctrl+D',
-              _('View file changes in external diff tool'), self.vdiff),
+             _('View file changes in external diff tool'), self.vdiff),
             ('ldiff', _('Diff to local'), 'ldiff', 'Shift+Ctrl+D',
-              _('View changes to current in external diff tool'),
-              self.vdifflocal),
+             _('View changes to current in external diff tool'),
+             self.vdifflocal),
             ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
-              _('View file as it appeared at this revision'), self.editfile),
+             _('View file as it appeared at this revision'), self.editfile),
             ('save', _('Save at Revision'), None, 'Alt+Ctrl+S',
-              _('Save file as it appeared at this revision'), self.savefile),
+             _('Save file as it appeared at this revision'), self.savefile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
-              _('Edit current file in working copy'), self.editlocal),
+             _('Edit current file in working copy'), self.editlocal),
             ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
-              _('Edit current file in working copy'), self.openlocal),
+             _('Edit current file in working copy'), self.openlocal),
             ('copypath', _('Copy Path'), '', 'Shift+Ctrl+C',
-              _('Copy full path of file(s) to the clipboard'),
-              self.copypath),
+             _('Copy full path of file(s) to the clipboard'), self.copypath),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
-              _('Revert file(s) to contents at this revision'),
-              self.revertfile),
+             _('Revert file(s) to contents at this revision'),
+             self.revertfile),
             ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
-              'Alt+Ctrl+O', _('Open the selected subrepository'),
-              self.opensubrepo),
+             'Alt+Ctrl+O', _('Open the selected subrepository'),
+             self.opensubrepo),
             ('explore', _('Explore subrepository'), 'system-file-manager',
-              'Alt+Ctrl+E', _('Open the selected subrepository'),
-              self.explore),
+             'Alt+Ctrl+E', _('Open the selected subrepository'),
+             self.explore),
             ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T',
-              _('Open a shell terminal in the selected subrepository root'),
-              self.terminal),
+             'utilities-terminal', 'Alt+Ctrl+T',
+             _('Open a shell terminal in the selected subrepository root'),
+             self.terminal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -126,8 +125,8 @@ class FilectxActions(QObject):
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
-                            'ledit', 'lopen', 'copypath', None, 'revert', None,
-                            'navigate', 'diffnavigate']
+                          'ledit', 'lopen', 'copypath', None, 'revert', None,
+                          'navigate', 'diffnavigate']
 
         if not contextmenu:
             contextmenu = QMenu(self.parent())
