@@ -1,12 +1,17 @@
 import os, sys, unittest
 from nose.plugins.skip import SkipTest
 from PyQt4.QtCore import QModelIndex, QString
+from PyQt4.QtGui import QApplication
 from tortoisehg.hgqt import thgrepo
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 import helpers
 
 def setup():
+    # necessary for style().standardIcon()
+    if QApplication.type() != QApplication.GuiClient:
+        raise SkipTest
+
     global _tmpdir
     _tmpdir = helpers.mktmpdir(__name__)
 

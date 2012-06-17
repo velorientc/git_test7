@@ -34,7 +34,7 @@ class RepoFilterBar(QToolBar):
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setIconSize(QSize(16,16))
@@ -266,26 +266,30 @@ class RepoFilterBar(QToolBar):
             self._branchCombo.setItemData(self._branchCombo.count() - 1,
                                           hglib.tounicode(branch),
                                           Qt.ToolTipRole)
-        self._branchCombo.setEnabled(self.filterEnabled
-                                     and (len(branches) > 1
-                                          or self._abranchAction.isChecked()))
+        self._branchCombo.setEnabled(self.filterEnabled and bool(branches))
         self._branchReloading = False
 
-        if not curbranch:
-            curbranch = self._allBranchesLabel
-        self.setBranch(curbranch)
+        if curbranch and curbranch not in branches:
+            self._emitBranchChanged()  # falls back to "show all"
+        else:
+            self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
-        self._branchCombo.setCurrentIndex(self._branchCombo.findText(branch))
+        if not branch:
+            index = 0
+        else:
+            index = self._branchCombo.findText(branch)
+        if index >= 0:
+            self._branchCombo.setCurrentIndex(index)
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        curbranch = self._branchCombo.currentText()
-        if curbranch == self._allBranchesLabel:
-            curbranch = ''
-        return unicode(curbranch)
+        if self._branchCombo.currentIndex() == 0:
+            return ''
+        else:
+            return unicode(self._branchCombo.currentText())
 
     @pyqtSlot()
     def _emitBranchChanged(self):

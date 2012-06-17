@@ -1,6 +1,7 @@
 """Nose plugin to set up test environment"""
 import os, shutil, sys, tempfile
 from nose import plugins
+from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QApplication
 # don't import mercurial or tortoisehg before setting up test environment
 
@@ -26,6 +27,7 @@ class HgEnvPlugin(plugins.Plugin):
                             'test environment')
         self._setupsyspath()
         self._setuptmpdir()
+        self._setupconfigdir()
         self._setuphgrc()
         self._setupmiscenv()
         self._setupqapp()
@@ -58,6 +60,13 @@ class HgEnvPlugin(plugins.Plugin):
             self.tmpdir = tempfile.mkdtemp('', 'thgtests.')
         os.environ['HGTMP'] = self.tmpdir
 
+    def _setupconfigdir(self):
+        self.configdir = os.path.join(self.tmpdir, '.config')
+        os.mkdir(self.configdir)
+        # these environment variables seem not to affect the running process
+        os.environ['APPDATA'] = self.configdir
+        os.environ['XDG_CONFIG_HOME'] = self.configdir
+
     def _setuphgrc(self):
         """Create a fresh hgrc for repeatable result"""
         os.environ['HGRCPATH'] = hgrcpath = os.path.join(self.tmpdir, '.hgrc')
@@ -75,7 +84,6 @@ class HgEnvPlugin(plugins.Plugin):
         os.environ['LANG'] = os.environ['LC_ALL'] = os.environ['LANGUAGE'] = 'C'
         os.environ['TZ'] = 'GMT'
         os.environ['HOME'] = self.tmpdir
-        os.environ['APPDATA'] = self.tmpdir  # for QSettings on Windows
         os.environ['EMAIL'] = 'Foo Bar <foo.bar@example.com>'
         os.environ['http_proxy'] = ''
         os.environ['HGUSER'] = 'test'
@@ -87,7 +95,16 @@ class HgEnvPlugin(plugins.Plugin):
     def _setupqapp(self):
         # Make sure to hold single QApplication instance on memory. Multiple
         # instances will lead crash.
-        self._qapp = QApplication([])
+        guienabled = (os.name == 'nt' or sys.platform == 'darwin'
+                      or bool(os.environ.get('DISPLAY')))
+        self._qapp = QApplication([], guienabled)
+
+        # settings will be saved at $HGTMP/.config/TortoiseHg/TortoiseHgQt.ini
+        self._qapp.setApplicationName('TortoiseHgQt')
+        self._qapp.setOrganizationName('TortoiseHg')
+        QSettings.setDefaultFormat(QSettings.IniFormat)
+        QSettings.setPath(QSettings.IniFormat, QSettings.UserScope,
+                          self.configdir)
 
     def finalize(self, result):
         del self._qapp
