@@ -57,7 +57,7 @@ class FilectxActions(QObject):
             ('navigate', _('File history'), 'hg-log', 'Shift+Return',
              _('Show the history of the selected file'), self.navigate),
             ('filter', _('Folder history'), 'hg-log', None,
-             _('Show the history of the selected file'), self.navigate),
+             _('Show the history of the selected file'), self.filterfile),
             ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
              _('Compare revisions of the selected file'), self.diffNavigate),
             ('diff', _('Diff to parent'), 'visualdiff', 'Ctrl+D',
@@ -173,6 +173,13 @@ class FilectxActions(QObject):
     def diffNavigate(self, filename=None):
         self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
+    def filterfile(self):
+        """Ask to only show the revisions in which files on that folder are
+        present"""
+        if not self._selectedfiles:
+            return
+        self.filterRequested.emit("file('%s/**')" % self._selectedfiles[0])
+
     def vdiff(self):
         filenames = self._selectedfiles
         if not filenames:
@@ -250,10 +257,6 @@ class FilectxActions(QObject):
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self._selectedfiles[0]
-        if self._itemisdir:
-            # ask the main repowidget to only show the revisions in which files
-            # on that folder are present
-            return self.filterRequested.emit("file('%s/**')" % filename)
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 # dirty hack to pass workbench only if available
