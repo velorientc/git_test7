@@ -2058,7 +2058,15 @@ class RepoWidget(QWidget):
             return self.runCommand(cmd)
 
         # Otherwise, run the selected command in the brackground
-        return subprocess.Popen(command, cwd=self.repo.root)
+        try:
+            res = subprocess.Popen(command, cwd=self.repo.root)
+        except OSError:
+            res = 1
+            qtlib.ErrorMsgBox(_('Failed to execute custom command'),
+                _('The command "%s" could not be executed.') % command,
+                _('Please check that its path is valid and '
+                  'that it is a valid application'))
+        return res
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
