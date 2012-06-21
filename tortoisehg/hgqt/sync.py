@@ -844,11 +844,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             self.outclicked()
 
-    def push(self, confirm, rev=None, branch=None):
+    def push(self, confirm, **kwargs):
         if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
-            self.pushclicked(confirm, rev, branch)
+            self.pushclicked(confirm, **kwargs)
 
     def pullBundle(self, bundle, rev, bsource=None):
         'accept bundle changesets'
@@ -1034,7 +1034,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Perforce pending...'))
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
-    def pushclicked(self, confirm, rev=None, branch=None):
+    def pushclicked(self, confirm, rev=None, branch=None, pushall=False):
+        if rev == '':
+            rev = None
+        if branch == '':
+            branch = None
+        if pushall and (rev is not None or branch is not None):
+            # This should never happen
+            qtlib.ErrorMsg(_('Internal TortoiseHg Error'),
+                _('Inconsistent call to SyncWidget.pushclicked()'),
+                _('Cannot call SyncWidget.pushclicked() with pushall=True, '
+                'rev!=None and branch!=None'))
+            return
         validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark', 'mq')
         self.syncStarted.emit()
         url = self.currentPushUrl()
@@ -1073,7 +1084,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.pushCompleted.emit()
         self.finishfunc = finished
 
-        if not rev and not branch:
+        if not pushall and rev is not None and branch is not None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
             if defaultpush == 'all':

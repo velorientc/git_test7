@@ -556,16 +556,25 @@ class RepoWidget(QWidget):
         assert w
 
         # Read the tortoisehg.defaultpush setting to determine what to push
-        # by default
+        # by default, and set the button label and action accordingly
         acceptbuttontext = _('Push')
         defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
+        rev = None
+        branch = None
+        pushall = False
         if defaultpush == 'branch':
-            acceptbuttontext = _('Push current branch')
+            branch = self.repo['.'].branch()
+            acceptbuttontext = _('Push current branch (%s)') \
+                % hglib.tounicode(branch)
         elif defaultpush == 'revision':
-            acceptbuttontext = _('Push current revision')
+            rev = self.repo['.'].rev()
+            acceptbuttontext = _('Push current revision (%d)') % rev
+        else:
+            pushall = True
 
         w.acceptButton.setText(acceptbuttontext)
-        w.accepted.connect(lambda: self.push(False))  # TODO: to the same URL
+        w.accepted.connect(lambda: self.push(False,
+            rev=rev, branch=branch, pushall=pushall))  # TODO: to the same URL
         w.rejected.connect(self.clearRevisionSet)
 
     def createGrepWidget(self):
@@ -1065,13 +1074,13 @@ class RepoWidget(QWidget):
     def outgoing(self):
         self.syncDemand.get().outgoing()
         self.outgoingMode = True
-    def push(self, confirm=True):
+    def push(self, confirm=True, **kwargs):
         """Call sync push.
 
         If confirm is False, the user will not be prompted for
         confirmation. If confirm is True, the prompt might be used.
         """
-        self.syncDemand.get().push(confirm)
+        self.syncDemand.get().push(confirm, **kwargs)
         self.outgoingMode = False
 
     @pyqtSlot()
@@ -1709,7 +1718,7 @@ class RepoWidget(QWidget):
                 'functionality, you must use a mercurial version above 2.1.'))
 
     def pushAll(self):
-        self.syncDemand.forward('push', True)
+        self.syncDemand.forward('push', False, pushall=True)
 
     def pushToRevision(self):
         # Do not ask for confirmation
