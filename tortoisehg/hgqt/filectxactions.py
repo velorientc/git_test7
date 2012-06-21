@@ -279,7 +279,12 @@ class FilectxActions(QObject):
     def opensubrepo(self):
         path = os.path.join(self.repo.root, self._currentfile)
         if os.path.isdir(path):
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+            spath = path[len(self.repo.root)+1:]
+            source, revid, stype = self.ctx.substate[spath]
+            link = u'subrepo:' + hglib.tounicode(path)
+            if stype == 'hg':
+                link = u'%s?%s' % (link, revid)
+            self.linkActivated.emit(link)
         else:
             QMessageBox.warning(self,
                 _("Cannot open subrepository"),

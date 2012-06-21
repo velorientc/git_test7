@@ -576,21 +576,32 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
-        self.showRepo(path)
-        rw = self.repoTabsWidget.currentWidget()
+        uri = path.split('?')
+        path = uri[0]
+        rev = None
+        if len(uri) > 1:
+            rev = hglib.fromunicode(uri[1])
+        rw = self.showRepo(path)
         if rw:
-            rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+            if rev:
+                rw.goto(rev)
+            else:
+                rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
 
     @pyqtSlot(QString)
     def showRepo(self, root):
         """Activate the repo tab or open it if not available [unicode]"""
+        shownrw = None
         root = hglib.fromunicode(root)
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
+                shownrw = w
                 self.repoTabsWidget.setCurrentIndex(i)
-                return
-        self._openRepo(root, False)
+                break
+        if shownrw is None:
+            shownrw = self._openRepo(root, False)
+        return shownrw
 
     @pyqtSlot(QString, QString)
     def showClonedRepo(self, root, src=None):
@@ -792,6 +803,7 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
+        return rw
 
 
 
@@ -915,11 +927,12 @@ class Workbench(QMainWindow):
                     return
             try:
                 repo = thgrepo.repository(path=root)
-                self.addRepoTab(repo, bundle)
+                return self.addRepoTab(repo, bundle)
             except RepoError:
                 upath = hglib.tounicode(root)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % upath)
+        return None
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
