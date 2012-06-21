@@ -343,23 +343,41 @@ class RepoRegistryView(QDockWidget):
         self.expand()
         self._pendingReloadModel = False
 
+    def _getItemAndAncestors(self, it):
+        """Create a list of ancestors (including the selected item)"""
+        from repotreeitem import RepoGroupItem
+        itchain = [it]
+        while(not isinstance(itchain[-1], RepoGroupItem)):
+            itchain.append(itchain[-1].parent())
+        return reversed(itchain)
+
     def expand(self, it=None):
         if not it:
             self.tview.expandToDepth(0)
         else:
             # Create a list of ancestors (including the selected item)
-            from repotreeitem import RepoGroupItem
-            itchain = [it]
-            while(not isinstance(itchain[-1], RepoGroupItem)):
-                itchain.append(itchain[-1].parent())
+            itchain = self._getItemAndAncestors(it)
 
             # Starting from the topmost ancestor (a root item), expand the
             # ancestors one by one
             m = self.tview.model()
             idx = self.tview.rootIndex()
-            for it in reversed(itchain):
+            for it in itchain:
                 idx = m.index(it.row(), 0, idx)
                 self.tview.expand(idx)
+
+    def scrollTo(self, it=None, scrollHint=RepoTreeView.EnsureVisible):
+        if not it:
+            return
+
+        # Create a list of ancestors (including the selected item)
+        itchain = self._getItemAndAncestors(it)
+
+        m = self.tview.model()
+        idx = self.tview.rootIndex()
+        for it in itchain:
+            idx = m.index(it.row(), 0, idx)
+        self.tview.scrollTo(idx, hint=scrollHint)
 
     def addRepo(self, root, groupname=None):
         """
@@ -398,7 +416,8 @@ class RepoRegistryView(QDockWidget):
             self.tview.dataChanged(QModelIndex(), QModelIndex())
 
             # Make sure that the active tab is visible by expanding its parent
-            self.expand(it.parent())
+            # and scrolling to it if necessary
+            self.scrollTo(it)
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
