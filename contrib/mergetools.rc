@@ -151,6 +151,25 @@ rekisa.diffargs = "-Title=$plabel1" "$parent" "-Title=$clabel" "$child"
 rekisa.diff3args = "-Title=$plabel1" "$parent1" "-Title=$clabel" "$child" "-Title=$plabel2" "$parent2"
 rekisa.dirdiff = False
 
+; 2-way diff only version of Code Compare
+codecompare_diff.regkey=SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CodeCompare_is1
+codecompare_diff.regname=InstallLocation
+codecompare_diff.regappend=CodeCompare.exe
+codecompare_diff.diffargs=/SC=TortoiseHg /title1="$plabel1" /title2="$clabel" $parent $child
+codecompare_diff.diff3args=/SC=TortoiseHg /title1="$plabel1" /title2="$clabel" /title3="$plabel2" $parent1 $child $parent2
+codecompare_diff.binary=False
+codecompare_diff.gui=True
+codecompare_diff.dirdiff=True
+
+; 3-way merge version of Code Compare (not for diff, just for merge, Pro version only)
+codecompare_merge.regkey=SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CodeCompare_is1
+codecompare_merge.regname=InstallLocation
+codecompare_merge.regappend=CodeMerge.exe
+codecompare_merge.args=/SC=TortoiseHg /TF=$other /MF=$local /RF=$output /BF=$base /TT="Other: $other" /MT="Local: $local" /RT="Output: $output" /BT="Base: $base"
+codecompare_merge.binary=False
+codecompare_merge.gui=True
+codecompare_merge.checkconflicts=True
+
 ; Linux only diff tools, listed here for reference
 bcompare.priority=-1
 bcompare.args=$local $other $base -mergeoutput=$output -ro -lefttitle=parent1 -centertitle=base -righttitle=parent2 -outputtitle=merged -automerge -reviewconflicts -solo
