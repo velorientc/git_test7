@@ -281,6 +281,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
     def _setupfilterupdater(self):
         self._filterupdatetimer = QTimer(self, interval=200, singleShot=True)
+        self.le.returnPressed.connect(self._treeview.expandAll)
         self.le.textChanged.connect(self._filterupdatetimer.start)
         self._filterupdatetimer.timeout.connect(
             lambda: self._treemodel.setNameFilter(self.le.text()))
