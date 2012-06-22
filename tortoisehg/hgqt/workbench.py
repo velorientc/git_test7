@@ -1127,8 +1127,33 @@ class Workbench(QMainWindow):
             root = socket.readAll()
             if root and root != '[echo]':
                 self.openRepo(root, reuse=True)
+
+                # Bring the workbench window to the front
+                # This assumes that the client process has
+                # called allowSetForegroundWindow(-1) right before
+                # sending the request
+                self.setWindowState(self.windowState() & ~Qt.WindowMinimized
+                                    | Qt.WindowActive)
+                self.show()
+                self.raise_()
+                self.activateWindow()
+                # Revoke the blanket permission to set the foreground window
+                allowSetForegroundWindow(os.getpid())
+
             socket.write(QByteArray(root))
             socket.flush()
+
+def allowSetForegroundWindow(processid=-1):
+    """Allow a given process to set the foreground window"""
+    # processid = -1 means ASFW_ANY (i.e. allow any process)
+    if os.name == 'nt':
+        # on windows we must explicitly allow bringing the main window to
+        # the foreground. To do so we must use ctypes
+        try:
+            from ctypes import windll
+            windll.user32.AllowSetForegroundWindow(processid)
+        except ImportError:
+            pass
 
 def connectToExistingWorkbench(root=None):
     """
@@ -1149,6 +1174,10 @@ def connectToExistingWorkbench(root=None):
     socket.connectToServer(qApp.applicationName() + '-' + getpass.getuser(),
         QIODevice.ReadWrite)
     if socket.waitForConnected(10000):
+        # Momentarily let any process set the foreground window
+        # The server process with revoke this permission as soon as it gets
+        # the request
+        allowSetForegroundWindow()
         socket.write(QByteArray(data))
         socket.flush()
         socket.waitForReadyRead(10000)
