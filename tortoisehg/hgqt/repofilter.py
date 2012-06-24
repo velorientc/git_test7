@@ -6,6 +6,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -44,7 +45,8 @@ class RepoFilterBar(QToolBar):
         self._permanent_queries = list(_permanent_queries)
         username = repo.ui.config('ui', 'username')
         if username:
-            self._permanent_queries.insert(0, hgrevset.formatspec('author(%s)', username))
+            self._permanent_queries.insert(0,
+                hgrevset.formatspec('author(%s)', os.path.expandvars(username)))
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo
