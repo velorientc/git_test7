@@ -2069,12 +2069,13 @@ class RepoWidget(QWidget):
         # Otherwise, run the selected command in the brackground
         try:
             res = subprocess.Popen(command, cwd=self.repo.root)
-        except OSError:
+        except OSError, ex:
             res = 1
             qtlib.ErrorMsgBox(_('Failed to execute custom command'),
-                _('The command "%s" could not be executed.') % command,
-                _('Please check that its path is valid and '
-                  'that it is a valid application'))
+                _('The command "%s" could not be executed.') % hglib.tounicode(command),
+                _('The following error message was returned:\n\n"%s"\n\n'
+                'Please check that the command path is valid and '
+                'that it is a valid application') % hglib.tounicode(ex.strerror))
         return res
 
     def runCommand(self, *cmdlines):
