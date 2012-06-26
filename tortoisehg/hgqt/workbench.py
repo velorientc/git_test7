@@ -586,6 +586,8 @@ class Workbench(QMainWindow):
             if rev:
                 rw.goto(rev)
             else:
+                # assumes that the request comes from commit widget; in this
+                # case, the user is going to commit changes to this repo.
                 rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
 
     @pyqtSlot(QString)
