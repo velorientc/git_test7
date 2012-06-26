@@ -29,7 +29,8 @@ class QFoldDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-qfold'))
 
         f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint
+                            | Qt.WindowMaximizeButtonHint)
 
         self.setLayout(QVBoxLayout())
 
