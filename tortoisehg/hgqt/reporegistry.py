@@ -351,20 +351,8 @@ class RepoRegistryView(QDockWidget):
             itchain.append(itchain[-1].parent())
         return reversed(itchain)
 
-    def expand(self, it=None):
-        if not it:
-            self.tview.expandToDepth(0)
-        else:
-            # Create a list of ancestors (including the selected item)
-            itchain = self._getItemAndAncestors(it)
-
-            # Starting from the topmost ancestor (a root item), expand the
-            # ancestors one by one
-            m = self.tview.model()
-            idx = self.tview.rootIndex()
-            for it in itchain:
-                idx = m.index(it.row(), 0, idx)
-                self.tview.expand(idx)
+    def expand(self):
+        self.tview.expandToDepth(0)
 
     def scrollTo(self, it=None, scrollHint=RepoTreeView.EnsureVisible):
         if not it:
