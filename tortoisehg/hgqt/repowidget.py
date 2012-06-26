@@ -386,6 +386,7 @@ class RepoWidget(QWidget):
         w.linkActivated.connect(self._openLink)
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
+        w.revsetFilterRequested.connect(self.setFilter)
         return w
 
     def createSyncWidget(self):
@@ -1271,9 +1272,6 @@ class RepoWidget(QWidget):
         entry(menu, None, fixed, _('Graft to local'), None,
               self.graftRevisions)
 
-        entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
-              self.transplantRevisions)
-
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modify history'))
             entry(submenu, 'mq', qgoto, _('Unapply patch (QGoto parent)'), 'hg-qgoto',
@@ -1451,12 +1449,6 @@ class RepoWidget(QWidget):
             a.triggered.connect(cb)
             menu.addAction(a)
 
-        if 'transplant' in self.repo.extensions():
-            a = QAction(_('Transplant Selected to local'), self)
-            a.setIcon(qtlib.getmenuicon('hg-transplant'))
-            a.triggered.connect(self.transplantRevisions)
-            menu.addAction(a)
-
         if 'reviewboard' in self.repo.extensions():
             menu.addSeparator()
             a = QAction(_('Post Selected to Review Board...'), self)
@@ -1535,12 +1527,6 @@ class RepoWidget(QWidget):
             if icon:
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
-            menu.addAction(a)
-
-        if 'transplant' in self.repo.extensions():
-            a = QAction(_('Transplant Selected to local'), self)
-            a.setIcon(qtlib.getmenuicon('hg-transplant'))
-            a.triggered.connect(self.transplantRevisions)
             menu.addAction(a)
 
         if 'reviewboard' in self.repo.extensions():
@@ -1752,12 +1738,6 @@ class RepoWidget(QWidget):
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
-
-    def transplantRevisions(self):
-        cmdline = ['transplant', '--repository', self.repo.root]
-        for rev in self.repoview.selectedRevisions():
-            cmdline.append(str(rev))
-        self.runCommand(cmdline)
 
     def graftRevisions(self):
         cmdline = ['graft', '--repository', self.repo.root]

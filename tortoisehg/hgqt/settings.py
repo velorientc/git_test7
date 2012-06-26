@@ -624,6 +624,13 @@ INFO = (
         _('Show tabs along the side of the bottom half of each repo '
           'widget allowing one to switch task tabs without using the toolbar. '
           'Default: off')),
+    _fi(_('Task Toolbar Order'), 'tortoisehg.workbench.task-toolbar', genEditCombo,
+        _('Specify which task buttons you want to show on the task toolbar '
+          'and in which order.<br>Type a list of the task button names. '
+          'Add separators by putting "|" between task button names.<br>'
+          'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
+          'Default: log commit mq sync manifest grep pbranch'),
+        restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
           'until they reach 80 characters. '
