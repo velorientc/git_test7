@@ -591,17 +591,13 @@ class Workbench(QMainWindow):
     @pyqtSlot(QString)
     def showRepo(self, root):
         """Activate the repo tab or open it if not available [unicode]"""
-        shownrw = None
         root = hglib.fromunicode(root)
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
-                shownrw = w
                 self.repoTabsWidget.setCurrentIndex(i)
-                break
-        if shownrw is None:
-            shownrw = self._openRepo(root, False)
-        return shownrw
+                return w
+        return self._openRepo(root, False)
 
     @pyqtSlot(QString, QString)
     def showClonedRepo(self, root, src=None):
