@@ -9,12 +9,18 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+if os.name == 'nt':
+    from tortoisehg.util import bugtraq
+    _hasbugtraq = True
+else:
+    _hasbugtraq = False
 
 # Technical Debt
 #   stacked widget or pages need to be scrollable
@@ -482,6 +488,8 @@ def findIssueTrackerPlugins():
     return names
 
 def issuePluginVisible():
+    if not _hasbugtraq:
+        return False
     try:
         # quick test to see if we're able to load the bugtraq module
         test = bugtraq.BugTraq('')
