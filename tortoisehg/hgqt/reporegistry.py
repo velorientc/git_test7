@@ -726,7 +726,7 @@ class RepoRegistryView(QDockWidget):
 
     def sortbyname(self):
         childs = self.selitem.internalPointer().childs
-        self.tview.model().sortchilds(childs, lambda x: x.shortname())
+        self.tview.model().sortchilds(childs, lambda x: x.shortname().lower())
 
     def sortbypath(self):
         childs = self.selitem.internalPointer().childs
