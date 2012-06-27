@@ -362,7 +362,8 @@ def copy(parent, ui, repo, files):
         return
     fname = hglib.fromunicode(fname)
     wfiles = [wfile, fname]
-    commands.copy(ui, repo, *wfiles)
+    opts = {'force': True}  # existing file is already checked by QFileDialog
+    commands.copy(ui, repo, *wfiles, **opts)
     return True
 
 def rename(parent, ui, repo, files):
