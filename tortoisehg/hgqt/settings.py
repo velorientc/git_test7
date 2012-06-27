@@ -9,12 +9,18 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+if os.name == 'nt':
+    from tortoisehg.util import bugtraq
+    _hasbugtraq = True
+else:
+    _hasbugtraq = False
 
 # Technical Debt
 #   stacked widget or pages need to be scrollable
@@ -482,6 +488,8 @@ def findIssueTrackerPlugins():
     return names
 
 def issuePluginVisible():
+    if not _hasbugtraq:
+        return False
     try:
         # quick test to see if we're able to load the bugtraq module
         test = bugtraq.BugTraq('')
@@ -624,6 +632,13 @@ INFO = (
         _('Show tabs along the side of the bottom half of each repo '
           'widget allowing one to switch task tabs without using the toolbar. '
           'Default: off')),
+    _fi(_('Task Toolbar Order'), 'tortoisehg.workbench.task-toolbar', genEditCombo,
+        _('Specify which task buttons you want to show on the task toolbar '
+          'and in which order.<br>Type a list of the task button names. '
+          'Add separators by putting "|" between task button names.<br>'
+          'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
+          'Default: log commit mq sync manifest grep pbranch'),
+        restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
           'until they reach 80 characters. '

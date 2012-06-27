@@ -8,8 +8,6 @@
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -18,9 +16,8 @@ from mercurial import error
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, fileview, status, thgrepo
-from tortoisehg.hgqt import visdiff, revert, revpanel, workbench
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
+from tortoisehg.hgqt import qtlib, fileview, status, thgrepo, filectxactions
+from tortoisehg.hgqt import revpanel
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 class ManifestDialog(QMainWindow):
@@ -117,8 +114,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     linkActivated = pyqtSignal(QString)
     """Emitted (path) when user clicks on link"""
 
-    filecontextmenu = None
-    subrepocontextmenu = None
+    revsetFilterRequested = pyqtSignal(QString)
+    """Ask the repowidget to change its revset filter"""
 
     def canswitch(self):
         return False
@@ -128,8 +125,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._repo = repo
         self._rev = rev
         self._selectedrev = rev
-        self._diff_dialogs = {}
-        self._nav_dialogs = {}
 
         self._initwidget()
         self._initactions()
@@ -205,167 +200,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
           statustext='MASC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
 
-        self._actions = {}
-        for name, desc, icon, key, tip, cb in [
-            ('navigate', _('File history'), 'hg-log', 'Shift+Return',
-              _('Show the history of the selected file'), self.navigate),
-            ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
-              _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Diff to parent'), 'visualdiff', 'Ctrl+D',
-              _('View file changes in external diff tool'), self.vdiff),
-            ('ldiff', _('Diff to local'), 'ldiff', 'Shift+Ctrl+D',
-              _('View changes to current in external diff tool'),
-              self.vdifflocal),
-            ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
-              _('View file as it appeared at this revision'), self.editfile),
-            ('open', _('Open at Revision'), '', 'Alt+Ctrl+O',
-              _('Open file as it appeared at this revision'), self.openfile),
-            ('save', _('Save at Revision'), '', 'Alt+Ctrl+S',
-              _('Save file as it appeared at this revision'), self.savefile),
-            ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
-              _('Edit current file in working copy'), self.editlocal),
-            ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
-              _('Edit current file in working copy'), self.openlocal),
-            ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
-              _('Revert file(s) to contents at this revision'),
-              self.revertfile),
-            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
-              'Alt+Ctrl+O', _('Open the selected subrepository'),
-              self.opensubrepo),
-            ('explore', _('Explore subrepository'), 'system-file-manager',
-              'Alt+Ctrl+E',
-              _('Open the selected subrepository in a file browser'),
-              self.explore),
-            ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T',
-              _('Open a shell terminal in the selected subrepository root'),
-              self.terminal),
-            ]:
-            act = QAction(desc, self)
-            if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
-            if key:
-                act.setShortcut(key)
-            if tip:
-                act.setStatusTip(tip)
-            if cb:
-                act.triggered.connect(cb)
-            self._actions[name] = act
-            self.addAction(act)
-
-    def navigate(self, filename=None):
-        self._navigate(filename, FileLogDialog, self._nav_dialogs)
-
-    def diffNavigate(self, filename=None):
-        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
-
-    def vdiff(self):
-        if self.path is None:
-            return
-        pats = [hglib.fromunicode(self.path)]
-        opts = {'change':self.rev}
-        dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
-        if dlg:
-            dlg.exec_()
-
-    def vdifflocal(self):
-        if self.path is None:
-            return
-        pats = [hglib.fromunicode(self.path)]
-        assert type(self.rev) is int
-        opts = {'rev':['rev(%d)' % self.rev]}
-        dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
-        if dlg:
-            dlg.exec_()
-
-    def editfile(self, editor=None):
-        if self.path is None:
-            return
-        if self.rev is None:
-            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
-                            parent=self)
-        elif self.path in self._repo[self.rev]:
-            base, _ = visdiff.snapshot(self._repo,
-                                       [hglib.fromunicode(self.path)],
-                                       self._repo[self.rev])
-            files = [os.path.join(base, hglib.fromunicode(self.path))]
-            qtlib.editfiles(self._repo, files, parent=self)
-
-    def openfile(self, editor=None):
-        if self.path is None:
-            return
-        if self.rev is None:
-            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
-                            parent=self)
-        elif self.path in self._repo[self.rev]:
-            base, _ = visdiff.snapshot(self._repo,
-                                       [hglib.fromunicode(self.path)],
-                                       self._repo[self.rev])
-            files = [os.path.join(base, hglib.fromunicode(self.path))]
-            qtlib.editfiles(self._repo, files, parent=self)
-
-    def savefile(self):
-        if self.path is None or self.rev is None:
-            return
-        else:
-            qtlib.savefiles(self._repo, [self.path], self.rev, parent=self)
-
-    def editlocal(self, editor=None):
-        if self.path is None:
-            return
-        qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
-                        parent=self)
-
-    def openlocal(self):
-        if self.path is None:
-            return
-        qtlib.openfiles(self._repo, [hglib.fromunicode(self.path)])
-
-    def revertfile(self):
-        if self.path is None:
-            return
-        rev = self.rev
-        if rev is None:
-            rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, [hglib.fromunicode(self.path)],
-                                  rev, self)
-        dlg.exec_()
-
-    def _navigate(self, filename, dlgclass, dlgdict):
-        if not filename:
-            filename = hglib.fromunicode(self.path)
-        if filename not in dlgdict:
-            repoviewer = self.window()
-            if not isinstance(repoviewer, workbench.Workbench):
-                repoviewer = None
-            dlg = dlgclass(self._repo, filename, repoviewer)
-            dlgdict[filename] = dlg
-            ufname = hglib.tounicode(filename)
-            dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-        dlg = dlgdict[filename]
-        dlg.goto(self.rev)
-        dlg.show()
-        dlg.raise_()
-        dlg.activateWindow()
-
-    def opensubrepo(self):
-        path = self._repo.wjoin(hglib.fromunicode(self.path))
-        if os.path.isdir(path):
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
-        else:
-            QMessageBox.warning(self,
-                _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
-
-    def explore(self):
-        root = self._repo.wjoin(hglib.fromunicode(self.path))
-        if os.path.isdir(root):
-            qtlib.openlocalurl(root)
-
-    def terminal(self):
-        root = self._repo.wjoin(hglib.fromunicode(self.path))
-        if os.path.isdir(root):
-            qtlib.openshell(root, hglib.fromunicode(self.path))
+        self._fileactions = filectxactions.FilectxActions(self._repo, self,
+                                                          rev=self._rev)
+        self._fileactions.linkActivated.connect(self.linkActivated)
+        self._fileactions.filterRequested.connect(self.revsetFilterRequested)
+        self.addActions(self._fileactions.actions())
 
     def showEvent(self, event):
         QWidget.showEvent(self, event)
@@ -377,13 +216,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
+        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo)
         if itemissubrepo:
-            self.opensubrepo()
+            self._fileactions.opensubrepo()
         elif not self._treemodel.isDir(index):
             if self._treemodel.fileStatus(index) in 'C?':
-                self.editfile()
+                self._fileactions.editfile()
             else:
-                self.vdiff()
+                self._fileactions.vdiff()
 
     def menuRequest(self, point):
         selmodel = self._treeview.selectionModel()
@@ -393,30 +233,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
         currentindex = self._treeview.currentIndex()
         itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
-
-        # Subrepos and regular items have different context menus
-        if itemissubrepo:
-            contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo', 'explore', 'terminal', None, 'revert']
-        else:
-            contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', None, 'edit', 'save', 'ledit', None,
-                        'revert', None, 'navigate', 'diffnavigate']
-
-        if not contextmenu:
-            contextmenu = QMenu(self)
-            for act in actionlist:
-                if act:
-                    contextmenu.addAction(self._actions[act])
-                else:
-                    contextmenu.addSeparator()
-
-            if itemissubrepo:
-                self.subrepocontextmenu = contextmenu
-            else:
-                self.filecontextmenu = contextmenu
-
-        if actionlist:
+        itemisdir = self._treemodel.isDir(currentindex)
+        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo,
+                                   itemisdir=itemisdir)
+        contextmenu = self._fileactions.menu()
+        if contextmenu:
             contextmenu.exec_(point)
 
     @property
@@ -472,6 +293,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if len(repo) <= self._rev:
             self._rev = len(repo)-1
         self._setupmodel()
+        self._fileactions.setRepo(repo)
 
     @property
     def rev(self):
@@ -503,12 +325,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             self.setPath(path)
             self._fileview.setContext(ctx)
             self._fileview.displayFile(self.path, self.status)
-        # update sensitivity of actions
-        real = type(rev) is int
-        self._actions['ldiff'].setEnabled(real)
-        for act in ['diff', 'edit']:
-            self._actions[act].setEnabled(real or rev is None)
-        self._actions['revert'].setEnabled(real)
+        self._fileactions.setRev(rev)
 
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
@@ -517,6 +334,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if self._rev != rev:
             self._rev = rev
             self._setupmodel()
+            self._fileactions.setRev(rev)
             self.revChanged.emit(rev)
         if path != self.path:
             self.setPath(path)
