@@ -882,6 +882,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if amend:
             cmdline.append('--amend')
 
+        if not self.files and (brcmd or newbranch) and not merge:
+            # make sure to commit empty changeset by excluding all files
+            cmdline.extend(['--exclude', repo.root])
+
         cmdline.append('--')
         cmdline.extend([repo.wjoin(f) for f in self.files])
         if len(repo.parents()) == 1:
