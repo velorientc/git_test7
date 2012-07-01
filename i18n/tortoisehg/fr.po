@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-06-27 10:11-0300\n"
-"PO-Revision-Date: 2012-06-26 09:50+0000\n"
+"PO-Revision-Date: 2012-06-30 20:36+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-06-28 04:44+0000\n"
-"X-Generator: Launchpad (build 15505)\n"
+"X-Launchpad-Export-Date: 2012-07-01 04:42+0000\n"
+"X-Generator: Launchpad (build 15520)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -2902,26 +2902,26 @@ msgstr "va être fermé"
 #: tortoisehg/hgqt/pbranch.py:301
 #, python-format
 msgid "needs merge of %i heads\n"
-msgstr ""
+msgstr "nécessite la fusion de %i têtes\n"
 
 #: tortoisehg/hgqt/pbranch.py:304
 #, python-format
 msgid "needs merge with %s (through %s)\n"
-msgstr ""
+msgstr "nécessite la fusion avec %s (à travers %s)\n"
 
 #: tortoisehg/hgqt/pbranch.py:307
 #, python-format
 msgid "needs merge with %s\n"
-msgstr ""
+msgstr "nécessite la fusion avec %s\n"
 
 #: tortoisehg/hgqt/pbranch.py:309
 #, python-format
 msgid "needs update of diff base to tip of %s\n"
-msgstr ""
+msgstr "nécessite la mise à jour de la base diff vers le tip de %s\n"
 
 #: tortoisehg/hgqt/pbranch.py:478
 msgid "&Goto (update workdir)"
-msgstr ""
+msgstr "&Aller (mise à jour du répertoire de travail)"
 
 #: tortoisehg/hgqt/pbranch.py:480 tortoisehg/hgqt/update.py:325
 msgid "&Merge"
@@ -2929,7 +2929,7 @@ msgstr "&Fusionner"
 
 #: tortoisehg/hgqt/pbranch.py:498
 msgid "No patch branch selected"
-msgstr ""
+msgstr "Aucune branche de patch sélectionnée"
 
 #: tortoisehg/hgqt/pbranch.py:549
 msgid "No editor found"
@@ -2961,19 +2961,19 @@ msgstr "Message"
 
 #: tortoisehg/hgqt/pbranch.py:845
 msgid "New Patch Branch"
-msgstr ""
+msgstr "Nouvelle branche de patch"
 
 #: tortoisehg/hgqt/pbranch.py:880
 msgid "Patch message:"
-msgstr ""
+msgstr "Message de patch :"
 
 #: tortoisehg/hgqt/pbranch.py:881
 msgid "Patch date:"
-msgstr ""
+msgstr "Date de patch :"
 
 #: tortoisehg/hgqt/pbranch.py:882
 msgid "Patch user:"
-msgstr ""
+msgstr "Utilisateur de patch :"
 
 #: tortoisehg/hgqt/postreview.py:34
 msgid "Invalid Settings - The ReviewBoard server is not setup"
@@ -4388,12 +4388,12 @@ msgstr "Pousser"
 #: tortoisehg/hgqt/repowidget.py:567
 #, python-format
 msgid "Push current branch (%s)"
-msgstr ""
+msgstr "Pousser la branche actuelle (%s)"
 
 #: tortoisehg/hgqt/repowidget.py:571
 #, python-format
 msgid "Push current revision (%d)"
-msgstr ""
+msgstr "Pousser la révision actuelle (%d)"
 
 #: tortoisehg/hgqt/repowidget.py:703
 #, python-format
@@ -4878,12 +4878,12 @@ msgstr "La commande sélectionnée est vide"
 
 #: tortoisehg/hgqt/repowidget.py:2074
 msgid "Failed to execute custom command"
-msgstr ""
+msgstr "Impossible d'exécuter la commande personnalisée"
 
 #: tortoisehg/hgqt/repowidget.py:2075
 #, python-format
 msgid "The command \"%s\" could not be executed."
-msgstr ""
+msgstr "La commande \"%s\" ne peut pas être exécutée."
 
 #: tortoisehg/hgqt/repowidget.py:2076
 #, python-format
@@ -4895,6 +4895,12 @@ msgid ""
 "Please check that the command path is valid and that it is a valid "
 "application"
 msgstr ""
+"Le message d'erreur suivant a été retourné :\n"
+"\n"
+"\"%s\"\n"
+"\n"
+"Veuillez vérifier que le chemin de la commande est valide et que c'est une "
+"application valide."
 
 #: tortoisehg/hgqt/repowidget.py:2083
 msgid "Unable to start"
@@ -7304,6 +7310,8 @@ msgid ""
 "List of settings that will be pulled from the project configuration file. "
 "Default is include NO settings."
 msgstr ""
+"Liste des paramètres qui seront tirés du fichier de configuration du projet. "
+"Par défaut, aucun paramètre."
 
 #: tortoisehg/hgqt/settings.py:986
 msgid "Exclude"
@@ -7314,6 +7322,8 @@ msgid ""
 "List of settings that will NOT be pulled from the project configuration "
 "file. Default is exclude none of the included settings."
 msgstr ""
+"Liste des paramètres qui NE seront PAS tirés du fichier de configuration du "
+"projet. Par défaut, exclure aucun des paramètres inclus."
 
 #: tortoisehg/hgqt/settings.py:989
 msgid "Update on incoming"
@@ -8093,17 +8103,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:1044
 msgid "Internal TortoiseHg Error"
-msgstr ""
+msgstr "Erreur interne de TortoiseHg"
 
 #: tortoisehg/hgqt/sync.py:1045
 msgid "Inconsistent call to SyncWidget.pushclicked()"
-msgstr ""
+msgstr "Appel incohérent à SyncWidget.pushclicked()"
 
 #: tortoisehg/hgqt/sync.py:1046
 msgid ""
 "Cannot call SyncWidget.pushclicked() with pushall=True, rev!=None and "
 "branch!=None"
 msgstr ""
+"Ne peut pas appeler SyncWidget.pushclicked() avec pushall=True, rev!=None et "
+"branch!=None"
 
 #: tortoisehg/hgqt/sync.py:1056
 msgid "Confirm Push to remote Repository"
@@ -8184,11 +8196,11 @@ msgstr "Impossible de retirer l'URL"
 
 #: tortoisehg/hgqt/sync.py:1184
 msgid "Post Pull Behavior"
-msgstr ""
+msgstr "Opération après avoir tiré"
 
 #: tortoisehg/hgqt/sync.py:1188
 msgid "Select post-pull operation for this repository"
-msgstr ""
+msgstr "Sélectionner l'opération après avoir tiré pour ce dépôt"
 
 #: tortoisehg/hgqt/sync.py:1191
 msgid "None - simply pull changesets"
@@ -8196,7 +8208,7 @@ msgstr "Aucune - tirer simplement les révisions"
 
 #: tortoisehg/hgqt/sync.py:1192
 msgid "Update - pull, then try to update"
-msgstr ""
+msgstr "Mettre à jour - tirer, puis essayer de mettre à jour"
 
 #: tortoisehg/hgqt/sync.py:1198
 msgid "Fetch - use fetch (auto merge pulled changes)"
@@ -8216,7 +8228,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/sync.py:1227
 msgid "<a href=\"config\">Launch settings tool...</a>"
-msgstr ""
+msgstr "<a href=\"config\">Ouvrir l'outil de configuration...</a>"
 
 #: tortoisehg/hgqt/sync.py:1260
 msgid "Unable to save post pull operation"
@@ -8244,6 +8256,8 @@ msgid ""
 "User authentication data should be associated with the hostname using the "
 "security dialog."
 msgstr ""
+"Les données d'authentification de l'utilisateur devraient être associées "
+"avec le nom d'hôte en utilisant le dialogue de sécurité."
 
 #: tortoisehg/hgqt/sync.py:1338
 msgid "Unable to save an URL"
@@ -8269,7 +8283,7 @@ msgstr "Sécurité : "
 #: tortoisehg/hgqt/sync.py:1421
 #, python-format
 msgid "<b>Host:</b> %s"
-msgstr ""
+msgstr "<b>Hôte :</b> %s"
 
 #: tortoisehg/hgqt/sync.py:1423
 msgid "Secure HTTPS Connection"
@@ -8278,14 +8292,15 @@ msgstr "Connexion HTTPS Securisée"
 #: tortoisehg/hgqt/sync.py:1430
 msgid "Verify with Certificate Authority certificates (best)"
 msgstr ""
+"Vérifier avec des certificats d'Autorités de Certification (le meilleur)"
 
 #: tortoisehg/hgqt/sync.py:1432
 msgid "Verify with stored host fingerprint (good)"
-msgstr ""
+msgstr "Vérifier avec l'empreinte stockée de l'hôte (bon)"
 
 #: tortoisehg/hgqt/sync.py:1434
 msgid "No host validation, but still encrypted (bad)"
-msgstr ""
+msgstr "Aucune validation de l'hôte mais tout de même chiffré (mauvais)"
 
 #: tortoisehg/hgqt/sync.py:1441
 msgid "### host certificate fingerprint ###"
@@ -8297,7 +8312,7 @@ msgstr "Requête"
 
 #: tortoisehg/hgqt/sync.py:1464
 msgid "User Authentication"
-msgstr ""
+msgstr "Authentification de l'utilisateur"
 
 #: tortoisehg/hgqt/sync.py:1471
 msgid ""
@@ -8349,7 +8364,7 @@ msgstr "Impossible d'enregistrer l'authentification"
 #: tortoisehg/hgqt/sync.py:1683
 #, python-format
 msgid "%s - sync options"
-msgstr ""
+msgstr "%s - options de sync"
 
 #: tortoisehg/hgqt/sync.py:1690
 msgid "Allow push of a new branch (--new-branch)"
@@ -8521,12 +8536,12 @@ msgstr ""
 #: tortoisehg/hgqt/thgimport.py:210
 #, python-format
 msgid "%s patches"
-msgstr ""
+msgstr "%s patchs"
 
 #: tortoisehg/hgqt/thgimport.py:213
 #, python-format
 msgid "%s will be imported to "
-msgstr ""
+msgstr "%s sera importé vers "
 
 #: tortoisehg/hgqt/thgimport.py:216
 msgid "Nothing to import"
@@ -8834,7 +8849,7 @@ msgstr "%s : %s"
 
 #: tortoisehg/hgqt/visdiff.py:154 tortoisehg/hgqt/visdiff.py:226
 msgid "No diff tool found"
-msgstr ""
+msgstr "Aucun outil de diff trouvé"
 
 #: tortoisehg/hgqt/visdiff.py:155 tortoisehg/hgqt/visdiff.py:227
 msgid "No visual diff tools were detected"
@@ -8842,7 +8857,7 @@ msgstr "Aucun outil de diff visuel détecté"
 
 #: tortoisehg/hgqt/visdiff.py:160
 msgid "[working copy]"
-msgstr ""
+msgstr "[copie de travail]"
 
 #: tortoisehg/hgqt/visdiff.py:162
 msgid "[original]"
@@ -8876,7 +8891,7 @@ msgstr "révision %d :%s"
 #: tortoisehg/hgqt/visdiff.py:381
 #, python-format
 msgid "revisions %d:%s to %d:%s"
-msgstr ""
+msgstr "révisions %d:%s à %d:%s"
 
 #: tortoisehg/hgqt/visdiff.py:383
 msgid "Visual Diffs - "
@@ -9059,11 +9074,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/webconf.py:105
 msgid "Open hgweb config"
-msgstr ""
+msgstr "Ouvrir la config hgweb"
 
 #: tortoisehg/hgqt/webconf.py:120
 msgid "Save hgweb config"
-msgstr ""
+msgstr "Enregistrer la config hgweb"
 
 #: tortoisehg/hgqt/webconf.py:198
 msgid "Path:"
@@ -9175,7 +9190,7 @@ msgstr "Fermer un dépôt"
 
 #: tortoisehg/hgqt/workbench.py:245
 msgid "&Settings..."
-msgstr ""
+msgstr "Préférences..."
 
 #: tortoisehg/hgqt/workbench.py:251
 msgid "Show Repository Registry"
@@ -9373,11 +9388,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:447 tortoisehg/hgqt/workbench.py:448
 msgid "Close tab"
-msgstr ""
+msgstr "Fermer l'onglet"
 
 #: tortoisehg/hgqt/workbench.py:449 tortoisehg/hgqt/workbench.py:450
 msgid "Close other tabs"
-msgstr ""
+msgstr "Fermer les autres onglets"
 
 #: tortoisehg/hgqt/workbench.py:451
 msgid "Undo close tab"
@@ -9398,7 +9413,7 @@ msgstr ""
 #: tortoisehg/hgqt/workbench.py:638
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
-msgstr ""
+msgstr "%s - Workbench de TortoiseHg - %s"
 
 #: tortoisehg/hgqt/workbench.py:641
 #, python-format

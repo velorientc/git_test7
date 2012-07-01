@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-06-27 10:11-0300\n"
-"PO-Revision-Date: 2012-06-27 07:41+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"PO-Revision-Date: 2012-06-28 11:39+0000\n"
+"Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-06-28 04:44+0000\n"
+"X-Launchpad-Export-Date: 2012-06-29 04:42+0000\n"
 "X-Generator: Launchpad (build 15505)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1560,7 +1560,7 @@ msgstr "(ist ein gelöschtes Unterarchiv)"
 
 #: tortoisehg/hgqt/filedata.py:285
 msgid "(is a changed and dirty sub-repository)"
-msgstr "(ist ein gelöschtes Unterarchiv mit lokalen Änderungen)"
+msgstr "(ist ein geändertes Unterarchiv mit lokalen Änderungen)"
 
 #: tortoisehg/hgqt/filedata.py:286
 msgid "(is a new and dirty sub-repository)"
