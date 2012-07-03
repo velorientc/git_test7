@@ -26,13 +26,6 @@ DiffMode = 1
 FileMode = 2
 AnnMode = 3
 
-def anyindict(d):
-    "is at least one item in the input dict True"
-    for (k, v) in d.iteritems():
-        if v:
-            return True
-    return False
-
 class HgFileView(QFrame):
     "file diff, content, and annotation viewer"
 
@@ -648,7 +641,7 @@ class HgFileView(QFrame):
         def toggleAnnotateField(menuitem, field):
             self.sci.annopts[field] = \
                 not self.sci.annopts.get(field, False)
-            if not anyindict(self.sci.annopts):
+            if not util.any(self.sci.annopts.itervalues()):
                 menuitem.setChecked(True)
                 self.sci.annopts[field] = True
             self.sci.setupLineAnnotation()
@@ -774,7 +767,7 @@ class AnnotateView(qscilib.Scintilla):
         wb = "Annotate/"
         for k in self.annopts:
             self.annopts[k] = s.value(wb + k).toBool()
-        if not anyindict(self.annopts):
+        if not util.any(self.annopts.itervalues()):
             self.annopts['rev'] = True
         self.setupLineAnnotation()
 
