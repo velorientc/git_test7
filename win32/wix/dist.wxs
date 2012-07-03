@@ -55,6 +55,8 @@
           <File Name="intl3_svn.dll" />
           <File Name="libdb48.dll" />
           <File Name="libsasl.dll" />
+        <?else?>
+          <File Name="libdb44.dll" />
         <?endif?>
         <File Name="select.pyd" />
         <File Name="sip.pyd" />
