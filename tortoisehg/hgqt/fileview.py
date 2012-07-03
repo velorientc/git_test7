@@ -9,9 +9,9 @@ import os
 import difflib
 import re
 
-from mercurial import error, util, patch
+from mercurial import util, patch
 
-from tortoisehg.util import hglib, patchctx, colormap, thread2
+from tortoisehg.util import hglib, colormap, thread2
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
 from tortoisehg.hgqt import visdiff, filedata
