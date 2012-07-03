@@ -730,31 +730,26 @@ class AnnotateView(qscilib.Scintilla):
         self._thread.finished.connect(self.fillModel)
 
         self.repo = repo
-        self.annopts = {
-            'rev': True,
-            'author': False,
-            'date': False,
-        }
+        self._initAnnotateOptionActions()
 
         self.repo.configChanged.connect(self.configChanged)
         self.configChanged()
         self.loadAnnotateSettings()
-        self._initAnnotateOptionActions()
 
     def loadAnnotateSettings(self):
         s = QSettings()
         wb = "Annotate/"
-        for k in self.annopts:
-            self.annopts[k] = s.value(wb + k).toBool()
-        if not util.any(self.annopts.itervalues()):
-            self.annopts['rev'] = True
+        for a in self._annoptactions:
+            a.setChecked(s.value(wb + a.data().toString()).toBool())
+        if not util.any(a.isChecked() for a in self._annoptactions):
+            self._annoptactions[-1].setChecked(True)  # 'rev' by default
         self.setupLineAnnotation()
 
     def saveAnnotateSettings(self):
         s = QSettings()
         wb = "Annotate/"
-        for (k, v) in self.annopts.items():
-            s.setValue(wb + k, v)
+        for a in self._annoptactions:
+            s.setValue(wb + a.data().toString(), a.isChecked())
 
     def _initAnnotateOptionActions(self):
         self._annoptactions = []
@@ -762,7 +757,6 @@ class AnnotateView(qscilib.Scintilla):
                             (_('Show Date'), 'date'),
                             (_('Show Revision'), 'rev')]:
             a = QAction(name, self, checkable=True)
-            a.setChecked(self.annopts[field])
             a.setData(field)
             a.triggered.connect(self._updateAnnotateOption)
             self._annoptactions.append(a)
@@ -773,8 +767,6 @@ class AnnotateView(qscilib.Scintilla):
         if not util.any(a.isChecked() for a in self._annoptactions):
             self.sender().setChecked(True)
 
-        self.annopts = dict((str(a.data().toString()), a.isChecked())
-                            for a in self._annoptactions)
         self.setupLineAnnotation()
         self.fillModel()
         self.saveAnnotateSettings()
@@ -791,8 +783,8 @@ class AnnotateView(qscilib.Scintilla):
         def getrev(fctx):
             return fctx.rev()
 
-        aformat = [k for k in ('author', 'date', 'rev')
-                   if self.annopts.get(k, False)]
+        aformat = [str(a.data().toString()) for a in self._annoptactions
+                   if a.isChecked()]
         if aformat == []:
             aformat = ['rev']
         tiprev = self.repo['tip'].rev()
