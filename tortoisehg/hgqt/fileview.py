@@ -651,7 +651,7 @@ class HgFileView(QFrame):
             if not anyindict(self.sci.annopts):
                 menuitem.setChecked(True)
                 self.sci.annopts[field] = True
-            self.sci.setupLineAnnotation(self.repo, self.sci.annopts)
+            self.sci.setupLineAnnotation()
             self.sci.fillModel()
             self.sci.saveAnnotateSettings()
 
@@ -776,7 +776,7 @@ class AnnotateView(qscilib.Scintilla):
             self.annopts[k] = s.value(wb + k).toBool()
         if not anyindict(self.annopts):
             self.annopts['rev'] = True
-        self.setupLineAnnotation(self.repo, self.annopts)
+        self.setupLineAnnotation()
 
     def saveAnnotateSettings(self):
         s = QSettings()
@@ -784,7 +784,7 @@ class AnnotateView(qscilib.Scintilla):
         for (k, v) in self.annopts.items():
             s.setValue(wb + k, v)
 
-    def setupLineAnnotation(self, repo, opts={}):
+    def setupLineAnnotation(self):
         def getauthor(fctx):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
@@ -793,10 +793,10 @@ class AnnotateView(qscilib.Scintilla):
             return fctx.rev()
 
         aformat = [k for k in ('author', 'date', 'rev')
-                   if opts.get(k, False)]
+                   if self.annopts.get(k, False)]
         if aformat == []:
             aformat = ['rev']
-        tiprev = repo['tip'].rev()
+        tiprev = self.repo['tip'].rev()
         revwidth = len(str(tiprev))
         annfields = {
             'rev': ('%%%dd' % revwidth, getrev),
