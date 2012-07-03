@@ -734,18 +734,18 @@ class AnnotateView(qscilib.Scintilla):
 
         self.repo.configChanged.connect(self.configChanged)
         self.configChanged()
-        self.loadAnnotateSettings()
+        self._loadAnnotateSettings()
 
-    def loadAnnotateSettings(self):
+    def _loadAnnotateSettings(self):
         s = QSettings()
         wb = "Annotate/"
         for a in self._annoptactions:
             a.setChecked(s.value(wb + a.data().toString()).toBool())
         if not util.any(a.isChecked() for a in self._annoptactions):
             self._annoptactions[-1].setChecked(True)  # 'rev' by default
-        self.setupLineAnnotation()
+        self._setupLineAnnotation()
 
-    def saveAnnotateSettings(self):
+    def _saveAnnotateSettings(self):
         s = QSettings()
         wb = "Annotate/"
         for a in self._annoptactions:
@@ -767,15 +767,15 @@ class AnnotateView(qscilib.Scintilla):
         if not util.any(a.isChecked() for a in self._annoptactions):
             self.sender().setChecked(True)
 
-        self.setupLineAnnotation()
+        self._setupLineAnnotation()
         self.fillModel()
-        self.saveAnnotateSettings()
+        self._saveAnnotateSettings()
 
     def annotateOptionActions(self):
         """List of QAction for annotate options"""
         return list(self._annoptactions)
 
-    def setupLineAnnotation(self):
+    def _setupLineAnnotation(self):
         def getauthor(fctx):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
