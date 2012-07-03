@@ -633,29 +633,7 @@ class HgFileView(QFrame):
 
         menu.addSeparator()
         annoptsmenu = QMenu(_('Annotate Options'), self)
-        annoptsmenuspec = [
-                (_('Show Author'), 'author'),
-                (_('Show Date'), 'date'),
-                (_('Show Revision'), 'rev'),
-            ]
-        def toggleAnnotateField(menuitem, field):
-            self.sci.annopts[field] = \
-                not self.sci.annopts.get(field, False)
-            if not util.any(self.sci.annopts.itervalues()):
-                menuitem.setChecked(True)
-                self.sci.annopts[field] = True
-            self.sci.setupLineAnnotation()
-            self.sci.fillModel()
-            self.sci.saveAnnotateSettings()
-
-        def addAnnotateAction(name, field):
-            action = annoptsmenu.addAction(name)
-            action.setCheckable(True)
-            action.setChecked(self.sci.annopts.get(field, False))
-            action.triggered.connect(lambda: toggleAnnotateField(action, field))
-
-        for name, field in annoptsmenuspec:
-            addAnnotateAction(name, field)
+        annoptsmenu.addActions(self.sci.annotateOptionActions())
         menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
@@ -761,6 +739,7 @@ class AnnotateView(qscilib.Scintilla):
         self.repo.configChanged.connect(self.configChanged)
         self.configChanged()
         self.loadAnnotateSettings()
+        self._initAnnotateOptionActions()
 
     def loadAnnotateSettings(self):
         s = QSettings()
@@ -776,6 +755,33 @@ class AnnotateView(qscilib.Scintilla):
         wb = "Annotate/"
         for (k, v) in self.annopts.items():
             s.setValue(wb + k, v)
+
+    def _initAnnotateOptionActions(self):
+        self._annoptactions = []
+        for name, field in [(_('Show Author'), 'author'),
+                            (_('Show Date'), 'date'),
+                            (_('Show Revision'), 'rev')]:
+            a = QAction(name, self, checkable=True)
+            a.setChecked(self.annopts[field])
+            a.setData(field)
+            a.triggered.connect(self._updateAnnotateOption)
+            self._annoptactions.append(a)
+
+    @pyqtSlot()
+    def _updateAnnotateOption(self):
+        # make sure at least one option is checked
+        if not util.any(a.isChecked() for a in self._annoptactions):
+            self.sender().setChecked(True)
+
+        self.annopts = dict((str(a.data().toString()), a.isChecked())
+                            for a in self._annoptactions)
+        self.setupLineAnnotation()
+        self.fillModel()
+        self.saveAnnotateSettings()
+
+    def annotateOptionActions(self):
+        """List of QAction for annotate options"""
+        return list(self._annoptactions)
 
     def setupLineAnnotation(self):
         def getauthor(fctx):
