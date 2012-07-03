@@ -781,8 +781,6 @@ class AnnotateView(qscilib.Scintilla):
     def saveAnnotateSettings(self):
         s = QSettings()
         wb = "Annotate/"
-        if not anyindict(self.annopts):
-            self.annopts['rev'] = True
         for (k, v) in self.annopts.items():
             s.setValue(wb + k, v)
 
