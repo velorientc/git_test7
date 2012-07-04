@@ -1240,10 +1240,10 @@ def run(ui, *pats, **opts):
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)
-    # Note that if the "single workbench mode" is enable, and there is no
+    # Note that if the "single workbench mode" is enabled, and there is no
     # existing workbench window, we must tell the Workbench object to create
     # the workbench server
-    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', False)
+    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
     mustcreateserver = False
     if singleworkbenchmode:
         newworkbench = opts.get('newworkbench')
