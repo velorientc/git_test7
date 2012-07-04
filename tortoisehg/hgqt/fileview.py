@@ -722,6 +722,7 @@ class AnnotateView(qscilib.Scintilla):
 
         self._annotation_enabled = False
         self._links = []  # by line
+        self._anncache = {}  # by rev
         self._revmarkers = {}  # by rev
         self._lastrev = None
 
@@ -801,7 +802,7 @@ class AnnotateView(qscilib.Scintilla):
                 annfunc.append(fielddata[1])
         annformat = ' : '.join(annformat)
 
-        self._anncache = {}
+        self._anncache.clear()
         def lineannotation(fctx):
             rev = fctx.rev()
             ann = self._anncache.get(rev, None)
@@ -857,6 +858,7 @@ class AnnotateView(qscilib.Scintilla):
             return
 
         self._links = list(self._thread.data)
+        self._anncache.clear()
 
         self._updaterevmargin()
         self._updatemarkers()
@@ -935,10 +937,9 @@ class AnnotateView(qscilib.Scintilla):
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
-        if self.isAnnotationEnabled() and self._links:
+        if self.isAnnotationEnabled() and self._anncache:
             # add 2 for margin
-            maxwidth = 2 + max(
-                len(self._lineannotation(fctx)) for fctx, _origline in self._links)
+            maxwidth = 2 + max(len(s) for s in self._anncache.itervalues())
             self.setMarginWidth(2, 'M' * maxwidth)
         else:
             self.setMarginWidth(2, 0)
