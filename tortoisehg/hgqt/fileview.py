@@ -785,8 +785,6 @@ class AnnotateView(qscilib.Scintilla):
 
         aformat = [str(a.data().toString()) for a in self._annoptactions
                    if a.isChecked()]
-        if aformat == []:
-            aformat = ['rev']
         tiprev = self.repo['tip'].rev()
         revwidth = len(str(tiprev))
         annfields = {
