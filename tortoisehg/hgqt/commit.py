@@ -16,7 +16,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt import hgrcutil, mq, lfprompt, i18n
-from tortoisehg.util.hgversion import hgversion
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -258,17 +257,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def commitSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
         notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
-        canamend = lambda r: False
-        # hg >= 2.2 has amend capabilities
-        if hgversion >= '2.2':
-            def canamend(r):
-                if ispatch(r):
-                    return False
-                ctx = r.changectx('.')
-                return not ctx.children() \
-                    and ctx.phase() != phases.public \
-                    and len(ctx.parents()) < 2 \
-                    and len(r.changectx(None).parents()) < 2
+        def canamend(r):
+            if ispatch(r):
+                return False
+            ctx = r.changectx('.')
+            return not ctx.children() \
+                and ctx.phase() != phases.public \
+                and len(ctx.parents()) < 2 \
+                and len(r.changectx(None).parents()) < 2
 
         acts = [
             ('commit', _('Commit changes'), _('Commit'), notpatch),
