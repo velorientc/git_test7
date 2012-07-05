@@ -20,9 +20,6 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
 
-    # hg >= 2.2
-    _hasbodyflag = hglib.hgversion > "2.1"
-
     def __init__(self, repo, revs, parent=None, outgoing=False,
                  outgoingrevs=None):
         """Create EmailDialog for the given repo and revs
@@ -158,12 +155,7 @@ class EmailDialog(QDialog):
         for e in self._qui.extra_frame.children():
             m = re.match(r'(\w+)_check', str(e.objectName()))
             if m:
-                option = m.group(1)
-                if not self._hasbodyflag:
-                    # hg <= 2.1 -> Ignore the --body flag
-                    if option == 'body':
-                        continue
-                opts[option] = e.isChecked()
+                opts[m.group(1)] = e.isChecked()
 
         return opts
 
@@ -252,27 +244,15 @@ class EmailDialog(QDialog):
     def _body_mode_clicked(self):
         # Only allow a single attachment type to be active at a time
         sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
-        if self._hasbodyflag:
-            if not sendattachment:
-                # If no attachment, ensure that the body mode is enabled
-                self._qui.body_check.setChecked(True)
-        else:
-            # hg <= 2.1
-            if self._qui.body_check.isChecked():
-                self._qui.attach_check.setChecked(False)
-                self._qui.inline_check.setChecked(False)
-            elif not sendattachment:
-                self._qui.attach_check.setChecked(True)
+        if not sendattachment:
+            # If no attachment, ensure that the body mode is enabled
+            self._qui.body_check.setChecked(True)
 
     def _attach_mode_clicked(self):
         sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
         self._qui.body_check.setDisabled(not sendattachment)
-        if self._hasbodyflag:
-            if not sendattachment:
-                self._qui.body_check.setChecked(True)
-        else:
-            # hg <= 2.1
-            self._qui.body_check.setChecked(not sendattachment)
+        if not sendattachment:
+            self._qui.body_check.setChecked(True)
 
         # Only allow a single attachment type to be active at a time
         if self._qui.attach_check.isChecked():
@@ -281,12 +261,8 @@ class EmailDialog(QDialog):
     def _inline_mode_clicked(self):
         sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
         self._qui.body_check.setDisabled(not sendattachment)
-        if self._hasbodyflag:
-            if not sendattachment:
-                self._qui.body_check.setChecked(True)
-        else:
-            # hg <= 2.1
-            self._qui.body_check.setChecked(not sendattachment)
+        if not sendattachment:
+            self._qui.body_check.setChecked(True)
 
         # Only allow a single attachment type to be active at a time
         if self._qui.inline_check.isChecked():

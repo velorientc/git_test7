@@ -305,15 +305,38 @@ class Workbench(QMainWindow):
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
             return a
-        addtaskview('hg-log', _("Revision &Details"), 'log')
-        addtaskview('hg-commit', _('&Commit'), 'commit')
-        self.actionSelectTaskMQ = \
-                addtaskview('thg-qrefresh', _('MQ Patch'), 'mq')
-        addtaskview('thg-sync', _('S&ynchronize'), 'sync')
-        addtaskview('hg-annotate', _('&Manifest'), 'manifest')
-        addtaskview('hg-grep', _('&Search'), 'grep')
-        self.actionSelectTaskPbranch = \
-                addtaskview('branch', _('&Patch Branch'), 'pbranch')
+
+        # note that 'grep' and 'search' are equivalent
+        taskdefs = {
+            'commit': ('hg-commit', _('&Commit')),
+            'mq': ('thg-qrefresh', _('MQ Patch')),
+            'pbranch': ('branch', _('&Patch Branch')),
+            'log': ('hg-log', _("Revision &Details")),
+            'manifest': ('hg-annotate', _('&Manifest')),
+            'grep': ('hg-grep', _('&Search')),
+            'sync': ('thg-sync', _('S&ynchronize')),
+        }
+        tasklist = self.ui.configlist(
+            'tortoisehg', 'workbench.task-toolbar', [])
+        if tasklist == []:
+            tasklist = ['log', 'commit', 'mq', 'sync', 'manifest',
+                'grep', 'pbranch']
+
+        self.actionSelectTaskMQ = None
+        self.actionSelectTaskPbranch = None
+
+        for taskname in tasklist:
+            taskname = taskname.strip()
+            taskinfo = taskdefs.get(taskname, None)
+            if taskinfo is None:
+                newseparator(toolbar='task')
+                continue
+            tbar = addtaskview(taskinfo[0], taskinfo[1], taskname)
+            if taskname == 'mq':
+                self.actionSelectTaskMQ = tbar
+            elif taskname == 'pbranch':
+                self.actionSelectTaskPbranch = tbar
+
         newseparator(menu='view')
 
         newaction(_("&Refresh"), self._repofwd('reload'), icon='view-refresh',
@@ -553,10 +576,19 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
-        self.showRepo(path)
-        rw = self.repoTabsWidget.currentWidget()
+        uri = path.split('?')
+        path = uri[0]
+        rev = None
+        if len(uri) > 1:
+            rev = hglib.fromunicode(uri[1])
+        rw = self.showRepo(path)
         if rw:
-            rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+            if rev:
+                rw.goto(rev)
+            else:
+                # assumes that the request comes from commit widget; in this
+                # case, the user is going to commit changes to this repo.
+                rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
 
     @pyqtSlot(QString)
     def showRepo(self, root):
@@ -566,8 +598,8 @@ class Workbench(QMainWindow):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
                 self.repoTabsWidget.setCurrentIndex(i)
-                return
-        self._openRepo(root, False)
+                return w
+        return self._openRepo(root, False)
 
     @pyqtSlot(QString, QString)
     def showClonedRepo(self, root, src=None):
@@ -651,13 +683,17 @@ class Workbench(QMainWindow):
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
-            self.actionSelectTaskMQ.setVisible(False)
-            self.actionSelectTaskPbranch.setVisible(False)
+            if self.actionSelectTaskMQ is not None:
+                self.actionSelectTaskMQ.setVisible(False)
+            if self.actionSelectTaskPbranch is not None:
+                self.actionSelectTaskPbranch.setVisible(False)
         else:
             repoWidget = self.repoTabsWidget.currentWidget()
             exts = repoWidget.repo.extensions()
-            self.actionSelectTaskMQ.setVisible('mq' in exts)
-            self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
+            if self.actionSelectTaskMQ is not None:
+                self.actionSelectTaskMQ.setVisible('mq' in exts)
+            if self.actionSelectTaskPbranch is not None:
+                self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
             for name, idx in repoWidget.namedTabs.iteritems():
                 if idx == taskIndex:
@@ -765,6 +801,7 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
+        return rw
 
 
 
@@ -888,11 +925,12 @@ class Workbench(QMainWindow):
                     return
             try:
                 repo = thgrepo.repository(path=root)
-                self.addRepoTab(repo, bundle)
+                return self.addRepoTab(repo, bundle)
             except RepoError:
                 upath = hglib.tounicode(root)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % upath)
+        return None
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""

@@ -161,7 +161,7 @@ class StripDialog(QDialog):
         rev = self.get_rev()
         if rev is None:
             return False
-        striprevs = list(self.repo.changelog.descendants(rev))
+        striprevs = list(self.repo.changelog.descendants([rev]))
         striprevs.append(rev)
         striprevs.sort()
         self.cslist.clear()
