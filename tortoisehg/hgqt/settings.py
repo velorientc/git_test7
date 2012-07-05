@@ -11,7 +11,7 @@ from mercurial import ui, util, error, extensions, scmutil
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, thgrepo
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -181,6 +181,7 @@ class PasswordEntry(LineEditBox):
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
+
 class TextEntry(QTextEdit):
     def __init__(self, parent=None, **opts):
         QTextEdit.__init__(self, parent, toolTip=opts['tooltip'])
@@ -908,6 +909,9 @@ INFO = (
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': 'hg-extensions'}, (
     )),
 
+({'name': 'tools', 'label': _('Tools'), 'icon': 'tools-spanner-hammer'}, (
+    )),
+
 ({'name': 'issue', 'label': _('Issue Tracking'), 'icon': 'edit-file'}, (
     _fi(_('Issue Regex'), 'tortoisehg.issue.regex', genEditCombo,
         _('Defines the regex to match when picking up issue numbers.')),
@@ -1289,6 +1293,8 @@ class SettingsForm(QWidget):
                 # make sure widgets are shown properly,
                 # even when no extensions mentioned in the config file
                 self.validateextensions()
+        elif name == 'tools':
+            self.toolsFrame.refresh()
         else:
             for row, e in enumerate(info):
                 if not e.cpath:
@@ -1384,6 +1390,11 @@ class SettingsForm(QWidget):
             widgets.append(w)
         return extsinfo, widgets
 
+    def fillToolsFrame(self):
+        self.toolsFrame = frame = customtools.ToolsFrame(parent=self)
+        self.stack.addWidget(frame)
+        return (), [frame]
+
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
@@ -1401,6 +1412,9 @@ class SettingsForm(QWidget):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
+        elif name == 'tools':
+            toolsinfo, widgets = self.fillToolsFrame()
+            self.pages[name] = name, toolsinfo, widgets
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
@@ -1458,6 +1472,8 @@ class SettingsForm(QWidget):
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
                 self.applyChangesForExtensions()
+            elif name == 'tools':
+                self.applyChangesForTools()
             else:
                 for row, e in enumerate(info):
                     if not e.cpath:
@@ -1535,6 +1551,9 @@ class SettingsForm(QWidget):
                 invalmsg = invalmsg.decode('utf-8')
             chk.setToolTip(invalmsg or hglib.tounicode(allexts[name]))
 
+    def applyChangesForTools(self):
+        if self.toolsFrame.applyChanges(self.ini):
+            self.restartRequested.emit(_('Tools'))
 
 def run(ui, *pats, **opts):
     return SettingsDialog(opts.get('alias') == 'repoconfig',
