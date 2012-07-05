@@ -36,11 +36,6 @@ def hasExtension(extname):
             return True
     return False
 
-# Detect if hg >= 2.1
-def phasesSupport():
-    from mercurial import commands
-    return hasattr(commands, 'phase')
-
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
         QComboBox.__init__(self, parent, toolTip=opts['tooltip'])
@@ -721,7 +716,7 @@ INFO = (
          'Default: False')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
        _('Make MQ patches secret (instead of draft). '
-         'Default: False'), visible=phasesSupport),
+         'Default: False')),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
         (genDefaultCombo,
