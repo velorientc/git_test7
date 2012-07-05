@@ -318,9 +318,10 @@ class HgFileView(QFrame):
             status = hglib.fromunicode(status)
         if filename and self._filename == filename:
             # Get the last visible line to restore it after reloading the editor
+            lastCursorPosition = self.sci.getCursorPosition()
             lastScrollPosition = self.sci.firstVisibleLine()
         else:
-            # Reset the scroll positions when the file is changed
+            lastCursorPosition = (0, 0)
             lastScrollPosition = 0
         self._filename, self._status = filename, status
 
@@ -414,7 +415,8 @@ class HgFileView(QFrame):
         else:
             return
 
-        # Recover the last scroll position
+        # Recover the last cursor/scroll position
+        self.sci.setCursorPosition(*lastCursorPosition)
         # Make sure that lastScrollPosition never exceeds the amount of
         # lines on the editor
         lastScrollPosition = min(lastScrollPosition,  self.sci.lines() - 1)
