@@ -9,11 +9,7 @@
 import binascii
 import os
 import shlex, subprocess, functools # used by runCustomCommand
-from mercurial import revset, error, patch, commands
-
-# hg >= 2.1
-if hasattr(commands, 'phase'):
-    from mercurial import phases
+from mercurial import revset, error, patch, phases
 
 from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt.i18n import _
@@ -1261,13 +1257,11 @@ class RepoWidget(QWidget):
               self.copyPatch)
         entry(menu)
 
-        # hg >= 2.1
-        if hasattr(commands, 'phase'):
-            submenu = menu.addMenu(_('Change phase to'))
-            for pnum, pname in enumerate(phases.phasenames):
-                entry(submenu, None, isrev, pname, None,
-                      functools.partial(self.changePhase, pnum))
-            entry(menu)
+        submenu = menu.addMenu(_('Change phase to'))
+        for pnum, pname in enumerate(phases.phasenames):
+            entry(submenu, None, isrev, pname, None,
+                  functools.partial(self.changePhase, pnum))
+        entry(menu)
 
         entry(menu, None, fixed, _('Graft to local'), None,
               self.graftRevisions)
