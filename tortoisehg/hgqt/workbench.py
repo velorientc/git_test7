@@ -225,7 +225,7 @@ class Workbench(QMainWindow):
                 getattr(self, '%stbar' % toolbar).addSeparator()
 
         newaction(_("New &Workbench..."), self.newWorkbench,
-                  shortcut='Ctrl+Alt+N', menu='file', icon='hg-log')
+                  shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
@@ -381,7 +381,7 @@ class Workbench(QMainWindow):
         newaction(_("Bisect..."), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
+        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+X',
                   icon='system-file-manager', enabled='repoopen',
                   menu='repository')
         newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',

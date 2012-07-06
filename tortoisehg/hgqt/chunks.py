@@ -88,9 +88,9 @@ class ChunksWidget(QWidget):
         for name, desc, icon, key, tip, cb in [
             ('diff', _('Visual Diff'), 'visualdiff', 'Ctrl+D',
               _('View file changes in external diff tool'), self.vdiff),
-            ('edit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
+            ('edit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+L',
               _('Edit current file in working copy'), self.editCurrentFile),
-            ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
+            ('revert', _('Revert to Revision'), 'hg-revert', 'Shift+Ctrl+R',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
             ]:
