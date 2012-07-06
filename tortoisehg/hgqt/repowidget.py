@@ -35,8 +35,6 @@ from tortoisehg.hgqt.pbranch import PatchBranchWidget
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import functools
-
 class RepoWidget(QWidget):
 
     showMessageSignal = pyqtSignal(QString)
