@@ -721,10 +721,5 @@ def getLineSeparator(line):
     return linesep
 
 def dispatch(ui, args):
-    if hasattr(hgdispatch, 'request'):
-        # hg >= 1.9, see mercurial changes 08bfec2ef031, 80c599eee3f3
-        req = hgdispatch.request(args, ui)
-        return hgdispatch._dispatch(req)
-    else:
-        # hg <= 1.8
-        return hgdispatch._dispatch(ui, args)
+    req = hgdispatch.request(args, ui)
+    return hgdispatch._dispatch(req)
