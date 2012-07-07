@@ -146,6 +146,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._treeview = QManifestTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
+        self._treeview.clicked.connect(self.updateItemFileActions)
         self._treeview.doubleClicked.connect(self.onDoubleClick)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
@@ -232,13 +233,16 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         point = self._treeview.viewport().mapToGlobal(point)
 
         currentindex = self._treeview.currentIndex()
-        itemissubrepo = (self._treemodel.fileStatus(currentindex) == 'S')
-        itemisdir = self._treemodel.isDir(currentindex)
-        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo,
-                                   itemisdir=itemisdir)
+        self.updateItemFileActions(currentindex)
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(point)
+
+    def updateItemFileActions(self, index):
+        itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
+        itemisdir = self._treemodel.isDir(index)
+        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo,
+                                   itemisdir=itemisdir)
 
     @property
     def toolbar(self):

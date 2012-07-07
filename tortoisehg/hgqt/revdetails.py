@@ -87,6 +87,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelist.linkActivated.connect(self.linkActivated)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
+        self.filelist.clicked.connect(self.updateItemFileActions)
         self.filelist.doubleClicked.connect(self.onDoubleClick)
 
         self.filelistframe = QFrame(self.filelistsplit)
@@ -273,6 +274,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(self.filelist.viewport().mapToGlobal(point))
+
+    def updateItemFileActions(self, index):
+        model = self.filelist.model()
+        itemstatus = model.dataFromIndex(index)['status']
+        itemissubrepo = (itemstatus == 'S')
+        self._updatefileactions(itemissubrepo)
 
     def _updatefileactions(self, itemissubrepo):
         self._fileactions.setPaths_(self.filelist.getSelectedFiles(),
