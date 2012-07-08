@@ -388,28 +388,30 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
 
-        def _setupCustomTools():
-            tools, toolnames = hglib.tortoisehgtools(self.ui, 'workbench')
-            if not tools:
-                return
-            for name in toolnames:
-                info = tools[name]
-                command = info.get('command', None)
-                if not command:
-                    continue
-                showoutput = info.get('showoutput', False)
-                label = info.get('label', name)
-                tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
-                icon = info.get('icon', 'tools-spanner-hammer')
-
-                newaction(label,
-                    self._repofwd('runCustomCommand', [command, showoutput]),
-                    icon=icon, tooltip=tooltip,
-                    enabled=True, toolbar='custom')
-
-        _setupCustomTools()
-
         self.updateMenu()
+
+    def _setupCustomTools(self, ui):
+        tools, toolnames = hglib.tortoisehgtools(ui, 'workbench')
+        # Clear the existing "custom" toolbar
+        self.customtbar.clear()
+        # and repopulate it again with the tool configuration
+        # for the current repository
+        if not tools:
+            return
+        for name in toolnames:
+            info = tools[name]
+            command = info.get('command', None)
+            if not command:
+                continue
+            showoutput = info.get('showoutput', False)
+            label = info.get('label', name)
+            tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
+            icon = info.get('icon', 'tools-spanner-hammer')
+
+            self._addNewAction(label,
+                self._repofwd('runCustomCommand', [command, showoutput]),
+                icon=icon, tooltip=tooltip,
+                enabled=True, toolbar='custom')
 
     def _addNewAction(self, text, slot=None, icon=None, shortcut=None,
                   checkable=False, tooltip=None, data=None, enabled=None,
@@ -748,6 +750,7 @@ class Workbench(QMainWindow):
             if w.repo:
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
+                self._setupCustomTools(w.repo.ui)
         else:
             self.activeRepoChanged.emit("")
         repo = w and w.repo or None
