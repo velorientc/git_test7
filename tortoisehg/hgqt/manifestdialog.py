@@ -146,7 +146,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._treeview = QManifestTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
-        self._treeview.clicked.connect(self.updateItemFileActions)
         self._treeview.doubleClicked.connect(self.onDoubleClick)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
@@ -273,6 +272,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
         selmodel = self._treeview.selectionModel()
         selmodel.currentChanged.connect(self._updatecontent)
+        selmodel.currentChanged.connect(self.updateItemFileActions)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
         self.le.textChanged.connect(self._treemodel.setNameFilter)

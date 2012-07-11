@@ -87,7 +87,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelist.linkActivated.connect(self.linkActivated)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
-        self.filelist.clicked.connect(self.updateItemFileActions)
         self.filelist.doubleClicked.connect(self.onDoubleClick)
 
         self.filelistframe = QFrame(self.filelistsplit)
@@ -163,6 +162,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.fileview.grepRequested.connect(self.grepRequested)
         self.fileview.revisionSelected.connect(self.revisionSelected)
         self.filelist.fileSelected.connect(self.fileview.displayFile)
+        self.filelist.fileSelected.connect(self.updateItemFileActions)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
         self.revpanel = RevPanelWidget(self.repo)
@@ -180,6 +180,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelistmodel.showMessage.connect(self.showMessage)
         self.filelist.setModel(model)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
+
+        # Because filelist.fileSelected, i.e. currentRowChanged, is emitted
+        # *before* selection changed, we cannot rely only on fileSelected.
+        # On fileSelected, getSelectedFiles() happens to return the previous
+        # selection, even though currentFile() works as expected.
+        self.filelist.selectionModel().selectionChanged.connect(
+            self.updateItemFileActions)
 
     def createActions(self):
         self.actionUpdate = a = self.filelisttbar.addAction(
@@ -275,7 +282,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         if contextmenu:
             contextmenu.exec_(self.filelist.viewport().mapToGlobal(point))
 
-    def updateItemFileActions(self, index):
+    @pyqtSlot()
+    def updateItemFileActions(self):
+        index = self.filelist.currentIndex()
         model = self.filelist.model()
         itemstatus = model.dataFromIndex(index)['status']
         itemissubrepo = (itemstatus == 'S')
