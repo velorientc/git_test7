@@ -259,7 +259,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         model = self.filelist.model()
         itemstatus = model.dataFromIndex(index)['status']
         itemissubrepo = (itemstatus == 'S')
-        self._updatefileactions(itemissubrepo)
         if itemissubrepo:
             self._fileactions.opensubrepo()
         elif itemstatus == 'C':
@@ -276,8 +275,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         data = model.dataFromIndex(index)
         if not data:
             return
-        itemissubrepo = (data['status'] == 'S')
-        self._updatefileactions(itemissubrepo)
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(self.filelist.viewport().mapToGlobal(point))

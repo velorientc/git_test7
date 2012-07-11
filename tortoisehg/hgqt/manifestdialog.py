@@ -216,7 +216,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
-        self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo)
         if itemissubrepo:
             self._fileactions.opensubrepo()
         elif not self._treemodel.isDir(index):
@@ -231,8 +230,6 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             return
         point = self._treeview.viewport().mapToGlobal(point)
 
-        currentindex = self._treeview.currentIndex()
-        self._updateItemFileActions(currentindex)
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(point)
