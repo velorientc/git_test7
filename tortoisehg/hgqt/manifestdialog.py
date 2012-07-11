@@ -232,12 +232,13 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         point = self._treeview.viewport().mapToGlobal(point)
 
         currentindex = self._treeview.currentIndex()
-        self.updateItemFileActions(currentindex)
+        self._updateItemFileActions(currentindex)
         contextmenu = self._fileactions.menu()
         if contextmenu:
             contextmenu.exec_(point)
 
-    def updateItemFileActions(self, index):
+    #@pyqtSlot(QModelIndex)
+    def _updateItemFileActions(self, index):
         itemissubrepo = (self._treemodel.fileStatus(index) == 'S')
         itemisdir = self._treemodel.isDir(index)
         self._fileactions.setPaths([self.path], itemissubrepo=itemissubrepo,
@@ -272,7 +273,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
         selmodel = self._treeview.selectionModel()
         selmodel.currentChanged.connect(self._updatecontent)
-        selmodel.currentChanged.connect(self.updateItemFileActions)
+        selmodel.currentChanged.connect(self._updateItemFileActions)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
         self.le.textChanged.connect(self._treemodel.setNameFilter)
