@@ -438,23 +438,27 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             return self.commit(amend=True)
 
         # Check if we need to change branch first
-        commandlines = []
+        wholecmdlines = []  # [[cmd1, ...], [cmd2, ...], ...]
         if self.branchop:
-            commandlines, newbranch = self.getBranchCommandLine(self.branchop,
-                                                                self.repo)
-            if commandlines is None:
+            cmdlines, newbranch = self.getBranchCommandLine(self.branchop,
+                                                            self.repo)
+            if cmdlines is None:
                 return
+            wholecmdlines.extend(cmdlines)
+
         olist = ('user', 'date')
-        cmdlines = commandlines + mq.mqNewRefreshCommand(self.repo,
+        cmdlines = mq.mqNewRefreshCommand(self.repo,
                                           curraction._name == 'qnew',
                                           self.stwidget, self.pnedit,
                                           self.msgte.text(), self.opts, olist)
+        wholecmdlines.extend(cmdlines)
+
         self.repo.incrementBusyCount()
         self.currentAction = curraction._name
         self.currentProgress = _('MQ Action', 'start progress')
         self.progress.emit(*cmdui.startProgress(self.currentProgress, ''))
         self.commitButtonEnable.emit(False)
-        self.runner.run(*cmdlines)
+        self.runner.run(*wholecmdlines)
 
     @pyqtSlot(QString, QString)
     def fileDisplayed(self, wfile, contents):
