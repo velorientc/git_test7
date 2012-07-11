@@ -285,9 +285,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         model = self.filelist.model()
         itemstatus = model.dataFromIndex(index)['status']
         itemissubrepo = (itemstatus == 'S')
-        self._updatefileactions(itemissubrepo)
-
-    def _updatefileactions(self, itemissubrepo):
         self._fileactions.setPaths_(self.filelist.getSelectedFiles(),
                                     self.filelist.currentFile(),
                                     itemissubrepo)
