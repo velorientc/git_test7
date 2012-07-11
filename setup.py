@@ -384,7 +384,7 @@ def setup_windows(version):
              'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
              'product_version':version},
-            {'script':'contrib/hg', 
+            {'script':'contrib/hg',
              'icon_resources':[(0,'icons/hg.ico')],
              'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
