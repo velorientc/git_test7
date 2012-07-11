@@ -12,9 +12,7 @@ License:    GPLv2
 URL:        http://tortoisehg.org
 Source0:    %{name}-%{version}.tar.gz
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# This package should be noarch, but we can't do it because the nautilus
-# subpackage has to be arch-specific (because of lib64)
-# BuildArch:    noarch
+BuildArch:  noarch
 BuildRequires:  python, python-devel, gettext, python-sphinx
 BuildRequires:  PyQt4-devel
 Requires:   python >= 2.4, python-iniparse, mercurial >= 1.6
@@ -38,9 +36,6 @@ system available in the file manager with a graphical interface.
 
 %prep
 %setup -q
-
-# Fedora Nautilus python extensions lives in lib64 on x86_64 (https://bugzilla.redhat.com/show_bug.cgi?id=509633) ...
-%{__sed} -i "s,lib/nautilus,%{_lib}/nautilus,g" setup.py
 
 cat > tortoisehg/util/config.py << EOT
 bin_path     = "%{_bindir}"
@@ -80,11 +75,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.txt doc/build/html/
 %{_bindir}/thg
 %{python_sitelib}/tortoisehg/
-%if "%{?pythonver}" > "2.4"
+%if "%{?python_version}" > "2.4"
 %{python_sitelib}/tortoisehg-*.egg-info
 %endif
 %{_datadir}/pixmaps/tortoisehg/
-%{_datadir}/pixmaps/%{name}_logo.svg
+%{_datadir}/pixmaps/thg_logo.svg
 %{_datadir}/applications/%{name}.desktop
 
 # /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
@@ -96,6 +91,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files nautilus
 %defattr(-,root,root,-)
-%{_libdir}/nautilus/extensions-2.0/python/nautilus-thg.py*
+%{_datadir}/nautilus-python/extensions/nautilus-thg.py*
 
 %changelog
