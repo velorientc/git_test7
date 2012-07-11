@@ -451,6 +451,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                           curraction._name == 'qnew',
                                           self.stwidget, self.pnedit,
                                           self.msgte.text(), self.opts, olist)
+        if not cmdlines:
+            return
         wholecmdlines.extend(cmdlines)
 
         self.repo.incrementBusyCount()
