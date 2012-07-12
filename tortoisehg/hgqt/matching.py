@@ -95,17 +95,25 @@ class MatchDialog(QDialog):
         self.author_chk = QCheckBox(_('Author'))
         self.date_chk = QCheckBox(_('Date'))
         self.files_chk = QCheckBox(_('Files'))
+        self.diff_chk = QCheckBox(_('Diff contents'))
         self.substate_chk = QCheckBox(_('Subrepo states'))
         self.branch_chk = QCheckBox(_('Branch'))
         self.parents_chk = QCheckBox(_('Parents'))
         self.phase_chk = QCheckBox(_('Phase'))
         self._hideable_chks = (self.branch_chk, self.phase_chk, self.parents_chk,)
 
+        has_diff_matching = hglib.hgversion >= "2.3"
+
         self.optbox.addWidget(self.summary_chk)
         self.optbox.addWidget(self.description_chk)
         self.optbox.addWidget(self.author_chk)
         self.optbox.addWidget(self.date_chk)
         self.optbox.addWidget(self.files_chk)
+        if has_diff_matching:
+            # if mercurial does not have a "diff" matching mode,
+            # we simply "hide" the diff checkbox,
+            # to make the saveSettings() method simpler
+            self.optbox.addWidget(self.diff_chk)
         self.optbox.addWidget(self.substate_chk)
         self.optbox.addWidget(self.branch_chk)
         self.optbox.addWidget(self.parents_chk)
@@ -120,6 +128,7 @@ class MatchDialog(QDialog):
         self.branch_chk.setChecked(s.value('matching/branch', False).toBool())
         self.date_chk.setChecked(s.value('matching/date', True).toBool())
         self.files_chk.setChecked(s.value('matching/files', False).toBool())
+        self.diff_chk.setChecked(s.value('matching/diff', False).toBool())
         self.parents_chk.setChecked(s.value('matching/parents', False).toBool())
         self.phase_chk.setChecked(s.value('matching/phase', False).toBool())
         self.substate_chk.setChecked(s.value('matching/substate', False).toBool())
@@ -168,6 +177,7 @@ class MatchDialog(QDialog):
         s.setValue('matching/branch', self.branch_chk.isChecked())
         s.setValue('matching/date', self.date_chk.isChecked())
         s.setValue('matching/files', self.files_chk.isChecked())
+        s.setValue('matching/diff', self.diff_chk.isChecked())
         s.setValue('matching/parents', self.parents_chk.isChecked())
         s.setValue('matching/phase', self.phase_chk.isChecked())
         s.setValue('matching/substate', self.substate_chk.isChecked())
@@ -231,6 +241,7 @@ class MatchDialog(QDialog):
             'branch': self.branch_chk,
             'date': self.date_chk,
             'files': self.files_chk,
+            'diff': self.diff_chk,
             'parents': self.parents_chk,
             'phase': self.phase_chk,
             'substate': self.substate_chk,

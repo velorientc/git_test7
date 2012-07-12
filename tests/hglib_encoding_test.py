@@ -80,3 +80,30 @@ def test_toutf():
 def test_toutf_fallback():
     assert_equals(JAPANESE_KANA_I.encode('utf-8'),
                   hglib.toutf(JAPANESE_KANA_I.encode('euc-jp')))
+
+
+@helpers.with_encoding('ascii')
+def test_lossless_unicode_replaced():
+    l = hglib.fromunicode(JAPANESE_KANA_I, 'replace')
+    assert_equals('?', l)
+    assert_equals(JAPANESE_KANA_I, hglib.tounicode(l))
+
+@helpers.with_encoding('euc-jp')
+def test_lossless_unicode_double_mapped():
+    YEN = u'\u00a5'  # "yen" and "back-slash" are mapped to the same code
+    l = hglib.fromunicode(YEN)
+    assert_equals('\\', l)
+    assert_equals(YEN, hglib.tounicode(l))
+
+@helpers.with_encoding('ascii')
+def test_lossless_utf_replaced():
+    u = JAPANESE_KANA_I.encode('utf-8')
+    l = hglib.fromutf(u)
+    assert_equals('?', l)
+    assert_equals(u, hglib.toutf(l))
+
+@helpers.with_encoding('ascii')
+def test_lossless_utf_cannot_roundtrip():
+    u = JAPANESE_KANA_I.encode('cp932')  # bad encoding
+    l = hglib.fromutf(u)
+    assert_not_equals(u, hglib.toutf(l))
