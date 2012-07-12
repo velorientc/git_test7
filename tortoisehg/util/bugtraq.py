@@ -1,7 +1,7 @@
 from ctypes import *
 import comtypes
 import pythoncom
-from comtypes import IUnknown, GUID, COMMETHOD, POINTER
+from comtypes import IUnknown, GUID, COMMETHOD, POINTER, COMError
 from comtypes.typeinfo import ITypeInfo
 from comtypes.client import CreateObject
 from comtypes.automation import _midlSAFEARRAY
