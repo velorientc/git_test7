@@ -66,10 +66,25 @@ class HgExtensionDefault(GObject.GObject):
         from tortoisehg.util import menuthg
         self.hgtk = paths.find_in_path(thg_main)
         self.menu = menuthg.menuThg()
-        self.notify = os.path.expanduser('~/.tortoisehg/notify')
 
-        f = open(self.notify, 'w')
-        f.close()
+        # Get the configuration directory path
+        try:
+            self.notify = os.environ['XDG_CONFIG_HOME']
+        except KeyError:
+            self.notify = os.path.join('$HOME', '.config')
+
+        self.notify = os.path.expandvars(os.path.join(
+            self.notify,
+            'TortoiseHg'))
+
+        # Create folder if it does not exist
+        if not os.path.isdir(self.notify):
+            os.makedirs(self.notify)
+
+        # Create the notify file
+        self.notify = os.path.join(self.notify, 'notify')
+        open(self.notify, 'w').close()
+
         self.gmon = Gio.file_new_for_path(self.notify).monitor(Gio.FileMonitorFlags.NONE, None)
         self.gmon.connect('changed', self.notified)
 

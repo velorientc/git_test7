@@ -1,46 +1,41 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 # Pure python package
-%define debug_package %{nil} 
+%define debug_package %{nil}
 
-Name:		tortoisehg
-Version:	hg
-Release:	hg
-Summary:	Mercurial GUI command line tool thg
-Group:		Development/Tools
-License:	GPLv2
+Name:       tortoisehg
+Version:    hg
+Release:    hg
+Summary:    Mercurial GUI command line tool thg
+Group:      Development/Tools
+License:    GPLv2
 # Few files are under the more permissive GPLv2+
-URL:		http://tortoisehg.org
-Source0:	%{name}-%{version}.tar.gz
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# This package should be noarch, but we can't do it because the nautilus
-# subpackage has to be arch-specific (because of lib64)
-# BuildArch:	noarch
-BuildRequires:	python, python-devel, gettext, python-sphinx
-BuildRequires:	PyQt4-devel
-Requires:	python >= 2.4, python-iniparse, mercurial >= 1.6
+URL:        http://tortoisehg.org
+Source0:    %{name}-%{version}.tar.gz
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:  noarch
+BuildRequires:  python, python-devel, gettext, python-sphinx
+BuildRequires:  PyQt4-devel
+Requires:   python >= 2.4, python-iniparse, mercurial >= 1.6
 # gconf needs at util/shlib.py for browse_url(url).
-Requires:	gnome-python2-gconf
-Requires:	PyQt4 >= 4.6, qscintilla-python
+Requires:   gnome-python2-gconf
+Requires:   PyQt4 >= 4.6, qscintilla-python
 
 %description
-This package contains the thg command line tool which provides a 
-graphical user interface to the Mercurial distributed revision control system. 
+This package contains the thg command line tool which provides a
+graphical user interface to the Mercurial distributed revision control system.
 
-%package	nautilus
-Summary:	Mercurial GUI plugin to Nautilus file manager 
-Group:		Development/Tools
-Requires:	%{name} = %{version}-%{release}, nautilus-python
+%package    nautilus
+Summary:    Mercurial GUI plugin to Nautilus file manager
+Group:      Development/Tools
+Requires:   %{name} = %{version}-%{release}, nautilus-python
 
-%description	nautilus
+%description    nautilus
 This package contains the TortoiseHg Gnome/Nautilus extension,
-which makes the Mercurial distributed revision control 
-system available in the file manager with a graphical interface. 
+which makes the Mercurial distributed revision control
+system available in the file manager with a graphical interface.
 
 %prep
 %setup -q
-
-# Fedora Nautilus python extensions lives in lib64 on x86_64 (https://bugzilla.redhat.com/show_bug.cgi?id=509633) ...
-%{__sed} -i "s,lib/nautilus,%{_lib}/nautilus,g" setup.py
 
 cat > tortoisehg/util/config.py << EOT
 bin_path     = "%{_bindir}"
@@ -80,11 +75,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.txt doc/build/html/
 %{_bindir}/thg
 %{python_sitelib}/tortoisehg/
-%if "%{?pythonver}" > "2.4"
+%if "%{?python_version}" > "2.4"
 %{python_sitelib}/tortoisehg-*.egg-info
 %endif
 %{_datadir}/pixmaps/tortoisehg/
-%{_datadir}/pixmaps/%{name}_logo.svg
+%{_datadir}/pixmaps/thg_logo.svg
 %{_datadir}/applications/%{name}.desktop
 
 # /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
@@ -96,6 +91,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files nautilus
 %defattr(-,root,root,-)
-%{_libdir}/nautilus/extensions-2.0/python/nautilus-thg.py*
+%{_datadir}/nautilus-python/extensions/nautilus-thg.py*
 
 %changelog
