@@ -1190,6 +1190,7 @@ class SettingsForm(QWidget):
         self.pages = {}
         self.stack = stack
         self.pageList = pageList
+        self.pageListIndexToStack = {}
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
@@ -1216,20 +1217,25 @@ class SettingsForm(QWidget):
 
     @pyqtSlot(int)
     def activatePage(self, index):
+        stackindex = self.pageListIndexToStack.get(index, -1)
+        if stackindex >= 0:
+            self.stack.setCurrentIndex(stackindex)
+            return
+
         item = self.pageList.item(index)
         for data in INFO:
             if item.text() == data[0]['label']:
                 meta, info = data
                 break
 
+        stackindex = self.stack.count()
         pagename = meta['name']
-        if self.pages.has_key(pagename):
-            page = self.pages[pagename]
-        else:
-            page = self.createPage(pagename, info)
-            self.refreshPage(page)
-        frame = page[2][0].parentWidget()
-        self.stack.setCurrentWidget(frame)
+        page = self.createPage(pagename, info)
+        self.refreshPage(page)
+        # better to call stack.addWidget() here, not by fillFrame()
+        assert self.stack.count() > stackindex, 'page must be added to stack'
+        self.pageListIndexToStack[index] = stackindex
+        self.stack.setCurrentIndex(stackindex)
 
     def editClicked(self):
         'Open internal editor in stacked widget'
