@@ -1214,8 +1214,9 @@ class SettingsForm(QWidget):
         self.refresh()
         self.focusField(focus or 'ui.merge')
 
+    @pyqtSlot(int)
     def activatePage(self, index):
-        item = self.pageList.currentItem()
+        item = self.pageList.item(index)
         for data in INFO:
             if item.text() == data[0]['label']:
                 meta, info = data
