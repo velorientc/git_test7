@@ -161,13 +161,7 @@ class Workbench(QMainWindow):
         keysequence = qtlib.keysequence
         modifiedkeysequence = qtlib.modifiedkeysequence
         newaction = self._addNewAction
-
-        def newseparator(menu=None, toolbar=None):
-            """Insert a separator action; returns nothing"""
-            if menu:
-                getattr(self, 'menu%s' % menu.title()).addSeparator()
-            if toolbar:
-                getattr(self, '%stbar' % toolbar).addSeparator()
+        newseparator = self._addNewSeparator
 
         newaction(_("New &Workbench..."), self.newWorkbench,
                   shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
@@ -457,6 +451,13 @@ class Workbench(QMainWindow):
         if toolbar:
             getattr(self, '%stbar' % toolbar).addAction(action)
         return action
+
+    def _addNewSeparator(self, menu=None, toolbar=None):
+        """Insert a separator action; returns nothing"""
+        if menu:
+            getattr(self, 'menu%s' % menu.title()).addSeparator()
+        if toolbar:
+            getattr(self, '%stbar' % toolbar).addSeparator()
 
     def _action_defs(self):
         a = [("closetab", _("Close tab"), '',
