@@ -174,7 +174,7 @@ class Workbench(QMainWindow):
 
         def newaction(text, slot=None, icon=None, shortcut=None,
                       checkable=False, tooltip=None, data=None, enabled=None,
-                      visible=None, menu=None, toolbar=None, parent=self):
+                      visible=None, menu=None, toolbar=None):
             """Create new action and register it
 
             :slot: function called if action triggered or toggled.
@@ -186,7 +186,7 @@ class Workbench(QMainWindow):
             :menu: name of menu to add this action.
             :toolbar: name of toolbar to add this action.
             """
-            action = QAction(text, parent, checkable=checkable)
+            action = QAction(text, self, checkable=checkable)
             if slot:
                 if checkable:
                     action.toggled.connect(slot)
