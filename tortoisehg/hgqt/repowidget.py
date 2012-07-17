@@ -1292,7 +1292,8 @@ class RepoWidget(QWidget):
               self.rupdate)
 
         def _setupCustomSubmenu(menu):
-            tools, toolnames = hglib.tortoisehgtools(self.repo.ui, 'repowidget')
+            tools, toollist = hglib.tortoisehgtools(ui_=self.repo.ui,
+                selectedlocation='workbench.revdetails.custom-menu')
             if not tools:
                 return
 
@@ -1304,10 +1305,12 @@ class RepoWidget(QWidget):
 
             entry(menu)
             submenu = menu.addMenu(_('Custom Tools'))
-            for name in toolnames:
-                info = tools[name]
-                location = info.get('location', '').replace(' ', '').split(',')
-                if 'repowidget' not in location:
+            for name in toollist:
+                if name == '|':
+                    entry(submenu)
+                    continue
+                info = tools.get(name, None)
+                if info is None:
                     continue
                 command = info.get('command', None)
                 if not command:

@@ -447,7 +447,13 @@ def difftools(ui):
     _difftools = tools
     return tools
 
-def tortoisehgtools(ui, selectedlocation=None):
+
+tortoisehgtoollocations = {
+    'workbench.custom-toolbar': 'Workbench custom toolbar',
+    'workbench.revdetails.custom-menu': 'Revision details context menu',
+}
+
+def tortoisehgtools(ui_=None, ini=None, selectedlocation=None, sources=None):
     '''
     Parse 'tortoisehg-tools' section of ini file. Changes:
     
@@ -455,46 +461,97 @@ def tortoisehgtools(ui, selectedlocation=None):
     update_to_tip.icon = hg-update
     update_to_tip.command = hg update tip
     update_to_tip.tooltip = Update to tip
-    update_to_tip.location = workbench,repowidget
     
-    into following dictionary
+    into the following dictionary
     
-    {'update_to_tip': 
-        {'icon': 'hg-update', 
-         'command': 'hg update tip', 
-         'tooltip': 'Update to tip',
-         'location': 'workbench,repowidget'}
+    {'update_to_tip':
+        {
+            'icon': 'hg-update',
+            'command': 'hg update tip',
+            'tooltip': 'Update to tip',
+        }
     }
+
+    If selectedlocation is set, only return those tools that have been
+    configured to be shown at the given "location".
+    Tools are added to "locations" by adding them to one of the
+    "extension lists", which are lists of tool names, which follow the same
+    format as the workbench.task-toolbar setting, i.e. a list of tool names,
+    separated by spaces or "|" to indicate separators.
     
-    If selectedlocation is set, only return those tools whose
-    location matches the selected location.
-    If a tool has no location set, it will be assumed that it must be
-    shown on the 'workbench' toolbar
+    Valid "locations lists" are:
+        - workbench.custom-toolbar
+        - workbench.revdetails.custom-menu
+
+    If sources is set then only config items whose configuration file "source"
+    is on the list of sources will be returned.
+
+    This function can take a ui object or an wconfig object as its input. If
+    a wconfig object is passed, it is not possible to limit the sources, since
+    a wconfig object is limited to a single "source" (i.e. hgrc file) by
+    definition.
     '''
+    if (ui_ is None and ini is None) or \
+            (ui_ is not None and ini is not None):
+        raise Exception(
+            _('tortoisehgtools: only one of the ui_ and ini inputs must be set'))
+    if sources is None or ini is not None:
+        # When no sources were specified, or when getting a wconfig input,
+        # consider all sources valid
+        checksources = False
+        sources = []
+    else:
+        checksources = True
+    if ui_:
+        configitems = ui_.configitems('tortoisehg-tools')
+    else:
+        configitems = ini['tortoisehg-tools'].items()
     tools = {}
-    toolnames = []
-    for key, value in ui.configitems('tortoisehg-tools'):
+    for key, value in configitems:
+        # if a set of sources was specified, check that the current item
+        # comes from one of these valid sources
+        validsource = not checksources
+        for source in sources:
+            if ui_.configsource('tortoisehg-tools', key).startswith(source):
+                validsource = True
+                break
+        if not validsource:
+            continue
+
         toolname, field = key.split('.')
         if toolname not in tools:
             tools[toolname] = {}
-            toolnames.append(toolname)
         bvalue = util.parsebool(value)
         if bvalue is not None:
             value = bvalue
         tools[toolname][field] = value
-    
+
     if selectedlocation is None:
-        return tools, toolnames
+        return tools, sorted(tools.keys())
+
     # Only return the tools that are linked to the selected location
+    if selectedlocation not in tortoisehgtoollocations.keys():
+        # [FIXME] for some reason ui_.warn does not work
+        # Note that this should not happen
+        # If it does it will probably be when adding a new location, in which
+        # case it will come handy to have a debug message
+        print "tortoisehgtools: invalid location '%s'" % selectedlocation
+        return {}, []
+
+    if ui_:
+        guidef = ui_.configlist('tortoisehg', selectedlocation, [])
+    else:
+        guidef = ini['tortoisehg'][selectedlocation].split()
+    toollist = []
     selectedtools = {}
-    selectedtoolnames = []
-    for name in toolnames:
-        info = tools[name]
-        location = info.get('location', 'workbench').replace(' ', '').split(',')
-        if selectedlocation in location:
+    for name in guidef:
+        if name != '|':
+            info = tools.get(name, None)
+            if info is None:
+                continue
             selectedtools[name] = info
-            selectedtoolnames.append(name)
-    return selectedtools, selectedtoolnames
+        toollist.append(name)
+    return selectedtools, toollist
 
 def hgcmd_toq(q, label, args):
     '''

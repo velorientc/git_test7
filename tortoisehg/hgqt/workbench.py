@@ -385,15 +385,21 @@ class Workbench(QMainWindow):
         self.updateMenu()
 
     def _setupCustomTools(self, ui):
-        tools, toolnames = hglib.tortoisehgtools(ui, 'workbench')
+        tools, toollist = hglib.tortoisehgtools(ui_=ui,
+            selectedlocation='workbench.custom-toolbar')
         # Clear the existing "custom" toolbar
         self.customtbar.clear()
         # and repopulate it again with the tool configuration
         # for the current repository
         if not tools:
             return
-        for name in toolnames:
-            info = tools[name]
+        for name in toollist:
+            if name == '|':
+                self._addNewSeparator(toolbar='custom')
+                continue
+            info = tools.get(name, None)
+            if info is None:
+                continue
             command = info.get('command', None)
             if not command:
                 continue
