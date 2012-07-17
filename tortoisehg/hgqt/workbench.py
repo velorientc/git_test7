@@ -160,51 +160,7 @@ class Workbench(QMainWindow):
 
         keysequence = qtlib.keysequence
         modifiedkeysequence = qtlib.modifiedkeysequence
-
-        def newaction(text, slot=None, icon=None, shortcut=None,
-                      checkable=False, tooltip=None, data=None, enabled=None,
-                      visible=None, menu=None, toolbar=None):
-            """Create new action and register it
-
-            :slot: function called if action triggered or toggled.
-            :checkable: checkable action. slot will be called on toggled.
-            :data: optional data stored on QAction.
-            :enabled: bool or group name to enable/disable action.
-            :visible: bool or group name to show/hide action.
-            :shortcut: QKeySequence, key sequence or name of standard key.
-            :menu: name of menu to add this action.
-            :toolbar: name of toolbar to add this action.
-            """
-            action = QAction(text, self, checkable=checkable)
-            if slot:
-                if checkable:
-                    action.toggled.connect(slot)
-                else:
-                    action.triggered.connect(slot)
-            if icon:
-                if toolbar:
-                    action.setIcon(qtlib.geticon(icon))
-                else:
-                    action.setIcon(qtlib.getmenuicon(icon))
-            if shortcut:
-                action.setShortcut(keysequence(shortcut))
-            if tooltip:
-                action.setToolTip(tooltip)
-            if data is not None:
-                action.setData(data)
-            if isinstance(enabled, bool):
-                action.setEnabled(enabled)
-            elif enabled:
-                self._actionavails[enabled].append(action)
-            if isinstance(visible, bool):
-                action.setVisible(visible)
-            elif visible:
-                self._actionvisibles[visible].append(action)
-            if menu:
-                getattr(self, 'menu%s' % menu.title()).addAction(action)
-            if toolbar:
-                getattr(self, '%stbar' % toolbar).addAction(action)
-            return action
+        newaction = self._addNewAction
 
         def newseparator(menu=None, toolbar=None):
             """Insert a separator action; returns nothing"""
@@ -454,6 +410,51 @@ class Workbench(QMainWindow):
         _setupCustomTools()
 
         self.updateMenu()
+
+    def _addNewAction(self, text, slot=None, icon=None, shortcut=None,
+                  checkable=False, tooltip=None, data=None, enabled=None,
+                  visible=None, menu=None, toolbar=None):
+        """Create new action and register it
+
+        :slot: function called if action triggered or toggled.
+        :checkable: checkable action. slot will be called on toggled.
+        :data: optional data stored on QAction.
+        :enabled: bool or group name to enable/disable action.
+        :visible: bool or group name to show/hide action.
+        :shortcut: QKeySequence, key sequence or name of standard key.
+        :menu: name of menu to add this action.
+        :toolbar: name of toolbar to add this action.
+        """
+        action = QAction(text, self, checkable=checkable)
+        if slot:
+            if checkable:
+                action.toggled.connect(slot)
+            else:
+                action.triggered.connect(slot)
+        if icon:
+            if toolbar:
+                action.setIcon(qtlib.geticon(icon))
+            else:
+                action.setIcon(qtlib.getmenuicon(icon))
+        if shortcut:
+            action.setShortcut(qtlib.keysequence(shortcut))
+        if tooltip:
+            action.setToolTip(tooltip)
+        if data is not None:
+            action.setData(data)
+        if isinstance(enabled, bool):
+            action.setEnabled(enabled)
+        elif enabled:
+            self._actionavails[enabled].append(action)
+        if isinstance(visible, bool):
+            action.setVisible(visible)
+        elif visible:
+            self._actionvisibles[visible].append(action)
+        if menu:
+            getattr(self, 'menu%s' % menu.title()).addAction(action)
+        if toolbar:
+            getattr(self, '%stbar' % toolbar).addAction(action)
+        return action
 
     def _action_defs(self):
         a = [("closetab", _("Close tab"), '',
