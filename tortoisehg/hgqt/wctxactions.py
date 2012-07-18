@@ -43,11 +43,11 @@ class WctxActions(QObject):
         make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+O')
         allactions.append(None)
         make(_('Open subrepository'), opensubrepo, frozenset('S'),
-            'thg-repository-open', 'ALT+CTRL+O')
+            'thg-repository-open', 'Shift+Ctrl+O')
         make(_('Explore subrepository'), explore, frozenset('S'),
-            'system-file-manager', 'ALT+CTRL+E')
+            'system-file-manager')
         make(_('Open terminal in subrepository'), terminal, frozenset('S'),
-            'utilities-terminal', 'ALT+CTRL+T')
+            'utilities-terminal')
         allactions.append(None)
         make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
