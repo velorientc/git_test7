@@ -175,7 +175,7 @@ class RepoWidget(QWidget):
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
         self.filterbar.setRevisionSet.connect(self.setRevisionSet)
-        self.filterbar.clearRevisionSet.connect(self.clearRevisionSet)
+        self.filterbar.clearRevisionSet.connect(self._unapplyRevisionSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
         self.filterbar.hide()
         self.revsetfilter = self.filterbar.filtercb.isChecked()
@@ -514,6 +514,10 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def clearRevisionSet(self):
         self.filterbar.revsetle.clear()
+        return self._unapplyRevisionSet()
+
+    @pyqtSlot()
+    def _unapplyRevisionSet(self):
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
         if not self.revset:
