@@ -525,6 +525,11 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
         - workbench.custom-toolbar
         - workbench.revdetails.custom-menu
 
+    >>> tortoisehgtools(uiobj, selectedlocation='invalid.location')
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid location 'invalid.location'
+
     This function can take a ui object or a config object as its input.
 
     >>> cfg = config.config()
@@ -559,13 +564,8 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
         return tools, sorted(tools.keys())
 
     # Only return the tools that are linked to the selected location
-    if selectedlocation not in tortoisehgtoollocations.keys():
-        # [FIXME] for some reason ui_.warn does not work
-        # Note that this should not happen
-        # If it does it will probably be when adding a new location, in which
-        # case it will come handy to have a debug message
-        print "tortoisehgtools: invalid location '%s'" % selectedlocation
-        return {}, []
+    if selectedlocation not in tortoisehgtoollocations:
+        raise ValueError('invalid location %r' % selectedlocation)
 
     if ui_:
         guidef = ui_.configlist('tortoisehg', selectedlocation, [])
