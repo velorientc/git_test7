@@ -11,7 +11,7 @@ Main Qt4 application for TortoiseHg
 import os
 import sys
 import getpass # used to get the username on the workbench server
-from mercurial import ui
+from mercurial import ui, util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
@@ -896,10 +896,12 @@ class Workbench(QMainWindow):
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
+        def normpathandcase(path):
+            return os.path.normcase(util.normpath(path))
         tw = self.repoTabsWidget
         for idx in range(tw.count()):
             rw = tw.widget(idx)
-            if rw.repo.root == root:
+            if normpathandcase(rw.repo.root) == normpathandcase(root):
                 yield rw
 
     def onAbout(self, *args):
