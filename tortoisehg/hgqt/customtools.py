@@ -401,7 +401,7 @@ class CustomToolConfigDialog(QDialog):
         tooltip = toolconfig.get('tooltip', '')
         ico = toolconfig.get('icon', '')
         enable = toolconfig.get('enable', 'all')
-        outputlog = toolconfig.get('outputlog', 'False')
+        showoutput = str(toolconfig.get('showoutput', False))
 
         self.name = self._addConfigItem(vbox, _('Tool name'),
             QLineEdit(toolname), _('The tool name. It cannot contain spaces.'))
@@ -439,7 +439,7 @@ class CustomToolConfigDialog(QDialog):
             'It is only taken into account when the tool is shown on the\n'
             'selected revision context menu.'))
 
-        combo = self._genCombo(('True', 'False'), outputlog)
+        combo = self._genCombo(('True', 'False'), showoutput)
         self.showoutput = self._addConfigItem(vbox, _('Show Output Log'),
             combo, _('When enabled, automatically show the Output Log when the'
             'command is run.\nDefault: False.'))
