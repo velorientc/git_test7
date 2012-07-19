@@ -31,7 +31,7 @@ class ToolsFrame(QFrame):
         QFrame.__init__(self, parent, **opts)
         self.widgets = []
         self.ini = ini
-        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini)
+        self.tortoisehgtools, guidef = hglib.tortoisehgtools(self.ini)
         self.setValue(self.tortoisehgtools)
 
         # The frame has a header and 3 columns:
@@ -271,7 +271,7 @@ class ToolsFrame(QFrame):
         return self.tortoisehgtools != self.curvalue
 
     def refresh(self):
-        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini)
+        self.tortoisehgtools, guidef = hglib.tortoisehgtools(self.ini)
         self.setValue(self.tortoisehgtools)
         self.globaltoollist.refresh()
         for w in self.widgets:
@@ -357,7 +357,7 @@ class ToolListBox(QListWidget):
         return self.value() != self.curvalue
 
     def refresh(self):
-        toolsdefs, guidef = hglib.tortoisehgtools(ini=self.ini,
+        toolsdefs, guidef = hglib.tortoisehgtools(self.ini,
             selectedlocation=self.location)
         self.toollist = self._guidef2toollist(guidef)
         self.setValue(guidef)

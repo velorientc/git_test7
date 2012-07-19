@@ -453,7 +453,7 @@ tortoisehgtoollocations = {
     'workbench.revdetails.custom-menu': 'Revision details context menu',
 }
 
-def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
+def tortoisehgtools(uiorconfig, selectedlocation=None):
     """Parse 'tortoisehg-tools' section of ini file.
 
     >>> from pprint import pprint
@@ -534,7 +534,7 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
 
     >>> cfg = config.config()
     >>> cfg.parse('<hgrc>', hgrctext)
-    >>> tools, toollist = tortoisehgtools(ini=cfg)
+    >>> tools, toollist = tortoisehgtools(cfg)
     >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
     {'update_to_tip': {'command': 'hg update tip',
                        'icon': 'hg-update',
@@ -542,13 +542,13 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
     >>> toollist
     ['update_to_tip']
     """
-    if (ui_ is None and ini is None) or \
-            (ui_ is not None and ini is not None):
-        raise Exception(
-            _('tortoisehgtools: only one of the ui_ and ini inputs must be set'))
-    if ui_:
+    if isinstance(uiorconfig, ui.ui):
+        ui_ = uiorconfig
+        ini = None
         configitems = ui_.configitems('tortoisehg-tools')
     else:
+        ui_ = None
+        ini = uiorconfig
         configitems = ini['tortoisehg-tools'].items()
     tools = {}
     for key, value in configitems:
