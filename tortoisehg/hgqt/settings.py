@@ -1391,7 +1391,7 @@ class SettingsForm(QWidget):
         return extsinfo, widgets
 
     def fillToolsFrame(self):
-        self.toolsFrame = frame = customtools.ToolsFrame(parent=self)
+        self.toolsFrame = frame = customtools.ToolsFrame(self.ini, parent=self)
         self.stack.addWidget(frame)
         return (), [frame]
 

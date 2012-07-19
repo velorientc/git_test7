@@ -27,10 +27,10 @@ from PyQt4.QtGui import *
 
 
 class ToolsFrame(QFrame):
-    def __init__(self, parent=None, **opts):
+    def __init__(self, ini, parent=None, **opts):
         QFrame.__init__(self, parent, **opts)
         self.widgets = []
-        self.ini = parent.ini
+        self.ini = ini
         self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini)
         self.setValue(self.tortoisehgtools)
 
@@ -63,13 +63,14 @@ class ToolsFrame(QFrame):
         topvbox.addLayout(hbox)
         vbox = QVBoxLayout()
 
-        self.globaltoollist = ToolListBox(minimumwidth=100, parent=parent)
+        self.globaltoollist = ToolListBox(self.ini, minimumwidth=100,
+                                          parent=parent)
         self.globaltoollist.doubleClicked.connect(self.editToolItem)
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
         for location in hglib.tortoisehgtoollocations:
             self.locationcombo.addItem(location)
-            toollist = ToolListBox(location=location,
+            toollist = ToolListBox(self.ini, location=location,
                 minimumwidth=100, parent=parent)
             toollist.doubleClicked.connect(self.editToolFromName)
             vbox.addWidget(toollist)
@@ -279,11 +280,12 @@ class ToolsFrame(QFrame):
 
 class ToolListBox(QListWidget):
     SEPARATOR = '------'
-    def __init__(self, parent=None, location=None, minimumwidth=None, **opts):
+    def __init__(self, ini, parent=None, location=None, minimumwidth=None,
+                 **opts):
         QListWidget.__init__(self, parent, **opts)
         self.opts = opts
         self.curvalue = None
-        self.ini = parent.ini
+        self.ini = ini
         self.location = location
 
         if minimumwidth:
