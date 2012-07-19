@@ -45,7 +45,7 @@ class ToolsFrame(QFrame):
 
         topvbox.addWidget(QLabel(_('Select a GUI location to edit:')))
 
-        self.locationcombo = QComboBox(parent,
+        self.locationcombo = QComboBox(self,
             toolTip='Select the toolbar or menu to change')
 
         def selectlocation(index):
@@ -64,20 +64,20 @@ class ToolsFrame(QFrame):
         vbox = QVBoxLayout()
 
         self.globaltoollist = ToolListBox(self.ini, minimumwidth=100,
-                                          parent=parent)
+                                          parent=self)
         self.globaltoollist.doubleClicked.connect(self.editToolItem)
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
         for location in hglib.tortoisehgtoollocations:
             self.locationcombo.addItem(location)
             toollist = ToolListBox(self.ini, location=location,
-                minimumwidth=100, parent=parent)
+                minimumwidth=100, parent=self)
             toollist.doubleClicked.connect(self.editToolFromName)
             vbox.addWidget(toollist)
             toollist.hide()
             self.widgets.append(toollist)
 
-        deletefromlistbutton = QPushButton(_('Delete from list'), parent)
+        deletefromlistbutton = QPushButton(_('Delete from list'), self)
         deletefromlistbutton.clicked.connect(
             lambda: self.forwardToCurrentToolList('deleteTool', remove=False))
         vbox.addWidget(deletefromlistbutton)
@@ -85,9 +85,9 @@ class ToolsFrame(QFrame):
 
         vbox = QVBoxLayout()
         vbox.addWidget(QLabel('')) # to align all lists
-        addtolistbutton = QPushButton('<< ' + _('Add to list') + ' <<', parent)
+        addtolistbutton = QPushButton('<< ' + _('Add to list') + ' <<', self)
         addtolistbutton.clicked.connect(self.addToList)
-        addseparatorbutton = QPushButton('<< ' + _('Add separator'), parent)
+        addseparatorbutton = QPushButton('<< ' + _('Add separator'), self)
         addseparatorbutton.clicked.connect(
             lambda: self.forwardToCurrentToolList('addSeparator'))
 
@@ -99,11 +99,11 @@ class ToolsFrame(QFrame):
         vbox = QVBoxLayout()
         vbox.addWidget(QLabel(_('List of all tools')))
         vbox.addWidget(self.globaltoollist)
-        newbutton = QPushButton(_('New Tool ...'), parent)
+        newbutton = QPushButton(_('New Tool ...'), self)
         newbutton.clicked.connect(self.newTool)
-        editbutton = QPushButton(_('Edit Tool ...'), parent)
+        editbutton = QPushButton(_('Edit Tool ...'), self)
         editbutton.clicked.connect(lambda: self.editTool(row=None))
-        deletebutton = QPushButton(_('Delete Tool'), parent)
+        deletebutton = QPushButton(_('Delete Tool'), self)
         deletebutton.clicked.connect(self.deleteCurrentTool)
 
         vbox.addWidget(newbutton)
