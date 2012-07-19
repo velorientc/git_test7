@@ -453,7 +453,7 @@ tortoisehgtoollocations = {
     'workbench.revdetails.custom-menu': 'Revision details context menu',
 }
 
-def tortoisehgtools(ui_=None, ini=None, selectedlocation=None, sources=None):
+def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
     '''
     Parse 'tortoisehg-tools' section of ini file. Changes:
     
@@ -483,41 +483,18 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None, sources=None):
         - workbench.custom-toolbar
         - workbench.revdetails.custom-menu
 
-    If sources is set then only config items whose configuration file "source"
-    is on the list of sources will be returned.
-
-    This function can take a ui object or an wconfig object as its input. If
-    a wconfig object is passed, it is not possible to limit the sources, since
-    a wconfig object is limited to a single "source" (i.e. hgrc file) by
-    definition.
+    This function can take a ui object or an wconfig object as its input.
     '''
     if (ui_ is None and ini is None) or \
             (ui_ is not None and ini is not None):
         raise Exception(
             _('tortoisehgtools: only one of the ui_ and ini inputs must be set'))
-    if sources is None or ini is not None:
-        # When no sources were specified, or when getting a wconfig input,
-        # consider all sources valid
-        checksources = False
-        sources = []
-    else:
-        checksources = True
     if ui_:
         configitems = ui_.configitems('tortoisehg-tools')
     else:
         configitems = ini['tortoisehg-tools'].items()
     tools = {}
     for key, value in configitems:
-        # if a set of sources was specified, check that the current item
-        # comes from one of these valid sources
-        validsource = not checksources
-        for source in sources:
-            if ui_.configsource('tortoisehg-tools', key).startswith(source):
-                validsource = True
-                break
-        if not validsource:
-            continue
-
         toolname, field = key.split('.')
         if toolname not in tools:
             tools[toolname] = {}
