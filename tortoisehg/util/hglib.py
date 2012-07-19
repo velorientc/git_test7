@@ -457,6 +457,7 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
     """Parse 'tortoisehg-tools' section of ini file.
 
     >>> from pprint import pprint
+    >>> from mercurial import config
     >>> class memui(ui.ui):
     ...     def readconfig(self, filename, root=None, trust=False,
     ...                    sections=None, remap=None):
@@ -489,12 +490,52 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
     "extension lists", which are lists of tool names, which follow the same
     format as the workbench.task-toolbar setting, i.e. a list of tool names,
     separated by spaces or "|" to indicate separators.
-    
+
+    >>> hgrctext_full = hgrctext + '''
+    ... update_to_null.icon = hg-update
+    ... update_to_null.command = hg update null
+    ... update_to_null.tooltip = Update to null
+    ... explore_wd.command = explorer.exe /e,{ROOT}
+    ... explore_wd.enable = iswd
+    ... explore_wd.label = Open in explorer
+    ... explore_wd.showoutput = True
+    ...
+    ... [tortoisehg]
+    ... workbench.custom-toolbar = update_to_tip | explore_wd
+    ... workbench.revdetails.custom-menu = update_to_tip update_to_null
+    ... '''
+    >>> uiobj = memui()
+    >>> uiobj._tcfg.parse('<hgrc>', hgrctext_full)
+
+    >>> tools, toollist = tortoisehgtools(
+    ...     uiobj, selectedlocation='workbench.custom-toolbar')
+    >>> sorted(tools.keys())
+    ['explore_wd', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', '|', 'explore_wd']
+
+    >>> tools, toollist = tortoisehgtools(
+    ...     uiobj, selectedlocation='workbench.revdetails.custom-menu')
+    >>> sorted(tools.keys())
+    ['update_to_null', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', 'update_to_null']
+
     Valid "locations lists" are:
         - workbench.custom-toolbar
         - workbench.revdetails.custom-menu
 
-    This function can take a ui object or an wconfig object as its input.
+    This function can take a ui object or a config object as its input.
+
+    >>> cfg = config.config()
+    >>> cfg.parse('<hgrc>', hgrctext)
+    >>> tools, toollist = tortoisehgtools(ini=cfg)
+    >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
+    {'update_to_tip': {'command': 'hg update tip',
+                       'icon': 'hg-update',
+                       'tooltip': 'Update to tip'}}
+    >>> toollist
+    ['update_to_tip']
     """
     if (ui_ is None and ini is None) or \
             (ui_ is not None and ini is not None):
