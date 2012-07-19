@@ -31,9 +31,7 @@ class ToolsFrame(QFrame):
         QFrame.__init__(self, parent, **opts)
         self.widgets = []
         self.ini = parent.ini
-        self.sources = parent.rcpath
-        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini,
-            sources=parent.rcpath)
+        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini)
         self.setValue(self.tortoisehgtools)
 
         # The frame has a header and 3 columns:
@@ -65,14 +63,13 @@ class ToolsFrame(QFrame):
         topvbox.addLayout(hbox)
         vbox = QVBoxLayout()
 
-        self.globaltoollist = ToolListBox(
-            minimumwidth=100, sources=parent.rcpath, parent=parent)
+        self.globaltoollist = ToolListBox(minimumwidth=100, parent=parent)
         self.globaltoollist.doubleClicked.connect(self.editToolItem)
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
         for location in hglib.tortoisehgtoollocations:
             self.locationcombo.addItem(location)
-            toollist = ToolListBox(location=location, sources=parent.rcpath,
+            toollist = ToolListBox(location=location,
                 minimumwidth=100, parent=parent)
             toollist.doubleClicked.connect(self.editToolFromName)
             vbox.addWidget(toollist)
@@ -273,8 +270,7 @@ class ToolsFrame(QFrame):
         return self.tortoisehgtools != self.curvalue
 
     def refresh(self):
-        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini,
-            sources=self.sources)
+        self.tortoisehgtools, guidef = hglib.tortoisehgtools(ini=self.ini)
         self.setValue(self.tortoisehgtools)
         self.globaltoollist.refresh()
         for w in self.widgets:
@@ -283,14 +279,12 @@ class ToolsFrame(QFrame):
 
 class ToolListBox(QListWidget):
     SEPARATOR = '------'
-    def __init__(self, parent=None, location=None, sources=None,
-            minimumwidth=None, **opts):
+    def __init__(self, parent=None, location=None, minimumwidth=None, **opts):
         QListWidget.__init__(self, parent, **opts)
         self.opts = opts
         self.curvalue = None
         self.ini = parent.ini
         self.location = location
-        self.sources = sources
 
         if minimumwidth:
             self.setMinimumWidth(minimumwidth)
@@ -362,8 +356,7 @@ class ToolListBox(QListWidget):
 
     def refresh(self):
         toolsdefs, guidef = hglib.tortoisehgtools(ini=self.ini,
-            selectedlocation=self.location,
-            sources=self.sources)
+            selectedlocation=self.location)
         self.toollist = self._guidef2toollist(guidef)
         self.setValue(guidef)
         self.clear()
