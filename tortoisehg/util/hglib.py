@@ -454,23 +454,34 @@ tortoisehgtoollocations = {
 }
 
 def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
-    '''
-    Parse 'tortoisehg-tools' section of ini file. Changes:
-    
-    [tortoisehg-tools]
-    update_to_tip.icon = hg-update
-    update_to_tip.command = hg update tip
-    update_to_tip.tooltip = Update to tip
-    
+    """Parse 'tortoisehg-tools' section of ini file.
+
+    >>> from pprint import pprint
+    >>> class memui(ui.ui):
+    ...     def readconfig(self, filename, root=None, trust=False,
+    ...                    sections=None, remap=None):
+    ...         pass  # avoid reading settings from file-system
+
+    Changes:
+
+    >>> hgrctext = '''
+    ... [tortoisehg-tools]
+    ... update_to_tip.icon = hg-update
+    ... update_to_tip.command = hg update tip
+    ... update_to_tip.tooltip = Update to tip
+    ... '''
+    >>> uiobj = memui()
+    >>> uiobj._tcfg.parse('<hgrc>', hgrctext)
+
     into the following dictionary
-    
-    {'update_to_tip':
-        {
-            'icon': 'hg-update',
-            'command': 'hg update tip',
-            'tooltip': 'Update to tip',
-        }
-    }
+
+    >>> tools, toollist = tortoisehgtools(uiobj)
+    >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
+    {'update_to_tip': {'command': 'hg update tip',
+                       'icon': 'hg-update',
+                       'tooltip': 'Update to tip'}}
+    >>> toollist
+    ['update_to_tip']
 
     If selectedlocation is set, only return those tools that have been
     configured to be shown at the given "location".
@@ -484,7 +495,7 @@ def tortoisehgtools(ui_=None, ini=None, selectedlocation=None):
         - workbench.revdetails.custom-menu
 
     This function can take a ui object or an wconfig object as its input.
-    '''
+    """
     if (ui_ is None and ini is None) or \
             (ui_ is not None and ini is not None):
         raise Exception(
