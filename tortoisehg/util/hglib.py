@@ -541,17 +541,34 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
                        'tooltip': 'Update to tip'}}
     >>> toollist
     ['update_to_tip']
+
+    >>> cfg = config.config()
+    >>> cfg.parse('<hgrc>', hgrctext_full)
+    >>> tools, toollist = tortoisehgtools(
+    ...     cfg, selectedlocation='workbench.custom-toolbar')
+    >>> sorted(tools.keys())
+    ['explore_wd', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', '|', 'explore_wd']
+
+    No error for empty config:
+
+    >>> emptycfg = config.config()
+    >>> tortoisehgtools(emptycfg)
+    ({}, [])
+    >>> tortoisehgtools(emptycfg, selectedlocation='workbench.custom-toolbar')
+    ({}, [])
     """
     if isinstance(uiorconfig, ui.ui):
-        ui_ = uiorconfig
-        ini = None
-        configitems = ui_.configitems('tortoisehg-tools')
+        configitems = uiorconfig.configitems
+        configlist = uiorconfig.configlist
     else:
-        ui_ = None
-        ini = uiorconfig
-        configitems = ini['tortoisehg-tools'].items()
+        configitems = uiorconfig.items
+        def configlist(section, name):
+            return uiorconfig.get(section, name, '').split()
+
     tools = {}
-    for key, value in configitems:
+    for key, value in configitems('tortoisehg-tools'):
         toolname, field = key.split('.')
         if toolname not in tools:
             tools[toolname] = {}
@@ -567,10 +584,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     if selectedlocation not in tortoisehgtoollocations:
         raise ValueError('invalid location %r' % selectedlocation)
 
-    if ui_:
-        guidef = ui_.configlist('tortoisehg', selectedlocation, [])
-    else:
-        guidef = ini['tortoisehg'][selectedlocation].split()
+    guidef = configlist('tortoisehg', selectedlocation) or []
     toollist = []
     selectedtools = {}
     for name in guidef:
