@@ -204,8 +204,12 @@ class RenameDialog(QDialog):
                 caption = _('Select Destination Folder')
         FD = QFileDialog
         if os.path.isfile(curr):
-            path = FD.getOpenFileName(parent=self, caption=caption,
-                    options=FD.ReadOnly)
+            if mode == 'src':
+                path = FD.getOpenFileName(parent=self, caption=caption,
+                                          options=FD.ReadOnly)
+            else:
+                path = FD.getSaveFileName(parent=self, caption=caption,
+                                          options=FD.ReadOnly)
         else:
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
