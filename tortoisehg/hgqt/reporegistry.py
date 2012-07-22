@@ -687,7 +687,7 @@ class RepoRegistryView(QDockWidget):
                 repotype = 'unknown'
         if repotype == 'hg':
             if groupname:
-                self.addRepo(hglib.tounicode(root), groupname)
+                self.addRepo(root, groupname)
             self.openRepo.emit(hglib.tounicode(root), False)
         else:
             qtlib.WarningMsgBox(
