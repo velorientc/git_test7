@@ -166,11 +166,11 @@ class FilectxActions(QObject):
         self._contextmenus[key] = contextmenu
         return contextmenu
 
-    def navigate(self, filename=None):
-        self._navigate(filename, FileLogDialog, self._nav_dialogs)
+    def navigate(self):
+        self._navigate(FileLogDialog, self._nav_dialogs)
 
-    def diffNavigate(self, filename=None):
-        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
+    def diffNavigate(self):
+        self._navigate(FileDiffDialog, self._diff_dialogs)
 
     def filterfile(self):
         """Ask to only show the revisions in which files on that folder are
@@ -253,9 +253,8 @@ class FilectxActions(QObject):
                                   parent=self.parent())
         dlg.exec_()
 
-    def _navigate(self, filename, dlgclass, dlgdict):
-        if not filename:
-            filename = self._selectedfiles[0]
+    def _navigate(self, dlgclass, dlgdict):
+        filename = self._selectedfiles[0]
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 # dirty hack to pass workbench only if available
