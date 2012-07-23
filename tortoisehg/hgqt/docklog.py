@@ -22,6 +22,9 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     returnPressed = pyqtSignal(unicode)
     """Return key pressed when cursor is on prompt line"""
+    historyPrev = pyqtSignal(unicode)
+    historyNext = pyqtSignal(unicode)
+    historyComplete = pyqtSignal(unicode)
 
     _prompt = '% '
 
@@ -30,13 +33,33 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self._prompt_marker = self.markerDefine(QsciScintilla.Background)
         self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
         self.cursorPositionChanged.connect(self._updatePrompt)
+        self._searchText = ''
 
     def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if self._cursoronpromptline():
-                self.returnPressed.emit(self.commandText())
-            return
+        cursoronprompt = self._cursoronpromptline()
+        if cursoronprompt:
+            if event.key() == Qt.Key_Up:
+                return self.historyPrev.emit(self._searchText)
+            elif event.key() == Qt.Key_Down:
+                return self.historyNext.emit(self._searchText)
+            if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+                self._searchText = ''
+                return self.returnPressed.emit(self.commandText())
+            if self._searchText == '':
+                self._searchText = self.commandText()
+            if event.key() == Qt.Key_Tab:
+                return self.historyComplete.emit(self.commandText())
+        if event.key() == Qt.Key_Escape:
+            # When ESC is pressed, if the cursor is on the prompt,
+            # this clears it, if not, this moves the cursor to the prompt
+            self.setCommandText('')
+
         super(_LogWidgetForConsole, self).keyPressEvent(event)
+
+        if cursoronprompt:
+            # The search text must be updated _after_ the base class keyPressEvent
+            # has been handled. Otherwise the last character is missing!
+            self._searchText = self.commandText()
 
     def setPrompt(self, text):
         if text == self._prompt:
@@ -175,15 +198,93 @@ class ConsoleWidget(QWidget):
         self.setRepository(None)
         self.openPrompt()
         self.suppressPrompt = False
+        self._commandHistory = []
+        self._commandIdx = None
 
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
+        self._color = self._logwidget.color()
         self._logwidget.returnPressed.connect(self._runcommand)
+        self._logwidget.historyPrev.connect(self.historyPrev)
+        self._logwidget.historyNext.connect(self.historyNext)
+        self._logwidget.historyComplete.connect(self.historyComplete)
         self.layout().addWidget(self._logwidget)
 
         # compatibility methods with LogWidget
         for name in ('openPrompt', 'closePrompt', 'clear'):
             setattr(self, name, getattr(self._logwidget, name))
+
+    def historySearch(self, text, backwards=True):
+        if not self._commandHistory:
+            self.flash()
+            return
+        text = unicode(text)
+        def getNextIdx(backwards, curIdx):
+            nextIdx = curIdx
+            if nextIdx is None:
+                nextIdx = len(self._commandHistory)
+            if backwards:
+                nextIdx -= 1
+            else:
+                nextIdx += 1
+            if 0 <= nextIdx < len(self._commandHistory):
+                return nextIdx
+            else:
+                return None
+
+        cmdline = ''
+        idx = self._commandIdx
+        while True:
+            idx = getNextIdx(backwards, idx)
+            if idx is None:
+                break
+            curcmdline = self._commandHistory[idx]
+            if curcmdline.startswith(text):
+                self._commandIdx = idx
+                cmdline = curcmdline
+                break
+
+        if cmdline:
+            self._logwidget.setCommandText(cmdline)
+        else:
+            self.flash()
+
+    def flash(self, color="brown"):
+        """briefly change the text color to catch the user attention"""
+        QTimer.singleShot(0, lambda: self._logwidget.setColor(QColor(color)))
+        QTimer.singleShot(100, lambda: self._logwidget.setColor(self._color))
+
+    @pyqtSlot(unicode)
+    def historyPrev(self, text):
+        self.historySearch(text, backwards=True)
+
+    @pyqtSlot(unicode)
+    def historyNext(self, text):
+        self.historySearch(text, backwards=False)
+
+    @pyqtSlot(unicode)
+    def historyComplete(self, text):
+        """
+        Show the list of history items matching the search text
+
+        Also complete the prompt with the common prefix to the matching items
+        """
+        text = unicode(text).strip()
+        if not text:
+            self.flash()
+            return
+        history = set(self._commandHistory)
+        matches = []
+        for cmdline in history:
+            if cmdline.startswith(text):
+                matches.append(cmdline)
+        if not matches:
+            self.flash()
+            return
+        matches.sort()
+        commonprefix = os.path.commonprefix(matches)
+        self._logwidget.setCommandText(commonprefix)
+        self._logwidget.append('\n' + '\n'.join(matches) + '\n')
 
     @util.propertycache
     def _cmdcore(self):
@@ -250,6 +351,7 @@ class ConsoleWidget(QWidget):
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
+        self._commandIdx = None
         try:
             args = list(self._parsecmdline(cmdline))
         except ValueError, e:
@@ -260,6 +362,11 @@ class ConsoleWidget(QWidget):
         if not args:
             self.openPrompt()
             return
+        # add command to command history
+        ucmdline = unicode(cmdline)
+        if not self._commandHistory or self._commandHistory[-1] != ucmdline:
+            self._commandHistory.append(ucmdline)
+        # execute the command
         cmd = args.pop(0)
         try:
             self._cmdtable[cmd](self, args)
