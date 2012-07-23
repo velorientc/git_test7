@@ -254,7 +254,7 @@ class FilectxActions(QObject):
         dlg.exec_()
 
     def _navigate(self, dlgclass, dlgdict):
-        filename = self._selectedfiles[0]
+        filename = self._currentfile
         if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
                 # dirty hack to pass workbench only if available
