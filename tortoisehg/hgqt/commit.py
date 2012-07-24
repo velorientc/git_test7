@@ -10,18 +10,22 @@ import re
 
 from mercurial import ui, util, error, scmutil, phases
 
-from tortoisehg.util import hglib, shlib, wconfig, bugtraq
+from tortoisehg.util import hglib, shlib, wconfig
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt import hgrcutil, mq, lfprompt, i18n
-from tortoisehg.util.hgversion import hgversion
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciAPIs
 
+if os.name == 'nt':
+    from tortoisehg.util import bugtraq
+    _hasbugtraq = True
+else:
+    _hasbugtraq = False
 
 # Technical Debt for CommitWidget
 #  disable commit button while no message is entered or no files are selected
@@ -117,7 +121,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         tbar.addAction(_('Options')).triggered.connect(self.details)
         tbar.setIconSize(QSize(16,16))
 
-        if self.opts['bugtraqplugin'] != None:
+        if _hasbugtraq and self.opts['bugtraqplugin'] != None:
             # We create the "Show Issues" button, but we delay its setup
             # because creating the bugtraq object is slow and blocks the GUI,
             # which would result in a noticeable slow down while creating the commit widget
@@ -253,17 +257,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def commitSetupButton(self):
         ispatch = lambda r: 'qtip' in r.changectx('.').tags()
         notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
-        canamend = lambda r: False
-        # hg >= 2.2 has amend capabilities
-        if hgversion >= '2.2':
-            def canamend(r):
-                if ispatch(r):
-                    return False
-                ctx = r.changectx('.')
-                return not ctx.children() \
-                    and ctx.phase() != phases.public \
-                    and len(ctx.parents()) < 2 \
-                    and len(r.changectx(None).parents()) < 2
+        def canamend(r):
+            if ispatch(r):
+                return False
+            ctx = r.changectx('.')
+            return not ctx.children() \
+                and ctx.phase() != phases.public \
+                and len(ctx.parents()) < 2 \
+                and len(r.changectx(None).parents()) < 2
 
         acts = [
             ('commit', _('Commit changes'), _('Commit'), notpatch),
@@ -500,7 +501,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.msgte.lexer().setAPIs(self._apis)
 
     def bugTrackerPostCommit(self):
-        if self.opts['bugtraqtrigger'] != 'commit':
+        if not _hasbugtraq or self.opts['bugtraqtrigger'] != 'commit':
             return
         # commit already happened, get last message in history
         message = self.lastmessage
