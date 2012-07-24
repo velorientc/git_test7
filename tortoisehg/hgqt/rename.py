@@ -193,8 +193,6 @@ class RenameDialog(QDialog):
             caption = _('Select Source Folder')
             path = FD.getExistingDirectory(parent=self, caption=caption,
                                            options=FD.ShowDirsOnly | FD.ReadOnly)
-        if not path:
-            return
         relpath = self.to_relative_path(path)
         if not relpath:
             return
@@ -212,14 +210,14 @@ class RenameDialog(QDialog):
             caption = _('Select Destination Folder')
             path = FD.getExistingDirectory(parent=self, caption=caption,
                                            options=FD.ShowDirsOnly | FD.ReadOnly)
-        if not path:
-            return
         relpath = self.to_relative_path(path)
         if not relpath:
             return
         self.dest_txt.setText(relpath)
 
     def to_relative_path(self, fullpath):  # unicode or QString
+        if not fullpath:
+            return
         fullpath = util.normpath(unicode(fullpath))
         pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
         if not fullpath.startswith(pathprefix):
