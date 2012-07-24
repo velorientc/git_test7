@@ -214,15 +214,20 @@ class RenameDialog(QDialog):
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
-            path = util.normpath(unicode(path))
-            pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
-            if not path.startswith(pathprefix):
+            relpath = self.to_relative_path(path)
+            if not relpath:
                 return
-            relpath = path[len(pathprefix):]
             if mode == 'src':
                 self.src_txt.setText(relpath)
             else:
                 self.dest_txt.setText(relpath)
+
+    def to_relative_path(self, fullpath):  # unicode or QString
+        fullpath = util.normpath(unicode(fullpath))
+        pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+        if not fullpath.startswith(pathprefix):
+            return
+        return fullpath[len(pathprefix):]
 
     def copy_chk_toggled(self):
         self.setRenameCopy()
