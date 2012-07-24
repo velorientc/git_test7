@@ -216,7 +216,7 @@ class RenameDialog(QDialog):
             return
         fullpath = util.normpath(unicode(fullpath))
         pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
-        if not fullpath.startswith(pathprefix):
+        if not os.path.normcase(fullpath).startswith(os.path.normcase(pathprefix)):
             return
         return fullpath[len(pathprefix):]
 
