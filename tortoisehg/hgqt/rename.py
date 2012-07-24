@@ -201,15 +201,11 @@ class RenameDialog(QDialog):
     def dest_btn_clicked(self):
         """Select the destination file of folder"""
         FD = QFileDialog
-        curr = self.get_dest()
-        if os.path.isfile(curr):
+        if os.path.isfile(self.get_src()):
             caption = _('Select Destination File')
-            path = FD.getSaveFileName(parent=self, caption=caption,
-                                      options=FD.ReadOnly)
         else:
             caption = _('Select Destination Folder')
-            path = FD.getExistingDirectory(parent=self, caption=caption,
-                                           options=FD.ShowDirsOnly | FD.ReadOnly)
+        path = FD.getSaveFileName(parent=self, caption=caption)
         relpath = self.to_relative_path(path)
         if not relpath:
             return
