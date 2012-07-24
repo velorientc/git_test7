@@ -11,10 +11,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from mercurial import util
+from mercurial import commands, util
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, run
 from tortoisehg.util import hglib
 
 class _LogWidgetForConsole(cmdui.LogWidget):
@@ -214,8 +214,6 @@ class ConsoleWidget(QWidget):
 
     _cmdtable = _ConsoleCmdTable()
 
-    # TODO: command history and completion
-
     def __init__(self, parent=None):
         super(ConsoleWidget, self).__init__(parent)
         self.setLayout(QVBoxLayout())
@@ -273,6 +271,57 @@ class ConsoleWidget(QWidget):
         else:
             self._logwidget.flash()
 
+    def _commandComplete(self, cmdtype, cmdline):
+        matches = []
+        cmd = cmdline.split()
+        if cmdtype == 'hg':
+            cmdtable = commands.table
+        else:
+            cmdtable = run.table
+        subcmd = ''
+        if len(cmd) >= 2:
+            subcmd = cmd[1].lower()
+        def findhgcmd(cmdstart):
+            matchinfo = {}
+            for cmdspec in cmdtable:
+                for cmdname in cmdspec.split('|'):
+                    if cmdname[0] == '^':
+                        cmdname = cmdname[1:]
+                    if cmdname.startswith(cmdstart):
+                        matchinfo[cmdname] = cmdspec
+            return matchinfo
+        matchingcmds = findhgcmd(subcmd)
+        if not matchingcmds:
+            return matches
+        if len(matchingcmds) > 1:
+            basecmdline = '%s %%s' % (cmdtype)
+            matches = [basecmdline % c for c in matchingcmds]
+        else:
+            scmdtype = matchingcmds.keys()[0]
+            cmdspec = matchingcmds[scmdtype]
+            opts = cmdtable[cmdspec][1]
+            def findcmdopt(cmdopt):
+                cmdopt = cmdopt.lower()
+                while(cmdopt.startswith('-')):
+                    cmdopt = cmdopt[1:]
+                matchingopts = []
+                for opt in opts:
+                    if opt[1].startswith(cmdopt):
+                        matchingopts.append(opt)
+                return matchingopts
+            basecmdline = '%s %s --%%s' % (cmdtype, scmdtype)
+            if len(cmd) == 2:
+                matches = ['%s %s ' % (cmdtype, scmdtype)]
+                matches += [basecmdline % opt[1] for opt in opts]
+            else:
+                cmdopt = cmd[-1]
+                if cmdopt.startswith('-'):
+                    # find the matching options
+                    basecmdline = ' '.join(cmd[:-1]) + ' --%s'
+                    cmdopts = findcmdopt(cmdopt)
+                    matches = [basecmdline % opt[1] for opt in cmdopts]
+        return sorted(matches)
+
     @pyqtSlot(unicode)
     def historyComplete(self, text):
         """
@@ -285,17 +334,30 @@ class ConsoleWidget(QWidget):
             self._logwidget.flash()
             return
         history = set(self._commandHistory)
+        commonprefix = ''
         matches = []
         for cmdline in history:
             if cmdline.startswith(text):
                 matches.append(cmdline)
+        if matches:
+            matches.sort()
+            commonprefix = os.path.commonprefix(matches)
+        cmd = text.split()
+        cmdtype = cmd[0].lower()
+        if cmdtype in ('hg', 'thg'):
+            hgcommandmatches = self._commandComplete(cmdtype, text)
+            if hgcommandmatches:
+                if not commonprefix:
+                    commonprefix = os.path.commonprefix(hgcommandmatches)
+                if matches:
+                    matches.append('------ %s commands ------' % cmdtype)
+                matches += hgcommandmatches
         if not matches:
             self._logwidget.flash()
             return
-        matches.sort()
-        commonprefix = os.path.commonprefix(matches)
         self._logwidget.setCommandText(commonprefix)
-        self._logwidget.append('\n' + '\n'.join(matches) + '\n')
+        if len(matches) > 1:
+            self._logwidget.append('\n' + '\n'.join(matches) + '\n')
 
     @util.propertycache
     def _cmdcore(self):
