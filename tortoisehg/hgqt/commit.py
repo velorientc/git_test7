@@ -807,7 +807,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             merge = False
             self.files = self.stwidget.getChecked('MAR?!S')
-        if not (self.files or brcmd or newbranch or amend or merge):
+        canemptycommit = bool(brcmd or newbranch or amend)
+        if not (self.files or canemptycommit or merge):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
@@ -889,7 +890,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if amend:
             cmdline.append('--amend')
 
-        if not self.files and (brcmd or newbranch or amend) and not merge:
+        if not self.files and canemptycommit and not merge:
             # make sure to commit empty changeset by excluding all files
             cmdline.extend(['--exclude', repo.root])
 
