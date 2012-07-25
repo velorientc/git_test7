@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 
 from mercurial import util
 
-from tortoisehg.hgqt import qtlib, revert, visdiff
+from tortoisehg.hgqt import qtlib, revert, thgrepo, visdiff
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
@@ -180,61 +180,58 @@ class FilectxActions(QObject):
         self.filterRequested.emit("file('%s/**')" % self._selectedfiles[0])
 
     def vdiff(self):
-        filenames = self._selectedfiles
+        repo, filenames, rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        rev = self.ctx.rev()
-        if rev in self.repo.thgmqunappliedpatches:
+        if rev in repo.thgmqunappliedpatches:
             QMessageBox.warning(self,
                 _("Cannot display visual diff"),
                 _("Visual diffs are not supported for unapplied patches"))
             return
         opts = {'change': rev}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
+        dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
         if dlg:
             dlg.exec_()
 
     def vdifflocal(self):
-        filenames = self._selectedfiles
+        repo, filenames, rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        assert type(self.ctx.rev()) is int
-        opts = {'rev':['rev(%d)' % (self.ctx.rev())]}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
+        assert type(rev) is int
+        opts = {'rev': ['rev(%d)' % rev]}
+        dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
         if dlg:
             dlg.exec_()
 
     def editfile(self):
-        filenames = self._selectedfiles
+        repo, filenames, rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        rev = self.ctx.rev()
         if rev is None:
-            qtlib.editfiles(self.repo, filenames, parent=self.parent())
+            qtlib.editfiles(repo, filenames, parent=self.parent())
         else:
-            base, _ = visdiff.snapshot(self.repo, filenames, self.ctx)
+            base, _ = visdiff.snapshot(repo, filenames, repo[rev])
             files = [os.path.join(base, filename)
                      for filename in filenames]
-            qtlib.editfiles(self.repo, files, parent=self.parent())
+            qtlib.editfiles(repo, files, parent=self.parent())
 
     def savefile(self):
-        filenames = self._selectedfiles
+        repo, filenames, rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        qtlib.savefiles(self.repo, filenames, self.ctx.rev(),
-                        parent=self.parent())
+        qtlib.savefiles(repo, filenames, rev, parent=self.parent())
 
     def editlocal(self):
-        filenames = self._selectedfiles
+        repo, filenames, _rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        qtlib.editfiles(self.repo, filenames, parent=self.parent())
+        qtlib.editfiles(repo, filenames, parent=self.parent())
 
     def openlocal(self):
-        filenames = self._selectedfiles
+        repo, filenames, _rev = self._findsub(self._selectedfiles)
         if not filenames:
             return
-        qtlib.openfiles(self.repo, filenames)
+        qtlib.openfiles(repo, filenames)
 
     def copypath(self):
         absfiles = [util.localpath(self.repo.wjoin(f))
@@ -243,36 +240,60 @@ class FilectxActions(QObject):
             hglib.tounicode(os.linesep.join(absfiles)))
 
     def revertfile(self):
-        fileSelection = self._selectedfiles
-        if len(fileSelection) == 0:
+        repo, fileSelection, rev = self._findsub(self._selectedfiles)
+        if not fileSelection:
             return
-        rev = self.ctx.rev()
         if rev is None:
-            rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, fileSelection, rev,
+            rev = repo[rev].p1().rev()
+        dlg = revert.RevertDialog(repo, fileSelection, rev,
                                   parent=self.parent())
         dlg.exec_()
 
     def _navigate(self, dlgclass, dlgdict):
-        filename = self._currentfile
-        if filename is not None and len(self.repo.file(filename))>0:
-            if filename not in dlgdict:
+        repo, filename, rev = self._findsubsingle(self._currentfile)
+        if filename and len(repo.file(filename)) > 0:
+            if self._currentfile not in dlgdict:
                 # dirty hack to pass workbench only if available
                 from tortoisehg.hgqt import workbench  # avoid cyclic dep
                 repoviewer = None
                 if self.parent() and isinstance(self.parent().window(),
                                                 workbench.Workbench):
                     repoviewer = self.parent().window()
-                dlg = dlgclass(self.repo, filename, repoviewer=repoviewer)
-                dlgdict[filename] = dlg
+                dlg = dlgclass(repo, filename, repoviewer=repoviewer)
+                dlgdict[self._currentfile] = dlg
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
                 dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = dlgdict[filename]
-            dlg.goto(self.ctx.rev())
+            dlg = dlgdict[self._currentfile]
+            dlg.goto(rev)
             dlg.show()
             dlg.raise_()
             dlg.activateWindow()
+
+    def _findsub(self, paths):
+        """Find the nearest (sub-)repository for the given paths
+
+        All paths should be in the same repository. Otherwise, unmatched
+        paths are silently omitted.
+        """
+        if not paths:
+            return self.repo, [], self.ctx.rev()
+
+        repopath, _relpath, ctx = hglib.getDeepestSubrepoContainingFile(
+            paths[0], self.ctx)
+        if not repopath:
+            return self.repo, paths, self.ctx.rev()
+
+        repo = thgrepo.repository(self.repo.ui, self.repo.wjoin(repopath))
+        pfx = repopath + '/'
+        relpaths = [e[len(pfx):] for e in paths if e.startswith(pfx)]
+        return repo, relpaths, ctx.rev()
+
+    def _findsubsingle(self, path):
+        if not path:
+            return self.repo, None, self.ctx.rev()
+        repo, relpaths, rev = self._findsub([path])
+        return repo, relpaths[0], rev
 
     def opensubrepo(self):
         path = os.path.join(self.repo.root, self._currentfile)
