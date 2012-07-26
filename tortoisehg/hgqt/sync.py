@@ -1069,7 +1069,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.showMessage.emit(_('No outgoing changesets to %s') % link)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (link, ret))
-                if self.needNewBranch:
+                if self.needNewBranch and '--new-branch' not in self.lastcmdline:
                     r = qtlib.QuestionMsgBox(_('Confirm New Branch'),
                                              _('One or more of the changesets that you '
                                                'are attempting to push involve the '
