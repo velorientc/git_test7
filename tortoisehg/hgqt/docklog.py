@@ -120,6 +120,19 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         else:
             return ''
 
+    def setCommandText(self, text):
+        """Replace the current command text; subsequent text is also removed"""
+        line = self._findPromptLine()
+        if line < 0:
+            return
+        self._ensurePrompt(line)
+        lastline = self.lines() - 1
+        self.setSelection(line, len(self._prompt),
+                          lastline, len(self.text(lastline)))
+        self.removeSelectedText()
+        self.insert(text)
+        self.setCursorPosition(line, len(self.text(line)))
+
     def _newline(self):
         if self.text(self.lines() - 1):
             self.append('\n')
