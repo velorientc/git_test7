@@ -413,9 +413,16 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
         self.addWidget(self._wrapchk)
-        self._bt = QPushButton(_('Search'), enabled=False)
+        self._btprev = QPushButton('<< ' + _('Prev'), enabled=False)
+        self._btprev.clicked.connect(
+            lambda: self._emitSearchRequested(forward=False))
+        self.addWidget(self._btprev)
+        self._bt = QPushButton(_('Next') + ' >>', enabled=False)
         self._bt.clicked.connect(self._emitSearchRequested)
-        self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
+        def setEnabledSearchButtons(s):
+            self._btprev.setEnabled(bool(s))
+            self._bt.setEnabled(bool(s))
+        self._le.textChanged.connect(setEnabledSearchButtons)
         self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
