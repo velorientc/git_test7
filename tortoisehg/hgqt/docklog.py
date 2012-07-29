@@ -65,24 +65,31 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.SCN_PAINTED.disconnect(self._scrollCaretOnPainted)
         self.SendScintilla(self.SCI_SCROLLCARET)
 
+    def _findPromptLine(self):
+        return self.markerFindPrevious(self.lines() - 1,
+                                       1 << self._prompt_marker)
+
     @pyqtSlot()
     def closePrompt(self):
         """Disable user input"""
-        if self.commandText():
-            self._setmarker((self.lines() - 1,), 'control')
-        self.markerDelete(self.lines() - 1, self._prompt_marker)
+        line = self._findPromptLine()
+        if line >= 0:
+            if self.commandText():
+                self._setmarker((line,), 'control')
+            self.markerDelete(line, self._prompt_marker)
         self._newline()
         self.setCursorPosition(self.lines() - 1, 0)
         self.setReadOnly(True)
 
     @pyqtSlot()
     def clearPrompt(self):
-        """Clear prompt line"""
-        line = self.lines() - 1
-        if not (self.markersAtLine(line) & (1 << self._prompt_marker)):
+        """Clear prompt line and subsequent text"""
+        line = self._findPromptLine()
+        if line < 0:
             return
         self.markerDelete(line)
-        self.setSelection(line, 0, line, len(self.text(line)))
+        lastline = self.lines() - 1
+        self.setSelection(line, 0, lastline, len(self.text(lastline)))
         self.removeSelectedText()
 
     @pyqtSlot(int, int)
@@ -107,9 +114,9 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     def commandText(self):
         """Return the current command text"""
-        l = self.lines() - 1
-        if self.markersAtLine(l) & (1 << self._prompt_marker):
-            return self.text(l)[len(self._prompt):]
+        l = self._findPromptLine()
+        if l >= 0:
+            return unicode(self.text(l))[len(self._prompt):].rstrip('\n')
         else:
             return ''
 
