@@ -23,7 +23,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     returnPressed = pyqtSignal(unicode)
     """Return key pressed when cursor is on prompt line"""
     historyRequested = pyqtSignal(unicode, int)  # keyword, direction
-    historyComplete = pyqtSignal(unicode)
+    completeRequested = pyqtSignal(unicode)
 
     _prompt = '% '
 
@@ -48,7 +48,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                 return self.returnPressed.emit(self.commandText())
             if event.key() == Qt.Key_Tab:
-                return self.historyComplete.emit(self.commandText())
+                return self.completeRequested.emit(self.commandText())
         if event.key() == Qt.Key_Escape:
             # When ESC is pressed, if the cursor is on the prompt,
             # this clears it, if not, this moves the cursor to the prompt
@@ -230,7 +230,7 @@ class ConsoleWidget(QWidget):
         self._logwidget = _LogWidgetForConsole(self)
         self._logwidget.returnPressed.connect(self._runcommand)
         self._logwidget.historyRequested.connect(self.historySearch)
-        self._logwidget.historyComplete.connect(self.historyComplete)
+        self._logwidget.completeRequested.connect(self.completeCommandText)
         self.layout().addWidget(self._logwidget)
 
         # compatibility methods with LogWidget
@@ -323,9 +323,8 @@ class ConsoleWidget(QWidget):
         return sorted(matches)
 
     @pyqtSlot(unicode)
-    def historyComplete(self, text):
-        """
-        Show the list of history items matching the search text
+    def completeCommandText(self, text):
+        """Show the list of history or known commands matching the search text
 
         Also complete the prompt with the common prefix to the matching items
         """
