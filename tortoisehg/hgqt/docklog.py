@@ -68,9 +68,12 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     def openPrompt(self):
         """Show prompt line and enable user input"""
         self.closePrompt()
-        self.markerAdd(self.lines() - 1, self._prompt_marker)
+        line = self.lines() - 1
+        self.markerAdd(line, self._prompt_marker)
         self.append(self._prompt)
-        self.setCursorPosition(self.lines() - 1, len(self._prompt))
+        if self._savedcommands:
+            self.append(self._savedcommands.pop())
+        self.setCursorPosition(line, len(self.text(line)))
         self.setReadOnly(False)
 
         # make sure the prompt line is visible. Because QsciScintilla may
@@ -106,6 +109,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         line = self._findPromptLine()
         if line < 0:
             return
+        self._savedcommands = [self.commandText()]
         self.markerDelete(line)
         lastline = self.lines() - 1
         self.setSelection(line, 0, lastline, len(self.text(lastline)))
