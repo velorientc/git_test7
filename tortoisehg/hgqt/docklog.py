@@ -357,6 +357,8 @@ class ConsoleWidget(QWidget):
         self._logwidget.setCommandText(commonprefix)
         if len(matches) > 1:
             self._logwidget.append('\n' + '\n'.join(matches) + '\n')
+            self._logwidget.ensureLineVisible(self._logwidget.lines() - 1)
+            self._logwidget.ensureCursorVisible()
 
     @util.propertycache
     def _cmdcore(self):
