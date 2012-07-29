@@ -122,7 +122,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     def _updatePrompt(self, line, pos):
         """Update availability of user input"""
         if self.markersAtLine(line) & (1 << self._prompt_marker):
-            self.setReadOnly(False)
+            self.setReadOnly(pos < len(self._prompt))
             self._ensurePrompt(line)
             if pos < len(self._prompt):
                 # avoid inconsistency caused by changing pos inside
