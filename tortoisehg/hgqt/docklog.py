@@ -33,7 +33,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self._prompt_marker = self.markerDefine(QsciScintilla.Background)
         self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
         self.cursorPositionChanged.connect(self._updatePrompt)
-        self._searchText = ''
+        self._savedcommands = []  # temporarily-invisible command
         self._origcolor = None
         self._flashtimer = QTimer(self, interval=100, singleShot=True)
         self._flashtimer.timeout.connect(self._restoreColor)
@@ -42,14 +42,12 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         cursoronprompt = not self.isReadOnly()
         if cursoronprompt:
             if event.key() == Qt.Key_Up:
-                return self.historyPrev.emit(self._searchText)
+                return self.historyPrev.emit(self.commandText())
             elif event.key() == Qt.Key_Down:
-                return self.historyNext.emit(self._searchText)
+                return self.historyNext.emit(self.commandText())
+            del self._savedcommands[:]  # settle candidate by user input
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-                self._searchText = ''
                 return self.returnPressed.emit(self.commandText())
-            if self._searchText == '':
-                self._searchText = self.commandText()
             if event.key() == Qt.Key_Tab:
                 return self.historyComplete.emit(self.commandText())
         if event.key() == Qt.Key_Escape:
@@ -58,11 +56,6 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             self.setCommandText('')
 
         super(_LogWidgetForConsole, self).keyPressEvent(event)
-
-        if cursoronprompt:
-            # The search text must be updated _after_ the base class keyPressEvent
-            # has been handled. Otherwise the last character is missing!
-            self._searchText = self.commandText()
 
     def setPrompt(self, text):
         if text == self._prompt:
@@ -149,17 +142,27 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     def commandText(self):
         """Return the current command text"""
+        if self._savedcommands:
+            return self._savedcommands[-1]
         l = self._findPromptLine()
         if l >= 0:
             return unicode(self.text(l))[len(self._prompt):].rstrip('\n')
         else:
             return ''
 
-    def setCommandText(self, text):
-        """Replace the current command text; subsequent text is also removed"""
+    def setCommandText(self, text, candidate=False):
+        """Replace the current command text; subsequent text is also removed.
+
+        If candidate, the specified text is displayed but does not replace
+        commandText() until the user takes some action.
+        """
         line = self._findPromptLine()
         if line < 0:
             return
+        if candidate:
+            self._savedcommands = [self.commandText()]
+        else:
+            del self._savedcommands[:]
         self._ensurePrompt(line)
         lastline = self.lines() - 1
         self.setSelection(line, len(self._prompt),
@@ -265,7 +268,7 @@ class ConsoleWidget(QWidget):
                 break
 
         if cmdline:
-            self._logwidget.setCommandText(cmdline)
+            self._logwidget.setCommandText(cmdline, candidate=True)
         else:
             self._logwidget.flash()
 
