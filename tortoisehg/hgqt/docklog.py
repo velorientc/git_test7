@@ -501,7 +501,6 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_thg(self, args):
-        from tortoisehg.hgqt import run
         self.closePrompt()
         try:
             if self._repo:
