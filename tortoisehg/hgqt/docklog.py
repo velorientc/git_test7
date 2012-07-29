@@ -124,8 +124,18 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         if self.markersAtLine(line) & (1 << self._prompt_marker):
             self.setReadOnly(False)
             self._ensurePrompt(line)
+            if pos < len(self._prompt):
+                # avoid inconsistency caused by changing pos inside
+                # cursorPositionChanged
+                QTimer.singleShot(0, self._moveCursorToPromptHome)
         else:
             self.setReadOnly(True)
+
+    @pyqtSlot()
+    def _moveCursorToPromptHome(self):
+        line = self._findPromptLine()
+        if line >= 0:
+            self.setCursorPosition(line, len(self._prompt))
 
     def _ensurePrompt(self, line):
         """Insert prompt string if not available"""
@@ -136,7 +146,6 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             if s[i:i + 1] != c:
                 self.insertAt(self._prompt[i:], line, i)
                 break
-        self.setCursorPosition(line, len(self.text(line)))
 
     def commandText(self):
         """Return the current command text"""
