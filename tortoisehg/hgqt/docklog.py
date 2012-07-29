@@ -7,15 +7,15 @@
 
 import glob, os, shlex
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla
+
 from mercurial import util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui
 from tortoisehg.util import hglib
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciScintilla
 
 class _LogWidgetForConsole(cmdui.LogWidget):
     """Wrapped LogWidget for ConsoleWidget"""
