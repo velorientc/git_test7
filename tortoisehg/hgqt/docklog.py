@@ -34,6 +34,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
         self.cursorPositionChanged.connect(self._updatePrompt)
         self._searchText = ''
+        self._color = self.color()
 
     def keyPressEvent(self, event):
         cursoronprompt = self._cursoronpromptline()
@@ -164,6 +165,11 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         line = self.getCursorPosition()[0]
         return self.markersAtLine(line) & (1 << self._prompt_marker)
 
+    def flash(self, color='brown'):
+        """Briefly change the text color to catch the user attention"""
+        QTimer.singleShot(0, lambda: self.setColor(QColor(color)))
+        QTimer.singleShot(100, lambda: self.setColor(self._color))
+
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
     _cmdfuncprefix = '_cmd_'
@@ -203,7 +209,6 @@ class ConsoleWidget(QWidget):
 
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
-        self._color = self._logwidget.color()
         self._logwidget.returnPressed.connect(self._runcommand)
         self._logwidget.historyPrev.connect(self.historyPrev)
         self._logwidget.historyNext.connect(self.historyNext)
@@ -216,7 +221,7 @@ class ConsoleWidget(QWidget):
 
     def historySearch(self, text, backwards=True):
         if not self._commandHistory:
-            self.flash()
+            self._logwidget.flash()
             return
         text = unicode(text)
         def getNextIdx(backwards, curIdx):
@@ -247,12 +252,7 @@ class ConsoleWidget(QWidget):
         if cmdline:
             self._logwidget.setCommandText(cmdline)
         else:
-            self.flash()
-
-    def flash(self, color="brown"):
-        """briefly change the text color to catch the user attention"""
-        QTimer.singleShot(0, lambda: self._logwidget.setColor(QColor(color)))
-        QTimer.singleShot(100, lambda: self._logwidget.setColor(self._color))
+            self._logwidget.flash()
 
     @pyqtSlot(unicode)
     def historyPrev(self, text):
@@ -271,7 +271,7 @@ class ConsoleWidget(QWidget):
         """
         text = unicode(text).strip()
         if not text:
-            self.flash()
+            self._logwidget.flash()
             return
         history = set(self._commandHistory)
         matches = []
@@ -279,7 +279,7 @@ class ConsoleWidget(QWidget):
             if cmdline.startswith(text):
                 matches.append(cmdline)
         if not matches:
-            self.flash()
+            self._logwidget.flash()
             return
         matches.sort()
         commonprefix = os.path.commonprefix(matches)
