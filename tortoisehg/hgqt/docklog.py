@@ -22,8 +22,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     returnPressed = pyqtSignal(unicode)
     """Return key pressed when cursor is on prompt line"""
-    historyPrev = pyqtSignal(unicode)
-    historyNext = pyqtSignal(unicode)
+    historyRequested = pyqtSignal(unicode, int)  # keyword, direction
     historyComplete = pyqtSignal(unicode)
 
     _prompt = '% '
@@ -42,9 +41,9 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         cursoronprompt = not self.isReadOnly()
         if cursoronprompt:
             if event.key() == Qt.Key_Up:
-                return self.historyPrev.emit(self.commandText())
+                return self.historyRequested.emit(self.commandText(), -1)
             elif event.key() == Qt.Key_Down:
-                return self.historyNext.emit(self.commandText())
+                return self.historyRequested.emit(self.commandText(), +1)
             del self._savedcommands[:]  # settle candidate by user input
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                 return self.returnPressed.emit(self.commandText())
@@ -232,8 +231,7 @@ class ConsoleWidget(QWidget):
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
         self._logwidget.returnPressed.connect(self._runcommand)
-        self._logwidget.historyPrev.connect(self.historyPrev)
-        self._logwidget.historyNext.connect(self.historyNext)
+        self._logwidget.historyRequested.connect(self.historySearch)
         self._logwidget.historyComplete.connect(self.historyComplete)
         self.layout().addWidget(self._logwidget)
 
@@ -241,19 +239,18 @@ class ConsoleWidget(QWidget):
         for name in ('openPrompt', 'closePrompt', 'clear'):
             setattr(self, name, getattr(self._logwidget, name))
 
-    def historySearch(self, text, backwards=True):
+    @pyqtSlot(unicode, int)
+    def historySearch(self, text, direction):
+        assert direction != 0
         if not self._commandHistory:
             self._logwidget.flash()
             return
         text = unicode(text)
-        def getNextIdx(backwards, curIdx):
+        def getNextIdx(curIdx):
             nextIdx = curIdx
             if nextIdx is None:
                 nextIdx = len(self._commandHistory)
-            if backwards:
-                nextIdx -= 1
-            else:
-                nextIdx += 1
+            nextIdx += direction
             if 0 <= nextIdx < len(self._commandHistory):
                 return nextIdx
             else:
@@ -262,7 +259,7 @@ class ConsoleWidget(QWidget):
         cmdline = ''
         idx = self._commandIdx
         while True:
-            idx = getNextIdx(backwards, idx)
+            idx = getNextIdx(idx)
             if idx is None:
                 break
             curcmdline = self._commandHistory[idx]
@@ -275,14 +272,6 @@ class ConsoleWidget(QWidget):
             self._logwidget.setCommandText(cmdline, candidate=True)
         else:
             self._logwidget.flash()
-
-    @pyqtSlot(unicode)
-    def historyPrev(self, text):
-        self.historySearch(text, backwards=True)
-
-    @pyqtSlot(unicode)
-    def historyNext(self, text):
-        self.historySearch(text, backwards=False)
 
     @pyqtSlot(unicode)
     def historyComplete(self, text):
