@@ -39,7 +39,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self._flashtimer.timeout.connect(self._restoreColor)
 
     def keyPressEvent(self, event):
-        cursoronprompt = self._cursoronpromptline()
+        cursoronprompt = not self.isReadOnly()
         if cursoronprompt:
             if event.key() == Qt.Key_Up:
                 return self.historyPrev.emit(self._searchText)
@@ -171,10 +171,6 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     def _newline(self):
         if self.text(self.lines() - 1):
             self.append('\n')
-
-    def _cursoronpromptline(self):
-        line = self.getCursorPosition()[0]
-        return self.markersAtLine(line) & (1 << self._prompt_marker)
 
     def flash(self, color='brown'):
         """Briefly change the text color to catch the user attention"""
