@@ -226,25 +226,15 @@ def _searchhistory(items, text, direction, idx):
     []
     """
     assert direction != 0
-    if not items:
-        return None, None
-    def getNextIdx(curIdx):
-        nextIdx = curIdx
-        if nextIdx is None:
-            nextIdx = len(items)
-        nextIdx += direction
-        if 0 <= nextIdx < len(items):
-            return nextIdx
-        else:
-            return None
-
-    while True:
-        idx = getNextIdx(idx)
-        if idx is None:
-            return None, None
+    if idx is None:
+        idx = len(items)
+    idx += direction
+    while 0 <= idx < len(items):
         curcmdline = items[idx]
         if curcmdline.startswith(text):
             return curcmdline, idx
+        idx += direction
+    return None, None
 
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
