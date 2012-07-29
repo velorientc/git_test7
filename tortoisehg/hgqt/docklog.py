@@ -82,7 +82,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         if not (self.markersAtLine(line) & (1 << self._prompt_marker)):
             return
         self.markerDelete(line)
-        self.setSelection(line, 0, line, self.lineLength(line))
+        self.setSelection(line, 0, line, len(self.text(line)))
         self.removeSelectedText()
 
     @pyqtSlot(int, int)
@@ -103,7 +103,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             if s[i:i + 1] != c:
                 self.insertAt(self._prompt[i:], line, i)
                 break
-        self.setCursorPosition(line, self.lineLength(line))
+        self.setCursorPosition(line, len(self.text(line)))
 
     def commandText(self):
         """Return the current command text"""
@@ -114,7 +114,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             return ''
 
     def _newline(self):
-        if self.lineLength(self.lines() - 1) > 0:
+        if self.text(self.lines() - 1):
             self.append('\n')
 
     def _cursoronpromptline(self):
