@@ -192,49 +192,51 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.setColor(self._origcolor)
 
 def _searchhistory(items, text, direction, idx):
-    """
-    >>> def searchall(items, text, direction, idx=None):
+    """Search history items and return (item, index_of_item)
+
+    Valid index is zero or negative integer. Zero is reserved for non-history
+    item.
+
+    >>> def searchall(items, text, direction, idx=0):
     ...     matched = []
     ...     while True:
     ...         it, idx = _searchhistory(items, text, direction, idx)
     ...         if not it:
-    ...             return matched
+    ...             return matched, idx
     ...         matched.append(it)
 
     >>> searchall('foo bar baz'.split(), '', direction=-1)
-    ['baz', 'bar', 'foo']
-    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=0)
-    ['bar', 'baz']
+    (['baz', 'bar', 'foo'], -4)
+    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=-3)
+    (['bar', 'baz'], 0)
 
     search by keyword:
 
     >>> searchall('foo bar baz'.split(), 'b', direction=-1)
-    ['baz', 'bar']
+    (['baz', 'bar'], -4)
     >>> searchall('foo bar baz'.split(), 'inexistent', direction=-1)
-    []
+    ([], -4)
 
     empty history:
 
     >>> searchall([], '', direction=-1)
-    []
+    ([], -1)
 
     initial index out of range:
 
-    >>> searchall('foo bar baz'.split(), '', direction=-1, idx=4)
-    []
-    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=-2)
-    []
+    >>> searchall('foo bar baz'.split(), '', direction=-1, idx=-3)
+    ([], -4)
+    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=0)
+    ([], 1)
     """
     assert direction != 0
-    if idx is None:
-        idx = len(items)
     idx += direction
-    while 0 <= idx < len(items):
+    while -len(items) <= idx < 0:
         curcmdline = items[idx]
         if curcmdline.startswith(text):
             return curcmdline, idx
         idx += direction
-    return None, None
+    return None, idx
 
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
@@ -269,7 +271,7 @@ class ConsoleWidget(QWidget):
         self.openPrompt()
         self.suppressPrompt = False
         self._commandHistory = []
-        self._commandIdx = None
+        self._commandIdx = 0
 
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
@@ -446,7 +448,7 @@ class ConsoleWidget(QWidget):
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
-        self._commandIdx = None
+        self._commandIdx = 0
         try:
             args = list(self._parsecmdline(cmdline))
         except ValueError, e:
