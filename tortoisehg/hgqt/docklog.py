@@ -192,6 +192,39 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.setColor(self._origcolor)
 
 def _searchhistory(items, text, direction, idx):
+    """
+    >>> def searchall(items, text, direction, idx=None):
+    ...     matched = []
+    ...     while True:
+    ...         it, idx = _searchhistory(items, text, direction, idx)
+    ...         if not it:
+    ...             return matched
+    ...         matched.append(it)
+
+    >>> searchall('foo bar baz'.split(), '', direction=-1)
+    ['baz', 'bar', 'foo']
+    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=0)
+    ['bar', 'baz']
+
+    search by keyword:
+
+    >>> searchall('foo bar baz'.split(), 'b', direction=-1)
+    ['baz', 'bar']
+    >>> searchall('foo bar baz'.split(), 'inexistent', direction=-1)
+    []
+
+    empty history:
+
+    >>> searchall([], '', direction=-1)
+    []
+
+    initial index out of range:
+
+    >>> searchall('foo bar baz'.split(), '', direction=-1, idx=4)
+    []
+    >>> searchall('foo bar baz'.split(), '', direction=+1, idx=-2)
+    []
+    """
     assert direction != 0
     if not items:
         return None, None
