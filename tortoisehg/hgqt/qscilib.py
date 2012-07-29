@@ -127,8 +127,10 @@ class Scintilla(QsciScintilla):
         super(Scintilla, self).__init__(parent)
         self.autoUseTabs = True
         self.setUtf8(True)
+        self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
+
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
