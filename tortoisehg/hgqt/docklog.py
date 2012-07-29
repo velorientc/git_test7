@@ -34,7 +34,9 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
         self.cursorPositionChanged.connect(self._updatePrompt)
         self._searchText = ''
-        self._color = self.color()
+        self._origcolor = None
+        self._flashtimer = QTimer(self, interval=100, singleShot=True)
+        self._flashtimer.timeout.connect(self._restoreColor)
 
     def keyPressEvent(self, event):
         cursoronprompt = self._cursoronpromptline()
@@ -167,8 +169,16 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     def flash(self, color='brown'):
         """Briefly change the text color to catch the user attention"""
-        QTimer.singleShot(0, lambda: self.setColor(QColor(color)))
-        QTimer.singleShot(100, lambda: self.setColor(self._color))
+        if self._flashtimer.isActive():
+            return
+        self._origcolor = self.color()
+        self.setColor(QColor(color))
+        self._flashtimer.start()
+
+    @pyqtSlot()
+    def _restoreColor(self):
+        assert self._origcolor
+        self.setColor(self._origcolor)
 
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
