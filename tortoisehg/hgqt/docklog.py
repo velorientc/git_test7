@@ -191,6 +191,28 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         assert self._origcolor
         self.setColor(self._origcolor)
 
+def _searchhistory(items, text, direction, idx):
+    assert direction != 0
+    if not items:
+        return None, None
+    def getNextIdx(curIdx):
+        nextIdx = curIdx
+        if nextIdx is None:
+            nextIdx = len(items)
+        nextIdx += direction
+        if 0 <= nextIdx < len(items):
+            return nextIdx
+        else:
+            return None
+
+    while True:
+        idx = getNextIdx(idx)
+        if idx is None:
+            return None, None
+        curcmdline = items[idx]
+        if curcmdline.startswith(text):
+            return curcmdline, idx
+
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
     _cmdfuncprefix = '_cmd_'
@@ -239,34 +261,10 @@ class ConsoleWidget(QWidget):
 
     @pyqtSlot(unicode, int)
     def historySearch(self, text, direction):
-        assert direction != 0
-        if not self._commandHistory:
-            self._logwidget.flash()
-            return
-        text = unicode(text)
-        def getNextIdx(curIdx):
-            nextIdx = curIdx
-            if nextIdx is None:
-                nextIdx = len(self._commandHistory)
-            nextIdx += direction
-            if 0 <= nextIdx < len(self._commandHistory):
-                return nextIdx
-            else:
-                return None
-
-        cmdline = ''
-        idx = self._commandIdx
-        while True:
-            idx = getNextIdx(idx)
-            if idx is None:
-                break
-            curcmdline = self._commandHistory[idx]
-            if curcmdline.startswith(text):
-                self._commandIdx = idx
-                cmdline = curcmdline
-                break
-
+        cmdline, idx = _searchhistory(self._commandHistory, unicode(text),
+                                      direction, self._commandIdx)
         if cmdline:
+            self._commandIdx = idx
             self._logwidget.setCommandText(cmdline, candidate=True)
         else:
             self._logwidget.flash()
