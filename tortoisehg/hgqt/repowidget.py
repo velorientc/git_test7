@@ -1336,6 +1336,13 @@ class RepoWidget(QWidget):
             self.singlecmenu = menu
             self.singlecmenuitems = items
 
+    def _gotoAncestor(self):
+        ancestor = self.repo[self.menuselection[0]]
+        for rev in self.menuselection:
+            ctx = self.repo[rev]
+            ancestor = ancestor.ancestor(ctx)
+        self.goto(ancestor.rev())
+
     def generatePairMenu(self):
         def dagrange():
             revA, revB = self.menuselection
@@ -1413,10 +1420,6 @@ class RepoWidget(QWidget):
             dlg = compress.CompressDialog(self.repo, revs, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
-        def gotoAncestor():
-            ctxa = self.repo[self.menuselection[0]]
-            ctxb = self.repo[self.menuselection[1]]
-            self.goto(ctxa.ancestor(ctxb).rev())
 
         menu = QMenu(self)
         for name, cb, icon in (
@@ -1434,7 +1437,7 @@ class RepoWidget(QWidget):
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
                 (_('Compress History...'), compressDlg, 'hg-compress'),
                 (None, None, None),
-                (_('Goto common ancestor'), gotoAncestor, 'hg-merge'),
+                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
                 (_('Graft Selected to local'), self.graftRevisions, None),
@@ -1515,6 +1518,7 @@ class RepoWidget(QWidget):
                 (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
                 (None, None, None),
+                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
                 (_('Graft Selected to local'), self.graftRevisions, None),
