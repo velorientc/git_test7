@@ -86,6 +86,11 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.SCN_PAINTED.disconnect(self._scrollCaretOnPainted)
         self.SendScintilla(self.SCI_SCROLLCARET)
 
+    def _removeTrailingText(self, line, index):
+        lastline = self.lines() - 1
+        self.setSelection(line, index, lastline, len(self.text(lastline)))
+        self.removeSelectedText()
+
     def _findPromptLine(self):
         return self.markerFindPrevious(self.lines() - 1,
                                        1 << self._prompt_marker)
@@ -110,9 +115,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             return
         self._savedcommands = [self.commandText()]
         self.markerDelete(line)
-        lastline = self.lines() - 1
-        self.setSelection(line, 0, lastline, len(self.text(lastline)))
-        self.removeSelectedText()
+        self._removeTrailingText(line, 0)
 
     @pyqtSlot(int, int)
     def _updatePrompt(self, line, pos):
@@ -167,10 +170,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         else:
             del self._savedcommands[:]
         self._ensurePrompt(line)
-        lastline = self.lines() - 1
-        self.setSelection(line, len(self._prompt),
-                          lastline, len(self.text(lastline)))
-        self.removeSelectedText()
+        self._removeTrailingText(line, len(self._prompt))
         self.insert(text)
         self.setCursorPosition(line, len(self.text(line)))
 
