@@ -32,6 +32,12 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self._prompt_marker = self.markerDefine(QsciScintilla.Background)
         self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
         self.cursorPositionChanged.connect(self._updatePrompt)
+        # ensure not moving prompt line even if completion list get shorter,
+        # by allowing to scroll one page below the last line
+        self.SendScintilla(QsciScintilla.SCI_SETENDATLASTLINE, False)
+        # don't reserve "slop" area at top/bottom edge on ensureFooVisible()
+        self.SendScintilla(QsciScintilla.SCI_SETVISIBLEPOLICY, 0, 0)
+
         self._savedcommands = []  # temporarily-invisible command
         self._origcolor = None
         self._flashtimer = QTimer(self, interval=100, singleShot=True)
@@ -87,9 +93,12 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.SendScintilla(self.SCI_SCROLLCARET)
 
     def _removeTrailingText(self, line, index):
+        visline = self.firstVisibleLine()
         lastline = self.lines() - 1
         self.setSelection(line, index, lastline, len(self.text(lastline)))
         self.removeSelectedText()
+        # restore scroll position changed by setSelection()
+        self.setFirstVisibleLine(visline)
 
     def _findPromptLine(self):
         return self.markerFindPrevious(self.lines() - 1,
