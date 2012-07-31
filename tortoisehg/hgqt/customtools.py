@@ -429,7 +429,7 @@ class CustomToolConfigDialog(QDialog):
             'You can use any built-in TortoiseHg icon\n'
             'by setting this value to a vaild TortoiseHg icon name\n'
             '(e.g. clone, add, remove, sync, thg-logo, hg-update, etc).\n'
-            'You can also set this value to the absoluate path to\n'
+            'You can also set this value to the absolute path to\n'
             'any icon on your file system.'))
 
         combo = self._genCombo(self._enablemappings.keys(),
@@ -441,7 +441,7 @@ class CustomToolConfigDialog(QDialog):
 
         combo = self._genCombo(('True', 'False'), showoutput)
         self.showoutput = self._addConfigItem(vbox, _('Show Output Log'),
-            combo, _('When enabled, automatically show the Output Log when the'
+            combo, _('When enabled, automatically show the Output Log when the '
             'command is run.\nDefault: False.'))
 
         self.hbox.addLayout(vbox)
