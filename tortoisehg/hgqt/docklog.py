@@ -112,6 +112,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             if self.commandText():
                 self._setmarker((line,), 'control')
             self.markerDelete(line, self._prompt_marker)
+            self._removeTrailingText(line + 1, 0)  # clear completion
         self._newline()
         self.setCursorPosition(self.lines() - 1, 0)
         self.setReadOnly(True)
