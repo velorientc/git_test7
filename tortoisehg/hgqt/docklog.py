@@ -98,7 +98,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
         self.setSelection(line, index, lastline, len(self.text(lastline)))
         self.removeSelectedText()
         # restore scroll position changed by setSelection()
-        self.setFirstVisibleLine(visline)
+        self.verticalScrollBar().setValue(visline)
 
     def _findPromptLine(self):
         return self.markerFindPrevious(self.lines() - 1,
