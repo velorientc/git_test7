@@ -387,7 +387,7 @@ class SearchToolBar(QToolBar):
     searchRequested = pyqtSignal(unicode, bool, bool, bool)
     """Emitted (pattern, icase, wrap, forward) when requested"""
 
-    def __init__(self, parent=None, hidable=False, settings=None):
+    def __init__(self, parent=None, hidable=False):
         super(SearchToolBar, self).__init__(_('Search'), parent,
                                             objectName='search',
                                             iconSize=QSize(16, 16))
@@ -425,11 +425,8 @@ class SearchToolBar(QToolBar):
         self.setFocusProxy(self._le)
         self.setStyleSheet(qtlib.tbstylesheet)
 
-        def defaultsettings():
-            s = QSettings()
-            s.beginGroup('searchtoolbar')
-            return s
-        self._settings = settings or defaultsettings()
+        self._settings = QSettings()
+        self._settings.beginGroup('searchtoolbar')
         self.searchRequested.connect(self._writesettings)
         self._readsettings()
 
