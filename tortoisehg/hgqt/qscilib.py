@@ -413,16 +413,13 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
         self.addWidget(self._wrapchk)
-        self._btprev = QPushButton('<< ' + _('Prev'), enabled=False)
+        self._btprev = QPushButton('<< ' + _('Prev'))
         self._btprev.clicked.connect(
             lambda: self._emitSearchRequested(forward=False))
         self.addWidget(self._btprev)
-        self._bt = QPushButton(_('Next') + ' >>', enabled=False)
+        self._bt = QPushButton(_('Next') + ' >>')
         self._bt.clicked.connect(self._emitSearchRequested)
-        def setEnabledSearchButtons(s):
-            self._btprev.setEnabled(bool(s))
-            self._bt.setEnabled(bool(s))
-        self._le.textChanged.connect(setEnabledSearchButtons)
+        self._le.textChanged.connect(self._updateSearchButtons)
         self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
@@ -439,6 +436,8 @@ class SearchToolBar(QToolBar):
         self._le.textChanged.connect(self._emitConditionChanged)
         self._chk.toggled.connect(self._emitConditionChanged)
         self._wrapchk.toggled.connect(self._emitConditionChanged)
+
+        self._updateSearchButtons()
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.FindNext):
@@ -484,6 +483,12 @@ class SearchToolBar(QToolBar):
     def _emitSearchRequested(self, forward=True):
         self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
                                   self.wrapAround(), forward)
+
+    @pyqtSlot()
+    def _updateSearchButtons(self):
+        enabled = bool(self._le.text())
+        self._btprev.setEnabled(enabled)
+        self._bt.setEnabled(enabled)
 
     def pattern(self):
         """Returns the current search pattern [unicode]"""
