@@ -420,11 +420,11 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
         self.addWidget(self._wrapchk)
-        self._btprev = QPushButton('<< ' + _('Prev'))
+        self._btprev = QPushButton(_('Prev'), icon=qtlib.geticon('go-up'))
         self._btprev.clicked.connect(
             lambda: self._emitSearchRequested(forward=False))
         self.addWidget(self._btprev)
-        self._bt = QPushButton(_('Next') + ' >>')
+        self._bt = QPushButton(_('Next'), icon=qtlib.geticon('go-down'))
         self._bt.clicked.connect(self._emitSearchRequested)
         self._le.textChanged.connect(self._updateSearchButtons)
         self.addWidget(self._bt)
