@@ -1295,7 +1295,7 @@ class CommitDialog(QDialog):
         self.commit.reload()
         self.updateUndo()
         self.commit.msgte.setFocus()
-        QShortcut(QKeySequence.Refresh, self, self.refresh)
+        qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
 
     def done(self, ret):
         self.commit.repo.configChanged.disconnect(self.commit.configChanged)

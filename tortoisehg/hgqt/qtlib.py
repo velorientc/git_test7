@@ -1130,3 +1130,8 @@ def modifiedkeysequence(o, modifier):
     """Create QKeySequence of modifier key prepended"""
     origseq = QKeySequence(keysequence(o))
     return QKeySequence('%s+%s' % (modifier, origseq.toString()))
+
+def newshortcutsforstdkey(key, *args, **kwargs):
+    """Create [QShortcut,...] for all key bindings of the given StandardKey"""
+    return [QShortcut(keyseq, *args, **kwargs)
+            for keyseq in QKeySequence.keyBindings(key)]

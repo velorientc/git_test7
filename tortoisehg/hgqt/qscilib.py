@@ -602,7 +602,7 @@ def fileEditor(filename, **opts):
     def showsearchbar():
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
-    QShortcut(QKeySequence.Find, dialog, showsearchbar)
+    qtlib.newshortcutsforstdkey(QKeySequence.Find, dialog, showsearchbar)
     dialog.layout().addWidget(searchbar)
 
     BB = QDialogButtonBox
