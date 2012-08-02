@@ -565,7 +565,7 @@ INFO = (
     _fi(_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various '
           'TortoiseHg windows. '
-          'Default: 0, Not expanded')),
+          'Default: 8')),
     _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolRBGroup,
         _('Always show repo tabs, even for a single repo. Default: False')),
     _fi(_('Monitor Repo Changes'), 'tortoisehg.monitorrepo',
