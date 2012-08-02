@@ -179,23 +179,28 @@ class Scintilla(QsciScintilla):
         else:
             self._stdMenu.clear()
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Undo'), self.undo, QKeySequence.Undo)
+            a = self._stdMenu.addAction(_('Undo'), self.undo)
+            a.setShortcuts(QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = self._stdMenu.addAction(_('Redo'), self.redo, QKeySequence.Redo)
+            a = self._stdMenu.addAction(_('Redo'), self.redo)
+            a.setShortcuts(QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
             self._stdMenu.addSeparator()
-            a = self._stdMenu.addAction(_('Cut'), self.cut, QKeySequence.Cut)
+            a = self._stdMenu.addAction(_('Cut'), self.cut)
+            a.setShortcuts(QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = self._stdMenu.addAction(_('Copy'), self.copy, QKeySequence.Copy)
+        a = self._stdMenu.addAction(_('Copy'), self.copy)
+        a.setShortcuts(QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            self._stdMenu.addAction(_('Paste'), self.paste, QKeySequence.Paste)
-            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText,
-                               QKeySequence.Delete)
+            a = self._stdMenu.addAction(_('Paste'), self.paste)
+            a.setShortcuts(QKeySequence.Paste)
+            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText)
+            a.setShortcuts(QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
         self._stdMenu.addSeparator()
-        self._stdMenu.addAction(_('Select All'),
-                                self.selectAll, QKeySequence.SelectAll)
+        a = self._stdMenu.addAction(_('Select All'), self.selectAll)
+        a.setShortcuts(QKeySequence.SelectAll)
         self._stdMenu.addSeparator()
         qsci = QsciScintilla
         wrapmenu = QMenu(_('Wrap'), self)

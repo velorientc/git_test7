@@ -136,7 +136,7 @@ class ShelveDialog(QDialog):
         self.tbarhbox.addWidget(self.rbar)
         self.refreshAction = a = QAction(_('Refresh'), self)
         a.setIcon(qtlib.geticon('view-refresh'))
-        a.setShortcut(QKeySequence.Refresh)
+        a.setShortcuts(QKeySequence.Refresh)
         a.triggered.connect(self.refreshCombos)
         self.rbar.addAction(self.refreshAction)
         self.actionNew = a = QAction(_('New Shelf'), self)

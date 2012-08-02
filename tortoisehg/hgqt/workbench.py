@@ -439,7 +439,11 @@ class Workbench(QMainWindow):
             else:
                 action.setIcon(qtlib.getmenuicon(icon))
         if shortcut:
-            action.setShortcut(qtlib.keysequence(shortcut))
+            keyseq = qtlib.keysequence(shortcut)
+            if isinstance(keyseq, QKeySequence.StandardKey):
+                action.setShortcuts(keyseq)
+            else:
+                action.setShortcut(keyseq)
         if tooltip:
             action.setToolTip(tooltip)
         if data is not None:
