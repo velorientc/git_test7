@@ -1338,7 +1338,7 @@ class RepoWidget(QWidget):
 
     def _gotoAncestor(self):
         ancestor = self.repo[self.menuselection[0]]
-        for rev in self.menuselection:
+        for rev in self.menuselection[1:]:
             ctx = self.repo[rev]
             ancestor = ancestor.ancestor(ctx)
         self.goto(ancestor.rev())
