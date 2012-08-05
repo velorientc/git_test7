@@ -796,7 +796,7 @@ class Workbench(QMainWindow):
                 tw.currentIndex()+1, rw, rw.title())
         else:
             index = self.repoTabsWidget.addTab(rw, rw.title())
-
+        tw.setTabToolTip(index, hglib.tounicode(repo.root))
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
             lambda title: tw.setTabText(tw.indexOf(rw), title))
