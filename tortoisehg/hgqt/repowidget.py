@@ -25,7 +25,7 @@ from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
-from tortoisehg.hgqt import matching
+from tortoisehg.hgqt import matching, graft
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -1272,7 +1272,7 @@ class RepoWidget(QWidget):
                       functools.partial(self.changePhase, pnum))
             entry(menu)
 
-        entry(menu, None, fixed, _('Graft to local'), None,
+        entry(menu, None, fixed, _('Graft to local...'), 'hg-transplant',
               self.graftRevisions)
 
         entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
@@ -1444,7 +1444,7 @@ class RepoWidget(QWidget):
                 (_('Goto common ancestor'), gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
-                (_('Graft Selected to local'), self.graftRevisions, None),
+                (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant'),
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1530,7 +1530,7 @@ class RepoWidget(QWidget):
                 (None, None, None),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
-                (_('Graft Selected to local'), self.graftRevisions, None),
+                (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant'),
                 ):
             if name is None:
                 menu.addSeparator()
@@ -1764,10 +1764,17 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def graftRevisions(self):
-        cmdline = ['graft', '--repository', self.repo.root]
+        """Graft selected revision on top of working directory parent"""
+        revlist = []
         for rev in self.repoview.selectedRevisions():
-            cmdline.append(str(rev))
-        self.runCommand(cmdline)
+            revlist.append(str(rev))
+        if not revlist:
+            revlist = [self.rev]
+        opts = {'source' : revlist, 'dest': self.repo['.'].rev()}
+        dlg = graft.GraftDialog(self.repo, self, **opts)
+        dlg.finished.connect(dlg.deleteLater)
+        if dlg.valid:
+            dlg.exec_()
 
     def backoutToRevision(self):
         dlg = backout.BackoutDialog(self.rev, self.repo, self)
