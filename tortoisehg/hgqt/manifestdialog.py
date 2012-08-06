@@ -129,6 +129,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._initwidget()
         self._initactions()
         self._setupmodel()
+        self._setupfilterupdater()
+
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
         self.setRev(self._rev)
 
@@ -273,10 +275,15 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         selmodel.currentChanged.connect(self._updateItemFileActions)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
-        self.le.textChanged.connect(self._treemodel.setNameFilter)
         self._statusfilter.statusChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.statusChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
+
+    def _setupfilterupdater(self):
+        self._filterupdatetimer = QTimer(self, interval=200, singleShot=True)
+        self.le.textChanged.connect(self._filterupdatetimer.start)
+        self._filterupdatetimer.timeout.connect(
+            lambda: self._treemodel.setNameFilter(self.le.text()))
 
     @pyqtSlot()
     def _autoexpandtree(self):
