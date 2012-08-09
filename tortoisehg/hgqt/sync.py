@@ -624,15 +624,22 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def menuRequest(self, point, url, alias, editable):
         'menu event emitted by one of the two URL lists'
         if not self.cmenu:
+            separator = (None, None, None)
             acts = []
             menu = QMenu(self)
             for text, cb, icon in (
                 (_('Explore'), self.exploreurl, 'system-file-manager'),
                 (_('Terminal'), self.terminalurl, 'utilities-terminal'),
+                (_('Copy path'), self.copypath, ''),
+                separator,
                 (_('Edit...'), self.editurl, 'general'),
                 (_('Remove'), self.removeurl, 'menudelete')):
+                if text is None:
+                    menu.addSeparator()
+                    continue
                 act = QAction(text, self)
-                act.setIcon(qtlib.getmenuicon(icon))
+                if icon:
+                    act.setIcon(qtlib.getmenuicon(icon))
                 act.triggered.connect(cb)
                 acts.append(act)
                 menu.addAction(act)
@@ -676,6 +683,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             _('Delete %s from your repo configuration file?') % self.menualias,
             parent=self):
             self.removeAlias(self.menualias)
+
+    def copypath(self):
+        QApplication.clipboard().setText(self.menuurl)
 
     def closeEvent(self, event):
         if self.cmd.core.running():
