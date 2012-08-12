@@ -9,11 +9,7 @@
 import binascii
 import os
 import shlex, subprocess, functools # used by runCustomCommand
-from mercurial import revset, error, patch, commands
-
-# hg >= 2.1
-if hasattr(commands, 'phase'):
-    from mercurial import phases
+from mercurial import revset, error, patch, phases
 
 from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt.i18n import _
@@ -38,8 +34,6 @@ from tortoisehg.hgqt.pbranch import PatchBranchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-import functools
 
 class RepoWidget(QWidget):
 
@@ -386,6 +380,7 @@ class RepoWidget(QWidget):
         w.linkActivated.connect(self._openLink)
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
+        w.revsetFilterRequested.connect(self.setFilter)
         return w
 
     def createSyncWidget(self):
@@ -1264,19 +1259,14 @@ class RepoWidget(QWidget):
               self.copyPatch)
         entry(menu)
 
-        # hg >= 2.1
-        if hasattr(commands, 'phase'):
-            submenu = menu.addMenu(_('Change phase to'))
-            for pnum, pname in enumerate(phases.phasenames):
-                entry(submenu, None, isrev, pname, None,
-                      functools.partial(self.changePhase, pnum))
-            entry(menu)
+        submenu = menu.addMenu(_('Change phase to'))
+        for pnum, pname in enumerate(phases.phasenames):
+            entry(submenu, None, isrev, pname, None,
+                  functools.partial(self.changePhase, pnum))
+        entry(menu)
 
         entry(menu, None, fixed, _('Graft to local'), None,
               self.graftRevisions)
-
-        entry(menu, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
-              self.transplantRevisions)
 
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modify history'))
@@ -1302,7 +1292,8 @@ class RepoWidget(QWidget):
               self.rupdate)
 
         def _setupCustomSubmenu(menu):
-            tools, toolnames = hglib.tortoisehgtools(self.repo.ui, 'repowidget')
+            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
+                selectedlocation='workbench.revdetails.custom-menu')
             if not tools:
                 return
 
@@ -1314,10 +1305,12 @@ class RepoWidget(QWidget):
 
             entry(menu)
             submenu = menu.addMenu(_('Custom Tools'))
-            for name in toolnames:
-                info = tools[name]
-                location = info.get('location', '').replace(' ', '').split(',')
-                if 'repowidget' not in location:
+            for name in toollist:
+                if name == '|':
+                    entry(submenu)
+                    continue
+                info = tools.get(name, None)
+                if info is None:
                     continue
                 command = info.get('command', None)
                 if not command:
@@ -1342,6 +1335,13 @@ class RepoWidget(QWidget):
         else:
             self.singlecmenu = menu
             self.singlecmenuitems = items
+
+    def _gotoAncestor(self):
+        ancestor = self.repo[self.menuselection[0]]
+        for rev in self.menuselection[1:]:
+            ctx = self.repo[rev]
+            ancestor = ancestor.ancestor(ctx)
+        self.goto(ancestor.rev())
 
     def generatePairMenu(self):
         def dagrange():
@@ -1420,10 +1420,6 @@ class RepoWidget(QWidget):
             dlg = compress.CompressDialog(self.repo, revs, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
-        def gotoAncestor():
-            ctxa = self.repo[self.menuselection[0]]
-            ctxb = self.repo[self.menuselection[1]]
-            self.goto(ctxa.ancestor(ctxb).rev())
 
         menu = QMenu(self)
         for name, cb, icon in (
@@ -1441,7 +1437,7 @@ class RepoWidget(QWidget):
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
                 (_('Compress History...'), compressDlg, 'hg-compress'),
                 (None, None, None),
-                (_('Goto common ancestor'), gotoAncestor, 'hg-merge'),
+                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
                 (_('Graft Selected to local'), self.graftRevisions, None),
@@ -1453,12 +1449,6 @@ class RepoWidget(QWidget):
             if icon:
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
-            menu.addAction(a)
-
-        if 'transplant' in self.repo.extensions():
-            a = QAction(_('Transplant Selected to local'), self)
-            a.setIcon(qtlib.getmenuicon('hg-transplant'))
-            a.triggered.connect(self.transplantRevisions)
             menu.addAction(a)
 
         if 'reviewboard' in self.repo.extensions():
@@ -1528,6 +1518,7 @@ class RepoWidget(QWidget):
                 (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
                 (None, None, None),
+                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
                 (None, None, None),
                 (_('Graft Selected to local'), self.graftRevisions, None),
@@ -1539,12 +1530,6 @@ class RepoWidget(QWidget):
             if icon:
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
-            menu.addAction(a)
-
-        if 'transplant' in self.repo.extensions():
-            a = QAction(_('Transplant Selected to local'), self)
-            a.setIcon(qtlib.getmenuicon('hg-transplant'))
-            a.triggered.connect(self.transplantRevisions)
             menu.addAction(a)
 
         if 'reviewboard' in self.repo.extensions():
@@ -1756,12 +1741,6 @@ class RepoWidget(QWidget):
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
-
-    def transplantRevisions(self):
-        cmdline = ['transplant', '--repository', self.repo.root]
-        for rev in self.repoview.selectedRevisions():
-            cmdline.append(str(rev))
-        self.runCommand(cmdline)
 
     def graftRevisions(self):
         cmdline = ['graft', '--repository', self.repo.root]

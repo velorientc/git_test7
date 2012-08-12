@@ -384,7 +384,7 @@ def setup_windows(version):
              'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
              'product_version':version},
-            {'script':'contrib/hg', 
+            {'script':'contrib/hg',
              'icon_resources':[(0,'icons/hg.ico')],
              'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
@@ -421,7 +421,7 @@ def setup_posix():
     _data_files += [(os.path.join('share', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('locale')]
-    _data_files += [('lib/nautilus/extensions-2.0/python',
+    _data_files += [('/usr/share/nautilus-python/extensions/',
                      ['contrib/nautilus-thg.py'])]
 
     # Create a config.py.  Distributions will need to supply their own

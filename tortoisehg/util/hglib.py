@@ -37,6 +37,8 @@ def tounicode(s):
         return None
     if isinstance(s, unicode):
         return s
+    if isinstance(s, encoding.localstr):
+        return s._utf8.decode('utf-8')
     for e in ('utf-8', _encoding):
         try:
             return s.decode(e, 'strict')
@@ -58,11 +60,15 @@ def fromunicode(s, errors='strict'):
     s = unicode(s)  # s can be QtCore.QString
     for enc in (_encoding, _fallbackencoding):
         try:
-            return s.encode(enc)
+            l = s.encode(enc)
+            if s == l.decode(enc):
+                return l  # non-lossy encoding
+            return encoding.localstr(s.encode('utf-8'), l)
         except UnicodeEncodeError:
             pass
 
-    return s.encode(_encoding, errors)  # last ditch
+    l = s.encode(_encoding, errors)  # last ditch
+    return encoding.localstr(s.encode('utf-8'), l)
 
 def toutf(s):
     """
@@ -72,6 +78,8 @@ def toutf(s):
     """
     if s is None:
         return None
+    if isinstance(s, encoding.localstr):
+        return s._utf8
     return tounicode(s).encode('utf-8').replace('\0','')
 
 def fromutf(s):
@@ -83,15 +91,10 @@ def fromutf(s):
     if s is None:
         return None
     try:
-        return s.decode('utf-8').encode(_encoding)
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        pass
-    try:
-        return s.decode('utf-8').encode(_fallbackencoding)
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        pass
-    u = s.decode('utf-8', 'replace') # last ditch
-    return u.encode(_encoding, 'replace')
+        return fromunicode(s.decode('utf-8'), 'replace')
+    except UnicodeDecodeError:
+        # can't round-trip
+        return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 _tabwidth = None
 def gettabwidth(ui):
@@ -444,54 +447,154 @@ def difftools(ui):
     _difftools = tools
     return tools
 
-def tortoisehgtools(ui, selectedlocation=None):
-    '''
-    Parse 'tortoisehg-tools' section of ini file. Changes:
-    
-    [tortoisehg-tools]
-    update_to_tip.icon = hg-update
-    update_to_tip.command = hg update tip
-    update_to_tip.tooltip = Update to tip
-    update_to_tip.location = workbench,repowidget
-    
-    into following dictionary
-    
-    {'update_to_tip': 
-        {'icon': 'hg-update', 
-         'command': 'hg update tip', 
-         'tooltip': 'Update to tip',
-         'location': 'workbench,repowidget'}
-    }
-    
-    If selectedlocation is set, only return those tools whose
-    location matches the selected location.
-    If a tool has no location set, it will be assumed that it must be
-    shown on the 'workbench' toolbar
-    '''
+
+tortoisehgtoollocations = {
+    'workbench.custom-toolbar': 'Workbench custom toolbar',
+    'workbench.revdetails.custom-menu': 'Revision details context menu',
+}
+
+def tortoisehgtools(uiorconfig, selectedlocation=None):
+    """Parse 'tortoisehg-tools' section of ini file.
+
+    >>> from pprint import pprint
+    >>> from mercurial import config
+    >>> class memui(ui.ui):
+    ...     def readconfig(self, filename, root=None, trust=False,
+    ...                    sections=None, remap=None):
+    ...         pass  # avoid reading settings from file-system
+
+    Changes:
+
+    >>> hgrctext = '''
+    ... [tortoisehg-tools]
+    ... update_to_tip.icon = hg-update
+    ... update_to_tip.command = hg update tip
+    ... update_to_tip.tooltip = Update to tip
+    ... '''
+    >>> uiobj = memui()
+    >>> uiobj._tcfg.parse('<hgrc>', hgrctext)
+
+    into the following dictionary
+
+    >>> tools, toollist = tortoisehgtools(uiobj)
+    >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
+    {'update_to_tip': {'command': 'hg update tip',
+                       'icon': 'hg-update',
+                       'tooltip': 'Update to tip'}}
+    >>> toollist
+    ['update_to_tip']
+
+    If selectedlocation is set, only return those tools that have been
+    configured to be shown at the given "location".
+    Tools are added to "locations" by adding them to one of the
+    "extension lists", which are lists of tool names, which follow the same
+    format as the workbench.task-toolbar setting, i.e. a list of tool names,
+    separated by spaces or "|" to indicate separators.
+
+    >>> hgrctext_full = hgrctext + '''
+    ... update_to_null.icon = hg-update
+    ... update_to_null.command = hg update null
+    ... update_to_null.tooltip = Update to null
+    ... explore_wd.command = explorer.exe /e,{ROOT}
+    ... explore_wd.enable = iswd
+    ... explore_wd.label = Open in explorer
+    ... explore_wd.showoutput = True
+    ...
+    ... [tortoisehg]
+    ... workbench.custom-toolbar = update_to_tip | explore_wd
+    ... workbench.revdetails.custom-menu = update_to_tip update_to_null
+    ... '''
+    >>> uiobj = memui()
+    >>> uiobj._tcfg.parse('<hgrc>', hgrctext_full)
+
+    >>> tools, toollist = tortoisehgtools(
+    ...     uiobj, selectedlocation='workbench.custom-toolbar')
+    >>> sorted(tools.keys())
+    ['explore_wd', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', '|', 'explore_wd']
+
+    >>> tools, toollist = tortoisehgtools(
+    ...     uiobj, selectedlocation='workbench.revdetails.custom-menu')
+    >>> sorted(tools.keys())
+    ['update_to_null', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', 'update_to_null']
+
+    Valid "locations lists" are:
+        - workbench.custom-toolbar
+        - workbench.revdetails.custom-menu
+
+    >>> tortoisehgtools(uiobj, selectedlocation='invalid.location')
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid location 'invalid.location'
+
+    This function can take a ui object or a config object as its input.
+
+    >>> cfg = config.config()
+    >>> cfg.parse('<hgrc>', hgrctext)
+    >>> tools, toollist = tortoisehgtools(cfg)
+    >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
+    {'update_to_tip': {'command': 'hg update tip',
+                       'icon': 'hg-update',
+                       'tooltip': 'Update to tip'}}
+    >>> toollist
+    ['update_to_tip']
+
+    >>> cfg = config.config()
+    >>> cfg.parse('<hgrc>', hgrctext_full)
+    >>> tools, toollist = tortoisehgtools(
+    ...     cfg, selectedlocation='workbench.custom-toolbar')
+    >>> sorted(tools.keys())
+    ['explore_wd', 'update_to_tip']
+    >>> toollist
+    ['update_to_tip', '|', 'explore_wd']
+
+    No error for empty config:
+
+    >>> emptycfg = config.config()
+    >>> tortoisehgtools(emptycfg)
+    ({}, [])
+    >>> tortoisehgtools(emptycfg, selectedlocation='workbench.custom-toolbar')
+    ({}, [])
+    """
+    if isinstance(uiorconfig, ui.ui):
+        configitems = uiorconfig.configitems
+        configlist = uiorconfig.configlist
+    else:
+        configitems = uiorconfig.items
+        def configlist(section, name):
+            return uiorconfig.get(section, name, '').split()
+
     tools = {}
-    toolnames = []
-    for key, value in ui.configitems('tortoisehg-tools'):
+    for key, value in configitems('tortoisehg-tools'):
         toolname, field = key.split('.')
         if toolname not in tools:
             tools[toolname] = {}
-            toolnames.append(toolname)
         bvalue = util.parsebool(value)
         if bvalue is not None:
             value = bvalue
         tools[toolname][field] = value
-    
+
     if selectedlocation is None:
-        return tools, toolnames
+        return tools, sorted(tools.keys())
+
     # Only return the tools that are linked to the selected location
+    if selectedlocation not in tortoisehgtoollocations:
+        raise ValueError('invalid location %r' % selectedlocation)
+
+    guidef = configlist('tortoisehg', selectedlocation) or []
+    toollist = []
     selectedtools = {}
-    selectedtoolnames = []
-    for name in toolnames:
-        info = tools[name]
-        location = info.get('location', 'workbench').replace(' ', '').split(',')
-        if selectedlocation in location:
+    for name in guidef:
+        if name != '|':
+            info = tools.get(name, None)
+            if info is None:
+                continue
             selectedtools[name] = info
-            selectedtoolnames.append(name)
-    return selectedtools, selectedtoolnames
+        toollist.append(name)
+    return selectedtools, toollist
 
 def hgcmd_toq(q, label, args):
     '''
@@ -718,10 +821,5 @@ def getLineSeparator(line):
     return linesep
 
 def dispatch(ui, args):
-    if hasattr(hgdispatch, 'request'):
-        # hg >= 1.9, see mercurial changes 08bfec2ef031, 80c599eee3f3
-        req = hgdispatch.request(args, ui)
-        return hgdispatch._dispatch(req)
-    else:
-        # hg <= 1.8
-        return hgdispatch._dispatch(ui, args)
+    req = hgdispatch.request(args, ui)
+    return hgdispatch._dispatch(req)

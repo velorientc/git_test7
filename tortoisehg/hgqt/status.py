@@ -917,7 +917,8 @@ class StatusDialog(QDialog):
         self.setWindowFlags(Qt.Window)
         self.loadSettings()
 
-        QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
+        qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self,
+                                    self.stwidget.refreshWctx)
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def linkActivated(self, link):

@@ -1117,3 +1117,21 @@ def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
       Qt.CustomizeWindowHint | Qt.WindowTitleHint |
       Qt.WindowCloseButtonHint | flags)
 
+def keysequence(o):
+    """Create QKeySequence from string or QKeySequence"""
+    if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
+        return o
+    try:
+        return getattr(QKeySequence, str(o))  # standard key
+    except AttributeError:
+        return QKeySequence(o)
+
+def modifiedkeysequence(o, modifier):
+    """Create QKeySequence of modifier key prepended"""
+    origseq = QKeySequence(keysequence(o))
+    return QKeySequence('%s+%s' % (modifier, origseq.toString()))
+
+def newshortcutsforstdkey(key, *args, **kwargs):
+    """Create [QShortcut,...] for all key bindings of the given StandardKey"""
+    return [QShortcut(keyseq, *args, **kwargs)
+            for keyseq in QKeySequence.keyBindings(key)]

@@ -7,14 +7,20 @@
 
 import os
 
-from mercurial import ui, util, error, extensions, scmutil
+from mercurial import ui, util, error, extensions, scmutil, phases
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, thgrepo
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+if os.name == 'nt':
+    from tortoisehg.util import bugtraq
+    _hasbugtraq = True
+else:
+    _hasbugtraq = False
 
 # Technical Debt
 #   stacked widget or pages need to be scrollable
@@ -29,11 +35,6 @@ def hasExtension(extname):
         if name == extname:
             return True
     return False
-
-# Detect if hg >= 2.1
-def phasesSupport():
-    from mercurial import commands
-    return hasattr(commands, 'phase')
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
@@ -180,6 +181,7 @@ class PasswordEntry(LineEditBox):
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
+
 class TextEntry(QTextEdit):
     def __init__(self, parent=None, **opts):
         QTextEdit.__init__(self, parent, toolTip=opts['tooltip'])
@@ -482,6 +484,8 @@ def findIssueTrackerPlugins():
     return names
 
 def issuePluginVisible():
+    if not _hasbugtraq:
+        return False
     try:
         # quick test to see if we're able to load the bugtraq module
         test = bugtraq.BugTraq('')
@@ -624,6 +628,13 @@ INFO = (
         _('Show tabs along the side of the bottom half of each repo '
           'widget allowing one to switch task tabs without using the toolbar. '
           'Default: off')),
+    _fi(_('Task Toolbar Order'), 'tortoisehg.workbench.task-toolbar', genEditCombo,
+        _('Specify which task buttons you want to show on the task toolbar '
+          'and in which order.<br>Type a list of the task button names. '
+          'Add separators by putting "|" between task button names.<br>'
+          'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
+          'Default: log commit mq sync manifest grep pbranch'),
+        restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
           'until they reach 80 characters. '
@@ -704,9 +715,12 @@ INFO = (
          'environment variables are set to a non-English language. '
          'This setting is used by the Merge, Tag and Backout dialogs. '
          'Default: False')),
+    _fi(_('New Commit Phase'), 'phases.new-commit', (genDefaultCombo,
+        phases.phasenames),
+        _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
        _('Make MQ patches secret (instead of draft). '
-         'Default: False'), visible=phasesSupport),
+         'Default: False')),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
         (genDefaultCombo,
@@ -896,6 +910,9 @@ INFO = (
     )),
 
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': 'hg-extensions'}, (
+    )),
+
+({'name': 'tools', 'label': _('Tools'), 'icon': 'tools-spanner-hammer'}, (
     )),
 
 ({'name': 'issue', 'label': _('Issue Tracking'), 'icon': 'edit-file'}, (
@@ -1180,6 +1197,7 @@ class SettingsForm(QWidget):
         self.pages = {}
         self.stack = stack
         self.pageList = pageList
+        self.pageListIndexToStack = {}
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
@@ -1204,21 +1222,27 @@ class SettingsForm(QWidget):
         self.refresh()
         self.focusField(focus or 'ui.merge')
 
+    @pyqtSlot(int)
     def activatePage(self, index):
-        item = self.pageList.currentItem()
+        stackindex = self.pageListIndexToStack.get(index, -1)
+        if stackindex >= 0:
+            self.stack.setCurrentIndex(stackindex)
+            return
+
+        item = self.pageList.item(index)
         for data in INFO:
             if item.text() == data[0]['label']:
                 meta, info = data
                 break
 
+        stackindex = self.stack.count()
         pagename = meta['name']
-        if self.pages.has_key(pagename):
-            page = self.pages[pagename]
-        else:
-            page = self.createPage(pagename, info)
-            self.refreshPage(page)
-        frame = page[2][0].parentWidget()
-        self.stack.setCurrentWidget(frame)
+        page = self.createPage(pagename, info)
+        self.refreshPage(page)
+        # better to call stack.addWidget() here, not by fillFrame()
+        assert self.stack.count() > stackindex, 'page must be added to stack'
+        self.pageListIndexToStack[index] = stackindex
+        self.stack.setCurrentIndex(stackindex)
 
     def editClicked(self):
         'Open internal editor in stacked widget'
@@ -1272,6 +1296,8 @@ class SettingsForm(QWidget):
                 # make sure widgets are shown properly,
                 # even when no extensions mentioned in the config file
                 self.validateextensions()
+        elif name == 'tools':
+            self.toolsFrame.refresh()
         else:
             for row, e in enumerate(info):
                 if not e.cpath:
@@ -1367,6 +1393,11 @@ class SettingsForm(QWidget):
             widgets.append(w)
         return extsinfo, widgets
 
+    def fillToolsFrame(self):
+        self.toolsFrame = frame = customtools.ToolsFrame(self.ini, parent=self)
+        self.stack.addWidget(frame)
+        return (), [frame]
+
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
@@ -1384,6 +1415,9 @@ class SettingsForm(QWidget):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
+        elif name == 'tools':
+            toolsinfo, widgets = self.fillToolsFrame()
+            self.pages[name] = name, toolsinfo, widgets
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
@@ -1441,6 +1475,8 @@ class SettingsForm(QWidget):
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
                 self.applyChangesForExtensions()
+            elif name == 'tools':
+                self.applyChangesForTools()
             else:
                 for row, e in enumerate(info):
                     if not e.cpath:
@@ -1518,6 +1554,9 @@ class SettingsForm(QWidget):
                 invalmsg = invalmsg.decode('utf-8')
             chk.setToolTip(invalmsg or hglib.tounicode(allexts[name]))
 
+    def applyChangesForTools(self):
+        if self.toolsFrame.applyChanges(self.ini):
+            self.restartRequested.emit(_('Tools'))
 
 def run(ui, *pats, **opts):
     return SettingsDialog(opts.get('alias') == 'repoconfig',

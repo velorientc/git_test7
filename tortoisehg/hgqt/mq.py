@@ -705,7 +705,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.layout().addWidget(self.statusbar)
             self.progress.connect(self.statusbar.progress)
             self.showMessage.connect(self.statusbar.showMessage)
-            QShortcut(QKeySequence.Refresh, self, self.reload)
+            qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self,
+                                        self.reload)
             self.resize(850, 550)
 
         self.loadConfigs()

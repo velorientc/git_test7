@@ -9,9 +9,9 @@ import os
 import difflib
 import re
 
-from mercurial import error, util, patch
+from mercurial import util, patch
 
-from tortoisehg.util import hglib, patchctx, colormap, thread2
+from tortoisehg.util import hglib, colormap, thread2
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
 from tortoisehg.hgqt import visdiff, filedata
@@ -179,7 +179,7 @@ class HgFileView(QFrame):
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
-        self.actionFind.setShortcut(QKeySequence.Find)
+        self.actionFind.setShortcuts(QKeySequence.Find)
 
         self.actionShelf = QAction('Shelve', self)
         self.actionShelf.setIcon(qtlib.geticon('shelve'))
@@ -633,8 +633,15 @@ class HgFileView(QFrame):
                     add(name, func)
             return menu.exec_(point)
 
+        menu.addSeparator()
+        annoptsmenu = QMenu(_('Annotate Options'), self)
+        annoptsmenu.addActions(self.sci.annotateOptionActions())
+        menu.addMenu(annoptsmenu)
+
         if line < 0 or line >= len(self.sci._links):
             return menu.exec_(point)
+
+        menu.addSeparator()
 
         fctx, line = self.sci._links[line]
         if selection:
@@ -717,6 +724,7 @@ class AnnotateView(qscilib.Scintilla):
 
         self._annotation_enabled = False
         self._links = []  # by line
+        self._anncache = {}  # by rev
         self._revmarkers = {}  # by rev
         self._lastrev = None
 
@@ -725,8 +733,86 @@ class AnnotateView(qscilib.Scintilla):
         self._thread.finished.connect(self.fillModel)
 
         self.repo = repo
+        self._initAnnotateOptionActions()
+
         self.repo.configChanged.connect(self.configChanged)
         self.configChanged()
+        self._loadAnnotateSettings()
+
+    def _loadAnnotateSettings(self):
+        s = QSettings()
+        wb = "Annotate/"
+        for a in self._annoptactions:
+            a.setChecked(s.value(wb + a.data().toString()).toBool())
+        if not util.any(a.isChecked() for a in self._annoptactions):
+            self._annoptactions[-1].setChecked(True)  # 'rev' by default
+        self._setupLineAnnotation()
+
+    def _saveAnnotateSettings(self):
+        s = QSettings()
+        wb = "Annotate/"
+        for a in self._annoptactions:
+            s.setValue(wb + a.data().toString(), a.isChecked())
+
+    def _initAnnotateOptionActions(self):
+        self._annoptactions = []
+        for name, field in [(_('Show Author'), 'author'),
+                            (_('Show Date'), 'date'),
+                            (_('Show Revision'), 'rev')]:
+            a = QAction(name, self, checkable=True)
+            a.setData(field)
+            a.triggered.connect(self._updateAnnotateOption)
+            self._annoptactions.append(a)
+
+    @pyqtSlot()
+    def _updateAnnotateOption(self):
+        # make sure at least one option is checked
+        if not util.any(a.isChecked() for a in self._annoptactions):
+            self.sender().setChecked(True)
+
+        self._setupLineAnnotation()
+        self.fillModel()
+        self._saveAnnotateSettings()
+
+    def annotateOptionActions(self):
+        """List of QAction for annotate options"""
+        return list(self._annoptactions)
+
+    def _setupLineAnnotation(self):
+        def getauthor(fctx):
+            return hglib.tounicode(hglib.username(fctx.user()))
+        def getdate(fctx):
+            return util.shortdate(fctx.date())
+        def getrev(fctx):
+            return fctx.rev()
+
+        aformat = [str(a.data().toString()) for a in self._annoptactions
+                   if a.isChecked()]
+        tiprev = self.repo['tip'].rev()
+        revwidth = len(str(tiprev))
+        annfields = {
+            'rev': ('%%%dd' % revwidth, getrev),
+            'author': ('%s', getauthor),
+            'date': ('%s', getdate),
+        }
+        annformat = []
+        annfunc = []
+        for fieldname in aformat:
+            fielddata = annfields.get(fieldname, ())
+            if fielddata:
+                annformat.append(fielddata[0])
+                annfunc.append(fielddata[1])
+        annformat = ' : '.join(annformat)
+
+        self._anncache.clear()
+        def lineannotation(fctx):
+            rev = fctx.rev()
+            ann = self._anncache.get(rev, None)
+            if ann is None:
+                ann = annformat % tuple([f(fctx) for f in annfunc])
+                self._anncache[rev] = ann
+            return ann
+        self._lineannotation = lineannotation
 
     def configChanged(self):
         self.setIndentationWidth(self.repo.tabwidth)
@@ -774,6 +860,7 @@ class AnnotateView(qscilib.Scintilla):
             return
 
         self._links = list(self._thread.data)
+        self._anncache.clear()
 
         self._updaterevmargin()
         self._updatemarkers()
@@ -809,7 +896,7 @@ class AnnotateView(qscilib.Scintilla):
         self.SendScintilla(qsci.SCI_STYLESETSIZE,
                            s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):
-            self.setMarginText(i, str(fctx.rev()), s)
+            self.setMarginText(i, self._lineannotation(fctx), s)
 
     def _updatemarkers(self):
         """Update markers which colorizes each line"""
@@ -852,9 +939,10 @@ class AnnotateView(qscilib.Scintilla):
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
-        if self.isAnnotationEnabled() and self._links:
-            maxrev = max(fctx.rev() for fctx, _origline in self._links)
-            self.setMarginWidth(2, lentext(maxrev))
+        if self.isAnnotationEnabled() and self._anncache:
+            # add 2 for margin
+            maxwidth = 2 + max(len(s) for s in self._anncache.itervalues())
+            self.setMarginWidth(2, 'M' * maxwidth)
         else:
             self.setMarginWidth(2, 0)
 

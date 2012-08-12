@@ -48,7 +48,7 @@ class RejectsDialog(QDialog):
         def showsearchbar():
             searchbar.show()
             searchbar.setFocus(Qt.OtherFocusReason)
-        QShortcut(QKeySequence.Find, self, showsearchbar)
+        qtlib.newshortcutsforstdkey(QKeySequence.Find, self, showsearchbar)
         self.layout().addWidget(searchbar)
 
         hbox = QHBoxLayout()

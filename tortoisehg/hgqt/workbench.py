@@ -158,74 +158,13 @@ class Workbench(QMainWindow):
         self._actionavails = {'repoopen': []}
         self._actionvisibles = {'repoopen': []}
 
-        def keysequence(o):
-            """Create QKeySequence from string or QKeySequence"""
-            if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
-                return o
-            try:
-                return getattr(QKeySequence, str(o))  # standard key
-            except AttributeError:
-                return QKeySequence(o)
-
-        def modifiedkeysequence(o, modifier):
-            """Create QKeySequence of modifier key prepended"""
-            origseq = QKeySequence(keysequence(o))
-            return QKeySequence('%s+%s' % (modifier, origseq.toString()))
-
-        def newaction(text, slot=None, icon=None, shortcut=None,
-                      checkable=False, tooltip=None, data=None, enabled=None,
-                      visible=None, menu=None, toolbar=None, parent=self):
-            """Create new action and register it
-
-            :slot: function called if action triggered or toggled.
-            :checkable: checkable action. slot will be called on toggled.
-            :data: optional data stored on QAction.
-            :enabled: bool or group name to enable/disable action.
-            :visible: bool or group name to show/hide action.
-            :shortcut: QKeySequence, key sequence or name of standard key.
-            :menu: name of menu to add this action.
-            :toolbar: name of toolbar to add this action.
-            """
-            action = QAction(text, parent, checkable=checkable)
-            if slot:
-                if checkable:
-                    action.toggled.connect(slot)
-                else:
-                    action.triggered.connect(slot)
-            if icon:
-                if toolbar:
-                    action.setIcon(qtlib.geticon(icon))
-                else:
-                    action.setIcon(qtlib.getmenuicon(icon))
-            if shortcut:
-                action.setShortcut(keysequence(shortcut))
-            if tooltip:
-                action.setToolTip(tooltip)
-            if data is not None:
-                action.setData(data)
-            if isinstance(enabled, bool):
-                action.setEnabled(enabled)
-            elif enabled:
-                self._actionavails[enabled].append(action)
-            if isinstance(visible, bool):
-                action.setVisible(visible)
-            elif visible:
-                self._actionvisibles[visible].append(action)
-            if menu:
-                getattr(self, 'menu%s' % menu.title()).addAction(action)
-            if toolbar:
-                getattr(self, '%stbar' % toolbar).addAction(action)
-            return action
-
-        def newseparator(menu=None, toolbar=None):
-            """Insert a separator action; returns nothing"""
-            if menu:
-                getattr(self, 'menu%s' % menu.title()).addSeparator()
-            if toolbar:
-                getattr(self, '%stbar' % toolbar).addSeparator()
+        keysequence = qtlib.keysequence
+        modifiedkeysequence = qtlib.modifiedkeysequence
+        newaction = self._addNewAction
+        newseparator = self._addNewSeparator
 
         newaction(_("New &Workbench..."), self.newWorkbench,
-                  shortcut='Ctrl+Alt+N', menu='file', icon='hg-log')
+                  shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
@@ -305,15 +244,38 @@ class Workbench(QMainWindow):
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
             return a
-        addtaskview('hg-log', _("Revision &Details"), 'log')
-        addtaskview('hg-commit', _('&Commit'), 'commit')
-        self.actionSelectTaskMQ = \
-                addtaskview('thg-qrefresh', _('MQ Patch'), 'mq')
-        addtaskview('thg-sync', _('S&ynchronize'), 'sync')
-        addtaskview('hg-annotate', _('&Manifest'), 'manifest')
-        addtaskview('hg-grep', _('&Search'), 'grep')
-        self.actionSelectTaskPbranch = \
-                addtaskview('branch', _('&Patch Branch'), 'pbranch')
+
+        # note that 'grep' and 'search' are equivalent
+        taskdefs = {
+            'commit': ('hg-commit', _('&Commit')),
+            'mq': ('thg-qrefresh', _('MQ Patch')),
+            'pbranch': ('branch', _('&Patch Branch')),
+            'log': ('hg-log', _("Revision &Details")),
+            'manifest': ('hg-annotate', _('&Manifest')),
+            'grep': ('hg-grep', _('&Search')),
+            'sync': ('thg-sync', _('S&ynchronize')),
+        }
+        tasklist = self.ui.configlist(
+            'tortoisehg', 'workbench.task-toolbar', [])
+        if tasklist == []:
+            tasklist = ['log', 'commit', 'mq', 'sync', 'manifest',
+                'grep', 'pbranch']
+
+        self.actionSelectTaskMQ = None
+        self.actionSelectTaskPbranch = None
+
+        for taskname in tasklist:
+            taskname = taskname.strip()
+            taskinfo = taskdefs.get(taskname, None)
+            if taskinfo is None:
+                newseparator(toolbar='task')
+                continue
+            tbar = addtaskview(taskinfo[0], taskinfo[1], taskname)
+            if taskname == 'mq':
+                self.actionSelectTaskMQ = tbar
+            elif taskname == 'pbranch':
+                self.actionSelectTaskPbranch = tbar
+
         newseparator(menu='view')
 
         newaction(_("&Refresh"), self._repofwd('reload'), icon='view-refresh',
@@ -358,7 +320,7 @@ class Workbench(QMainWindow):
         newaction(_("Bisect..."), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
+        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+X',
                   icon='system-file-manager', enabled='repoopen',
                   menu='repository')
         newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
@@ -420,28 +382,92 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
 
-        def _setupCustomTools():
-            tools, toolnames = hglib.tortoisehgtools(self.ui, 'workbench')
-            if not tools:
-                return
-            for name in toolnames:
-                info = tools[name]
-                command = info.get('command', None)
-                if not command:
-                    continue
-                showoutput = info.get('showoutput', False)
-                label = info.get('label', name)
-                tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
-                icon = info.get('icon', 'tools-spanner-hammer')
-
-                newaction(label,
-                    self._repofwd('runCustomCommand', [command, showoutput]),
-                    icon=icon, tooltip=tooltip,
-                    enabled=True, toolbar='custom')
-
-        _setupCustomTools()
-
         self.updateMenu()
+
+    def _setupCustomTools(self, ui):
+        tools, toollist = hglib.tortoisehgtools(ui,
+            selectedlocation='workbench.custom-toolbar')
+        # Clear the existing "custom" toolbar
+        self.customtbar.clear()
+        # and repopulate it again with the tool configuration
+        # for the current repository
+        if not tools:
+            return
+        for name in toollist:
+            if name == '|':
+                self._addNewSeparator(toolbar='custom')
+                continue
+            info = tools.get(name, None)
+            if info is None:
+                continue
+            command = info.get('command', None)
+            if not command:
+                continue
+            showoutput = info.get('showoutput', False)
+            label = info.get('label', name)
+            tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
+            icon = info.get('icon', 'tools-spanner-hammer')
+
+            self._addNewAction(label,
+                self._repofwd('runCustomCommand', [command, showoutput]),
+                icon=icon, tooltip=tooltip,
+                enabled=True, toolbar='custom')
+
+    def _addNewAction(self, text, slot=None, icon=None, shortcut=None,
+                  checkable=False, tooltip=None, data=None, enabled=None,
+                  visible=None, menu=None, toolbar=None):
+        """Create new action and register it
+
+        :slot: function called if action triggered or toggled.
+        :checkable: checkable action. slot will be called on toggled.
+        :data: optional data stored on QAction.
+        :enabled: bool or group name to enable/disable action.
+        :visible: bool or group name to show/hide action.
+        :shortcut: QKeySequence, key sequence or name of standard key.
+        :menu: name of menu to add this action.
+        :toolbar: name of toolbar to add this action.
+        """
+        action = QAction(text, self, checkable=checkable)
+        if slot:
+            if checkable:
+                action.toggled.connect(slot)
+            else:
+                action.triggered.connect(slot)
+        if icon:
+            if toolbar:
+                action.setIcon(qtlib.geticon(icon))
+            else:
+                action.setIcon(qtlib.getmenuicon(icon))
+        if shortcut:
+            keyseq = qtlib.keysequence(shortcut)
+            if isinstance(keyseq, QKeySequence.StandardKey):
+                action.setShortcuts(keyseq)
+            else:
+                action.setShortcut(keyseq)
+        if tooltip:
+            action.setToolTip(tooltip)
+        if data is not None:
+            action.setData(data)
+        if isinstance(enabled, bool):
+            action.setEnabled(enabled)
+        elif enabled:
+            self._actionavails[enabled].append(action)
+        if isinstance(visible, bool):
+            action.setVisible(visible)
+        elif visible:
+            self._actionvisibles[visible].append(action)
+        if menu:
+            getattr(self, 'menu%s' % menu.title()).addAction(action)
+        if toolbar:
+            getattr(self, '%stbar' % toolbar).addAction(action)
+        return action
+
+    def _addNewSeparator(self, menu=None, toolbar=None):
+        """Insert a separator action; returns nothing"""
+        if menu:
+            getattr(self, 'menu%s' % menu.title()).addSeparator()
+        if toolbar:
+            getattr(self, '%stbar' % toolbar).addSeparator()
 
     def _action_defs(self):
         a = [("closetab", _("Close tab"), '',
@@ -553,10 +579,19 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
-        self.showRepo(path)
-        rw = self.repoTabsWidget.currentWidget()
+        uri = path.split('?')
+        path = uri[0]
+        rev = None
+        if len(uri) > 1:
+            rev = hglib.fromunicode(uri[1])
+        rw = self.showRepo(path)
         if rw:
-            rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+            if rev:
+                rw.goto(rev)
+            else:
+                # assumes that the request comes from commit widget; in this
+                # case, the user is going to commit changes to this repo.
+                rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
 
     @pyqtSlot(QString)
     def showRepo(self, root):
@@ -566,8 +601,8 @@ class Workbench(QMainWindow):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
                 self.repoTabsWidget.setCurrentIndex(i)
-                return
-        self._openRepo(root, False)
+                return w
+        return self._openRepo(root, False)
 
     @pyqtSlot(QString, QString)
     def showClonedRepo(self, root, src=None):
@@ -651,13 +686,17 @@ class Workbench(QMainWindow):
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
-            self.actionSelectTaskMQ.setVisible(False)
-            self.actionSelectTaskPbranch.setVisible(False)
+            if self.actionSelectTaskMQ is not None:
+                self.actionSelectTaskMQ.setVisible(False)
+            if self.actionSelectTaskPbranch is not None:
+                self.actionSelectTaskPbranch.setVisible(False)
         else:
             repoWidget = self.repoTabsWidget.currentWidget()
             exts = repoWidget.repo.extensions()
-            self.actionSelectTaskMQ.setVisible('mq' in exts)
-            self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
+            if self.actionSelectTaskMQ is not None:
+                self.actionSelectTaskMQ.setVisible('mq' in exts)
+            if self.actionSelectTaskPbranch is not None:
+                self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
             for name, idx in repoWidget.namedTabs.iteritems():
                 if idx == taskIndex:
@@ -722,6 +761,7 @@ class Workbench(QMainWindow):
             if w.repo:
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
+                self._setupCustomTools(w.repo.ui)
         else:
             self.activeRepoChanged.emit("")
         repo = w and w.repo or None
@@ -756,7 +796,7 @@ class Workbench(QMainWindow):
                 tw.currentIndex()+1, rw, rw.title())
         else:
             index = self.repoTabsWidget.addTab(rw, rw.title())
-
+        tw.setTabToolTip(index, hglib.tounicode(repo.root))
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
             lambda title: tw.setTabText(tw.indexOf(rw), title))
@@ -765,6 +805,7 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
+        return rw
 
 
 
@@ -888,11 +929,12 @@ class Workbench(QMainWindow):
                     return
             try:
                 repo = thgrepo.repository(path=root)
-                self.addRepoTab(repo, bundle)
+                return self.addRepoTab(repo, bundle)
             except RepoError:
                 upath = hglib.tounicode(root)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % upath)
+        return None
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
@@ -1204,10 +1246,10 @@ def run(ui, *pats, **opts):
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)
-    # Note that if the "single workbench mode" is enable, and there is no
+    # Note that if the "single workbench mode" is enabled, and there is no
     # existing workbench window, we must tell the Workbench object to create
     # the workbench server
-    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', False)
+    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
     mustcreateserver = False
     if singleworkbenchmode:
         newworkbench = opts.get('newworkbench')

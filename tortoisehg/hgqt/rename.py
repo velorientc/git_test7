@@ -183,46 +183,42 @@ class RenameDialog(QDialog):
 
     def src_btn_clicked(self):
         """Select the source file of folder"""
-        self.get_file_or_folder('src')
+        FD = QFileDialog
+        curr = self.get_src()
+        if os.path.isfile(curr):
+            caption = _('Select Source File')
+            path = FD.getOpenFileName(parent=self, caption=caption,
+                                      options=FD.ReadOnly)
+        else:
+            caption = _('Select Source Folder')
+            path = FD.getExistingDirectory(parent=self, caption=caption,
+                                           options=FD.ShowDirsOnly | FD.ReadOnly)
+        relpath = self.to_relative_path(path)
+        if not relpath:
+            return
+        self.src_txt.setText(relpath)
 
     def dest_btn_clicked(self):
         """Select the destination file of folder"""
-        self.get_file_or_folder('dest')
-
-    def get_file_or_folder(self, mode):
-        if mode == 'src':
-            curr = self.get_src()
-            if os.path.isfile(curr):
-                caption = _('Select Source File')
-            else:
-                caption = _('Select Source Folder')
-        else:
-            curr = self.get_dest()
-            if os.path.isfile(curr):
-                caption = _('Select Destination File')
-            else:
-                caption = _('Select Destination Folder')
         FD = QFileDialog
-        if os.path.isfile(curr):
-            if mode == 'src':
-                path = FD.getOpenFileName(parent=self, caption=caption,
-                                          options=FD.ReadOnly)
-            else:
-                path = FD.getSaveFileName(parent=self, caption=caption,
-                                          options=FD.ReadOnly)
+        if os.path.isfile(self.get_src()):
+            caption = _('Select Destination File')
         else:
-            path = FD.getExistingDirectory(parent=self, caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
-        if path:
-            path = util.normpath(unicode(path))
-            pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
-            if not path.startswith(pathprefix):
-                return
-            relpath = path[len(pathprefix):]
-            if mode == 'src':
-                self.src_txt.setText(relpath)
-            else:
-                self.dest_txt.setText(relpath)
+            caption = _('Select Destination Folder')
+        path = FD.getSaveFileName(parent=self, caption=caption)
+        relpath = self.to_relative_path(path)
+        if not relpath:
+            return
+        self.dest_txt.setText(relpath)
+
+    def to_relative_path(self, fullpath):  # unicode or QString
+        if not fullpath:
+            return
+        fullpath = util.normpath(unicode(fullpath))
+        pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+        if not os.path.normcase(fullpath).startswith(os.path.normcase(pathprefix)):
+            return
+        return fullpath[len(pathprefix):]
 
     def copy_chk_toggled(self):
         self.setRenameCopy()

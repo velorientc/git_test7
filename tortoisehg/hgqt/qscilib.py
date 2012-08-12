@@ -127,8 +127,10 @@ class Scintilla(QsciScintilla):
         super(Scintilla, self).__init__(parent)
         self.autoUseTabs = True
         self.setUtf8(True)
+        self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
+
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
@@ -177,23 +179,28 @@ class Scintilla(QsciScintilla):
         else:
             self._stdMenu.clear()
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Undo'), self.undo, QKeySequence.Undo)
+            a = self._stdMenu.addAction(_('Undo'), self.undo)
+            a.setShortcuts(QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = self._stdMenu.addAction(_('Redo'), self.redo, QKeySequence.Redo)
+            a = self._stdMenu.addAction(_('Redo'), self.redo)
+            a.setShortcuts(QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
             self._stdMenu.addSeparator()
-            a = self._stdMenu.addAction(_('Cut'), self.cut, QKeySequence.Cut)
+            a = self._stdMenu.addAction(_('Cut'), self.cut)
+            a.setShortcuts(QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = self._stdMenu.addAction(_('Copy'), self.copy, QKeySequence.Copy)
+        a = self._stdMenu.addAction(_('Copy'), self.copy)
+        a.setShortcuts(QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            self._stdMenu.addAction(_('Paste'), self.paste, QKeySequence.Paste)
-            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText,
-                               QKeySequence.Delete)
+            a = self._stdMenu.addAction(_('Paste'), self.paste)
+            a.setShortcuts(QKeySequence.Paste)
+            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText)
+            a.setShortcuts(QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
         self._stdMenu.addSeparator()
-        self._stdMenu.addAction(_('Select All'),
-                                self.selectAll, QKeySequence.SelectAll)
+        a = self._stdMenu.addAction(_('Select All'), self.selectAll)
+        a.setShortcuts(QKeySequence.SelectAll)
         self._stdMenu.addSeparator()
         qsci = QsciScintilla
         wrapmenu = QMenu(_('Wrap'), self)
@@ -387,7 +394,7 @@ class SearchToolBar(QToolBar):
     searchRequested = pyqtSignal(unicode, bool, bool, bool)
     """Emitted (pattern, icase, wrap, forward) when requested"""
 
-    def __init__(self, parent=None, hidable=False, settings=None):
+    def __init__(self, parent=None, hidable=False):
         super(SearchToolBar, self).__init__(_('Search'), parent,
                                             objectName='search',
                                             iconSize=QSize(16, 16))
@@ -413,25 +420,30 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
         self.addWidget(self._wrapchk)
-        self._bt = QPushButton(_('Search'), enabled=False)
+        self._btprev = QPushButton(_('Prev'), icon=qtlib.geticon('go-up'),
+                                   iconSize=QSize(16, 16))
+        self._btprev.clicked.connect(
+            lambda: self._emitSearchRequested(forward=False))
+        self.addWidget(self._btprev)
+        self._bt = QPushButton(_('Next'), icon=qtlib.geticon('go-down'),
+                               iconSize=QSize(16, 16))
         self._bt.clicked.connect(self._emitSearchRequested)
-        self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
+        self._le.textChanged.connect(self._updateSearchButtons)
         self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
         self.setStyleSheet(qtlib.tbstylesheet)
 
-        def defaultsettings():
-            s = QSettings()
-            s.beginGroup('searchtoolbar')
-            return s
-        self._settings = settings or defaultsettings()
+        self._settings = QSettings()
+        self._settings.beginGroup('searchtoolbar')
         self.searchRequested.connect(self._writesettings)
         self._readsettings()
 
         self._le.textChanged.connect(self._emitConditionChanged)
         self._chk.toggled.connect(self._emitConditionChanged)
         self._wrapchk.toggled.connect(self._emitConditionChanged)
+
+        self._updateSearchButtons()
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.FindNext):
@@ -477,6 +489,12 @@ class SearchToolBar(QToolBar):
     def _emitSearchRequested(self, forward=True):
         self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
                                   self.wrapAround(), forward)
+
+    @pyqtSlot()
+    def _updateSearchButtons(self):
+        enabled = bool(self._le.text())
+        self._btprev.setEnabled(enabled)
+        self._bt.setEnabled(enabled)
 
     def pattern(self):
         """Returns the current search pattern [unicode]"""
@@ -586,7 +604,7 @@ def fileEditor(filename, **opts):
     def showsearchbar():
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
-    QShortcut(QKeySequence.Find, dialog, showsearchbar)
+    qtlib.newshortcutsforstdkey(QKeySequence.Find, dialog, showsearchbar)
     dialog.layout().addWidget(searchbar)
 
     BB = QDialogButtonBox

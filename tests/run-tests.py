@@ -19,7 +19,6 @@ ignorefiles = [
     r'^[._]',
     r'^setup\.py$',
     r'^TortoiseHgOverlayServer\.py$',
-    r'^prej\.py$',  # TODO broken module; maybe unused?
     # exclude platform-dependent modules
     r'^bugtraq\.py$',
     r'^shellconf\.py$',
