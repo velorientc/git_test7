@@ -641,7 +641,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.menuurl = url
         self.menualias = alias
-        self.acts[-1].setEnabled(editable)
+        for act in self.acts[-2:]:
+            act.setEnabled(editable)
         self.cmenu.exec_(point)
 
     def exploreurl(self):
