@@ -174,12 +174,8 @@ class Workbench(QMainWindow):
         newseparator(menu='file')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file')
-        closerepo = newaction(_("&Close Repository"), self.closeRepository,
+        newaction(_("&Close Repository"), self.closeRepository,
                   shortcut='Close', enabled='repoopen', menu='file')
-        if os.name == 'nt':
-            sc = closerepo.shortcuts()
-            sc.append(keysequence('Ctrl+W'))
-            closerepo.setShortcuts(sc)
         newseparator(menu='file')
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
