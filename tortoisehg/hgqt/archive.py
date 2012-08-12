@@ -191,14 +191,13 @@ class ArchiveDialog(QDialog):
         FD = QFileDialog
         if select['type'] == 'files':
             caption = _('Select Destination Folder')
-            response = FD.getExistingDirectory(parent=self, caption=caption,
-                    directory=dest, options=FD.ShowDirsOnly | FD.ReadOnly)
+            filter = ''
         else:
-            caption = _('Open File')
+            caption = _('Select Destination File')
             ext = '*' + select['ext']
             filter = '%s (%s)\nAll Files (*.*)' % (select['label'], ext)
-            response = FD.getOpenFileName(parent=self, caption=caption,
-                    directory=dest, filter=filter, options=FD.ReadOnly)
+        response = FD.getSaveFileName(parent=self, caption=caption,
+                directory=dest, filter=filter, options=FD.ReadOnly)
         if response:
             self.dest_edit.setText(response)
             self.update_path()
