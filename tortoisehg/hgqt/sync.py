@@ -1383,8 +1383,12 @@ class SecureDialog(QDialog):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
+            if port is None:
+                portnum = 443
+            else:
+                portnum = int(port)
             try:
-                pem = ssl.get_server_certificate( (host, port) )
+                pem = ssl.get_server_certificate( (host, portnum) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Certificate Query Error'),
@@ -1395,10 +1399,6 @@ class SecureDialog(QDialog):
             le.setText(pretty)
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
-        if port is None:
-            port = 443
-        else:
-            port = int(port)
         uhost = hglib.tounicode(host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
