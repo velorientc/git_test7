@@ -1386,7 +1386,13 @@ class SecureDialog(QDialog):
             if port is None:
                 portnum = 443
             else:
-                portnum = int(port)
+                try:
+                    portnum = int(port)
+                except ValueError:
+                    qtlib.WarningMsgBox(_('Certificate Query Error'),
+                                        _('Invalid port number: %s')
+                                        % hglib.tounicode(port), parent=self)
+                    return
             try:
                 pem = ssl.get_server_certificate( (host, portnum) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
