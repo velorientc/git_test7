@@ -1106,6 +1106,7 @@ class RepoWidget(QWidget):
         if len(selection) == 0:
             return
 
+        self.menuselection = selection
         if self.bundle:
             if len(selection) == 1:
                 self.bundlemenu.exec_(point)
@@ -1115,7 +1116,6 @@ class RepoWidget(QWidget):
                 self.outgoingcmenu.exec_(point)
                 return
 
-        self.menuselection = selection
         allunapp = False
         if 'mq' in self.repo.extensions():
             for rev in selection:
