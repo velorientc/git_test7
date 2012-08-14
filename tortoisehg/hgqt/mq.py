@@ -531,6 +531,7 @@ class MQPatchesWidget(QDockWidget):
         self.setGuardsAct.setEnabled(False)
         self.qpopAct.setEnabled(bool(applied))
         self.qpopAllAct.setEnabled(bool(applied))
+        self.qreorderAct.setEnabled(bool(repo.thgmqunappliedpatches))
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
