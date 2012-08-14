@@ -1085,7 +1085,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.pushCompleted.emit()
         self.finishfunc = finished
 
-        if not pushall and rev is not None and branch is not None:
+        if not pushall and rev is None and branch is None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
             if defaultpush == 'all':
