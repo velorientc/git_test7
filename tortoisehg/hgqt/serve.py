@@ -215,12 +215,13 @@ def _create_server(orig, ui, app):
     def serve_forever(orig):
         server._serving = True
         try:
-            while server._serving:
-                server.handle_request()
-        except KeyboardInterrupt:
-            # raised outside try-block around process_request().
-            # see SocketServer.BaseServer
-            pass
+            try:
+                while server._serving:
+                    server.handle_request()
+            except KeyboardInterrupt:
+                # raised outside try-block around process_request().
+                # see SocketServer.BaseServer
+                pass
         finally:
             server._serving = False
             server.server_close()
