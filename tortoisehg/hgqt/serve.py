@@ -277,6 +277,23 @@ def recursiveRepoSearch(repo):
     except (EnvironmentError, error.Abort, error.RepoError):
         pass
 
+def _asconfigliststr(value):
+    r"""
+    >>> _asconfigliststr('foo')
+    'foo'
+    >>> _asconfigliststr('foo bar')
+    '"foo bar"'
+    >>> _asconfigliststr('foo,bar')
+    '"foo,bar"'
+    >>> _asconfigliststr('foo "bar"')
+    '"foo \\"bar\\""'
+    """
+    # ui.configlist() uses isspace(), which is locale-dependent
+    if util.any(c.isspace() or c == ',' for c in value):
+        return '"' + value.replace('"', '\\"') + '"'
+    else:
+        return value
+
 def _newwebconf(repopath, webconfpath):
     """create config obj for hgweb"""
     if webconfpath:
@@ -290,12 +307,16 @@ def _newwebconf(repopath, webconfpath):
             repo = thgrepo.repository(None, repopath)
             roots = [root for root in recursiveRepoSearch(repo)]
             if len(roots) == 1:
+                # no _asconfigliststr(repopath) for now, because ServeDialog
+                # cannot parse it as a list in single-repo mode.
                 c.set('paths', '/', repopath)
             else:
+                # since hg 8cbb59124e67, path entry is parsed as a list
                 base = hglib.fromunicode(repo.shortname)
-                c.set('paths', base, repopath)
+                c.set('paths', base, _asconfigliststr(repopath))
                 for root in roots[1:]:
-                    c.set('paths', base + root[len(repopath):], root)
+                    c.set('paths', base + root[len(repopath):],
+                          _asconfigliststr(root))
         except (EnvironmentError, error.Abort, error.RepoError):
             c.set('paths', '/', repopath)
         return c
