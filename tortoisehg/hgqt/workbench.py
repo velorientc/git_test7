@@ -158,7 +158,6 @@ class Workbench(QMainWindow):
         self._actionavails = {'repoopen': []}
         self._actionvisibles = {'repoopen': []}
 
-        keysequence = qtlib.keysequence
         modifiedkeysequence = qtlib.modifiedkeysequence
         newaction = self._addNewAction
         newseparator = self._addNewSeparator
@@ -739,7 +738,6 @@ class Workbench(QMainWindow):
                 self.lastClosedRepoRootList = [reporoot]
 
     def reopenLastClosedTabs(self):
-        progress = None
         for n, reporoot in enumerate(self.lastClosedRepoRootList):
             self.progress(_('Reopening tabs'), n,
                 _('Reopening repository %s') % reporoot, '', len(self.lastClosedRepoRootList))
