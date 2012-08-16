@@ -1030,7 +1030,7 @@ class Workbench(QMainWindow):
         # Note that calling setChecked will NOT reload the model if the new
         # setting is the same as the one in the repo registry
         QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(ssr))
+        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(snsr))
         QTimer.singleShot(0, lambda: self.actionShowShortPaths.setChecked(ssp))
 
         # Manually reload the model now, to apply the settings
