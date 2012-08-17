@@ -336,10 +336,12 @@ class RepoRegistryView(QDockWidget):
             QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
 
     def reloadModel(self):
+        oldmodel = self.tview.model()
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self.showSubrepos, self.showNetworkSubrepos,
                 self.showShortPaths))
+        oldmodel.deleteLater()
         self.expand()
         self._pendingReloadModel = False
 
