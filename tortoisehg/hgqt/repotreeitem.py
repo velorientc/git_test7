@@ -276,6 +276,11 @@ class RepoItem(RepoTreeItem):
             try:
                 sri = None
                 if repo is None:
+                    if not os.path.exists(self._root):
+                        self._valid = False
+                        return [self._root]
+                    elif not os.path.exists(os.path.join(self._root, '.hgsub')):
+                        return []  # skip repo creation, which is expensive
                     repo = hg.repository(ui.ui(), self._root)
                 wctx = repo['.']
                 sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
