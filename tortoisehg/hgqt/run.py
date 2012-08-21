@@ -502,8 +502,8 @@ class _QtRunner(QObject):
                                   hglib.tounicode(errstr), opts,
                                   parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
-                    _('Close this application?')):
+            if qtlib.QuestionMsgBox(hglib.tounicode(_('Keyboard interrupt')),
+                    hglib.tounicode(_('Close this application?'))):
                 QApplication.quit()
             else:
                 self.errors = []
@@ -548,7 +548,7 @@ class _QtRunner(QObject):
                     from tortoisehg.hgqt import thgrepo
                     thgrepo.repository(ui, opts['repository'])
                 except error.RepoError, e:
-                    qtlib.WarningMsgBox(_('Repository Error'),
+                    qtlib.WarningMsgBox(hglib.tounicode(_('Repository Error')),
                                         hglib.tounicode(str(e)))
                     return
             dlg = dlgfunc(ui, *args, **opts)

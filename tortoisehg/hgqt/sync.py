@@ -648,7 +648,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.menuurl = url
         self.menualias = alias
-        self.acts[-1].setEnabled(editable)
+        for act in self.acts[-2:]:
+            act.setEnabled(editable)
         self.cmenu.exec_(point)
 
     def exploreurl(self):
@@ -1094,7 +1095,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.pushCompleted.emit()
         self.finishfunc = finished
 
-        if not pushall and rev is not None and branch is not None:
+        if not pushall and rev is None and branch is None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
             if defaultpush == 'all':
@@ -1392,8 +1393,18 @@ class SecureDialog(QDialog):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
+            if port is None:
+                portnum = 443
+            else:
+                try:
+                    portnum = int(port)
+                except ValueError:
+                    qtlib.WarningMsgBox(_('Certificate Query Error'),
+                                        _('Invalid port number: %s')
+                                        % hglib.tounicode(port), parent=self)
+                    return
             try:
-                pem = ssl.get_server_certificate( (host, port) )
+                pem = ssl.get_server_certificate( (host, portnum) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Certificate Query Error'),
@@ -1404,10 +1415,6 @@ class SecureDialog(QDialog):
             le.setText(pretty)
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
-        if port is None:
-            port = 443
-        else:
-            port = int(port)
         uhost = hglib.tounicode(host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \

@@ -1065,7 +1065,7 @@ class Workbench(QMainWindow):
         # Note that calling setChecked will NOT reload the model if the new
         # setting is the same as the one in the repo registry
         QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(ssr))
+        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(snsr))
         QTimer.singleShot(0, lambda: self.actionShowShortPaths.setChecked(ssp))
 
         # Manually reload the model now, to apply the settings
@@ -1077,7 +1077,11 @@ class Workbench(QMainWindow):
         # Reload the all the repos that were open on the last session
         # This may be a lengthy operation, which happens before the Workbench GUI is open
         # We use a progress dialog to let the user know that the workbench is being loaded
-        openrepos = unicode(s.value(wb + 'openrepos').toString()).split(',')
+        openreposvalue = unicode(s.value(wb + 'openrepos').toString())
+        if openreposvalue:
+            openrepos = openreposvalue.split(',')
+        else:
+            openrepos = []
         for n, upath in enumerate(openrepos):
             self.progress(_('Reopening tabs'), n,
                           _('Reopening repository %s') % upath, '',

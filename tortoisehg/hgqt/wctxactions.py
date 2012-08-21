@@ -58,7 +58,7 @@ class WctxActions(QObject):
         make(_('File History'), log, frozenset('MARC!'), 'hg-log')
         make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
         allactions.append(None)
-        make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
+        make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
@@ -273,15 +273,17 @@ def revert(parent, ui, repo, files):
             return
         commands.revert(ui, repo, *files, **revertopts)
     else:
-        res = qtlib.CustomPrompt(
+        wctx = repo[None]
+        if [file for file in files if file in wctx.modified()]:
+            res = qtlib.CustomPrompt(
                 _('Confirm Revert'),
                 _('Revert local file changes?'), parent,
                 (_('&Revert with backup'), _('&Discard changes'),
                 _('Cancel')), 2, 2, files).run()
-        if res == 2:
-            return False
-        if res == 1:
-            revertopts['no_backup'] = True
+            if res == 2:
+                return False
+            if res == 1:
+                revertopts['no_backup'] = True
         commands.revert(ui, repo, *files, **revertopts)
         return True
 
