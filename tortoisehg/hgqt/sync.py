@@ -724,6 +724,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
+            self.reload()
 
     def secureclicked(self):
         dlg = SecureDialog(self.repo, self.currentUrl(False), self)
