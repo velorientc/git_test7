@@ -273,15 +273,17 @@ def revert(parent, ui, repo, files):
             return
         commands.revert(ui, repo, *files, **revertopts)
     else:
-        res = qtlib.CustomPrompt(
+        wctx = repo[None]
+        if [file for file in files if file in wctx.modified()]:
+            res = qtlib.CustomPrompt(
                 _('Confirm Revert'),
                 _('Revert local file changes?'), parent,
                 (_('&Revert with backup'), _('&Discard changes'),
                 _('Cancel')), 2, 2, files).run()
-        if res == 2:
-            return False
-        if res == 1:
-            revertopts['no_backup'] = True
+            if res == 2:
+                return False
+            if res == 1:
+                revertopts['no_backup'] = True
         commands.revert(ui, repo, *files, **revertopts)
         return True
 
