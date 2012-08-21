@@ -58,7 +58,7 @@ class WctxActions(QObject):
         make(_('File History'), log, frozenset('MARC!'), 'hg-log')
         make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
         allactions.append(None)
-        make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
+        make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
