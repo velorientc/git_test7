@@ -70,7 +70,6 @@ class RepoWidget(QWidget):
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
-        self.ubranch = u''
         self.bundle = None  # bundle file name [local encoding]
         self.bundlesource = None  # source URL of incoming bundle [unicode]
         self.outgoingMode = False
@@ -271,8 +270,8 @@ class RepoWidget(QWidget):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
             return _('%s <incoming>') % self.repo.shortname
-        elif self.ubranch:
-            return u'%s [%s]' % (self.repo.shortname, self.ubranch)
+        elif self.repomodel.branch():
+            return u'%s [%s]' % (self.repo.shortname, self.repomodel.branch())
         else:
             return self.repo.shortname
 
@@ -781,7 +780,7 @@ class RepoWidget(QWidget):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
-                                         self.ubranch, self.revset,
+                                         self.filterbar.branch(), self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
@@ -997,7 +996,6 @@ class RepoWidget(QWidget):
     @pyqtSlot(QString, bool)
     def setBranch(self, branch, allparents=True):
         'Change the branch filter'
-        self.ubranch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
         if self.revset:
