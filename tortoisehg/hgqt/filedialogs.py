@@ -19,11 +19,13 @@ Qt4 dialogs to display hg revisions of a file
 
 import os
 import difflib
+import functools
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
 from tortoisehg.hgqt import fileview, repoview, revpanel, revert
+from tortoisehg.hgqt.qscilib import Scintilla
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -386,6 +388,11 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
 
+    def fileViewMenuRequest(self, sci, point):
+        menu = sci.createStandardContextMenu()
+        point = sci.viewport().mapToGlobal(point)
+        menu.exec_(point)
+
     def setupViews(self):
         self.tableViews = {'left': self.tableView_revisions_left,
                            'right': self.tableView_revisions_right}
@@ -405,11 +412,16 @@ class FileDiffDialog(_AbstractFileDialog):
             lexer = None
 
         for side, idx  in (('left', 0), ('right', 3)):
-            sci = QsciScintilla(self.frame)
+            sci = Scintilla(self.frame)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
             sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+            sci.setContextMenuPolicy(Qt.CustomContextMenu)
+            sci.customContextMenuRequested.connect(
+                functools.partial(self.fileViewMenuRequest, sci))
+
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
             sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
