@@ -200,6 +200,10 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
+        self._branchReloading = True
+        self.setBranch(s.value('revset/' + repoid + '/branch').toString())
+        self._branchReloading = False
+
         # Show the filter bar if necessary
         if s.value('revset/' + repoid + '/showrepofilterbar').toBool():
             self.show()
@@ -215,6 +219,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('revset/' + repoid + '/queries', self.revsethist)
         s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
         s.setValue('revset/' + repoid + '/showrepofilterbar', not self.isHidden())
+        s.setValue('revset/' + repoid + '/branch', self.branch())
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
