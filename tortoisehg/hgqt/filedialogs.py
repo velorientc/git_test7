@@ -416,7 +416,6 @@ class FileDiffDialog(_AbstractFileDialog):
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
-            sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
             sci.setContextMenuPolicy(Qt.CustomContextMenu)
             sci.customContextMenuRequested.connect(
