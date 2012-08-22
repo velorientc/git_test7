@@ -24,6 +24,7 @@ class RepoFilterBarBranchTest(unittest.TestCase):
             hg.branch(name)
             hg.commit('-m', 'create %s branch' % name)
         hg.commit('--close-branch', '-m', 'close baz branch')
+        hg.update('foo')  # current branch will be listed first
         cls.repo = thgrepo.repository(path=hg.path)
 
     @classmethod
@@ -45,7 +46,7 @@ class RepoFilterBarBranchTest(unittest.TestCase):
 
     def test_open_branches(self):
         self.assertEqual([self.widget._allBranchesLabel,
-                          'default', 'bar', 'foo'],
+                          'foo', 'default', 'bar'],
                          _listitems(self.widget._branchCombo))
         self.assertTrue(self.widget._branchCombo.isEnabled())
         self.assertFalse(self.branchchanged.called)
@@ -54,7 +55,7 @@ class RepoFilterBarBranchTest(unittest.TestCase):
         self.widget._abranchAction.setChecked(False)
         self.widget._abranchAction.trigger()  # checked
         self.assertEqual([self.widget._allBranchesLabel,
-                          'bar', 'foo'],
+                          'foo', 'bar'],
                          _listitems(self.widget._branchCombo))
         self.assertTrue(self.widget._branchCombo.isEnabled())
         self.assertFalse(self.branchchanged.called)
@@ -63,7 +64,7 @@ class RepoFilterBarBranchTest(unittest.TestCase):
         self.widget._cbranchAction.setChecked(False)
         self.widget._cbranchAction.trigger()  # checked
         self.assertEqual([self.widget._allBranchesLabel,
-                          'default', 'bar', 'baz', 'foo'],
+                         'foo',  'default', 'bar', 'baz'],
                          _listitems(self.widget._branchCombo))
         self.assertTrue(self.widget._branchCombo.isEnabled())
         self.assertFalse(self.branchchanged.called)

@@ -256,10 +256,10 @@ class RepoFilterBar(QToolBar):
         else:
             branches = self._repo.namedbranches
 
-        # show the 'default' branch on top, if there is one
-        if 'default' in branches:
-            branches = ['default'] + \
-                [branch for branch in branches if branch != 'default']
+        # easy access to common branches (Python sorted() is stable)
+        priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
+        branches = sorted(branches, key=lambda e: priomap.get(e, 0))
+
         self._branchReloading = True
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
