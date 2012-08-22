@@ -655,21 +655,24 @@ class Workbench(QMainWindow):
         self.updateTaskViewMenu()
         self.updateToolBarActions()
         tw = self.repoTabsWidget
-        w = tw.currentWidget()
         if ((tw.count() == 0) or
             ((tw.count() == 1) and
              not self.ui.configbool('tortoisehg', 'forcerepotab', False))):
             tw.tabBar().hide()
         else:
             tw.tabBar().show()
+        self._updateWindowTitle()
+
+    def _updateWindowTitle(self):
+        tw = self.repoTabsWidget
+        w = tw.currentWidget()
         if tw.count() == 0:
             self.setWindowTitle(_('TortoiseHg Workbench'))
         elif w.repo.shortname != w.repo.displayname:
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
-                                (w.repo.shortname, w.repo.displayname))
+                                (w.title(), w.repo.displayname))
         else:
-            self.setWindowTitle(_('%s - TortoiseHg Workbench') %
-                                w.repo.shortname)
+            self.setWindowTitle(_('%s - TortoiseHg Workbench') % w.title())
 
     def updateToolBarActions(self):
         w = self.repoTabsWidget.currentWidget()
@@ -762,6 +765,13 @@ class Workbench(QMainWindow):
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
 
+    @pyqtSlot(unicode)
+    def _updateRepoTabTitle(self, title):
+        index = self.repoTabsWidget.indexOf(self.sender())
+        self.repoTabsWidget.setTabText(index, title)
+        if index == self.repoTabsWidget.currentIndex():
+            self._updateWindowTitle()
+
     def addRepoTab(self, repo, bundle):
         '''opens the given repo in a new tab'''
         rw = RepoWidget(repo, self, bundle=bundle)
@@ -792,8 +802,7 @@ class Workbench(QMainWindow):
             index = self.repoTabsWidget.addTab(rw, rw.title())
         tw.setTabToolTip(index, hglib.tounicode(repo.root))
         tw.setCurrentIndex(index)
-        rw.titleChanged.connect(
-            lambda title: tw.setTabText(tw.indexOf(rw), title))
+        rw.titleChanged.connect(self._updateRepoTabTitle)
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
         self.reporegistry.addRepo(repo.root)
