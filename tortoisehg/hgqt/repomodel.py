@@ -170,7 +170,7 @@ class HgRepoListModel(QAbstractTableModel):
         for branch in sorted(self.repo.branchtags().keys()):
             self.namedbranch_color(branch)
 
-    def setBranch(self, branch=None, allparents=True):
+    def setBranch(self, branch=None, allparents=False):
         self.filterbranch = branch  # unicode
         self.invalidateCache()
         if self.revset and self.filterbyrevset:

@@ -994,7 +994,7 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.tabBar().hide()
 
     @pyqtSlot(QString, bool)
-    def setBranch(self, branch, allparents=True):
+    def setBranch(self, branch, allparents):
         'Change the branch filter'
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
