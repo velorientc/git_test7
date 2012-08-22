@@ -1135,3 +1135,45 @@ def newshortcutsforstdkey(key, *args, **kwargs):
     """Create [QShortcut,...] for all key bindings of the given StandardKey"""
     return [QShortcut(keyseq, *args, **kwargs)
             for keyseq in QKeySequence.keyBindings(key)]
+
+class PaletteSwitcher(object):
+    """
+    Class that can be used to enable a predefined, alterantive background color
+    for a widget
+
+    This is normally used to change the color of widgets when they display some
+    "filtered" content which is a subset of the actual widget contents.
+
+    The alternative background color is fixed, and depends on the original
+    background color (dark and light backgrounds use a different alternative
+    color).
+
+    The alterenative color cannot be changed because the idea is to set a
+    consistent "filter" style for all widgets.
+
+    An instance of this class must be added as a property of the widget whose
+    background we want to change. The constructor takes the "target widget" as
+    its only parameter.
+
+    In order to enable or disable the background change, simply call the
+    enablefilterpalette() method.
+    """
+    def __init__(self, targetwidget):
+        self._targetwidget = targetwidget
+        self._defaultpalette = targetwidget.palette()
+        bgcolor = self._defaultpalette.color(QPalette.Base)
+        if bgcolor.black() <= 128:
+            # Light theme
+            filterbgcolor = QColor('#FFFFB7')
+        else:
+            # Dark theme
+            filterbgcolor = QColor('darkgrey')
+        self._filterpalette = QPalette()
+        self._filterpalette.setColor(QPalette.Base, filterbgcolor)
+
+    def enablefilterpalette(self, enabled=False):
+        if enabled:
+            pl = self._filterpalette
+        else:
+            pl = self._defaultpalette
+        self._targetwidget.setPalette(pl)

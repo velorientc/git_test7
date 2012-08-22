@@ -514,6 +514,7 @@ class RepoWidget(QWidget):
     def _unapplyRevisionSet(self):
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
+        self.repoview.enablefilterpalette(False)
         if not self.revset:
             return False
         self.revset = []
@@ -536,6 +537,7 @@ class RepoWidget(QWidget):
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
+        self.repoview._paletteswitcher.enablefilterpalette(revs)
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):

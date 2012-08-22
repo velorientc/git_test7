@@ -283,8 +283,13 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._filterupdatetimer = QTimer(self, interval=200, singleShot=True)
         self.le.returnPressed.connect(self._treeview.expandAll)
         self.le.textChanged.connect(self._filterupdatetimer.start)
+        def applyFilter():
+            filtertext = self.le.text()
+            self._treemodel.setNameFilter(filtertext)
+            self._treeview.enablefilterpalette(filtertext)
+
         self._filterupdatetimer.timeout.connect(
-            lambda: self._treemodel.setNameFilter(self.le.text()))
+            applyFilter)
 
     @pyqtSlot()
     def _autoexpandtree(self):
@@ -444,6 +449,11 @@ class QManifestLineEdit(QLineEdit):
 
 class QManifestTreeView(QTreeView):
     topreached = pyqtSignal(int)
+
+    def __init__(self, *args, **kwargs):
+        QTreeView.__init__(self, *args, **kwargs)
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
+
     def keyPressEvent(self, event):
         if self.currentIndex().row() == 0 \
                 and not self.currentIndex().parent().isValid():
@@ -453,3 +463,6 @@ class QManifestTreeView(QTreeView):
                 return
         # default handler for event
         super(QManifestTreeView, self).keyPressEvent(event)
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
