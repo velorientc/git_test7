@@ -817,8 +817,10 @@ class RepoWidget(QWidget):
         if not cw.canswitch():
             return
         ctx = self.repo.changectx(rev)
-        if rev is None or ('mq' in self.repo.extensions() and 'qtip' in ctx.tags()):
-            # Clicking on working copy switches to commit tab
+        if rev is None or ('mq' in self.repo.extensions() and 'qtip' in ctx.tags()
+                           and self.repo['.'].rev() == rev):
+            # Clicking on working copy or on the topmost applied patch
+            # (_if_ it is also the working copy parent) switches to the commit tab
             tw.setCurrentIndex(self.commitTabIndex)
         else:
             # Clicking on a normal revision switches from commit tab
