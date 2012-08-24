@@ -427,7 +427,7 @@ class CustomToolConfigDialog(QDialog):
             QLineEdit(ico),
             _('The tool icon.\n'
             'You can use any built-in TortoiseHg icon\n'
-            'by setting this value to a vaild TortoiseHg icon name\n'
+            'by setting this value to a valid TortoiseHg icon name\n'
             '(e.g. clone, add, remove, sync, thg-logo, hg-update, etc).\n'
             'You can also set this value to the absolute path to\n'
             'any icon on your file system.'))
