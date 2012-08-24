@@ -179,7 +179,7 @@ class HgFileView(QFrame):
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
-        self.actionFind.setShortcuts(QKeySequence.Find)
+        qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.searchbar.show)
 
         self.actionShelf = QAction('Shelve', self)
         self.actionShelf.setIcon(qtlib.geticon('shelve'))
