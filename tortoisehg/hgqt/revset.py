@@ -210,6 +210,7 @@ class RevisionSetQuery(QDialog):
 
         self.entry = RevsetEntry(self)
         self.entry.addCompletions(logical, ancestry, _filepatterns, _common)
+        self.entry.returnPressed.connect(self.returnPressed)
         layout.addWidget(self.entry, 0)
 
         txt = _('<a href="http://www.selenic.com/mercurial/hg.1.html#revsets">'
@@ -311,6 +312,9 @@ class RevisionSetQuery(QDialog):
         self.accept()
 
 class RevsetEntry(QsciScintilla):
+
+    returnPressed = pyqtSignal()
+
     def __init__(self, parent=None):
         super(RevsetEntry, self).__init__(parent)
         self.setMarginWidth(1, 0)
@@ -353,6 +357,7 @@ class RevsetEntry(QsciScintilla):
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
             if not self.isListActive():
                 event.ignore()
+                self.returnPressed.emit()
                 return
         super(RevsetEntry, self).keyPressEvent(event)
 
