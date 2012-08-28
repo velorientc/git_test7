@@ -239,7 +239,7 @@ class FileData(object):
                         else:
                             self.error = _('Not a Mercurial subrepo, not previewable')
                             return
-                except (util.Abort), e:
+                except (util.Abort, KeyError), e:
                     sactual = ''
 
                 out = []
