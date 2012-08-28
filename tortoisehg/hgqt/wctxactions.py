@@ -270,7 +270,7 @@ def revert(parent, ui, repo, files):
         elif res == 1:
             revertopts['rev'] = repo[None].p2().rev()
         else:
-            return
+            return False
         commands.revert(ui, repo, *files, **revertopts)
     else:
         wctx = repo[None]
@@ -357,7 +357,7 @@ def delete(parent, ui, repo, files):
             _('Delete the following unversioned files?'),
             parent, (_('&Delete'), _('Cancel')), 1, 1, files).run()
     if res == 1:
-        return
+        return False
     for wfile in files:
         os.unlink(wfile)
     return True
@@ -368,7 +368,7 @@ def copy(parent, ui, repo, files):
     fd = QFileDialog(parent)
     fname = fd.getSaveFileName(parent, _('Copy file to'), wfile)
     if not fname:
-        return
+        return False
     fname = hglib.fromunicode(fname)
     wfiles = [wfile, fname]
     opts = {'force': True}  # existing file is already checked by QFileDialog
