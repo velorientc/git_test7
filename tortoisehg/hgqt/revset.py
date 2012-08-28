@@ -240,7 +240,6 @@ class RevisionSetQuery(QDialog):
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
     def returnPressed(self):
-        text = self.entry.text()
         if self.entry.hasSelectedText():
             lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
             start = self.entry.positionFromLineIndex(lineFrom, indexFrom)
@@ -259,7 +258,6 @@ class RevisionSetQuery(QDialog):
         else:
             self.runQuery()
         self.entry.setFocus()
-
 
     def currentItemChanged(self, current, previous):
         if current is None:
