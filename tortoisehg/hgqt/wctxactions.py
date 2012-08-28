@@ -284,6 +284,13 @@ def revert(parent, ui, repo, files):
                 return False
             if res == 1:
                 revertopts['no_backup'] = True
+        else:
+            res = qtlib.CustomPrompt(
+                    _('Confirm Revert'),
+                    _('Revert the following files?'),
+                    parent, (_('&Revert'), _('Cancel')), 1, 1, files).run()
+            if res == 1:
+                return False
         commands.revert(ui, repo, *files, **revertopts)
         return True
 
