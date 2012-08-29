@@ -24,10 +24,10 @@
   <?define templates.root.guid = {01A37649-64F4-483B-9E91-FDD8D81D45EB} ?>
   <?define templates.atom.guid = {68D030FA-56A1-4CAF-ADBF-07362B1DDF15} ?>
   <?define templates.coal.guid = {89768AB3-A942-470B-8C1C-9C026B80FF8E} ?>
-  <?define templates.gitweb.guid = {516A9A5F-33DF-41EC-B64C-F910251549D7} ?>
-  <?define templates.monoblue.guid = {BF01AC59-C62C-4946-B820-E528748EB3B2} ?>
-  <?define templates.paper.guid = {31BF16C5-3525-47F7-9733-F67A3B02171B} ?>
-  <?define templates.raw.guid = {936139F7-9A73-4685-80D2-F17A2BC42EAD} ?>
+  <?define templates.gitweb.guid = {C9151699-3282-4F3F-BE03-5154BC99DA60} ?>
+  <?define templates.monoblue.guid = {91CD4FFB-12C7-4879-89F2-A14464A45820} ?>
+  <?define templates.paper.guid = {9DBE9EE0-69F9-40E4-BED5-16093DB1AE81} ?>
+  <?define templates.raw.guid = {EBDC91BC-12BB-4D1C-9F68-2355F2957122} ?>
   <?define templates.rss.guid = {948BDACE-4E70-459A-BDD2-89158FD53F1F} ?>
   <?define templates.spartan.guid = {C49A4A44-53EB-4C37-AA0B-159070F46E84} ?>
   <?define templates.static.guid = {B6C414E5-CD1E-4820-86E7-EEC2386426BE} ?>
