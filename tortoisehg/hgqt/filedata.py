@@ -28,6 +28,7 @@ class FileData(object):
             self.error = hglib.tounicode(str(e))
 
     def checkMaxDiff(self, ctx, wfile, maxdiff, status):
+        self.error = None
         p = _('File or diffs not displayed: ')
         try:
             fctx = ctx.filectx(wfile)
@@ -45,10 +46,23 @@ class FileData(object):
             self.error = p + _('File is larger than the specified max size.\n'
                                'maxdiff = %s KB') % (maxdiff // 1024)
             return None
+
+        def exceedsMaxLineLength(data, maxlength=100000):
+            if len(data) < maxlength:
+                return False
+            for line in data.splitlines():
+                if len(line) > maxlength:
+                    return True
+            return False
+
         try:
             data = fctx.data()
             if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary')
+            elif exceedsMaxLineLength(data):
+                self.error = p + \
+                    _('File may be binary (maximum line length exceeded)')
+            if self.error:
                 if status != 'A':
                     return None
 
