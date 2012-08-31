@@ -60,6 +60,7 @@ class FileData(object):
             if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary')
             elif exceedsMaxLineLength(data):
+                # it's incredibly slow to render long line by QScintilla
                 self.error = p + \
                     _('File may be binary (maximum line length exceeded)')
             if self.error:
