@@ -447,10 +447,16 @@ class HgFileView(QFrame):
             font = self.sci.font()
 
         fm = QFontMetrics(font)
-        maxWidth = fm.maxWidth()
-        lines = self.sci.text().split('\n')
-        widths = [fm.width(line) + maxWidth for line in lines]
-        self.maxWidth = max(widths)
+        self.maxWidth = fm.maxWidth()
+        lines = unicode(self.sci.text()).splitlines()
+        if lines:
+            # assume that the longest line has the largest width;
+            # fm.width() is too slow to apply to each line.
+            try:
+                longestline = max(lines, key=len)
+            except TypeError:  # Python<2.5 has no key support
+                longestline = max((len(l), l) for l in lines)[1]
+            self.maxWidth += fm.width(longestline)
         self.updateScrollBar()
 
     #
