@@ -258,7 +258,7 @@ def viewother(parent, ui, repo, files):
     edit(parent, ui, repo, [os.path.join(base, f) for f in files])
 
 def revert(parent, ui, repo, files):
-    revertopts = {'date': None, 'rev': '.'}
+    revertopts = {'date': None, 'rev': '.', 'all': False}
 
     if len(repo.parents()) > 1:
         res = qtlib.CustomPrompt(
