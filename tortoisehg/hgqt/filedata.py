@@ -13,6 +13,14 @@ from mercurial import ui as uimod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 
+def _exceedsMaxLineLength(data, maxlength=100000):
+    if len(data) < maxlength:
+        return False
+    for line in data.splitlines():
+        if len(line) > maxlength:
+            return True
+    return False
+
 class FileData(object):
     def __init__(self, ctx, ctx2, wfile, status=None):
         self.contents = None
@@ -47,19 +55,11 @@ class FileData(object):
                                'maxdiff = %s KB') % (maxdiff // 1024)
             return None
 
-        def exceedsMaxLineLength(data, maxlength=100000):
-            if len(data) < maxlength:
-                return False
-            for line in data.splitlines():
-                if len(line) > maxlength:
-                    return True
-            return False
-
         try:
             data = fctx.data()
             if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary')
-            elif exceedsMaxLineLength(data):
+            elif _exceedsMaxLineLength(data):
                 # it's incredibly slow to render long line by QScintilla
                 self.error = p + \
                     _('File may be binary (maximum line length exceeded)')
