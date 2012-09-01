@@ -40,7 +40,7 @@ class WctxActions(QObject):
         make(_('&Diff to parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
-        make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+O')
+        make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
         allactions.append(None)
         make(_('Open subrepository'), opensubrepo, frozenset('S'),
             'thg-repository-open', 'Shift+Ctrl+O')
