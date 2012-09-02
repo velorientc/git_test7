@@ -292,7 +292,10 @@ class StatusWidget(QWidget):
         if self.checkable:
             tm.checkToggled.connect(self.updateCheckCount)
 
+        oldtm = self.tv.model()
         self.tv.setModel(tm)
+        if oldtm:
+            oldtm.deleteLater()
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()) or not self.checkable)
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
