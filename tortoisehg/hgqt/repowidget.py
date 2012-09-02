@@ -785,7 +785,10 @@ class RepoWidget(QWidget):
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
+        oldmodel = self.repoview.model()
         self.repoview.setModel(self.repomodel)
+        if oldmodel:
+            oldmodel.deleteLater()
         try:
             self._last_series = self.repo.mq.series[:]
         except AttributeError:
