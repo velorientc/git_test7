@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-08-28 01:55+0000\n"
+"PO-Revision-Date: 2012-09-02 18:42+0000\n"
 "Last-Translator: Peter_lin <floubadour@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-09-01 05:00+0000\n"
+"X-Launchpad-Export-Date: 2012-09-03 05:26+0000\n"
 "X-Generator: Launchpad (build 15890)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1344,7 +1344,7 @@ msgstr "Subversion:"
 
 #: tortoisehg/hgqt/csinfo.py:114
 msgid "Converted From:"
-msgstr ""
+msgstr "Konwert. z:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 msgid "No items to display"
@@ -1382,11 +1382,11 @@ msgstr "Dodaj do listy"
 
 #: tortoisehg/hgqt/customtools.py:90
 msgid "Add separator"
-msgstr ""
+msgstr "Dodaj separator"
 
 #: tortoisehg/hgqt/customtools.py:100
 msgid "List of all tools"
-msgstr ""
+msgstr "Lista wszystkich narzędzi"
 
 #: tortoisehg/hgqt/customtools.py:102
 msgid "New Tool ..."
@@ -1530,7 +1530,7 @@ msgstr "Pokaż historię wybranego pliku"
 
 #: tortoisehg/hgqt/filectxactions.py:59
 msgid "Folder history"
-msgstr ""
+msgstr "Historia katalogu"
 
 #: tortoisehg/hgqt/filectxactions.py:61
 msgid "Compare file revisions"
@@ -1543,11 +1543,11 @@ msgstr "Porównaj rewizje dla wybranego pliku"
 #: tortoisehg/hgqt/filectxactions.py:63 tortoisehg/hgqt/grep.py:568
 #: tortoisehg/util/menuthg.py:76
 msgid "Diff to parent"
-msgstr ""
+msgstr "Diff z rodzicem"
 
 #: tortoisehg/hgqt/filectxactions.py:65
 msgid "Diff to local"
-msgstr ""
+msgstr "Diff z lokalną wersją"
 
 #: tortoisehg/hgqt/filectxactions.py:66
 msgid "View changes to current in external diff tool"
@@ -1571,7 +1571,7 @@ msgstr "Zapisz plik tak jak w tej rewizji"
 
 #: tortoisehg/hgqt/filectxactions.py:74
 msgid "Open Local"
-msgstr ""
+msgstr "Otwórz lokalne"
 
 #: tortoisehg/hgqt/filectxactions.py:76
 msgid "Copy Path"
@@ -1603,11 +1603,11 @@ msgstr "Otwórz terminal w tym miejscu"
 
 #: tortoisehg/hgqt/filectxactions.py:88
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
+msgstr "Otwórz powłokę syst. w wybranym katalogu"
 
 #: tortoisehg/hgqt/filectxactions.py:188
 msgid "Cannot display visual diff"
-msgstr ""
+msgstr "Nie można pokazać wizualnego diffa"
 
 #: tortoisehg/hgqt/filectxactions.py:189
 msgid "Visual diffs are not supported for unapplied patches"
@@ -1624,7 +1624,7 @@ msgstr "Nie można otworzyć subrepo"
 
 #: tortoisehg/hgqt/filectxactions.py:310 tortoisehg/hgqt/wctxactions.py:239
 msgid "The selected subrepository does not exist on the working directory"
-msgstr ""
+msgstr "Wybrane subrepozytorium nie istnieje w katalogu roboczym"
 
 #: tortoisehg/hgqt/filedata.py:40
 msgid "File or diffs not displayed: "
@@ -1926,7 +1926,7 @@ msgstr "Szukaj w historii"
 
 #: tortoisehg/hgqt/fileview.py:643
 msgid "Annotate Options"
-msgstr ""
+msgstr "Opcje Adnotacji"
 
 #: tortoisehg/hgqt/fileview.py:660
 msgid "Search in original revision"
@@ -3630,15 +3630,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:250
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: tortoisehg/hgqt/qscilib.py:251
 msgid "TAB"
-msgstr ""
+msgstr "TAB"
 
 #: tortoisehg/hgqt/qscilib.py:252
 msgid "Spaces"
-msgstr ""
+msgstr "Spacje"
 
 #: tortoisehg/hgqt/qscilib.py:260
 msgid "Auto-Complete"
@@ -3646,15 +3646,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:261
 msgid "Enable"
-msgstr ""
+msgstr "Odblokuj"
 
 #: tortoisehg/hgqt/qscilib.py:262
 msgid "Disable"
-msgstr ""
+msgstr "Zablokuj"
 
 #: tortoisehg/hgqt/qscilib.py:270
 msgid "Editor Options"
-msgstr ""
+msgstr "Opcje edytora"
 
 #: tortoisehg/hgqt/qscilib.py:410
 msgid "### regular expression ###"
@@ -3902,7 +3902,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/rejects.py:66
 msgid "Mark this chunk as resolved, goto next unresolved"
-msgstr ""
+msgstr "Oznacz tę zmianę za rozwiązaną, idź do kolejnej"
 
 #: tortoisehg/hgqt/rejects.py:70
 msgid "Mark this chunk as unresolved"
@@ -4486,7 +4486,7 @@ msgstr "Wybierz kolumny w logu..."
 #: tortoisehg/hgqt/repoview.py:240
 #, python-format
 msgid "Goto ancestor of %s and %s"
-msgstr ""
+msgstr "Idź do przodka %s i %s"
 
 #: tortoisehg/hgqt/repoview.py:276
 #, python-format
@@ -5560,6 +5560,8 @@ msgid ""
 "Configuration Error: \"%(arg0)s\",<br>Please <a "
 "href=\"#fix:%(arg0)s\">fix</a> your config"
 msgstr ""
+"Błąd konfiguracji: \"%(arg0)s\",<br>Proszę <a "
+"href=\"#fix:%(arg0)s\">naprawić</a> swoją konfigurację"
 
 #: tortoisehg/hgqt/run.py:439
 #, python-format
@@ -5629,7 +5631,7 @@ msgstr ""
 #: tortoisehg/hgqt/run.py:883 tortoisehg/hgqt/run.py:915
 #: tortoisehg/hgqt/run.py:948
 msgid "(no help text available)"
-msgstr ""
+msgstr "(nie ma dostępnego tekstu pomocy)"
 
 #: tortoisehg/hgqt/run.py:891
 msgid "options:\n"
@@ -6158,7 +6160,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:536
 msgid "Three-way Merge Tool"
-msgstr ""
+msgstr "Narzędzie do scalania 3-Way"
 
 #: tortoisehg/hgqt/settings.py:538
 msgid ""
@@ -6169,10 +6171,18 @@ msgid ""
 "local or other, or internal:dump to leave files in the working directory for "
 "manual merging"
 msgstr ""
+"Program do graficznego scalania i rozwiązywania konfliktów. Jeśli to pole "
+"będzie puste, Mercurial użyje pierwszego dostępnego w systemie narzędzia w "
+"tym celu albo użyje wewnętrznej aplikacji do wsp. scalania, które pozostawia "
+"markery konfliktów w miejscach wystąpienia. <br>Wybierz "
+"<b>internal:merge</b> aby wymusić używanie markerów konfliktów, "
+"<br><b>internal:prompt</b> aby zawsze mieć możliwość wyboru, "
+"<br><b>internal:dump</b> aby zostawić pliki w katalogu roboczym w celu ich "
+"ręcznego scalenia"
 
 #: tortoisehg/hgqt/settings.py:544
 msgid "Visual Diff Tool"
-msgstr ""
+msgstr "Narzędzie do wizualizacji Diffa"
 
 #: tortoisehg/hgqt/settings.py:546
 msgid ""
@@ -6180,6 +6190,11 @@ msgid ""
 "Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
 "selected merge tool. Failing that it uses the first applicable tool it finds."
 msgstr ""
+"Wskaż narzędzie do wizualizacji diffa. Tak jak w dokumentacji plików "
+"konfiguracyjnych Mercuriala w sekcji <i>[merge-tools]</i>, jeśli pole "
+"pozostanie puste, TortoiseHg użyje tego samego narzędzia co w przypadku "
+"narz. do scalania. Gdyby się to jednak nie udało, uruchomiona zostanie "
+"pierwsza odpowiadająca aplikacja w tym celu w systemie."
 
 #: tortoisehg/hgqt/settings.py:550
 msgid "Visual Editor"
@@ -6192,6 +6207,8 @@ msgid ""
 "[$FILE --num=$LINENUM][--search $SEARCH]<br><br>See <a "
 "href=\"%s\">OpenAtLine</a>"
 msgstr ""
+"Wskaż edytor do oglądania plików. Format: <br>myeditor -flags [$FILE --"
+"num=$LINENUM][--search $SEARCH]<br><br>Zobacz <a href=\"%s\">OpenAtLine</a>"
 
 #: tortoisehg/hgqt/settings.py:555
 msgid "Shell"
@@ -6206,10 +6223,16 @@ msgid ""
 "Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
 "other: xterm -T \"%(reponame)s\""
 msgstr ""
+"Wybierz komendę uruchamiającą twoją preferowaną powłokę systemową. Jeśli "
+"wartość zawiera ciąg <b>%(reponame)s</b>, to nazwa repozytorium będzie "
+"wstawiona zamiast tego taga. <br>Uwaga! Wymaga restartu "
+"TortoiseHg!<br>Wartości domyślne dla poszczególnych systemów: <br>Windows: "
+"cmd.exe /K title %(reponame)s,<br>OS X: <i>BRAK</i>,<br>inne: xterm -T "
+"\"%(reponame)s\""
 
 #: tortoisehg/hgqt/settings.py:564
 msgid "Immediate Operations"
-msgstr ""
+msgstr "Czynności automatyczne"
 
 #: tortoisehg/hgqt/settings.py:565
 msgid ""
@@ -6230,25 +6253,29 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:573
 msgid "Force Repo Tab"
-msgstr ""
+msgstr "Zawsze widoczna zakł.<br>z repozytoriami"
 
 #: tortoisehg/hgqt/settings.py:574
 msgid "Always show repo tabs, even for a single repo. Default: False"
 msgstr ""
+"Zawsze pokazuj panel z repozytoriami, nawet gdy jest tylko jedno do "
+"pokazania. Domyślnie: False"
 
 #: tortoisehg/hgqt/settings.py:575
 msgid "Monitor Repo Changes"
-msgstr ""
+msgstr "Śledź zmiany w repo"
 
 #: tortoisehg/hgqt/settings.py:577
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
 "always"
 msgstr ""
+"Wskaż docelowy system plików, w którym TortoiseHg będzie śledził zmiany. "
+"Domyślnie: always"
 
 #: tortoisehg/hgqt/settings.py:579
 msgid "Max Diff Size"
-msgstr ""
+msgstr "Maks. wielk. pliku do diff"
 
 #: tortoisehg/hgqt/settings.py:580
 msgid ""
@@ -6269,13 +6296,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:586
 msgid "Full Path Title"
-msgstr ""
+msgstr "Pełna ścieżka w tytule"
 
 #: tortoisehg/hgqt/settings.py:587
 msgid ""
 "Show a full directory path of the repository in the dialog title instead of "
 "just the root directory name.  Default: False"
 msgstr ""
+"Pokazuje pełną ścieżkę do repozytorium w tytule okna zamiast standardowej "
+"nazwy katalogu rodzica. Domyślnie: False"
 
 #: tortoisehg/hgqt/settings.py:589
 msgid "Auto-resolve merges"
@@ -6323,7 +6352,7 @@ msgstr ""
 msgid ""
 "Open new tabs next\n"
 "to the current tab"
-msgstr ""
+msgstr "Nowe zakł. zaraz po aktywnej"
 
 #: tortoisehg/hgqt/settings.py:618
 msgid ""
@@ -6445,7 +6474,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:676
 msgid "Activate Bookmarks"
-msgstr ""
+msgstr "Aktywuj zakładki"
 
 #: tortoisehg/hgqt/settings.py:678
 msgid ""
@@ -6562,7 +6591,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:724
 msgid "Monitor working<br>directory changes"
-msgstr ""
+msgstr "Śledź zmiany w <br>katalogu roboczym"
 
 #: tortoisehg/hgqt/settings.py:728
 msgid ""
@@ -6580,7 +6609,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:740
 msgid "Confirm adding unknown files"
-msgstr ""
+msgstr "Potw. usuwanie niezn. plików"
 
 #: tortoisehg/hgqt/settings.py:741
 msgid ""
@@ -6592,7 +6621,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:746
 msgid "Confirm deleting files"
-msgstr ""
+msgstr "Potw. usuwanie plików"
 
 #: tortoisehg/hgqt/settings.py:747
 msgid ""
@@ -8927,7 +8956,7 @@ msgstr "&Inny"
 
 #: tortoisehg/hgqt/wctxactions.py:280
 msgid "Revert local file changes?"
-msgstr ""
+msgstr "Odrzucić lokalne zmiany?"
 
 #: tortoisehg/hgqt/wctxactions.py:281
 msgid "&Revert with backup"
@@ -8947,11 +8976,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/wctxactions.py:356
 msgid "Confirm Delete Unversioned"
-msgstr ""
+msgstr "Potwierdź usunięcie nieśledzonych plików"
 
 #: tortoisehg/hgqt/wctxactions.py:357
 msgid "Delete the following unversioned files?"
-msgstr ""
+msgstr "Usunąć poniższe pliki spoza syst. kontroli wersji?"
 
 #: tortoisehg/hgqt/wctxactions.py:369
 msgid "Copy file to"
@@ -9240,7 +9269,7 @@ msgstr "Pasek filtrowania"
 
 #: tortoisehg/hgqt/workbench.py:357
 msgid "Filter graph with revision sets or branches"
-msgstr ""
+msgstr "Filtruj graf numerami rew lub gałęziami"
 
 #: tortoisehg/hgqt/workbench.py:367
 msgid "Incoming"

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-08-24 19:50+0000\n"
+"PO-Revision-Date: 2012-09-01 17:39+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-09-01 04:58+0000\n"
+"X-Launchpad-Export-Date: 2012-09-02 04:41+0000\n"
 "X-Generator: Launchpad (build 15890)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
@@ -1670,7 +1670,7 @@ msgstr "Le fichier est binaire"
 
 #: tortoisehg/hgqt/filedata.py:65
 msgid "File may be binary (maximum line length exceeded)"
-msgstr ""
+msgstr "Le fichier peut être binaire (longueur maximale de ligne dépassée)"
 
 #: tortoisehg/hgqt/filedata.py:74 tortoisehg/hgqt/filedata.py:381
 #, python-format
@@ -6419,6 +6419,8 @@ msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHg "
 "windows. Default: 8"
 msgstr ""
+"Spécifier le nombre d'espaces remplaçant une tabulation dans différentes "
+"fenêtres de TortoiseHg. Par défaut :8"
 
 #: tortoisehg/hgqt/settings.py:573
 msgid "Force Repo Tab"
@@ -7201,6 +7203,9 @@ msgid ""
 "does no normalization.  Auto does per-file detection, and is the recommended "
 "setting. Default: strict"
 msgstr ""
+"Normaliser les fins de ligne durant et après patch à lf ou crlf. Strict ne "
+"fait aucune normalisation. Auto fait une détection automatique et c'est ce "
+"qui est recommandé. Par défaut : strict"
 
 #: tortoisehg/hgqt/settings.py:858
 msgid "Git Format"
@@ -8628,6 +8633,12 @@ msgid ""
 "it. Environment variables are expanded in the username letting you do\n"
 "foo.username = $USER."
 msgstr ""
+"Optionnel. Nom d'utilisateur pour l'authentification. Si non donné et que "
+"le\n"
+"site distant demande une authentification, il lui sera demandé. Les "
+"variables\n"
+"d'environnement sont développées dans le nom d'utilisateur de sorte que\n"
+"vous pouvez utiliser foo.username = $USER."
 
 #: tortoisehg/hgqt/sync.py:1498
 msgid ""
@@ -8635,6 +8646,8 @@ msgid ""
 "site requires basic or digest authentication, the user will be prompted for\n"
 "it."
 msgstr ""
+"Optionnel. Mot de passe pour l'authentification. Si non donné et que le\n"
+"site distant demande une authentification, il lui sera demandé."
 
 #: tortoisehg/hgqt/sync.py:1505
 msgid ""
@@ -8649,20 +8662,24 @@ msgid ""
 "Optional. PEM encoded client certificate key file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
+"Optionnel. Fichier de clés pour le certificat client au format PEM.\n"
+"Les variables d'environnement sont développées dans le nom de fichier."
 
 #: tortoisehg/hgqt/sync.py:1513
 msgid "User Certificate Key File"
-msgstr ""
+msgstr "Fichier de clé de certificat de l'utilisateur"
 
 #: tortoisehg/hgqt/sync.py:1517
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
+"Optionnel. Fichier de chaîne de certificat client au format PEM.\n"
+"Les variables d'environnement sont développées dans le nom de fichier."
 
 #: tortoisehg/hgqt/sync.py:1519
 msgid "User Certificate Chain File"
-msgstr ""
+msgstr "Fichier de chaîne de certificat de l'utilisateur"
 
 #: tortoisehg/hgqt/sync.py:1539
 msgid "Unable to save authentication"
@@ -8978,7 +8995,7 @@ msgstr ""
 #: tortoisehg/hgqt/thread.py:310
 #, python-format
 msgid "lock held by %s"
-msgstr ""
+msgstr "verrouillé par %s"
 
 #: tortoisehg/hgqt/thread.py:311 tortoisehg/hgqt/thread.py:343
 #: tortoisehg/hgqt/thread.py:350
@@ -9143,7 +9160,7 @@ msgstr "Confirmer la mise à jour"
 
 #: tortoisehg/hgqt/visdiff.py:29
 msgid "[non-existant]"
-msgstr ""
+msgstr "[inexistent]"
 
 #: tortoisehg/hgqt/visdiff.py:146
 msgid "Tool launch failure"
@@ -9216,7 +9233,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/visdiff.py:418
 msgid "Select Tool:"
-msgstr ""
+msgstr "Choisir l'outil :"
 
 #: tortoisehg/hgqt/visdiff.py:442
 msgid "Dir diff to p1"
@@ -9373,11 +9390,11 @@ msgstr "Abandonner les changements"
 
 #: tortoisehg/hgqt/wctxactions.py:290
 msgid "Revert the following files?"
-msgstr ""
+msgstr "Rétablir les fichiers suivants ?"
 
 #: tortoisehg/hgqt/wctxactions.py:291
 msgid "&Revert"
-msgstr ""
+msgstr "&Rétablir"
 
 #: tortoisehg/hgqt/wctxactions.py:356
 msgid "Confirm Delete Unversioned"
@@ -9418,11 +9435,11 @@ msgstr "Sélectionner le dépôt"
 
 #: tortoisehg/hgqt/webconf.py:246
 msgid "Add Path to Serve"
-msgstr ""
+msgstr "Ajouter le chemin pour Hg serve"
 
 #: tortoisehg/hgqt/webconf.py:256
 msgid "Edit Path to Serve"
-msgstr ""
+msgstr "Éditer le chemin pour Hg serve"
 
 #: tortoisehg/hgqt/webconf.py:267
 msgid "Local Path"
@@ -9430,7 +9447,7 @@ msgstr "Chemin local"
 
 #: tortoisehg/hgqt/webconf_ui.py:74
 msgid "Webconf"
-msgstr ""
+msgstr "Webconf"
 
 #: tortoisehg/hgqt/webconf_ui.py:75
 msgid "Config File:"
@@ -9708,7 +9725,7 @@ msgstr "Pousser les révisions sortantes vers l'URL sélectionnée"
 #: tortoisehg/hgqt/workbench.py:403
 #, python-format
 msgid "Execute custom tool '%s'"
-msgstr ""
+msgstr "Lancer l'outil personnalisé '%s'"
 
 #: tortoisehg/hgqt/workbench.py:468 tortoisehg/hgqt/workbench.py:469
 msgid "Close tab"
@@ -9794,7 +9811,7 @@ msgstr ""
 #: tortoisehg/hgqt/workbench.py:1249
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
-msgstr ""
+msgstr "Affichage d'historique Hg de fichier [%s] - %s"
 
 #: tortoisehg/util/bugtraq.py:87 tortoisehg/util/bugtraq.py:111
 #: tortoisehg/util/bugtraq.py:132 tortoisehg/util/bugtraq.py:147
@@ -9820,7 +9837,7 @@ msgstr ""
 
 #: tortoisehg/util/bugtraq.py:148
 msgid "Cannot open Plugin Options dialog"
-msgstr ""
+msgstr "Ne peut pas ouvrir le dialogue des options plugin"
 
 #: tortoisehg/util/hglib.py:298
 msgid "inotify is not supported on this platform"
