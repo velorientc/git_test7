@@ -283,13 +283,13 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self._filterupdatetimer = QTimer(self, interval=200, singleShot=True)
         self.le.returnPressed.connect(self._treeview.expandAll)
         self.le.textChanged.connect(self._filterupdatetimer.start)
-        def applyFilter():
-            filtertext = self.le.text()
-            self._treemodel.setNameFilter(filtertext)
-            self._treeview.enablefilterpalette(filtertext)
+        self._filterupdatetimer.timeout.connect(self._applyFilter)
 
-        self._filterupdatetimer.timeout.connect(
-            applyFilter)
+    @pyqtSlot()
+    def _applyFilter(self):
+        filtertext = self.le.text()
+        self._treemodel.setNameFilter(filtertext)
+        self._treeview.enablefilterpalette(filtertext)
 
     @pyqtSlot()
     def _autoexpandtree(self):
