@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-08-24 18:13+0000\n"
+"PO-Revision-Date: 2012-09-03 15:54+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-01 04:58+0000\n"
+"X-Launchpad-Export-Date: 2012-09-04 04:55+0000\n"
 "X-Generator: Launchpad (build 15890)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1500,6 +1500,12 @@ msgid ""
 "You can also set this value to the absolute path to\n"
 "any icon on your file system."
 msgstr ""
+"Das Werkzeugsymbol.\n"
+"Sie können jedes eingebaute TortoiseHg-Symbol nutzen,\n"
+"indem sie diesen Wert auf einen gültigen Symbolnamen setzen\n"
+"(beispielsweise clone, add, remove, sync, thg-logo, hg-update, etc).\n"
+"Sie können diesen Wert auch auf den absoluten Pfad\n"
+"irgendeines Symbols in Ihrem Dateisystem setzen."
 
 #: tortoisehg/hgqt/customtools.py:437
 msgid "On repowidget, show for"
@@ -1696,7 +1702,7 @@ msgstr "Die Datei enthält Binärdaten"
 
 #: tortoisehg/hgqt/filedata.py:65
 msgid "File may be binary (maximum line length exceeded)"
-msgstr ""
+msgstr "Die Datei könnte binär sein (maximale Zeilenlänge überschritten)"
 
 #: tortoisehg/hgqt/filedata.py:74 tortoisehg/hgqt/filedata.py:381
 #, python-format
@@ -9529,11 +9535,11 @@ msgstr "Änderungen &vollständig verwerfen"
 
 #: tortoisehg/hgqt/wctxactions.py:290
 msgid "Revert the following files?"
-msgstr ""
+msgstr "Die nachgenannten Dateien wiederherstellen?"
 
 #: tortoisehg/hgqt/wctxactions.py:291
 msgid "&Revert"
-msgstr ""
+msgstr "&Wiederherstellen"
 
 #: tortoisehg/hgqt/wctxactions.py:356
 msgid "Confirm Delete Unversioned"
