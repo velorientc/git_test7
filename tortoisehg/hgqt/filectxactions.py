@@ -184,7 +184,7 @@ class FilectxActions(QObject):
         if not filenames:
             return
         if rev in repo.thgmqunappliedpatches:
-            QMessageBox.warning(self,
+            QMessageBox.warning(self.parent(),
                 _("Cannot display visual diff"),
                 _("Visual diffs are not supported for unapplied patches"))
             return
