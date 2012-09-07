@@ -402,8 +402,8 @@ Příklady::
 	issue.link = http://bitbucket.org/<your project and repo>/issue/{1}/
 
 	Mercurial:
-	issue.regex = \bissue\d+\b
-	issue.link = http://mercurial.selenic.com/bts/
+	issue.regex = \bissue(\d+)\b
+	issue.link = http://bz.selenic.com/show_bug.cgi?id={1}
 
 Konzola Output Log
 ------------------
