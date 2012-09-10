@@ -1174,9 +1174,9 @@ class Workbench(QMainWindow):
         socket = self.server.nextPendingConnection()
         if socket:
             socket.waitForReadyRead(10000)
-            root = socket.readAll()
+            root = str(socket.readAll())
             if root and root != '[echo]':
-                self.openRepo(root, reuse=True)
+                self._openRepo(root, reuse=True)
 
                 # Bring the workbench window to the front
                 # This assumes that the client process has

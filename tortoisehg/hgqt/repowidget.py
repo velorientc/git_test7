@@ -550,6 +550,7 @@ class RepoWidget(QWidget):
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
         self.setRevisionSet([self.repo[n].rev() for n in nodes])
+        self.outgoingMode = True
 
         w = self.setInfoBar(qtlib.ConfirmInfoBar,
                             _('%d outgoing changesets') % len(nodes))
@@ -1077,7 +1078,6 @@ class RepoWidget(QWidget):
         self.syncDemand.get().pull()
     def outgoing(self):
         self.syncDemand.get().outgoing()
-        self.outgoingMode = True
     def push(self, confirm=True, **kwargs):
         """Call sync push.
 
