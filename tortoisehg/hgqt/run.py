@@ -637,6 +637,11 @@ def email(ui, *pats, **opts):
     from tortoisehg.hgqt.hgemail import run
     return qtrun(run, ui, *pats, **opts)
 
+def graft(ui, *revs, **opts):
+    """graft dialog"""
+    from tortoisehg.hgqt.graft import run
+    return qtrun(run, ui, *revs, **opts)
+
 def resolve(ui, *pats, **opts):
     """resolve dialog"""
     from tortoisehg.hgqt.resolve import run
@@ -1087,6 +1092,9 @@ table = {
         _('thg commit [OPTIONS] [FILE]...')),
     "drag_move": (drag_move, [], _('thg drag_move SOURCE... DEST')),
     "drag_copy": (drag_copy, [], _('thg drag_copy SOURCE... DEST')),
+    "graft": (graft,
+        [('r', 'rev', [], _('revisions to graft'))],
+        _('thg graft [-r] REV...')),
     "^grep|search": (grep,
         [('i', 'ignorecase', False, _('ignore case during search')),],
         _('thg grep')),
