@@ -2042,6 +2042,7 @@ class RepoWidget(QWidget):
         # 2. Expand internal workbench variables
         vars = {
             'ROOT': self.repo.root,
+            'REVID': str(self.repo[self.rev]),
             'REV': self.rev
         }
         for var in vars:
