@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-04-16 17:45+0000\n"
+"PO-Revision-Date: 2012-09-10 08:10+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-09-01 05:02+0000\n"
-"X-Generator: Launchpad (build 15890)\n"
+"X-Launchpad-Export-Date: 2012-09-11 05:00+0000\n"
+"X-Generator: Launchpad (build 15924)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -946,7 +946,7 @@ msgstr "複製常用提交訊息中的一個"
 
 #: tortoisehg/hgqt/commit.py:128
 msgid "Show Issues"
-msgstr ""
+msgstr "顯示Issues"
 
 #: tortoisehg/hgqt/commit.py:130
 msgid "Please wait..."
@@ -964,7 +964,7 @@ msgstr "問題追蹤系統"
 
 #: tortoisehg/hgqt/commit.py:149
 msgid "Show Issues..."
-msgstr ""
+msgstr "顯示Issues..."
 
 #: tortoisehg/hgqt/commit.py:153 tortoisehg/hgqt/grep.py:53
 #: tortoisehg/hgqt/serve_ui.py:87
@@ -981,11 +981,11 @@ msgstr "提交"
 
 #: tortoisehg/hgqt/commit.py:271
 msgid "Amend current revision"
-msgstr ""
+msgstr "修改目前的修訂版"
 
 #: tortoisehg/hgqt/commit.py:271
 msgid "Amend"
-msgstr ""
+msgstr "修改"
 
 #: tortoisehg/hgqt/commit.py:275
 msgid "Create a new patch"
@@ -1064,7 +1064,7 @@ msgstr "補丁名稱"
 #: tortoisehg/hgqt/commit.py:622
 #, python-format
 msgid "Close %s branch"
-msgstr ""
+msgstr "關閉 %s 分支"
 
 #: tortoisehg/hgqt/commit.py:635
 #, python-format
@@ -1331,7 +1331,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:114
 msgid "Converted From:"
-msgstr ""
+msgstr "從哪邊轉換"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 msgid "No items to display"
@@ -1361,43 +1361,43 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:80
 msgid "Delete from list"
-msgstr ""
+msgstr "從列表刪除"
 
 #: tortoisehg/hgqt/customtools.py:88
 msgid "Add to list"
-msgstr ""
+msgstr "加入列表"
 
 #: tortoisehg/hgqt/customtools.py:90
 msgid "Add separator"
-msgstr ""
+msgstr "新增分隔棒"
 
 #: tortoisehg/hgqt/customtools.py:100
 msgid "List of all tools"
-msgstr ""
+msgstr "列出所有工具"
 
 #: tortoisehg/hgqt/customtools.py:102
 msgid "New Tool ..."
-msgstr ""
+msgstr "新增工具 ..."
 
 #: tortoisehg/hgqt/customtools.py:104
 msgid "Edit Tool ..."
-msgstr ""
+msgstr "編輯工具 ..."
 
 #: tortoisehg/hgqt/customtools.py:106
 msgid "Delete Tool"
-msgstr ""
+msgstr "刪除工具"
 
 #: tortoisehg/hgqt/customtools.py:406
 msgid "Tool name"
-msgstr ""
+msgstr "工具名字"
 
 #: tortoisehg/hgqt/customtools.py:407
 msgid "The tool name. It cannot contain spaces."
-msgstr ""
+msgstr "工具名字不能有空白"
 
 #: tortoisehg/hgqt/customtools.py:409
 msgid "Command"
-msgstr ""
+msgstr "命令"
 
 #: tortoisehg/hgqt/customtools.py:410
 msgid ""
@@ -1410,7 +1410,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:415
 msgid "Tool label"
-msgstr ""
+msgstr "工具標籤"
 
 #: tortoisehg/hgqt/customtools.py:417
 msgid ""
@@ -1421,7 +1421,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:421
 msgid "Tooltip"
-msgstr ""
+msgstr "工具提示"
 
 #: tortoisehg/hgqt/customtools.py:423
 msgid ""
@@ -1432,7 +1432,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:426
 msgid "Icon"
-msgstr ""
+msgstr "圖示"
 
 #: tortoisehg/hgqt/customtools.py:428
 msgid ""
@@ -1457,7 +1457,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:443
 msgid "Show Output Log"
-msgstr ""
+msgstr "顯示輸出log"
 
 #: tortoisehg/hgqt/customtools.py:444
 msgid ""
@@ -1471,19 +1471,19 @@ msgstr "確定"
 
 #: tortoisehg/hgqt/customtools.py:509
 msgid "Missing information"
-msgstr ""
+msgstr "遺失的資訊"
 
 #: tortoisehg/hgqt/customtools.py:516
 msgid "You must set a tool name."
-msgstr ""
+msgstr "你必須設定一個工具名字"
 
 #: tortoisehg/hgqt/customtools.py:518
 msgid "The tool name cannot have any spaces in it."
-msgstr ""
+msgstr "工具名字不能有任何空白"
 
 #: tortoisehg/hgqt/customtools.py:520
 msgid "You must set a command to run."
-msgstr ""
+msgstr "你得要設定一個指令來執行"
 
 #: tortoisehg/hgqt/docklog.py:413
 msgid "failed to run command\n"
@@ -1530,11 +1530,11 @@ msgstr "比對選擇的檔案的修訂版"
 #: tortoisehg/hgqt/filectxactions.py:63 tortoisehg/hgqt/grep.py:568
 #: tortoisehg/util/menuthg.py:76
 msgid "Diff to parent"
-msgstr ""
+msgstr "跟母系進行Diff"
 
 #: tortoisehg/hgqt/filectxactions.py:65
 msgid "Diff to local"
-msgstr ""
+msgstr "根本地進行Diff"
 
 #: tortoisehg/hgqt/filectxactions.py:66
 msgid "View changes to current in external diff tool"
@@ -1562,11 +1562,11 @@ msgstr "開啟本地工作複本"
 
 #: tortoisehg/hgqt/filectxactions.py:76
 msgid "Copy Path"
-msgstr ""
+msgstr "複製路徑"
 
 #: tortoisehg/hgqt/filectxactions.py:77
 msgid "Copy full path of file(s) to the clipboard"
-msgstr ""
+msgstr "複製檔案絕對路徑到剪貼簿"
 
 #: tortoisehg/hgqt/filectxactions.py:81 tortoisehg/hgqt/wctxactions.py:45
 msgid "Open subrepository"
@@ -1578,7 +1578,7 @@ msgstr "開啟選擇的子儲存庫"
 
 #: tortoisehg/hgqt/filectxactions.py:84
 msgid "Explore folder"
-msgstr ""
+msgstr "瀏覽資料夾"
 
 #: tortoisehg/hgqt/filectxactions.py:85
 msgid "Open the selected folder in the system file manager"
@@ -1586,15 +1586,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/filectxactions.py:87
 msgid "Open terminal here"
-msgstr ""
+msgstr "在這裡開啟終端機"
 
 #: tortoisehg/hgqt/filectxactions.py:88
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
+msgstr "在選擇的目錄開啟終端機"
 
 #: tortoisehg/hgqt/filectxactions.py:188
 msgid "Cannot display visual diff"
-msgstr ""
+msgstr "不能顯示視覺化Diff"
 
 #: tortoisehg/hgqt/filectxactions.py:189
 msgid "Visual diffs are not supported for unapplied patches"
@@ -1632,7 +1632,7 @@ msgstr "是二進位檔"
 
 #: tortoisehg/hgqt/filedata.py:65
 msgid "File may be binary (maximum line length exceeded)"
-msgstr ""
+msgstr "檔案可能是二進位檔(maximum line length exceeded)"
 
 #: tortoisehg/hgqt/filedata.py:74 tortoisehg/hgqt/filedata.py:381
 #, python-format
@@ -1646,11 +1646,11 @@ msgstr " <i>(已被新增)</i>"
 
 #: tortoisehg/hgqt/filedata.py:109 tortoisehg/hgqt/filedata.py:369
 msgid "exec mode has been <font color='red'>set</font>"
-msgstr ""
+msgstr "執行模式已被<font color='red'>設定</font>"
 
 #: tortoisehg/hgqt/filedata.py:111 tortoisehg/hgqt/filedata.py:371
 msgid "exec mode has been <font color='red'>unset</font>"
-msgstr ""
+msgstr "執行模式已被<font color='red'>取消</font>"
 
 #: tortoisehg/hgqt/filedata.py:113 tortoisehg/hgqt/filedata.py:133
 msgid " <i>(is a symlink)</i>"
@@ -1808,7 +1808,7 @@ msgstr "下一個"
 #: tortoisehg/hgqt/filedialogs.py:200 tortoisehg/hgqt/filedialogs.py:702
 #: tortoisehg/hgqt/repowidget.py:1224
 msgid "Diff to parent..."
-msgstr ""
+msgstr "跟母系進行Diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:705
 #: tortoisehg/hgqt/repowidget.py:1226
@@ -1817,7 +1817,7 @@ msgstr "跟本地工作複本做Diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:207 tortoisehg/hgqt/filedialogs.py:709
 msgid "Diff file to parent..."
-msgstr ""
+msgstr "跟母系進行檔案的Diff ..."
 
 #: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:712
 msgid "Diff file to local..."
@@ -1829,7 +1829,7 @@ msgstr "在這個修訂版裡檢視..."
 
 #: tortoisehg/hgqt/filedialogs.py:217 tortoisehg/hgqt/filedialogs.py:719
 msgid "Save at revision..."
-msgstr ""
+msgstr "儲存在修訂版 ..."
 
 #: tortoisehg/hgqt/filedialogs.py:219 tortoisehg/hgqt/filedialogs.py:721
 msgid "Edit local"
@@ -1906,7 +1906,7 @@ msgstr "在歷史紀錄中搜尋"
 
 #: tortoisehg/hgqt/fileview.py:643
 msgid "Annotate Options"
-msgstr ""
+msgstr "註釋選項"
 
 #: tortoisehg/hgqt/fileview.py:660
 msgid "Search in original revision"
@@ -1940,7 +1940,7 @@ msgstr "觀看母系修訂版 %d"
 
 #: tortoisehg/hgqt/fileview.py:765
 msgid "Show Author"
-msgstr ""
+msgstr "顯示作者"
 
 #: tortoisehg/hgqt/fileview.py:766
 msgid "Show Date"
@@ -1948,7 +1948,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/fileview.py:767
 msgid "Show Revision"
-msgstr ""
+msgstr "顯示修訂版"
 
 #: tortoisehg/hgqt/graft.py:44
 msgid "Interrupted graft operation found"
@@ -3801,6 +3801,8 @@ msgid ""
 "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"在rebase之前,你必須<a href=\"commit\"><b>提交</b></a> 或 <a "
+"href=\"discard\"><b>放棄</b></a>變更"
 
 #: tortoisehg/hgqt/rebase.py:150 tortoisehg/hgqt/rebase.py:216
 msgid "You may continue the rebase"
@@ -4455,7 +4457,7 @@ msgstr "提交"
 #: tortoisehg/hgqt/repowidget.py:223
 msgctxt "tab tooltip"
 msgid "MQ Patch"
-msgstr ""
+msgstr "MQ 補丁"
 
 #: tortoisehg/hgqt/repowidget.py:231
 msgctxt "tab tooltip"
@@ -4692,7 +4694,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1275
 msgid "Import to MQ"
-msgstr ""
+msgstr "匯入MQ"
 
 #: tortoisehg/hgqt/repowidget.py:1277
 msgid "Finish patch"
@@ -6804,7 +6806,7 @@ msgstr "使用git額外diff標頭格式. 預設: False"
 
 #: tortoisehg/hgqt/settings.py:861
 msgid "MQ Git Format"
-msgstr ""
+msgstr "MQ git 格式"
 
 #: tortoisehg/hgqt/settings.py:863
 msgid ""
@@ -8192,7 +8194,7 @@ msgstr "顯示除錯訊息(--debug)"
 
 #: tortoisehg/hgqt/sync.py:1736
 msgid "Work on patch queue (--mq)"
-msgstr ""
+msgstr "工作在補丁佇列模式(--mq)"
 
 #: tortoisehg/hgqt/tag.py:29
 #, python-format
@@ -8217,7 +8219,7 @@ msgstr "取代已存在的標籤(-f/--force)"
 
 #: tortoisehg/hgqt/tag.py:83
 msgid "Use English commit message"
-msgstr ""
+msgstr "使用英文提交訊息"
 
 #: tortoisehg/hgqt/tag.py:88
 msgid "Use custom commit message:"
@@ -9042,7 +9044,7 @@ msgstr "提交(&C)"
 
 #: tortoisehg/hgqt/workbench.py:246
 msgid "MQ Patch"
-msgstr ""
+msgstr "MQ 補丁"
 
 #: tortoisehg/hgqt/workbench.py:247
 msgid "&Patch Branch"
@@ -9472,7 +9474,7 @@ msgstr "全域設定"
 
 #: tortoisehg/util/menuthg.py:65
 msgid "Configure user wide settings"
-msgstr ""
+msgstr "配置使用者域設定"
 
 #: tortoisehg/util/menuthg.py:67
 msgid "Repository Settings"

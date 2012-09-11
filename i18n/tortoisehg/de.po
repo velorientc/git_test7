@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-09-03 15:54+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"PO-Revision-Date: 2012-09-05 08:54+0000\n"
+"Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-04 04:55+0000\n"
-"X-Generator: Launchpad (build 15890)\n"
+"X-Launchpad-Export-Date: 2012-09-06 04:40+0000\n"
+"X-Generator: Launchpad (build 15909)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -3012,11 +3012,11 @@ msgstr "Dateinamen &einfügen"
 
 #: tortoisehg/hgqt/messageentry.py:80
 msgid "App&ly Format"
-msgstr "Formatierung An%wenden"
+msgstr "Formatierung An&wenden"
 
 #: tortoisehg/hgqt/messageentry.py:81
 msgid "C&onfigure Format"
-msgstr "%Formatierung einstellen"
+msgstr "&Formatierung einstellen"
 
 #: tortoisehg/hgqt/mq.py:35
 msgid "### patch name ###"

@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-08-13 06:06+0000\n"
+"PO-Revision-Date: 2012-09-07 14:32+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-09-01 04:59+0000\n"
-"X-Generator: Launchpad (build 15890)\n"
+"X-Launchpad-Export-Date: 2012-09-08 05:00+0000\n"
+"X-Generator: Launchpad (build 15914)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -71,7 +71,7 @@ msgstr "新しいバージョンがダウンロード可能です！"
 
 #: tortoisehg/hgqt/archive.py:20
 msgid "= Working Directory Parent ="
-msgstr "= 作業ディレクトリの親リビジョン ="
+msgstr "= 作業領域の親リビジョン ="
 
 #: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:420
 #: tortoisehg/hgqt/bookmark.py:50 tortoisehg/hgqt/csinfo.py:105
@@ -243,7 +243,7 @@ msgstr "バックアウトの準備"
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
-msgstr "打ち消し対象のリビジョンと作業ディレクトリの状態を確認してください。"
+msgstr "打ち消し対象のリビジョンと作業領域の状態を確認してください。"
 
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
 #: tortoisehg/hgqt/backout.py:130
@@ -310,7 +310,7 @@ msgstr "マージリビジョンの二番目の親を打ち消す"
 
 #: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:160
 msgid "Working directory status"
-msgstr "作業ディレクトリの状態"
+msgstr "作業領域の状態"
 
 #: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
 #: tortoisehg/hgqt/graft.py:122 tortoisehg/hgqt/merge.py:168
@@ -359,7 +359,7 @@ msgstr "破棄の確認"
 #: tortoisehg/hgqt/graft.py:277 tortoisehg/hgqt/merge.py:321
 #: tortoisehg/hgqt/rebase.py:242
 msgid "Discard outstanding changes to working directory?"
-msgstr "作業ディレクトリのコミットしていない変更を破棄しますか?"
+msgstr "作業領域のコミットしていない変更を破棄しますか?"
 
 #: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
@@ -398,11 +398,11 @@ msgstr "親リビジョン"
 #: tortoisehg/hgqt/repomodel.py:639 tortoisehg/hgqt/repomodel.py:641
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:88
 msgid "Working Directory"
-msgstr "作業ディレクトリ"
+msgstr "作業領域"
 
 #: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:497
 msgid "Working Directory (merged)"
-msgstr "作業ディレクトリ (マージ)"
+msgstr "作業領域 (マージ)"
 
 #: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:505
 msgid "Commit message"
@@ -676,7 +676,7 @@ msgstr "ローカルファイルをエディタで開く"
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/filectxactions.py:73
 #: tortoisehg/hgqt/filectxactions.py:75
 msgid "Edit current file in working copy"
-msgstr "作業コピーのファイルを編集"
+msgstr "作業領域のファイルを編集"
 
 #: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/filectxactions.py:78
 msgid "Revert to Revision"
@@ -778,7 +778,7 @@ msgstr "このリビジョンまでクローン:"
 
 #: tortoisehg/hgqt/clone.py:130
 msgid "Do not update the new working directory"
-msgstr "作業ディレクトリを更新しない"
+msgstr "作業領域を更新しない"
 
 #: tortoisehg/hgqt/clone.py:131
 msgid "Use pull protocol to copy metadata"
@@ -1710,7 +1710,7 @@ msgstr "From:"
 
 #: tortoisehg/hgqt/filedata.py:216
 msgid "Subrepository not found in the working directory."
-msgstr "作業ディレクトリにサブリポジトリが見つかりません。"
+msgstr "作業領域にサブリポジトリが見つかりません。"
 
 #: tortoisehg/hgqt/filedata.py:218 tortoisehg/hgqt/filedata.py:224
 msgid "Further subrepository revision information cannot be retrieved."
@@ -1922,7 +1922,7 @@ msgstr "由来リビジョンで検索"
 
 #: tortoisehg/hgqt/fileview.py:662
 msgid "Search in working revision"
-msgstr "作業ディレクトリで検索"
+msgstr "作業領域を検索"
 
 #: tortoisehg/hgqt/fileview.py:664
 msgid "Search in current annotation"
@@ -2082,7 +2082,7 @@ msgstr "検索"
 
 #: tortoisehg/hgqt/grep.py:63
 msgid "Working Copy"
-msgstr "作業コピー"
+msgstr "作業領域"
 
 #: tortoisehg/hgqt/grep.py:65
 msgid "All History"
@@ -2774,7 +2774,7 @@ msgstr "終了しますか?"
 
 #: tortoisehg/hgqt/merge.py:102
 msgid "To finish merging, you need to commit the working directory."
-msgstr "マージを完了するには、作業ディレクトリの内容をコミットしてください。"
+msgstr "マージを完了するには、作業領域の内容をコミットしてください。"
 
 #: tortoisehg/hgqt/merge.py:124
 msgid "Prepare to merge"
@@ -2803,7 +2803,7 @@ msgstr "マージリビジョンが指定されていないか存在しません
 
 #: tortoisehg/hgqt/merge.py:153
 msgid "Merge to (working directory)"
-msgstr "マージ先 (作業ディレクトリ)"
+msgstr "マージ先 (作業領域)"
 
 #: tortoisehg/hgqt/merge.py:176
 msgid ""
@@ -2811,7 +2811,7 @@ msgid ""
 "href=\"skip\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> "
 "existing merge."
 msgstr ""
-"作業ディレクトリは既に<b>マージされています</b>。<a href=\"skip\"><b>続ける</b></a>かマージを<a "
+"作業領域は既に<b>マージされています</b>。<a href=\"skip\"><b>続ける</b></a>かマージを<a "
 "href=\"discard\"><b>破棄</b></a>してください。"
 
 #: tortoisehg/hgqt/merge.py:185
@@ -5210,11 +5210,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/revert.py:22 tortoisehg/hgqt/revert.py:26
 msgid "Cannot revert to working directory"
-msgstr "作業ディレクトリに戻せません"
+msgstr "作業領域に戻せません"
 
 #: tortoisehg/hgqt/revert.py:23
 msgid "Reverting to the working directory revision does not make sense"
-msgstr "作業ディレクトリのりビジョンへ戻す意味はありません"
+msgstr "作業領域のリビジョンへ戻す意味はありません"
 
 #: tortoisehg/hgqt/revert.py:29
 #, python-format
@@ -5263,19 +5263,16 @@ msgstr "ヘッドが閉じています!"
 
 #: tortoisehg/hgqt/revset.py:28
 msgid "Changesets where username contains string."
-msgstr "文字列をユーザー名に持つリビジョン群。 合致判定は文字大小を無視。"
+msgstr "ユーザー名に文字列を含むリビジョン群。"
 
 #: tortoisehg/hgqt/revset.py:30
 msgid ""
 "Search commit message, user name, and names of changed files for string."
-msgstr "文字列が、 コミットログ、 ユーザ名、 変更対象ファイル名の、いずれかに合致するリビジョン群。 合致判定は文字大小を無視。"
+msgstr "コミットログ、ユーザ名、修正ファイルの名前を文字列で検索。"
 
 #: tortoisehg/hgqt/revset.py:33
 msgid "Like \"keyword(string)\" but accepts a regex."
-msgstr ""
-"\"keyword(string)\" と同等ですが、正規表現を使用できます。\"grep(r'...')\"形式の場合、 "
-"特殊文字もそのまま適用されます。 (※ 訳注: 接頭辞 'r'の使用は、バックスラッシュ等を含めて、文字列をそのまま使用する場合のPython "
-"式の記法です) \"keyword(string)\"と異なり、文字大小は無視されません。"
+msgstr "\"keyword(string)\" と同じ内容を正規表現で検索。"
 
 #: tortoisehg/hgqt/revset.py:35
 msgid ""
@@ -5312,8 +5309,8 @@ msgid ""
 "Changesets within the interval, see <a "
 "href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">help dates</a>"
 msgstr ""
-"指定期間中のリビジョン群。期間指定の詳細は <a "
-"href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">こちら</a> を参照。"
+"指定期間中のリビジョン群。 <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">期間指定の詳細</a>"
 
 #: tortoisehg/hgqt/revset.py:53
 msgid "Greatest common ancestor of the two changesets."
@@ -5323,16 +5320,7 @@ msgstr "2つのリビジョンに共通な最新の祖先。"
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
 "revisions."
-msgstr ""
-"指定リビジョン群 (revision) と、指定項目 (field) 値が同一な、リビジョンの抽出 (※ 訳注: \"and\" "
-"結合等での抽出元指定が無い場合、全リビジョンが抽出元になります)。複数項目の合致判定は、対象項目を空白区切りで指定します (例: 'author "
-"description')。リビジョンの一般的な項目以外に、特別な項目も指定できます。一般的な項目には、\"description\"、 "
-"\"author\"、 \"branch\"、 \"date\"、 \"files\"、 \"phase\"、 \"parents\"、 "
-"\"substate\" および \"user\" があります。\"author\" と \"user\" は同一項目です。特殊項目には "
-"\"summary\" および \"metadata\" があります: \"summary\" は\"description\" の１行目に相当します。 "
-"\"metadata\" は \"description user date\" との合致に相当します "
-"(この名称は、「主なメタデータ項目との合致」判定に由来します)フィールド指定が無い場合、 \"metadata\" "
-"フィールドが対象となります。同時に複数フィールドの合致判定が可能です。"
+msgstr "指定リビジョン群とフィールドの値が同じリビジョンの抽出。"
 
 #: tortoisehg/hgqt/revset.py:61
 msgid ""
@@ -5340,8 +5328,8 @@ msgid ""
 "href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help "
 "patterns</a>"
 msgstr ""
-"パターンに合致するファイルに改変を行ったリビジョン群。 (※ 訳注: \"filelog()\" に合致するリビジョンは \"file()\" "
-"にも合致。 リビジョン側情報で判定するため \"filelog()\" と一致しない場合もある。)"
+"パターンに合致するファイルに改変を行ったリビジョン群。 <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">パターンの詳細</a>"
 
 #: tortoisehg/hgqt/revset.py:65
 msgid "Changesets which modify files matched by pattern."
@@ -5399,9 +5387,7 @@ msgstr ""
 msgid ""
 "An empty set, if any revision in set isn't found; otherwise, all revisions "
 "in set."
-msgstr ""
-"指定リビジョン群に存在しないものが含まれている場合は空集合、それ以外なら指定リビジョン群そのもの。 (※ 訳注: "
-"通常であれば、存在しないリビジョンが含まれている場合、処理が中断されますが、present()を使用することで、処理を継続することができます)"
+msgstr "指定リビジョン群に存在しないものがあれば空、でなければ指定リビジョン群。"
 
 #: tortoisehg/hgqt/revset.py:100
 msgid "Changeset with lowest revision number in set."
@@ -5419,16 +5405,11 @@ msgstr "指定リビジョン群の冒頭 n 個。 無指定時は 1。"
 msgid ""
 "Sort set by keys.  The default sort order is ascending, specify a key as \"-"
 "key\" to sort in descending order."
-msgstr ""
-"key での指定方法で整列した集合。 基本の整列方式は昇順で、降順整列の場\n"
-"合は \"-key\" 形式で記述します。指定可能な整列方式は: 1. リビジョン番号\n"
-"順の \"rev\" 2. ブランチ名順の \"branch\" 3. コミットログ (description) 順\n"
-"の \"desc\" 4. ユーザ名順の \"user\" (別名の \"author\" も使用可能) 5. コミット日時順の \"date\""
+msgstr "key でソート。デフォルトでは昇順、\"-key\" で降順。"
 
 #: tortoisehg/hgqt/revset.py:109
 msgid "An alias for \"::.\" (ancestors of the working copy's first parent)."
-msgstr ""
-"\"::.\" (作業領域の第1親の祖先リビジョン群) 記述の別名。ファイル名指定がある場合、当該ファイルの履歴 (複製含む) を辿ります。"
+msgstr "\"::.\" (作業領域の第1親の祖先リビジョン群) 記述の別名。"
 
 #: tortoisehg/hgqt/revset.py:111
 msgid "All changesets, the same as 0:tip."
@@ -6351,8 +6332,8 @@ msgid ""
 " You can select the \"current\" (i.e. the working directory parent), the "
 "current \"tip\" or the working directory (\"workingdir\"). Default: current"
 msgstr ""
-"リポジトリを開いた時に選択されるリビジョンを指定します。選択肢は\"current\"(作業ディレクトリの親)、\"tip\"、\"workingdir"
-"\"(作業ディレクトリ)です。デフォルトは\"current\"です。"
+"リポジトリを開いた時に選択されるリビジョンを指定します。選択肢は\"current\"(作業領域の親)、\"tip\"、\"workingdir\"(作業"
+"領域)です。デフォルトは\"current\"です。"
 
 #: tortoisehg/hgqt/settings.py:616
 msgid ""
@@ -6600,7 +6581,7 @@ msgstr "MQパッチを(draftの代わりに)Secretに設定します。デフォ
 
 #: tortoisehg/hgqt/settings.py:724
 msgid "Monitor working<br>directory changes"
-msgstr "作業ディレクトリ内の変更を監視"
+msgstr "作業領域の変更を監視"
 
 #: tortoisehg/hgqt/settings.py:728
 msgid ""
@@ -8437,7 +8418,7 @@ msgstr "シェルフ"
 
 #: tortoisehg/hgqt/thgimport.py:104
 msgid "Checking working directory status..."
-msgstr "作業ディレクトリの状態を調べています..."
+msgstr "作業領域の状態を調べています..."
 
 #: tortoisehg/hgqt/thgimport.py:116
 msgid "&Import"
@@ -8450,7 +8431,7 @@ msgstr "インポート - %s"
 
 #: tortoisehg/hgqt/thgimport.py:159
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
-msgstr "作業ディレクトリがクリーンでありません! <a href=\"view\">変更を見る...</a>"
+msgstr "作業領域がクリーンでありません! <a href=\"view\">変更を見る...</a>"
 
 #: tortoisehg/hgqt/thgimport.py:177
 msgid "Select patches"
@@ -8778,7 +8759,7 @@ msgstr "GUI 差分ツールが見つかりませんでした"
 
 #: tortoisehg/hgqt/visdiff.py:160
 msgid "[working copy]"
-msgstr "[作業コピー]"
+msgstr "[作業領域]"
 
 #: tortoisehg/hgqt/visdiff.py:162
 msgid "[original]"
@@ -8802,7 +8783,7 @@ msgstr "ローカルとの間に変更点はありませんでした。"
 
 #: tortoisehg/hgqt/visdiff.py:377
 msgid "working changes"
-msgstr "作業ディレクトリの変更"
+msgstr "作業領域の変更"
 
 #: tortoisehg/hgqt/visdiff.py:379
 #, python-format
