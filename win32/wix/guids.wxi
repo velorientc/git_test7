@@ -55,7 +55,7 @@
   <?define KDiff3EXE.guid = {075ECC11-1B44-48DB-B7FD-D3207BB801A4} ?>
 
   <?define TortoisePlinkEXE.guid = {7C2AD6B6-B80B-429C-959F-1A52648E13C9} ?>
-  <?define PageantEXE.guid = {91F28A55-874F-4957-A288-BB0F24E419A4} ?>
+  <?define PageantEXE.guid = {7149C722-FA3F-4E6A-87A7-AA192D977728} ?>
 
   <?define chmFile.guid = {422C758A-6CB2-4531-BE6A-366B3CD1FD8D} ?>
   <?define pdfFile.guid = {A0EC2473-996A-4DBC-9F44-76B63B57AE31} ?>
