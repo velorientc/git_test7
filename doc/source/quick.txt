@@ -99,6 +99,7 @@ diff/merge tool that is supported by our mergetools.rc or configure your
 own tool.
 
 .. note::
+
 	If you installed TortoiseHg from source, you need to add our
 	:file:`contrib/mergetools.ini` file to your HGRC path in some way.  One
 	approach is to *%include* it from your :file:`~/.hgrc` file.
