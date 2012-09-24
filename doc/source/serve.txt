@@ -6,7 +6,7 @@ a single repository for single connection. Serve does not provide user
 authentication, but does provide a convenient, ad-hoc method of synchronizing
 a repository over a local network. For more complete information on publishing
 repositories, see the Mercurial wiki article on
-`Publishing Repositories <http://mercurial.selenic.com/wiki/PublishingRepositories2>`_.
+`Publishing Repositories <http://mercurial.selenic.com/wiki/PublishingRepositories>`_.
 
 From TortoiseHg
 ---------------
