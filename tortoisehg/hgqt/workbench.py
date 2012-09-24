@@ -323,6 +323,7 @@ class Workbench(QMainWindow):
                   menu='repository')
 
         newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
+        newaction(_("Explorer Help"), self.onHelpExplorer, menu='help')
         visiblereadme = 'repoopen'
         if  self.ui.config('tortoisehg', 'readme', None):
             visiblereadme = True
@@ -958,6 +959,10 @@ class Workbench(QMainWindow):
     def onHelp(self, *args):
         """ Display online help """
         qtlib.openhelpcontents('workbench.html')
+
+    def onHelpExplorer(self, *args):
+        """ Display online help for shell extension """
+        qtlib.openhelpcontents('explorer.html')
 
     def onReadme(self, *args):
         """ Display the README file or URL for the current repo, or the global README if no repo is open"""
