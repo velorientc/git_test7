@@ -127,6 +127,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
+        self.repoview.setSelectionMode(QAbstractItemView.SingleSelection)
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -384,6 +385,8 @@ class FileDiffDialog(_AbstractFileDialog):
                                                              cs, self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
+        self.tableView_revisions_right.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableView_revisions_left.setSelectionMode(QAbstractItemView.SingleSelection)
         self.frame = QFrame()
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
