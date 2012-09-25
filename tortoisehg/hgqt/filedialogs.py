@@ -378,15 +378,15 @@ class FileDiffDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
         cs = ('fileDiffDialogLeft', _('File Differences Log Columns'))
-        self.tableView_revisions_left = repoview.HgRepoView(self.repo, cs[0],
+        self.fileHistoryLeft = repoview.HgRepoView(self.repo, cs[0],
                                                             cs, self)
-        self.tableView_revisions_right = repoview.HgRepoView(self.repo,
+        self.fileHistoryRight = repoview.HgRepoView(self.repo,
                                                              'fileDiffDialogRight',
                                                              cs, self)
-        self.horizontalLayout.addWidget(self.tableView_revisions_left)
-        self.horizontalLayout.addWidget(self.tableView_revisions_right)
-        self.tableView_revisions_right.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableView_revisions_left.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.horizontalLayout.addWidget(self.fileHistoryLeft)
+        self.horizontalLayout.addWidget(self.fileHistoryRight)
+        self.fileHistoryRight.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.fileHistoryLeft.setSelectionMode(QAbstractItemView.SingleSelection)
         self.frame = QFrame()
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
@@ -397,8 +397,8 @@ class FileDiffDialog(_AbstractFileDialog):
         menu.exec_(point)
 
     def setupViews(self):
-        self.tableViews = {'left': self.tableView_revisions_left,
-                           'right': self.tableView_revisions_right}
+        self.tableViews = {'left': self.fileHistoryLeft,
+                           'right': self.fileHistoryRight}
         # viewers are Scintilla editors
         self.viewers = {}
         # block are diff-block displayers
@@ -484,13 +484,13 @@ class FileDiffDialog(_AbstractFileDialog):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
         self.filerevmodel = filerevmodel.FileRevModel(self.repo,
-                                         self.tableView_revisions_left.colselect[0],
+                                         self.fileHistoryLeft.colselect[0],
                                          self.filename, parent=self)
         self.filerevmodel.filled.connect(self.modelFilled)
-        self.tableView_revisions_left.setModel(self.filerevmodel)
-        self.tableView_revisions_right.setModel(self.filerevmodel)
-        self.tableView_revisions_left.menuRequested.connect(self.viewMenuRequest)
-        self.tableView_revisions_right.menuRequested.connect(self.viewMenuRequest)
+        self.fileHistoryLeft.setModel(self.filerevmodel)
+        self.fileHistoryRight.setModel(self.filerevmodel)
+        self.fileHistoryLeft.menuRequested.connect(self.viewMenuRequest)
+        self.fileHistoryRight.menuRequested.connect(self.viewMenuRequest)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -516,8 +516,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionPrevDiff)
 
     def modelFilled(self):
-        self.tableView_revisions_left.resizeColumns()
-        self.tableView_revisions_right.resizeColumns()
+        self.fileHistoryLeft.resizeColumns()
+        self.fileHistoryRight.resizeColumns()
         if self._show_rev is not None:
             self.goto(self._show_rev)
             self._show_rev = None
@@ -527,7 +527,7 @@ class FileDiffDialog(_AbstractFileDialog):
     def onRevisionSelected(self, rev):
         if rev is None or rev not in self.filerevmodel.graph.nodesdict:
             return
-        if self.sender() is self.tableView_revisions_right:
+        if self.sender() is self.fileHistoryRight:
             side = 'right'
         else:
             side = 'left'
@@ -542,9 +542,9 @@ class FileDiffDialog(_AbstractFileDialog):
         if index is not None:
             if index.row() == 0:
                 index = self.filerevmodel.index(1, 0)
-            self.tableView_revisions_left.setCurrentIndex(index)
+            self.fileHistoryLeft.setCurrentIndex(index)
             index = self.filerevmodel.index(0, 0)
-            self.tableView_revisions_right.setCurrentIndex(index)
+            self.fileHistoryRight.setCurrentIndex(index)
         else:
             self._show_rev = rev
 
@@ -691,8 +691,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self._invbarchanged = False
 
     def reload(self):
-        self.tableView_revisions_left.saveSettings()
-        self.tableView_revisions_right.saveSettings()
+        self.fileHistoryLeft.saveSettings()
+        self.fileHistoryRight.saveSettings()
         super(FileDiffDialog, self).reload()
 
     @pyqtSlot(QPoint, object)
