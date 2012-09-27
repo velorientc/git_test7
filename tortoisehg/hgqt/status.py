@@ -802,7 +802,8 @@ class WctxModel(QAbstractTableModel):
     def setFilter(self, match):
         'simple match in filename filter'
         self.layoutAboutToBeChanged.emit()
-        self.rows = [r for r in self.unfiltered if match in r[COL_PATH_DISPLAY]]
+        self.rows = [r for r in self.unfiltered
+                     if unicode(match) in r[COL_PATH_DISPLAY]]
         self.layoutChanged.emit()
         self.reset()
 
