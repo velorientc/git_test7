@@ -131,8 +131,7 @@ class ManifestModel(QAbstractItemModel):
                 stype = self.subrepoType(index)
                 if stype in _subrepoType2IcoMap:
                     ic = qtlib.geticon(_subrepoType2IcoMap[stype])
-            ic = qtlib.getoverlaidicon(ic,
-                icOverlay)  # XXX
+            ic = qtlib.getoverlaidicon(ic, icOverlay)
         return ic
 
     def fileStatus(self, index):
