@@ -51,7 +51,7 @@ class QuickOpDialog(QDialog):
         toplayout = QVBoxLayout()
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
-        
+
         hbox = QHBoxLayout()
         lbl = QLabel(LABELS[command][0])
         slbl = QLabel()
@@ -115,7 +115,7 @@ class QuickOpDialog(QDialog):
         hbox.addWidget(bb)
         toplayout.addLayout(hbox)
         self.bb = bb
-        
+
         if self.command == 'add':
             if 'largefiles' in self.repo.extensions():
                 self.addLfilesButton = QPushButton(_('Add &Largefiles'))
