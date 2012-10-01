@@ -766,7 +766,7 @@ class Workbench(QMainWindow):
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
 
-    @pyqtSlot(unicode)
+    #@pyqtSlot(unicode)
     def _updateRepoTabTitle(self, title):
         index = self.repoTabsWidget.indexOf(self.sender())
         self.repoTabsWidget.setTabText(index, title)
