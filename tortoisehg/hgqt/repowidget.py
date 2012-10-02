@@ -1750,7 +1750,7 @@ class RepoWidget(QWidget):
     def graftRevisions(self):
         """Graft selected revision on top of working directory parent"""
         revlist = []
-        for rev in self.repoview.selectedRevisions():
+        for rev in sorted(self.repoview.selectedRevisions()):
             revlist.append(str(rev))
         if not revlist:
             revlist = [self.rev]
@@ -2044,6 +2044,7 @@ class RepoWidget(QWidget):
         # 2. Expand internal workbench variables
         vars = {
             'ROOT': self.repo.root,
+            'REVID': str(self.repo[self.rev]),
             'REV': self.rev
         }
         for var in vars:

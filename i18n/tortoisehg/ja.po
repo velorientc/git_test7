@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-08-31 21:38-0300\n"
-"PO-Revision-Date: 2012-08-13 06:06+0000\n"
+"POT-Creation-Date: 2012-09-26 17:14-0300\n"
+"PO-Revision-Date: 2012-09-07 14:32+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-09-01 04:59+0000\n"
-"X-Generator: Launchpad (build 15890)\n"
+"X-Launchpad-Export-Date: 2012-09-27 04:46+0000\n"
+"X-Generator: Launchpad (build 16033)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -71,7 +71,7 @@ msgstr "新しいバージョンがダウンロード可能です！"
 
 #: tortoisehg/hgqt/archive.py:20
 msgid "= Working Directory Parent ="
-msgstr "= 作業ディレクトリの親リビジョン ="
+msgstr "= 作業領域の親リビジョン ="
 
 #: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:420
 #: tortoisehg/hgqt/bookmark.py:50 tortoisehg/hgqt/csinfo.py:105
@@ -243,7 +243,7 @@ msgstr "バックアウトの準備"
 
 #: tortoisehg/hgqt/backout.py:100
 msgid "Verify backout revision and ensure your working directory is clean."
-msgstr "打ち消し対象のリビジョンと作業ディレクトリの状態を確認してください。"
+msgstr "打ち消し対象のリビジョンと作業領域の状態を確認してください。"
 
 #: tortoisehg/hgqt/backout.py:111 tortoisehg/hgqt/backout.py:123
 #: tortoisehg/hgqt/backout.py:130
@@ -310,7 +310,7 @@ msgstr "マージリビジョンの二番目の親を打ち消す"
 
 #: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:160
 msgid "Working directory status"
-msgstr "作業ディレクトリの状態"
+msgstr "作業領域の状態"
 
 #: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
 #: tortoisehg/hgqt/graft.py:122 tortoisehg/hgqt/merge.py:168
@@ -359,7 +359,7 @@ msgstr "破棄の確認"
 #: tortoisehg/hgqt/graft.py:277 tortoisehg/hgqt/merge.py:321
 #: tortoisehg/hgqt/rebase.py:242
 msgid "Discard outstanding changes to working directory?"
-msgstr "作業ディレクトリのコミットしていない変更を破棄しますか?"
+msgstr "作業領域のコミットしていない変更を破棄しますか?"
 
 #: tortoisehg/hgqt/backout.py:327
 msgid "Backing out, then merging..."
@@ -398,11 +398,11 @@ msgstr "親リビジョン"
 #: tortoisehg/hgqt/repomodel.py:639 tortoisehg/hgqt/repomodel.py:641
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:88
 msgid "Working Directory"
-msgstr "作業ディレクトリ"
+msgstr "作業領域"
 
 #: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:497
 msgid "Working Directory (merged)"
-msgstr "作業ディレクトリ (マージ)"
+msgstr "作業領域 (マージ)"
 
 #: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:505
 msgid "Commit message"
@@ -522,7 +522,7 @@ msgstr "このリビジョンをテストし、発見したものを報告する
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
 #: tortoisehg/hgqt/commit.py:877 tortoisehg/hgqt/commit.py:1198
 #: tortoisehg/hgqt/commit.py:1218 tortoisehg/hgqt/hgignore.py:260
-#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:483
+#: tortoisehg/hgqt/hginit.py:179 tortoisehg/hgqt/status.py:486
 #: tortoisehg/hgqt/wctxactions.py:185
 #, python-format
 msgid "%s (hint: %s)"
@@ -676,7 +676,7 @@ msgstr "ローカルファイルをエディタで開く"
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/filectxactions.py:73
 #: tortoisehg/hgqt/filectxactions.py:75
 msgid "Edit current file in working copy"
-msgstr "作業コピーのファイルを編集"
+msgstr "作業領域のファイルを編集"
 
 #: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/filectxactions.py:78
 msgid "Revert to Revision"
@@ -778,7 +778,7 @@ msgstr "このリビジョンまでクローン:"
 
 #: tortoisehg/hgqt/clone.py:130
 msgid "Do not update the new working directory"
-msgstr "作業ディレクトリを更新しない"
+msgstr "作業領域を更新しない"
 
 #: tortoisehg/hgqt/clone.py:131
 msgid "Use pull protocol to copy metadata"
@@ -1710,7 +1710,7 @@ msgstr "From:"
 
 #: tortoisehg/hgqt/filedata.py:216
 msgid "Subrepository not found in the working directory."
-msgstr "作業ディレクトリにサブリポジトリが見つかりません。"
+msgstr "作業領域にサブリポジトリが見つかりません。"
 
 #: tortoisehg/hgqt/filedata.py:218 tortoisehg/hgqt/filedata.py:224
 msgid "Further subrepository revision information cannot be retrieved."
@@ -1805,59 +1805,65 @@ msgstr " <i>(はまだバージョン管理下にはありません)</i>"
 msgid "File History Log Columns"
 msgstr ""
 
-#: tortoisehg/hgqt/filedialogs.py:170 tortoisehg/hgqt/workbench.py:346
+#: tortoisehg/hgqt/filedialogs.py:171 tortoisehg/hgqt/workbench.py:347
 msgid "Back"
 msgstr "戻る"
 
-#: tortoisehg/hgqt/filedialogs.py:172 tortoisehg/hgqt/workbench.py:349
+#: tortoisehg/hgqt/filedialogs.py:173 tortoisehg/hgqt/workbench.py:350
 msgid "Forward"
 msgstr "進む"
 
-#: tortoisehg/hgqt/filedialogs.py:200 tortoisehg/hgqt/filedialogs.py:702
-#: tortoisehg/hgqt/repowidget.py:1224
-msgid "Diff to parent..."
-msgstr "親リビジョンとの差分..."
+#: tortoisehg/hgqt/filedialogs.py:201
+msgid "Diff changeset to parent..."
+msgstr ""
 
-#: tortoisehg/hgqt/filedialogs.py:203 tortoisehg/hgqt/filedialogs.py:705
-#: tortoisehg/hgqt/repowidget.py:1226
-msgid "Diff to local..."
-msgstr "ローカルとの差分..."
+#: tortoisehg/hgqt/filedialogs.py:204
+msgid "Diff changeset to local..."
+msgstr ""
 
-#: tortoisehg/hgqt/filedialogs.py:207 tortoisehg/hgqt/filedialogs.py:709
+#: tortoisehg/hgqt/filedialogs.py:208 tortoisehg/hgqt/filedialogs.py:712
 msgid "Diff file to parent..."
 msgstr "親リビジョンとのファイル差分..."
 
-#: tortoisehg/hgqt/filedialogs.py:210 tortoisehg/hgqt/filedialogs.py:712
+#: tortoisehg/hgqt/filedialogs.py:211 tortoisehg/hgqt/filedialogs.py:715
 msgid "Diff file to local..."
 msgstr "ローカルとのファイル差分..."
 
-#: tortoisehg/hgqt/filedialogs.py:214 tortoisehg/hgqt/filedialogs.py:716
+#: tortoisehg/hgqt/filedialogs.py:215 tortoisehg/hgqt/filedialogs.py:719
 msgid "View at revision..."
 msgstr "このリビジョンをエディタで表示..."
 
-#: tortoisehg/hgqt/filedialogs.py:217 tortoisehg/hgqt/filedialogs.py:719
+#: tortoisehg/hgqt/filedialogs.py:218 tortoisehg/hgqt/filedialogs.py:722
 msgid "Save at revision..."
 msgstr "このリビジョンを保存..."
 
-#: tortoisehg/hgqt/filedialogs.py:219 tortoisehg/hgqt/filedialogs.py:721
+#: tortoisehg/hgqt/filedialogs.py:220 tortoisehg/hgqt/filedialogs.py:724
 msgid "Edit local"
 msgstr "ローカルファイルをエディタで開く"
 
-#: tortoisehg/hgqt/filedialogs.py:222 tortoisehg/hgqt/filedialogs.py:724
+#: tortoisehg/hgqt/filedialogs.py:223 tortoisehg/hgqt/filedialogs.py:727
 msgid "Revert to revision..."
 msgstr "このリビジョンへ復旧..."
 
-#: tortoisehg/hgqt/filedialogs.py:379
+#: tortoisehg/hgqt/filedialogs.py:380
 msgid "File Differences Log Columns"
 msgstr ""
 
-#: tortoisehg/hgqt/filedialogs.py:498
+#: tortoisehg/hgqt/filedialogs.py:501
 msgid "Next diff"
 msgstr "次の差分"
 
-#: tortoisehg/hgqt/filedialogs.py:503
+#: tortoisehg/hgqt/filedialogs.py:506
 msgid "Previous diff"
 msgstr "前の差分"
+
+#: tortoisehg/hgqt/filedialogs.py:705 tortoisehg/hgqt/repowidget.py:1227
+msgid "Diff to parent..."
+msgstr "親リビジョンとの差分..."
+
+#: tortoisehg/hgqt/filedialogs.py:708 tortoisehg/hgqt/repowidget.py:1229
+msgid "Diff to local..."
+msgstr "ローカルとの差分..."
 
 #: tortoisehg/hgqt/filerevmodel.py:23
 msgctxt "column header"
@@ -1922,7 +1928,7 @@ msgstr "由来リビジョンで検索"
 
 #: tortoisehg/hgqt/fileview.py:662
 msgid "Search in working revision"
-msgstr "作業ディレクトリで検索"
+msgstr "作業領域を検索"
 
 #: tortoisehg/hgqt/fileview.py:664
 msgid "Search in current annotation"
@@ -1987,9 +1993,9 @@ msgstr ""
 msgid "Graft"
 msgstr ""
 
-#: tortoisehg/hgqt/graft.py:113 tortoisehg/hgqt/graft.py:309
+#: tortoisehg/hgqt/graft.py:113 tortoisehg/hgqt/graft.py:313
 #: tortoisehg/hgqt/rebase.py:101 tortoisehg/hgqt/rebase.py:274
-#: tortoisehg/hgqt/repowidget.py:1607 tortoisehg/hgqt/repowidget.py:1634
+#: tortoisehg/hgqt/repowidget.py:1610 tortoisehg/hgqt/repowidget.py:1637
 msgid "Abort"
 msgstr "中止"
 
@@ -2052,17 +2058,17 @@ msgstr ""
 msgid "&Exit"
 msgstr "終了(&E)"
 
-#: tortoisehg/hgqt/graft.py:306
+#: tortoisehg/hgqt/graft.py:310
 msgid "Graft already in progress"
 msgstr ""
 
-#: tortoisehg/hgqt/graft.py:307
+#: tortoisehg/hgqt/graft.py:311
 msgid "Resuming graft already in progress"
 msgstr ""
 
-#: tortoisehg/hgqt/graft.py:310 tortoisehg/hgqt/rebase.py:275
-msgid "You must provide source and dest arguments"
-msgstr "移動元と移動先を指定する必要があります"
+#: tortoisehg/hgqt/graft.py:314
+msgid "You must provide revisions to graft"
+msgstr ""
 
 #: tortoisehg/hgqt/grep.py:42
 msgid "### regular expression search pattern ###"
@@ -2082,7 +2088,7 @@ msgstr "検索"
 
 #: tortoisehg/hgqt/grep.py:63
 msgid "Working Copy"
-msgstr "作業コピー"
+msgstr "作業領域"
 
 #: tortoisehg/hgqt/grep.py:65
 msgid "All History"
@@ -2663,7 +2669,7 @@ msgid "Drag to change order"
 msgstr "順番を変えるにはドラッグしてください"
 
 #: tortoisehg/hgqt/logcolumns.py:100 tortoisehg/hgqt/settings.py:599
-#: tortoisehg/hgqt/workbench.py:839 tortoisehg/util/menuthg.py:46
+#: tortoisehg/hgqt/workbench.py:840 tortoisehg/util/menuthg.py:46
 msgid "Workbench"
 msgstr "ワークベンチ"
 
@@ -2774,7 +2780,7 @@ msgstr "終了しますか?"
 
 #: tortoisehg/hgqt/merge.py:102
 msgid "To finish merging, you need to commit the working directory."
-msgstr "マージを完了するには、作業ディレクトリの内容をコミットしてください。"
+msgstr "マージを完了するには、作業領域の内容をコミットしてください。"
 
 #: tortoisehg/hgqt/merge.py:124
 msgid "Prepare to merge"
@@ -2803,7 +2809,7 @@ msgstr "マージリビジョンが指定されていないか存在しません
 
 #: tortoisehg/hgqt/merge.py:153
 msgid "Merge to (working directory)"
-msgstr "マージ先 (作業ディレクトリ)"
+msgstr "マージ先 (作業領域)"
 
 #: tortoisehg/hgqt/merge.py:176
 msgid ""
@@ -2811,7 +2817,7 @@ msgid ""
 "href=\"skip\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> "
 "existing merge."
 msgstr ""
-"作業ディレクトリは既に<b>マージされています</b>。<a href=\"skip\"><b>続ける</b></a>かマージを<a "
+"作業領域は既に<b>マージされています</b>。<a href=\"skip\"><b>続ける</b></a>かマージを<a "
 "href=\"discard\"><b>破棄</b></a>してください。"
 
 #: tortoisehg/hgqt/merge.py:185
@@ -2982,7 +2988,7 @@ msgid "%s had rejected chunks, edit patched file together with rejects?"
 msgstr "%s に失敗したチャンクがあります。パッチが成功したファイルと一緒に失敗したチャンクも編集しますか?"
 
 #: tortoisehg/hgqt/mq.py:335 tortoisehg/hgqt/mq.py:786
-#: tortoisehg/hgqt/repowidget.py:1475
+#: tortoisehg/hgqt/repowidget.py:1478
 msgid ""
 "<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
 "them.<br><br>Continue?</p>"
@@ -3875,6 +3881,10 @@ msgstr "リベースは既に実行中です。"
 msgid "Resuming rebase already in progress"
 msgstr "リベースの再開は既に実行中です。"
 
+#: tortoisehg/hgqt/rebase.py:275
+msgid "You must provide source and dest arguments"
+msgstr "移動元と移動先を指定する必要があります"
+
 #: tortoisehg/hgqt/rejects.py:28
 #, python-format
 msgid "Merge rejected patch chunks into %s"
@@ -4539,76 +4549,76 @@ msgstr "破棄する"
 msgid "Reject incoming changesets"
 msgstr "取り込み対象のチェンジセットを却下します"
 
-#: tortoisehg/hgqt/repowidget.py:553 tortoisehg/hgqt/sync.py:1135
+#: tortoisehg/hgqt/repowidget.py:554 tortoisehg/hgqt/sync.py:1135
 #, python-format
 msgid "%d outgoing changesets"
 msgstr "%d 件の送信チェンジセット"
 
-#: tortoisehg/hgqt/repowidget.py:558 tortoisehg/hgqt/repowidget.py:1213
-#: tortoisehg/hgqt/workbench.py:376
+#: tortoisehg/hgqt/repowidget.py:559 tortoisehg/hgqt/repowidget.py:1216
+#: tortoisehg/hgqt/workbench.py:377
 msgid "Push"
 msgstr "プッシュ"
 
-#: tortoisehg/hgqt/repowidget.py:565
+#: tortoisehg/hgqt/repowidget.py:566
 #, python-format
 msgid "Push current branch (%s)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:569
+#: tortoisehg/hgqt/repowidget.py:570
 #, python-format
 msgid "Push current revision (%d)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:701
+#: tortoisehg/hgqt/repowidget.py:702
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - リポジトリを検証"
 
-#: tortoisehg/hgqt/repowidget.py:712
+#: tortoisehg/hgqt/repowidget.py:713
 #, python-format
 msgid "%s - recover repository"
 msgstr "%s - リポジトリを復元"
 
-#: tortoisehg/hgqt/repowidget.py:732
+#: tortoisehg/hgqt/repowidget.py:733
 msgid "No transaction available"
 msgstr "元に戻せる変更がありません"
 
-#: tortoisehg/hgqt/repowidget.py:733
+#: tortoisehg/hgqt/repowidget.py:734
 msgid "There is no rollback transaction available"
 msgstr "元に戻せる変更がありません"
 
-#: tortoisehg/hgqt/repowidget.py:736
+#: tortoisehg/hgqt/repowidget.py:737
 msgid "Undo last commit?"
 msgstr "直前のコミットを取り消しますか？"
 
-#: tortoisehg/hgqt/repowidget.py:737
+#: tortoisehg/hgqt/repowidget.py:738
 #, python-format
 msgid "Undo most recent commit (%d), preserving file changes?"
 msgstr "直前のコミット(%d)を取り消し、変更を保存しますか?"
 
-#: tortoisehg/hgqt/repowidget.py:741
+#: tortoisehg/hgqt/repowidget.py:742
 msgid "Undo last transaction?"
 msgstr "最後の操作を取り消しますか?"
 
-#: tortoisehg/hgqt/repowidget.py:742
+#: tortoisehg/hgqt/repowidget.py:743
 #, python-format
 msgid "Rollback to revision %d (undo %s)?"
 msgstr "リビジョン %d に巻き戻しますか? (%sを取り消す)"
 
-#: tortoisehg/hgqt/repowidget.py:748 tortoisehg/hgqt/repowidget.py:1375
+#: tortoisehg/hgqt/repowidget.py:749 tortoisehg/hgqt/repowidget.py:1378
 #: tortoisehg/hgqt/run.py:551
 msgid "Repository Error"
 msgstr "リポジトリエラー"
 
-#: tortoisehg/hgqt/repowidget.py:749
+#: tortoisehg/hgqt/repowidget.py:750
 msgid "Unable to determine working copy revision\n"
 msgstr "作業領域のリビジョンを特定できません\n"
 
-#: tortoisehg/hgqt/repowidget.py:753
+#: tortoisehg/hgqt/repowidget.py:754
 msgid "Remove current working revision?"
 msgstr "現在作業中のリビジョンを取り除きますか？"
 
-#: tortoisehg/hgqt/repowidget.py:754
+#: tortoisehg/hgqt/repowidget.py:755
 #, python-format
 msgid ""
 "Your current working revision (%d) will be removed by this rollback, leaving "
@@ -4619,261 +4629,261 @@ msgstr ""
 "トしていない変更はそのまま残されます。\n"
 "続けますか？"
 
-#: tortoisehg/hgqt/repowidget.py:899
+#: tortoisehg/hgqt/repowidget.py:903
 msgid "Repository stripped, incoming preview cleared"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:904
+#: tortoisehg/hgqt/repowidget.py:908
 msgid "Repository stripped, revision set cleared"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1028
+#: tortoisehg/hgqt/repowidget.py:1032
 msgid "Commit tab cannot exit"
 msgstr "コミットタブが終了できません"
 
-#: tortoisehg/hgqt/repowidget.py:1032
+#: tortoisehg/hgqt/repowidget.py:1036
 msgid "Sync tab cannot exit"
 msgstr "同期タブが終了できません"
 
-#: tortoisehg/hgqt/repowidget.py:1037
+#: tortoisehg/hgqt/repowidget.py:1041
 msgid "MQ tab cannot exit"
 msgstr "MQタブが終了できません"
 
-#: tortoisehg/hgqt/repowidget.py:1041
+#: tortoisehg/hgqt/repowidget.py:1045
 msgid "Search tab cannot exit"
 msgstr "検索タブが終了できません"
 
-#: tortoisehg/hgqt/repowidget.py:1044 tortoisehg/hgqt/tag.py:228
+#: tortoisehg/hgqt/repowidget.py:1048 tortoisehg/hgqt/tag.py:228
 #: tortoisehg/hgqt/tag.py:291 tortoisehg/hgqt/tag.py:340
 msgid "Repository command still running"
 msgstr "リポジトリのコマンドがまだ動作しています"
 
-#: tortoisehg/hgqt/repowidget.py:1214
+#: tortoisehg/hgqt/repowidget.py:1217
 msgid "Push all"
 msgstr "全てをプッシュ"
 
-#: tortoisehg/hgqt/repowidget.py:1216
+#: tortoisehg/hgqt/repowidget.py:1219
 msgid "Push to here"
 msgstr "ここにプッシュ"
 
-#: tortoisehg/hgqt/repowidget.py:1218
+#: tortoisehg/hgqt/repowidget.py:1221
 msgid "Push selected branch"
 msgstr "選択したブランチをプッシュ"
 
-#: tortoisehg/hgqt/repowidget.py:1221 tortoisehg/util/menuthg.py:58
+#: tortoisehg/hgqt/repowidget.py:1224 tortoisehg/util/menuthg.py:58
 msgid "Update..."
 msgstr "特定のリビジョンへ更新..."
 
-#: tortoisehg/hgqt/repowidget.py:1228
+#: tortoisehg/hgqt/repowidget.py:1231
 msgid "Browse at rev..."
 msgstr "このリビジョンのファイルを閲覧"
 
-#: tortoisehg/hgqt/repowidget.py:1230 tortoisehg/hgqt/repowidget.py:1441
-#: tortoisehg/hgqt/repowidget.py:1522
+#: tortoisehg/hgqt/repowidget.py:1233 tortoisehg/hgqt/repowidget.py:1444
+#: tortoisehg/hgqt/repowidget.py:1525
 msgid "Similar revisions..."
 msgstr "類似のリビジョン..."
 
-#: tortoisehg/hgqt/repowidget.py:1233
+#: tortoisehg/hgqt/repowidget.py:1236
 msgid "Merge with local..."
 msgstr "ローカルとマージ..."
 
-#: tortoisehg/hgqt/repowidget.py:1236
+#: tortoisehg/hgqt/repowidget.py:1239
 msgid "Tag..."
 msgstr "タグ..."
 
-#: tortoisehg/hgqt/repowidget.py:1238
+#: tortoisehg/hgqt/repowidget.py:1241
 msgid "Bookmark..."
 msgstr "ブックマーク..."
 
-#: tortoisehg/hgqt/repowidget.py:1241
+#: tortoisehg/hgqt/repowidget.py:1244
 msgid "Backout..."
 msgstr "バックアウト..."
 
-#: tortoisehg/hgqt/repowidget.py:1245
+#: tortoisehg/hgqt/repowidget.py:1248
 msgid "Copy hash"
 msgstr "ハッシュをコピー"
 
-#: tortoisehg/hgqt/repowidget.py:1249
+#: tortoisehg/hgqt/repowidget.py:1252
 msgid "Export"
 msgstr "エクスポート"
 
-#: tortoisehg/hgqt/repowidget.py:1250
+#: tortoisehg/hgqt/repowidget.py:1253
 msgid "Export patch..."
 msgstr "パッチとして保存..."
 
-#: tortoisehg/hgqt/repowidget.py:1252
+#: tortoisehg/hgqt/repowidget.py:1255
 msgid "Email patch..."
 msgstr "パッチをメール送信..."
 
-#: tortoisehg/hgqt/repowidget.py:1254
+#: tortoisehg/hgqt/repowidget.py:1257
 msgid "Archive..."
 msgstr "アーカイブ..."
 
-#: tortoisehg/hgqt/repowidget.py:1256
+#: tortoisehg/hgqt/repowidget.py:1259
 msgid "Bundle rev and descendants..."
 msgstr "リビジョンと子孫をバンドルする..."
 
-#: tortoisehg/hgqt/repowidget.py:1258 tortoisehg/hgqt/wctxactions.py:41
+#: tortoisehg/hgqt/repowidget.py:1261 tortoisehg/hgqt/wctxactions.py:41
 msgid "Copy patch"
 msgstr "パッチをコピー"
 
-#: tortoisehg/hgqt/repowidget.py:1262
+#: tortoisehg/hgqt/repowidget.py:1265
 msgid "Change phase to"
 msgstr "フェーズを変更"
 
-#: tortoisehg/hgqt/repowidget.py:1268
+#: tortoisehg/hgqt/repowidget.py:1271
 msgid "Graft to local..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1272
+#: tortoisehg/hgqt/repowidget.py:1275
 msgid "Modify history"
 msgstr "履歴を修正"
 
-#: tortoisehg/hgqt/repowidget.py:1273
+#: tortoisehg/hgqt/repowidget.py:1276
 msgid "Unapply patch (QGoto parent)"
 msgstr "パッチを適用解除 (QGoto parent)"
 
-#: tortoisehg/hgqt/repowidget.py:1275
+#: tortoisehg/hgqt/repowidget.py:1278
 msgid "Import to MQ"
 msgstr "MQ へインポート"
 
-#: tortoisehg/hgqt/repowidget.py:1277
+#: tortoisehg/hgqt/repowidget.py:1280
 msgid "Finish patch"
 msgstr "パッチを通常リビジョン化"
 
-#: tortoisehg/hgqt/repowidget.py:1279 tortoisehg/hgqt/repowidget.py:1501
+#: tortoisehg/hgqt/repowidget.py:1282 tortoisehg/hgqt/repowidget.py:1504
 msgid "Rename patch..."
 msgstr "パッチ名を変更..."
 
-#: tortoisehg/hgqt/repowidget.py:1282
+#: tortoisehg/hgqt/repowidget.py:1285
 msgid "Rebase..."
 msgstr "リベース..."
 
-#: tortoisehg/hgqt/repowidget.py:1285
+#: tortoisehg/hgqt/repowidget.py:1288
 msgid "Strip..."
 msgstr "リビジョンの除外..."
 
-#: tortoisehg/hgqt/repowidget.py:1288
+#: tortoisehg/hgqt/repowidget.py:1291
 msgid "Post to Review Board..."
 msgstr "レビューボードに投稿..."
 
-#: tortoisehg/hgqt/repowidget.py:1291
+#: tortoisehg/hgqt/repowidget.py:1294
 msgid "Remote Update..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1307
+#: tortoisehg/hgqt/repowidget.py:1310
 msgid "Custom Tools"
 msgstr "カスタムツール"
 
-#: tortoisehg/hgqt/repowidget.py:1363
+#: tortoisehg/hgqt/repowidget.py:1366
 msgid "Write diff file"
 msgstr "差分をファイルに書き込む"
 
-#: tortoisehg/hgqt/repowidget.py:1376
+#: tortoisehg/hgqt/repowidget.py:1379
 msgid "Unable to write diff file"
 msgstr "差分ファイルを書き込めません"
 
-#: tortoisehg/hgqt/repowidget.py:1417
+#: tortoisehg/hgqt/repowidget.py:1420
 msgid "Unable to compress history"
 msgstr "履歴を圧縮できません"
 
-#: tortoisehg/hgqt/repowidget.py:1418
+#: tortoisehg/hgqt/repowidget.py:1421
 msgid "Selected changeset pair not related"
 msgstr "選択したチェンジセットのペアは関連がありません"
 
-#: tortoisehg/hgqt/repowidget.py:1426
+#: tortoisehg/hgqt/repowidget.py:1429
 msgid "Visual Diff..."
 msgstr "GUI 差分表示..."
 
-#: tortoisehg/hgqt/repowidget.py:1427
+#: tortoisehg/hgqt/repowidget.py:1430
 msgid "Export Diff..."
 msgstr "差分をエクスポート..."
 
-#: tortoisehg/hgqt/repowidget.py:1429 tortoisehg/hgqt/repowidget.py:1518
+#: tortoisehg/hgqt/repowidget.py:1432 tortoisehg/hgqt/repowidget.py:1521
 msgid "Export Selected..."
 msgstr "選択した部分をエクスポート..."
 
-#: tortoisehg/hgqt/repowidget.py:1430 tortoisehg/hgqt/repowidget.py:1519
+#: tortoisehg/hgqt/repowidget.py:1433 tortoisehg/hgqt/repowidget.py:1522
 msgid "Email Selected..."
 msgstr "選択範囲をメール送信..."
 
-#: tortoisehg/hgqt/repowidget.py:1432
+#: tortoisehg/hgqt/repowidget.py:1435
 msgid "Export DAG Range..."
 msgstr "DAG 範囲をエクスポート..."
 
-#: tortoisehg/hgqt/repowidget.py:1433
+#: tortoisehg/hgqt/repowidget.py:1436
 msgid "Email DAG Range..."
 msgstr "DAG 範囲をメール送信..."
 
-#: tortoisehg/hgqt/repowidget.py:1434
+#: tortoisehg/hgqt/repowidget.py:1437
 msgid "Bundle DAG Range..."
 msgstr "DAG 範囲をバンドル..."
 
-#: tortoisehg/hgqt/repowidget.py:1436
+#: tortoisehg/hgqt/repowidget.py:1439
 msgid "Bisect - Good, Bad..."
 msgstr "分割探索 - Good, Bad ..."
 
-#: tortoisehg/hgqt/repowidget.py:1437
+#: tortoisehg/hgqt/repowidget.py:1440
 msgid "Bisect - Bad, Good..."
 msgstr "分割探索 - Bad, Good..."
 
-#: tortoisehg/hgqt/repowidget.py:1438
+#: tortoisehg/hgqt/repowidget.py:1441
 msgid "Compress History..."
 msgstr "履歴を圧縮..."
 
-#: tortoisehg/hgqt/repowidget.py:1440 tortoisehg/hgqt/repowidget.py:1521
+#: tortoisehg/hgqt/repowidget.py:1443 tortoisehg/hgqt/repowidget.py:1524
 msgid "Goto common ancestor"
 msgstr "共通の祖先に移動"
 
-#: tortoisehg/hgqt/repowidget.py:1443 tortoisehg/hgqt/repowidget.py:1524
+#: tortoisehg/hgqt/repowidget.py:1446 tortoisehg/hgqt/repowidget.py:1527
 msgid "Graft Selected to local..."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1456 tortoisehg/hgqt/repowidget.py:1536
+#: tortoisehg/hgqt/repowidget.py:1459 tortoisehg/hgqt/repowidget.py:1539
 msgid "Post Selected to Review Board..."
 msgstr "選択した部分をレビューボードに投稿..."
 
-#: tortoisehg/hgqt/repowidget.py:1496
+#: tortoisehg/hgqt/repowidget.py:1499
 msgid "Apply patch (QGoto)"
 msgstr "パッチを適用 (QGoto)"
 
-#: tortoisehg/hgqt/repowidget.py:1497
+#: tortoisehg/hgqt/repowidget.py:1500
 msgid "QPush --move"
 msgstr "QPush --move"
 
-#: tortoisehg/hgqt/repowidget.py:1498
+#: tortoisehg/hgqt/repowidget.py:1501
 msgid "Fold patches..."
 msgstr "パッチを統合..."
 
-#: tortoisehg/hgqt/repowidget.py:1499
+#: tortoisehg/hgqt/repowidget.py:1502
 msgid "Delete patches..."
 msgstr "パッチを削除..."
 
-#: tortoisehg/hgqt/repowidget.py:1500
+#: tortoisehg/hgqt/repowidget.py:1503
 msgid "Reorder patches..."
 msgstr "パッチの順序を変更..."
 
-#: tortoisehg/hgqt/repowidget.py:1544
+#: tortoisehg/hgqt/repowidget.py:1547
 msgid "Pull to here..."
 msgstr "ここにプル..."
 
-#: tortoisehg/hgqt/repowidget.py:1545
+#: tortoisehg/hgqt/repowidget.py:1548
 msgid "Visual diff..."
 msgstr "GUI 差分表示..."
 
-#: tortoisehg/hgqt/repowidget.py:1565 tortoisehg/hgqt/repowidget.py:1575
+#: tortoisehg/hgqt/repowidget.py:1568 tortoisehg/hgqt/repowidget.py:1578
 msgid "Export patch"
 msgstr "パッチをエクスポート"
 
-#: tortoisehg/hgqt/repowidget.py:1567
+#: tortoisehg/hgqt/repowidget.py:1570
 msgid "Patch Files (*.patch)"
 msgstr "パッチファイル (*.patch)"
 
-#: tortoisehg/hgqt/repowidget.py:1598
+#: tortoisehg/hgqt/repowidget.py:1601
 msgid "Cannot export revision"
 msgstr "リビジョンをエクスポートできません"
 
-#: tortoisehg/hgqt/repowidget.py:1599
+#: tortoisehg/hgqt/repowidget.py:1602
 #, python-format
 msgid ""
 "Cannot export revision %s into the file named:\n"
@@ -4884,19 +4894,19 @@ msgstr ""
 "\n"
 "%s\n"
 
-#: tortoisehg/hgqt/repowidget.py:1601
+#: tortoisehg/hgqt/repowidget.py:1604
 msgid "There is already an existing folder with that same name."
 msgstr "同じ名前のフォルダーが既にあります"
 
-#: tortoisehg/hgqt/repowidget.py:1607 tortoisehg/hgqt/repowidget.py:1627
+#: tortoisehg/hgqt/repowidget.py:1610 tortoisehg/hgqt/repowidget.py:1630
 msgid "Replace"
 msgstr "置換"
 
-#: tortoisehg/hgqt/repowidget.py:1607
+#: tortoisehg/hgqt/repowidget.py:1610
 msgid "Append"
 msgstr "追加"
 
-#: tortoisehg/hgqt/repowidget.py:1610
+#: tortoisehg/hgqt/repowidget.py:1613
 #, python-format
 msgid ""
 "There are existing patch files for %d revisions (%s) in the selected "
@@ -4906,31 +4916,31 @@ msgstr ""
 "リビジョン %d (%s)へのパッチファイルは選択した場所(%s)にすでにあります\n"
 "\n"
 
-#: tortoisehg/hgqt/repowidget.py:1617
+#: tortoisehg/hgqt/repowidget.py:1620
 msgid "What do you want to do?\n"
 msgstr "どうしますか?\n"
 
-#: tortoisehg/hgqt/repowidget.py:1618
+#: tortoisehg/hgqt/repowidget.py:1621
 msgid "Replace the existing patch files.\n"
 msgstr "すでにあるパッチファイルを置き換える\n"
 
-#: tortoisehg/hgqt/repowidget.py:1619
+#: tortoisehg/hgqt/repowidget.py:1622
 msgid "Append the changes to the existing patch files.\n"
 msgstr "今あるパッチファイルに変更を追加する\n"
 
-#: tortoisehg/hgqt/repowidget.py:1620
+#: tortoisehg/hgqt/repowidget.py:1623
 msgid "Abort the export operation.\n"
 msgstr "エクスポートを中止する\n"
 
-#: tortoisehg/hgqt/repowidget.py:1622
+#: tortoisehg/hgqt/repowidget.py:1625
 msgid "Patch files already exist"
 msgstr "パッチファイルがすでに存在しています"
 
-#: tortoisehg/hgqt/repowidget.py:1648
+#: tortoisehg/hgqt/repowidget.py:1651
 msgid "Patch exported"
 msgstr "パッチをエクスポートしました"
 
-#: tortoisehg/hgqt/repowidget.py:1649
+#: tortoisehg/hgqt/repowidget.py:1652
 #, python-format
 msgid ""
 "Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a "
@@ -4939,38 +4949,38 @@ msgstr ""
 "リビジョン #%d (%s) を<p><a href=\"file:///%s\">%s</a>%s<a "
 "href=\"file:///%s\">%s</a> </p>にエクスポートしました"
 
-#: tortoisehg/hgqt/repowidget.py:1657
+#: tortoisehg/hgqt/repowidget.py:1660
 msgid "Patches exported"
 msgstr "パッチをエクスポートしました"
 
-#: tortoisehg/hgqt/repowidget.py:1658
+#: tortoisehg/hgqt/repowidget.py:1661
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d つのパッチを以下にエキスポートしました:<p><a href=\"file:///%s\">%s</a>"
 
-#: tortoisehg/hgqt/repowidget.py:1705
+#: tortoisehg/hgqt/repowidget.py:1708
 msgid "Incorrect Mercurial version"
 msgstr "Mercurialバージョンが不正です"
 
-#: tortoisehg/hgqt/repowidget.py:1706
+#: tortoisehg/hgqt/repowidget.py:1709
 msgid ""
 "In order to use the \"Find Similar revisions\" functionality, you must use a "
 "mercurial version above 2.1."
 msgstr "\"類似のバージョンを探す\"<機能を使うためには、 Mercurialの2.1以上のバージョンが必要です"
 
-#: tortoisehg/hgqt/repowidget.py:1806
+#: tortoisehg/hgqt/repowidget.py:1809
 msgid "Write bundle"
 msgstr "バンドルを書く"
 
-#: tortoisehg/hgqt/repowidget.py:1866
+#: tortoisehg/hgqt/repowidget.py:1869
 msgid "Backwards phase change requested"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1867
+#: tortoisehg/hgqt/repowidget.py:1870
 msgid "Do you really want to <i>force</i> a backwards phase transition?"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1868
+#: tortoisehg/hgqt/repowidget.py:1871
 #, python-format
 msgid ""
 "You are trying to move the phase of revision %d backwards,\n"
@@ -4986,43 +4996,43 @@ msgid ""
 "Please be careful!"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:1876
+#: tortoisehg/hgqt/repowidget.py:1879
 msgid "&Force"
 msgstr "強制(&F)"
 
-#: tortoisehg/hgqt/repowidget.py:1877
+#: tortoisehg/hgqt/repowidget.py:1880
 msgid "&Cancel"
 msgstr "キャンセル（&C）"
 
-#: tortoisehg/hgqt/repowidget.py:1908
+#: tortoisehg/hgqt/repowidget.py:1911
 msgid "Cannot import selected revision"
 msgstr "指定のリビジョンをインポートできません"
 
-#: tortoisehg/hgqt/repowidget.py:1909
+#: tortoisehg/hgqt/repowidget.py:1912
 #, python-format
 msgid ""
 "The selected revision (rev #%d) cannot be imported because it is not a "
 "descendant of qparent (rev #%d)"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2035
+#: tortoisehg/hgqt/repowidget.py:2038
 msgid "Invalid command"
 msgstr "不正なコマンドです"
 
-#: tortoisehg/hgqt/repowidget.py:2036
+#: tortoisehg/hgqt/repowidget.py:2039
 msgid "The selected command is empty"
 msgstr "選択したコマンドは空です"
 
-#: tortoisehg/hgqt/repowidget.py:2064
+#: tortoisehg/hgqt/repowidget.py:2068
 msgid "Failed to execute custom command"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2065
+#: tortoisehg/hgqt/repowidget.py:2069
 #, python-format
 msgid "The command \"%s\" could not be executed."
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2066
+#: tortoisehg/hgqt/repowidget.py:2070
 #, python-format
 msgid ""
 "The following error message was returned:\n"
@@ -5033,11 +5043,11 @@ msgid ""
 "application"
 msgstr ""
 
-#: tortoisehg/hgqt/repowidget.py:2073
+#: tortoisehg/hgqt/repowidget.py:2077
 msgid "Unable to start"
 msgstr "開始できません"
 
-#: tortoisehg/hgqt/repowidget.py:2074
+#: tortoisehg/hgqt/repowidget.py:2078
 msgid "Previous command is still running"
 msgstr "前回のコマンドがまだ実行中です"
 
@@ -5210,11 +5220,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/revert.py:22 tortoisehg/hgqt/revert.py:26
 msgid "Cannot revert to working directory"
-msgstr "作業ディレクトリに戻せません"
+msgstr "作業領域に戻せません"
 
 #: tortoisehg/hgqt/revert.py:23
 msgid "Reverting to the working directory revision does not make sense"
-msgstr "作業ディレクトリのりビジョンへ戻す意味はありません"
+msgstr "作業領域のリビジョンへ戻す意味はありません"
 
 #: tortoisehg/hgqt/revert.py:29
 #, python-format
@@ -5263,19 +5273,16 @@ msgstr "ヘッドが閉じています!"
 
 #: tortoisehg/hgqt/revset.py:28
 msgid "Changesets where username contains string."
-msgstr "文字列をユーザー名に持つリビジョン群。 合致判定は文字大小を無視。"
+msgstr "ユーザー名に文字列を含むリビジョン群。"
 
 #: tortoisehg/hgqt/revset.py:30
 msgid ""
 "Search commit message, user name, and names of changed files for string."
-msgstr "文字列が、 コミットログ、 ユーザ名、 変更対象ファイル名の、いずれかに合致するリビジョン群。 合致判定は文字大小を無視。"
+msgstr "コミットログ、ユーザ名、修正ファイルの名前を文字列で検索。"
 
 #: tortoisehg/hgqt/revset.py:33
 msgid "Like \"keyword(string)\" but accepts a regex."
-msgstr ""
-"\"keyword(string)\" と同等ですが、正規表現を使用できます。\"grep(r'...')\"形式の場合、 "
-"特殊文字もそのまま適用されます。 (※ 訳注: 接頭辞 'r'の使用は、バックスラッシュ等を含めて、文字列をそのまま使用する場合のPython "
-"式の記法です) \"keyword(string)\"と異なり、文字大小は無視されません。"
+msgstr "\"keyword(string)\" と同じ内容を正規表現で検索。"
 
 #: tortoisehg/hgqt/revset.py:35
 msgid ""
@@ -5312,8 +5319,8 @@ msgid ""
 "Changesets within the interval, see <a "
 "href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">help dates</a>"
 msgstr ""
-"指定期間中のリビジョン群。期間指定の詳細は <a "
-"href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">こちら</a> を参照。"
+"指定期間中のリビジョン群。 <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#dates\">期間指定の詳細</a>"
 
 #: tortoisehg/hgqt/revset.py:53
 msgid "Greatest common ancestor of the two changesets."
@@ -5323,16 +5330,7 @@ msgstr "2つのリビジョンに共通な最新の祖先。"
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
 "revisions."
-msgstr ""
-"指定リビジョン群 (revision) と、指定項目 (field) 値が同一な、リビジョンの抽出 (※ 訳注: \"and\" "
-"結合等での抽出元指定が無い場合、全リビジョンが抽出元になります)。複数項目の合致判定は、対象項目を空白区切りで指定します (例: 'author "
-"description')。リビジョンの一般的な項目以外に、特別な項目も指定できます。一般的な項目には、\"description\"、 "
-"\"author\"、 \"branch\"、 \"date\"、 \"files\"、 \"phase\"、 \"parents\"、 "
-"\"substate\" および \"user\" があります。\"author\" と \"user\" は同一項目です。特殊項目には "
-"\"summary\" および \"metadata\" があります: \"summary\" は\"description\" の１行目に相当します。 "
-"\"metadata\" は \"description user date\" との合致に相当します "
-"(この名称は、「主なメタデータ項目との合致」判定に由来します)フィールド指定が無い場合、 \"metadata\" "
-"フィールドが対象となります。同時に複数フィールドの合致判定が可能です。"
+msgstr "指定リビジョン群とフィールドの値が同じリビジョンの抽出。"
 
 #: tortoisehg/hgqt/revset.py:61
 msgid ""
@@ -5340,8 +5338,8 @@ msgid ""
 "href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help "
 "patterns</a>"
 msgstr ""
-"パターンに合致するファイルに改変を行ったリビジョン群。 (※ 訳注: \"filelog()\" に合致するリビジョンは \"file()\" "
-"にも合致。 リビジョン側情報で判定するため \"filelog()\" と一致しない場合もある。)"
+"パターンに合致するファイルに改変を行ったリビジョン群。 <a "
+"href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">パターンの詳細</a>"
 
 #: tortoisehg/hgqt/revset.py:65
 msgid "Changesets which modify files matched by pattern."
@@ -5399,9 +5397,7 @@ msgstr ""
 msgid ""
 "An empty set, if any revision in set isn't found; otherwise, all revisions "
 "in set."
-msgstr ""
-"指定リビジョン群に存在しないものが含まれている場合は空集合、それ以外なら指定リビジョン群そのもの。 (※ 訳注: "
-"通常であれば、存在しないリビジョンが含まれている場合、処理が中断されますが、present()を使用することで、処理を継続することができます)"
+msgstr "指定リビジョン群に存在しないものがあれば空、でなければ指定リビジョン群。"
 
 #: tortoisehg/hgqt/revset.py:100
 msgid "Changeset with lowest revision number in set."
@@ -5419,16 +5415,11 @@ msgstr "指定リビジョン群の冒頭 n 個。 無指定時は 1。"
 msgid ""
 "Sort set by keys.  The default sort order is ascending, specify a key as \"-"
 "key\" to sort in descending order."
-msgstr ""
-"key での指定方法で整列した集合。 基本の整列方式は昇順で、降順整列の場\n"
-"合は \"-key\" 形式で記述します。指定可能な整列方式は: 1. リビジョン番号\n"
-"順の \"rev\" 2. ブランチ名順の \"branch\" 3. コミットログ (description) 順\n"
-"の \"desc\" 4. ユーザ名順の \"user\" (別名の \"author\" も使用可能) 5. コミット日時順の \"date\""
+msgstr "key でソート。デフォルトでは昇順、\"-key\" で降順。"
 
 #: tortoisehg/hgqt/revset.py:109
 msgid "An alias for \"::.\" (ancestors of the working copy's first parent)."
-msgstr ""
-"\"::.\" (作業領域の第1親の祖先リビジョン群) 記述の別名。ファイル名指定がある場合、当該ファイルの履歴 (複製含む) を辿ります。"
+msgstr "\"::.\" (作業領域の第1親の祖先リビジョン群) 記述の別名。"
 
 #: tortoisehg/hgqt/revset.py:111
 msgid "All changesets, the same as 0:tip."
@@ -5597,34 +5588,34 @@ msgstr "キーボードによる中断"
 msgid "Close this application?"
 msgstr "このアプリケーションを終了しますか？"
 
-#: tortoisehg/hgqt/run.py:789
+#: tortoisehg/hgqt/run.py:794
 msgid "annotate requires a single filename\n"
 msgstr "情報表示には単一のファイル名が必要です\n"
 
-#: tortoisehg/hgqt/run.py:846
+#: tortoisehg/hgqt/run.py:851
 msgid "global options:"
 msgstr "ユーザ設定:"
 
-#: tortoisehg/hgqt/run.py:848
+#: tortoisehg/hgqt/run.py:853
 msgid "use \"thg help\" for the full list of commands"
 msgstr "コマンド一覧は \"thg help\" を見て下さい"
 
-#: tortoisehg/hgqt/run.py:852
+#: tortoisehg/hgqt/run.py:857
 msgid ""
 "use \"thg help\" for the full list of commands or \"thg -v\" for details"
 msgstr "コマンド一覧を得るには \"thg help\" を、詳細を見るには \"thg -v\" を使ってください"
 
-#: tortoisehg/hgqt/run.py:855
+#: tortoisehg/hgqt/run.py:860
 #, python-format
 msgid "use \"thg -v help%s\" to show aliases and global options"
 msgstr "エイリアスとオプションを見るには \"thg -v help%s\" を使ってください"
 
-#: tortoisehg/hgqt/run.py:858
+#: tortoisehg/hgqt/run.py:863
 #, python-format
 msgid "use \"thg -v help %s\" to show global options"
 msgstr "オプションを見るには \"thg -v help %s \" を使ってください"
 
-#: tortoisehg/hgqt/run.py:870 tortoisehg/hgqt/run.py:979
+#: tortoisehg/hgqt/run.py:875 tortoisehg/hgqt/run.py:984
 msgid ""
 "list of commands:\n"
 "\n"
@@ -5632,7 +5623,7 @@ msgstr ""
 "コマンド一覧:\n"
 "\n"
 
-#: tortoisehg/hgqt/run.py:878
+#: tortoisehg/hgqt/run.py:883
 #, python-format
 msgid ""
 "\n"
@@ -5641,24 +5632,24 @@ msgstr ""
 "\n"
 "エイリアス: %s\n"
 
-#: tortoisehg/hgqt/run.py:883 tortoisehg/hgqt/run.py:915
-#: tortoisehg/hgqt/run.py:948
+#: tortoisehg/hgqt/run.py:888 tortoisehg/hgqt/run.py:920
+#: tortoisehg/hgqt/run.py:953
 msgid "(no help text available)"
 msgstr "(ヘルプテキストがありません)"
 
-#: tortoisehg/hgqt/run.py:891
+#: tortoisehg/hgqt/run.py:896
 msgid "options:\n"
 msgstr "オプション:\n"
 
-#: tortoisehg/hgqt/run.py:920
+#: tortoisehg/hgqt/run.py:925
 msgid "no commands defined\n"
 msgstr "コマンドが定義されていません\n"
 
-#: tortoisehg/hgqt/run.py:972
+#: tortoisehg/hgqt/run.py:977
 msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
 msgstr "Thg - Mercurial SCM(Hg) のための TortoiseHgによるGUIツール\n"
 
-#: tortoisehg/hgqt/run.py:977
+#: tortoisehg/hgqt/run.py:982
 msgid ""
 "basic commands:\n"
 "\n"
@@ -5666,409 +5657,417 @@ msgstr ""
 "基本的なコマンド:\n"
 "\n"
 
-#: tortoisehg/hgqt/run.py:993
+#: tortoisehg/hgqt/run.py:998
 #, python-format
 msgid " (default: %s)"
 msgstr " (デフォルト値: %s)"
 
-#: tortoisehg/hgqt/run.py:1010
+#: tortoisehg/hgqt/run.py:1015
 #, python-format
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
 msgstr "TortoiseHg フロントエンド (バージョン %s), Mercurial (バージョン %s)\n"
 
-#: tortoisehg/hgqt/run.py:1039
+#: tortoisehg/hgqt/run.py:1044
 msgid "repository root directory or symbolic path name"
 msgstr "リポジトリのルートディレクトリまたはシンボリックパス名"
 
-#: tortoisehg/hgqt/run.py:1040
+#: tortoisehg/hgqt/run.py:1045
 msgid "enable additional output"
 msgstr "追加情報を出力する"
 
-#: tortoisehg/hgqt/run.py:1041
+#: tortoisehg/hgqt/run.py:1046
 msgid "suppress output"
 msgstr "出力を抑制する"
 
-#: tortoisehg/hgqt/run.py:1042
+#: tortoisehg/hgqt/run.py:1047
 msgid "display help and exit"
 msgstr "ヘルプを表示して終了する"
 
-#: tortoisehg/hgqt/run.py:1043
+#: tortoisehg/hgqt/run.py:1048
 msgid "start debugger"
 msgstr "デバッガを開始"
 
-#: tortoisehg/hgqt/run.py:1044
+#: tortoisehg/hgqt/run.py:1049
 msgid "print command execution profile"
 msgstr "コマンドの実行時プロファイルを出力"
 
-#: tortoisehg/hgqt/run.py:1045
+#: tortoisehg/hgqt/run.py:1050
 msgid "do not fork GUI process"
 msgstr "ダイアログプロセスを起動しない"
 
-#: tortoisehg/hgqt/run.py:1046
+#: tortoisehg/hgqt/run.py:1051
 msgid "always fork GUI process"
 msgstr "常にダイアログプロセスを生成する"
 
-#: tortoisehg/hgqt/run.py:1047
+#: tortoisehg/hgqt/run.py:1052
 msgid "read file list from file"
 msgstr "ファイルリストをファイルから読み込む"
 
-#: tortoisehg/hgqt/run.py:1048
+#: tortoisehg/hgqt/run.py:1053
 msgid "read file list from file encoding utf-8"
 msgstr "UTF-8でファイルリストを読み込む"
 
-#: tortoisehg/hgqt/run.py:1049
+#: tortoisehg/hgqt/run.py:1054
 msgid "open a new workbench window"
 msgstr "新しいworkbenchウィンドウを開く"
 
-#: tortoisehg/hgqt/run.py:1053
+#: tortoisehg/hgqt/run.py:1058
 msgid "thg about"
 msgstr "thgについて"
 
-#: tortoisehg/hgqt/run.py:1054
+#: tortoisehg/hgqt/run.py:1059
 msgid "thg add [FILE]..."
 msgstr "thg add [ファイル]..."
 
-#: tortoisehg/hgqt/run.py:1056
+#: tortoisehg/hgqt/run.py:1061
 msgid "revision to annotate"
 msgstr "情報を表示するリビジョン"
 
-#: tortoisehg/hgqt/run.py:1057 tortoisehg/hgqt/run.py:1110
+#: tortoisehg/hgqt/run.py:1062 tortoisehg/hgqt/run.py:1118
 msgid "open to line"
 msgstr ""
 
-#: tortoisehg/hgqt/run.py:1058 tortoisehg/hgqt/run.py:1111
+#: tortoisehg/hgqt/run.py:1063 tortoisehg/hgqt/run.py:1119
 msgid "initial search pattern"
 msgstr "最初の検索パターン"
 
-#: tortoisehg/hgqt/run.py:1059
+#: tortoisehg/hgqt/run.py:1064
 msgid "thg annotate"
 msgstr "thg annotate"
 
-#: tortoisehg/hgqt/run.py:1061
+#: tortoisehg/hgqt/run.py:1066
 msgid "revision to archive"
 msgstr "アーカイブするリビジョン"
 
-#: tortoisehg/hgqt/run.py:1062
+#: tortoisehg/hgqt/run.py:1067
 msgid "thg archive"
 msgstr "thg archive"
 
-#: tortoisehg/hgqt/run.py:1065
+#: tortoisehg/hgqt/run.py:1070
 msgid "merge with old dirstate parent after backout"
 msgstr "打ち消しリビジョンを現親リビジョンとマージ"
 
-#: tortoisehg/hgqt/run.py:1066
+#: tortoisehg/hgqt/run.py:1071
 msgid "parent to choose when backing out merge"
 msgstr "打ち消しリビジョンとのマージ対象 (非推奨)"
 
-#: tortoisehg/hgqt/run.py:1067
+#: tortoisehg/hgqt/run.py:1072
 msgid "revision to backout"
 msgstr "打ち消すリビジョン"
 
-#: tortoisehg/hgqt/run.py:1068
+#: tortoisehg/hgqt/run.py:1073
 msgid "thg backout [OPTION]... [[-r] REV]"
 msgstr "thg backout [オプション]... [[-r] リビジョン]"
 
-#: tortoisehg/hgqt/run.py:1069
+#: tortoisehg/hgqt/run.py:1074
 msgid "thg bisect"
 msgstr "thg bisect"
 
-#: tortoisehg/hgqt/run.py:1073
+#: tortoisehg/hgqt/run.py:1078
 msgid "the clone will include an empty working copy (only a repository)"
 msgstr "作業領域の更新無し(管理領域のみの複製)"
 
-#: tortoisehg/hgqt/run.py:1076
+#: tortoisehg/hgqt/run.py:1081
 msgid "revision, tag or branch to check out"
 msgstr "作業領域更新用リビジョン(タグ名／ブランチ名)"
 
-#: tortoisehg/hgqt/run.py:1077
+#: tortoisehg/hgqt/run.py:1082
 msgid "include the specified changeset"
 msgstr "複製対象に含めるリビジョン"
 
-#: tortoisehg/hgqt/run.py:1079
+#: tortoisehg/hgqt/run.py:1084
 msgid "clone only the specified branch"
 msgstr "指定ブランチのみを複製"
 
-#: tortoisehg/hgqt/run.py:1080
+#: tortoisehg/hgqt/run.py:1085
 msgid "use pull protocol to copy metadata"
 msgstr "メタデータのコピーに Pull を使用する"
 
-#: tortoisehg/hgqt/run.py:1082
+#: tortoisehg/hgqt/run.py:1087
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr "非圧縮での転送(LAN での高速転送用)"
 
-#: tortoisehg/hgqt/run.py:1083
+#: tortoisehg/hgqt/run.py:1088
 msgid "thg clone [OPTION]... SOURCE [DEST]"
 msgstr "thg clone [オプション]... SOURCE [DEST]"
 
-#: tortoisehg/hgqt/run.py:1085
+#: tortoisehg/hgqt/run.py:1090
 msgid "record user as committer"
 msgstr "ユーザをコミッタとして記録する"
 
-#: tortoisehg/hgqt/run.py:1086
+#: tortoisehg/hgqt/run.py:1091
 msgid "record datecode as commit date"
 msgstr "日付をコミット日時として記録する"
 
-#: tortoisehg/hgqt/run.py:1087
+#: tortoisehg/hgqt/run.py:1092
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [オプション] [ファイル]..."
 
-#: tortoisehg/hgqt/run.py:1088
+#: tortoisehg/hgqt/run.py:1093
 msgid "thg drag_move SOURCE... DEST"
 msgstr "thg drag_move SOURCE... DEST"
 
-#: tortoisehg/hgqt/run.py:1089
+#: tortoisehg/hgqt/run.py:1094
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy SOURCE... DEST"
 
-#: tortoisehg/hgqt/run.py:1091
+#: tortoisehg/hgqt/run.py:1096
+msgid "revisions to graft"
+msgstr ""
+
+#: tortoisehg/hgqt/run.py:1097
+msgid "thg graft [-r] REV..."
+msgstr ""
+
+#: tortoisehg/hgqt/run.py:1099
 msgid "ignore case during search"
 msgstr "検索で大文字小文字を無視する"
 
-#: tortoisehg/hgqt/run.py:1092
+#: tortoisehg/hgqt/run.py:1100
 msgid "thg grep"
 msgstr "thg grep"
 
-#: tortoisehg/hgqt/run.py:1093
+#: tortoisehg/hgqt/run.py:1101
 msgid "thg guess"
 msgstr "thg guess"
 
-#: tortoisehg/hgqt/run.py:1094
+#: tortoisehg/hgqt/run.py:1102
 msgid "thg hgignore [FILE]"
 msgstr "thg hgignore [ファイル]"
 
-#: tortoisehg/hgqt/run.py:1096
+#: tortoisehg/hgqt/run.py:1104
 msgid "import to the patch queue (MQ)"
 msgstr "MQ にインポートする"
 
-#: tortoisehg/hgqt/run.py:1097
+#: tortoisehg/hgqt/run.py:1105
 msgid "thg import [OPTION] [SOURCE]..."
 msgstr "thg import [オプション] [ソース]..."
 
-#: tortoisehg/hgqt/run.py:1098
+#: tortoisehg/hgqt/run.py:1106
 msgid "thg init [DEST]"
 msgstr "thg init [作成先ディレクトリ]"
 
-#: tortoisehg/hgqt/run.py:1101
+#: tortoisehg/hgqt/run.py:1109
 msgid "a revision to send"
 msgstr "送信するリビジョン"
 
-#: tortoisehg/hgqt/run.py:1102
+#: tortoisehg/hgqt/run.py:1110
 msgid "thg email [REVS]"
 msgstr "thg email [リビジョン]"
 
-#: tortoisehg/hgqt/run.py:1105
+#: tortoisehg/hgqt/run.py:1113
 msgid "limit number of changes displayed"
 msgstr "表示するチェンジセット数を制限する"
 
-#: tortoisehg/hgqt/run.py:1106
+#: tortoisehg/hgqt/run.py:1114
 msgid "thg log [OPTIONS] [FILE]"
 msgstr "thg log [オプション] [ファイル]"
 
-#: tortoisehg/hgqt/run.py:1109
+#: tortoisehg/hgqt/run.py:1117
 msgid "revision to display"
 msgstr "表示するリビジョン"
 
-#: tortoisehg/hgqt/run.py:1112
+#: tortoisehg/hgqt/run.py:1120
 msgid "thg manifest [-r REV] [FILE]"
 msgstr "thg manifest [-r リビジョン] [ファイル]"
 
-#: tortoisehg/hgqt/run.py:1115
+#: tortoisehg/hgqt/run.py:1123
 msgid "revision to merge"
 msgstr "マージ対象のリビジョン"
 
-#: tortoisehg/hgqt/run.py:1116
+#: tortoisehg/hgqt/run.py:1124
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] リビジョン]"
 
-#: tortoisehg/hgqt/run.py:1117
+#: tortoisehg/hgqt/run.py:1125
 msgid "thg remove [FILE]..."
 msgstr "thg remove [ファイル]..."
 
-#: tortoisehg/hgqt/run.py:1118
+#: tortoisehg/hgqt/run.py:1126
 msgid "thg mq"
 msgstr "thg mq"
 
-#: tortoisehg/hgqt/run.py:1119
+#: tortoisehg/hgqt/run.py:1127
 msgid "thg resolve"
 msgstr "thg resolve"
 
-#: tortoisehg/hgqt/run.py:1120
+#: tortoisehg/hgqt/run.py:1128
 msgid "thg revert [FILE]..."
 msgstr "thg revert [ファイル]..."
 
-#: tortoisehg/hgqt/run.py:1121
+#: tortoisehg/hgqt/run.py:1129
 msgid "thg forget [FILE]..."
 msgstr "thg forget [ファイル]..."
 
-#: tortoisehg/hgqt/run.py:1122
+#: tortoisehg/hgqt/run.py:1130
 msgid "thg rename SOURCE [DEST]..."
 msgstr "thg rename 変更元 [変更先]..."
 
-#: tortoisehg/hgqt/run.py:1126
+#: tortoisehg/hgqt/run.py:1134
 msgid "name of the hgweb config file (serve more than one repository)"
 msgstr "hgweb 設定ファイル名 (複数のリポジトリを公開)"
 
-#: tortoisehg/hgqt/run.py:1128
+#: tortoisehg/hgqt/run.py:1136
 msgid "name of the hgweb config file (DEPRECATED)"
 msgstr "hgweb 設定ファイル名 (非推奨)"
 
-#: tortoisehg/hgqt/run.py:1129
+#: tortoisehg/hgqt/run.py:1137
 msgid "thg serve [--web-conf FILE]"
 msgstr "thg serve [--web-conf ファイル]"
 
-#: tortoisehg/hgqt/run.py:1130
+#: tortoisehg/hgqt/run.py:1138
 msgid "thg sync"
 msgstr "thg sync"
 
-#: tortoisehg/hgqt/run.py:1132
+#: tortoisehg/hgqt/run.py:1140
 msgid "show files without changes"
 msgstr "変更の無いファイルを表示"
 
-#: tortoisehg/hgqt/run.py:1133
+#: tortoisehg/hgqt/run.py:1141
 msgid "show ignored files"
 msgstr "無視対象のファイルを表示"
 
-#: tortoisehg/hgqt/run.py:1134
+#: tortoisehg/hgqt/run.py:1142
 msgid "thg status [OPTIONS] [FILE]"
 msgstr "thg status [オプション] [ファイル]"
 
-#: tortoisehg/hgqt/run.py:1136 tortoisehg/hgqt/run.py:1167
+#: tortoisehg/hgqt/run.py:1144 tortoisehg/hgqt/run.py:1175
 msgid "discard uncommitted changes (no backup)"
 msgstr "リビジョンを強制的に削除し、未コミット変更内容を破棄(保存無し)"
 
-#: tortoisehg/hgqt/run.py:1137
+#: tortoisehg/hgqt/run.py:1145
 msgid "do not back up stripped revisions"
 msgstr "バックアップ作成の抑止(非推奨)"
 
-#: tortoisehg/hgqt/run.py:1138
+#: tortoisehg/hgqt/run.py:1146
 msgid "revision to strip"
 msgstr "stripするリビジョン"
 
-#: tortoisehg/hgqt/run.py:1139
+#: tortoisehg/hgqt/run.py:1147
 msgid "thg strip [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-f] [-n] [[-r] リビジョン]"
 
-#: tortoisehg/hgqt/run.py:1141
+#: tortoisehg/hgqt/run.py:1149
 msgid "keep original changesets"
 msgstr "元リビジョンを維持"
 
-#: tortoisehg/hgqt/run.py:1142
+#: tortoisehg/hgqt/run.py:1150
 msgid "keep original branch names"
 msgstr "元ブランチ名を維持"
 
-#: tortoisehg/hgqt/run.py:1143
+#: tortoisehg/hgqt/run.py:1151
 msgid "force detaching of source from its original branch"
 msgstr "移動元を元ブランチから強制的に移動"
 
-#: tortoisehg/hgqt/run.py:1146
+#: tortoisehg/hgqt/run.py:1154
 msgid "rebase from the specified changeset"
 msgstr "指定リビジョンからの移動"
 
-#: tortoisehg/hgqt/run.py:1148
+#: tortoisehg/hgqt/run.py:1156
 msgid "rebase onto the specified changeset"
 msgstr "移動先リビジョン"
 
-#: tortoisehg/hgqt/run.py:1149
+#: tortoisehg/hgqt/run.py:1157
 msgid "thg rebase -s REV -d REV [--keep] [--detach]"
 msgstr "thg rebase -s リビジョン -d リビジョン [--keep] [--detach]"
 
-#: tortoisehg/hgqt/run.py:1152
+#: tortoisehg/hgqt/run.py:1160
 msgid "replace existing tag"
 msgstr "既存のタグを置換"
 
-#: tortoisehg/hgqt/run.py:1153
+#: tortoisehg/hgqt/run.py:1161
 msgid "make the tag local"
 msgstr "ローカルタグとして作成"
 
-#: tortoisehg/hgqt/run.py:1154
+#: tortoisehg/hgqt/run.py:1162
 msgid "revision to tag"
 msgstr "タグ付け対象リビジョン"
 
-#: tortoisehg/hgqt/run.py:1155
+#: tortoisehg/hgqt/run.py:1163
 msgid "remove a tag"
 msgstr "タグの削除"
 
-#: tortoisehg/hgqt/run.py:1156
+#: tortoisehg/hgqt/run.py:1164
 msgid "use <text> as commit message"
 msgstr "<テキスト>をコミットメッセージとして使う"
 
-#: tortoisehg/hgqt/run.py:1157
+#: tortoisehg/hgqt/run.py:1165
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr "thg tag [-f] [-l] [-m テキスト] [-r リビジョン] [名前]"
 
-#: tortoisehg/hgqt/run.py:1158
+#: tortoisehg/hgqt/run.py:1166
 msgid "thg shelve"
 msgstr "thg shelve"
 
-#: tortoisehg/hgqt/run.py:1159
+#: tortoisehg/hgqt/run.py:1167
 msgid "thg rejects [FILE]"
 msgstr "thg rejects [ファイル]"
 
-#: tortoisehg/hgqt/run.py:1160
+#: tortoisehg/hgqt/run.py:1168
 msgid "thg test"
 msgstr "thg test"
 
-#: tortoisehg/hgqt/run.py:1161
+#: tortoisehg/hgqt/run.py:1169
 msgid "thg help [COMMAND]"
 msgstr "thg help [コマンド]"
 
-#: tortoisehg/hgqt/run.py:1162
+#: tortoisehg/hgqt/run.py:1170
 msgid "thg purge"
 msgstr "thg purge"
 
-#: tortoisehg/hgqt/run.py:1163
+#: tortoisehg/hgqt/run.py:1171
 msgid "thg qreorder"
 msgstr "thg qreorder"
 
-#: tortoisehg/hgqt/run.py:1164
+#: tortoisehg/hgqt/run.py:1172
 msgid "thg qqueue"
 msgstr "thg qqueue"
 
-#: tortoisehg/hgqt/run.py:1168
+#: tortoisehg/hgqt/run.py:1176
 msgid "revision to update"
 msgstr "リビジョンを更新"
 
-#: tortoisehg/hgqt/run.py:1169
+#: tortoisehg/hgqt/run.py:1177
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] リビジョン]"
 
-#: tortoisehg/hgqt/run.py:1171 tortoisehg/hgqt/run.py:1174
+#: tortoisehg/hgqt/run.py:1179 tortoisehg/hgqt/run.py:1182
 msgid "field to give initial focus"
 msgstr "初期化時にフォーカスを与えるフィールド"
 
-#: tortoisehg/hgqt/run.py:1172
+#: tortoisehg/hgqt/run.py:1180
 msgid "thg userconfig"
 msgstr "thg userconfig"
 
-#: tortoisehg/hgqt/run.py:1175
+#: tortoisehg/hgqt/run.py:1183
 msgid "thg repoconfig"
 msgstr "thg repoconfig"
 
-#: tortoisehg/hgqt/run.py:1177
+#: tortoisehg/hgqt/run.py:1185
 msgid "changeset to view in diff tool"
 msgstr "差分表示ツールで表示するチェンジセット"
 
-#: tortoisehg/hgqt/run.py:1178
+#: tortoisehg/hgqt/run.py:1186
 msgid "revisions to view in diff tool"
 msgstr "差分表示ツールで表示するリビジョン"
 
-#: tortoisehg/hgqt/run.py:1179
+#: tortoisehg/hgqt/run.py:1187
 msgid "bundle file to preview"
 msgstr "プレビューするバンドルファイル"
 
-#: tortoisehg/hgqt/run.py:1180
+#: tortoisehg/hgqt/run.py:1188
 msgid "launch visual diff tool"
 msgstr "GUI 差分表示ツールを起動する"
 
-#: tortoisehg/hgqt/run.py:1182
+#: tortoisehg/hgqt/run.py:1190
 msgid "print license"
 msgstr "ライセンス文書を表示"
 
-#: tortoisehg/hgqt/run.py:1183
+#: tortoisehg/hgqt/run.py:1191
 msgid "thg version [OPTION]"
 msgstr "thg version [オプション]"
 
-#: tortoisehg/hgqt/run.py:1188
+#: tortoisehg/hgqt/run.py:1196
 msgid "thg shellconfig"
 msgstr "thg shellconfig"
 
@@ -6351,8 +6350,8 @@ msgid ""
 " You can select the \"current\" (i.e. the working directory parent), the "
 "current \"tip\" or the working directory (\"workingdir\"). Default: current"
 msgstr ""
-"リポジトリを開いた時に選択されるリビジョンを指定します。選択肢は\"current\"(作業ディレクトリの親)、\"tip\"、\"workingdir"
-"\"(作業ディレクトリ)です。デフォルトは\"current\"です。"
+"リポジトリを開いた時に選択されるリビジョンを指定します。選択肢は\"current\"(作業領域の親)、\"tip\"、\"workingdir\"(作業"
+"領域)です。デフォルトは\"current\"です。"
 
 #: tortoisehg/hgqt/settings.py:616
 msgid ""
@@ -6600,7 +6599,7 @@ msgstr "MQパッチを(draftの代わりに)Secretに設定します。デフォ
 
 #: tortoisehg/hgqt/settings.py:724
 msgid "Monitor working<br>directory changes"
-msgstr "作業ディレクトリ内の変更を監視"
+msgstr "作業領域の変更を監視"
 
 #: tortoisehg/hgqt/settings.py:728
 msgid ""
@@ -7648,109 +7647,109 @@ msgstr "適切なファイルがありません"
 msgid "No files found for this operation"
 msgstr "この操作が可能なファイルが見つかりません"
 
-#: tortoisehg/hgqt/status.py:623
+#: tortoisehg/hgqt/status.py:626
 msgid "Stat"
 msgstr "状態"
 
-#: tortoisehg/hgqt/status.py:623
+#: tortoisehg/hgqt/status.py:626
 msgid "M"
 msgstr "M"
 
-#: tortoisehg/hgqt/status.py:623
+#: tortoisehg/hgqt/status.py:626
 msgid "Filename"
 msgstr "ファイル名"
 
-#: tortoisehg/hgqt/status.py:624
+#: tortoisehg/hgqt/status.py:627
 msgid "Type"
 msgstr "タイプ"
 
-#: tortoisehg/hgqt/status.py:624
+#: tortoisehg/hgqt/status.py:627
 msgid "Size (KB)"
 msgstr "サイズ (KB)"
 
-#: tortoisehg/hgqt/status.py:667
+#: tortoisehg/hgqt/status.py:670
 #, python-format
 msgid "Checked count: %d"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:815
+#: tortoisehg/hgqt/status.py:818
 msgid ", resolved merge"
 msgstr ", 解決済マージ"
 
-#: tortoisehg/hgqt/status.py:817
+#: tortoisehg/hgqt/status.py:820
 msgid ", unresolved merge"
 msgstr ", 未解決のマージ"
 
-#: tortoisehg/hgqt/status.py:830
+#: tortoisehg/hgqt/status.py:833
 #, python-format
 msgid "%s is modified"
 msgstr "%s は変更されています"
 
-#: tortoisehg/hgqt/status.py:831
+#: tortoisehg/hgqt/status.py:834
 msgid "modified"
 msgstr "変更"
 
-#: tortoisehg/hgqt/status.py:832
+#: tortoisehg/hgqt/status.py:835
 #, python-format
 msgid "%s is added"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:833
+#: tortoisehg/hgqt/status.py:836
 msgid "added"
 msgstr "追加"
 
-#: tortoisehg/hgqt/status.py:834
+#: tortoisehg/hgqt/status.py:837
 #, python-format
 msgid "%s is removed"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:835
+#: tortoisehg/hgqt/status.py:838
 msgid "removed"
 msgstr "削除"
 
-#: tortoisehg/hgqt/status.py:836
+#: tortoisehg/hgqt/status.py:839
 #, python-format
 msgid "%s is not tracked (unknown)"
 msgstr ""
 
-#: tortoisehg/hgqt/status.py:837 tortoisehg/util/version.py:47
+#: tortoisehg/hgqt/status.py:840 tortoisehg/util/version.py:47
 #: tortoisehg/util/version.py:73
 msgid "unknown"
 msgstr "不明"
 
-#: tortoisehg/hgqt/status.py:838
+#: tortoisehg/hgqt/status.py:841
 #, python-format
 msgid "%s is missing!"
 msgstr "%s は見つかりません!"
 
-#: tortoisehg/hgqt/status.py:839
+#: tortoisehg/hgqt/status.py:842
 msgid "deleted"
 msgstr "削除"
 
-#: tortoisehg/hgqt/status.py:840
+#: tortoisehg/hgqt/status.py:843
 #, python-format
 msgid "%s is ignored"
 msgstr "%s は無視されています"
 
-#: tortoisehg/hgqt/status.py:841
+#: tortoisehg/hgqt/status.py:844
 msgid "ignored"
 msgstr "無視"
 
-#: tortoisehg/hgqt/status.py:842
+#: tortoisehg/hgqt/status.py:845
 #, python-format
 msgid "%s is not modified (clean)"
 msgstr "%s は変更されていません(クリーン)"
 
-#: tortoisehg/hgqt/status.py:843
+#: tortoisehg/hgqt/status.py:846
 msgid "clean"
 msgstr "クリーン"
 
-#: tortoisehg/hgqt/status.py:844
+#: tortoisehg/hgqt/status.py:847
 #, python-format
 msgid "%s is a dirty subrepo"
 msgstr "%s は変更されているサブリポジトリです"
 
-#: tortoisehg/hgqt/status.py:845
+#: tortoisehg/hgqt/status.py:848
 msgid "subrepo"
 msgstr "サブリポ"
 
@@ -8437,7 +8436,7 @@ msgstr "シェルフ"
 
 #: tortoisehg/hgqt/thgimport.py:104
 msgid "Checking working directory status..."
-msgstr "作業ディレクトリの状態を調べています..."
+msgstr "作業領域の状態を調べています..."
 
 #: tortoisehg/hgqt/thgimport.py:116
 msgid "&Import"
@@ -8450,7 +8449,7 @@ msgstr "インポート - %s"
 
 #: tortoisehg/hgqt/thgimport.py:159
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
-msgstr "作業ディレクトリがクリーンでありません! <a href=\"view\">変更を見る...</a>"
+msgstr "作業領域がクリーンでありません! <a href=\"view\">変更を見る...</a>"
 
 #: tortoisehg/hgqt/thgimport.py:177
 msgid "Select patches"
@@ -8778,7 +8777,7 @@ msgstr "GUI 差分ツールが見つかりませんでした"
 
 #: tortoisehg/hgqt/visdiff.py:160
 msgid "[working copy]"
-msgstr "[作業コピー]"
+msgstr "[作業領域]"
 
 #: tortoisehg/hgqt/visdiff.py:162
 msgid "[original]"
@@ -8802,7 +8801,7 @@ msgstr "ローカルとの間に変更点はありませんでした。"
 
 #: tortoisehg/hgqt/visdiff.py:377
 msgid "working changes"
-msgstr "作業ディレクトリの変更"
+msgstr "作業領域の変更"
 
 #: tortoisehg/hgqt/visdiff.py:379
 #, python-format
@@ -9047,7 +9046,7 @@ msgstr "ウェブサーバー設定"
 msgid "Config File:"
 msgstr "設定ファイル:"
 
-#: tortoisehg/hgqt/workbench.py:52 tortoisehg/hgqt/workbench.py:670
+#: tortoisehg/hgqt/workbench.py:52 tortoisehg/hgqt/workbench.py:671
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg Workbench"
 
@@ -9075,7 +9074,7 @@ msgstr "ファイル(&F)"
 msgid "&View"
 msgstr "表示(&V)"
 
-#: tortoisehg/hgqt/workbench.py:142 tortoisehg/hgqt/workbench.py:359
+#: tortoisehg/hgqt/workbench.py:142 tortoisehg/hgqt/workbench.py:360
 msgid "Workbench Toolbars"
 msgstr "Workbenchツールバー"
 
@@ -9219,8 +9218,8 @@ msgstr ""
 msgid "&Goto revision..."
 msgstr "リビジョンへ移動(&G)"
 
-#: tortoisehg/hgqt/workbench.py:290 tortoisehg/hgqt/workbench.py:342
-#: tortoisehg/hgqt/workbench.py:343
+#: tortoisehg/hgqt/workbench.py:290 tortoisehg/hgqt/workbench.py:343
+#: tortoisehg/hgqt/workbench.py:344
 msgid "Go to a specific revision"
 msgstr "指定のリビジョンに移動"
 
@@ -9264,132 +9263,136 @@ msgstr "分割探索..."
 msgid "Help"
 msgstr "ヘルプ"
 
-#: tortoisehg/hgqt/workbench.py:329
+#: tortoisehg/hgqt/workbench.py:326
+msgid "Explorer Help"
+msgstr ""
+
+#: tortoisehg/hgqt/workbench.py:330
 msgid "README"
 msgstr "マニュアル"
 
-#: tortoisehg/hgqt/workbench.py:332
+#: tortoisehg/hgqt/workbench.py:333
 msgid "About Qt"
 msgstr "Qtについて"
 
-#: tortoisehg/hgqt/workbench.py:333 tortoisehg/util/menuthg.py:73
+#: tortoisehg/hgqt/workbench.py:334 tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
 msgstr "TortoiseHg について"
 
-#: tortoisehg/hgqt/workbench.py:338 tortoisehg/hgqt/workbench.py:339
+#: tortoisehg/hgqt/workbench.py:339 tortoisehg/hgqt/workbench.py:340
 msgid "Go to current revision"
 msgstr "現在のリビジョンへ移動"
 
-#: tortoisehg/hgqt/workbench.py:354
+#: tortoisehg/hgqt/workbench.py:355
 msgid "Filter Toolbar"
 msgstr "フィルターツールバー"
 
-#: tortoisehg/hgqt/workbench.py:357
+#: tortoisehg/hgqt/workbench.py:358
 msgid "Filter graph with revision sets or branches"
 msgstr "リビジョンセットやブランチで履歴をフィルター"
 
-#: tortoisehg/hgqt/workbench.py:367
+#: tortoisehg/hgqt/workbench.py:368
 msgid "Incoming"
 msgstr "受信"
 
-#: tortoisehg/hgqt/workbench.py:368
+#: tortoisehg/hgqt/workbench.py:369
 msgid "Check for incoming changes from selected URL"
 msgstr "指定のURLからプルできるか(取り込めるか)確認"
 
-#: tortoisehg/hgqt/workbench.py:370
+#: tortoisehg/hgqt/workbench.py:371
 msgid "Pull"
 msgstr "プル"
 
-#: tortoisehg/hgqt/workbench.py:371
+#: tortoisehg/hgqt/workbench.py:372
 msgid "Pull incoming changes from selected URL"
 msgstr "指定したURLからプルする(取り込む)"
 
-#: tortoisehg/hgqt/workbench.py:373
+#: tortoisehg/hgqt/workbench.py:374
 msgid "Outgoing"
 msgstr "送信"
 
-#: tortoisehg/hgqt/workbench.py:374
+#: tortoisehg/hgqt/workbench.py:375
 msgid "Detect outgoing changes to selected URL"
 msgstr "指定のURLにプッシュ(送信)する内容があるか確認"
 
-#: tortoisehg/hgqt/workbench.py:377
+#: tortoisehg/hgqt/workbench.py:378
 msgid "Push outgoing changes to selected URL"
 msgstr "指定のURLにプッシュ(送信)"
 
-#: tortoisehg/hgqt/workbench.py:403
+#: tortoisehg/hgqt/workbench.py:404
 #, python-format
 msgid "Execute custom tool '%s'"
 msgstr "カスタムツール '%s' を実行"
 
-#: tortoisehg/hgqt/workbench.py:468 tortoisehg/hgqt/workbench.py:469
+#: tortoisehg/hgqt/workbench.py:469 tortoisehg/hgqt/workbench.py:470
 msgid "Close tab"
 msgstr "タブを閉じる"
 
-#: tortoisehg/hgqt/workbench.py:470 tortoisehg/hgqt/workbench.py:471
+#: tortoisehg/hgqt/workbench.py:471 tortoisehg/hgqt/workbench.py:472
 msgid "Close other tabs"
 msgstr "他のタブを閉じる"
 
-#: tortoisehg/hgqt/workbench.py:472
+#: tortoisehg/hgqt/workbench.py:473
 msgid "Undo close tab"
 msgstr "閉じたタブを開く"
 
-#: tortoisehg/hgqt/workbench.py:473
+#: tortoisehg/hgqt/workbench.py:474
 msgid "Reopen last closed tab"
 msgstr "最後に閉じたタブを開く"
 
-#: tortoisehg/hgqt/workbench.py:474
+#: tortoisehg/hgqt/workbench.py:475
 msgid "Undo close other tabs"
 msgstr "閉じた他のタブを開く"
 
-#: tortoisehg/hgqt/workbench.py:475
+#: tortoisehg/hgqt/workbench.py:476
 msgid "Reopen last closed tab group"
 msgstr "最後に閉じたタブグループを開く"
 
-#: tortoisehg/hgqt/workbench.py:672
+#: tortoisehg/hgqt/workbench.py:673
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
 msgstr "%s - TortoiseHg Workbench - %s"
 
-#: tortoisehg/hgqt/workbench.py:675
+#: tortoisehg/hgqt/workbench.py:676
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg Workbench"
 
-#: tortoisehg/hgqt/workbench.py:745 tortoisehg/hgqt/workbench.py:750
-#: tortoisehg/hgqt/workbench.py:1095 tortoisehg/hgqt/workbench.py:1101
+#: tortoisehg/hgqt/workbench.py:746 tortoisehg/hgqt/workbench.py:751
+#: tortoisehg/hgqt/workbench.py:1100 tortoisehg/hgqt/workbench.py:1106
 msgid "Reopening tabs"
 msgstr "タブを再度開いています"
 
-#: tortoisehg/hgqt/workbench.py:746 tortoisehg/hgqt/workbench.py:1096
+#: tortoisehg/hgqt/workbench.py:747 tortoisehg/hgqt/workbench.py:1101
 #, python-format
 msgid "Reopening repository %s"
 msgstr "リポジトリ %s を再度開いています"
 
-#: tortoisehg/hgqt/workbench.py:751 tortoisehg/hgqt/workbench.py:1102
+#: tortoisehg/hgqt/workbench.py:752 tortoisehg/hgqt/workbench.py:1107
 msgid "All repositories open"
 msgstr "すべてのリポジトリを開く"
 
-#: tortoisehg/hgqt/workbench.py:876
+#: tortoisehg/hgqt/workbench.py:877
 msgid "Goto revision"
 msgstr "指定のリビジョンに移動"
 
-#: tortoisehg/hgqt/workbench.py:877
+#: tortoisehg/hgqt/workbench.py:878
 msgid "Enter revision identifier"
 msgstr "リビジョンIDを入力してください"
 
-#: tortoisehg/hgqt/workbench.py:915
+#: tortoisehg/hgqt/workbench.py:916
 msgid "Select repository directory to open"
 msgstr "ディレクトリを選択してリポジトリを開く"
 
-#: tortoisehg/hgqt/workbench.py:937
+#: tortoisehg/hgqt/workbench.py:938
 msgid "Failed to open repository"
 msgstr "リポジトリを開けません"
 
-#: tortoisehg/hgqt/workbench.py:1017
+#: tortoisehg/hgqt/workbench.py:1022
 msgid "README not configured"
 msgstr "マニュアルが設定されていません"
 
-#: tortoisehg/hgqt/workbench.py:1018
+#: tortoisehg/hgqt/workbench.py:1023
 msgid ""
 "A README file is not configured for the current repository.<p>To configure a "
 "README file for a repository, open the repository settings file, add a "
@@ -9400,7 +9403,7 @@ msgstr ""
 "、'<i>readme</i>'キーを'<i>tortoisehg</i>'セクションに加え、マニュアル(README)ファイルのファイル名かURLを設定"
 "してください。"
 
-#: tortoisehg/hgqt/workbench.py:1249
+#: tortoisehg/hgqt/workbench.py:1254
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr "Hg ファイルログビューアー [%s] - %s"
