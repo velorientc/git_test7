@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-09-26 17:14-0300\n"
-"PO-Revision-Date: 2012-09-24 08:17+0000\n"
+"PO-Revision-Date: 2012-10-01 13:42+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-09-27 04:45+0000\n"
-"X-Generator: Launchpad (build 16033)\n"
+"X-Launchpad-Export-Date: 2012-10-02 05:26+0000\n"
+"X-Generator: Launchpad (build 16061)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -1859,11 +1859,11 @@ msgstr "Suivant"
 
 #: tortoisehg/hgqt/filedialogs.py:201
 msgid "Diff changeset to parent..."
-msgstr ""
+msgstr "Diff avec le parent..."
 
 #: tortoisehg/hgqt/filedialogs.py:204
 msgid "Diff changeset to local..."
-msgstr ""
+msgstr "Diff avec la révision locale..."
 
 #: tortoisehg/hgqt/filedialogs.py:208 tortoisehg/hgqt/filedialogs.py:712
 msgid "Diff file to parent..."
@@ -2120,7 +2120,7 @@ msgstr "Reprise de la greffe déjà en cours"
 
 #: tortoisehg/hgqt/graft.py:314
 msgid "You must provide revisions to graft"
-msgstr ""
+msgstr "Vous devez fournir des révisions à greffer"
 
 #: tortoisehg/hgqt/grep.py:42
 msgid "### regular expression search pattern ###"
