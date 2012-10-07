@@ -46,7 +46,7 @@ class ToolsFrame(QFrame):
         topvbox.addWidget(QLabel(_('Select a GUI location to edit:')))
 
         self.locationcombo = QComboBox(self,
-            toolTip='Select the toolbar or menu to change')
+            toolTip=_('Select the toolbar or menu to change'))
 
         def selectlocation(index):
             location = self.locationcombo.itemText(index)
