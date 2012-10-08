@@ -15,7 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mq, lfprompt, i18n
+from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -165,7 +165,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             pnhbox = QHBoxLayout()
             self.pnlabel = QLabel()
             pnhbox.addWidget(self.pnlabel)
-            self.pnedit = mq.getPatchNameLineEdit()
+            self.pnedit = mqutil.getPatchNameLineEdit()
             self.pnedit.setMaximumWidth(250)
             pnhbox.addWidget(self.pnedit)
             pnhbox.addStretch()
@@ -349,7 +349,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.pnlabel.setVisible(True)
             self.pnedit.setVisible(True)
             self.pnedit.setFocus()
-            self.pnedit.setText(mq.defaultNewPatchName(self.repo))
+            self.pnedit.setText(mqutil.defaultNewPatchName(self.repo))
             self.pnedit.selectAll()
             self.stwidget.setPatchContext(None)
             refreshwctx = refresh and oldpctx is not None
@@ -448,10 +448,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             wholecmdlines.extend(cmdlines)
 
         olist = ('user', 'date')
-        cmdlines = mq.mqNewRefreshCommand(self.repo,
-                                          curraction._name == 'qnew',
-                                          self.stwidget, self.pnedit,
-                                          self.msgte.text(), self.opts, olist)
+        cmdlines = mqutil.mqNewRefreshCommand(self.repo,
+                                              curraction._name == 'qnew',
+                                              self.stwidget, self.pnedit,
+                                              self.msgte.text(), self.opts,
+                                              olist)
         if not cmdlines:
             return
         wholecmdlines.extend(cmdlines)
