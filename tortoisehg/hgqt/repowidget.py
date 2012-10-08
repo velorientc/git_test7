@@ -1754,8 +1754,7 @@ class RepoWidget(QWidget):
             revlist.append(str(rev))
         if not revlist:
             revlist = [self.rev]
-        opts = {'source' : revlist, 'dest': self.repo['.'].rev()}
-        dlg = graft.GraftDialog(self.repo, self, **opts)
+        dlg = graft.GraftDialog(self.repo, self, source=revlist)
         dlg.finished.connect(dlg.deleteLater)
         if dlg.valid:
             dlg.exec_()

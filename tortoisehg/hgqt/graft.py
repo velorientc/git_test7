@@ -29,7 +29,6 @@ class GraftDialog(QDialog):
         self.aborted = False
         self.valid = True
 
-        destrev = opts.get('dest', '.')
         def cleanrevlist(revlist):
             return [self.repo[rev].rev() for rev in revlist]
         self.sourcelist = cleanrevlist(opts.get('source', ['.']))
@@ -58,6 +57,7 @@ class GraftDialog(QDialog):
         box.setContentsMargins(*(6,)*4)
         self.setLayout(box)
 
+        destrev = self.repo['.'].rev()
         if len(self.sourcelist) > 1:
             listlabel = qtlib.LabeledSeparator(
                 _('Graft %d changesets on top of changeset %s') \
