@@ -390,7 +390,7 @@ class CustomToolConfigDialog(QDialog):
         QDialog.__init__(self, parent)
 
         self.setWindowIcon(qtlib.geticon('tools-spanner-hammer'))
-        self.setWindowTitle('Configure Custom Tool')
+        self.setWindowTitle(_('Configure Custom Tool'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.hbox = QHBoxLayout()
