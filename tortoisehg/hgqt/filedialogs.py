@@ -85,6 +85,7 @@ class FileLogDialog(_AbstractFileDialog):
         super(FileLogDialog, self).__init__(repo, filename, repoviewer)
         self._readSettings()
         self.menu = None
+        self.dualmenu = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -127,7 +128,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
-        self.repoview.setSelectionMode(QAbstractItemView.SingleSelection)
+
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -196,7 +197,20 @@ class FileLogDialog(_AbstractFileDialog):
         'User requested a context menu in repo view widget'
         if not selection:
             return
-        if self.menu is None:
+        if len(selection) > 2:
+            self.textView.showMessage.emit(_('Too many rows selected for menu'))
+            return
+        elif len(selection) == 2:
+            if self.dualmenu is None:
+                self.dualmenu = menu = QMenu(self)
+                a = menu.addAction(_('Diff selected changesets...'))
+                a.triggered.connect(self.onVisualDiffRevs)
+                a = menu.addAction(_('Diff selected file revisions...'))
+                a.setIcon(qtlib.getmenuicon('visualdiff'))
+                a.triggered.connect(self.onVisualDiffFileRevs)
+            else:
+                menu = self.dualmenu
+        elif self.menu is None:
             self.menu = menu = QMenu(self)
             a = menu.addAction(_('Diff changeset to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
@@ -223,8 +237,10 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('Revert to revision...'))
             a.setIcon(qtlib.getmenuicon('hg-revert'))
             a.triggered.connect(self.onRevertFileToRevision)
+        else:
+            menu = self.menu
         self.selection = selection
-        self.menu.exec_(point)
+        menu.exec_(point)
 
     def onVisualDiff(self):
         opts = dict(change=self.selection[0])
@@ -235,6 +251,17 @@ class FileLogDialog(_AbstractFileDialog):
 
     def onVisualDiffToLocal(self):
         opts = dict(rev=['rev(%d)' % self.selection[0]])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffRevs(self):
+        revs = self.selection
+        if len(revs) != 2:
+            self.textView.showMessage.emit(_('You must select two revisions to diff'))
+            return
+        opts = dict(rev=revs)
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
@@ -253,6 +280,18 @@ class FileLogDialog(_AbstractFileDialog):
         rev = self.selection[0]
         paths = [self.filerevmodel.graph.filename(rev)]
         opts = dict(rev=['rev(%d)' % rev])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffFileRevs(self):
+        revs = self.selection
+        if len(revs) != 2:
+            self.textView.showMessage.emit(_('You must select two revisions to diff'))
+            return
+        paths = [self.filerevmodel.graph.filename(revs[0])]
+        opts = dict(rev=['rev(%d)' % rev for rev in revs])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
