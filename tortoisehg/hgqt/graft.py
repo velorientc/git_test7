@@ -26,7 +26,6 @@ class GraftDialog(QDialog):
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
         self._graftstatefile = self.repo.join('graftstate')
-        self.opts = opts
         self.aborted = False
         self.valid = True
 
