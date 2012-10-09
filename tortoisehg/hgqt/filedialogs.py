@@ -129,6 +129,18 @@ class FileLogDialog(_AbstractFileDialog):
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
 
+        # It does not make sense to select more than two revisions at a time.
+        # Rather than enforcing a max selection size we simply let the user
+        # know when it has selected too many revisions by using the status bar
+        def checkValidSelection(selected, deselected):
+            selection = self.repoview.selectedRevisions()
+            if len(selection) > 2:
+                msg = _('Too many rows selected for menu')
+            else:
+                msg = ''
+            self.textView.showMessage.emit(msg)
+        self.repoview.selectionChanged.connect(checkValidSelection)
+
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -195,12 +207,9 @@ class FileLogDialog(_AbstractFileDialog):
     @pyqtSlot(QPoint, object)
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
-        if not selection:
+        if not selection or len(selection) > 2:
             return
-        if len(selection) > 2:
-            self.textView.showMessage.emit(_('Too many rows selected for menu'))
-            return
-        elif len(selection) == 2:
+        if len(selection) == 2:
             if self.dualmenu is None:
                 self.dualmenu = menu = QMenu(self)
                 a = menu.addAction(_('Diff selected changesets...'))

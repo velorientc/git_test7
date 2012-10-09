@@ -35,6 +35,7 @@ class HgRepoView(QTableView):
     revisionAltClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
+    selectionChanged = pyqtSignal(QItemSelection, QItemSelection)
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
@@ -115,6 +116,7 @@ class HgRepoView(QTableView):
         if not QFontMetrics(self.font()).inFont(QString(u'\u2327').at(0)):
             model.unicodexinabox = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
+        self.selectionModel().selectionChanged.connect(self.selectionChanged)
         self.resetDelegate()
         self._rev_history = []
         self._rev_pos = -1
