@@ -967,10 +967,11 @@ class AnnotateThread(QThread):
 
     @pyqtSlot()
     def abort(self):
-        if self._threadid is None:
+        threadid = self._threadid
+        if threadid is None:
             return
         try:
-            thread2._async_raise(self._threadid, KeyboardInterrupt)
+            thread2._async_raise(threadid, KeyboardInterrupt)
             self.wait()
         except ValueError:
             pass
