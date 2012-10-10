@@ -139,7 +139,7 @@ class FileLogDialog(_AbstractFileDialog):
             else:
                 msg = ''
             self.textView.showMessage.emit(msg)
-        self.repoview.selectionChanged.connect(checkValidSelection)
+        self.repoview.revisionSelectionChanged.connect(checkValidSelection)
 
         self.contentframe = QFrame(self.splitter)
 
