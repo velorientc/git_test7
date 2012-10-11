@@ -46,7 +46,7 @@ class ToolsFrame(QFrame):
         topvbox.addWidget(QLabel(_('Select a GUI location to edit:')))
 
         self.locationcombo = QComboBox(self,
-            toolTip='Select the toolbar or menu to change')
+            toolTip=_('Select the toolbar or menu to change'))
 
         def selectlocation(index):
             location = self.locationcombo.itemText(index)
@@ -390,7 +390,7 @@ class CustomToolConfigDialog(QDialog):
         QDialog.__init__(self, parent)
 
         self.setWindowIcon(qtlib.geticon('tools-spanner-hammer'))
-        self.setWindowTitle('Configure Custom Tool')
+        self.setWindowTitle(_('Configure Custom Tool'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.hbox = QHBoxLayout()

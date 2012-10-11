@@ -724,8 +724,6 @@ class RepoWidget(QWidget):
             if os.path.exists(self.repo.sjoin('undo')):
                 try:
                     args = self.repo.opener('undo.desc', 'r').read().splitlines()
-                    if args[1] != 'commit':
-                        return None
                     return args[1], int(args[0])
                 except (IOError, IndexError, ValueError):
                     pass
