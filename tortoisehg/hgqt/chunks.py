@@ -236,12 +236,15 @@ class ChunksWidget(QWidget):
         if not dchunks:
             self.showMessage.emit(_('No deletable chunks'))
             return
+        ctx = self.ctx
         kchunks = [c for c in chunks[1:] if not c.selected]
         revertall = False
-        if not kchunks and qtlib.QuestionMsgBox(_('No chunks remain'),
-                                                _('Remove all file changes?')):
-            revertall = True
-        ctx = self.ctx
+        if not kchunks:
+            if isinstance(ctx, patchctx):
+                revertmsg = _('Completely remove file from patch?')
+            else:
+                revertmsg = _('Revert all file changes?')
+            revertall = qtlib.QuestionMsgBox(_('No chunks remain'), revertmsg)
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
