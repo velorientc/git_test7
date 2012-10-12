@@ -7,6 +7,7 @@
 
 import os
 import sys
+import re
 
 from mercurial import encoding, extensions
 from tortoisehg.util import hglib, version
@@ -53,7 +54,7 @@ class BugReport(QDialog):
 
     def gettext(self, opts):
         # TODO: make this more uniformly unicode safe
-        text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
+        text = '#!python\n' # Bitbucket wiki marker for python code
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
@@ -66,7 +67,9 @@ class BugReport(QDialog):
             text += self.getarch()
         text += '** Qt-%s PyQt-%s\n' % (QT_VERSION_STR, PYQT_VERSION_STR)
         text += hglib.tounicode(opts.get('error', 'N/A'))
-        text += '\n}}}'
+        # Bitbucket wiki marker for code: 4 spaces indent (Markdown syntax)
+        regexp = re.compile(r'^', re.MULTILINE)
+        text = regexp.sub(r'    ', text)
         return text
 
     def copyText(self):
