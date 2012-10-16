@@ -53,7 +53,7 @@ class MessageEntry(qscilib.Scintilla):
         result = super(MessageEntry, self).setText(text)
         self.setDefaultEolMode()
         return result
-        
+
     def menuRequested(self, point):
         line = self.lineAt(point)
         point = self.viewport().mapToGlobal(point)
