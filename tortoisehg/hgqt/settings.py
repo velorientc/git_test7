@@ -751,7 +751,11 @@ INFO = (
         'commit with no confirmation dialog.  Default: True')),
     )),
 
-({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
+({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
+    _fi(_('<b>Behavior:</b>'), None, genSpacer, ''),
+    _fi(_("'Publishing' repository"), 'phases.publish', genBoolRBGroup,
+        _('When true, make pushed revisions public. Default: True')),
+    _fi(_('<b>Web Server:</b>'), None, genSpacer, ''),
     _fi(_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface, and by TortoiseHg '
           'as a shorthand name.  Default is the working directory.')),
