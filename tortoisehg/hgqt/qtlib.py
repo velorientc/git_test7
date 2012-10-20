@@ -1108,11 +1108,21 @@ def getCurrentUsername(widget, repo, opts=None):
     except error.Abort:
         return None
 
+class _EncodingSafeInputDialog(QInputDialog):
+    def accept(self):
+        try:
+            hglib.fromunicode(self.textValue())
+            return super(_EncodingSafeInputDialog, self).accept()
+        except UnicodeEncodeError:
+            WarningMsgBox(_('Text Translation Failure'),
+                          _('Unable to translate input to local encoding.'),
+                          parent=self)
+
 def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
                  flags=Qt.WindowFlags()):
     flags |= (Qt.CustomizeWindowHint | Qt.WindowTitleHint
               | Qt.WindowCloseButtonHint)
-    dlg = QInputDialog(parent, flags)
+    dlg = _EncodingSafeInputDialog(parent, flags)
     dlg.setWindowTitle(title)
     dlg.setLabelText(label)
     dlg.setTextValue(text)
