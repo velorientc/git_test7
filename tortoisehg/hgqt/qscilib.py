@@ -580,7 +580,7 @@ def findTabIndentsInLines(lines, linestocheck=100):
         elif line.startswith('\t'):
             return True
     return False # Use spaces for indents default
-    
+
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
