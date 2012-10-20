@@ -232,7 +232,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         inlinetags = self.repo.ui.configbool('tortoisehg', 'issue.inlinetags')
         if ctx.tags() and inlinetags:
             msg = ' '.join(['[%s]' % tag for tag in ctx.tags()]) + ' ' + msg
-        self.message.setHtml('<pre>%s</pre>'
+        # don't use <pre>...</pre>, which also changes font family
+        self.message.setHtml('<div style="white-space: pre;">%s</div>'
                              % self._deschtmlize(msg))
         self._fileactions.setRev(rev)
         self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
