@@ -1109,13 +1109,18 @@ def getCurrentUsername(widget, repo, opts=None):
         return None
 
 def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
-  flags=Qt.WindowFlags()):
-    # the flags argument is supported under Qt 4.6, but probably with
-    # a different name (see issue 252), so we simply call everything
-    # positionally
-    return QInputDialog.getText(parent, title, label, mode, text,
-      Qt.CustomizeWindowHint | Qt.WindowTitleHint |
-      Qt.WindowCloseButtonHint | flags)
+                 flags=Qt.WindowFlags()):
+    flags |= (Qt.CustomizeWindowHint | Qt.WindowTitleHint
+              | Qt.WindowCloseButtonHint)
+    dlg = QInputDialog(parent, flags)
+    dlg.setWindowTitle(title)
+    dlg.setLabelText(label)
+    dlg.setTextValue(text)
+    dlg.setTextEchoMode(mode)
+
+    r = dlg.exec_()
+    dlg.setParent(None)  # so that garbage collected
+    return r and dlg.textValue() or '', bool(r)
 
 def keysequence(o):
     """Create QKeySequence from string or QKeySequence"""
