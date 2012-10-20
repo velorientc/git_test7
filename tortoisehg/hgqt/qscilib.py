@@ -130,7 +130,7 @@ class Scintilla(QsciScintilla):
         self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
-
+        self.standardCommands().boundTo(QKeySequence('CTRL+L')).setKey(0)
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
