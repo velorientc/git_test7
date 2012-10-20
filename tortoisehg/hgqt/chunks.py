@@ -177,17 +177,10 @@ class ChunksWidget(QWidget):
                 eolmode = 'strict'
             else:
                 eolmode = eolmode.lower()
+            # 'updatestate' flag has no effect since hg 1.9
             try:
-                # hg-1.9
                 ret = patch.internalpatch(ui, repo, fp, 1, files=None,
                                           eolmode=eolmode, similarity=0)
-            except TypeError:
-                # hg-1.8
-                pfiles = {}
-                ret = patch.internalpatch(fp, ui, 1, repo.root, pfiles,
-                                          eolmode=eolmode)
-                if updatestate:
-                    cmdutil.updatedir(repo.ui, repo, pfiles)
             except ValueError:
                 ret = -1
             if ret < 0:
