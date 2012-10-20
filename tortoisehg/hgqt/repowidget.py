@@ -1689,25 +1689,12 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def matchRevision(self):
-        hasmatching = True
-        try:
-            # hg >= 2.2
-            from mercurial.revset import matching as matchingkeyword
-        except:
-            hasmatching = False
-        if hasmatching:
-            revlist = self.rev
-            if len(self.menuselection) > 1:
-                revlist = '|'.join([str(rev) for rev in self.menuselection])
-            dlg = matching.MatchDialog(self.repo, revlist, self)
-            if dlg.exec_():
-                self.setFilter(dlg.revsetexpression)
-        else:
-            # We cannot find similar revisions
-            # without the matching revset keyword
-            qtlib.WarningMsgBox(_('Incorrect Mercurial version'),
-                _('In order to use the "Find Similar revisions" '
-                'functionality, you must use a mercurial version above 2.1.'))
+        revlist = self.rev
+        if len(self.menuselection) > 1:
+            revlist = '|'.join([str(rev) for rev in self.menuselection])
+        dlg = matching.MatchDialog(self.repo, revlist, self)
+        if dlg.exec_():
+            self.setFilter(dlg.revsetexpression)
 
     def pushAll(self):
         self.syncDemand.forward('push', False, pushall=True)
