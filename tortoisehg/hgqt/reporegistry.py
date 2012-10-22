@@ -343,6 +343,7 @@ class RepoRegistryView(QDockWidget):
                 self.showShortPaths))
         oldmodel.deleteLater()
         self.expand()
+        self.setActiveTabRepo()
         self._pendingReloadModel = False
 
     def _getItemAndAncestors(self, it):
@@ -389,17 +390,21 @@ class RepoRegistryView(QDockWidget):
             m.addRepo(group, root, -1)
             self.updateSettingsFile()
 
-    def setActiveTabRepo(self, root):
+    def setActiveTabRepo(self, root=None):
         """"
         The selected tab has changed on the workbench
         Unmark the previously selected tab and mark the new one as selected on
         the Repo Registry as well
         """
-        root = hglib.fromunicode(root)
-        if self._activeTabRepo:
-            self._activeTabRepo.setActive(False)
-        m = self.tview.model()
-        it = m.getRepoItem(root, lookForSubrepos=True)
+        it = None
+        if root:
+            root = hglib.fromunicode(root)
+            if self._activeTabRepo:
+                self._activeTabRepo.setActive(False)
+            m = self.tview.model()
+            it = m.getRepoItem(root, lookForSubrepos=True)
+        elif self._activeTabRepo:
+            it = self._activeTabRepo
         if it:
             self._activeTabRepo = it
             it.setActive(True)
