@@ -352,6 +352,7 @@ class StatusWidget(QWidget):
         model = self.tv.model()
         if model:
             model.setFilter(match)
+            self.tv.enablefilterpalette(bool(match))
 
     def updateCheckCount(self):
         model = self.tv.model()
@@ -500,6 +501,7 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.setTextElideMode(Qt.ElideLeft)
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
@@ -552,6 +554,9 @@ class WctxFileTree(QTreeView):
             return self.selectionModel().selectedRows()
         # Invalid selectionModel found
         return []
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
 
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()

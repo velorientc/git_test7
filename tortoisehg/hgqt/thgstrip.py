@@ -6,8 +6,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import inspect
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -163,11 +161,7 @@ class StripDialog(QDialog):
         rev = self.get_rev()
         if rev is None:
             return False
-        cl = self.repo.changelog
-        if inspect.getargspec(cl.descendants)[1]:  # hg<2.3: *revs
-            striprevs = list(cl.descendants(rev))
-        else:
-            striprevs = list(cl.descendants([rev]))
+        striprevs = list(self.repo.changelog.descendants([rev]))
         striprevs.append(rev)
         striprevs.sort()
         self.cslist.clear()

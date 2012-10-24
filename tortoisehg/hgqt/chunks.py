@@ -177,17 +177,10 @@ class ChunksWidget(QWidget):
                 eolmode = 'strict'
             else:
                 eolmode = eolmode.lower()
+            # 'updatestate' flag has no effect since hg 1.9
             try:
-                # hg-1.9
                 ret = patch.internalpatch(ui, repo, fp, 1, files=None,
                                           eolmode=eolmode, similarity=0)
-            except TypeError:
-                # hg-1.8
-                pfiles = {}
-                ret = patch.internalpatch(fp, ui, 1, repo.root, pfiles,
-                                          eolmode=eolmode)
-                if updatestate:
-                    cmdutil.updatedir(repo.ui, repo, pfiles)
             except ValueError:
                 ret = -1
             if ret < 0:
@@ -236,12 +229,15 @@ class ChunksWidget(QWidget):
         if not dchunks:
             self.showMessage.emit(_('No deletable chunks'))
             return
+        ctx = self.ctx
         kchunks = [c for c in chunks[1:] if not c.selected]
         revertall = False
-        if not kchunks and qtlib.QuestionMsgBox(_('No chunks remain'),
-                                                _('Remove all file changes?')):
-            revertall = True
-        ctx = self.ctx
+        if not kchunks:
+            if isinstance(ctx, patchctx):
+                revertmsg = _('Completely remove file from patch?')
+            else:
+                revertmsg = _('Revert all file changes?')
+            revertall = qtlib.QuestionMsgBox(_('No chunks remain'), revertmsg)
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
