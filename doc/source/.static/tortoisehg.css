@@ -1,0 +1,17 @@
+/*
+ * tortoisehg.css
+ * ~~~~~~~~~~~~~
+ *
+ * TortoiseHg stylesheet
+ *
+ */
+
+@import url("default.css");
+
+/* -- figure styles ----------------------------------------------------------- */
+.figure {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
