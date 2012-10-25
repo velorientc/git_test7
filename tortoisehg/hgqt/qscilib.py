@@ -130,7 +130,7 @@ class Scintilla(QsciScintilla):
         self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
-        self.standardCommands().boundTo(QKeySequence('CTRL+L')).setKey(0)
+        unbindConflictedKeys(self)
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
@@ -556,6 +556,9 @@ class KeyPressInterceptor(QObject):
         if util.any(event.matches(e) for e in self._keyseqs):
             return True
         return False
+
+def unbindConflictedKeys(sci):
+    sci.standardCommands().boundTo(QKeySequence('CTRL+L')).setKey(0)
 
 def qsciEolModeFromOs():
     if os.name.startswith('nt'):

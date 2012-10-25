@@ -336,7 +336,7 @@ class LogWidget(QsciScintilla):
         self.setWrapMode(QsciScintilla.WrapCharacter)
         self._initfont()
         self._initmarkers()
-        self.standardCommands().boundTo(QKeySequence('CTRL+L')).setKey(0)
+        qscilib.unbindConflictedKeys(self)
 
     def _initfont(self):
         tf = qtlib.getfont('fontoutputlog')
