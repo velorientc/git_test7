@@ -558,7 +558,13 @@ class KeyPressInterceptor(QObject):
         return False
 
 def unbindConflictedKeys(sci):
-    sci.standardCommands().boundTo(QKeySequence('CTRL+L')).setKey(0)
+    cmdset = sci.standardCommands()
+    try:
+        cmd = cmdset.boundTo(QKeySequence('CTRL+L'))
+        if cmd:
+            cmd.setKey(0)
+    except AttributeError:  # old QScintilla does not have boundTo()
+        pass
 
 def qsciEolModeFromOs():
     if os.name.startswith('nt'):
