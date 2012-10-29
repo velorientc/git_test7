@@ -754,7 +754,10 @@ INFO = (
 ({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
     _fi(_('<b>Behavior:</b>'), None, genSpacer, ''),
     _fi(_("'Publishing' repository"), 'phases.publish', genBoolRBGroup,
-        _('When true, make pushed revisions public. Default: True')),
+        _('Controls draft phase behavior when working as a server. When true, '
+          'pushed changesets are set to public in both client and server and '
+          'pulled or cloned changesets are set to public in the client. '
+          'Default: True')),
     _fi(_('<b>Web Server:</b>'), None, genSpacer, ''),
     _fi(_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface, and by TortoiseHg '
