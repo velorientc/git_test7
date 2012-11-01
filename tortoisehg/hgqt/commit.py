@@ -755,11 +755,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if not defaultusername:
             res = qtlib.CustomPrompt(
                 _('Default username is not configured'),
-                _('A default username is not configured. ') +
-                _('This username is used when you commit '
-                  'unless you set a different username on a given repository.\n\n') +
-                _('You must configure a default username before being able to commit.\n\n') +
-                _('Do you want to configure your default username now?'), self,
+                _('A default username is not configured. '
+                  'This username is used when you commit '
+                  'unless you set a different username on a given repository.\n\n'
+                  'You must configure a default username before being able to commit.\n\n'
+                  'Do you want to configure your default username now?'), self,
                 (_('&Configure'), _('Cancel')), 0, 1, []).run()
             if res == 0:
                 from tortoisehg.hgqt import settings
