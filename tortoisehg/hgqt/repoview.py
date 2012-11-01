@@ -18,7 +18,7 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import htmldelegate
+from tortoisehg.hgqt import htmldelegate, qtlib
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from PyQt4.QtCore import *
@@ -69,6 +69,7 @@ class HgRepoView(QTableView):
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
         self.setStyle(HgRepoViewStyle(self.style()))
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -322,6 +323,9 @@ class HgRepoView(QTableView):
             self.setColumnWidth(stretch_col, width)
 
         super(HgRepoView, self).resizeEvent(e)
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
 
 class HgRepoViewStyle(QStyle):
     "Override a style's drawPrimitive method to customize the drop indicator"

@@ -178,8 +178,6 @@ class ThgRepoWrapper(QObject):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
         watchedfiles.append(self.repo.sjoin('phaseroots'))
         watchedfiles.append(self.repo.join('localtags'))
-        watchedfiles.append(self.repo.join('bookmarks'))
-        watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
             watchedfiles.append(self.repo.mq.path)
             watchedfiles.append(self.repo.mq.join('series'))
@@ -272,12 +270,8 @@ class ThgRepoWrapper(QObject):
 _uiprops = '''_uifiles _uimtime postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
-
-# _bookmarkcurrent is a Mercurial property, we include it here to work
-# around a bug in hg-1.8.  It should be removed when we drop support for
-# Mercurial 1.8
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
-                   _branchheads _bookmarkcurrent'''.split()
+                   _branchheads'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
