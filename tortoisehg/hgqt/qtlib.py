@@ -1108,14 +1108,29 @@ def getCurrentUsername(widget, repo, opts=None):
     except error.Abort:
         return None
 
+class _EncodingSafeInputDialog(QInputDialog):
+    def accept(self):
+        try:
+            hglib.fromunicode(self.textValue())
+            return super(_EncodingSafeInputDialog, self).accept()
+        except UnicodeEncodeError:
+            WarningMsgBox(_('Text Translation Failure'),
+                          _('Unable to translate input to local encoding.'),
+                          parent=self)
+
 def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
-  flags=Qt.WindowFlags()):
-    # the flags argument is supported under Qt 4.6, but probably with
-    # a different name (see issue 252), so we simply call everything
-    # positionally
-    return QInputDialog.getText(parent, title, label, mode, text,
-      Qt.CustomizeWindowHint | Qt.WindowTitleHint |
-      Qt.WindowCloseButtonHint | flags)
+                 flags=Qt.WindowFlags()):
+    flags |= (Qt.CustomizeWindowHint | Qt.WindowTitleHint
+              | Qt.WindowCloseButtonHint)
+    dlg = _EncodingSafeInputDialog(parent, flags)
+    dlg.setWindowTitle(title)
+    dlg.setLabelText(label)
+    dlg.setTextValue(text)
+    dlg.setTextEchoMode(mode)
+
+    r = dlg.exec_()
+    dlg.setParent(None)  # so that garbage collected
+    return r and dlg.textValue() or '', bool(r)
 
 def keysequence(o):
     """Create QKeySequence from string or QKeySequence"""
@@ -1135,3 +1150,45 @@ def newshortcutsforstdkey(key, *args, **kwargs):
     """Create [QShortcut,...] for all key bindings of the given StandardKey"""
     return [QShortcut(keyseq, *args, **kwargs)
             for keyseq in QKeySequence.keyBindings(key)]
+
+class PaletteSwitcher(object):
+    """
+    Class that can be used to enable a predefined, alterantive background color
+    for a widget
+
+    This is normally used to change the color of widgets when they display some
+    "filtered" content which is a subset of the actual widget contents.
+
+    The alternative background color is fixed, and depends on the original
+    background color (dark and light backgrounds use a different alternative
+    color).
+
+    The alterenative color cannot be changed because the idea is to set a
+    consistent "filter" style for all widgets.
+
+    An instance of this class must be added as a property of the widget whose
+    background we want to change. The constructor takes the "target widget" as
+    its only parameter.
+
+    In order to enable or disable the background change, simply call the
+    enablefilterpalette() method.
+    """
+    def __init__(self, targetwidget):
+        self._targetwidget = targetwidget
+        self._defaultpalette = targetwidget.palette()
+        bgcolor = self._defaultpalette.color(QPalette.Base)
+        if bgcolor.black() <= 128:
+            # Light theme
+            filterbgcolor = QColor('#FFFFB7')
+        else:
+            # Dark theme
+            filterbgcolor = QColor('darkgrey')
+        self._filterpalette = QPalette()
+        self._filterpalette.setColor(QPalette.Base, filterbgcolor)
+
+    def enablefilterpalette(self, enabled=False):
+        if enabled:
+            pl = self._filterpalette
+        else:
+            pl = self._defaultpalette
+        self._targetwidget.setPalette(pl)

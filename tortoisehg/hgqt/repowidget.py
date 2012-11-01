@@ -514,6 +514,7 @@ class RepoWidget(QWidget):
     def _unapplyRevisionSet(self):
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
+        self.repoview.enablefilterpalette(False)
         if not self.revset:
             return False
         self.revset = []
@@ -536,6 +537,7 @@ class RepoWidget(QWidget):
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
+        self.repoview._paletteswitcher.enablefilterpalette(revs)
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):
@@ -1687,25 +1689,12 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def matchRevision(self):
-        hasmatching = True
-        try:
-            # hg >= 2.2
-            from mercurial.revset import matching as matchingkeyword
-        except:
-            hasmatching = False
-        if hasmatching:
-            revlist = self.rev
-            if len(self.menuselection) > 1:
-                revlist = '|'.join([str(rev) for rev in self.menuselection])
-            dlg = matching.MatchDialog(self.repo, revlist, self)
-            if dlg.exec_():
-                self.setFilter(dlg.revsetexpression)
-        else:
-            # We cannot find similar revisions
-            # without the matching revset keyword
-            qtlib.WarningMsgBox(_('Incorrect Mercurial version'),
-                _('In order to use the "Find Similar revisions" '
-                'functionality, you must use a mercurial version above 2.1.'))
+        revlist = self.rev
+        if len(self.menuselection) > 1:
+            revlist = '|'.join([str(rev) for rev in self.menuselection])
+        dlg = matching.MatchDialog(self.repo, revlist, self)
+        if dlg.exec_():
+            self.setFilter(dlg.revsetexpression)
 
     def pushAll(self):
         self.syncDemand.forward('push', False, pushall=True)
@@ -1750,8 +1739,7 @@ class RepoWidget(QWidget):
             revlist.append(str(rev))
         if not revlist:
             revlist = [self.rev]
-        opts = {'source' : revlist, 'dest': self.repo['.'].rev()}
-        dlg = graft.GraftDialog(self.repo, self, **opts)
+        dlg = graft.GraftDialog(self.repo, self, source=revlist)
         dlg.finished.connect(dlg.deleteLater)
         if dlg.valid:
             dlg.exec_()
