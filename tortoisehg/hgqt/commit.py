@@ -720,18 +720,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def saveSettings(self, s, prefix):
         'Save history, etc, in QSettings instance'
-        repoid = str(self.repo[0])
-        lpref = prefix + '/commit/'
-        gpref = 'commit/'
-        s.setValue(lpref+'split', self.split.saveState())
-        self.msgte.saveSettings(s, lpref+'msgte')
-        self.stwidget.saveSettings(s, lpref+'status')
-        s.setValue(gpref+'history-'+repoid, self.msghistory)
-        s.setValue(gpref+'userhist', self.userhist)
-        msg = self.getMessage(True)
         try:
+            repoid = str(self.repo[0])
+            lpref = prefix + '/commit/'
+            gpref = 'commit/'
+            s.setValue(lpref+'split', self.split.saveState())
+            self.msgte.saveSettings(s, lpref+'msgte')
+            self.stwidget.saveSettings(s, lpref+'status')
+            s.setValue(gpref+'history-'+repoid, self.msghistory)
+            s.setValue(gpref+'userhist', self.userhist)
+            msg = self.getMessage(True)
             self.repo.opener('cur-message.txt', 'w').write(msg)
-        except EnvironmentError:
+        except (EnvironmentError, IOError):
             pass
 
     def addMessageToHistory(self, umsg):
