@@ -362,7 +362,7 @@ class RepoItem(RepoTreeItem):
                     _('An error occurred while updating the repository hgrc '
                       'file (%s)') % hglib.tounicode(abshgrcpath))
                 return False
-            self.setShortName(shortname)
+            self.setShortName(value.toString())
             return True
         return False
 
