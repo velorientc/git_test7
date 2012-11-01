@@ -183,6 +183,7 @@ class RepoItem(RepoTreeItem):
         self._basenode = basenode
 
     def setShortName(self, uname):
+        uname = unicode(uname)
         if uname != self._shortname:
             self._shortname = uname
 
