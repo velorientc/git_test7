@@ -188,7 +188,7 @@ class RepoFilterBar(QToolBar):
         full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
-        self.revsetcombo.lineEdit().setText(query)
+        self.revsetcombo.setCurrentIndex(self.revsetcombo.findText(query))
 
     def loadSettings(self, s):
         repoid = str(self._repo[0])
