@@ -222,7 +222,11 @@ class RevisionSetQuery(QDialog):
         QShortcut(QKeySequence('Return'), self, self.returnPressed)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
+        self.refreshing = None
+
     def runQuery(self):
+        if self.refreshing:
+            return
         self.entry.setEnabled(False)
         self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
@@ -236,6 +240,8 @@ class RevisionSetQuery(QDialog):
 
     def queryFinished(self):
         self.refreshing.wait()
+        self.refreshing.setParent(None)  # assist garbage-collection
+        self.refreshing = None
         self.entry.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
