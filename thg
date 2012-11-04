@@ -49,6 +49,10 @@ else:
         if os.path.isdir(testpath) and hgpath not in sys.path:
             sys.path.insert(0, hgpath)
 
+# Make sure to load threading by main thread; otherwise, _MainThread instance
+# may have wrong thread id and results KeyError at exit.
+import threading
+
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.ignore.append('tortoisehg.util.config')
