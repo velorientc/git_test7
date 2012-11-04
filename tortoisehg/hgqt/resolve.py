@@ -123,7 +123,12 @@ class ResolveDialog(QDialog):
         cmother.triggered.connect(lambda: self.merge('internal:other'))
         cmres = self.utreecmenu.addAction(_('Mark as Resolved'))
         cmres.triggered.connect(self.markresolved)
-        self.umenuitems = (cmauto, cmmanual, cmlocal, cmother, cmres)
+        cmdiffLocToAnc = self.utreecmenu.addAction(_('Diff Local to Ancestor'))
+        cmdiffLocToAnc.triggered.connect(self.diffLocToAnc)
+        cmdiffOthToAnc = self.utreecmenu.addAction(_('Diff Other to Ancestor'))
+        cmdiffOthToAnc.triggered.connect(self.diffOthToAnc)
+        self.umenuitems = (cmauto, cmmanual, cmlocal, cmother, cmres,
+                           cmdiffLocToAnc, cmdiffOthToAnc)
         self.utree.customContextMenuRequested.connect(self.utreeMenuRequested)
 
         res = qtlib.LabeledSeparator(_('Resolved conflicts'))
@@ -265,7 +270,7 @@ class ResolveDialog(QDialog):
             qtlib.editfiles(self.repo, abspaths, parent=self)
 
     def getVdiffFiles(self, tree):
-        paths = self.getSelectedPaths(self.rtree)
+        paths = self.getSelectedPaths(tree)
         if not paths:
             return []
         files, sub = [], False
@@ -305,6 +310,26 @@ class ResolveDialog(QDialog):
         if paths:
             opts = {}
             opts['rev'] = ['p2()']
+            opts['tool'] = self.tcombo.readValue()
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            if dlg:
+                dlg.exec_()
+
+    def diffLocToAnc(self):
+        paths = self.getVdiffFiles(self.utree)
+        if paths:
+            opts = {}
+            opts['rev'] = ['ancestor(p1(),p2())..p1()']
+            opts['tool'] = self.tcombo.readValue()
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            if dlg:
+                dlg.exec_()
+
+    def diffOthToAnc(self):
+        paths = self.getVdiffFiles(self.utree)
+        if paths:
+            opts = {}
+            opts['rev'] = ['ancestor(p1(),p2())..p2()']
             opts['tool'] = self.tcombo.readValue()
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
