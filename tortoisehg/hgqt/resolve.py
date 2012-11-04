@@ -398,11 +398,11 @@ class ResolveDialog(QDialog):
 
     @pyqtSlot(QPoint)
     def utreeMenuRequested(self, point):
-        self.utreecmenu.exec_(self.utree.mapToGlobal(point), self.umenuitems[0])
+        self.utreecmenu.exec_(self.utree.viewport().mapToGlobal(point))
 
     @pyqtSlot(QPoint)
     def rtreeMenuRequested(self, point):
-        self.rtreecmenu.exec_(self.rtree.mapToGlobal(point), self.rmenuitems[0])
+        self.rtreecmenu.exec_(self.rtree.viewport().mapToGlobal(point))
 
 class PathsTree(QTreeView):
     def __init__(self, repo, parent):
