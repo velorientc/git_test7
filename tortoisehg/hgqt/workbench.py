@@ -10,7 +10,6 @@ Main Qt4 application for TortoiseHg
 
 import os
 import sys
-import getpass # used to get the username on the workbench server
 from mercurial import ui, util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
@@ -1173,7 +1172,7 @@ class Workbench(QMainWindow):
     def createWorkbenchServer(self):
         self.server = QLocalServer()
         self.server.newConnection.connect(self.newConnection)
-        self.server.listen(qApp.applicationName()+ '-' + getpass.getuser())
+        self.server.listen(qApp.applicationName() + '-' + util.getuser())
 
     def newConnection(self):
         socket = self.server.nextPendingConnection()
@@ -1226,7 +1225,7 @@ def connectToExistingWorkbench(root=None):
     else:
         data = '[echo]'
     socket = QLocalSocket()
-    socket.connectToServer(qApp.applicationName() + '-' + getpass.getuser(),
+    socket.connectToServer(qApp.applicationName() + '-' + util.getuser(),
         QIODevice.ReadWrite)
     if socket.waitForConnected(10000):
         # Momentarily let any process set the foreground window
