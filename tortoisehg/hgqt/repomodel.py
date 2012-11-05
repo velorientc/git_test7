@@ -187,7 +187,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.layoutChanged.emit()
         self.ensureBuilt(row=0)
         self.showMessage.emit('')
-        QTimer.singleShot(0, self.filled)
+        QTimer.singleShot(0, self, SIGNAL('filled()'))
 
     def reloadConfig(self):
         _ui = self.repo.ui
