@@ -1052,12 +1052,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if branch == '':
             branch = None
         if pushall and (rev is not None or branch is not None):
-            # This should never happen
-            qtlib.ErrorMsg(_('Internal TortoiseHg Error'),
-                _('Inconsistent call to SyncWidget.pushclicked()'),
-                _('Cannot call SyncWidget.pushclicked() with pushall=True, '
-                'rev!=None and branch!=None'))
-            return
+            raise ValueError('inconsistent call with pushall=%r, rev=%r and '
+                             'branch=%r' % (pushall, rev, branch))
         validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark', 'mq')
         self.syncStarted.emit()
         url = self.currentPushUrl()

@@ -102,18 +102,12 @@ class MatchDialog(QDialog):
         self.phase_chk = QCheckBox(_('Phase'))
         self._hideable_chks = (self.branch_chk, self.phase_chk, self.parents_chk,)
 
-        has_diff_matching = hglib.hgversion >= "2.3"
-
         self.optbox.addWidget(self.summary_chk)
         self.optbox.addWidget(self.description_chk)
         self.optbox.addWidget(self.author_chk)
         self.optbox.addWidget(self.date_chk)
         self.optbox.addWidget(self.files_chk)
-        if has_diff_matching:
-            # if mercurial does not have a "diff" matching mode,
-            # we simply "hide" the diff checkbox,
-            # to make the saveSettings() method simpler
-            self.optbox.addWidget(self.diff_chk)
+        self.optbox.addWidget(self.diff_chk)
         self.optbox.addWidget(self.substate_chk)
         self.optbox.addWidget(self.branch_chk)
         self.optbox.addWidget(self.parents_chk)

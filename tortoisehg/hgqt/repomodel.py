@@ -48,6 +48,7 @@ COLUMNHEADERS = (
     ('Description', _('Description', 'column header')),
     ('Author', _('Author', 'column header')),
     ('Tags', _('Tags', 'column header')),
+    ('Latest tags', _('Latest tags', 'column header')),
     ('Node', _('Node', 'column header')),
     ('Age', _('Age', 'column header')),
     ('LocalTime', _('Local Time', 'column header')),
@@ -142,6 +143,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.unicodestar = True
         self.unicodexinabox = True
         self.cfgname = cfgname
+        self.latesttags = {-1: 'null'}
 
         # To be deleted
         self._user_colors = {}
@@ -299,7 +301,7 @@ class HgRepoListModel(QAbstractTableModel):
             return '8' * 12 + '+'
         if column in ('LocalTime', 'UTCTime'):
             return hglib.displaytime(util.makedate())
-        if column == 'Tags':
+        if column in ('Tags', 'Latest tags'):
             try:
                 return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]
             except IndexError:
@@ -610,6 +612,33 @@ class HgRepoListModel(QAbstractTableModel):
                 b += u'--'
         return b
 
+    def getlatesttags(self, ctx, gnode):
+        rev = ctx.rev()
+        todo = [rev]
+        repo = self.repo
+        while todo:
+            rev = todo.pop()
+            if rev in self.latesttags:
+                continue
+            ctx = repo[rev]
+            tags = [t for t in ctx.tags() if repo.tagtype(t) == 'global']
+            if tags:
+                self.latesttags[rev] = ':'.join(sorted(tags))
+                continue
+            try:
+                if (ctx.parents()):
+                    ptag = max(
+                        self.latesttags[p.rev()] for p in ctx.parents())
+                else:
+                    ptag = ""
+            except KeyError:
+                # Cache miss - recurse
+                todo.append(rev)
+                todo.extend(p.rev() for p in ctx.parents())
+                continue
+            self.latesttags[rev] = ptag
+        return self.latesttags[rev]
+
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
             return ''
@@ -739,6 +768,7 @@ class HgRepoListModel(QAbstractTableModel):
         'Description': getlog,
         'Author':   getauthor,
         'Tags':     gettags,
+        'Latest tags':     getlatesttags,
         'Branch':   getbranch,
         'Filename': lambda self, ctx, gnode: gnode.extra[0],
         'Age':      lambda self, ctx, gnode: hglib.age(ctx.date()).decode('utf-8'),

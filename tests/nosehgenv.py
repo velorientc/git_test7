@@ -32,11 +32,6 @@ class HgEnvPlugin(plugins.Plugin):
         self._setupmiscenv()
         self._setupqapp()
 
-        # TODO: workaround for "no module named comtypes" error
-        # https://bitbucket.org/tortoisehg/thg/issue/1726/
-        from mercurial import demandimport
-        demandimport.enable()
-
     def _setupsyspath(self):
         hgpath = os.environ.get('HGPATH')
         if hgpath:

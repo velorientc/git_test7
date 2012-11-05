@@ -111,6 +111,21 @@ class ResolveDialog(QDialog):
         vbox.addStretch(1)
         self.ubuttons = (auto, manual, local, other, res)
 
+        self.utree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.utreecmenu = QMenu(self)
+        cmauto = self.utreecmenu.addAction(_('Mercurial Resolve'))
+        cmauto.triggered.connect(lambda: self.merge('internal:merge'))
+        cmmanual = self.utreecmenu.addAction(_('Tool Resolve'))
+        cmmanual.triggered.connect(self.merge)
+        cmlocal = self.utreecmenu.addAction(_('Take Local'))
+        cmlocal.triggered.connect(lambda: self.merge('internal:local'))
+        cmother = self.utreecmenu.addAction(_('Take Other'))
+        cmother.triggered.connect(lambda: self.merge('internal:other'))
+        cmres = self.utreecmenu.addAction(_('Mark as Resolved'))
+        cmres.triggered.connect(self.markresolved)
+        self.umenuitems = (cmauto, cmmanual, cmlocal, cmother, cmres)
+        self.utree.customContextMenuRequested.connect(self.utreeMenuRequested)
+
         res = qtlib.LabeledSeparator(_('Resolved conflicts'))
         self.layout().addWidget(res)
 
@@ -148,6 +163,22 @@ class ResolveDialog(QDialog):
         vbox.addStretch(1)
         self.rbuttons = (edit, vp0, ures)
         self.rmbuttons = (vp1, v3way)
+
+        self.rtree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.rtreecmenu = QMenu(self)
+        cmedit = self.rtreecmenu.addAction(_('Edit File'))
+        cmedit.triggered.connect(self.edit)
+        cmv3way = self.rtreecmenu.addAction(_('3-Way Diff'))
+        cmv3way.triggered.connect(self.v3way)
+        cmvp0 = self.rtreecmenu.addAction(_('Diff to Local'))
+        cmvp0.triggered.connect(self.vp0)
+        cmvp1 = self.rtreecmenu.addAction(_('Diff to Other'))
+        cmvp1.triggered.connect(self.vp1)
+        cmures = self.rtreecmenu.addAction(_('Mark as Unresolved'))
+        cmures.triggered.connect(self.markunresolved)
+        self.rmenuitems = (cmedit, cmvp0, cmures)
+        self.rmmenuitems = (cmvp1, cmv3way)
+        self.rtree.customContextMenuRequested.connect(self.rtreeMenuRequested)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
@@ -311,6 +342,8 @@ class ResolveDialog(QDialog):
             enable = self.utree.selectionModel().hasSelection()
             for b in self.ubuttons:
                 b.setEnabled(enable)
+            for c in self.umenuitems:
+                c.setEnabled(enable)
         smodel.selectionChanged.connect(uchanged)
         uchanged(None, None)
 
@@ -332,9 +365,13 @@ class ResolveDialog(QDialog):
             enable = self.rtree.selectionModel().hasSelection()
             for b in self.rbuttons:
                 b.setEnabled(enable)
+            for c in self.rmenuitems:
+                c.setEnabled(enable)
             merge = len(self.repo.parents()) > 1
             for b in self.rmbuttons:
                 b.setEnabled(enable and merge)
+            for c in self.rmmenuitems:
+                c.setEnabled(enable and merge)
         smodel.selectionChanged.connect(rchanged)
         rchanged(None, None)
 
@@ -358,6 +395,14 @@ class ResolveDialog(QDialog):
                                 labels=labels, parent=self):
                 return
         super(ResolveDialog, self).reject()
+
+    @pyqtSlot(QPoint)
+    def utreeMenuRequested(self, point):
+        self.utreecmenu.exec_(self.utree.viewport().mapToGlobal(point))
+
+    @pyqtSlot(QPoint)
+    def rtreeMenuRequested(self, point):
+        self.rtreecmenu.exec_(self.rtree.viewport().mapToGlobal(point))
 
 class PathsTree(QTreeView):
     def __init__(self, repo, parent):
