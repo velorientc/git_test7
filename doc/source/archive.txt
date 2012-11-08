@@ -5,16 +5,19 @@ Archiving
 	:synopsis: Dialog used to make an archive of a repository
 
 You can choose from quite a lot of formats to make an archive of a repository.
-There are the usual compressed formats. But it's also possible to make a plain
-folder of files in another place than the Working Directory (it's like a clone,
-but without the .hg folder). Can be useful for doing builds for example (think
-'svn export'). One can make an archive with only the files of the selected rev.
-Some people seem to use this to send changes to external people that do not have
-access to the repository.
+There are the usual compressed formats, of course, but it's also possible to make a
+folder of the uncompressed files in a place other than the Working Directory (like a clone,
+but without the .hg folder). Such archives, for example, can be useful for doing builds (similar
+to 'svn export'). Archives may also be useful for sending changes to external people
+without access to the reposity, where only the effected files of a given revision or set
+of revisions need be included in the archive.
+
+
+From TortoiseHg
+---------------
 
 From the changelog context menu in the Workbench select
-:menuselection:`Archive...` for the choosen changeset, or,
-within the folder, type :command:`thg archive`.
+:menuselection:`Export --> Archive...` for the choosen changeset.
 
 .. figure:: figures/archive.png
 	:alt: Archive dialog
@@ -26,7 +29,7 @@ within the folder, type :command:`thg archive`.
 :guilabel:`Only files modified/created in this revision`
 	To limit the number of files in the archive.
 :guilabel:`Destination path`
-	The filename or directory where the archive will be created. It is filled
+	The filename or directory where the archive will be created. The archive is filled
 	with the name of the current repository, suffixed with the revision number
 	of the selected revision, and has the appropriate extension of the selected
 	archive type.
