@@ -305,7 +305,7 @@ class FilectxActions(QObject):
                 link = u'%s?%s' % (link, revid)
             self.linkActivated.emit(link)
         else:
-            QMessageBox.warning(self,
+            QMessageBox.warning(self.parent(),
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working "
                   "directory"))
