@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-05 23:09-0200\n"
-"PO-Revision-Date: 2012-11-03 17:10+0000\n"
+"PO-Revision-Date: 2012-11-06 15:19+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-11-06 10:48+0000\n"
+"X-Launchpad-Export-Date: 2012-11-08 05:02+0000\n"
 "X-Generator: Launchpad (build 16232)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
@@ -722,11 +722,11 @@ msgstr "Aucun morceau supprimable"
 
 #: tortoisehg/hgqt/chunks.py:237
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "Supprimer complètement le fichier du patch ?"
 
 #: tortoisehg/hgqt/chunks.py:239
 msgid "Revert all file changes?"
-msgstr ""
+msgstr "Rétablir tous les changements de fichier ?"
 
 #: tortoisehg/hgqt/chunks.py:240
 msgid "No chunks remain"
@@ -1115,7 +1115,7 @@ msgstr "Abandonner le message de commit actuel ?"
 
 #: tortoisehg/hgqt/commit.py:757
 msgid "Default username is not configured"
-msgstr ""
+msgstr "Le nom d'utilisateur par défaut n'est pas configuré"
 
 #: tortoisehg/hgqt/commit.py:758
 msgid ""
@@ -1126,10 +1126,18 @@ msgid ""
 "\n"
 "Do you want to configure your default username now?"
 msgstr ""
+"Un nom d'utilisateur par défaut n'est pas configuré. Ce nom d'utilisateur "
+"est utilisé lorsque vous committez à moins de définir un autre nom "
+"d'utilisateur pour un dépôt donné.\n"
+"\n"
+"Vous devez configurer un nom d'utilisateur par défaut avant de pouvoir "
+"committer.\n"
+"\n"
+"Voulez-vous configurer votre nom d'utilisateur par défaut ?"
 
 #: tortoisehg/hgqt/commit.py:763
 msgid "&Configure"
-msgstr ""
+msgstr "&Configurer"
 
 #: tortoisehg/hgqt/commit.py:773
 msgid "Message Translation Failure"
@@ -1141,7 +1149,7 @@ msgid ""
 "Consider setting HGENCODING environment variable\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Impossible de transposer le message dans le encodage local\n"
+"Impossible de transposer le message dans l'encodage local\n"
 "Envisager de configurer la variable d'environnement HGENCODING\n"
 "Remplacer les caractères non-transposables par \"?\" ?\n"
 
@@ -3866,11 +3874,11 @@ msgstr "Vous devez vous identifier à Mercurial"
 
 #: tortoisehg/hgqt/qtlib.py:1117
 msgid "Text Translation Failure"
-msgstr ""
+msgstr "Erreur de transposition de texte"
 
 #: tortoisehg/hgqt/qtlib.py:1118
 msgid "Unable to translate input to local encoding."
-msgstr ""
+msgstr "Impossible de transposer l'entrée dans l'encodage local."
 
 #: tortoisehg/hgqt/quickbar.py:30
 msgid "Goto"
@@ -4261,7 +4269,7 @@ msgstr "Étiquettes"
 #: tortoisehg/hgqt/repomodel.py:51
 msgctxt "column header"
 msgid "Latest tags"
-msgstr ""
+msgstr "Dernières étiquettes"
 
 #: tortoisehg/hgqt/repomodel.py:52
 msgctxt "column header"
@@ -12079,13 +12087,6 @@ msgstr "Dépôt %s non trouvé"
 #~ msgid "Commit Preview"
 #~ msgstr "Prévisualisation de la validation"
 
-#~ msgid ""
-#~ "In order to use the \"Find Similar revisions\" functionality, you must use a "
-#~ "mercurial version above 2.1."
-#~ msgstr ""
-#~ "Pour utiliser la fonction \"Trouver des révisions similaires\", vous devez "
-#~ "utiliser une version de Mercurial supérieure à 2.1."
-
 #, python-format
 #~ msgid "unable to strip away %d dirs from %s"
 #~ msgstr "impossible de se débarrasser de %d répertoires de %s"
@@ -12103,9 +12104,6 @@ msgstr "Dépôt %s non trouvé"
 
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
-
-#~ msgid "Incorrect Mercurial version"
-#~ msgstr "Version incorrecte de Mercurial"
 
 #, python-format
 #~ msgid "Hunk #%d FAILED at %d\n"
@@ -12143,19 +12141,3 @@ msgstr "Dépôt %s non trouvé"
 #, python-format
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "morceau %d déjà appliqué à la ligne %d (flou %d)\n"
-
-#~ msgid "Inconsistent call to SyncWidget.pushclicked()"
-#~ msgstr "Appel incohérent à SyncWidget.pushclicked()"
-
-#~ msgid "Internal TortoiseHg Error"
-#~ msgstr "Erreur interne de TortoiseHg"
-
-#~ msgid ""
-#~ "Cannot call SyncWidget.pushclicked() with pushall=True, rev!=None and "
-#~ "branch!=None"
-#~ msgstr ""
-#~ "Ne peut pas appeler SyncWidget.pushclicked() avec pushall=True, rev!=None et "
-#~ "branch!=None"
-
-#~ msgid "Remove all file changes?"
-#~ msgstr "Enlever tous les changements du fichier ?"
