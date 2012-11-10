@@ -99,11 +99,17 @@ class FilectxActions(QObject):
                 act.triggered.connect(cb)
             self._actions[name] = act
 
+        self._updateActions()
+
     def setRepo(self, repo):
         self.repo = repo
 
     def setRev(self, rev):
         self.ctx = self.repo[rev]
+        self._updateActions()
+
+    def _updateActions(self):
+        rev = self.ctx.rev()
         real = type(rev) is int
         wd = rev is None
         for act in ['navigate', 'diffnavigate', 'ldiff', 'edit', 'save']:
