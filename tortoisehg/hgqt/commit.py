@@ -543,7 +543,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.setMessage(newMessage)
 
     def details(self):
-        dlg = DetailsDialog(self.opts, self.userhist, self)
+        mode = 'commit'
+        if len(self.repo.parents()) > 1:
+            mode = 'merge'
+        dlg = DetailsDialog(self.opts, self.userhist, self, mode=mode)
         dlg.finished.connect(dlg.deleteLater)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -975,7 +978,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
 class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
-    def __init__(self, opts, userhistory, parent):
+    def __init__(self, opts, userhistory, parent, mode='commit'):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('%s - commit options') % parent.repo.displayname)
         self.repo = parent.repo
@@ -1094,7 +1097,9 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.autoinccb)
         hbox.addWidget(self.autoincle)
         hbox.addWidget(autoincsave)
-        layout.addLayout(hbox)
+        if mode != 'merge':
+            #self.autoinccb.setVisible(False)
+            layout.addLayout(hbox)
         
         hbox = QHBoxLayout()
         recursesave = QPushButton(_('Save in Repo'))
