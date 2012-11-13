@@ -27,6 +27,34 @@ if os.name == 'nt':
 else:
     _hasbugtraq = False
 
+def readrepoopts(repo):
+    opts = {}
+    opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
+    opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
+    opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+    opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
+    opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
+    opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
+    if opts['bugtraqparameters']:
+        opts['bugtraqparameters'] = os.path.expandvars(opts['bugtraqparameters'])
+    opts['bugtraqtrigger'] = repo.ui.config('tortoisehg', 'issue.bugtraqtrigger', None)
+
+    return opts
+
+def commitopts2str(opts, mode='commit'):
+    optslist = []
+    for opt, value in opts.iteritems():
+        if opt in ['user', 'date', 'pushafter', 'autoinc',
+                   'recurseinsubrepos']:
+            if mode == 'merge' and opt == 'autoinc':
+                # autoinc does not apply to merge commits
+                continue
+            if value is True:
+                optslist.append('--' + opt)
+            elif value:
+                optslist.append('--%s=%s' % (opt, value))
+    return ' '.join(optslist)
+
 # Technical Debt for CommitWidget
 #  disable commit button while no message is entered or no files are selected
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
@@ -59,16 +87,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.currentAction = None
         self.currentProgress = None
 
-        opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
-        opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
-        opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
-        opts['recurseinsubrepos'] = repo.ui.config('tortoisehg', 'recurseinsubrepos', None)
-        opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
-        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
-        if opts['bugtraqparameters']:
-            opts['bugtraqparameters'] = os.path.expandvars(opts['bugtraqparameters'])
-        opts['bugtraqtrigger'] = repo.ui.config('tortoisehg', 'issue.bugtraqtrigger', None)
-        self.opts = opts # user, date
+        self.opts = opts = readrepoopts(repo) # user, date
 
         self.stwidget = status.StatusWidget(repo, pats, opts, self)
         self.stwidget.showMessage.connect(self.showMessage)
@@ -574,18 +593,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.branchbutton.setText(title)
 
         # Update options label, showing only whitelisted options.
-        opts = []
-        for opt, value in self.opts.iteritems():
-            if opt in ['user', 'date', 'pushafter', 'autoinc',
-                       'recurseinsubrepos']:
-                if value is True:
-                    opts.append('--' + opt)
-                elif value:
-                    opts.append('--%s=%s' % (opt, value))
-
+        opts = commitopts2str(self.opts)
         self.optionslabelfmt = _('<b>Selected Options:</b> %s')
         self.optionslabel.setText(self.optionslabelfmt
-                                  % hglib.tounicode(' '.join(opts)))
+                                  % hglib.tounicode(opts))
         self.optionslabel.setVisible(bool(opts))
 
         # Update parent csinfo widget
