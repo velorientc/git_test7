@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-05 23:09-0200\n"
-"PO-Revision-Date: 2012-11-06 15:19+0000\n"
+"PO-Revision-Date: 2012-11-12 09:32+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-11-08 05:02+0000\n"
-"X-Generator: Launchpad (build 16232)\n"
+"X-Launchpad-Export-Date: 2012-11-13 05:21+0000\n"
+"X-Generator: Launchpad (build 16251)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -330,7 +330,7 @@ msgid ""
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
 "Avant le backout, vous devez <a href=\"commit\"><b>committer</b></a>, <a "
-"href=\"shelve\"><b>faire</b></a> un patch ou <a "
+"href=\"shelve\"><b>faire un \"shelve\"</b></a> ou <a "
 "href=\"discard\"><b>abandonner</b></a> les changements."
 
 #: tortoisehg/hgqt/backout.py:228 tortoisehg/hgqt/graft.py:91
@@ -458,7 +458,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:585
 msgid "Backing out and committing..."
-msgstr ""
+msgstr "En cours de back out et de commit..."
 
 #: tortoisehg/hgqt/backout.py:586
 msgid "Please wait while making backout."
@@ -974,7 +974,7 @@ msgstr "Copier un des messages récents de commit"
 
 #: tortoisehg/hgqt/commit.py:128
 msgid "Show Issues"
-msgstr ""
+msgstr "Afficher les problèmes"
 
 #: tortoisehg/hgqt/commit.py:130
 msgid "Please wait..."
@@ -983,16 +983,16 @@ msgstr "Veuillez patienter..."
 #: tortoisehg/hgqt/commit.py:138
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr ""
+msgstr "Impossible de charger le suivi de problème '%s' : %s"
 
 #: tortoisehg/hgqt/commit.py:141 tortoisehg/hgqt/commit.py:511
 #: tortoisehg/hgqt/settings.py:370
 msgid "Issue Tracker"
-msgstr ""
+msgstr "Suivi de problèmes"
 
 #: tortoisehg/hgqt/commit.py:149
 msgid "Show Issues..."
-msgstr ""
+msgstr "Afficher les problèmes..."
 
 #: tortoisehg/hgqt/commit.py:153 tortoisehg/hgqt/grep.py:53
 #: tortoisehg/hgqt/serve_ui.py:87
@@ -1171,6 +1171,9 @@ msgid ""
 "contain an issue link.  Configure this in the 'Issue Tracking' section of "
 "the settings."
 msgstr ""
+"Aucun lien vers un problème n'a été trouvé dans le message de commit. Le "
+"message de commit devrait contenir un lien vers un problème. Configurer ceci "
+"dans la section 'Suivi de problèmes' des préférences."
 
 #: tortoisehg/hgqt/commit.py:828
 msgid "No files checked"
@@ -3218,15 +3221,15 @@ msgstr "Vous devez entrer un nom de patch"
 #: tortoisehg/hgqt/p4pending.py:66
 #, python-format
 msgid "Pending Perforce Changelists - %s"
-msgstr ""
+msgstr "Changelists de Perforce en cours - %s"
 
 #: tortoisehg/hgqt/p4pending.py:96
 msgid "Submitting p4 changelist..."
-msgstr ""
+msgstr "Soumettant une changelist p4..."
 
 #: tortoisehg/hgqt/p4pending.py:108
 msgid "Reverting p4 changelist..."
-msgstr ""
+msgstr "Rétablissant une changelist p4..."
 
 #: tortoisehg/hgqt/pathedit.py:23
 msgid "Edit Repository URL"
@@ -3246,7 +3249,7 @@ msgstr "Faire un backout de la branche actuelle de patch"
 
 #: tortoisehg/hgqt/pbranch.py:76
 msgid "Backport part of a changeset to a dependency"
-msgstr ""
+msgstr "\"Backporter\" une partie de révision vers une dépendance"
 
 #: tortoisehg/hgqt/pbranch.py:82
 msgid "Start a new patch branch"
@@ -3960,11 +3963,11 @@ msgstr "Retirer tous les fichiers sélectionnés"
 
 #: tortoisehg/hgqt/rebase.py:40
 msgid "Rebase changeset and descendants"
-msgstr ""
+msgstr "\"Rebaser\" une révision et ses descendants"
 
 #: tortoisehg/hgqt/rebase.py:48
 msgid "To rebase destination"
-msgstr ""
+msgstr "Vers la destination du \"rebase\""
 
 #: tortoisehg/hgqt/rebase.py:60
 msgid "Keep original changesets"
@@ -3977,24 +3980,27 @@ msgstr "Garder les noms de branches originaux"
 #: tortoisehg/hgqt/rebase.py:68
 msgid "Force detach of rebased changesets from their original branch"
 msgstr ""
+"Forcer la séparation des révisions \"rebasées\" de leur branche originale"
 
 #: tortoisehg/hgqt/rebase.py:72
 msgid "Collapse the rebased changesets "
-msgstr ""
+msgstr "Fusionner les révisions \"rebasées\" "
 
 #: tortoisehg/hgqt/rebase.py:83
 msgid ""
 "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
+"\"Rebaser\" les révisions non publiées sur la tête Subversion (remplacer "
+"source, destination)"
 
 #: tortoisehg/hgqt/rebase.py:98
 msgid "Rebase"
-msgstr ""
+msgstr "\"Rebaser\""
 
 #: tortoisehg/hgqt/rebase.py:121
 #, python-format
 msgid "Rebase - %s"
-msgstr ""
+msgstr "\"Rebase\" - %s"
 
 #: tortoisehg/hgqt/rebase.py:145
 msgid ""
@@ -4006,41 +4012,43 @@ msgstr ""
 
 #: tortoisehg/hgqt/rebase.py:150 tortoisehg/hgqt/rebase.py:216
 msgid "You may continue the rebase"
-msgstr ""
+msgstr "Vous pouvez continuer de \"rebaser\""
 
 #: tortoisehg/hgqt/rebase.py:195
 msgid "Rebase is complete"
-msgstr ""
+msgstr "Le \"rebase\" est fini"
 
 #: tortoisehg/hgqt/rebase.py:197
 msgid "Rebase aborted"
-msgstr ""
+msgstr "\"Rebase\" abandonné"
 
 #: tortoisehg/hgqt/rebase.py:199
 msgid "Rebase failed"
-msgstr ""
+msgstr "Échec du \"rebase\""
 
 #: tortoisehg/hgqt/rebase.py:210
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
+"Le \"rebase\" a créé des <b>conflits</b> de fusion qui doivent être <a "
+"href=\"resolve\"><b>résolus</b></a>"
 
 #: tortoisehg/hgqt/rebase.py:258
 msgid "Exiting with an unfinished rebase is not recommended."
-msgstr ""
+msgstr "Sortir avec un \"rebase\" inachevé n'est pas recommandé."
 
 #: tortoisehg/hgqt/rebase.py:259
 msgid "Consider aborting the rebase first."
-msgstr ""
+msgstr "Envisager de d'abord abandonner le \"rebase\"."
 
 #: tortoisehg/hgqt/rebase.py:271
 msgid "Rebase already in progress"
-msgstr ""
+msgstr "\"Rebase\" déjà en cours"
 
 #: tortoisehg/hgqt/rebase.py:272
 msgid "Resuming rebase already in progress"
-msgstr ""
+msgstr "Reprise du \"rebase\" déjà en cours"
 
 #: tortoisehg/hgqt/rebase.py:275
 msgid "You must provide source and dest arguments"
@@ -4480,7 +4488,7 @@ msgstr "Sélectionneer un dépôt à ajouter"
 #: tortoisehg/hgqt/reporegistry.py:538 tortoisehg/hgqt/reporegistry.py:632
 #: tortoisehg/hgqt/reporegistry.py:660 tortoisehg/hgqt/reporegistry.py:666
 msgid "Failed to add repository"
-msgstr "Échec lors de l'ajout du dépôt"
+msgstr "Impossible d'ajouter le dépôt"
 
 #: tortoisehg/hgqt/reporegistry.py:539 tortoisehg/hgqt/reporegistry.py:557
 #, python-format
@@ -4542,7 +4550,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:614
 msgid "Failed to add subrepository"
-msgstr "Échec lors de l'ajout du sous-dépôt"
+msgstr "Impossible d'ajouter le sous-dépôt"
 
 #: tortoisehg/hgqt/reporegistry.py:615
 #, python-format
@@ -4958,7 +4966,7 @@ msgstr "Renommer le patch..."
 
 #: tortoisehg/hgqt/repowidget.py:1285
 msgid "Rebase..."
-msgstr ""
+msgstr "Rebaser..."
 
 #: tortoisehg/hgqt/repowidget.py:1288
 msgid "Strip..."
@@ -5162,7 +5170,7 @@ msgstr "%d patches ont été exportés vers :<p><a href=\"file:///%s\">%s</a>"
 
 #: tortoisehg/hgqt/repowidget.py:1795
 msgid "Write bundle"
-msgstr "Écrire un bundle"
+msgstr "Écrire un paquet"
 
 #: tortoisehg/hgqt/repowidget.py:1855
 msgid "Backwards phase change requested"
@@ -5991,7 +5999,7 @@ msgstr "fusion avec l'ancien parent du répertoire de travail après backout"
 
 #: tortoisehg/hgqt/run.py:1071
 msgid "parent to choose when backing out merge"
-msgstr ""
+msgstr "parent à choisir lors du back out d'une fusion"
 
 #: tortoisehg/hgqt/run.py:1072
 msgid "revision to backout"
@@ -6011,7 +6019,7 @@ msgstr "le clone aura une copie de travail vide (seulement un dépôt)"
 
 #: tortoisehg/hgqt/run.py:1081
 msgid "revision, tag or branch to check out"
-msgstr ""
+msgstr "révision, étiquette ou branche à obtenir"
 
 #: tortoisehg/hgqt/run.py:1082
 msgid "include the specified changeset"
@@ -6204,11 +6212,11 @@ msgstr "forcer le détachement de la source de sa branche originale"
 
 #: tortoisehg/hgqt/run.py:1154
 msgid "rebase from the specified changeset"
-msgstr ""
+msgstr "rebase depuis la révision spécifiée"
 
 #: tortoisehg/hgqt/run.py:1156
 msgid "rebase onto the specified changeset"
-msgstr ""
+msgstr "rebase vers la révision spécifiée"
 
 #: tortoisehg/hgqt/run.py:1157
 msgid "thg rebase -s REV -d REV [--keep] [--detach]"
@@ -6398,7 +6406,7 @@ msgstr "Effacer"
 #: tortoisehg/hgqt/settings.py:371
 #, python-format
 msgid "Failed to load issue tracker: '%s': %s. "
-msgstr ""
+msgstr "Impossible de charger le suivi de problème : '%s' : %s. "
 
 #: tortoisehg/hgqt/settings.py:401
 msgid "&Browse..."
@@ -7304,7 +7312,7 @@ msgstr "Diff et annoter"
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "Patch EOL"
-msgstr ""
+msgstr "Fin de lignes des patches"
 
 #: tortoisehg/hgqt/settings.py:861
 msgid ""
@@ -7479,19 +7487,20 @@ msgstr "Outils"
 
 #: tortoisehg/hgqt/settings.py:925
 msgid "Issue Tracking"
-msgstr ""
+msgstr "Suivi de problèmes"
 
 #: tortoisehg/hgqt/settings.py:926
 msgid "Issue Regex"
-msgstr ""
+msgstr "Expression régulière de problème"
 
 #: tortoisehg/hgqt/settings.py:927
 msgid "Defines the regex to match when picking up issue numbers."
 msgstr ""
+"Définit l'expression régulière pour trouver des numéros de problèmes."
 
 #: tortoisehg/hgqt/settings.py:928
 msgid "Issue Link"
-msgstr ""
+msgstr "Lien vers un problème"
 
 #: tortoisehg/hgqt/settings.py:929
 msgid ""
@@ -7501,6 +7510,12 @@ msgid ""
 "by issue.regex, while {1} refers to the first group and so on. If no {n} "
 "tokensare found in issue.link, the entire matched string is appended instead."
 msgstr ""
+"Définit la commande à exécuter quand un numéro de problème est reconnu. Vous "
+"pouvez inclure des groupes dans issue.regex et des jetons correspondants à "
+"{n} dans issue.link (où n est un entier positif). {0} correspond à la chaîne "
+"entière trouvée par issue.regex, {1} désigne le premier groupe et ainsi de "
+"suite. Si aucun jeton {n} n'est trouvé dans issue.link, la chaîne complète "
+"trouvée est ajoutée."
 
 #: tortoisehg/hgqt/settings.py:936
 msgid "Inline Tags"
@@ -7512,7 +7527,7 @@ msgstr "Afficher les étiquettes au début du message de commit."
 
 #: tortoisehg/hgqt/settings.py:938
 msgid "Mandatory Issue Reference"
-msgstr ""
+msgstr "Référence à un problème obligatoire"
 
 #: tortoisehg/hgqt/settings.py:939
 msgid ""
@@ -7520,28 +7535,33 @@ msgid ""
 "enabled, the regex configured in 'Issue Regex' must find a match in the "
 "commit message."
 msgstr ""
+"Lors du commit, une référence à un problème doit être spécifiée. Si activé, "
+"l'expression régulière configurée dans 'Expression régulière de problème' "
+"doit  trouver un texte correspondant dans le message de commit."
 
 #: tortoisehg/hgqt/settings.py:942
 msgid "Issue Tracker Plugin"
-msgstr ""
+msgstr "Plugin de suivi de problème"
 
 #: tortoisehg/hgqt/settings.py:944
 msgid ""
 "Configures a COM IBugTraqProvider or IBugTrackProvider2 issue tracking "
 "plugin."
 msgstr ""
+"Configurer un plugin COM IBugTraqProvider ou IBugTrackProvider2 de suivi de "
+"problème."
 
 #: tortoisehg/hgqt/settings.py:946
 msgid "Configure Issue Tracker"
-msgstr ""
+msgstr "Configurer le suivi de problème"
 
 #: tortoisehg/hgqt/settings.py:947
 msgid "Configure the selected COM Bug Tracker plugin."
-msgstr ""
+msgstr "Configurer le plugin COM sélectionné de suivi de problème"
 
 #: tortoisehg/hgqt/settings.py:949
 msgid "Issue Tracker Trigger"
-msgstr ""
+msgstr "Déclencheur de suivi de problème"
 
 #: tortoisehg/hgqt/settings.py:951
 msgid ""
@@ -7550,6 +7570,10 @@ msgid ""
 "state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
 "a successful commit.</ul><p>Default: never"
 msgstr ""
+"Détermine quand l'état du suivi de problème sera mis à jour par TortoiseHg. "
+"Les valeurs valides sont :<ul><li><b>never</b> : Ne pas mettre l'état du "
+"suivi de problème automatiquement.<li><b>commit</b> : Mettre à jour l'état "
+"du suivi de problème après un commit réussi.</ul><p>Par défaut : never"
 
 #: tortoisehg/hgqt/settings.py:960
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -8258,7 +8282,7 @@ msgstr "Gérer les listes de changements Perforce en attente"
 
 #: tortoisehg/hgqt/sync.py:166
 msgid "Unbundle"
-msgstr ""
+msgstr "Dépaqueter (unbundle)"
 
 #: tortoisehg/hgqt/sync.py:170
 msgid "Stop current operation"
@@ -8584,7 +8608,7 @@ msgstr "Sélectionner le fichier paquet"
 
 #: tortoisehg/hgqt/sync.py:1151
 msgid "Bundle files (*.hg)"
-msgstr ""
+msgstr "Empaqueter (bundle) des fichiers (*.hg)"
 
 #: tortoisehg/hgqt/sync.py:1170
 msgid "Unable to remove URL"
@@ -8609,18 +8633,19 @@ msgstr "Mettre à jour - tirer, puis essayer de mettre à jour"
 #: tortoisehg/hgqt/sync.py:1206
 msgid "Fetch - use fetch (auto merge pulled changes)"
 msgstr ""
+"Fetch - utiliser fetch (fusionner automatiquement les changements tirés)"
 
 #: tortoisehg/hgqt/sync.py:1208
 msgid "Fetch - use fetch extension (fetch is not active!)"
-msgstr ""
+msgstr "Fetch - utiliser l'extension fetch (fetch n'est pas actif !)"
 
 #: tortoisehg/hgqt/sync.py:1215
 msgid "Rebase - rebase local commits above pulled changes"
-msgstr ""
+msgstr "Rebase - rebase les révisions locales au-dessus des révisions tirées"
 
 #: tortoisehg/hgqt/sync.py:1217
 msgid "Rebase - use rebase extension (rebase is not active!)"
-msgstr ""
+msgstr "Rebase - utiliser l'extension rebase (rebase n'est pas actif !)"
 
 #: tortoisehg/hgqt/sync.py:1235
 msgid "<a href=\"config\">Launch settings tool...</a>"
@@ -8917,7 +8942,7 @@ msgstr "Aperçu :"
 
 #: tortoisehg/hgqt/thgimport.py:87
 msgid "Shelf"
-msgstr ""
+msgstr "Shelf"
 
 #: tortoisehg/hgqt/thgimport.py:104
 msgid "Checking working directory status..."
@@ -9079,7 +9104,7 @@ msgstr "hg : erreur d'analyse : %s\n"
 #: tortoisehg/hgqt/thread.py:308
 #, python-format
 msgid "timed out waiting for lock held by %s"
-msgstr ""
+msgstr "attente trop longue du verrou tenu par %s"
 
 #: tortoisehg/hgqt/thread.py:310
 #, python-format
@@ -9119,7 +9144,7 @@ msgstr "abandon : erreur : %s\n"
 
 #: tortoisehg/hgqt/thread.py:340
 msgid "broken pipe\n"
-msgstr ""
+msgstr "pipe cassé\n"
 
 #: tortoisehg/hgqt/thread.py:363
 #, python-format
@@ -9294,7 +9319,7 @@ msgstr "Pas de changement de fichier à voir"
 
 #: tortoisehg/hgqt/visdiff.py:377
 msgid "working changes"
-msgstr ""
+msgstr "changements courants"
 
 #: tortoisehg/hgqt/visdiff.py:379
 #, python-format
@@ -9909,11 +9934,11 @@ msgstr "Affichage d'historique Hg de fichier [%s] - %s"
 #: tortoisehg/util/bugtraq.py:87 tortoisehg/util/bugtraq.py:111
 #: tortoisehg/util/bugtraq.py:132 tortoisehg/util/bugtraq.py:147
 msgid "Issue Tracker Plugin Error"
-msgstr ""
+msgstr "Erreur du plugin de suivi de problème"
 
 #: tortoisehg/util/bugtraq.py:88
 msgid "Could not instantiate Issue Tracker plugin COM object"
-msgstr ""
+msgstr "Ne peut pas instancier un objet COM du plugin de suivi de problème"
 
 #: tortoisehg/util/bugtraq.py:89
 msgid "This error will not be shown again until you restart the workbench"
@@ -9923,10 +9948,11 @@ msgstr ""
 #: tortoisehg/util/bugtraq.py:112
 msgid "Error getting commit message information from Issue Tracker plugin"
 msgstr ""
+"Erreur en récupérant le message de commit du plugin de suivi de problème"
 
 #: tortoisehg/util/bugtraq.py:133
 msgid "Error executing \"commit finished\" trigger"
-msgstr ""
+msgstr "Erreur durant le déclencheur \"commit terminé\""
 
 #: tortoisehg/util/bugtraq.py:148
 msgid "Cannot open Plugin Options dialog"
@@ -10083,11 +10109,11 @@ msgstr "Afficher l'historique des changements des fichiers sélectionnés"
 
 #: tortoisehg/util/menuthg.py:52
 msgid "Shelve Changes"
-msgstr ""
+msgstr "Changements du \"shelf\""
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Move changes between working dir and patch"
-msgstr ""
+msgstr "Déplacer les changements entre le répertoire de travail et le patch"
 
 #: tortoisehg/util/menuthg.py:55
 msgid "Synchronize"
