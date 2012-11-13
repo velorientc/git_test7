@@ -534,6 +534,10 @@ class CommitPage(BasePage):
         self.skiplast.setChecked(checked)
         self.layout().addWidget(self.skiplast)
 
+        self.setButtonText(QWizard.CommitButton, _('Commit Now'))
+        # The cancel button does not really "cancel" the merge
+        self.setButtonText(QWizard.CancelButton, _('Commit Later'))
+
     def refresh(self):
         pass
 
