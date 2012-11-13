@@ -99,8 +99,10 @@ class BasePage(QWizardPage):
     def canExit(self):
         if len(self.repo.parents()) == 2:
             main = _('Do you want to exit?')
-            text = _('To finish merging, you need to commit '
-                     'the working directory.')
+            text = _('To finish merging, you must commit '
+                     'the working directory.\n\n'
+                     'To cancel the merge you can update to one '
+                     'of the merge parent revisions.')
             labels = ((QMessageBox.Yes, _('&Exit')),
                       (QMessageBox.No, _('Cancel')))
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
