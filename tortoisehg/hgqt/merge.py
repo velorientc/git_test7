@@ -94,7 +94,7 @@ class BasePage(QWizardPage):
         pass
 
     def currentPage(self):
-        pass
+        self.wizard().setOption(QWizard.NoDefaultButton, False)
 
     def canExit(self):
         if len(self.repo.parents()) == 2:
@@ -270,6 +270,7 @@ class SummaryPage(BasePage):
         return True
 
     def currentPage(self):
+        super(SummaryPage, self).currentPage()
         self.refresh()
 
     def refresh(self):
@@ -369,6 +370,7 @@ class MergePage(BasePage):
         self.layout().addWidget(self.autonext)
 
     def currentPage(self):
+        super(MergePage, self).currentPage()
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
@@ -549,6 +551,9 @@ class CommitPage(BasePage):
         self.msgEntry.saveSettings(s, 'merge/message')
 
     def currentPage(self):
+        super(CommitPage, self).currentPage()
+        self.wizard().setOption(QWizard.NoDefaultButton, True)
+
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
         wctx = self.repo[None]
         if wctx.p1().branch() == wctx.p2().branch():
@@ -636,6 +641,7 @@ class ResultPage(BasePage):
         self.layout().addStretch(1)
 
     def currentPage(self):
+        super(ResultPage, self).currentPage()
         self.mergeCsInfo.update(self.repo['tip'])
         self.wizard().setOption(QWizard.NoCancelButton, True)
 
