@@ -100,6 +100,7 @@ class FileData(object):
 
         isbfile = False
         repo = ctx._repo
+        maxdiff = repo.maxdiff
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
         if isinstance(ctx, patchctx.patchctx):
@@ -111,6 +112,20 @@ class FileData(object):
                 self.elabel = _("exec mode has been <font color='red'>unset</font>")
             elif flags == 'l':
                 self.flabel += _(' <i>(is a symlink)</i>')
+
+            # Do not show patches that are too big or may be binary
+            p = _('Diff not displayed: ')
+            data = self.diff
+            size = len(data)
+            if (size > maxdiff):
+                self.error = p + _('File is larger than the specified max size.\n'
+                               'maxdiff = %s KB') % (maxdiff // 1024)
+            elif '\0' in data:
+                self.error = p + _('File is binary')
+            elif _exceedsMaxLineLength(data):
+                # it's incredibly slow to render long line by QScintilla
+                self.error = p + \
+                    _('File may be binary (maximum line length exceeded)')
             return
 
         if ctx2:
@@ -312,7 +327,6 @@ class FileData(object):
 
         # TODO: elif check if a subdirectory (for manifest tool)
 
-        maxdiff = repo.maxdiff
         mde = _('File or diffs not displayed: '
                 'File is larger than the specified max size.\n'
                 'maxdiff = %s KB') % (maxdiff // 1024)
