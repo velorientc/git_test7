@@ -867,10 +867,13 @@ INFO = (
           'Default: False')),
     _fi(_('MQ Git Format'), 'mq.git', (genDefaultCombo,
         ['auto', 'keep', 'yes', 'no']),
-     _("If set to 'keep', mq will obey the [diff] section configuration while"
+     _("When set to 'auto', mq will automatically use git patches when required"
+       " to avoid losing changes to file modes, copy records or binary files."
+       " If set to 'keep', mq will obey the [diff] section configuration while"
        " preserving existing git patches upon qrefresh. If set to 'yes' or"
        " 'no', mq will override the [diff] section and always generate git or"
-       " regular patches, possibly losing data in the second case.")),
+       " regular patches, possibly losing data in the second case."
+       " Default: auto")),
     _fi(_('No Dates'), 'diff.nodates', genBoolRBGroup,
         _('Do not include modification dates in diff headers. '
           'Default: False')),
