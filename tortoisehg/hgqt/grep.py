@@ -650,7 +650,8 @@ class MatchTree(QTableView):
         from tortoisehg.hgqt.run import qtrun
         repo, ui, pattern, icase = self.repo, self.repo.ui, self.pattern, self.icase
         seen = set()
-        for rev, path, line in self.selectedRows:
+        for rev, upath, line in self.selectedRows:
+            path = hglib.fromunicode(upath)
             # Only open one annotate instance per file
             if path in seen:
                 continue
@@ -684,7 +685,8 @@ class MatchTree(QTableView):
     def onViewFile(self):
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
-        for rev, path, line in self.selectedRows:
+        for rev, upath, line in self.selectedRows:
+            path = hglib.fromunicode(upath)
             # Only open one editor instance per file
             if path in seen:
                 continue
@@ -710,7 +712,9 @@ class MatchTree(QTableView):
                 else:
                     defer.append([rev, path, line])
             if crev is not None:
-                dlg = visdiff.visualdiff(ui, repo, list(files), {'change':crev})
+                dlg = visdiff.visualdiff(ui, repo,
+                                         map(hglib.fromunicode, files),
+                                         {'change':crev})
                 if dlg:
                     dlg.exec_()
             rows = defer
