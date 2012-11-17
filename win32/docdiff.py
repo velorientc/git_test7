@@ -27,6 +27,7 @@ scripts = {
     'doc'  : ('diff-doc.js', 'merge-doc.js'),    # MS Word
     'docx' : ('diff-doc.js', 'merge-doc.js'),
     'docm' : ('diff-doc.js', 'merge-doc.js'),
+    'rtf'  : ('diff-doc.js', 'merge-doc.js'),
     'ppt'  : ('diff-ppt.js',),                   # MS PowerPoint
     'pptx' : ('diff-ppt.js',),
     'pptm' : ('diff-ppt.js',),

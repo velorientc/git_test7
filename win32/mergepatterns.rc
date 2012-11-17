@@ -1,5 +1,6 @@
 [merge-patterns]
 **.doc = docdiff
+**.rtf = docdiff
 **.docx = docdiff
 **.docm = docdiff
 **.ods = docdiff
@@ -13,6 +14,7 @@
 
 [diff-patterns]
 **.doc = docdiff
+**.rtf = docdiff
 **.docx = docdiff
 **.docm = docdiff
 **.ppt = docdiff
