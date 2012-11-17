@@ -921,6 +921,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         if self.opts.get('pushafter'):
             cmd = ['push', '--repository', repo.root, self.opts['pushafter']]
+            if newbranch:
+                cmd.append('--new-branch')
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
