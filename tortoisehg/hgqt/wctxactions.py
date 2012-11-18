@@ -363,16 +363,11 @@ def delete(parent, ui, repo, files):
     return True
 
 def copy(parent, ui, repo, files):
+    from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    wfile = repo.wjoin(files[0])
-    fd = QFileDialog(parent)
-    fname = fd.getSaveFileName(parent, _('Copy file to'), wfile)
-    if not fname:
-        return False
-    fname = hglib.fromunicode(fname)
-    wfiles = [wfile, fname]
-    opts = {'force': True}  # existing file is already checked by QFileDialog
-    commands.copy(ui, repo, *wfiles, **opts)
+    dlg = RenameDialog(ui, files, parent, iscopy=True)
+    dlg.finished.connect(dlg.deleteLater)
+    dlg.exec_()
     return True
 
 def rename(parent, ui, repo, files):
