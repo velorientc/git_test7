@@ -26,9 +26,9 @@ class RenameDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, ui, pats, parent=None, **opts):
+    def __init__(self, ui, pats, parent=None, iscopy=False):
         super(RenameDialog, self).__init__(parent)
-        self.iscopy = (opts.get('alias') == 'copy')
+        self.iscopy = iscopy
         # pats: local; src, dest: unicode
         src, dest = self.init_data(ui, pats)
         self.init_view(src, dest)
@@ -351,4 +351,5 @@ class RenameDialog(QDialog):
         s.setValue('rename/geom', self.saveGeometry())
 
 def run(ui, *pats, **opts):
-    return RenameDialog(ui, pats, **opts)
+    iscopy = (opts.get('alias') == 'copy')
+    return RenameDialog(ui, pats, iscopy=iscopy)
