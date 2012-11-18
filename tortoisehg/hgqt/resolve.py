@@ -123,6 +123,7 @@ class ResolveDialog(QDialog):
         cmother.triggered.connect(lambda: self.merge('internal:other'))
         cmres = self.utreecmenu.addAction(_('Mark as Resolved'))
         cmres.triggered.connect(self.markresolved)
+        self.utreecmenu.addSeparator()
         cmdiffLocToAnc = self.utreecmenu.addAction(_('Diff Local to Ancestor'))
         cmdiffLocToAnc.triggered.connect(self.diffLocToAnc)
         cmdiffOthToAnc = self.utreecmenu.addAction(_('Diff Other to Ancestor'))
