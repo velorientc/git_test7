@@ -187,7 +187,7 @@ class ResolveDialog(QDialog):
         self.rmmenuitems = (cmvp1, cmv3way)
         self.rtree.customContextMenuRequested.connect(self.rtreeMenuRequested)
 
-        self.rtree.doubleClicked.connect(self.rtreeDoubleClicked)
+        self.rtree.doubleClicked.connect(self.vp0)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
@@ -433,14 +433,11 @@ class ResolveDialog(QDialog):
     def rtreeMenuRequested(self, point):
         self.rtreecmenu.exec_(self.rtree.viewport().mapToGlobal(point))
 
-    def utreeDoubleClicked(self, index):
+    def utreeDoubleClicked(self):
         if self.repo.ui.configbool('tortoisehg', 'autoresolve'):
             self.merge()
         else:
             self.merge('internal:merge')
-
-    def rtreeDoubleClicked(self, index):
-        self.vp0()
 
 class PathsTree(QTreeView):
     def __init__(self, repo, parent):
