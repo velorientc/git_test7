@@ -236,7 +236,7 @@ class RenameDialog(QDialog):
         else:
             cmdline = ['rename']
         cmdline += ['-R', self.repo.root]
-        cmdline.append('-v')
+        cmdline.append('-vf')
         if self.isCaseFoldingOnWin():
             cmdline.append('-A')
         cmdline.append(src)
