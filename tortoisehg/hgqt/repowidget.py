@@ -1818,6 +1818,7 @@ class RepoWidget(QWidget):
                 class Writable(object):
                     def write(self, *args, **opts): _ui.write(*args, **opts)
                     def close(self): pass
+                    def __len__(self): return 0
                 commands.export(_ui, self.repo, self.rev, output=Writable())
             else:
                 revs = self.rev and self.menuselection or None
