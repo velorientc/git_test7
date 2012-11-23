@@ -336,6 +336,10 @@ class RepoRegistryView(QDockWidget):
             QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
 
     def reloadModel(self):
+        activeroot = None
+        if self._activeTabRepo:
+            activeroot = hglib.tounicode(self._activeTabRepo.rootpath())
+            self._activeTabRepo = None  # invalid after setModel()
         oldmodel = self.tview.model()
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
@@ -343,6 +347,8 @@ class RepoRegistryView(QDockWidget):
                 self.showShortPaths))
         oldmodel.deleteLater()
         self.expand()
+        if activeroot:
+            self.setActiveTabRepo(activeroot)
         self._pendingReloadModel = False
 
     def _getItemAndAncestors(self, it):
