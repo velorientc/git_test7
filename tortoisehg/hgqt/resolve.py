@@ -248,7 +248,7 @@ class ResolveDialog(QDialog):
             cmd = cmdline + ['--repository', curroot, '--']
             for root, wfile in selected:
                 if root == curroot:
-                    cmd.append(os.path.join(root, wfile))
+                    cmd.append(os.path.normpath(os.path.join(root, wfile)))
             cmdlines.append(cmd)
             selected = [(r, w) for r, w in selected if r != curroot]
         if cmdlines:
