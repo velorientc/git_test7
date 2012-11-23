@@ -142,7 +142,6 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
-    shortnameChanged = pyqtSignal()
     def __init__(self, root=None, parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root or ''
