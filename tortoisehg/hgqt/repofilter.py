@@ -63,6 +63,7 @@ class RepoFilterBar(QToolBar):
         combo.setEditable(True)
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        combo.completer().setCaseSensitivity(Qt.CaseSensitive)
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
         le.selectionChanged.connect(self.selectionChanged)
