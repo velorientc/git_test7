@@ -132,6 +132,39 @@ class ThgStatusBar(QStatusBar):
             pm.unknown()
 
 
+def _quotecmdarg(arg):
+    # only for display; no use to construct command string for os.system()
+    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
+        return '"%s"' % arg.replace('"', '\\"')
+    else:
+        return arg
+
+def _prettifycmdline(cmdline):
+    r"""Build pretty command-line string for display
+
+    >>> _prettifycmdline(['--repository', 'foo', 'status'])
+    'status'
+    >>> _prettifycmdline(['--cwd', 'foo', 'resolve', '--', '--repository'])
+    'resolve -- --repository'
+    >>> _prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
+    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
+    """
+    try:
+        argcount = cmdline.index('--')
+    except ValueError:
+        argcount = len(cmdline)
+    printables = []
+    pos = 0
+    while pos < argcount:
+        if cmdline[pos] in ('-R', '--repository', '--cwd'):
+            pos += 2
+        else:
+            printables.append(cmdline[pos])
+            pos += 1
+    printables.extend(cmdline[argcount:])
+
+    return ' '.join(_quotecmdarg(e) for e in printables)
+
 class Core(QObject):
     """Core functionality for running Mercurial command.
     Do not attempt to instantiate and use this directly.
@@ -220,7 +253,7 @@ class Core(QObject):
             if display:
                 cmd = '%% hg %s\n' % display
             else:
-                cmd = '%% hg %s\n' % ' '.join(cmdline)
+                cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
             self.output.emit(cmd, 'control')
             proc.start(exepath, cmdline, QIODevice.ReadOnly)
 
@@ -272,7 +305,8 @@ class Core(QObject):
 
         cmdline = self.queue.pop(0)
 
-        self.thread = thread.CmdThread(cmdline, self.display, self.parent())
+        display = self.display or _prettifycmdline(cmdline)
+        self.thread = thread.CmdThread(cmdline, display, self.parent())
         self.thread.started.connect(self.onCommandStarted)
         self.thread.commandFinished.connect(self.onThreadFinished)
 
