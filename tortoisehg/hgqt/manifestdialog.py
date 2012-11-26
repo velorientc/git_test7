@@ -90,7 +90,8 @@ class ManifestDialog(QMainWindow):
     def _linkHandler(self, link):
         ulink = unicode(link)
         if ulink.startswith('cset:'):
-            rev = ulink[len('cset:'):]
+            changeid = hglib.fromunicode(ulink[len('cset:'):])
+            rev = self._repo[changeid].rev()
             self._manifest_widget.setRev(rev)
         else:
             self.linkActivated.emit(link)
