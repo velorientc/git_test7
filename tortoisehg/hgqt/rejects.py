@@ -98,7 +98,7 @@ class RejectsDialog(QDialog):
             self.hide()
             QTimer.singleShot(0, self.reject)
             return
-        earlybytes = f.readData(4096)
+        earlybytes = f.read(4096)
         if '\0' in earlybytes:
             qtlib.ErrorMsgBox(_('Unable to merge rejects'),
                               _('This appears to be a binary file'))
