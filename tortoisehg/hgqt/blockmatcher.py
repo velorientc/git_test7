@@ -129,6 +129,24 @@ class BlockList(QWidget):
         p.drawRect(0, self._value, w, self._pagestep)
         p.restore()
 
+    def scrollToPos(self, y):
+        # Scroll to the position which specified by Y coodinate.
+        if not isinstance(self._sbar, QScrollBar):
+            return
+        ratio = float(y) / self.height()
+        minimum, maximum, step = self._minimum, self._maximum, self._pagestep
+        value = minimum + (maximum + step - minimum) * ratio - (step * 0.5)
+        value = min(maximum, max(minimum, value))  # round to valid range.
+        self.setValue(value)
+
+    def mousePressEvent(self, event):
+        super(BlockList, self).mousePressEvent(event)
+        self.scrollToPos(event.y())
+
+    def mouseMoveEvent(self, event):
+        super(BlockList, self).mouseMoveEvent(event)
+        self.scrollToPos(event.y())
+
 class BlockMatch(BlockList):
     """
     A simpe widget to be linked to 2 file views (text areas),
