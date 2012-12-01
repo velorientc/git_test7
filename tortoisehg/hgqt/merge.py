@@ -504,6 +504,7 @@ class CommitPage(BasePage):
                                     withupdate=True)
         mergeCsInfo.linkActivated.connect(self.onLinkActivated)
         self.layout().addWidget(mergeCsInfo)
+        self.mergeCsInfo = mergeCsInfo
 
         # commit message area
         msg_sep = qtlib.LabeledSeparator(_('Commit message'))
@@ -570,6 +571,7 @@ class CommitPage(BasePage):
     def currentPage(self):
         super(CommitPage, self).currentPage()
         self.wizard().setOption(QWizard.NoDefaultButton, True)
+        self.mergeCsInfo.update()  # show post-merge state
 
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
         wctx = self.repo[None]
