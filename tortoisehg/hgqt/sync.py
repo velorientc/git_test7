@@ -141,16 +141,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return a
 
         self.incomingAction = \
-        newaction(_('Preview incoming changesets from remote repository'),
+        newaction(_('Check for incoming changes from selected URL'),
              'hg-incoming', self.inclicked)
         self.pullAction = \
-        newaction(_('Pull incoming changesets from remote repository'),
+        newaction(_('Pull incoming changes from selected URL'),
              'hg-pull', lambda: self.pullclicked())
         self.outgoingAction = \
-        newaction(_('Filter outgoing changesets to remote repository'),
+        newaction(_('Detect outgoing changes to selected URL'),
              'hg-outgoing', self.outclicked)
         self.pushAction = \
-        newaction(_('Push outgoing changesets to remote repository'),
+        newaction(_('Push outgoing changes to selected URL'),
              'hg-push', lambda: self.pushclicked(True))
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
