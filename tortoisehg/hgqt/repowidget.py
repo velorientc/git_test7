@@ -1836,7 +1836,10 @@ class RepoWidget(QWidget):
         if returnval:
             return output
         else:
-            QApplication.clipboard().setText(hglib.tounicode(output))
+            mdata = QMimeData()
+            mdata.setData('text/x-diff', output)  # for lossless import
+            mdata.setText(hglib.tounicode(output))
+            QApplication.clipboard().setMimeData(mdata)
 
     def copyHash(self):
         clip = QApplication.clipboard()

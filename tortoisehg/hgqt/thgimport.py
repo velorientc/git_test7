@@ -194,8 +194,12 @@ class ImportDialog(QDialog):
             self.src_combo.setFocus()
 
     def getcliptext(self):
-        text = hglib.fromunicode(QApplication.clipboard().text())
-        if not text:
+        mdata = QApplication.clipboard().mimeData()
+        if mdata.hasFormat('text/x-diff'):  # lossless
+            text = str(mdata.data('text/x-diff'))
+        elif mdata.hasText():  # could be encoding damaged
+            text = hglib.fromunicode(mdata.text(), errors='ignore')
+        else:
             return
         filename = self.writetempfile(text)
         curtext = self.src_combo.currentText()
