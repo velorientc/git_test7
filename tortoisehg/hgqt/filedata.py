@@ -407,13 +407,12 @@ class FileData(object):
         self.olddata = olddata
         newdate = util.datestr(ctx.date())
         olddate = util.datestr(ctx2.date())
-        revs = [str(ctx), str(ctx2)]
         diffopts = patch.diffopts(repo.ui, {})
         diffopts.git = False
         if isbfile:
             olddata += '\0'
             newdata += '\0'
 
-        self.diff = 'diff -r ' + ' -r '.join(revs) + ' ' + oldname + '\n'
+        self.diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
         self.diff += mdiff.unidiff(olddata, olddate, newdata, newdate,
                                    oldname, wfile, opts=diffopts)
