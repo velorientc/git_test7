@@ -91,12 +91,12 @@ class HgFileView(QFrame):
         hbox.setContentsMargins(0, 0, 0, 0)
         hbox.setSpacing(0)
         l.addLayout(hbox)
-
         self.blk = blockmatcher.BlockList(self)
+        self.blksearch = blockmatcher.BlockList(self)
         self.sci = AnnotateView(repo, self)
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
-
+        hbox.addWidget(self.blksearch)
         self.sci.showMessage.connect(self.showMessage)
         self.sci.setAnnotationEnabled(False)
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -107,10 +107,10 @@ class HgFileView(QFrame):
             self.sci.setAnnotationDisplay(qsci.AnnotationStandard)
         else:
             self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
-
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
-
+        self.blksearch.linkScrollBar(self.sci.verticalScrollBar())
+        self.blksearch.setVisible(False)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -447,6 +447,7 @@ class HgFileView(QFrame):
     def clearMarkup(self):
         self.sci.clear()
         self.blk.clear()
+        self.blksearch.clear()
         # Setting the label to ' ' rather than clear() keeps the label
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
@@ -619,6 +620,7 @@ class HgFileView(QFrame):
         if self._mode != DiffMode:
             self.blk.setVisible(True)
             self.blk.syncPageStep()
+        self.blksearch.syncPageStep()
 
         if fd.contents and fd.olddata:
             if self.timer.isActive():
@@ -675,7 +677,14 @@ class HgFileView(QFrame):
     def highlightText(self, match, icase=False):
         self._lastSearch = match, icase
         self.sci.highlightText(match, icase)
-
+        blk = self.blksearch
+        blk.clear()
+        blk.setUpdatesEnabled(False)
+        blk.clear()
+        for l in self.sci.highlightLines:
+            blk.addBlock('s', l, l + 1)
+        blk.setVisible(bool(match))
+        blk.setUpdatesEnabled(True)
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
 
