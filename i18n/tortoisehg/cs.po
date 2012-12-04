@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-25 08:56-0200\n"
-"PO-Revision-Date: 2012-05-08 15:21+0000\n"
+"PO-Revision-Date: 2012-12-03 19:42+0000\n"
 "Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-11-26 04:45+0000\n"
-"X-Generator: Launchpad (build 16293)\n"
+"X-Launchpad-Export-Date: 2012-12-04 05:57+0000\n"
+"X-Generator: Launchpad (build 16335)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -62,7 +62,7 @@ msgstr "verze %s"
 #: tortoisehg/hgqt/about.py:107
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
+msgstr "plus Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #: tortoisehg/hgqt/about.py:156
 msgid "A new version of TortoiseHg is ready for download!"
@@ -138,7 +138,7 @@ msgstr "Vždy zobrazit výstup"
 
 #: tortoisehg/hgqt/archive.py:106
 msgid "&Archive"
-msgstr "&Archiv"
+msgstr "&Archivovat"
 
 #: tortoisehg/hgqt/archive.py:111 tortoisehg/hgqt/rename.py:107
 msgid "&Detail"
@@ -280,7 +280,7 @@ msgstr "Stávající lokální revize"
 
 #: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
-msgstr ""
+msgstr "Rodič sloučení k němuž se vrátit"
 
 #: tortoisehg/hgqt/backout.py:174
 msgid ""
@@ -533,7 +533,7 @@ msgstr "%s (hint: %s)"
 
 #: tortoisehg/hgqt/bookmark.py:57
 msgid "Bookmark:"
-msgstr "Označení:"
+msgstr "Záložka:"
 
 #: tortoisehg/hgqt/bookmark.py:62
 msgid "New Name:"
@@ -561,42 +561,42 @@ msgstr "&Move"
 #: tortoisehg/hgqt/bookmark.py:92
 #, python-format
 msgid "Bookmark - %s"
-msgstr "Označení - %s"
+msgstr "Záložka - %s"
 
 #: tortoisehg/hgqt/bookmark.py:159 tortoisehg/hgqt/bookmark.py:213
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr "Označení jménem \"%s\" již existuje"
+msgstr "Záložka s jménem \"%s\" již existuje"
 
 #: tortoisehg/hgqt/bookmark.py:164
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr "Bylo přidáno označení '%s'"
+msgstr "Byla přidána záložka '%s'"
 
 #: tortoisehg/hgqt/bookmark.py:175
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr "Označení jménem \"%s\" neexistuje"
+msgstr "Záložka s jménem \"%s\" neexistuje"
 
 #: tortoisehg/hgqt/bookmark.py:180
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr "Označení '%s' bylo přemístěno"
+msgstr "Záložka '%s' byla přemístěna"
 
 #: tortoisehg/hgqt/bookmark.py:191 tortoisehg/hgqt/bookmark.py:209
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr "Označení \"%s\" neexistuje"
+msgstr "Záložka \"%s\" neexistuje"
 
 #: tortoisehg/hgqt/bookmark.py:195
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr "Označení '%s' bylo odstraněno"
+msgstr "Záložka '%s' byla odstraněna"
 
 #: tortoisehg/hgqt/bookmark.py:218
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr "Označení '%s' bylo změněno na '%s'"
+msgstr "Záložka '%s' byla přejmenována na '%s'"
 
 #: tortoisehg/hgqt/branchop.py:22
 #, python-format
@@ -626,7 +626,7 @@ msgstr "Zavřít aktuální větev"
 #: tortoisehg/hgqt/bugreport.py:27
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
-msgstr "Ohlašte prosím tuto chybu do našeho <a href=\"%s\">bestiáře</a>"
+msgstr "Ohlašte prosím tuto chybu našemu <a href=\"%s\"> bug tracker</a>"
 
 #: tortoisehg/hgqt/bugreport.py:45 tortoisehg/hgqt/qscilib.py:192
 #: tortoisehg/hgqt/rename.py:166
@@ -676,7 +676,7 @@ msgstr "Zobrazit změny souboru v externím diffovém prohlížeči"
 
 #: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/filectxactions.py:72
 msgid "Edit Local"
-msgstr "Edit Local"
+msgstr "Editovat soubor"
 
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/filectxactions.py:73
 #: tortoisehg/hgqt/filectxactions.py:75
@@ -710,11 +710,11 @@ msgstr "No deletable chunks"
 
 #: tortoisehg/hgqt/chunks.py:237
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "Kompletně odebrat soubor z oprávky?"
 
 #: tortoisehg/hgqt/chunks.py:239
 msgid "Revert all file changes?"
-msgstr ""
+msgstr "Vrátit zpět všechny změny souboru?"
 
 #: tortoisehg/hgqt/chunks.py:240
 msgid "No chunks remain"
@@ -722,11 +722,11 @@ msgstr "No chunks remain"
 
 #: tortoisehg/hgqt/chunks.py:271
 msgid "file has been deleted, refresh"
-msgstr "soubor byl smazán, osvěžit"
+msgstr "soubor byl smazán, (refresh)"
 
 #: tortoisehg/hgqt/chunks.py:274
 msgid "file has been modified, refresh"
-msgstr "soubor byl změněn, osvěžit"
+msgstr "soubor byl změněn, (refresh)"
 
 #: tortoisehg/hgqt/chunks.py:308
 msgid "Unable to merge chunks"
@@ -997,7 +997,7 @@ msgstr "Commit"
 
 #: tortoisehg/hgqt/commit.py:290
 msgid "Amend current revision"
-msgstr ""
+msgstr "Upravit aktální revizi"
 
 #: tortoisehg/hgqt/commit.py:290
 msgid "Amend"
@@ -1013,7 +1013,7 @@ msgstr "QNew"
 
 #: tortoisehg/hgqt/commit.py:295
 msgid "Refresh current patch"
-msgstr "Osvěžit aktuální oprávku"
+msgstr "Zčerstvit aktuální oprávku"
 
 #: tortoisehg/hgqt/commit.py:295 tortoisehg/hgqt/mq.py:553
 #: tortoisehg/hgqt/mq.py:934
@@ -1054,7 +1054,7 @@ msgstr "Vytvořit &větev"
 #: tortoisehg/hgqt/commit.py:481
 msgctxt "start progress"
 msgid "MQ Action"
-msgstr ""
+msgstr "Akce MQ"
 
 #: tortoisehg/hgqt/commit.py:593
 msgid "Close Branch: "
@@ -1067,7 +1067,7 @@ msgstr "Nová větev: "
 #: tortoisehg/hgqt/commit.py:600 tortoisehg/hgqt/merge.py:546
 #, python-format
 msgid "<b>Selected Options:</b> %s"
-msgstr ""
+msgstr "<b>Vybrané možnosti:</b> %s"
 
 #: tortoisehg/hgqt/commit.py:614 tortoisehg/hgqt/revpanel.py:24
 #: tortoisehg/hgqt/update.py:87
@@ -1081,7 +1081,7 @@ msgstr "Název oprávky (patch):"
 #: tortoisehg/hgqt/commit.py:637
 #, python-format
 msgid "Close %s branch"
-msgstr ""
+msgstr "Zavřít větev %s"
 
 #: tortoisehg/hgqt/commit.py:650
 #, python-format
@@ -1103,7 +1103,7 @@ msgstr "Zavrhnout zprávu aktuálního komitu?"
 
 #: tortoisehg/hgqt/commit.py:771
 msgid "Default username is not configured"
-msgstr ""
+msgstr "Implicitní jméno uživatele není nastaveno"
 
 #: tortoisehg/hgqt/commit.py:772
 msgid ""
@@ -1114,14 +1114,20 @@ msgid ""
 "\n"
 "Do you want to configure your default username now?"
 msgstr ""
+"Implicitní jméno uživatele není zadáno. Toto jméno se použije při komitu, "
+"pokud v daném repozitáři nezadáte jiné jméno.\n"
+"\n"
+"Bez implicitního jména uživatele nelze provádět komit.\n"
+"\n"
+"Chcete nyní zadat své implicitní uživatelské jméno?"
 
 #: tortoisehg/hgqt/commit.py:777
 msgid "&Configure"
-msgstr ""
+msgstr "&Konfigurovat"
 
 #: tortoisehg/hgqt/commit.py:787
 msgid "Message Translation Failure"
-msgstr ""
+msgstr "Nezdařil se překlad sdělení"
 
 #: tortoisehg/hgqt/commit.py:788
 msgid ""
@@ -1187,7 +1193,7 @@ msgstr "Commit"
 #: tortoisehg/hgqt/commit.py:983
 #, python-format
 msgid "%s - commit options"
-msgstr "%s - commit options"
+msgstr "%s - možnosti komitu"
 
 #: tortoisehg/hgqt/commit.py:990
 msgid "Set username:"
@@ -1394,47 +1400,47 @@ msgstr "Zobrazeno %(count)d z %(total)d položek"
 
 #: tortoisehg/hgqt/customtools.py:46
 msgid "Select a GUI location to edit:"
-msgstr ""
+msgstr "Vybrat umístění editovaného GUI:"
 
 #: tortoisehg/hgqt/customtools.py:49
 msgid "Select the toolbar or menu to change"
-msgstr ""
+msgstr "Vybrat nástrojovou lištu nebo menu, které má být měněno"
 
 #: tortoisehg/hgqt/customtools.py:70
 msgid "Tools shown on selected location"
-msgstr ""
+msgstr "Nástroje, zobrazené ve vybraném místě"
 
 #: tortoisehg/hgqt/customtools.py:80
 msgid "Delete from list"
-msgstr ""
+msgstr "Vymazat ze seznamu"
 
 #: tortoisehg/hgqt/customtools.py:88
 msgid "Add to list"
-msgstr ""
+msgstr "Přidat do seznamu"
 
 #: tortoisehg/hgqt/customtools.py:90
 msgid "Add separator"
-msgstr ""
+msgstr "Přidat oddělovač"
 
 #: tortoisehg/hgqt/customtools.py:100
 msgid "List of all tools"
-msgstr ""
+msgstr "Seznam všech nástrojů"
 
 #: tortoisehg/hgqt/customtools.py:102
 msgid "New Tool ..."
-msgstr ""
+msgstr "Nový nástroj..."
 
 #: tortoisehg/hgqt/customtools.py:104
 msgid "Edit Tool ..."
-msgstr ""
+msgstr "Upravit nástroj..."
 
 #: tortoisehg/hgqt/customtools.py:106
 msgid "Delete Tool"
-msgstr ""
+msgstr "Smazat nástroj"
 
 #: tortoisehg/hgqt/customtools.py:393
 msgid "Configure Custom Tool"
-msgstr ""
+msgstr "Nastavení uživatelského nástroje"
 
 #: tortoisehg/hgqt/customtools.py:406
 msgid "Tool name"
@@ -1442,7 +1448,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:407
 msgid "The tool name. It cannot contain spaces."
-msgstr ""
+msgstr "Název nástroje. Nesmí obsahovat mezery."
 
 #: tortoisehg/hgqt/customtools.py:409
 msgid "Command"
@@ -1456,6 +1462,10 @@ msgid ""
 "You can use {ROOT} as an alias of the current repository root and\n"
 "{REV} as an alias of the selected revision."
 msgstr ""
+"Příkaz, který bude proveden.\n"
+"Ke spuštění příkazu Mercurialu používáme  \"hg\" místo \"hg.exe\".\n"
+"Můžete použít {ROOT} jako alias aktuálního kořenu repozitáře a\n"
+"{REV} jako alias vybrané revize."
 
 #: tortoisehg/hgqt/customtools.py:415
 msgid "Tool label"
@@ -1467,6 +1477,9 @@ msgid ""
 "If no label is set, the tool name will be used as the tool label.\n"
 "If no tooltip is set, the label will be used as the tooltip as well."
 msgstr ""
+"Popisek nástroje se zobrazí v kontextovém menu repowidgetu.\n"
+"Není-li žádný zadán, zobrazí se jako popisek název nástroje.\n"
+"Není-li zadána nápověda (tooltip), zobrazí se popisek."
 
 #: tortoisehg/hgqt/customtools.py:421
 msgid "Tooltip"
@@ -1478,6 +1491,8 @@ msgid ""
 "This is only shown when the tool button is shown on\n"
 "the workbench toolbar."
 msgstr ""
+"Nápověda, která se zobrazí u tlačítka nástroje\n"
+"v případě, že je tlačítko zařazeno v nástrojové liště verpánku."
 
 #: tortoisehg/hgqt/customtools.py:426
 msgid "Icon"
@@ -1492,10 +1507,15 @@ msgid ""
 "You can also set this value to the absolute path to\n"
 "any icon on your file system."
 msgstr ""
+"Ikona nástroje.\n"
+"Můžete použít kteroukoli vestavěnou ikonu TortoiseHg\n"
+"zapsáním platného názvu ikony\n"
+"(např. clone, add, remove, sync, thg-logo, hg-update, etc).\n"
+"Můžete také zapsat absolutní cestu k souboru s ikonou."
 
 #: tortoisehg/hgqt/customtools.py:437
 msgid "On repowidget, show for"
-msgstr ""
+msgstr "V repowidgetu ukázat pro"
 
 #: tortoisehg/hgqt/customtools.py:438
 msgid ""
@@ -1503,16 +1523,21 @@ msgid ""
 "It is only taken into account when the tool is shown on the\n"
 "selected revision context menu."
 msgstr ""
+"Pro které druhy revizí bude nástroj povolen.\n"
+"Připadá v úvahu pouze tehdy, je-li nástroj uveden\n"
+"v kontextovém menu vybrané revize."
 
 #: tortoisehg/hgqt/customtools.py:443
 msgid "Show Output Log"
-msgstr ""
+msgstr "Zobrazit záznam výstupu"
 
 #: tortoisehg/hgqt/customtools.py:444
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
 "Default: False."
 msgstr ""
+"Je-li povoleno, automaticky při spuštění příkazu ukázat Output Log.\n"
+"Implicitně: False"
 
 #: tortoisehg/hgqt/customtools.py:449
 msgid "OK"
@@ -1520,19 +1545,19 @@ msgstr "OK"
 
 #: tortoisehg/hgqt/customtools.py:509
 msgid "Missing information"
-msgstr ""
+msgstr "Chybějící informace"
 
 #: tortoisehg/hgqt/customtools.py:516
 msgid "You must set a tool name."
-msgstr ""
+msgstr "Musíte zadat název nástroje"
 
 #: tortoisehg/hgqt/customtools.py:518
 msgid "The tool name cannot have any spaces in it."
-msgstr ""
+msgstr "Název nástroje nesmí obsahovat mezery."
 
 #: tortoisehg/hgqt/customtools.py:520
 msgid "You must set a command to run."
-msgstr ""
+msgstr "Musíte zadat příkaz."
 
 #: tortoisehg/hgqt/docklog.py:413
 msgid "failed to run command\n"
@@ -1566,11 +1591,11 @@ msgstr "Zobrazit historii vybraného souboru"
 
 #: tortoisehg/hgqt/filectxactions.py:59
 msgid "Folder history"
-msgstr ""
+msgstr "Historie složky"
 
 #: tortoisehg/hgqt/filectxactions.py:61
 msgid "Compare file revisions"
-msgstr "Porovnat revize souborů"
+msgstr "Porovnat revize souboru"
 
 #: tortoisehg/hgqt/filectxactions.py:62
 msgid "Compare revisions of the selected file"
@@ -1579,11 +1604,11 @@ msgstr "Porovnat revize vybraného souboru"
 #: tortoisehg/hgqt/filectxactions.py:63 tortoisehg/hgqt/grep.py:568
 #: tortoisehg/util/menuthg.py:79
 msgid "Diff to parent"
-msgstr ""
+msgstr "Diff vůči rodiči"
 
 #: tortoisehg/hgqt/filectxactions.py:65
 msgid "Diff to local"
-msgstr ""
+msgstr "Diff vůči lokální kopii"
 
 #: tortoisehg/hgqt/filectxactions.py:66
 msgid "View changes to current in external diff tool"
@@ -1592,7 +1617,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filectxactions.py:68
 msgid "View at Revision"
-msgstr "View at Revision"
+msgstr "Zobrazit v revizi"
 
 #: tortoisehg/hgqt/filectxactions.py:69
 msgid "View file as it appeared at this revision"
@@ -1600,7 +1625,7 @@ msgstr "Zobrazit stav souboru při této revizi"
 
 #: tortoisehg/hgqt/filectxactions.py:70
 msgid "Save at Revision"
-msgstr ""
+msgstr "Uložit v revizi"
 
 #: tortoisehg/hgqt/filectxactions.py:71
 msgid "Save file as it appeared at this revision"
@@ -1608,11 +1633,11 @@ msgstr "Uložit soubor ve stavu, odpovídajícím této revizi"
 
 #: tortoisehg/hgqt/filectxactions.py:74
 msgid "Open Local"
-msgstr ""
+msgstr "Otevřít soubor"
 
 #: tortoisehg/hgqt/filectxactions.py:76
 msgid "Copy Path"
-msgstr ""
+msgstr "Kopírovat cestu do schr."
 
 #: tortoisehg/hgqt/filectxactions.py:77
 msgid "Copy full path of file(s) to the clipboard"
@@ -1628,27 +1653,27 @@ msgstr "Otevřít vybraný subrepozitář"
 
 #: tortoisehg/hgqt/filectxactions.py:84
 msgid "Explore folder"
-msgstr ""
+msgstr "Prozkoumat složku"
 
 #: tortoisehg/hgqt/filectxactions.py:85
 msgid "Open the selected folder in the system file manager"
-msgstr ""
+msgstr "Otevřít vybranou složku v systémovém správci souborů."
 
 #: tortoisehg/hgqt/filectxactions.py:87
 msgid "Open terminal here"
-msgstr ""
+msgstr "Zde otevřít terminál"
 
 #: tortoisehg/hgqt/filectxactions.py:88
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
+msgstr "Otevřít terminál ve vybrané složce"
 
 #: tortoisehg/hgqt/filectxactions.py:194
 msgid "Cannot display visual diff"
-msgstr ""
+msgstr "Nejde zobrazit vizuální diff"
 
 #: tortoisehg/hgqt/filectxactions.py:195
 msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
+msgstr "Pro nepoužité oprávky nejsou vizuální diffy podporovány"
 
 #: tortoisehg/hgqt/filectxactions.py:271
 #, python-format
@@ -1682,7 +1707,7 @@ msgstr "Binární soubor"
 
 #: tortoisehg/hgqt/filedata.py:65 tortoisehg/hgqt/filedata.py:128
 msgid "File may be binary (maximum line length exceeded)"
-msgstr ""
+msgstr "Soubor může být binární (překročena max. délka řádku)"
 
 #: tortoisehg/hgqt/filedata.py:74 tortoisehg/hgqt/filedata.py:395
 #, python-format
@@ -1696,11 +1721,11 @@ msgstr " <i>(přidáno)</i>"
 
 #: tortoisehg/hgqt/filedata.py:110 tortoisehg/hgqt/filedata.py:383
 msgid "exec mode has been <font color='red'>set</font>"
-msgstr ""
+msgstr "exec mode je <font color='red'>zapnut</font>"
 
 #: tortoisehg/hgqt/filedata.py:112 tortoisehg/hgqt/filedata.py:385
 msgid "exec mode has been <font color='red'>unset</font>"
-msgstr ""
+msgstr "exec mode je <font color='red'>vypnut</font>"
 
 #: tortoisehg/hgqt/filedata.py:114 tortoisehg/hgqt/filedata.py:148
 msgid " <i>(is a symlink)</i>"
@@ -1708,7 +1733,7 @@ msgstr " <i>(is a symlink)</i>"
 
 #: tortoisehg/hgqt/filedata.py:117
 msgid "Diff not displayed: "
-msgstr ""
+msgstr "Rozdíl (diff) nezobrazen: "
 
 #: tortoisehg/hgqt/filedata.py:177
 #, python-format
@@ -1854,11 +1879,11 @@ msgstr " <i>(je neverzovaný)</i>"
 
 #: tortoisehg/hgqt/filedialogs.py:129
 msgid "File History Log Columns"
-msgstr ""
+msgstr "Sloupce záznamu o historii souboru"
 
 #: tortoisehg/hgqt/filedialogs.py:138
 msgid "Too many rows selected for menu"
-msgstr ""
+msgstr "Pro menu bylo vybráno příliš mnoho řádků"
 
 #: tortoisehg/hgqt/filedialogs.py:184 tortoisehg/hgqt/workbench.py:346
 msgid "Back"
@@ -1870,39 +1895,39 @@ msgstr "Vpřed"
 
 #: tortoisehg/hgqt/filedialogs.py:215
 msgid "Diff selected changesets..."
-msgstr ""
+msgstr "Porovnat vybrané changesety..."
 
 #: tortoisehg/hgqt/filedialogs.py:217
 msgid "Diff selected file revisions..."
-msgstr ""
+msgstr "Porovnat vybrané revize souborů..."
 
 #: tortoisehg/hgqt/filedialogs.py:224
 msgid "Diff changeset to parent..."
-msgstr ""
+msgstr "Porovnat changeset s rodičem..."
 
 #: tortoisehg/hgqt/filedialogs.py:227
 msgid "Diff changeset to local..."
-msgstr ""
+msgstr "Porovnat changeset s lokální kopií..."
 
 #: tortoisehg/hgqt/filedialogs.py:231 tortoisehg/hgqt/filedialogs.py:760
 msgid "Diff file to parent..."
-msgstr ""
+msgstr "Porovnat soubor s rodičem..."
 
 #: tortoisehg/hgqt/filedialogs.py:234 tortoisehg/hgqt/filedialogs.py:763
 msgid "Diff file to local..."
-msgstr ""
+msgstr "Porovnat soubor s lokální kopií..."
 
 #: tortoisehg/hgqt/filedialogs.py:238 tortoisehg/hgqt/filedialogs.py:767
 msgid "View at revision..."
-msgstr ""
+msgstr "Zobrazit v revizi..."
 
 #: tortoisehg/hgqt/filedialogs.py:241 tortoisehg/hgqt/filedialogs.py:770
 msgid "Save at revision..."
-msgstr ""
+msgstr "Uložit v revizi..."
 
 #: tortoisehg/hgqt/filedialogs.py:243 tortoisehg/hgqt/filedialogs.py:772
 msgid "Edit local"
-msgstr ""
+msgstr "Editovat lokální kopii"
 
 #: tortoisehg/hgqt/filedialogs.py:246 tortoisehg/hgqt/filedialogs.py:775
 msgid "Revert to revision..."
@@ -1910,11 +1935,11 @@ msgstr "Nastavit k revizi..."
 
 #: tortoisehg/hgqt/filedialogs.py:271 tortoisehg/hgqt/filedialogs.py:300
 msgid "You must select two revisions to diff"
-msgstr ""
+msgstr "K porovnání (diff) musíte vybrat dvě revize"
 
 #: tortoisehg/hgqt/filedialogs.py:428
 msgid "File Differences Log Columns"
-msgstr ""
+msgstr "Sloupce záznamu o rozdílech souborů"
 
 #: tortoisehg/hgqt/filedialogs.py:549
 msgid "Next diff"
@@ -1926,11 +1951,11 @@ msgstr "Předchozí diff"
 
 #: tortoisehg/hgqt/filedialogs.py:753 tortoisehg/hgqt/repowidget.py:1227
 msgid "Diff to parent..."
-msgstr ""
+msgstr "Porovnat s rodičem..."
 
 #: tortoisehg/hgqt/filedialogs.py:756 tortoisehg/hgqt/repowidget.py:1229
 msgid "Diff to local..."
-msgstr "Diff to local copy..."
+msgstr "Diff vůči lokální revizi..."
 
 #: tortoisehg/hgqt/filerevmodel.py:23
 msgctxt "column header"
@@ -1987,7 +2012,7 @@ msgstr "Hledat v historii"
 
 #: tortoisehg/hgqt/fileview.py:643
 msgid "Annotate Options"
-msgstr ""
+msgstr "Možnosti anotace"
 
 #: tortoisehg/hgqt/fileview.py:660
 msgid "Search in original revision"
@@ -2021,19 +2046,19 @@ msgstr "Zobrazit rodičovskou revizi %d"
 
 #: tortoisehg/hgqt/fileview.py:765
 msgid "Show Author"
-msgstr ""
+msgstr "Zobrazit autora"
 
 #: tortoisehg/hgqt/fileview.py:766
 msgid "Show Date"
-msgstr ""
+msgstr "Zobrazit datum"
 
 #: tortoisehg/hgqt/fileview.py:767
 msgid "Show Revision"
-msgstr ""
+msgstr "Zobrazit revizi"
 
 #: tortoisehg/hgqt/graft.py:39
 msgid "Interrupted graft operation found"
-msgstr ""
+msgstr "Nalezena přerušená operace gráftu"
 
 #: tortoisehg/hgqt/graft.py:40
 msgid ""
@@ -2042,19 +2067,22 @@ msgid ""
 "You cannot perform a different graft operation unless you abort the "
 "interrupted graft operation first."
 msgstr ""
+"Byla nalezena přerušená operace gráftu.\n"
+"\n"
+"Nemůžete provést další gráft bez předchozího zrušení přerušeného gráftu."
 
 #: tortoisehg/hgqt/graft.py:44
 msgid "Continue or abort interrupted graft operation?"
-msgstr ""
+msgstr "Pokračovat nebo zrušit přerušenou operaci gráftu?"
 
 #: tortoisehg/hgqt/graft.py:63
 #, python-format
 msgid "Graft %d changesets on top of changeset %s"
-msgstr ""
+msgstr "Přesadit %d changesety(ů) nad changeset %s"
 
 #: tortoisehg/hgqt/graft.py:80
 msgid "To graft destination"
-msgstr ""
+msgstr "Destinace gráftu"
 
 #: tortoisehg/hgqt/graft.py:106
 msgid "Graft"
@@ -2073,52 +2101,56 @@ msgstr ""
 
 #: tortoisehg/hgqt/graft.py:131
 msgid "Graft changeset"
-msgstr ""
+msgstr "Changeset gráftu"
 
 #: tortoisehg/hgqt/graft.py:133
 #, python-format
 msgid "Graft changeset #%d of %d"
-msgstr ""
+msgstr "Changeset gráftu #%d z %d"
 
 #: tortoisehg/hgqt/graft.py:162
 msgid ""
 "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a "
 "href=\"discard\"><b>discard</b></a> changes."
 msgstr ""
+"Před gráftem musíte <a href=\"commit\"><b>komitovat</b></a> nebo <a "
+"href=\"discard\"><b>zavrhnout</b></a> změny."
 
 #: tortoisehg/hgqt/graft.py:167
 msgid "You may continue or start the graft"
-msgstr ""
+msgstr "Můžete pokračovat nebo začít vytvářet gráft"
 
 #: tortoisehg/hgqt/graft.py:213
 msgid "Graft is complete"
-msgstr ""
+msgstr "Gráft je hotový"
 
 #: tortoisehg/hgqt/graft.py:215
 msgid "Graft aborted"
-msgstr ""
+msgstr "Gráft byl zrušen"
 
 #: tortoisehg/hgqt/graft.py:217
 msgid "Graft failed"
-msgstr ""
+msgstr "Gráft se nezdařil"
 
 #: tortoisehg/hgqt/graft.py:230
 msgid ""
 "Graft generated merge <b>conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
+"Gráft generoval <b>konflikty</b>, které musí být <a "
+"href=\"resolve\"><b>řešeny</b></a>"
 
 #: tortoisehg/hgqt/graft.py:236
 msgid "You may continue the graft"
-msgstr ""
+msgstr "Můžete pokračovat v provádění gráftu"
 
 #: tortoisehg/hgqt/graft.py:289
 msgid "Exiting with an unfinished graft is not recommended."
-msgstr ""
+msgstr "Nedoporučuje se končit s nedokončeným gráftem."
 
 #: tortoisehg/hgqt/graft.py:290
 msgid "Consider aborting the graft first."
-msgstr ""
+msgstr "Zkuste nejprve zrušit gráft."
 
 #: tortoisehg/hgqt/graft.py:291 tortoisehg/hgqt/merge.py:106
 #: tortoisehg/hgqt/rebase.py:260
@@ -2127,15 +2159,15 @@ msgstr "&Exit"
 
 #: tortoisehg/hgqt/graft.py:306
 msgid "Graft already in progress"
-msgstr ""
+msgstr "Gráft se již provádí"
 
 #: tortoisehg/hgqt/graft.py:307
 msgid "Resuming graft already in progress"
-msgstr ""
+msgstr "Opětovné provádění gráftu bylo započato."
 
 #: tortoisehg/hgqt/graft.py:310
 msgid "You must provide revisions to graft"
-msgstr ""
+msgstr "Nutno uvést revize, které mají být gráftovány"
 
 #: tortoisehg/hgqt/grep.py:42
 msgid "### regular expression search pattern ###"
@@ -2292,7 +2324,7 @@ msgstr "<b>Neverzované soubory</b>"
 
 #: tortoisehg/hgqt/guess.py:65 tortoisehg/hgqt/status.py:98
 msgid "Refresh file list"
-msgstr "Osvěžit seznam souborů"
+msgstr "Zčerstvit seznam souborů"
 
 #: tortoisehg/hgqt/guess.py:83
 #, python-format
@@ -2329,7 +2361,7 @@ msgstr "Přijmout vybrané shody"
 
 #: tortoisehg/hgqt/guess.py:141
 msgid "<b>Differences from Source to Dest</b>"
-msgstr "<b>Differences from Source to Dest</b>"
+msgstr "<b>Rozdíly mezi zdrojem a destinací</b>"
 
 #: tortoisehg/hgqt/guess.py:188
 msgid "Search already in progress"
@@ -2391,7 +2423,7 @@ msgstr "pro označení revize použijte jen jeden způsob"
 
 #: tortoisehg/hgqt/hgemail.py:505
 msgid "Failed to open Email dialog"
-msgstr "Failed to open Email dialog"
+msgstr "Nepodařilo se otevřít dialog pro Email"
 
 #: tortoisehg/hgqt/hgemail_ui.py:261 tortoisehg/hgqt/settings.py:822
 msgid "Email"
@@ -2588,7 +2620,7 @@ msgstr "<b>Nesledované soubory</b>"
 
 #: tortoisehg/hgqt/hgignore.py:106
 msgid "Backspace or Del to remove row(s)"
-msgstr ""
+msgstr "Backspace či Del pro odebrání řádku(ů)"
 
 #: tortoisehg/hgqt/hgignore.py:150
 msgid "Add ignore filter..."
@@ -2640,7 +2672,7 @@ msgstr "Vytvořit repozitář kompatibilní s Mercurialem <1.7"
 
 #: tortoisehg/hgqt/hginit.py:49
 msgid "Show in Workbench after init"
-msgstr "Show in Workbench after init"
+msgstr "Zobrazit ve Verpánku (po init)"
 
 #: tortoisehg/hgqt/hginit.py:56
 msgid "Create"
@@ -2752,7 +2784,7 @@ msgstr "Táhnutím změnit pořadí"
 #: tortoisehg/hgqt/logcolumns.py:100 tortoisehg/hgqt/settings.py:599
 #: tortoisehg/hgqt/workbench.py:839 tortoisehg/util/menuthg.py:46
 msgid "Workbench"
-msgstr "Workbench neboli Verpánek"
+msgstr "Verpánek"
 
 #: tortoisehg/hgqt/manifestdialog.py:54
 #, python-format
@@ -2777,7 +2809,7 @@ msgstr "Nepodařilo se otevřít dialog Manifestu"
 
 #: tortoisehg/hgqt/matching.py:42
 msgid "Find revisions matching fields of:"
-msgstr ""
+msgstr "Nalézt shodná pole revizí:"
 
 #: tortoisehg/hgqt/matching.py:73 tortoisehg/hgqt/matching.py:196
 #: tortoisehg/hgqt/matching.py:217
@@ -2786,11 +2818,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/matching.py:81
 msgid "Fields to match:"
-msgstr ""
+msgstr "Pole pro shodu:"
 
 #: tortoisehg/hgqt/matching.py:87
 msgid "Summary (first description line)"
-msgstr ""
+msgstr "Shrnutí (první řádek popisu)"
 
 #: tortoisehg/hgqt/matching.py:88 tortoisehg/hgqt/settings.py:765
 msgid "Description"
@@ -2798,7 +2830,7 @@ msgstr "Popis"
 
 #: tortoisehg/hgqt/matching.py:95
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: tortoisehg/hgqt/matching.py:96
 msgid "Date"
@@ -2810,11 +2842,11 @@ msgstr "Soubory"
 
 #: tortoisehg/hgqt/matching.py:98
 msgid "Diff contents"
-msgstr ""
+msgstr "Obsah diffů"
 
 #: tortoisehg/hgqt/matching.py:99
 msgid "Subrepo states"
-msgstr ""
+msgstr "Stavy subrepozitáře"
 
 #: tortoisehg/hgqt/matching.py:100 tortoisehg/hgqt/repofilter.py:227
 msgid "Branch"
@@ -2822,7 +2854,7 @@ msgstr "Větev"
 
 #: tortoisehg/hgqt/matching.py:102
 msgid "Phase"
-msgstr ""
+msgstr "Fáze"
 
 #: tortoisehg/hgqt/matching.py:135
 msgid "&Match"
@@ -2831,20 +2863,20 @@ msgstr ""
 #: tortoisehg/hgqt/matching.py:146
 #, python-format
 msgid "Find matches - %s"
-msgstr ""
+msgstr "Najít shody - %s"
 
 #: tortoisehg/hgqt/matching.py:213
 msgid "Revisions to Match:"
-msgstr ""
+msgstr "Účel hledání:"
 
 #: tortoisehg/hgqt/matching.py:214
 #, python-format
 msgid "Match any of <b><i>%d</i></b> revisions"
-msgstr ""
+msgstr "Nalézt shody u libovolných <b>%d </b> revizí"
 
 #: tortoisehg/hgqt/matching.py:221
 msgid "<b>Unknown revision!</b>"
-msgstr ""
+msgstr "<b>Neznámá revize!</b>"
 
 #: tortoisehg/hgqt/matching.py:223
 msgid "<b>Parse Error!</b>"
@@ -2865,6 +2897,9 @@ msgid ""
 "\n"
 "To cancel the merge you can update to one of the merge parent revisions."
 msgstr ""
+"Slučování ukončíte po komitu pracovního adresáře.\n"
+"\n"
+"Sloučení můžete zrušit aktualizací k jedné z rodičovských revizí."
 
 #: tortoisehg/hgqt/merge.py:126
 msgid "Prepare to merge"
@@ -2881,7 +2916,7 @@ msgstr "Bez čelní revize!"
 
 #: tortoisehg/hgqt/merge.py:143
 msgid "Merge from (other revision)"
-msgstr "Merge from (jiné revize)"
+msgstr "Merge z (jiné revize)"
 
 #: tortoisehg/hgqt/merge.py:150 tortoisehg/hgqt/merge.py:737
 msgid "Unable to merge"
@@ -2893,7 +2928,7 @@ msgstr "Slučovací revize neurčena nebo nenalezena"
 
 #: tortoisehg/hgqt/merge.py:155
 msgid "Merge to (working directory)"
-msgstr "Merge to (pracovní adresář)"
+msgstr "Merge k (pracovnímu adresáři)"
 
 #: tortoisehg/hgqt/merge.py:178
 msgid ""
@@ -3120,7 +3155,7 @@ msgstr "Guards: %d/%d"
 
 #: tortoisehg/hgqt/mq.py:559
 msgid "Queues"
-msgstr ""
+msgstr "Fronty"
 
 #: tortoisehg/hgqt/mq.py:598
 msgid "New Patch"
@@ -3301,11 +3336,11 @@ msgstr "Zpráva oprávky"
 
 #: tortoisehg/hgqt/pbranch.py:881
 msgid "Patch date:"
-msgstr ""
+msgstr "Datum oprávky"
 
 #: tortoisehg/hgqt/pbranch.py:882
 msgid "Patch user:"
-msgstr ""
+msgstr "Uživatel oprávky"
 
 #: tortoisehg/hgqt/postreview.py:34
 msgid "Invalid Settings - The ReviewBoard server is not setup"
@@ -3452,7 +3487,7 @@ msgstr[2] "Smazat %d neznámých souborů"
 #, python-format
 msgid "Delete %d ignored file"
 msgid_plural "Delete %d ignored files"
-msgstr[0] "Delete %d ignored file"
+msgstr[0] "Smazat %d ignorovaný soubor"
 msgstr[1] "Smazat %d ignorované soubory"
 msgstr[2] "Smazat %d ignorovaných souborů"
 
@@ -3768,7 +3803,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:270
 msgid "Editor Options"
-msgstr ""
+msgstr "Možnosti editoru"
 
 #: tortoisehg/hgqt/qscilib.py:410
 msgid "### regular expression ###"
@@ -3792,7 +3827,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:645
 msgid "Unable to read/write config file"
-msgstr "Nejde 'read/write' konfigurační soubor"
+msgstr "Nejde číst ani psát konfigurační soubor"
 
 #: tortoisehg/hgqt/qtlib.py:148
 msgid "No visual editor configured"
@@ -3837,7 +3872,7 @@ msgstr "Terminálové rozhraní musí byt nastaveno"
 
 #: tortoisehg/hgqt/qtlib.py:925
 msgid "Show Log"
-msgstr ""
+msgstr "Ukázat záznam"
 
 #: tortoisehg/hgqt/qtlib.py:1099
 msgid "Please enter a username"
@@ -3849,11 +3884,11 @@ msgstr "Musíte Mercurialu prokázat svou identitu"
 
 #: tortoisehg/hgqt/qtlib.py:1117
 msgid "Text Translation Failure"
-msgstr ""
+msgstr "Překlad textu se nezdařil"
 
 #: tortoisehg/hgqt/qtlib.py:1118
 msgid "Unable to translate input to local encoding."
-msgstr ""
+msgstr "Vstup nelze přeložit do lokálního kódování."
 
 #: tortoisehg/hgqt/quickbar.py:30
 msgid "Goto"
@@ -3970,7 +4005,7 @@ msgstr "Přeskupit"
 #: tortoisehg/hgqt/rebase.py:121
 #, python-format
 msgid "Rebase - %s"
-msgstr "Rebase - %s"
+msgstr "Přeskupit - %s"
 
 #: tortoisehg/hgqt/rebase.py:145
 msgid ""
@@ -4246,7 +4281,7 @@ msgstr "Tagy"
 #: tortoisehg/hgqt/repomodel.py:51
 msgctxt "column header"
 msgid "Latest tags"
-msgstr ""
+msgstr "Poslední tagy"
 
 #: tortoisehg/hgqt/repomodel.py:52
 msgctxt "column header"
@@ -4320,11 +4355,11 @@ msgstr "Registr repozitářů"
 
 #: tortoisehg/hgqt/reporegistry.py:432
 msgid "Refresh repository list"
-msgstr "Osvěžit seznam v repozitáři"
+msgstr "Zčerstvit seznam v repozitáři"
 
 #: tortoisehg/hgqt/reporegistry.py:433
 msgid "Refresh the Repository Registry list"
-msgstr "Osvěžit registr repozitářů"
+msgstr "Zčerstvit registr repozitářů"
 
 #: tortoisehg/hgqt/reporegistry.py:434 tortoisehg/hgqt/wctxactions.py:43
 #: tortoisehg/hgqt/webconf_ui.py:76
@@ -4357,7 +4392,7 @@ msgstr "Přejmenovat záznam"
 
 #: tortoisehg/hgqt/reporegistry.py:442
 msgid "Settings..."
-msgstr "Settings..."
+msgstr "Nastavení..."
 
 #: tortoisehg/hgqt/reporegistry.py:443
 msgid "View the repository's settings"
@@ -4558,12 +4593,12 @@ msgstr "\"%s\" není platný repozitář uvnitř \"%s\""
 #: tortoisehg/hgqt/repotreeitem.py:239 tortoisehg/hgqt/repotreeitem.py:421
 #: tortoisehg/hgqt/repotreeitem.py:470 tortoisehg/hgqt/repotreeitem.py:525
 msgid "Sort"
-msgstr ""
+msgstr "Třídit"
 
 #: tortoisehg/hgqt/repotreeitem.py:261
 #, python-format
 msgid "Local Repository %s"
-msgstr "Local Repository %s"
+msgstr "Lokální repo %s"
 
 #: tortoisehg/hgqt/repotreeitem.py:337
 #, python-format
@@ -4645,7 +4680,7 @@ msgstr "Registr repozitářů byl aktualizován"
 
 #: tortoisehg/hgqt/repoview.py:97 tortoisehg/hgqt/workbench.py:225
 msgid "Choose Log Columns..."
-msgstr "Vybrat sloupce záznamu..."
+msgstr "Vybrat sloupce přehledu..."
 
 #: tortoisehg/hgqt/repoview.py:243
 #, python-format
@@ -4731,12 +4766,12 @@ msgstr "Push"
 #: tortoisehg/hgqt/repowidget.py:568
 #, python-format
 msgid "Push current branch (%s)"
-msgstr ""
+msgstr "Poslat aktuální větev (%s)"
 
 #: tortoisehg/hgqt/repowidget.py:572
 #, python-format
 msgid "Push current revision (%d)"
-msgstr ""
+msgstr "Poslat aktuální revizi (%d)"
 
 #: tortoisehg/hgqt/repowidget.py:704
 #, python-format
@@ -4829,7 +4864,7 @@ msgstr "Příkaz pro repozitář stále běží"
 
 #: tortoisehg/hgqt/repowidget.py:1217
 msgid "Push all"
-msgstr ""
+msgstr "Poslat (push) vše"
 
 #: tortoisehg/hgqt/repowidget.py:1219
 msgid "Push to here"
@@ -4837,7 +4872,7 @@ msgstr "Push sem"
 
 #: tortoisehg/hgqt/repowidget.py:1221
 msgid "Push selected branch"
-msgstr ""
+msgstr "Poslat vybranou větev"
 
 #: tortoisehg/hgqt/repowidget.py:1224 tortoisehg/util/menuthg.py:61
 msgid "Update..."
@@ -4845,16 +4880,16 @@ msgstr "Aktualizovat..."
 
 #: tortoisehg/hgqt/repowidget.py:1231
 msgid "Browse at rev..."
-msgstr "Browse at rev..."
+msgstr "Projít revizí..."
 
 #: tortoisehg/hgqt/repowidget.py:1233 tortoisehg/hgqt/repowidget.py:1444
 #: tortoisehg/hgqt/repowidget.py:1525
 msgid "Similar revisions..."
-msgstr ""
+msgstr "Podobné revize..."
 
 #: tortoisehg/hgqt/repowidget.py:1236
 msgid "Merge with local..."
-msgstr "Merge with local..."
+msgstr "Sloučit s lokální revizí..."
 
 #: tortoisehg/hgqt/repowidget.py:1239
 msgid "Tag..."
@@ -4866,7 +4901,7 @@ msgstr "Bookmark..."
 
 #: tortoisehg/hgqt/repowidget.py:1244
 msgid "Backout..."
-msgstr "Anulovat"
+msgstr "Anulovat (backout)..."
 
 #: tortoisehg/hgqt/repowidget.py:1248
 msgid "Copy hash"
@@ -4886,11 +4921,11 @@ msgstr "Email patch..."
 
 #: tortoisehg/hgqt/repowidget.py:1257
 msgid "Archive..."
-msgstr "Archive..."
+msgstr "Archivovat..."
 
 #: tortoisehg/hgqt/repowidget.py:1259
 msgid "Bundle rev and descendants..."
-msgstr ""
+msgstr "Vytvořit svazek z revize a jejich potomků..."
 
 #: tortoisehg/hgqt/repowidget.py:1261 tortoisehg/hgqt/wctxactions.py:41
 msgid "Copy patch"
@@ -4902,7 +4937,7 @@ msgstr "Změnit fázi na"
 
 #: tortoisehg/hgqt/repowidget.py:1271
 msgid "Graft to local..."
-msgstr ""
+msgstr "Gráft k lokální revizi..."
 
 #: tortoisehg/hgqt/repowidget.py:1275
 msgid "Modify history"
@@ -4922,7 +4957,7 @@ msgstr "Finish patch"
 
 #: tortoisehg/hgqt/repowidget.py:1282 tortoisehg/hgqt/repowidget.py:1504
 msgid "Rename patch..."
-msgstr ""
+msgstr "Přejmenovat oprávku..."
 
 #: tortoisehg/hgqt/repowidget.py:1285
 msgid "Rebase..."
@@ -4938,11 +4973,11 @@ msgstr "Post to Review Board..."
 
 #: tortoisehg/hgqt/repowidget.py:1294
 msgid "Remote Update..."
-msgstr ""
+msgstr "Vzdálená aktualizace..."
 
 #: tortoisehg/hgqt/repowidget.py:1310
 msgid "Custom Tools"
-msgstr ""
+msgstr "Uživatelské nástroje"
 
 #: tortoisehg/hgqt/repowidget.py:1366
 msgid "Write diff file"
@@ -4966,7 +5001,7 @@ msgstr "Visual Diff..."
 
 #: tortoisehg/hgqt/repowidget.py:1430
 msgid "Export Diff..."
-msgstr ""
+msgstr "Exportovat diff..."
 
 #: tortoisehg/hgqt/repowidget.py:1432 tortoisehg/hgqt/repowidget.py:1521
 msgid "Export Selected..."
@@ -5006,7 +5041,7 @@ msgstr "Přejít ke společnému předkovi"
 
 #: tortoisehg/hgqt/repowidget.py:1446 tortoisehg/hgqt/repowidget.py:1527
 msgid "Graft Selected to local..."
-msgstr ""
+msgstr "Gráftovat výběr k lokální..."
 
 #: tortoisehg/hgqt/repowidget.py:1459 tortoisehg/hgqt/repowidget.py:1539
 msgid "Post Selected to Review Board..."
@@ -5196,12 +5231,12 @@ msgstr "Vybraný příkaz je prázdný"
 
 #: tortoisehg/hgqt/repowidget.py:2055
 msgid "Failed to execute custom command"
-msgstr ""
+msgstr "Nepodařilo se provést uživatelský příkaz"
 
 #: tortoisehg/hgqt/repowidget.py:2056
 #, python-format
 msgid "The command \"%s\" could not be executed."
-msgstr ""
+msgstr "Příkaz \"%s\" nemohl být proveden"
 
 #: tortoisehg/hgqt/repowidget.py:2057
 #, python-format
@@ -5213,6 +5248,11 @@ msgid ""
 "Please check that the command path is valid and that it is a valid "
 "application"
 msgstr ""
+"Byla vrácena tato chybová zpráva:\n"
+"\n"
+"\"%s\"\n"
+"\n"
+"Ověřte prosím platnost aplikace a cesty příkazu"
 
 #: tortoisehg/hgqt/repowidget.py:2064
 msgid "Unable to start"
@@ -5281,11 +5321,11 @@ msgstr "Označit tento soubor jako vyřešený"
 
 #: tortoisehg/hgqt/resolve.py:127
 msgid "Diff Local to Ancestor"
-msgstr ""
+msgstr "Porovnat lokální kopii s předkem"
 
 #: tortoisehg/hgqt/resolve.py:129
 msgid "Diff Other to Ancestor"
-msgstr ""
+msgstr "Porovnat ostatní s předkem"
 
 #: tortoisehg/hgqt/resolve.py:137
 msgid "Resolved conflicts"
@@ -5305,7 +5345,7 @@ msgstr "Visual three-way diff"
 
 #: tortoisehg/hgqt/resolve.py:157 tortoisehg/hgqt/resolve.py:181
 msgid "Diff to Local"
-msgstr "VDiff k aktuální"
+msgstr "Diff vůči lokální kopii"
 
 #: tortoisehg/hgqt/resolve.py:158
 msgid "Visual diff between resolved file and first parent"
@@ -5313,7 +5353,7 @@ msgstr "Vizuální diff mezi vyřešeným souborem a prvním rodičem"
 
 #: tortoisehg/hgqt/resolve.py:160 tortoisehg/hgqt/resolve.py:183
 msgid "Diff to Other"
-msgstr "Diff to Other"
+msgstr "Diff vůči ostatním"
 
 #: tortoisehg/hgqt/resolve.py:161
 msgid "Visual diff between resolved file and second parent"
@@ -5333,7 +5373,7 @@ msgstr "Nalezeny nástroje pro merge/diff:"
 
 #: tortoisehg/hgqt/resolve.py:203
 msgid "Command output"
-msgstr "Command output"
+msgstr "Výstup příkazu"
 
 #: tortoisehg/hgqt/resolve.py:288
 msgid "Unable to show subrepository files"
@@ -5466,7 +5506,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:33
 msgid "Like \"keyword(string)\" but accepts a regex."
-msgstr "Like \"keyword(string)\" but accepts a regex."
+msgstr "Jako \"keyword(string)\" ale přijme regex."
 
 #: tortoisehg/hgqt/revset.py:35
 msgid ""
@@ -5477,7 +5517,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:38
 msgid "The named bookmark or all bookmarks."
-msgstr "Pojmenované označení (bookmark) nebo všechna označení."
+msgstr "Pojmenovaná záložka (bookmark) nebo všechny záložky."
 
 #: tortoisehg/hgqt/revset.py:40
 msgid "The named tag or all tags."
@@ -5516,6 +5556,7 @@ msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
 "revisions."
 msgstr ""
+"Nalézt revize, shodující se v jednom či více polích dané sady revizí."
 
 #: tortoisehg/hgqt/revset.py:61
 msgid ""
@@ -5577,7 +5618,7 @@ msgstr "Druhý rodič pro všechny changesety v sadě nebo pracovní adresář."
 
 #: tortoisehg/hgqt/revset.py:92
 msgid "Changesets with no parent changeset in set."
-msgstr ""
+msgstr "Changesety bez rodiče v sadě"
 
 #: tortoisehg/hgqt/revset.py:94
 msgid ""
@@ -5669,11 +5710,11 @@ msgstr "nalezená revize"
 
 #: tortoisehg/hgqt/revset.py:411
 msgid "Parse Error: "
-msgstr "Parse Error: "
+msgstr ""
 
 #: tortoisehg/hgqt/revset.py:415
 msgid "Invalid query: "
-msgstr ""
+msgstr "Neplatný dotaz: "
 
 #: tortoisehg/hgqt/run.py:64 tortoisehg/hgqt/run.py:435
 #, python-format
@@ -5750,7 +5791,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:433 tortoisehg/hgqt/run.py:434
 msgid "Try refreshing your repository."
-msgstr "Zkuste osvěžit (refresh) svůj repozitář."
+msgstr "Zkuste zčerstvit (refresh) svůj repozitář."
 
 #: tortoisehg/hgqt/run.py:437
 #, python-format
@@ -5772,7 +5813,7 @@ msgstr "Repozitář je uzamčen"
 
 #: tortoisehg/hgqt/run.py:498
 msgid "hint:"
-msgstr ""
+msgstr "návod"
 
 #: tortoisehg/hgqt/run.py:505
 msgid "Keyboard interrupt"
@@ -6011,7 +6052,7 @@ msgstr "thg drag_copy SOURCE... DEST"
 
 #: tortoisehg/hgqt/run.py:1096
 msgid "revisions to graft"
-msgstr ""
+msgstr "gráftované revize"
 
 #: tortoisehg/hgqt/run.py:1097
 msgid "thg graft [-r] REV..."
@@ -6272,7 +6313,7 @@ msgstr "thg shellconfig"
 
 #: tortoisehg/hgqt/rupdate.py:57
 msgid "Location:"
-msgstr ""
+msgstr "Umístění:"
 
 #: tortoisehg/hgqt/rupdate.py:61
 msgid "Discard remote changes, no backup (-C/--clean)"
@@ -6341,7 +6382,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:125
 msgid "&Unspecified"
-msgstr ""
+msgstr "&Neurčeno"
 
 #: tortoisehg/hgqt/settings.py:227
 msgid "&Set..."
@@ -6358,15 +6399,15 @@ msgstr "Nepodařilo se načíst issue tracker: '%s': %s. "
 
 #: tortoisehg/hgqt/settings.py:401
 msgid "&Browse..."
-msgstr ""
+msgstr "&Procházet..."
 
 #: tortoisehg/hgqt/settings.py:532
 msgid "UI Language"
-msgstr "UI Language"
+msgstr "Jazyk aplikace"
 
 #: tortoisehg/hgqt/settings.py:534
 msgid "Specify your preferred user interface language (restart needed)"
-msgstr "Určit preferovaný jakyk uživatelského rozhraní (restart needed)"
+msgstr "Určit preferovaný jakyk uživatelského rozhraní (protřebný restart)"
 
 #: tortoisehg/hgqt/settings.py:536
 msgid "Three-way Merge Tool"
@@ -6382,9 +6423,9 @@ msgid ""
 "manual merging"
 msgstr ""
 "Program pro řešení slučovacích konfliktů. Pokud neurčeno, použije Mercurial "
-"první použitelný nástroj, který nalezne ve vašem systému nebo použije svůj "
-"vlastní slučovací nástroj, jenž ponechává na místě markery konfliktů. Zvolte "
-"internal:merge pro vynucení konfliktových markerů, internal:prompt pro "
+"první použitelný nástroj, který nalezne v systému nebo použije svůj vlastní "
+"slučovací nástroj, jenž ponechává na místě markery konfliktů. Zvolte "
+"internal:merge pro vytvoření konfliktových markerů, internal:prompt pro "
 "lokální či jiný výběr a internal:dump pro ponechání souborů v pracovním "
 "adresáři k ručnímu slučování."
 
@@ -6400,8 +6441,8 @@ msgid ""
 msgstr ""
 "Určete nástroj pro vizuální diff, tak jak je zapsán v sekci [merge-tools] "
 "vašich konfiguračních souborů Mercurialu.  Pokud nezadáno, použije "
-"TortoiseHg vybraný slučovací nástroj. Pokud tato volba selže, použije první "
-"použitelný nástroj, který nalezne."
+"TortoiseHg výše vybraný slučovací nástroj. Pokud tato volba selže, použije "
+"první použitelný nástroj, který nalezne."
 
 #: tortoisehg/hgqt/settings.py:550
 msgid "Visual Editor"
@@ -6420,7 +6461,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:555
 msgid "Shell"
-msgstr "Shell"
+msgstr "Terminál"
 
 #: tortoisehg/hgqt/settings.py:556
 #, python-format
@@ -6439,7 +6480,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:564
 msgid "Immediate Operations"
-msgstr "Immediate Operations"
+msgstr "Následné operace"
 
 #: tortoisehg/hgqt/settings.py:565
 msgid ""
@@ -6447,23 +6488,24 @@ msgid ""
 "immediately, without user interaction. Commands are \"add remove revert "
 "forget\". Default: None (leave blank)"
 msgstr ""
-"Seznam mezerami oddělených operací shellu, které si přejete okamžitq použít "
+"Seznam mezerami oddělených operací shellu, které si přejete okamžitě použít "
 "bez součinnosti uživatele. Příkazy jsou \"add remove revert forget\". "
 "Implicitně: None (ponechte prázdné)"
 
 #: tortoisehg/hgqt/settings.py:569
 msgid "Tab Width"
-msgstr "Šířka karty"
+msgstr "Šířka ouška karty"
 
 #: tortoisehg/hgqt/settings.py:570
 msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHg "
 "windows. Default: 8"
 msgstr ""
+"Určit šířku, vyplněnou oušky karet v různých oknech TortoiseHg. Implicitně: 8"
 
 #: tortoisehg/hgqt/settings.py:573
 msgid "Force Repo Tab"
-msgstr ""
+msgstr "Zobrazit karty"
 
 #: tortoisehg/hgqt/settings.py:574
 msgid "Always show repo tabs, even for a single repo. Default: False"
@@ -6472,14 +6514,14 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:575
 msgid "Monitor Repo Changes"
-msgstr ""
+msgstr "Sledovat změny repozitáře"
 
 #: tortoisehg/hgqt/settings.py:577
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
 "always"
 msgstr ""
-"Určit systém souborů, kde TortoiseHg monitoruje změny. Implicitně: always"
+"Určit kategorii souborů, kde TortoiseHg monitoruje změny. Implicitně: always"
 
 #: tortoisehg/hgqt/settings.py:579
 msgid "Max Diff Size"
@@ -6497,15 +6539,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:583
 msgid "Fork GUI"
-msgstr "Fork GUI"
+msgstr "Rozdělit GUI"
 
 #: tortoisehg/hgqt/settings.py:584
 msgid ""
 "When running from the command line, fork a background process to run "
 "graphical dialogs.  Default: True"
 msgstr ""
-"Při spuštění z příkazového řádku, rozdělí proces na pozadí pro zobrazení "
-"grafických dialogů. Implicitně: True"
+"Při spuštění příkazu z příkazového řádku spustí proces na pozadí pro "
+"zobrazení grafických dialogů. Implicitně: True"
 
 #: tortoisehg/hgqt/settings.py:586
 msgid "Full Path Title"
@@ -6521,7 +6563,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:589
 msgid "Auto-resolve merges"
-msgstr "Auto-resolve merges"
+msgstr "Automatická sloučení"
 
 #: tortoisehg/hgqt/settings.py:590
 msgid ""
@@ -6541,7 +6583,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:600
 msgid "Single Workbench Window"
-msgstr ""
+msgstr "Jediné okno Verpánku"
 
 #: tortoisehg/hgqt/settings.py:601
 msgid ""
@@ -6551,19 +6593,19 @@ msgid ""
 msgstr ""
 "Zvolte, zda chcete mít jediné okno verpánku. Pokud tuto volbu zamítnete, "
 "bude se vám otevírat nové okno vždy, když v kontextovém menu exploreru "
-"vyberete volbu \"Hg Workbench\". Implicitně: True"
+"vyberete volbu \"Hg Verpánek\". Implicitně: True"
 
 #: tortoisehg/hgqt/settings.py:605
 msgid "Default widget"
-msgstr ""
+msgstr "Počáteční widget"
 
 #: tortoisehg/hgqt/settings.py:607
 msgid ""
 "Select the initial widget that will be shown when opening a repository. "
 "Default: revdetails"
 msgstr ""
-"Zvolte počáteční widget, který se ukáže při otevření verpánku. Implicitně: "
-"revdetails"
+"Zvolte počáteční widget, který se ukáže při otevření repozitáře. Implicitně: "
+"revdetails (neboli detaily revizí, neboli Verpánek)"
 
 #: tortoisehg/hgqt/settings.py:612
 msgid ""
@@ -6607,19 +6649,18 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:626
 msgid "Task Tabs"
-msgstr "Task Tabs"
+msgstr "Umístění manipulační lišty"
 
 #: tortoisehg/hgqt/settings.py:628
 msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
 msgstr ""
-"Zobrazit karty podél spodní poloviny každého widgetu repa, což umožňuje "
-"přepínat zadávací karty bez použití nástrojové lišty. Implicitně: off"
+"Orientace manipulační nástrojové lišty (east, west, off). Implicitně: off"
 
 #: tortoisehg/hgqt/settings.py:631
 msgid "Task Toolbar Order"
-msgstr ""
+msgstr "Pořadí úloh"
 
 #: tortoisehg/hgqt/settings.py:632
 msgid ""
@@ -6629,6 +6670,10 @@ msgid ""
 "manifest grep and pbranch.<br>Default: log commit mq sync manifest grep "
 "pbranch"
 msgstr ""
+"Určete, které ulohy se zobrazí v manipulační liště a v jakém "
+"pořadí.<br>Napište seznam názvů tlačítek. Přidejte separátory vložením \"|\" "
+"mezi názvy tlačítek.<br>Platné názvy jsou: log commit mq sync manifest grep "
+"a pbranch.<br>Implicitně: log commit mq sync manifest grep pbranch"
 
 #: tortoisehg/hgqt/settings.py:638
 msgid "Long Summary"
@@ -6651,7 +6696,7 @@ msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
 msgstr ""
-"Počet současně zobrazených revizí v přehledu changesetů. Implicitně je 500"
+"Počet současně zobrazitelných revizí v přehledu changesetů. Implicitně je 500"
 
 #: tortoisehg/hgqt/settings.py:646
 msgid "Dead Branches"
@@ -6663,7 +6708,7 @@ msgid ""
 "list of branch names for a repository. Default: None (leave blank)"
 msgstr ""
 "Seznam čárkami oddělených názvů větví, které by měly být ignorovány při "
-"sestavování názvů větví pro repozitář. Implicitně. None (nevyplněno)"
+"sestavování seznamu větví pro repozitář. Implicitně. None (nevyplněno)"
 
 #: tortoisehg/hgqt/settings.py:650
 msgid "Branch Colors"
@@ -6712,7 +6757,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:667
 msgid "Default Push"
-msgstr ""
+msgstr "Připojit k push"
 
 #: tortoisehg/hgqt/settings.py:669
 msgid ""
@@ -6730,7 +6775,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:676
 msgid "Activate Bookmarks"
-msgstr ""
+msgstr "Aktivovat záložky"
 
 #: tortoisehg/hgqt/settings.py:678
 msgid ""
@@ -6743,6 +6788,13 @@ msgid ""
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
 msgstr ""
+"Zvolte poté, co TortoiseHg zobrazí výzvu k aktivaci záložky při aktualizaci "
+"k revizi, která má jednu nebo více záložek.<ul><li><b>auto</b>: Pokusit se "
+"záložky aktivovat automaticky při aktualizaci k revizi, která má jedinou "
+"záložku. Zobrazit výzvu při aktualizaci k revizi, která má více "
+"záložek.<li><b>prompt</b>: Implicitní nastavení. Zobrazit výzvu při "
+"aktualizaci k revizi, která má jednu či více záložek.<li><b>never</b>: Nikdy "
+"nezobrazovat žádnou výzvu pro aktivaci záložek.</ul><p>Implicitně: prompt"
 
 #: tortoisehg/hgqt/settings.py:690
 msgctxt "config item"
@@ -6785,7 +6837,7 @@ msgstr "Uzavřít nástroj Commit po každém úspěšném komitu. Implicitně: 
 
 #: tortoisehg/hgqt/settings.py:701
 msgid "Push After Commit"
-msgstr "Push po komitu"
+msgstr "Po komitu: push"
 
 #: tortoisehg/hgqt/settings.py:703
 msgid ""
@@ -6837,15 +6889,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:718
 msgid "New Commit Phase"
-msgstr ""
+msgstr "Fáze nových komitů"
 
 #: tortoisehg/hgqt/settings.py:720
 msgid "The phase of new commits. Default: draft"
-msgstr ""
+msgstr "Fáze nových komitů. Implicitně: draft"
 
 #: tortoisehg/hgqt/settings.py:721
 msgid "Secret MQ Patches"
-msgstr ""
+msgstr "Tajné oprávky MQ"
 
 #: tortoisehg/hgqt/settings.py:722
 msgid "Make MQ patches secret (instead of draft). Default: False"
@@ -6868,13 +6920,16 @@ msgid ""
 "<b>alwayslocal</b>: same as \"<b>always</b>\" but restricts forced refreshes "
 "to <i>local repos</i>.<br>Default: auto"
 msgstr ""
-"Vyberte, kdy se osvěží (refresh) stavový výpis pracovního adresáře:<br>- "
-"<b>auto</b>: [<i>default</i>] nechť TortoiseHg rozhodne, kdy tento výpis "
-"osvěžit.<br>TortoiseHg provede osvěžení pokaždé, když provede akci, která by "
-"mohla změnit pracovní adresář. <i>Při této volbě se můžou přehlédnout "
-"všechny změny, provedené mimo kontrolu TortoiseHg;</i><br>- "
-"<b>always</b>:stejně jako u 'default' a navíc se osvěžení stavového výpisu "
-"provede vždy, když uživatel"
+"Vyberte, kdy se zčerství (refresh) stavový výpis pracovního adresáře:<br>- "
+"<b>auto</b>: [<i>implicitní</i>] nechť TortoiseHg rozhodne, kdy tento výpis "
+"zčerstvit.<br>TortoiseHg provede zčerstvení pokaždé, když provede akci, "
+"která by mohla změnit pracovní adresář. <i>Při této volbě se můžou "
+"přehlédnout všechny změny, provedené mimo kontrolu TortoiseHg;</i><br>- "
+"<b>always</b>:stejně jako u 'default' a navíc se zčerstvení stavového výpisu "
+"provede vždy, když uživatel klepne na revizi \"Pracovní adresář\" nebo na "
+"ikonu \"Commit\" v manipulační liště Verpánku;<br>- <b>alwayslocal</b>: "
+"totéž jako \"<b>always</b>\" ale omezí vynucená zčerstvení na <i>lokální "
+"repozitáře</i>.<br>Implicitně: auto"
 
 #: tortoisehg/hgqt/settings.py:740
 msgid "Confirm adding unknown files"
@@ -6914,11 +6969,11 @@ msgstr "Server"
 
 #: tortoisehg/hgqt/settings.py:755
 msgid "<b>Behavior:</b>"
-msgstr ""
+msgstr "<b>Chování:</b>"
 
 #: tortoisehg/hgqt/settings.py:756
 msgid "'Publishing' repository"
-msgstr ""
+msgstr "'Publikující' repozitář"
 
 #: tortoisehg/hgqt/settings.py:757
 msgid ""
@@ -6926,17 +6981,21 @@ msgid ""
 "changesets are set to public in both client and server and pulled or cloned "
 "changesets are set to public in the client. Default: True"
 msgstr ""
+"Řídí chování fáze 'draft' při práci coby server. Nastaveno-li True, jsou "
+"poslané (pushed) changesety zařazeny jako 'public' u klienta i serveru. "
+"Stažené (pulled) nebo klonované changesety jsou u klienta zařazeny jako "
+"'public'. Implicitně: True"
 
 #: tortoisehg/hgqt/settings.py:761
 msgid "<b>Web Server:</b>"
-msgstr ""
+msgstr "<b>Webový server:</b>"
 
 #: tortoisehg/hgqt/settings.py:763
 msgid ""
 "Repository name to use in the web interface, and by TortoiseHg as a "
 "shorthand name.  Default is the working directory."
 msgstr ""
-"Název repozitáře použitý ve webovém rozhranní a aplikací TortoiseHg jako "
+"Název pro repozitář, použitý ve webovém rozhranní a aplikací TortoiseHg jako "
 "zkratka. Implicitně to je pracovní adresář."
 
 #: tortoisehg/hgqt/settings.py:766
@@ -7142,11 +7201,10 @@ msgid ""
 "messages."
 msgstr ""
 "Nepovinné. Použitá metoda pro odeslání mailové zprávy. Je-li hodnota "
-"\"smtp\" (default), použije se SMTP.  Otherwise, use as name of program to "
-"run that acts like sendmail (takes \"-f\" option for sender, list of "
-"recipients on command line, message on stdin). Normally, setting this to "
-"\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
-"messages."
+"\"smtp\" (default), použije se SMTP.  Jinak se použije název programu, který "
+"pro odesílatele slouží jako sendmail (takes \"-f\" option for sender, list "
+"of recipients on command line, message on stdin). Normálně pro poslání zpráv "
+"s použitím sendmail postačí zadat  \"sendmail\" nebo \"/usr/sbin/sendmail\"."
 
 #: tortoisehg/hgqt/settings.py:840
 msgid "SMTP Host"
@@ -7200,7 +7258,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:857
 msgid "Diff and Annotate"
-msgstr ""
+msgstr "Diffy a anotace"
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "Patch EOL"
@@ -7226,7 +7284,7 @@ msgstr "Použít rozšířený git formát záhlaví diffu. Implicitně je False
 
 #: tortoisehg/hgqt/settings.py:868
 msgid "MQ Git Format"
-msgstr "MQ Git Format"
+msgstr "Formát MQ Git"
 
 #: tortoisehg/hgqt/settings.py:870
 msgid ""
@@ -7237,6 +7295,12 @@ msgid ""
 "override the [diff] section and always generate git or regular patches, "
 "possibly losing data in the second case. Default: auto"
 msgstr ""
+"Nastaveno-li na 'auto', použije mq automaticky oprávky (patches) gitu, je-li "
+"zapotřebí vyhnout se ztrátě změn u souborů. Nastaveno-li na 'keep', podřídí "
+"se mq nastavení v sekci [diff] při zachování existujících oprávek gitu po "
+"provedení qrefresh. Nastaveno-li na 'yes' či 'no', mq přepíše sekci [diff] a "
+"vždy generuje gitové nebo regulerní oprávky; v druhém případě je možná "
+"ztráta dat. Implicitně: auto"
 
 #: tortoisehg/hgqt/settings.py:877
 msgid "No Dates"
@@ -7261,6 +7325,8 @@ msgstr "Ignorovat prázdné znaky (WS)"
 #: tortoisehg/hgqt/settings.py:884
 msgid "Ignore white space when comparing lines in diff views. Default: False"
 msgstr ""
+"Ignorovat prázdná místa při porovnávání řádků v zobrazení diffu. Implicitně: "
+"False"
 
 #: tortoisehg/hgqt/settings.py:886 tortoisehg/hgqt/settings.py:896
 msgid "Ignore WS Amount"
@@ -7270,6 +7336,7 @@ msgstr "Množství ignorovaných WS"
 msgid ""
 "Ignore changes in the amount of white space in diff views. Default: False"
 msgstr ""
+"Ignorovat změny v počtu prázdných míst v zobrazení diffu. Implicitně: False"
 
 #: tortoisehg/hgqt/settings.py:889 tortoisehg/hgqt/settings.py:899
 msgid "Ignore Blank Lines"
@@ -7279,26 +7346,32 @@ msgstr "Ignorovat prázdné řádky"
 msgid ""
 "Ignore changes whose lines are all blank in diff views. Default: False"
 msgstr ""
+"Ignorovat změny v počtu prázdných řádků v zobrazení diffu. Implicitně: False"
 
 #: tortoisehg/hgqt/settings.py:892
 msgid "<b>Annotate:</b>"
-msgstr ""
+msgstr "<b>Anotace:</b>"
 
 #: tortoisehg/hgqt/settings.py:894
 msgid ""
 "Ignore white space when comparing lines in the annotate view. Default: False"
 msgstr ""
+"Ignorovat prázdná místa při porovnávání řádků v zobrazení anotace. "
+"Implicitně: False"
 
 #: tortoisehg/hgqt/settings.py:897
 msgid ""
 "Ignore changes in the amount of white space in the annotate view. Default: "
 "False"
 msgstr ""
+"Ignorovat změny v počtu prázdných míst v zobrazení anotace. Implicitně: False"
 
 #: tortoisehg/hgqt/settings.py:900
 msgid ""
 "Ignore changes whose lines are all blank in the annotate view. Default: False"
 msgstr ""
+"Ignorovat změny v počtu prázdných řádků v zobrazení anotace. Implicitně: "
+"False"
 
 #: tortoisehg/hgqt/settings.py:904
 msgid "Fonts"
@@ -7331,7 +7404,7 @@ msgstr "Font použitý v seznamu souborů. Implicitně: sans 9"
 
 #: tortoisehg/hgqt/settings.py:914
 msgid "ChangeLog Font"
-msgstr "ChangeLog Font"
+msgstr "Font dat"
 
 #: tortoisehg/hgqt/settings.py:915
 msgid "Font used to display changelog data. Default: monospace 10"
@@ -7351,7 +7424,7 @@ msgstr "Extenze"
 
 #: tortoisehg/hgqt/settings.py:925 tortoisehg/hgqt/settings.py:1569
 msgid "Tools"
-msgstr ""
+msgstr "Nástroje"
 
 #: tortoisehg/hgqt/settings.py:928
 msgid "Issue Tracking"
@@ -7385,7 +7458,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:939
 msgid "Inline Tags"
-msgstr ""
+msgstr "Úvodní tagy"
 
 #: tortoisehg/hgqt/settings.py:940
 msgid "Show tags at start of commit message."
@@ -7393,7 +7466,7 @@ msgstr "Zobrazit tagy na počátku zprávy komitu."
 
 #: tortoisehg/hgqt/settings.py:941
 msgid "Mandatory Issue Reference"
-msgstr "Povinná Issue reference"
+msgstr "Povinný odkaz na problém"
 
 #: tortoisehg/hgqt/settings.py:942
 msgid ""
@@ -7414,18 +7487,20 @@ msgid ""
 "Configures a COM IBugTraqProvider or IBugTrackProvider2 issue tracking "
 "plugin."
 msgstr ""
+"Konfiguruje plugin COM pro sledování chyb (Bug Tracker) IBugTraqProvider "
+"nebo IBugTrackProvider2."
 
 #: tortoisehg/hgqt/settings.py:949
 msgid "Configure Issue Tracker"
-msgstr ""
+msgstr "Konfigurovat IT"
 
 #: tortoisehg/hgqt/settings.py:950
 msgid "Configure the selected COM Bug Tracker plugin."
-msgstr ""
+msgstr "Konfigurovat vybraný plugin COM Bug Tracker"
 
 #: tortoisehg/hgqt/settings.py:952
 msgid "Issue Tracker Trigger"
-msgstr ""
+msgstr "Aktualizovat Issue Tracker"
 
 #: tortoisehg/hgqt/settings.py:954
 msgid ""
@@ -7434,7 +7509,7 @@ msgid ""
 "state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
 "a successful commit.</ul><p>Default: never"
 msgstr ""
-"Určuje, kdy má být stav Isue Tracker aktualizován aplikací TortoiseHg. "
+"Určuje, kdy má být stav Issue Tracker aktualizován aplikací TortoiseHg. "
 "Platné hodnoty jsou:<ul><li><b>never</b>: Neaktualizovat stav Issue Tracker "
 "automaticky.<li><b>commit</b>: Aktualizovat Issue Tracker po úspěšném "
 "komitu.</ul><p>Implicitně: never"
@@ -7453,7 +7528,7 @@ msgstr "Heslo pro ověření přístupu na review board"
 
 #: tortoisehg/hgqt/settings.py:969
 msgid "Server Repository ID"
-msgstr "Server Repository ID"
+msgstr "ID repa serveru"
 
 #: tortoisehg/hgqt/settings.py:970
 msgid "The default repository id for this repo on the review board server"
@@ -7593,6 +7668,8 @@ msgid ""
 "List of settings that will be pulled from the project configuration file. "
 "Default is include NO settings."
 msgstr ""
+"Seznam nastavení, která budou stažena z konfiguračního souboru projektu. "
+"Implicitně je: include NO settings"
 
 #: tortoisehg/hgqt/settings.py:1013
 msgid "Exclude"
@@ -7603,6 +7680,8 @@ msgid ""
 "List of settings that will NOT be pulled from the project configuration "
 "file. Default is exclude none of the included settings."
 msgstr ""
+"Seznam nastavení, která nebudou stažena z konfiguračního souboru projektu. "
+"Implicitně je nevylučovat žádná z připojovaných nastavení."
 
 #: tortoisehg/hgqt/settings.py:1016
 msgid "Update on incoming"
@@ -7632,7 +7711,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:1040
 msgid "TortoiseHg Settings"
-msgstr "TortoiseHg Settings"
+msgstr "Nastavení TortoiseHg"
 
 #: tortoisehg/hgqt/settings.py:1046
 msgid "Iniparse package not found"
@@ -7646,7 +7725,7 @@ msgstr ""
 #: tortoisehg/hgqt/settings.py:1071
 #, python-format
 msgid "%s's global settings"
-msgstr "%s's global settings"
+msgstr "Globální nastavení %s"
 
 #: tortoisehg/hgqt/settings.py:1085
 msgid "No repository found"
@@ -7686,7 +7765,7 @@ msgstr "&Ne (odvrhnout změny)"
 
 #: tortoisehg/hgqt/settings.py:1193
 msgid "Settings File:"
-msgstr "Settings File:"
+msgstr "Konfigurační soubor:"
 
 #: tortoisehg/hgqt/settings.py:1260
 msgid "Confirm Save"
@@ -7714,7 +7793,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:1457
 msgid "Unable to create a Mercurial.ini file"
-msgstr "Nejde vytvořit Mercurialový soubor .ini"
+msgstr "Nejde vytvořit soubor Mercurial.ini"
 
 #: tortoisehg/hgqt/settings.py:1458
 msgid "Insufficient access rights, reverting to read-only mode."
@@ -7734,7 +7813,7 @@ msgstr "Položky submenu:"
 
 #: tortoisehg/hgqt/shellconf.py:118
 msgid "Menu Behavior"
-msgstr "Menu Behavior"
+msgstr "Chování menu"
 
 #: tortoisehg/hgqt/shellconf.py:120
 msgid "Hide context menu outside repositories"
@@ -7830,7 +7909,7 @@ msgstr "Smazat aktuální šelfový soubor"
 
 #: tortoisehg/hgqt/shelve.py:110
 msgid "Left Toolbar"
-msgstr "Left Toolbar"
+msgstr "Levý Toolbar"
 
 #: tortoisehg/hgqt/shelve.py:113 tortoisehg/hgqt/shelve.py:166
 msgid "Delete selected chunks"
@@ -7867,7 +7946,7 @@ msgstr "New Shelf"
 
 #: tortoisehg/hgqt/shelve.py:147
 msgid "Right Toolbar"
-msgstr "Right Toolbar"
+msgstr "Pravý Toolbar"
 
 #: tortoisehg/hgqt/shelve.py:151
 msgid "Move selected chunks left"
@@ -7900,7 +7979,7 @@ msgstr "Určit název nového šelfu"
 
 #: tortoisehg/hgqt/shelve.py:266
 msgid "Bad filename"
-msgstr ""
+msgstr "Nesprávný název souboru"
 
 #: tortoisehg/hgqt/shelve.py:267
 msgid "A shelf name cannot contain :#/\\<>|"
@@ -8114,7 +8193,7 @@ msgstr "Příchozí changesety"
 
 #: tortoisehg/hgqt/sync.py:147
 msgid "Pull incoming changesets from remote repository"
-msgstr "Stáhnout (pull) příchozí changesety"
+msgstr "Pull příchozí changesety"
 
 #: tortoisehg/hgqt/sync.py:150
 msgid "Filter outgoing changesets to remote repository"
@@ -8122,7 +8201,7 @@ msgstr "Odchozí changesety"
 
 #: tortoisehg/hgqt/sync.py:153
 msgid "Push outgoing changesets to remote repository"
-msgstr "Vyslat (push) odchozí changesety"
+msgstr "Push odchozí changesety"
 
 #: tortoisehg/hgqt/sync.py:155
 msgid "Email outgoing changesets for remote repository"
@@ -8146,7 +8225,7 @@ msgstr "Cíl:"
 
 #: tortoisehg/hgqt/sync.py:203
 msgid "<b>Selected Options:</b>"
-msgstr ""
+msgstr "<b>Vybrané možnosti:</b>"
 
 #: tortoisehg/hgqt/sync.py:213
 msgid "<b>Remote Repository:</b>"
@@ -8154,7 +8233,7 @@ msgstr "<b>Vzdálený repozitář:</b>"
 
 #: tortoisehg/hgqt/sync.py:218
 msgid "<b>Remote Push Repository:</b>"
-msgstr ""
+msgstr "<b>Vzálené repo pro Push:</b>"
 
 #: tortoisehg/hgqt/sync.py:231
 msgid "Path Edit Toolbar"
@@ -8170,7 +8249,7 @@ msgstr "Uložit aktuální URL jako alias"
 
 #: tortoisehg/hgqt/sync.py:250
 msgid "Security"
-msgstr ""
+msgstr "Bezpečnost"
 
 #: tortoisehg/hgqt/sync.py:251
 msgid "Manage HTTPS connection security and user authentication"
@@ -8239,7 +8318,7 @@ msgstr "Terminálové rozhranní nelze otevřít pro vzdálené repo"
 
 #: tortoisehg/hgqt/sync.py:683 tortoisehg/hgqt/sync.py:1609
 msgid "Confirm path delete"
-msgstr "Confirm path delete"
+msgstr "Potvrdit smazání cesty"
 
 #: tortoisehg/hgqt/sync.py:684 tortoisehg/hgqt/sync.py:1610
 #, python-format
@@ -8549,7 +8628,7 @@ msgstr "Certificate Query Error"
 #: tortoisehg/hgqt/sync.py:1400
 #, python-format
 msgid "Invalid port number: %s"
-msgstr ""
+msgstr "Neplatné číslo portu: %s"
 
 #: tortoisehg/hgqt/sync.py:1416
 msgid "Security: "
@@ -8663,7 +8742,7 @@ msgstr "Vynutit push nebo pull (potlačit bezpečnostní kontroly, --force)"
 
 #: tortoisehg/hgqt/sync.py:1719
 msgid "Temporarily disable configured HTTP proxy"
-msgstr "Temporarily disable configured HTTP proxy"
+msgstr "Dočasně odpojit nastavené HTTP proxy"
 
 #: tortoisehg/hgqt/sync.py:1726
 msgid "Emit debugging output (--debug)"
@@ -8860,8 +8939,8 @@ msgstr "Odtrhnout -%s"
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
 msgstr[0] "<b>%d changeset</b> bude odtržen"
-msgstr[1] "<b>%d changesety</b> budou odtrtženy"
-msgstr[2] "<b>%d changesetů</b> bude odtrženo"
+msgstr[1] "<b>%d poslední changesety</b> budou odtrženy"
+msgstr[2] "<b>%d posledních changesetů</b> bude odtrženo"
 
 #: tortoisehg/hgqt/thgstrip.py:183
 msgid "Unknown revision!"
@@ -8950,7 +9029,7 @@ msgstr "hg: parse error: %s\n"
 #: tortoisehg/hgqt/thread.py:308
 #, python-format
 msgid "timed out waiting for lock held by %s"
-msgstr "timed out waiting for lock held by %s"
+msgstr "vypršení času čekáním na zámek držený %s"
 
 #: tortoisehg/hgqt/thread.py:310
 #, python-format
@@ -9041,7 +9120,7 @@ msgstr "Aktualizovat - %s"
 
 #: tortoisehg/hgqt/update.py:200
 msgid "remove working directory"
-msgstr ""
+msgstr "odebrat pracovní adresář"
 
 #: tortoisehg/hgqt/update.py:207
 msgid "(same as parent)"
@@ -9053,7 +9132,7 @@ msgstr "neznámá revize!"
 
 #: tortoisehg/hgqt/update.py:242 tortoisehg/hgqt/update.py:254
 msgid "Activate bookmark?"
-msgstr ""
+msgstr "Aktivovat záložku?"
 
 #: tortoisehg/hgqt/update.py:243
 #, python-format
@@ -9062,6 +9141,9 @@ msgid ""
 "you want to activate it?<br></b><i>You can disable this prompt by "
 "configuring Settings/Workbench/Activate Bookmarks</i>"
 msgstr ""
+"Vybraná revize (%s) má záložku s názvem \"<i>%s</i>\".<p>Chcete ji "
+"aktivovat?<br></b><i>Můžete tuto výzvu nepovolit v "
+"Settings/Workbench/Activate Bookmarks</i>"
 
 #: tortoisehg/hgqt/update.py:255
 #, python-format
@@ -9072,15 +9154,19 @@ msgid ""
 "disable this prompt by configuring Settings/Workbench/Activate "
 "Bookmarks</i><p>"
 msgstr ""
+"Vybraná revize (<i>%s</i>) má <i>%d</i> záložky (záložek).<p>Vyberte tu, "
+"kterou chcete aktivovat a klepněte <i>OK</i>.<p>klepněte <i>Cancel</i>, "
+"nechcete-li aktivovat žádnou z nich.<p><p><i>Můžete tuto výzvu nepovolit v  "
+"Settings/Workbench/Activate Bookmarks</i><p>"
 
 #: tortoisehg/hgqt/update.py:267
 msgid "Deactivate current bookmark?"
-msgstr ""
+msgstr "Deaktivovat stavající záložku?"
 
 #: tortoisehg/hgqt/update.py:268
 #, python-format
 msgid "Do you really want to deactivate the <i>%s</i> bookmark?"
-msgstr ""
+msgstr "Opravdu chcete deaktivovat záložku <i>%s</i>?"
 
 #: tortoisehg/hgqt/update.py:319
 msgid ""
@@ -9100,7 +9186,7 @@ msgstr "&Shelve"
 
 #: tortoisehg/hgqt/update.py:324
 msgid "Shelve - move local changes to a patch"
-msgstr "Shelve - move local changes to a patch"
+msgstr "Shelve - přemístit lokální změny do oprávky"
 
 #: tortoisehg/hgqt/update.py:326
 msgid "Merge - allow to merge with local changes"
@@ -9145,7 +9231,7 @@ msgstr "Nelze nalézt changeset"
 
 #: tortoisehg/hgqt/visdiff.py:202
 msgid "You likely need to refresh this application"
-msgstr "Patrně potřebujete tuto aplikaci obnovit"
+msgstr "Patrně potřebujete tuto aplikaci zčerstvit"
 
 #: tortoisehg/hgqt/visdiff.py:219
 msgid "No file changes"
@@ -9207,7 +9293,7 @@ msgstr "Žádný repositář nenalezen"
 
 #: tortoisehg/hgqt/wctxactions.py:40
 msgid "&Diff to parent"
-msgstr ""
+msgstr "&Diff vůči rodiči"
 
 #: tortoisehg/hgqt/wctxactions.py:47
 msgid "Explore subrepository"
@@ -9223,7 +9309,7 @@ msgstr "Zobrazit chybějící soubor"
 
 #: tortoisehg/hgqt/wctxactions.py:55
 msgid "&Revert..."
-msgstr ""
+msgstr "&Vrátit..."
 
 #: tortoisehg/hgqt/wctxactions.py:58 tortoisehg/util/menuthg.py:49
 msgid "File History"
@@ -9243,11 +9329,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/wctxactions.py:65
 msgid "&Detect Renames..."
-msgstr "&Detect Renames..."
+msgstr "&Zjistit přejmenované..."
 
 #: tortoisehg/hgqt/wctxactions.py:67
 msgid "&Ignore..."
-msgstr ""
+msgstr "&Ignorovat..."
 
 #: tortoisehg/hgqt/wctxactions.py:68
 msgid "Remove versioned"
@@ -9255,7 +9341,7 @@ msgstr "Odstranit verzovaný"
 
 #: tortoisehg/hgqt/wctxactions.py:69
 msgid "&Delete unversioned..."
-msgstr ""
+msgstr "&Smazat neverzované..."
 
 #: tortoisehg/hgqt/wctxactions.py:71
 msgid "Mark unresolved"
@@ -9316,7 +9402,7 @@ msgstr "Nekomitované sloučení - vyberte prosím rodičovskou revizi"
 
 #: tortoisehg/hgqt/wctxactions.py:266
 msgid "Revert files to local or other parent?"
-msgstr "Navrátit soubory k lokálnímu nebo jinému rodiči?"
+msgstr "Vrátit soubory ke stavu lokálního či jihého rodiče?"
 
 #: tortoisehg/hgqt/wctxactions.py:267
 msgid "&Local"
@@ -9332,7 +9418,7 @@ msgstr "Vrátit změny lokálních souborů?"
 
 #: tortoisehg/hgqt/wctxactions.py:281
 msgid "&Revert with backup"
-msgstr "&Návrat se zálohou"
+msgstr "&Návrat do předchozího stavu se zálohou"
 
 #: tortoisehg/hgqt/wctxactions.py:281
 msgid "&Discard changes"
@@ -9340,7 +9426,7 @@ msgstr "&Odvrhnout změny"
 
 #: tortoisehg/hgqt/wctxactions.py:290
 msgid "Revert the following files?"
-msgstr ""
+msgstr "Vrátit (revert) změny následujících suborů?"
 
 #: tortoisehg/hgqt/wctxactions.py:291
 msgid "&Revert"
@@ -9404,7 +9490,7 @@ msgstr "TortoiseHg Workbench"
 
 #: tortoisehg/hgqt/workbench.py:84
 msgid "New Workbench..."
-msgstr ""
+msgstr "Nový Verpánek"
 
 #: tortoisehg/hgqt/workbench.py:86
 msgid "New Repository..."
@@ -9440,27 +9526,27 @@ msgstr "&Help"
 
 #: tortoisehg/hgqt/workbench.py:145
 msgid "Edit Toolbar"
-msgstr "Edit Toolbar"
+msgstr "Editovací nástr. lišta"
 
 #: tortoisehg/hgqt/workbench.py:147
 msgid "Dock Toolbar"
-msgstr "Dock Toolbar"
+msgstr "Přemistitelná nástr. lišta"
 
 #: tortoisehg/hgqt/workbench.py:149
 msgid "Sync Toolbar"
-msgstr "Sync Toolbar"
+msgstr "Synchronizační nástr. lišta"
 
 #: tortoisehg/hgqt/workbench.py:151
 msgid "Task Toolbar"
-msgstr "Task Toolbar"
+msgstr "Provozní nástrojová lišta"
 
 #: tortoisehg/hgqt/workbench.py:153
 msgid "Custom Toolbar"
-msgstr ""
+msgstr "Uživatelská nástr. lišta"
 
 #: tortoisehg/hgqt/workbench.py:164
 msgid "New &Workbench..."
-msgstr ""
+msgstr "Nový &Verpánek..."
 
 #: tortoisehg/hgqt/workbench.py:167
 msgid "&New Repository..."
@@ -9540,23 +9626,23 @@ msgstr "&Hledat"
 
 #: tortoisehg/hgqt/workbench.py:250
 msgid "S&ynchronize"
-msgstr "S&ynchronize"
+msgstr "S&ynchronizovat"
 
 #: tortoisehg/hgqt/workbench.py:275
 msgid "&Refresh"
-msgstr "&Obnovit"
+msgstr "&Zčerstvit"
 
 #: tortoisehg/hgqt/workbench.py:278
 msgid "Refresh current repository"
-msgstr "Osvěžit aktuální repozitář"
+msgstr "Zčerstvit aktuální repozitář"
 
 #: tortoisehg/hgqt/workbench.py:279
 msgid "Refresh &Task Tab"
-msgstr "Refresh &Task Tab"
+msgstr "Zčerstvit operační pole"
 
 #: tortoisehg/hgqt/workbench.py:282
 msgid "Refresh only the current task tab"
-msgstr "Osvěžit pouze aktuální panel úloh"
+msgstr "Zčerstvit pouze aktuální panel úloh"
 
 #: tortoisehg/hgqt/workbench.py:284
 msgid "Load all revisions"
@@ -9577,7 +9663,7 @@ msgstr "Přejít k určené revizi"
 
 #: tortoisehg/hgqt/workbench.py:291
 msgid "Web Server..."
-msgstr "Web Server..."
+msgstr "Webový server..."
 
 #: tortoisehg/hgqt/workbench.py:294
 msgid "Shelve..."
@@ -9589,7 +9675,7 @@ msgstr "Importovat..."
 
 #: tortoisehg/hgqt/workbench.py:299
 msgid "Verify"
-msgstr "Ověřit"
+msgstr "Ověřit repo"
 
 #: tortoisehg/hgqt/workbench.py:301
 msgid "Recover"
@@ -9597,7 +9683,7 @@ msgstr "Obnovit"
 
 #: tortoisehg/hgqt/workbench.py:304
 msgid "Resolve..."
-msgstr "Řešit..."
+msgstr "Řešit konflikty..."
 
 #: tortoisehg/hgqt/workbench.py:307
 msgid "Rollback/Undo..."
@@ -9674,7 +9760,7 @@ msgstr "Push odchozích změn"
 #: tortoisehg/hgqt/workbench.py:403
 #, python-format
 msgid "Execute custom tool '%s'"
-msgstr ""
+msgstr "Spustit uživatelský nástroj '%s'"
 
 #: tortoisehg/hgqt/workbench.py:468 tortoisehg/hgqt/workbench.py:469
 msgid "Close tab"
@@ -9686,7 +9772,7 @@ msgstr "Zavřít ostatní karty"
 
 #: tortoisehg/hgqt/workbench.py:472
 msgid "Undo close tab"
-msgstr ""
+msgstr "Zrušit zavření karty"
 
 #: tortoisehg/hgqt/workbench.py:473
 msgid "Reopen last closed tab"
@@ -9694,7 +9780,7 @@ msgstr "Znovu otevřít poslední zavřenou kartu"
 
 #: tortoisehg/hgqt/workbench.py:474
 msgid "Undo close other tabs"
-msgstr ""
+msgstr "Zrušit zavření ostatních karet"
 
 #: tortoisehg/hgqt/workbench.py:475
 msgid "Reopen last closed tab group"
@@ -9764,27 +9850,27 @@ msgstr "Hg file log viewer [%s] - %s"
 #: tortoisehg/util/bugtraq.py:87 tortoisehg/util/bugtraq.py:111
 #: tortoisehg/util/bugtraq.py:132 tortoisehg/util/bugtraq.py:147
 msgid "Issue Tracker Plugin Error"
-msgstr ""
+msgstr "Chyba pluginu Issue Tracker"
 
 #: tortoisehg/util/bugtraq.py:88
 msgid "Could not instantiate Issue Tracker plugin COM object"
-msgstr ""
+msgstr "Nešlo vytvořit instanci přidaného objektu COM: Issue Tracker"
 
 #: tortoisehg/util/bugtraq.py:89
 msgid "This error will not be shown again until you restart the workbench"
-msgstr ""
+msgstr "Tato chyba se již nezobrazí, pokud nerestartujete Verpánek."
 
 #: tortoisehg/util/bugtraq.py:112
 msgid "Error getting commit message information from Issue Tracker plugin"
-msgstr ""
+msgstr "Chyba při získání chybové zprávy z pluginu Issue Tracker"
 
 #: tortoisehg/util/bugtraq.py:133
 msgid "Error executing \"commit finished\" trigger"
-msgstr ""
+msgstr "Chyba při běhu spouštěče (trigger) \"commit finished\""
 
 #: tortoisehg/util/bugtraq.py:148
 msgid "Cannot open Plugin Options dialog"
-msgstr ""
+msgstr "Nejde otevřít dialog Plugin Options"
 
 #: tortoisehg/util/hglib.py:298
 msgid "inotify is not supported on this platform"
@@ -9937,11 +10023,11 @@ msgstr "Zobrazit historii změn vybraných souborů"
 
 #: tortoisehg/util/menuthg.py:52
 msgid "Shelve Changes"
-msgstr ""
+msgstr "Odložit (shelve) změny"
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Move changes between working dir and patch"
-msgstr ""
+msgstr "Přesunout změny z pracovního adresáře do oprávky (path)"
 
 #: tortoisehg/util/menuthg.py:55
 msgid "Synchronize"
@@ -9953,7 +10039,7 @@ msgstr "Synchronizovat se vzdáleným repozitářem"
 
 #: tortoisehg/util/menuthg.py:58
 msgid "Web Server"
-msgstr "Web"
+msgstr "Webový server"
 
 #: tortoisehg/util/menuthg.py:59
 msgid "Start web server for this repository"

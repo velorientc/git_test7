@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-25 08:56-0200\n"
-"PO-Revision-Date: 2012-11-25 15:33+0000\n"
+"PO-Revision-Date: 2012-12-01 12:57+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-11-26 04:47+0000\n"
-"X-Generator: Launchpad (build 16293)\n"
+"X-Launchpad-Export-Date: 2012-12-02 04:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -333,7 +333,7 @@ msgstr ""
 #: tortoisehg/hgqt/merge.py:223 tortoisehg/hgqt/rebase.py:76
 #: tortoisehg/hgqt/sync.py:1229 tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
-msgstr "マージ衝突をできるだけ自動で解決"
+msgstr "マージ衝突をできるだけ自動で解消"
 
 #: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:294
 msgid "<b>Uncommitted local changes are detected</b>"
@@ -368,7 +368,7 @@ msgstr "打ち消し、マージしています..."
 
 #: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:352
 msgid "All conflicting files will be marked unresolved."
-msgstr "衝突したファイルは全て未解決として記録されました。"
+msgstr "マージできなかったファイルは全て衝突未解消として記録されました。"
 
 #: tortoisehg/hgqt/backout.py:341
 msgid ""
@@ -380,7 +380,7 @@ msgstr "打ち消しとマージが成功すると、自動的に次のページ
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr "%d つのファイルで <b>マージ衝突</b> - <a href=\"resolve\"><b>解決する</b></a>"
+msgstr "%d つのファイルで <b>マージ衝突</b> - <a href=\"resolve\"><b>解消する</b></a>"
 
 #: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:416
 msgid "No merge conflicts, ready to commit"
@@ -1971,7 +1971,7 @@ msgstr "履歴を検索"
 
 #: tortoisehg/hgqt/fileview.py:643
 msgid "Annotate Options"
-msgstr ""
+msgstr "由来情報オプション"
 
 #: tortoisehg/hgqt/fileview.py:660
 msgid "Search in original revision"
@@ -2005,15 +2005,15 @@ msgstr "親リビジョン %d をエディタで開く"
 
 #: tortoisehg/hgqt/fileview.py:765
 msgid "Show Author"
-msgstr ""
+msgstr "ユーザ名を表示"
 
 #: tortoisehg/hgqt/fileview.py:766
 msgid "Show Date"
-msgstr ""
+msgstr "日付を表示"
 
 #: tortoisehg/hgqt/fileview.py:767
 msgid "Show Revision"
-msgstr ""
+msgstr "リビジョン番号を表示"
 
 #: tortoisehg/hgqt/graft.py:39
 msgid "Interrupted graft operation found"
@@ -2929,7 +2929,7 @@ msgstr "マージが完了したら自動的に次のページに進む"
 msgid ""
 "%d files were modified on both branches and must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr "%d つのファイルが両方のブランチで変更されています。<a href=\"resolve\"><b>解決</b></a>が必要です"
+msgstr "%d つのファイルが両方のブランチで変更されています。 <a href=\"resolve\"><b>解消してください</b></a>。"
 
 #: tortoisehg/hgqt/merge.py:450
 msgid "Commit merge results"
@@ -3824,7 +3824,7 @@ msgstr "登録除外するファイルをチェック"
 
 #: tortoisehg/hgqt/quickop.py:21
 msgid "Forget"
-msgstr "破棄"
+msgstr "登録除外"
 
 #: tortoisehg/hgqt/quickop.py:22
 msgid "Checkmark files to revert"
@@ -3948,7 +3948,7 @@ msgstr "リベースが失敗しました"
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
-msgstr "リベースにより<b>衝突</b>が起きます。<a href=\"resolve\"><b>解決</b></a>が必要です。"
+msgstr "リベースで<b>マージ衝突</b>しました。 <a href=\"resolve\"><b>解消してください</b></a>。"
 
 #: tortoisehg/hgqt/rebase.py:258
 msgid "Exiting with an unfinished rebase is not recommended."
@@ -3977,11 +3977,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/rejects.py:66
 msgid "Mark this chunk as resolved, goto next unresolved"
-msgstr "このチャンクを解決済みと印をつけ、次の未解決のチャンクに移動する"
+msgstr "このチャンクを衝突解消済みと印をつけ、次の未解消のチャンクに移動する"
 
 #: tortoisehg/hgqt/rejects.py:70
 msgid "Mark this chunk as unresolved"
-msgstr "このチャンクを未解決と印を付ける"
+msgstr "このチャンクを衝突未解消と印を付ける"
 
 #: tortoisehg/hgqt/rejects.py:96 tortoisehg/hgqt/rejects.py:103
 msgid "Unable to merge rejects"
@@ -5134,7 +5134,7 @@ msgstr "前回のコマンドがまだ実行中です"
 #: tortoisehg/hgqt/resolve.py:25
 #, python-format
 msgid "Resolve conflicts - %s"
-msgstr "衝突の解決 - %s"
+msgstr "マージ衝突を解消 - %s"
 
 #: tortoisehg/hgqt/resolve.py:54
 msgid "Local revision information"
@@ -5146,11 +5146,11 @@ msgstr "他のリビジョン情報"
 
 #: tortoisehg/hgqt/resolve.py:77
 msgid "Unresolved conflicts"
-msgstr "未解決の衝突"
+msgstr "衝突未解消"
 
 #: tortoisehg/hgqt/resolve.py:91 tortoisehg/hgqt/resolve.py:116
 msgid "Mercurial Resolve"
-msgstr "Mercurialによる自動解決"
+msgstr "単純なマージで解消"
 
 #: tortoisehg/hgqt/resolve.py:92
 msgid "Attempt automatic (trivial) merge"
@@ -5158,7 +5158,7 @@ msgstr "自動マージを試す"
 
 #: tortoisehg/hgqt/resolve.py:94 tortoisehg/hgqt/resolve.py:118
 msgid "Tool Resolve"
-msgstr "ツールによる解決"
+msgstr "ツールで解消"
 
 #: tortoisehg/hgqt/resolve.py:95
 msgid "Merge using selected merge tool"
@@ -5198,11 +5198,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/resolve.py:137
 msgid "Resolved conflicts"
-msgstr "解決した衝突"
+msgstr "衝突解消済み"
 
 #: tortoisehg/hgqt/resolve.py:152
 msgid "Edit resolved file"
-msgstr "解決済みファイルを編集"
+msgstr "解消済みファイルを編集"
 
 #: tortoisehg/hgqt/resolve.py:154 tortoisehg/hgqt/resolve.py:179
 msgid "3-Way Diff"
@@ -5218,7 +5218,7 @@ msgstr "ローカルとの差分"
 
 #: tortoisehg/hgqt/resolve.py:158
 msgid "Visual diff between resolved file and first parent"
-msgstr "解決済みファイルと最初の親とのVisual Diff"
+msgstr "解消済みファイルと最初の親リビジョンとの差分"
 
 #: tortoisehg/hgqt/resolve.py:160 tortoisehg/hgqt/resolve.py:183
 msgid "Diff to Other"
@@ -5226,7 +5226,7 @@ msgstr "他との差分"
 
 #: tortoisehg/hgqt/resolve.py:161
 msgid "Visual diff between resolved file and second parent"
-msgstr "解決済みファイルと二番目の親とのGUI差分"
+msgstr "解消済みファイルと二番目の親との差分"
 
 #: tortoisehg/hgqt/resolve.py:163 tortoisehg/hgqt/resolve.py:185
 msgid "Mark as Unresolved"
@@ -5256,11 +5256,11 @@ msgstr "Visual Diffはサブリポジトリーのファイルには対応して�
 
 #: tortoisehg/hgqt/resolve.py:409
 msgid "There are merge <b>conflicts</b> to be resolved"
-msgstr "解決する必要がある<b>衝突</b>が見つかりました"
+msgstr "マージ<b>衝突</b>を解消してください"
 
 #: tortoisehg/hgqt/resolve.py:411
 msgid "All conflicts are resolved."
-msgstr "すべての衝突が解決できました。"
+msgstr "衝突を全て解消しました。"
 
 #: tortoisehg/hgqt/resolve.py:413
 msgid "There are no conflicting file merges."
@@ -5268,11 +5268,11 @@ msgstr "衝突しているマージはありません"
 
 #: tortoisehg/hgqt/resolve.py:420
 msgid "Exit without finishing resolve?"
-msgstr "解決せずに終了しますか？"
+msgstr "衝突を解消せずに終了しますか?"
 
 #: tortoisehg/hgqt/resolve.py:421
 msgid "Unresolved conflicts remain. Are you sure?"
-msgstr "解決していない衝突が残っています。本当に終了しますか?"
+msgstr "未解消の衝突があります。本当に終了しますか?"
 
 #: tortoisehg/hgqt/resolve.py:422 tortoisehg/hgqt/workbench.py:181
 msgid "E&xit"
@@ -6391,7 +6391,7 @@ msgstr "ダイアログタイトルにルートディレクトリ名の代わり
 
 #: tortoisehg/hgqt/settings.py:589
 msgid "Auto-resolve merges"
-msgstr "マージを自動解決"
+msgstr "マージを自動解消"
 
 #: tortoisehg/hgqt/settings.py:590
 msgid ""
@@ -6402,9 +6402,9 @@ msgid ""
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: False."
 msgstr ""
-"同じファイルに対する両方の親からの変更をTortoiseHgが自動的に解決し、自動的に解決できない場合のみユーザーに報告します。\n"
+"同じファイルに対する両方の親からの変更をTortoiseHgが自動的に解消し、自動的に解消できない場合のみユーザーに報告します。\r\n"
 "もし無効であれば、マージにおける両方の親からの変更があるファイルは、ファイル内の違う場所に対する変更でも衝突として報告されます。どちらの場合でも、衝突が起"
-"きた場合、ダイアログが開き、ユーザーは解決を手動で行う必要があります。デフォルトは無効です。"
+"きた場合、ダイアログが開き、ユーザーは解消を手動で行う必要があります。デフォルトは無効です。"
 
 #: tortoisehg/hgqt/settings.py:600
 msgid "Single Workbench Window"
@@ -7003,7 +7003,7 @@ msgstr "送信者自信をメールサーバが識別するために使うホス
 
 #: tortoisehg/hgqt/settings.py:857
 msgid "Diff and Annotate"
-msgstr ""
+msgstr "差分と由来情報"
 
 #: tortoisehg/hgqt/settings.py:859
 msgid "Patch EOL"
@@ -7084,7 +7084,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:892
 msgid "<b>Annotate:</b>"
-msgstr ""
+msgstr "<b>由来情報:</b>"
 
 #: tortoisehg/hgqt/settings.py:894
 msgid ""
@@ -7779,11 +7779,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/status.py:824
 msgid ", resolved merge"
-msgstr ", 解決済マージ"
+msgstr "、マージ解消済み"
 
 #: tortoisehg/hgqt/status.py:826
 msgid ", unresolved merge"
-msgstr ", 未解決のマージ"
+msgstr "、マージ未解消"
 
 #: tortoisehg/hgqt/status.py:839
 #, python-format
@@ -8073,7 +8073,7 @@ msgstr "マージによるファイルの衝突"
 
 #: tortoisehg/hgqt/sync.py:946 tortoisehg/hgqt/update.py:410
 msgid "File conflicts need to be resolved"
-msgstr "変更が衝突しました。解決が必要です。"
+msgstr "変更が衝突しました。解消してください。"
 
 #: tortoisehg/hgqt/sync.py:952
 #, python-format
@@ -8962,7 +8962,7 @@ msgstr "復旧(&R)..."
 
 #: tortoisehg/hgqt/wctxactions.py:58 tortoisehg/util/menuthg.py:49
 msgid "File History"
-msgstr "ファイル変更履歴"
+msgstr "ファイルの変更履歴"
 
 #: tortoisehg/hgqt/wctxactions.py:59
 msgid "&Annotate"
@@ -8994,11 +8994,11 @@ msgstr "未バージョン管理を削除(&D)..."
 
 #: tortoisehg/hgqt/wctxactions.py:71
 msgid "Mark unresolved"
-msgstr "未解決としてマーク"
+msgstr "衝突未解消状態に設定"
 
 #: tortoisehg/hgqt/wctxactions.py:72
 msgid "Mark resolved"
-msgstr "解決済みとしてマーク"
+msgstr "衝突解消済み状態に設定"
 
 #: tortoisehg/hgqt/wctxactions.py:75
 msgid "Check"
@@ -9026,11 +9026,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/wctxactions.py:141
 msgid "Restart Merge..."
-msgstr "マージの再開..."
+msgstr "再マージ..."
 
 #: tortoisehg/hgqt/wctxactions.py:143
 msgid "Restart merge with"
-msgstr "マージの再開:"
+msgstr "指定ツールで再マージ"
 
 #: tortoisehg/hgqt/wctxactions.py:172
 msgid " errors"
@@ -9332,7 +9332,7 @@ msgstr "復元"
 
 #: tortoisehg/hgqt/workbench.py:304
 msgid "Resolve..."
-msgstr "解決..."
+msgstr "マージ衝突を解消..."
 
 #: tortoisehg/hgqt/workbench.py:307
 msgid "Rollback/Undo..."
@@ -9636,7 +9636,7 @@ msgstr "変更を元に戻します"
 
 #: tortoisehg/util/menuthg.py:37
 msgid "Forget Files..."
-msgstr "破棄..."
+msgstr "登録除外..."
 
 #: tortoisehg/util/menuthg.py:38 tortoisehg/util/menuthg.py:41
 msgid "Remove files from version control"
