@@ -163,7 +163,7 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
 
-        cmdline = ['bookmark', '--repository', self.repo.root,
+        cmdline = ['bookmarks', '--repository', self.repo.root,
                    '--rev', str(self.rev), bookmarklocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
@@ -179,7 +179,7 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been moved") % bookmark, True)
 
-        cmdline = ['bookmark', '--repository', self.repo.root,
+        cmdline = ['bookmarks', '--repository', self.repo.root,
                    '--rev', str(self.rev), '--force', bookmarklocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
@@ -194,7 +194,7 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been removed") % bookmark, True)
 
-        cmdline = ['bookmark', '--repository', self.repo.root,
+        cmdline = ['bookmarks', '--repository', self.repo.root,
                    '--delete', bookmarklocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
@@ -218,7 +218,7 @@ class BookmarkDialog(QDialog):
             self.set_status(_("Bookmark '%s' has been renamed to '%s'") %
                             (name, newname), True)
 
-        cmdline = ['bookmark', '--repository', self.repo.root,
+        cmdline = ['bookmarks', '--repository', self.repo.root,
                    '--rename', namelocal, newnamelocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
