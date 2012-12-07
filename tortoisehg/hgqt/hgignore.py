@@ -61,7 +61,7 @@ class HgignoreDialog(QDialog):
         ignorefiles = [repo.wjoin('.hgignore')]
         for name, value in repo.ui.configitems('ui'):
             if name == 'ignore' or name.startswith('ignore.'):
-                ignorefiles.append(os.path.expanduser(value))
+                ignorefiles.append(util.expandpath(value))
 
         filecombo = QComboBox()
         hbox.addWidget(filecombo)
