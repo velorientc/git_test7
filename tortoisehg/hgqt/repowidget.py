@@ -1681,7 +1681,22 @@ class RepoWidget(QWidget):
             dlg.deleteLater()
 
     def updateToRevision(self):
-        dlg = update.UpdateDialog(self.repo, self.rev, self)
+        ctx = self.repo[self.rev]
+        bookmarks = ctx.bookmarks()
+        if ctx in self.repo.parents():
+            # keep bookmark unchanged when updating to current rev
+            if self.repo._bookmarkcurrent in bookmarks:
+                rev = self.repo._bookmarkcurrent
+            else:
+                rev = self.rev
+        else:
+            # more common switching bookmark, rather than deselecting it
+            if bookmarks:
+                rev = bookmarks[0]
+            else:
+                rev = self.rev
+
+        dlg = update.UpdateDialog(self.repo, rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
