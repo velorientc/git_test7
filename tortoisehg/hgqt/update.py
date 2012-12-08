@@ -224,7 +224,7 @@ class UpdateDialog(QDialog):
         rev = hglib.fromunicode(self.rev_combo.currentText())
 
         activatebookmarkmode = self.repo.ui.config(
-            'tortoisehg', 'activatebookmarks', 'auto')
+            'tortoisehg', 'activatebookmarks', 'prompt')
         if activatebookmarkmode != 'never':
             bookmarks = self.repo[rev].bookmarks()
             if bookmarks and rev not in bookmarks:
