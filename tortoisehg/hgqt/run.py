@@ -1079,7 +1079,7 @@ table = {
              '(only a repository)')),
           ('u', 'updaterev', '',
            _('revision, tag or branch to check out')),
-          ('r', 'rev', [], _('include the specified changeset')),
+          ('r', 'rev', '', _('include the specified changeset')),
           ('b', 'branch', [],
            _('clone only the specified branch')),
           ('', 'pull', None, _('use pull protocol to copy metadata')),
