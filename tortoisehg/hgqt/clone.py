@@ -260,12 +260,9 @@ class CloneDialog(QDialog):
         rev = hglib.fromunicode(self.rev_text.text().trimmed())
         startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
         if self.qclone_chk.isChecked():
-            qclonedir = hglib.fromunicode(self.qclone_txt.text().trimmed())
-            if qclonedir == '':
-                qclonedir = '.hg\patches'
-                self.qclone_txt.setText(qclonedir)
             cmdline = ['qclone']
-            if not qclonedir in ['.hg\patches', '.hg/patches', '']:
+            qclonedir = hglib.fromunicode(self.qclone_txt.text().trimmed())
+            if qclonedir:
                 cmdline += ['--patches', qclonedir]
         else:
             cmdline = ['clone']
@@ -426,16 +423,7 @@ class CloneDialog(QDialog):
         upath = FD.getExistingDirectory(self, caption, upatchroot,
                                         QFileDialog.ShowDirsOnly)
         if upath:
-            path = hglib.fromunicode(upath).replace('/', os.sep)
-            src = hglib.fromunicode(self.src_combo.currentText())
-            if not path.startswith(src):
-                qtlib.ErrorMsgBox('TortoiseHg QClone',
-                    _('The selected patch folder is not'
-                      ' under the source repository.'),
-                    '<p>src = %s</p><p>path = %s</p>' % (src, path))
-                return
-            path = path.replace(src + os.sep, '')
-            self.qclone_txt.setText(QDir.toNativeSeparators(hglib.tounicode(path)))
+            self.qclone_txt.setText(QDir.toNativeSeparators(upath))
             self.qclone_txt.setFocus()
         self.composeCommand()
 
