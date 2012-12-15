@@ -422,8 +422,9 @@ class CloneDialog(QDialog):
     def onBrowseQclone(self):
         FD = QFileDialog
         caption = _("Select patch folder")
-        upath = FD.getExistingDirectory(self, caption, \
-            self.qclone_txt.text(), QFileDialog.ShowDirsOnly)
+        upatchroot = os.path.join(unicode(self.src_combo.currentText()), '.hg')
+        upath = FD.getExistingDirectory(self, caption, upatchroot,
+                                        QFileDialog.ShowDirsOnly)
         if upath:
             path = hglib.fromunicode(upath).replace('/', os.sep)
             src = hglib.fromunicode(self.src_combo.currentText())
