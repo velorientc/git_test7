@@ -6,7 +6,7 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import cStringIO
-import os
+import os, re
 
 from mercurial import hg, util, patch, commands, cmdutil
 from mercurial import match as matchmod, ui as uimod
@@ -189,8 +189,9 @@ class ChunksWidget(QWidget):
         except (patch.PatchError, EnvironmentError), err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
+        rejfilere = re.compile(r'\b%s\.rej\b' % re.escape(wfile))
         for line in ui.popbuffer().splitlines():
-            if line.endswith(wfile + '.rej'):
+            if rejfilere.search(line):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
                                         hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
