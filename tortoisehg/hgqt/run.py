@@ -1110,7 +1110,7 @@ table = {
          _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
-         [('l', 'limit', '', _('limit number of changes displayed'))],
+         [('l', 'limit', '', _('(DEPRECATED)'))],
          _('thg log [OPTIONS] [FILE]')),
     "manifest":
         (manifest,
