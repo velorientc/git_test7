@@ -664,7 +664,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.currentProgress = _('Rollback', 'start progress')
         self.progress.emit(*cmdui.startProgress(self.currentProgress, ''))
         self.commitButtonEnable.emit(False)
-        self.runner.run(['rollback'])
+        self.runner.run(['rollback', '--repository', self.repo.root])
         self.stopAction.setEnabled(True)
 
     def updateRecentMessages(self):
