@@ -1148,13 +1148,12 @@ table = {
     "^rebase": (rebase,
         [('', 'keep', False, _('keep original changesets')),
          ('', 'keepbranches', False, _('keep original branch names')),
-         ('', 'detach', False, _('force detaching of source from its original '
-                                'branch')),
+         ('', 'detach', False, _('(DEPRECATED)')),
          ('s', 'source', '',
           _('rebase from the specified changeset')),
          ('d', 'dest', '',
           _('rebase onto the specified changeset'))],
-        _('thg rebase -s REV -d REV [--keep] [--detach]')),
+        _('thg rebase -s REV -d REV [--keep]')),
     "^tag":
         (tag,
          [('f', 'force', None, _('replace existing tag')),
