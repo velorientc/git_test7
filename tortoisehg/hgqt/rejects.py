@@ -91,7 +91,7 @@ class RejectsDialog(QDialog):
         self.editor.loadSettings(s, 'rejects/editor')
         self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
-        f = QFile(path)
+        f = QFile(hglib.tounicode(path))
         if not f.open(QIODevice.ReadOnly):
             qtlib.ErrorMsgBox(_('Unable to merge rejects'),
                               _("Can't read this file (maybe deleted)"))
@@ -213,7 +213,7 @@ class RejectsDialog(QDialog):
                 acceptresolution = True
 
         if acceptresolution:
-            f = QFile(self.path)
+            f = QFile(hglib.tounicode(self.path))
             f.open(QIODevice.WriteOnly)
             self.editor.write(f)
             self.saveSettings()
