@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
 "POT-Creation-Date: 2012-11-25 08:56-0200\n"
-"PO-Revision-Date: 2012-07-03 14:34+0000\n"
-"Last-Translator: Stanislav V. Kroter <krotersv@gmail.com>\n"
+"PO-Revision-Date: 2012-12-11 08:45+0000\n"
+"Last-Translator: Andrey Sergunov <sw-info@ya.ru>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-11-26 04:49+0000\n"
-"X-Generator: Launchpad (build 16293)\n"
+"X-Launchpad-Export-Date: 2012-12-12 04:44+0000\n"
+"X-Generator: Launchpad (build 16361)\n"
 "Language: ru\n"
 "X-Poedit-Language: Russian\n"
 
@@ -717,7 +717,7 @@ msgstr "Нет лоскутов для уничтожения"
 
 #: tortoisehg/hgqt/chunks.py:237
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "Полностью удалить файл из патча"
 
 #: tortoisehg/hgqt/chunks.py:239
 msgid "Revert all file changes?"
@@ -1410,15 +1410,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:80
 msgid "Delete from list"
-msgstr ""
+msgstr "Удалить из списка"
 
 #: tortoisehg/hgqt/customtools.py:88
 msgid "Add to list"
-msgstr ""
+msgstr "Добавить в список"
 
 #: tortoisehg/hgqt/customtools.py:90
 msgid "Add separator"
-msgstr ""
+msgstr "Добавить разделитель"
 
 #: tortoisehg/hgqt/customtools.py:100
 msgid "List of all tools"
@@ -1450,7 +1450,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:409
 msgid "Command"
-msgstr ""
+msgstr "Команда"
 
 #: tortoisehg/hgqt/customtools.py:410
 msgid ""
@@ -1460,6 +1460,11 @@ msgid ""
 "You can use {ROOT} as an alias of the current repository root and\n"
 "{REV} as an alias of the selected revision."
 msgstr ""
+"Команда, которая будет выполнена.\n"
+"Для выполнения команды mercurial используйте \"hg\" (а не \"hg.exe\") как "
+"исполняемую команду.\n"
+"Вы можете использовать {ROOT} как имя корня текущего репозитория и\n"
+" {REV} как имя выбранной ревизии."
 
 #: tortoisehg/hgqt/customtools.py:415
 msgid "Tool label"
@@ -1570,7 +1575,7 @@ msgstr "Показать историю выбранного файла"
 
 #: tortoisehg/hgqt/filectxactions.py:59
 msgid "Folder history"
-msgstr ""
+msgstr "История папки"
 
 #: tortoisehg/hgqt/filectxactions.py:61
 msgid "Compare file revisions"
@@ -1633,11 +1638,11 @@ msgstr "Открыть выбранное подхранилище"
 
 #: tortoisehg/hgqt/filectxactions.py:84
 msgid "Explore folder"
-msgstr ""
+msgstr "Обзор папки"
 
 #: tortoisehg/hgqt/filectxactions.py:85
 msgid "Open the selected folder in the system file manager"
-msgstr ""
+msgstr "Открыть выбранную папку в файловом менеджере"
 
 #: tortoisehg/hgqt/filectxactions.py:87
 msgid "Open terminal here"
@@ -1649,11 +1654,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/filectxactions.py:194
 msgid "Cannot display visual diff"
-msgstr ""
+msgstr "Не могу отобразить визуальное различие"
 
 #: tortoisehg/hgqt/filectxactions.py:195
 msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
+msgstr "Визуальные различия не поддреживаются для непримененных патчей"
 
 #: tortoisehg/hgqt/filectxactions.py:271
 #, python-format
@@ -1687,7 +1692,7 @@ msgstr "Файл является двоичным"
 
 #: tortoisehg/hgqt/filedata.py:65 tortoisehg/hgqt/filedata.py:128
 msgid "File may be binary (maximum line length exceeded)"
-msgstr ""
+msgstr "Файл может быть бинарным (превышена максимальная длина строки)"
 
 #: tortoisehg/hgqt/filedata.py:74 tortoisehg/hgqt/filedata.py:395
 #, python-format
@@ -1713,7 +1718,7 @@ msgstr " <i>(является символической ссылкой)</i>"
 
 #: tortoisehg/hgqt/filedata.py:117
 msgid "Diff not displayed: "
-msgstr ""
+msgstr "Различия не отображены: "
 
 #: tortoisehg/hgqt/filedata.py:177
 #, python-format
@@ -1864,7 +1869,7 @@ msgstr "Колонки журнала истории файла"
 
 #: tortoisehg/hgqt/filedialogs.py:138
 msgid "Too many rows selected for menu"
-msgstr ""
+msgstr "Слишком много строк выбрано для меню"
 
 #: tortoisehg/hgqt/filedialogs.py:184 tortoisehg/hgqt/workbench.py:346
 msgid "Back"
@@ -1880,7 +1885,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedialogs.py:217
 msgid "Diff selected file revisions..."
-msgstr ""
+msgstr "Различия для выбранных ревизий файла..."
 
 #: tortoisehg/hgqt/filedialogs.py:224
 msgid "Diff changeset to parent..."
@@ -1916,7 +1921,7 @@ msgstr "Вернуть к ревизии..."
 
 #: tortoisehg/hgqt/filedialogs.py:271 tortoisehg/hgqt/filedialogs.py:300
 msgid "You must select two revisions to diff"
-msgstr ""
+msgstr "Вы должны выбрать две ревизии для сравнения"
 
 #: tortoisehg/hgqt/filedialogs.py:428
 msgid "File Differences Log Columns"
@@ -2027,15 +2032,15 @@ msgstr "Посмотреть родительскую ревизию %d"
 
 #: tortoisehg/hgqt/fileview.py:765
 msgid "Show Author"
-msgstr ""
+msgstr "Показать автора"
 
 #: tortoisehg/hgqt/fileview.py:766
 msgid "Show Date"
-msgstr ""
+msgstr "Показать дату"
 
 #: tortoisehg/hgqt/fileview.py:767
 msgid "Show Revision"
-msgstr ""
+msgstr "Показать ревизию"
 
 #: tortoisehg/hgqt/graft.py:39
 msgid "Interrupted graft operation found"
@@ -2485,7 +2490,7 @@ msgstr "Отправить одним двоичным комплектом, а 
 
 #: tortoisehg/hgqt/hgemail_ui.py:276
 msgid "send patches as part of the email body"
-msgstr ""
+msgstr "отослать заплатки по электронной почте"
 
 #: tortoisehg/hgqt/hgemail_ui.py:277
 msgid "body"
@@ -2857,7 +2862,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/matching.py:221
 msgid "<b>Unknown revision!</b>"
-msgstr ""
+msgstr "<b>Неизвестная ревизия!</b>"
 
 #: tortoisehg/hgqt/matching.py:223
 msgid "<b>Parse Error!</b>"
@@ -3755,7 +3760,7 @@ msgstr "Mac"
 
 #: tortoisehg/hgqt/qscilib.py:249
 msgid "TAB inserts"
-msgstr ""
+msgstr "Вставить табуляцию"
 
 #: tortoisehg/hgqt/qscilib.py:250
 msgid "Auto"
@@ -3763,7 +3768,7 @@ msgstr "Автоматически"
 
 #: tortoisehg/hgqt/qscilib.py:251
 msgid "TAB"
-msgstr ""
+msgstr "табуляция"
 
 #: tortoisehg/hgqt/qscilib.py:252
 msgid "Spaces"
@@ -3799,11 +3804,11 @@ msgstr "Зациклить поиск"
 
 #: tortoisehg/hgqt/qscilib.py:423
 msgid "Prev"
-msgstr ""
+msgstr "Пред."
 
 #: tortoisehg/hgqt/qscilib.py:428
 msgid "Next"
-msgstr ""
+msgstr "След."
 
 #: tortoisehg/hgqt/qscilib.py:645
 msgid "Unable to read/write config file"
@@ -3868,7 +3873,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/qtlib.py:1118
 msgid "Unable to translate input to local encoding."
-msgstr ""
+msgstr "Невозможно транслировать ввод в локальную кодировку"
 
 #: tortoisehg/hgqt/quickbar.py:30
 msgid "Goto"
@@ -4266,7 +4271,7 @@ msgstr "Метки"
 #: tortoisehg/hgqt/repomodel.py:51
 msgctxt "column header"
 msgid "Latest tags"
-msgstr ""
+msgstr "Последние теги"
 
 #: tortoisehg/hgqt/repomodel.py:52
 msgctxt "column header"
@@ -5222,11 +5227,11 @@ msgstr "Неверная команда"
 
 #: tortoisehg/hgqt/repowidget.py:2026
 msgid "The selected command is empty"
-msgstr ""
+msgstr "Выбранная команда пуста"
 
 #: tortoisehg/hgqt/repowidget.py:2055
 msgid "Failed to execute custom command"
-msgstr ""
+msgstr "Ошибка выполнения заданной команды"
 
 #: tortoisehg/hgqt/repowidget.py:2056
 #, python-format
@@ -5243,6 +5248,11 @@ msgid ""
 "Please check that the command path is valid and that it is a valid "
 "application"
 msgstr ""
+"Возвращено следующее сообщение об ошибке:\n"
+"\n"
+"\"%s\"\n"
+"\n"
+"Проверьте, что это правильное приложение и путь к нему"
 
 #: tortoisehg/hgqt/repowidget.py:2064
 msgid "Unable to start"
@@ -6496,6 +6506,8 @@ msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHg "
 "windows. Default: 8"
 msgstr ""
+"Укажите число пробелов для замены табуляции в различных окнах TortoiseHg. По-"
+"умолчанию: 8"
 
 #: tortoisehg/hgqt/settings.py:573
 msgid "Force Repo Tab"
@@ -6769,7 +6781,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:676
 msgid "Activate Bookmarks"
-msgstr ""
+msgstr "Включить закладки"
 
 #: tortoisehg/hgqt/settings.py:678
 msgid ""
@@ -6967,7 +6979,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:761
 msgid "<b>Web Server:</b>"
-msgstr ""
+msgstr "<b>Web сервер:</b>"
 
 #: tortoisehg/hgqt/settings.py:763
 msgid ""
@@ -8613,7 +8625,7 @@ msgstr "Ошибка запроса сертификата"
 #: tortoisehg/hgqt/sync.py:1400
 #, python-format
 msgid "Invalid port number: %s"
-msgstr ""
+msgstr "Неверный номер порта: %s"
 
 #: tortoisehg/hgqt/sync.py:1416
 msgid "Security: "
@@ -9109,7 +9121,7 @@ msgstr "Обновление - %s"
 
 #: tortoisehg/hgqt/update.py:200
 msgid "remove working directory"
-msgstr ""
+msgstr "Переместить рабочую директорию"
 
 #: tortoisehg/hgqt/update.py:207
 msgid "(same as parent)"
@@ -9121,7 +9133,7 @@ msgstr "неизвестная ревизия!"
 
 #: tortoisehg/hgqt/update.py:242 tortoisehg/hgqt/update.py:254
 msgid "Activate bookmark?"
-msgstr ""
+msgstr "Установить закладку?"
 
 #: tortoisehg/hgqt/update.py:243
 #, python-format
@@ -9143,12 +9155,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/update.py:267
 msgid "Deactivate current bookmark?"
-msgstr ""
+msgstr "Убрать текущую закладку"
 
 #: tortoisehg/hgqt/update.py:268
 #, python-format
 msgid "Do you really want to deactivate the <i>%s</i> bookmark?"
-msgstr ""
+msgstr "Вы действительно хотите убрать <i>%s</i> закладку?"
 
 #: tortoisehg/hgqt/update.py:319
 msgid ""
@@ -9813,7 +9825,7 @@ msgstr "Не удалось открыть хранилище"
 
 #: tortoisehg/hgqt/workbench.py:1021
 msgid "README not configured"
-msgstr ""
+msgstr "README не указан"
 
 #: tortoisehg/hgqt/workbench.py:1022
 msgid ""
@@ -9822,6 +9834,10 @@ msgid ""
 "'<i>readme</i>' key to the '<i>tortoisehg</i>' section, and set it to the "
 "filename or URL of your repository's README file."
 msgstr ""
+"README файл не указан для текущего репозитория.<p>Укажите README файл для "
+"репозитория, для этого откройти файл настроек репозитория, добавьте ключ "
+"'<i>readme</i>' в раздел '<i>tortoisehg</i>' и установите имя файла или URL "
+"к README файлу вашего репозитория."
 
 #: tortoisehg/hgqt/workbench.py:1253
 #, python-format
@@ -9847,7 +9863,7 @@ msgstr ""
 
 #: tortoisehg/util/bugtraq.py:133
 msgid "Error executing \"commit finished\" trigger"
-msgstr ""
+msgstr "Ошибка выполнения триггера \"commit finished\""
 
 #: tortoisehg/util/bugtraq.py:148
 msgid "Cannot open Plugin Options dialog"
