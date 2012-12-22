@@ -411,7 +411,8 @@ class CustomToolConfigDialog(QDialog):
             'To execute a mercurial command use "hg" (rather than "hg.exe") '
             'as the executable command.\n'
             'You can use {ROOT} as an alias of the current repository root and\n'
-            '{REV} as an alias of the selected revision.'))
+            '{REV} / {REVID} as an alias of the selected revision number / '
+            'hexadecimal identifier respectively.'))
         self.label = self._addConfigItem(vbox, _('Tool label'),
             QLineEdit(label),
             _('The tool label, which is what will be shown '
