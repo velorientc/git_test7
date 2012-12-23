@@ -376,13 +376,14 @@ class ToolListBox(QListWidget):
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
 
-    _enablemappings = {'All items': 'istrue',
-                        'Working Directory': 'iswd',
-                        'All revisions': 'isrev',
-                        'All contexts': 'isctx',
-                        'Fixed revisions': 'fixed',
-                        'Applied patches': 'applied',
-                        'qgoto': 'qgoto'}
+    _enablemappings = [('All items', 'istrue'),
+                       ('Working Directory', 'iswd'),
+                       ('All revisions', 'isrev'),
+                       ('All contexts', 'isctx'),
+                       ('Fixed revisions', 'fixed'),
+                       ('Applied patches', 'applied'),
+                       ('qgoto', 'qgoto'),
+                       ]
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         QDialog.__init__(self, parent)
@@ -430,7 +431,7 @@ class CustomToolConfigDialog(QDialog):
             'You can also set this value to the absolute path to\n'
             'any icon on your file system.'))
 
-        combo = self._genCombo(self._enablemappings.keys(),
+        combo = self._genCombo([l for l, _v in self._enablemappings],
             self._enable2label(enable), 'All items')
         self.enable = self._addConfigItem(vbox, _('On repowidget, show for'),
             combo,  _('For which kinds of revisions the tool will be enabled\n'
@@ -461,7 +462,7 @@ class CustomToolConfigDialog(QDialog):
             'command': str(self.command.text()),
             'tooltip': str(self.tooltip.text()),
             'icon': str(self.icon.text()),
-            'enable': self._enablemappings[str(self.enable.currentText())],
+            'enable': self._enablemappings[self.enable.currentIndex()][1],
             'showoutput': str(self.showoutput.currentText()),
         }
         return toolname, toolconfig
@@ -489,14 +490,8 @@ class CustomToolConfigDialog(QDialog):
         parent.addLayout(hbox)
         return configwidget
 
-    def _enable2label(self, label):
-        return self._dictvalue2key(self._enablemappings, label)
-
-    def _dictvalue2key(self, dictionary, value):
-        for key in dictionary:
-            if value == dictionary[key]:
-                return key
-        return None
+    def _enable2label(self, value):
+        return dict((v, l) for l, v in self._enablemappings).get(value)
 
     def okClicked(self):
         errormsg = self.validateForm()
