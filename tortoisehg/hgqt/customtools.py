@@ -382,7 +382,7 @@ class CustomToolConfigDialog(QDialog):
                        (_('All contexts'), 'isctx'),
                        (_('Fixed revisions'), 'fixed'),
                        (_('Applied patches'), 'applied'),
-                       (_('qgoto'), 'qgoto'),
+                       (_('Applied patches or qparent'), 'qgoto'),
                        ]
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
