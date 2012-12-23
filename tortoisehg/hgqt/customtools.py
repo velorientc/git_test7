@@ -471,12 +471,9 @@ class CustomToolConfigDialog(QDialog):
         if selecteditem:
             try:
                 index = items.index(selecteditem)
-            except:
+            except ValueError:
                 if defaultitem:
-                    try:
-                        index = items.index(defaultitem)
-                    except:
-                        pass
+                    index = items.index(defaultitem)
         combo = QComboBox()
         combo.addItems(items)
         if index:
