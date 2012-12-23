@@ -376,13 +376,13 @@ class ToolListBox(QListWidget):
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
 
-    _enablemappings = [('All items', 'istrue'),
-                       ('Working Directory', 'iswd'),
-                       ('All revisions', 'isrev'),
-                       ('All contexts', 'isctx'),
-                       ('Fixed revisions', 'fixed'),
-                       ('Applied patches', 'applied'),
-                       ('qgoto', 'qgoto'),
+    _enablemappings = [(_('All items'), 'istrue'),
+                       (_('Working Directory'), 'iswd'),
+                       (_('All revisions'), 'isrev'),
+                       (_('All contexts'), 'isctx'),
+                       (_('Fixed revisions'), 'fixed'),
+                       (_('Applied patches'), 'applied'),
+                       (_('qgoto'), 'qgoto'),
                        ]
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
