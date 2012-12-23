@@ -432,7 +432,7 @@ class CustomToolConfigDialog(QDialog):
             'any icon on your file system.'))
 
         combo = self._genCombo([l for l, _v in self._enablemappings],
-            self._enable2label(enable), 'All items')
+                               self._enable2label(enable))
         self.enable = self._addConfigItem(vbox, _('On repowidget, show for'),
             combo,  _('For which kinds of revisions the tool will be enabled\n'
             'It is only taken into account when the tool is shown on the\n'
@@ -467,14 +467,13 @@ class CustomToolConfigDialog(QDialog):
         }
         return toolname, toolconfig
 
-    def _genCombo(self, items, selecteditem=None, defaultitem=None):
+    def _genCombo(self, items, selecteditem=None):
         index = 0
         if selecteditem:
             try:
                 index = items.index(selecteditem)
             except ValueError:
-                if defaultitem:
-                    index = items.index(defaultitem)
+                pass
         combo = QComboBox()
         combo.addItems(items)
         if index:
