@@ -58,8 +58,10 @@ class ProgressMonitor(QWidget):
         self.idle = True
 
     def setcounts(self, cur, max):
-        self.pbar.setMaximum(max)
-        self.pbar.setValue(cur)
+        # cur and max may exceed INT_MAX, which confuses QProgressBar
+        assert max != 0
+        self.pbar.setMaximum(100)
+        self.pbar.setValue(int(cur * 100 / max))
 
     def unknown(self):
         self.pbar.setMinimum(0)
