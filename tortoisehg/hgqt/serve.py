@@ -193,6 +193,8 @@ class ServeDialog(QDialog):
     @pyqtSlot()
     def _minimizetotray(self):
         self._trayicon.show()
+        self._trayicon.showMessage(_('TortoiseHg Web Server'),
+                                   _('Running at %s') % self.rooturl)
         self.hide()
 
     @pyqtSlot()
