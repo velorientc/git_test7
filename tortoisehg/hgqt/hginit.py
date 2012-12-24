@@ -82,7 +82,7 @@ class InitDialog(QDialog):
         self.compose_command()
 
         # dialog settings
-        self.setWindowTitle(_('Init'))
+        self.setWindowTitle(_('New Repository'))
         self.setWindowIcon(qtlib.geticon('hg-init'))
         self.setWindowFlags(
                 self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
