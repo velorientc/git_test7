@@ -94,6 +94,16 @@ class GraftDialog(QDialog):
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
+        self.currentuservechk = QCheckBox(_('Use my user name instead of graft '
+                                            'committer user name'))
+        self.layout().addWidget(self.currentuservechk)
+
+        self.currentdatevechk = QCheckBox(_('Use current date'))
+        self.layout().addWidget(self.currentdatevechk)
+
+        self.logvechk = QCheckBox(_('Append graft info to log message'))
+        self.layout().addWidget(self.logvechk)
+
         self.cmd = cmdui.Widget(True, True, self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.showMessage.connect(self.cmd.stbar.showMessage)
@@ -176,6 +186,12 @@ class GraftDialog(QDialog):
         cmdline = ['graft', '--repository', self.repo.root]
         cmdline += ['--config', 'ui.merge=internal:' +
                     (self.autoresolvechk.isChecked() and 'merge' or 'fail')]
+        if self.currentuservechk.isChecked():
+            cmdline += ['--currentuser']
+        if self.currentdatevechk.isChecked():
+            cmdline += ['--currentdate']
+        if self.logvechk.isChecked():
+            cmdline += ['--log']
         if os.path.exists(self._graftstatefile):
             cmdline += ['--continue']
         else:
