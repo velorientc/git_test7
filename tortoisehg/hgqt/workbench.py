@@ -288,7 +288,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Web Server..."), self.serve, enabled='repoopen',
+        newaction(_("Start Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
         newaction(_("Shelve..."), self._repofwd('shelve'), icon='shelve',
