@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Serve</string>
+   <string>Web Server</string>
   </property>
   <layout class="QVBoxLayout" name="dialog_layout" stretch="0,1">
    <item>
