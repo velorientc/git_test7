@@ -283,12 +283,18 @@ class RepoWidget(QWidget):
         """Toggle display repowidget filter bar"""
         self.filterbar.setVisible(checked)
 
+    def _openRepoLink(self, upath):
+        path = hglib.fromunicode(upath)
+        if not os.path.isabs(path):
+            path = self.repo.wjoin(path)
+        self.repoLinkClicked.emit(hglib.tounicode(path))
+
     @pyqtSlot(unicode)
     def _openLink(self, link):
         link = unicode(link)
         handlers = {'cset': self.goto,
                     'log': lambda a: self.makeLogVisible.emit(True),
-                    'subrepo': self.repoLinkClicked.emit,
+                    'subrepo': self._openRepoLink,
                     'shelve' : self.shelve}
         if ':' in link:
             scheme, param = link.split(':', 1)
