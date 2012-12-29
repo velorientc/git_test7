@@ -843,6 +843,16 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+_hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
+
+def linkifyMessage(message):
+    """Convert revision id hashes in messages into 'cset' links"""
+    message = unicode(message)
+    message = _hashregex.sub(
+        r'<a href="cset:\1">\1</a>',
+        message)
+    return message
+
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
 
@@ -903,7 +913,8 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(linkifyMessage(message), self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -916,7 +927,8 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(linkifyMessage(message), self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -937,7 +949,7 @@ class ConfirmInfoBar(InfoBar):
 
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(linkifyMessage(message), self,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
