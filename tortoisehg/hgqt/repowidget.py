@@ -294,7 +294,7 @@ class RepoWidget(QWidget):
         link = unicode(link)
         handlers = {'cset': self.goto,
                     'log': lambda a: self.makeLogVisible.emit(True),
-                    'subrepo': self._openRepoLink,
+                    'repo': self._openRepoLink,
                     'shelve' : self.shelve}
         if ':' in link:
             scheme, param = link.split(':', 1)

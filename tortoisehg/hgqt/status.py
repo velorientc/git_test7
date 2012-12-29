@@ -404,7 +404,7 @@ class StatusWidget(QWidget):
             self.actions.allactions[0].trigger()
         elif status == 'S':
             self.linkActivated.emit(
-                u'subrepo:' + hglib.tounicode(self.repo.wjoin(path)))
+                u'repo:' + hglib.tounicode(self.repo.wjoin(path)))
         elif status in 'C?':
             qtlib.editfiles(self.repo, [path])
 
@@ -1042,7 +1042,7 @@ class StatusDialog(QDialog):
 
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
-        if link.startswith('subrepo:'):
+        if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
             qtrun(commit.run, self.stwidget.repo.ui, root=link[8:])
