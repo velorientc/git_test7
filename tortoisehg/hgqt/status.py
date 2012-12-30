@@ -239,16 +239,12 @@ class StatusWidget(QWidget):
 
         wfile = unicode(wfile)
         if wfile in self.partials:
-            # merge selection state from prev hunk list to new hunk list
-            oldchanges = self.partials[wfile]
+            # merge selection state from old hunk list to new hunk list
+            oldhunks = self.partials[wfile].hunks
+            oldstates = dict([(c.fromline, c.excluded) for c in oldhunks])
             for chunk in changes.hunks:
-                for ochunk in oldchanges.hunks[:]:
-                    if ochunk.fromline < chunk.fromline:
-                        oldchanges.hunks.remove(ochunk)
-                    elif ochunk.fromline == chunk.fromline:
-                        self.fileview.updateChunk(chunk, ochunk.excluded)
-                    else:
-                        break
+                if chunk.fromline in oldstates:
+                    self.fileview.updateChunk(chunk, oldstates[chunk.fromline])
         else:
             # the file was not in the partials dictionary, so it is either
             # checked (all changes enabled) or unchecked (all changes
