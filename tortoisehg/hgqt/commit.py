@@ -356,6 +356,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(bool)
     def commitSetAction(self, refresh=False, actionName=None):
+        allowfolding = False
         if actionName:
             selectedAction = \
                 [act for act in self.mqgroup.actions() \
@@ -392,6 +393,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
+                allowfolding = True
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
@@ -399,6 +401,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
+        self.stwidget.fileview.enableDiffFolding(allowfolding)
         if refreshwctx:
             self.stwidget.refreshWctx()
         self.committb.setText(curraction._text)

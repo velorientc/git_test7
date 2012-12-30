@@ -6,9 +6,11 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import cStringIO
 
 from mercurial import error, match, patch, util, mdiff
 from mercurial import ui as uimod
+from hgext import record
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
@@ -22,7 +24,7 @@ def _exceedsMaxLineLength(data, maxlength=100000):
     return False
 
 class FileData(object):
-    def __init__(self, ctx, ctx2, wfile, status=None):
+    def __init__(self, ctx, ctx2, wfile, status=None, changeselect=False):
         self.contents = None
         self.ucontents = None
         self.error = None
@@ -30,8 +32,9 @@ class FileData(object):
         self.diff = None
         self.flabel = u''
         self.elabel = u''
+        self.changes = None
         try:
-            self.readStatus(ctx, ctx2, wfile, status)
+            self.readStatus(ctx, ctx2, wfile, status, changeselect)
         except (EnvironmentError, error.LookupError), e:
             self.error = hglib.tounicode(str(e))
 
@@ -84,7 +87,7 @@ class FileData(object):
     def isValid(self):
         return self.error is None
 
-    def readStatus(self, ctx, ctx2, wfile, status):
+    def readStatus(self, ctx, ctx2, wfile, status, changeselect):
         def getstatus(repo, n1, n2, wfile):
             m = match.exact(repo.root, repo.getcwd(), [wfile])
             modified, added, removed = repo.status(n1, n2, match=m)[:3]
@@ -408,11 +411,29 @@ class FileData(object):
         newdate = util.datestr(ctx.date())
         olddate = util.datestr(ctx2.date())
         diffopts = patch.diffopts(repo.ui, {})
-        diffopts.git = False
+        diffopts.git = changeselect
         if isbfile:
             olddata += '\0'
             newdata += '\0'
 
-        self.diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
-        self.diff += mdiff.unidiff(olddata, olddate, newdata, newdate,
-                                   oldname, wfile, opts=diffopts)
+        diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
+        diff += mdiff.unidiff(olddata, olddate, newdata, newdate, oldname,
+                              wfile, opts=diffopts)
+        if changeselect:
+            # feed diffs through record.parsepatch() for more fine grained
+            # chunk selection
+            self.changes = record.parsepatch(cStringIO.StringIO(diff))[0]
+            self.changes.excludecount = 0
+            values = []
+            lines = 0
+            for chunk in self.changes.hunks:
+                buf = cStringIO.StringIO()
+                chunk.write(buf)
+                chunk.excluded = False
+                chunk.lineno = lines
+                val = buf.getvalue()
+                values.append(val)
+                lines += len(val.splitlines())
+            self.diff = ''.join(values)
+        else:
+            self.diff = diff

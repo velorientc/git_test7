@@ -62,6 +62,7 @@ class StatusWidget(QWidget):
         self.pctx = None
         self.savechecks = True
         self.refthread = None
+        self.partials = {}
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -185,6 +186,8 @@ class StatusWidget(QWidget):
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.shelveToolExited.connect(self.refreshWctx)
+        self.fileview.newChunkList.connect(self.updatePartials)
+        self.fileview.chunkSelectionChanged.connect(self.updateCheckbox)
         self.fileview.setContext(self.repo[None])
         self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
@@ -217,6 +220,51 @@ class StatusWidget(QWidget):
     def saveSettings(self, qs, prefix):
         self.fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/state', self.split.saveState())
+
+    @pyqtSlot(QString, object)
+    def updatePartials(self, wfile, changes):
+        # remove files from the partials dictionary if they are not partial
+        # selections, in order to simplify refresh.
+        dels = []
+        for file, oldchanges in self.partials.iteritems():
+            if oldchanges.excludecount == 0:
+                dels.append(file)
+            elif oldchanges.excludecount == len(oldchanges.hunks):
+                dels.append(file)
+        for file in dels:
+            del self.partials[file]
+
+        if not wfile or not changes:
+            return
+
+        wfile = unicode(wfile)
+        if wfile in self.partials:
+            # merge selection state from prev hunk list to new hunk list
+            oldchanges = self.partials[wfile]
+            for chunk in changes.hunks:
+                for ochunk in oldchanges.hunks[:]:
+                    if ochunk.fromline < chunk.fromline:
+                        oldchanges.hunks.remove(ochunk)
+                    elif ochunk.fromline == chunk.fromline:
+                        self.fileview.updateChunk(chunk, ochunk.excluded)
+                    else:
+                        break
+        else:
+            # the file was not in the partials dictionary, so it is either
+            # checked (all changes enabled) or unchecked (all changes
+            # excluded).
+            if wfile not in self.getChecked():
+                for chunk in changes.hunks:
+                    self.fileview.updateChunk(chunk, True)
+        self.fileview.updateFolds()
+        self.partials[wfile] = changes
+
+    @pyqtSlot(QString, bool)
+    def updateCheckbox(self, wfile, state):
+        'checkbox state has changed via chunk selection'
+        # mark row as checked if any chunks are enabled
+        wfile = unicode(wfile)
+        self.tv.model().check([wfile], state, False)
 
     @pyqtSlot(QPoint, object)
     def onMenuRequest(self, point, selected):
@@ -290,7 +338,8 @@ class StatusWidget(QWidget):
                        checked, self, checkable=self.checkable,
                        defcheck=self.defcheck)
         if self.checkable:
-            tm.checkToggled.connect(self.updateCheckCount)
+            tm.checkToggled.connect(self.checkToggled)
+            tm.checkCountChanged.connect(self.updateCheckCount)
 
         oldtm = self.tv.model()
         self.tv.setModel(tm)
@@ -354,7 +403,9 @@ class StatusWidget(QWidget):
             model.setFilter(match)
             self.tv.enablefilterpalette(bool(match))
 
+    @pyqtSlot()
     def updateCheckCount(self):
+        'user has toggled one or more checkboxes, update counts and checkall'
         model = self.tv.model()
         if model:
             model.checkCount = len(self.getChecked())
@@ -365,6 +416,18 @@ class StatusWidget(QWidget):
             else:
                 state = Qt.PartiallyChecked
             self.checkAllNoneBtn.setCheckState(state)
+
+    @pyqtSlot(QString, bool)
+    def checkToggled(self, wfile, checked):
+        'user has toggled a checkbox, update partial chunk selection status'
+        wfile = unicode(wfile)
+        if wfile in self.partials:
+            if wfile == hglib.tounicode(self.fileview._filename):
+                for chunk in self.partials[wfile].hunks:
+                    self.fileview.updateChunk(chunk, not checked)
+                self.fileview.updateFolds()
+            else:
+                del self.partials[wfile]
 
     def checkAll(self):
         model = self.tv.model()
@@ -559,11 +622,13 @@ class WctxFileTree(QTreeView):
         self._paletteswitcher.enablefilterpalette(enable)
 
 class WctxModel(QAbstractTableModel):
-    checkToggled = pyqtSignal()
+    checkCountChanged = pyqtSignal()
+    checkToggled = pyqtSignal(QString, bool)
 
     def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent,
                  checkable=True, defcheck='MAR!S'):
         QAbstractTableModel.__init__(self, parent)
+        self.partials = parent.partials
         self.checkCount = 0
         rows = []
         nchecked = {}
@@ -640,17 +705,20 @@ class WctxModel(QAbstractTableModel):
             return 0 # no child
         return len(self.rows)
 
-    def check(self, files, state=True):
+    def check(self, files, state=True, emit=True):
         for f in files:
             self.checked[f] = state
+            if emit:
+                self.checkToggled.emit(f, state)
         self.layoutChanged.emit()
-        self.checkToggled.emit()
-        
+        self.checkCountChanged.emit()
+
     def checkAll(self, state):
         for data in self.rows:
             self.checked[data[0]] = state
+            self.checkToggled.emit(data[3], state)
         self.layoutChanged.emit()
-        self.checkToggled.emit()
+        self.checkCountChanged.emit()
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -664,7 +732,14 @@ class WctxModel(QAbstractTableModel):
         path, status, mst, upath, ext, sz = self.rows[index.row()]
         if index.column() == COL_PATH:
             if role == Qt.CheckStateRole and self.checkable:
-                # also Qt.PartiallyChecked
+                if upath in self.partials:
+                    changes = self.partials[upath]
+                    if changes.excludecount == 0:
+                        return Qt.Checked
+                    elif changes.excludecount == len(changes.hunks):
+                        return Qt.Unchecked
+                    else:
+                        return Qt.PartiallyChecked
                 if self.checked[path]:
                     return Qt.Checked
                 else:
@@ -729,9 +804,11 @@ class WctxModel(QAbstractTableModel):
         for index in indexes:
             assert index.isValid()
             fname = self.rows[index.row()][COL_PATH]
+            uname = self.rows[index.row()][COL_PATH_DISPLAY]
             self.checked[fname] = not self.checked[fname]
+            self.checkToggled.emit(uname, self.checked[fname])
         self.layoutChanged.emit()
-        self.checkToggled.emit()
+        self.checkCountChanged.emit()
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
