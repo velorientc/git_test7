@@ -403,7 +403,7 @@ def resolve_with(tool, repo, files):
     return True
 
 def check(parent, ui, repo, files):
-    parent.tv.model().check(files)
+    parent.tv.model().check(files, True)
     return True
 
 def uncheck(parent, ui, repo, files):

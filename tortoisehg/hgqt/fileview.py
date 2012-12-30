@@ -37,7 +37,7 @@ class HgFileView(QFrame):
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
     newChunkList = pyqtSignal(QString, object)
-    chunkSelectionChanged = pyqtSignal(QString, bool)
+    chunkSelectionChanged = pyqtSignal()
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -242,26 +242,24 @@ class HgFileView(QFrame):
 
     def updateChunk(self, chunk, exclude):
         'change chunk exclusion state, update display when necessary'
-        # TODO: create a decent QsciStyle for these annotations
+        # returns True if the chunk state was changed
         if exclude:
             if self.changes.excludecount == 0:
+                # TODO: create a decent QsciStyle for these annotations
                 self.sci.annotate(chunk.lineno,
                                 _('folded changes are excluded from commit'), 4)
             if chunk.excluded:
-                return
+                return False
             chunk.excluded = True
             self.changes.excludecount += 1
-            uf = hglib.tounicode(self._filename)
-            state = self.changes.excludecount < len(self.changes.hunks)
-            self.chunkSelectionChanged.emit(uf, state)
+            return True
         else:
             self.sci.clearAnnotations(chunk.lineno)
             if not chunk.excluded:
-                return
+                return False
             chunk.excluded = False
             self.changes.excludecount -= 1
-            uf = hglib.tounicode(self._filename)
-            self.chunkSelectionChanged.emit(uf, True)
+            return True
 
     def updateFolds(self):
         'should be called after chunk states are modified programatically'
@@ -377,7 +375,8 @@ class HgFileView(QFrame):
             return
         assert margin == 3 and index == 0
         chunk = self.chunkatline[line]
-        self.updateChunk(chunk, not chunk.excluded)
+        if self.updateChunk(chunk, not chunk.excluded):
+            self.chunkSelectionChanged.emit()
 
     def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):

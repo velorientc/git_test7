@@ -187,7 +187,7 @@ class StatusWidget(QWidget):
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.newChunkList.connect(self.updatePartials)
-        self.fileview.chunkSelectionChanged.connect(self.updateCheckbox)
+        self.fileview.chunkSelectionChanged.connect(self.chunkSelectionChanged)
         self.fileview.setContext(self.repo[None])
         self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
@@ -237,7 +237,7 @@ class StatusWidget(QWidget):
         if not wfile or not changes:
             return
 
-        wfile = unicode(wfile)
+        wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
             # merge selection state from old hunk list to new hunk list
             oldhunks = self.partials[wfile].hunks
@@ -253,14 +253,17 @@ class StatusWidget(QWidget):
                 for chunk in changes.hunks:
                     self.fileview.updateChunk(chunk, True)
         self.fileview.updateFolds()
+        self.chunkSelectionChanged()
         self.partials[wfile] = changes
 
-    @pyqtSlot(QString, bool)
-    def updateCheckbox(self, wfile, state):
+    @pyqtSlot()
+    def chunkSelectionChanged(self):
         'checkbox state has changed via chunk selection'
-        # mark row as checked if any chunks are enabled
-        wfile = unicode(wfile)
-        self.tv.model().check([wfile], state, False)
+        # inform filelist view that the file selection state may have changed
+        model = self.tv.model()
+        if model:
+            model.layoutChanged.emit()
+            model.checkCountChanged.emit()
 
     @pyqtSlot(QPoint, object)
     def onMenuRequest(self, point, selected):
@@ -416,9 +419,9 @@ class StatusWidget(QWidget):
     @pyqtSlot(QString, bool)
     def checkToggled(self, wfile, checked):
         'user has toggled a checkbox, update partial chunk selection status'
-        wfile = unicode(wfile)
+        wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
-            if wfile == hglib.tounicode(self.fileview._filename):
+            if wfile == self.fileview._filename:
                 for chunk in self.partials[wfile].hunks:
                     self.fileview.updateChunk(chunk, not checked)
                 self.fileview.updateFolds()
@@ -701,11 +704,10 @@ class WctxModel(QAbstractTableModel):
             return 0 # no child
         return len(self.rows)
 
-    def check(self, files, state=True, emit=True):
+    def check(self, files, state):
         for f in files:
             self.checked[f] = state
-            if emit:
-                self.checkToggled.emit(f, state)
+            self.checkToggled.emit(f, state)
         self.layoutChanged.emit()
         self.checkCountChanged.emit()
 
@@ -728,8 +730,8 @@ class WctxModel(QAbstractTableModel):
         path, status, mst, upath, ext, sz = self.rows[index.row()]
         if index.column() == COL_PATH:
             if role == Qt.CheckStateRole and self.checkable:
-                if upath in self.partials:
-                    changes = self.partials[upath]
+                if path in self.partials:
+                    changes = self.partials[path]
                     if changes.excludecount == 0:
                         return Qt.Checked
                     elif changes.excludecount == len(changes.hunks):
@@ -801,7 +803,14 @@ class WctxModel(QAbstractTableModel):
             assert index.isValid()
             fname = self.rows[index.row()][COL_PATH]
             uname = self.rows[index.row()][COL_PATH_DISPLAY]
-            self.checked[fname] = not self.checked[fname]
+            if fname in self.partials:
+                checked = 0
+                changes = self.partials[fname]
+                if changes.excludecount < len(changes.hunks):
+                    checked = 1
+            else:
+                checked = self.checked[fname]
+            self.checked[fname] = not checked
             self.checkToggled.emit(uname, self.checked[fname])
         self.layoutChanged.emit()
         self.checkCountChanged.emit()
