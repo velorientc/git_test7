@@ -782,7 +782,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 from tortoisehg.hgqt import settings
                 settings.SettingsDialog(parent=self, focus='ui.username').exec_()
             return
-  
+
         try:
             msg = self.getMessage(False)
         except UnicodeEncodeError:
@@ -1103,7 +1103,7 @@ class DetailsDialog(QDialog):
         if mode != 'merge':
             #self.autoinccb.setVisible(False)
             layout.addLayout(hbox)
-        
+
         hbox = QHBoxLayout()
         recursesave = QPushButton(_('Save in Repo'))
         recursesave.clicked.connect(self.saveRecurseInSubrepos)
@@ -1111,14 +1111,14 @@ class DetailsDialog(QDialog):
         SP = QSizePolicy
         self.recursecb.setSizePolicy(SP(SP.Expanding, SP.Minimum))
         #self.recursecb.toggled.connect(recursesave.setEnabled)
-        
+
         if opts.get('recurseinsubrepos'):
             self.recursecb.setChecked(True)
-            
+
         hbox.addWidget(self.recursecb)
         hbox.addWidget(recursesave)
         layout.addLayout(hbox)
-        
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1275,7 +1275,7 @@ class DetailsDialog(QDialog):
             outopts['recurseinsubrepos'] = 'true'
         else:
             outopts['recurseinsubrepos'] = ''
-        
+
         self.outopts = outopts
         QDialog.accept(self)
 
@@ -1388,7 +1388,7 @@ class CommitDialog(QDialog):
             s.setValue('commit/geom', self.saveGeometry())
             self.commit.saveSettings(s, 'committool')
         return exit
-    
+
     def accept(self):
         self.commit.commit()
 
