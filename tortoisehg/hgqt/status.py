@@ -318,6 +318,9 @@ class StatusWidget(QWidget):
         if self.refthread.wctx is not None:
             self.updateModel(self.refthread.wctx, self.refthread.patchecked)
         self.refthread = None
+        if len(self.repo.parents()) > 1:
+            # nuke partial selections if wctx has a merge in-progress
+            self.partials = {}
 
     def canExit(self):
         return not self.refthread
