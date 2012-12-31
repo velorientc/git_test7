@@ -402,6 +402,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
         self.stwidget.fileview.enableDiffFolding(allowfolding)
+        if not allowfolding:
+            self.stwidget.partials = {}
         if refreshwctx:
             self.stwidget.refreshWctx()
         self.committb.setText(curraction._text)
