@@ -82,6 +82,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
 registered = False
 def uisetup(ui):
     'Replace commit with a decorator to provide --partials option'
+    global registered
     if registered:
         return
     entry = extensions.wrapcommand(commands.table, 'commit', partialcommit)
