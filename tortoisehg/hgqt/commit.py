@@ -836,12 +836,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
+        # remove trivial files from partials dictionary
+        self.stwidget.updatePartials(None, None)
         if len(repo.parents()) > 1:
             merge = True
             self.files = []
         else:
             merge = False
-            self.files = self.stwidget.getChecked('MAR?!S')
+            files = self.stwidget.getChecked('MAR?!S')
+            self.files = set(files + self.stwidget.partials.keys())
         canemptycommit = bool(brcmd or newbranch or amend)
         if not (self.files or canemptycommit or merge):
             qtlib.WarningMsgBox(_('No files checked'),
