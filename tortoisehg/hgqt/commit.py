@@ -7,6 +7,7 @@
 
 import os
 import re
+import tempfile
 
 from mercurial import ui, util, error, scmutil, phases
 
@@ -924,9 +925,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         if self.stwidget.partials:
             partialcommit.uisetup(repo.ui)
+
+            fd, tmpname = tempfile.mkstemp(prefix='thg-patch-')
+            fp = os.fdopen(fd, 'wb')
+            for changes in self.stwidget.partials.values():
+                changes.write(fp)
+                for chunk in changes.hunks:
+                    if not chunk.excluded:
+                        chunk.write(fp)
+            fp.close()
+
             cmdline.append('--partials')
-            cmdline.append(self.stwidget.partials)
-            # TODO: --subrepos will likely not be supported
+            cmdline.append(tmpname)
             assert not amend
 
         if self.opts.get('recurseinsubrepos'):

@@ -5,10 +5,11 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import cStringIO
 
 from mercurial.i18n import _
-from mercurial import patch, hg, commands, extensions
+from mercurial import patch, commands, extensions
 
 def partialcommit(orig, ui, repo, *pats, **opts):
     if 'partials' not in opts:
@@ -18,19 +19,11 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         # Let --subrepos on the command line override config setting.
         ui.setconfig('ui', 'commitsubrepos', True)
 
-    branch = repo[None].branch()
-
-    partials = opts['partials']
-    fp = cStringIO.StringIO()
-    for changes in partials.values():
-        changes.write(fp)
-        for chunk in changes.hunks:
-            if not chunk.excluded:
-                chunk.write(fp)
-    fp.seek(0)
+    patchfile = opts['partials']
+    fp = open(patchfile, 'rb')
 
     newrev = None
-    repo = hg.repository(ui, repo.root, False)
+    branch = repo[None].branch()
     store = patch.filestore()
     try:
         pctx = repo['.']
@@ -40,14 +33,14 @@ def partialcommit(orig, ui, repo, *pats, **opts):
 
         # patch files in tmp directory
         try:
-            patch.patchrepo(ui, repo, pctx, store, fp, 1, partials.keys())
+            patch.patchrepo(ui, repo, pctx, store, fp, 1, None)
         except patch.PatchError, e:
             raise util.Abort(str(e))
 
         # create new revision from memory
         memctx = patch.makememctx(repo, (pctx.node(), None), opts['message'],
                                   opts.get('user'), opts.get('date'), branch,
-                                  files, store)
+                                  pats, store)
 
         if opts.get('close_branch'):
             if pctx.node() not in repo.branchheads():
@@ -73,6 +66,8 @@ def partialcommit(orig, ui, repo, *pats, **opts):
             wlock.release()
 
     # TODO: localrepo.hook('commit') lines 1434-1437
+    fp.close()
+    os.unlink(patchfile)
     return 0
 
 # We're not using Mercurial's extension loader (so partialcommit will not
@@ -86,6 +81,6 @@ def uisetup(ui):
     if registered:
         return
     entry = extensions.wrapcommand(commands.table, 'commit', partialcommit)
-    entry[1].append(('', 'partials', [],
+    entry[1].append(('', 'partials', '',
                      _("selected patch chunks (internal use only)")))
     registered = True
