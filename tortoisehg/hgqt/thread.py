@@ -254,9 +254,7 @@ class CmdThread(QThread):
         ui.sig.interactSignal.connect(self.interact_handler,
                 Qt.QueuedConnection)
 
-        if self.cmdline[0] == 'commit' and '--partials' in self.cmdline:
-            cmd = '%% hg commit --partials\n'
-        elif self.display:
+        if self.display:
             cmd = '%% hg %s\n' % self.display
         else:
             cmd = '%% hg %s\n' % ' '.join(self.cmdline)
