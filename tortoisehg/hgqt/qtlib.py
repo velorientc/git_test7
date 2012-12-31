@@ -843,15 +843,44 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+# Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
+# Currently converting subrepo paths into links only works in English
+_subrepoindicator = '(in subrepo %s)'
+_subreporegex = re.compile(r'\(in subrepo (\S+)\)')
 
 def linkifyMessage(message):
-    """Convert revision id hashes in messages into 'cset' links"""
+    """Convert revision id hashes and subrepo paths in messages into links"""
+    def linkifyHash(message, subrepo=''):
+        if subrepo:
+            replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
+        else:
+            replaceexpr = r'<a href="cset:\1">\1</a>'
+        return _hashregex.sub(replaceexpr, message)
+
+    def linkifySubrepoRef(message, hash=''):
+        if hash:
+            hash = '?' + hash
+        subrepos = _subreporegex.findall(message)
+        if subrepos:
+            subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
+            linkifiedsubrepoindicator = _subrepoindicator % subrepolink
+            message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+        return message
+
     message = unicode(message)
-    message = _hashregex.sub(
-        r'<a href="cset:\1">\1</a>',
-        message)
-    return message
+    subrepo = ''
+    sname = _subreporegex.findall(message)
+    if sname:
+        subrepo = sname[0]
+    message = linkifyHash(message, subrepo)
+    if subrepo:
+        hash = ''
+        hashes = _hashregex.findall(message)
+        if hashes:
+            hash = hashes[0]
+        message = linkifySubrepoRef(message, hash)
+    return message.replace('\n', '<br>')
 
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
