@@ -9,7 +9,7 @@ import os
 import cStringIO
 
 from mercurial.i18n import _
-from mercurial import patch, commands, extensions
+from mercurial import patch, commands, extensions, scmutil
 
 def partialcommit(orig, ui, repo, *pats, **opts):
     if 'partials' not in opts:
@@ -18,6 +18,8 @@ def partialcommit(orig, ui, repo, *pats, **opts):
     if opts.get('subrepos'):
         # Let --subrepos on the command line override config setting.
         ui.setconfig('ui', 'commitsubrepos', True)
+
+    files = [scmutil.canonpath(repo.root, repo.root, f) for f in pats]
 
     patchfile = opts['partials']
     fp = open(patchfile, 'rb')
@@ -40,7 +42,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         # create new revision from memory
         memctx = patch.makememctx(repo, (pctx.node(), None), opts['message'],
                                   opts.get('user'), opts.get('date'), branch,
-                                  pats, store)
+                                  files, store)
 
         if opts.get('close_branch'):
             if pctx.node() not in repo.branchheads():
