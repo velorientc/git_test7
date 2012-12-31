@@ -9,7 +9,36 @@ import os
 import cStringIO
 
 from mercurial.i18n import _
-from mercurial import patch, commands, extensions, scmutil
+from mercurial import patch, commands, extensions, scmutil, encoding, context
+
+def makememctx(repo, parents, text, user, date, branch, files, store):
+    def getfilectx(repo, memctx, path):
+        try:
+            # try patched file contents first
+            data, (islink, isexec), copied = store.getfile(path)
+        except IOError:
+            # fall back to working folder contents
+            wctx = repo[None]
+            try:
+                fctx = wctx[path]
+            except error.LookupError:
+                raise IOError
+            data = fctx.data()
+            islink = 'l' in fctx.flags()
+            isexec = 'x' in fctx.flags()
+            rp = fctx.renamed()
+            if rp is not None:
+                copied = rp[0]
+            else:
+                copied = None
+
+        return context.memfilectx(path, data, islink=islink, isexec=isexec,
+                                  copied=copied)
+    extra = {}
+    if branch:
+        extra['branch'] = encoding.fromlocal(branch)
+    return context.memctx(repo, parents, text, files, getfilectx, user,
+                          date, extra)
 
 def partialcommit(orig, ui, repo, *pats, **opts):
     if 'partials' not in opts:
@@ -40,9 +69,9 @@ def partialcommit(orig, ui, repo, *pats, **opts):
             raise util.Abort(str(e))
 
         # create new revision from memory
-        memctx = patch.makememctx(repo, (pctx.node(), None), opts['message'],
-                                  opts.get('user'), opts.get('date'), branch,
-                                  files, store)
+        memctx = makememctx(repo, (pctx.node(), None), opts['message'],
+                            opts.get('user'), opts.get('date'), branch,
+                            files, store)
 
         if opts.get('close_branch'):
             if pctx.node() not in repo.branchheads():
@@ -55,6 +84,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         newrev = memctx.commit()
     finally:
         store.close()
+        fp.close()
 
     # move working directory to new revision
     if newrev:
@@ -68,7 +98,6 @@ def partialcommit(orig, ui, repo, *pats, **opts):
             wlock.release()
 
     # TODO: localrepo.hook('commit') lines 1434-1437
-    fp.close()
     os.unlink(patchfile)
     return 0
 
