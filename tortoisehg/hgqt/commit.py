@@ -922,6 +922,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd
 
+        if 0 and self.stwidget.partials:
+            cmdline[0] = 'partialcommit'
+            cmdline.append('--partials')
+            cmdline.append(self.stwidget.partials)
+            assert not amend
+
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
 
