@@ -1,4 +1,4 @@
-# thread.py - A seprated thread to run Mercurial command
+# thread.py - A separate thread to run Mercurial commands
 #
 # Copyright 2009 Steve Borho <steve@borho.org>
 # Copyright 2010 Yuki KODAMA <endflow.net@gmail.com>
@@ -8,7 +8,6 @@
 
 import os
 import Queue
-import cStringIO
 import time
 import urllib2
 import socket
@@ -246,61 +245,6 @@ class CmdThread(QThread):
                 text = None
             self.responseq.put(text)
 
-    def partialcommit(self, _ui, cmdline):
-        'special commit which uses patch and memctx for partial selection'
-        # TODO: parse cmdline into opts, files, partials
-        opts = {}
-        files = ()
-        partials = {}
-
-        fp = cStringIO.StringIO()
-        patchfiles = []
-        for changes in partials.values():
-            patchfiles.append(changes.filename())
-            changes.write(fp)
-            for chunk in changes.hunks:
-                if not chunk.excluded:
-                    chunk.write(fp)
-        fp.seek(0)
-
-        newrev = None
-        repo = hg.repository(_ui, self.root, False)
-        store = patch.filestore()
-        contenders = set(files + patchfiles)
-        try:
-            pctx = repo['.']
-
-            # patch files in tmp directory
-            try:
-                patch.patchrepo(_ui, repo, pctx, store, fp, 1, patchfiles)
-            except patch.PatchError, e:
-                raise util.Abort(str(e))
-
-            # create new revision from memory
-            memctx = patch.makememctx(repo, (pctx.node(), None),
-                                      opts['message'],
-                                      opts.get('user'),
-                                      opts.get('date'),
-                                      repo[None].branch(), 
-                                      contenders,
-                                      store,
-                                      editor=None)
-            newrev = memctx.commit()
-        finally:
-            store.close()
-
-        # move working directory to new revision
-        if newrev:
-            wlock = repo.wlock()
-            try:
-                repo.setparents(newrev)
-                ctx = repo[newrev]
-                repo.dirstate.rebuild(ctx.node(), ctx.manifest())
-                return 0
-            finally:
-                wlock.release()
-        return 1
-
     def run(self):
         ui = QtUi(responseq=self.responseq)
         ui.sig.writeSignal.connect(self.output_handler,
@@ -310,8 +254,8 @@ class CmdThread(QThread):
         ui.sig.interactSignal.connect(self.interact_handler,
                 Qt.QueuedConnection)
 
-        if self.cmdline[0] == 'partialcommit':
-            cmd = '%% hg partialcommit\n'
+        if self.cmdline[0] == 'commit' and '--partials' in self.cmdline:
+            cmd = '%% hg commit --partials\n'
         elif self.display:
             cmd = '%% hg %s\n' % self.display
         else:
@@ -325,10 +269,7 @@ class CmdThread(QThread):
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
             self.ret = 255
-            if self.cmdline[0] == 'partialcommit':
-                self.ret = self.partialcommit(ui, self.cmdline) or 0
-            else:
-                self.ret = hglib.dispatch(ui, self.cmdline) or 0
+            self.ret = hglib.dispatch(ui, self.cmdline) or 0
         except util.Abort, e:
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:

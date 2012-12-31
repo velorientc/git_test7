@@ -15,7 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n
+from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n, partialcommit
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -922,10 +922,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd
 
-        if 0 and self.stwidget.partials:
-            cmdline[0] = 'partialcommit'
+        if self.stwidget.partials:
+            partialcommit.uisetup(repo.ui)
             cmdline.append('--partials')
             cmdline.append(self.stwidget.partials)
+            # TODO: --subrepos will likely not be supported
             assert not amend
 
         if self.opts.get('recurseinsubrepos'):
@@ -937,6 +938,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if not self.files and canemptycommit and not merge:
             # make sure to commit empty changeset by excluding all files
             cmdline.extend(['--exclude', repo.root])
+            assert not self.stwidget.partials
 
         cmdline.append('--')
         cmdline.extend([repo.wjoin(f) for f in self.files])
