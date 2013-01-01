@@ -837,15 +837,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
-        # remove trivial files from partials dictionary
-        self.stwidget.updatePartials(None, None)
+        partials = []
         if len(repo.parents()) > 1:
             merge = True
             self.files = []
         else:
             merge = False
             files = self.stwidget.getChecked('MAR?!S')
-            self.files = set(files + self.stwidget.partials.keys())
+            # make list of files with partial change selections
+            for fname, c in self.stwidget.partials.iteritems():
+                if c.excludecount > 0 and c.excludecount < len(c.hunks):
+                    partials.append(fname)
+            self.files = set(files + partials)
         canemptycommit = bool(brcmd or newbranch or amend)
         if not (self.files or canemptycommit or merge):
             qtlib.WarningMsgBox(_('No files checked'),
@@ -923,12 +926,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd
 
-        if self.stwidget.partials:
+        if partials:
             partialcommit.uisetup(repo.ui)
 
+            # write patch for partial change selections to temp file
             fd, tmpname = tempfile.mkstemp(prefix='thg-patch-')
             fp = os.fdopen(fd, 'wb')
-            for changes in self.stwidget.partials.values():
+            for fname in partials:
+                changes = self.stwidget.partials[fname]
                 changes.write(fp)
                 for chunk in changes.hunks:
                     if not chunk.excluded:
