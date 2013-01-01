@@ -274,8 +274,9 @@ class RepoRegistryView(QDockWidget):
             tv.model().write(sfile)
         self.watcher = QFileSystemWatcher(self)
         self.watcher.addPath(sfile)
-        self.watcher.fileChanged.connect(self.modifiedSettings)
-        self._pendingReloadModel = False
+        self._reloadModelTimer = QTimer(self, interval=2000, singleShot=True)
+        self._reloadModelTimer.timeout.connect(self.reloadModel)
+        self.watcher.fileChanged.connect(self._reloadModelTimer.start)
         self._activeTabRepo = None
 
         QTimer.singleShot(0, self._initView)
@@ -353,21 +354,6 @@ class RepoRegistryView(QDockWidget):
         # file
         QTimer.singleShot(0, self.updateSettingsFile)
 
-    @pyqtSlot(QString)
-    def modifiedSettings(self):
-        UPDATE_DELAY = 2 # seconds
-
-        # Do not update the repo registry more often than
-        # once every UPDATE_DELAY seconds
-        if not self._pendingReloadModel:
-            # There are no pending updates:
-            # -> schedule and update in UPDATE_DELAY seconds.
-            # If other update notifications arrive from now
-            # until now + UPDATE_DELAY, they will be ignored and "rolled into"
-            # the pending update
-            self._pendingReloadModel = True
-            QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
-
     @pyqtSlot()
     def reloadModel(self):
         activeroot = None
@@ -384,7 +370,7 @@ class RepoRegistryView(QDockWidget):
         self.expand()
         if activeroot:
             self.setActiveTabRepo(activeroot)
-        self._pendingReloadModel = False
+        self._reloadModelTimer.stop()
 
     def _getItemAndAncestors(self, it):
         """Create a list of ancestors (including the selected item)"""
