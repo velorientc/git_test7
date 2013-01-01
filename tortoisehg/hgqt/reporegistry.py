@@ -309,44 +309,43 @@ class RepoRegistryView(QDockWidget):
 
         # Note that calling setChecked will NOT reload the model if the new
         # setting is the same as the one in the repo registry
-        QTimer.singleShot(0, lambda: self._actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self._actionShowNetworkSubrepos.setChecked(snsr))
-        QTimer.singleShot(0, lambda: self._actionShowShortPaths.setChecked(ssp))
+        sact = self._settingactions
+        QTimer.singleShot(0, lambda: sact['showSubrepos'].setChecked(ssr))
+        QTimer.singleShot(0, lambda: sact['showNetworkSubrepos'].setChecked(snsr))
+        QTimer.singleShot(0, lambda: sact['showShortPaths'].setChecked(ssp))
 
         # Manually reload the model now, to apply the settings
         self.reloadModel()
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: self._actionShowPaths.setChecked(sp))
+        QTimer.singleShot(0, lambda: sact['showPaths'].setChecked(sp))
 
     def _saveSettings(self):
         s = QSettings()
         wb = 'Workbench/'  # for compatibility with old release
-        s.setValue(wb + 'showPaths', self._actionShowPaths.isChecked())
-        s.setValue(wb + 'showSubrepos', self._actionShowSubrepos.isChecked())
-        s.setValue(wb + 'showNetworkSubrepos',
-            self._actionShowNetworkSubrepos.isChecked())
-        s.setValue(wb + 'showShortPaths', self._actionShowShortPaths.isChecked())
+        for key, action in self._settingactions.iteritems():
+            s.setValue(wb + key, action.isChecked())
 
     def _setupSettingActions(self):
-        def newaction(text, slot):
+        settingtable = [
+            ('showPaths', _('Show Paths'), self.showPaths),
+            ('showSubrepos', _('Show Subrepos on Registry'),
+             self.setShowSubrepos),
+            ('showNetworkSubrepos', _('Show Subrepos for remote repositories'),
+             self.setShowNetworkSubrepos),
+            ('showShortPaths', _('Show Short Paths'), self.setShowShortPaths),
+            ]
+        self._settingactions = {}
+        for i, (key, text, slot) in enumerate(settingtable):
             a = QAction(text, self, checkable=True)
+            a.setData(i)  # sort key
             a.toggled.connect(slot)
-            return a
-
-        self._actionShowPaths = newaction(_("Show Paths"), self.showPaths)
-        self._actionShowSubrepos = newaction(_("Show Subrepos on Registry"),
-                                             self.setShowSubrepos)
-        self._actionShowNetworkSubrepos = newaction(_("Show Subrepos for "
-                                                      "remote repositories"),
-                                                    self.setShowNetworkSubrepos)
-        self._actionShowShortPaths = newaction(_("Show Short Paths"),
-                                               self.setShowShortPaths)
+            self._settingactions[key] = a
 
     def settingActions(self):
-        return [self._actionShowPaths, self._actionShowSubrepos,
-                self._actionShowNetworkSubrepos, self._actionShowShortPaths]
+        return sorted(self._settingactions.itervalues(),
+                      key=lambda a: a.data().toInt())
 
     def setShowSubrepos(self, show, reloadModel=True):
         if self.showSubrepos != show:
