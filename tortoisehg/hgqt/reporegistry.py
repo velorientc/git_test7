@@ -255,11 +255,14 @@ class RepoRegistryView(QDockWidget):
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
+        self._loadSettings()
 
         sfile = settingsfilename()
+        # start without subrepos because loading them is expensive
         tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
-            showSubrepos=self._isSettingEnabled('showSubrepos'),
-            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos')))
+            showSubrepos=False,
+            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
+            showShortPaths=self._isSettingEnabled('showShortPaths')))
 
         # Setup a file system watcher to update the reporegistry
         # anytime it is modified by another thg instance
@@ -275,13 +278,14 @@ class RepoRegistryView(QDockWidget):
         self._pendingReloadModel = False
         self._activeTabRepo = None
 
-        self._loadSettings()
         QTimer.singleShot(0, self._initView)
 
     @pyqtSlot()
     def _initView(self):
         self.expand()
         self._updateColumnVisibility()
+        if self._isSettingEnabled('showSubrepos'):
+            self.reloadModel()  # delayed loading of subrepos
 
     def _loadSettings(self):
         defaultmap = {'showPaths': False, 'showSubrepos': True,
@@ -291,9 +295,6 @@ class RepoRegistryView(QDockWidget):
         for key, action in self._settingactions.iteritems():
             action.setChecked(s.value(key, defaultmap[key]).toBool())
         s.endGroup()
-
-        # Manually reload the model now, to apply the settings
-        self.reloadModel()
 
     def _saveSettings(self):
         s = QSettings()
