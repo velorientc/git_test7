@@ -224,13 +224,10 @@ class RepoRegistryView(QDockWidget):
     removeRepo = pyqtSignal(QString)
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
-            showShortPaths=False):
+    def __init__(self, parent, showShortPaths=False):
         QDockWidget.__init__(self, parent)
 
         self.watcher = None
-        self.showSubrepos = showSubrepos
-        self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
         self._setupSettingActions()
 
@@ -249,8 +246,8 @@ class RepoRegistryView(QDockWidget):
 
         sfile = settingsfilename()
         tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
-            showSubrepos=self.showSubrepos,
-            showNetworkSubrepos=self.showNetworkSubrepos))
+            showSubrepos=self._isSettingEnabled('showSubrepos'),
+            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos')))
 
         mainframe.layout().addWidget(tv)
 
@@ -303,8 +300,6 @@ class RepoRegistryView(QDockWidget):
             defaultValue=QVariant(True)).toBool()
         ssp = s.value(wb + 'showShortPaths',
             defaultValue=QVariant(True)).toBool()
-        self.setShowSubrepos(ssr, False)
-        self.setShowNetworkSubrepos(snsr, False)
         self.setShowShortPaths(ssp)
 
         sact = self._settingactions
@@ -329,10 +324,9 @@ class RepoRegistryView(QDockWidget):
     def _setupSettingActions(self):
         settingtable = [
             ('showPaths', _('Show Paths'), self.showPaths),
-            ('showSubrepos', _('Show Subrepos on Registry'),
-             self.setShowSubrepos),
+            ('showSubrepos', _('Show Subrepos on Registry'), self.reloadModel),
             ('showNetworkSubrepos', _('Show Subrepos for remote repositories'),
-             self.setShowNetworkSubrepos),
+             self.reloadModel),
             ('showShortPaths', _('Show Short Paths'), self.setShowShortPaths),
             ]
         self._settingactions = {}
@@ -346,17 +340,8 @@ class RepoRegistryView(QDockWidget):
         return sorted(self._settingactions.itervalues(),
                       key=lambda a: a.data().toInt())
 
-    def setShowSubrepos(self, show, reloadModel=True):
-        if self.showSubrepos != show:
-            self.showSubrepos = show
-            if reloadModel:
-                self.reloadModel()
-
-    def setShowNetworkSubrepos(self, show, reloadModel=True):
-        if self.showNetworkSubrepos != show:
-            self.showNetworkSubrepos = show
-            if reloadModel:
-                self.reloadModel()
+    def _isSettingEnabled(self, key):
+        return self._settingactions[key].isChecked()
 
     def setShowShortPaths(self, show):
         if self.showShortPaths != show:
@@ -401,6 +386,7 @@ class RepoRegistryView(QDockWidget):
             self._pendingReloadModel = True
             QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
 
+    @pyqtSlot()
     def reloadModel(self):
         activeroot = None
         if self._activeTabRepo:
@@ -409,7 +395,8 @@ class RepoRegistryView(QDockWidget):
         oldmodel = self.tview.model()
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
-                self.showSubrepos, self.showNetworkSubrepos,
+                self._isSettingEnabled('showSubrepos'),
+                self._isSettingEnabled('showNetworkSubrepos'),
                 self.showShortPaths))
         oldmodel.deleteLater()
         self.expand()
