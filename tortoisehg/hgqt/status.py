@@ -228,8 +228,10 @@ class StatusWidget(QWidget):
         dels = []
         for file, oldchanges in self.partials.iteritems():
             if oldchanges.excludecount == 0:
+                self.tv.model().checked[file] = True
                 dels.append(file)
             elif oldchanges.excludecount == len(oldchanges.hunks):
+                self.tv.model().checked[file] = False
                 dels.append(file)
         for file in dels:
             del self.partials[file]
