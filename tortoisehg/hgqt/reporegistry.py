@@ -224,11 +224,10 @@ class RepoRegistryView(QDockWidget):
     removeRepo = pyqtSignal(QString)
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, parent, showShortPaths=False):
+    def __init__(self, parent):
         QDockWidget.__init__(self, parent)
 
         self.watcher = None
-        self.showShortPaths = showShortPaths
         self._setupSettingActions()
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -300,7 +299,6 @@ class RepoRegistryView(QDockWidget):
             defaultValue=QVariant(True)).toBool()
         ssp = s.value(wb + 'showShortPaths',
             defaultValue=QVariant(True)).toBool()
-        self.setShowShortPaths(ssp)
 
         sact = self._settingactions
         sact['showSubrepos'].setChecked(ssr)
@@ -327,7 +325,7 @@ class RepoRegistryView(QDockWidget):
             ('showSubrepos', _('Show Subrepos on Registry'), self.reloadModel),
             ('showNetworkSubrepos', _('Show Subrepos for remote repositories'),
              self.reloadModel),
-            ('showShortPaths', _('Show Short Paths'), self.setShowShortPaths),
+            ('showShortPaths', _('Show Short Paths'), self._updateCommonPath),
             ]
         self._settingactions = {}
         for i, (key, text, slot) in enumerate(settingtable):
@@ -343,12 +341,12 @@ class RepoRegistryView(QDockWidget):
     def _isSettingEnabled(self, key):
         return self._settingactions[key].isChecked()
 
-    def setShowShortPaths(self, show):
-        if self.showShortPaths != show:
-            self.showShortPaths = show
-            #self.tview.model().showShortPaths = show
-            self.tview.model().updateCommonPaths(show)
-            self.tview.dataChanged(QModelIndex(), QModelIndex())
+    @pyqtSlot()
+    def _updateCommonPath(self):
+        show = self._isSettingEnabled('showShortPaths')
+        self.tview.model().updateCommonPaths(show)
+        # FIXME: access violation; should be done by model
+        self.tview.dataChanged(QModelIndex(), QModelIndex())
 
     def updateSettingsFile(self):
         # If there is a settings watcher, we must briefly stop watching the
@@ -397,7 +395,7 @@ class RepoRegistryView(QDockWidget):
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self._isSettingEnabled('showSubrepos'),
                 self._isSettingEnabled('showNetworkSubrepos'),
-                self.showShortPaths))
+                self._isSettingEnabled('showShortPaths')))
         oldmodel.deleteLater()
         self.expand()
         if activeroot:
