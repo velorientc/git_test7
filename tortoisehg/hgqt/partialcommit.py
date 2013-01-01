@@ -1,6 +1,6 @@
 # partialcommit.py - commit extension for partial commits (change selection)
 #
-# Copyright 2013 Steve Borho <steve@borho.org>
+# Copyright 2012 Steve Borho <steve@borho.org>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
