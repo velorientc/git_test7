@@ -307,19 +307,18 @@ class RepoRegistryView(QDockWidget):
         self.setShowNetworkSubrepos(snsr, False)
         self.setShowShortPaths(ssp)
 
-        # Note that calling setChecked will NOT reload the model if the new
-        # setting is the same as the one in the repo registry
         sact = self._settingactions
-        QTimer.singleShot(0, lambda: sact['showSubrepos'].setChecked(ssr))
-        QTimer.singleShot(0, lambda: sact['showNetworkSubrepos'].setChecked(snsr))
-        QTimer.singleShot(0, lambda: sact['showShortPaths'].setChecked(ssp))
+        sact['showSubrepos'].setChecked(ssr)
+        sact['showNetworkSubrepos'].setChecked(snsr)
+        sact['showShortPaths'].setChecked(ssp)
 
         # Manually reload the model now, to apply the settings
         self.reloadModel()
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: sact['showPaths'].setChecked(sp))
+        sact['showPaths'].setChecked(sp)
+        QTimer.singleShot(0, lambda: self.showPaths(sp))
 
     def _saveSettings(self):
         s = QSettings()
@@ -340,7 +339,7 @@ class RepoRegistryView(QDockWidget):
         for i, (key, text, slot) in enumerate(settingtable):
             a = QAction(text, self, checkable=True)
             a.setData(i)  # sort key
-            a.toggled.connect(slot)
+            a.triggered.connect(slot)
             self._settingactions[key] = a
 
     def settingActions(self):
