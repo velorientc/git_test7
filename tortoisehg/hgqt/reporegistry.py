@@ -288,18 +288,20 @@ class RepoRegistryView(QDockWidget):
         defaultmap = {'showPaths': False, 'showSubrepos': True,
                       'showNetworkSubrepos': True, 'showShortPaths': True}
         s = QSettings()
-        wb = 'Workbench/'  # for compatibility with old release
+        s.beginGroup('Workbench')  # for compatibility with old release
         for key, action in self._settingactions.iteritems():
-            action.setChecked(s.value(wb + key, defaultmap[key]).toBool())
+            action.setChecked(s.value(key, defaultmap[key]).toBool())
+        s.endGroup()
 
         # Manually reload the model now, to apply the settings
         self.reloadModel()
 
     def _saveSettings(self):
         s = QSettings()
-        wb = 'Workbench/'  # for compatibility with old release
+        s.beginGroup('Workbench')  # for compatibility with old release
         for key, action in self._settingactions.iteritems():
-            s.setValue(wb + key, action.isChecked())
+            s.setValue(key, action.isChecked())
+        s.endGroup()
 
     def _setupSettingActions(self):
         settingtable = [
