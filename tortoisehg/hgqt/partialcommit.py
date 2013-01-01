@@ -6,10 +6,10 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import cStringIO
 
 from mercurial.i18n import _
 from mercurial import patch, commands, extensions, scmutil, encoding, context
+from mercurial import error
 
 def makememctx(repo, parents, text, user, date, branch, files, store):
     def getfilectx(repo, memctx, path):
@@ -66,7 +66,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         try:
             patch.patchrepo(ui, repo, pctx, store, fp, 1, None)
         except patch.PatchError, e:
-            raise util.Abort(str(e))
+            raise error.Abort(str(e))
 
         # create new revision from memory
         memctx = makememctx(repo, (pctx.node(), None), opts['message'],
@@ -77,7 +77,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
             if pctx.node() not in repo.branchheads():
                 # The topo heads set is included in the branch heads set of the
                 # current branch, so it's sufficient to test branchheads
-                raise util.Abort(_('can only close branch heads'))
+                raise error.Abort(_('can only close branch heads'))
             memctx._extra['close'] = 1
 
         # TODO: precommit hook from localrepo.commit() lines 1406-1415
