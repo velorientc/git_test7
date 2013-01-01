@@ -202,24 +202,7 @@ class Workbench(QMainWindow):
 
         newseparator(menu='view')
         self.menuViewregistryopts = self.menuView.addMenu(_('Repository Registry Options'))
-        self.actionShowPaths = \
-        newaction(_("Show Paths"), self.reporegistry.showPaths,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowSubrepos = \
-            newaction(_("Show Subrepos on Registry"),
-                self.reporegistry.setShowSubrepos,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowNetworkSubrepos = \
-            newaction(_("Show Subrepos for remote repositories"),
-                self.reporegistry.setShowNetworkSubrepos,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowShortPaths = \
-            newaction(_("Show Short Paths"),
-                self.reporegistry.setShowShortPaths,
-                  checkable=True, menu='viewregistryopts')
+        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
         newaction(_("Choose Log Columns..."), self.setHistoryColumns,
@@ -1030,11 +1013,11 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
-        s.setValue(wb + 'showPaths', self.actionShowPaths.isChecked())
-        s.setValue(wb + 'showSubrepos', self.actionShowSubrepos.isChecked())
+        s.setValue(wb + 'showPaths', self.reporegistry._actionShowPaths.isChecked())
+        s.setValue(wb + 'showSubrepos', self.reporegistry._actionShowSubrepos.isChecked())
         s.setValue(wb + 'showNetworkSubrepos',
-            self.actionShowNetworkSubrepos.isChecked())
-        s.setValue(wb + 'showShortPaths', self.actionShowShortPaths.isChecked())
+            self.reporegistry._actionShowNetworkSubrepos.isChecked())
+        s.setValue(wb + 'showShortPaths', self.reporegistry._actionShowShortPaths.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
         lastactiverepo = ''
@@ -1077,9 +1060,9 @@ class Workbench(QMainWindow):
 
         # Note that calling setChecked will NOT reload the model if the new
         # setting is the same as the one in the repo registry
-        QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(snsr))
-        QTimer.singleShot(0, lambda: self.actionShowShortPaths.setChecked(ssp))
+        QTimer.singleShot(0, lambda: self.reporegistry._actionShowSubrepos.setChecked(ssr))
+        QTimer.singleShot(0, lambda: self.reporegistry._actionShowNetworkSubrepos.setChecked(snsr))
+        QTimer.singleShot(0, lambda: self.reporegistry._actionShowShortPaths.setChecked(ssp))
 
         # Manually reload the model now, to apply the settings
         self.reporegistry.reloadModel()
@@ -1120,7 +1103,7 @@ class Workbench(QMainWindow):
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
+        QTimer.singleShot(0, lambda: self.reporegistry._actionShowPaths.setChecked(sp))
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):

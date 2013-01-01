@@ -232,6 +232,7 @@ class RepoRegistryView(QDockWidget):
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
+        self._setupSettingActions()
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -279,6 +280,25 @@ class RepoRegistryView(QDockWidget):
         self.watcher.fileChanged.connect(self.modifiedSettings)
         self._pendingReloadModel = False
         self._activeTabRepo = None
+
+    def _setupSettingActions(self):
+        def newaction(text, slot):
+            a = QAction(text, self, checkable=True)
+            a.toggled.connect(slot)
+            return a
+
+        self._actionShowPaths = newaction(_("Show Paths"), self.showPaths)
+        self._actionShowSubrepos = newaction(_("Show Subrepos on Registry"),
+                                             self.setShowSubrepos)
+        self._actionShowNetworkSubrepos = newaction(_("Show Subrepos for "
+                                                      "remote repositories"),
+                                                    self.setShowNetworkSubrepos)
+        self._actionShowShortPaths = newaction(_("Show Short Paths"),
+                                               self.setShowShortPaths)
+
+    def settingActions(self):
+        return [self._actionShowPaths, self._actionShowSubrepos,
+                self._actionShowNetworkSubrepos, self._actionShowShortPaths]
 
     def setShowSubrepos(self, show, reloadModel=True):
         if self.showSubrepos != show:
