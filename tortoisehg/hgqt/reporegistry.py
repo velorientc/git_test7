@@ -261,7 +261,6 @@ class RepoRegistryView(QDockWidget):
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
-        QTimer.singleShot(0, self.expand)
 
         # Setup a file system watcher to update the reporegistry
         # anytime it is modified by another thg instance
@@ -278,6 +277,12 @@ class RepoRegistryView(QDockWidget):
         self._activeTabRepo = None
 
         self._loadSettings()
+        QTimer.singleShot(0, self._initView)
+
+    @pyqtSlot()
+    def _initView(self):
+        self.expand()
+        self._updateColumnVisibility()
 
     def _loadSettings(self):
         s = QSettings()
@@ -308,10 +313,8 @@ class RepoRegistryView(QDockWidget):
         # Manually reload the model now, to apply the settings
         self.reloadModel()
 
-        # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         sact['showPaths'].setChecked(sp)
-        QTimer.singleShot(0, self._updateColumnVisibility)
 
     def _saveSettings(self):
         s = QSettings()
