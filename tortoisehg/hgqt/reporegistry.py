@@ -285,36 +285,15 @@ class RepoRegistryView(QDockWidget):
         self._updateColumnVisibility()
 
     def _loadSettings(self):
+        defaultmap = {'showPaths': False, 'showSubrepos': True,
+                      'showNetworkSubrepos': True, 'showShortPaths': True}
         s = QSettings()
         wb = 'Workbench/'  # for compatibility with old release
-
-        # Load the repo registry settings. Note that we must allow the
-        # repo registry to assemble itself before toggling its settings
-        # Also the view path setttings should be enabled last, once we have
-        # loaded the repo subrepositories (if needed)
-
-        # Normally, checking the "show subrepos" and the "show network subrepos"
-        # settings will trigger a reload of the repo registry.
-        # To avoid reloading it twice (every time we set one of its view
-        # settings), we tell the setters to avoid reloading the repo tree
-        # model, and then we  manually reload the model
-        ssr = s.value(wb + 'showSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        snsr = s.value(wb + 'showNetworkSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        ssp = s.value(wb + 'showShortPaths',
-            defaultValue=QVariant(True)).toBool()
-
-        sact = self._settingactions
-        sact['showSubrepos'].setChecked(ssr)
-        sact['showNetworkSubrepos'].setChecked(snsr)
-        sact['showShortPaths'].setChecked(ssp)
+        for key, action in self._settingactions.iteritems():
+            action.setChecked(s.value(wb + key, defaultmap[key]).toBool())
 
         # Manually reload the model now, to apply the settings
         self.reloadModel()
-
-        sp = s.value(wb + 'showPaths').toBool()
-        sact['showPaths'].setChecked(sp)
 
     def _saveSettings(self):
         s = QSettings()
