@@ -1013,11 +1013,6 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
-        s.setValue(wb + 'showPaths', self.reporegistry._actionShowPaths.isChecked())
-        s.setValue(wb + 'showSubrepos', self.reporegistry._actionShowSubrepos.isChecked())
-        s.setValue(wb + 'showNetworkSubrepos',
-            self.reporegistry._actionShowNetworkSubrepos.isChecked())
-        s.setValue(wb + 'showShortPaths', self.reporegistry._actionShowShortPaths.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
         lastactiverepo = ''
@@ -1037,35 +1032,6 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
-
-        # Load the repo registry settings. Note that we must allow the
-        # repo registry to assemble itself before toggling its settings
-        # Also the view path setttings should be enabled last, once we have
-        # loaded the repo subrepositories (if needed)
-
-        # Normally, checking the "show subrepos" and the "show network subrepos"
-        # settings will trigger a reload of the repo registry.
-        # To avoid reloading it twice (every time we set one of its view
-        # settings), we tell the setters to avoid reloading the repo tree
-        # model, and then we  manually reload the model
-        ssr = s.value(wb + 'showSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        snsr = s.value(wb + 'showNetworkSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        ssp = s.value(wb + 'showShortPaths',
-            defaultValue=QVariant(True)).toBool()
-        self.reporegistry.setShowSubrepos(ssr, False)
-        self.reporegistry.setShowNetworkSubrepos(snsr, False)
-        self.reporegistry.setShowShortPaths(ssp)
-
-        # Note that calling setChecked will NOT reload the model if the new
-        # setting is the same as the one in the repo registry
-        QTimer.singleShot(0, lambda: self.reporegistry._actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self.reporegistry._actionShowNetworkSubrepos.setChecked(snsr))
-        QTimer.singleShot(0, lambda: self.reporegistry._actionShowShortPaths.setChecked(ssp))
-
-        # Manually reload the model now, to apply the settings
-        self.reporegistry.reloadModel()
 
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
@@ -1100,10 +1066,6 @@ class Workbench(QMainWindow):
         # reopen these repos again
         s.setValue(wb + 'openrepos', '')
         s.setValue(wb + 'lastactiverepo', '')
-
-        # Allow repo registry to assemble itself before toggling path state
-        sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: self.reporegistry._actionShowPaths.setChecked(sp))
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):

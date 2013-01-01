@@ -281,6 +281,54 @@ class RepoRegistryView(QDockWidget):
         self._pendingReloadModel = False
         self._activeTabRepo = None
 
+        self._loadSettings()
+
+    def _loadSettings(self):
+        s = QSettings()
+        wb = 'Workbench/'  # for compatibility with old release
+
+        # Load the repo registry settings. Note that we must allow the
+        # repo registry to assemble itself before toggling its settings
+        # Also the view path setttings should be enabled last, once we have
+        # loaded the repo subrepositories (if needed)
+
+        # Normally, checking the "show subrepos" and the "show network subrepos"
+        # settings will trigger a reload of the repo registry.
+        # To avoid reloading it twice (every time we set one of its view
+        # settings), we tell the setters to avoid reloading the repo tree
+        # model, and then we  manually reload the model
+        ssr = s.value(wb + 'showSubrepos',
+            defaultValue=QVariant(True)).toBool()
+        snsr = s.value(wb + 'showNetworkSubrepos',
+            defaultValue=QVariant(True)).toBool()
+        ssp = s.value(wb + 'showShortPaths',
+            defaultValue=QVariant(True)).toBool()
+        self.setShowSubrepos(ssr, False)
+        self.setShowNetworkSubrepos(snsr, False)
+        self.setShowShortPaths(ssp)
+
+        # Note that calling setChecked will NOT reload the model if the new
+        # setting is the same as the one in the repo registry
+        QTimer.singleShot(0, lambda: self._actionShowSubrepos.setChecked(ssr))
+        QTimer.singleShot(0, lambda: self._actionShowNetworkSubrepos.setChecked(snsr))
+        QTimer.singleShot(0, lambda: self._actionShowShortPaths.setChecked(ssp))
+
+        # Manually reload the model now, to apply the settings
+        self.reloadModel()
+
+        # Allow repo registry to assemble itself before toggling path state
+        sp = s.value(wb + 'showPaths').toBool()
+        QTimer.singleShot(0, lambda: self._actionShowPaths.setChecked(sp))
+
+    def _saveSettings(self):
+        s = QSettings()
+        wb = 'Workbench/'  # for compatibility with old release
+        s.setValue(wb + 'showPaths', self._actionShowPaths.isChecked())
+        s.setValue(wb + 'showSubrepos', self._actionShowSubrepos.isChecked())
+        s.setValue(wb + 'showNetworkSubrepos',
+            self._actionShowNetworkSubrepos.isChecked())
+        s.setValue(wb + 'showShortPaths', self._actionShowShortPaths.isChecked())
+
     def _setupSettingActions(self):
         def newaction(text, slot):
             a = QAction(text, self, checkable=True)
@@ -447,6 +495,7 @@ class RepoRegistryView(QDockWidget):
         sfile = settingsfilename()
         self.watcher.removePath(sfile)
         self.tview.model().write(sfile)
+        self._saveSettings()
 
     def _action_defs(self):
         a = [("reloadRegistry", _("Refresh repository list"), 'view-refresh',
