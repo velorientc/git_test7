@@ -242,12 +242,6 @@ class RepoRegistryView(QDockWidget):
 
         self.contextmenu = QMenu(self)
         self.tview = tv = RepoTreeView(self)
-
-        sfile = settingsfilename()
-        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
-            showSubrepos=self._isSettingEnabled('showSubrepos'),
-            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos')))
-
         mainframe.layout().addWidget(tv)
 
         tv.setIndentation(10)
@@ -261,6 +255,11 @@ class RepoRegistryView(QDockWidget):
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
+
+        sfile = settingsfilename()
+        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
+            showSubrepos=self._isSettingEnabled('showSubrepos'),
+            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos')))
 
         # Setup a file system watcher to update the reporegistry
         # anytime it is modified by another thg instance
