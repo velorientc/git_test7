@@ -311,7 +311,7 @@ class RepoRegistryView(QDockWidget):
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         sact['showPaths'].setChecked(sp)
-        QTimer.singleShot(0, lambda: self.showPaths(sp))
+        QTimer.singleShot(0, self._updateColumnVisibility)
 
     def _saveSettings(self):
         s = QSettings()
@@ -321,7 +321,7 @@ class RepoRegistryView(QDockWidget):
 
     def _setupSettingActions(self):
         settingtable = [
-            ('showPaths', _('Show Paths'), self.showPaths),
+            ('showPaths', _('Show Paths'), self._updateColumnVisibility),
             ('showSubrepos', _('Show Subrepos on Registry'), self.reloadModel),
             ('showNetworkSubrepos', _('Show Subrepos for remote repositories'),
              self.reloadModel),
@@ -466,7 +466,9 @@ class RepoRegistryView(QDockWidget):
             # and scrolling to it if necessary
             self.scrollTo(it)
 
-    def showPaths(self, show):
+    @pyqtSlot()
+    def _updateColumnVisibility(self):
+        show = self._isSettingEnabled('showPaths')
         self.tview.setColumnHidden(1, not show)
         self.tview.setHeaderHidden(not show)
         if show:
