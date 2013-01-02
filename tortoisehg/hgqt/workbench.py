@@ -730,8 +730,7 @@ class Workbench(QMainWindow):
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
         self.lastClosedRepoRootList = []
-        self.progress(_('Reopening tabs'), len(self.lastClosedRepoRootList),
-            _('All repositories open'), '', len(self.lastClosedRepoRootList))
+        self.progress(_('Reopening tabs'), None, '', '', None)
 
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
@@ -1051,8 +1050,7 @@ class Workbench(QMainWindow):
             QCoreApplication.processEvents()
             self._openRepo(hglib.fromunicode(upath), False)
             QCoreApplication.processEvents()
-        self.progress(_('Reopening tabs'), len(openrepos),
-                      _('All repositories open'), '', len(openrepos))
+        self.progress(_('Reopening tabs'), None, '', '', None)
 
         # Activate the tab that was last active on the last session (if any)
         # Note that if a "root" has been passed to the "thg" command,
