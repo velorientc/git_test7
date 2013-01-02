@@ -63,6 +63,7 @@ class StatusWidget(QWidget):
         self.savechecks = True
         self.refthread = None
         self.partials = {}
+        self.manualCheckAllUpdate = False
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -196,6 +197,8 @@ class StatusWidget(QWidget):
         self.diffvbox = vbox
 
     def checkAllNone(self):
+        if self.manualCheckAllUpdate:
+            return
         state = self.checkAllNoneBtn.checkState()
         if state == Qt.Checked:
             self.checkAll()
@@ -421,7 +424,9 @@ class StatusWidget(QWidget):
                 state = Qt.Checked
             else:
                 state = Qt.PartiallyChecked
+            self.manualCheckAllUpdate = True
             self.checkAllNoneBtn.setCheckState(state)
+            self.manualCheckAllUpdate = False
 
     @pyqtSlot(QString, bool)
     def checkToggled(self, wfile, checked):
@@ -450,13 +455,26 @@ class StatusWidget(QWidget):
         if model:
             checked = model.getChecked()
             if types is None:
-                return [f for f, v in checked.iteritems() if v]
+                files = []
+                for f, v in checked.iteritems():
+                    if f in self.partials:
+                        changes = self.partials[f]
+                        if changes.excludecount < len(changes.hunks):
+                            files.append(f)
+                    elif v:
+                        files.append(f)
+                return files
             else:
                 files = []
                 for row in model.getAllRows():
                     path, status, mst, upath, ext, sz = row
-                    if status in types and checked[path]:
-                        files.append(path)
+                    if status in types:
+                        if path in self.partials:
+                            changes = self.partials[path]
+                            if changes.excludecount < len(changes.hunks):
+                                files.append(path)
+                        elif checked[path]:
+                            files.append(path)
                 return files
         else:
             return []
