@@ -403,8 +403,7 @@ class HgFileView(QFrame):
             ctx2 = self._ctx.p1()
         else:
             ctx2 = self._ctx.p2()
-        cs = (self._mode == DiffMode and self.folddiffs)
-        fd = filedata.FileData(self._ctx, ctx2, filename, status, cs)
+        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.folddiffs)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -413,6 +412,8 @@ class HgFileView(QFrame):
             self.extralabel.hide()
         self.filenamelabel.setText(fd.flabel)
 
+        uf = hglib.tounicode(filename)
+
         if not fd.isValid():
             self.sci.setText(fd.error)
             self.sci.setLexer(None)
@@ -420,6 +421,7 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, 0)
             self.blk.setVisible(False)
             self.restrictModes(False, False, False)
+            self.newChunkList.emit(uf, None)
             return
 
         candiff = bool(fd.diff)
@@ -443,6 +445,9 @@ class HgFileView(QFrame):
                 self._lostMode = None
                 self.blk.setVisible(self._mode != DiffMode)
                 self.sci.setAnnotationEnabled(self._mode == AnnMode)
+
+        if fd.changes is None:
+            self.newChunkList.emit(uf, None)
 
         if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
@@ -496,11 +501,9 @@ class HgFileView(QFrame):
         self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
-        uf = hglib.tounicode(filename)
         uc = hglib.tounicode(fd.contents) or ''
         self.fileDisplayed.emit(uf, uc)
-        if self.changes:
-            self.newChunkList.emit(uf, self.changes)
+        self.newChunkList.emit(uf, fd.changes)
 
         if self._mode != DiffMode:
             self.blk.setVisible(True)

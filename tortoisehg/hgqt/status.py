@@ -236,7 +236,9 @@ class StatusWidget(QWidget):
         for file in dels:
             del self.partials[file]
 
-        if not wfile or not changes:
+        if changes is None:
+            if wfile in self.partials:
+                del self.partials[wfile]
             return
 
         wfile = hglib.fromunicode(wfile)
