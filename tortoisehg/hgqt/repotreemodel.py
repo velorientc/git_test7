@@ -60,14 +60,13 @@ def iterRepoItemFromXml(source):
         if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
             yield repotreeitem.undumpObject(xr)
 
-def getRepoItemList(root, includeSubRepos=False):
-    if not includeSubRepos and isinstance(root, repotreeitem.RepoItem):
+def getRepoItemList(root):
+    if isinstance(root, repotreeitem.RepoItem):
         return [root]
     if not isinstance(root, repotreeitem.RepoTreeItem):
         return []
     return reduce(lambda a, b: a + b,
-                  (getRepoItemList(c, includeSubRepos=includeSubRepos) \
-                    for c in root.childs), [])
+                  (getRepoItemList(c) for c in root.childs), [])
 
 
 class RepoTreeModel(QAbstractItemModel):
