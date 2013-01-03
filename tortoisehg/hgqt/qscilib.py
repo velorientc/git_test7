@@ -179,53 +179,53 @@ class Scintilla(QsciScintilla):
         else:
             self._stdMenu.clear()
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Undo'), self.undo)
+            a = self._stdMenu.addAction(_('&Undo'), self.undo)
             a.setShortcuts(QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = self._stdMenu.addAction(_('Redo'), self.redo)
+            a = self._stdMenu.addAction(_('&Redo'), self.redo)
             a.setShortcuts(QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
             self._stdMenu.addSeparator()
-            a = self._stdMenu.addAction(_('Cut'), self.cut)
+            a = self._stdMenu.addAction(_('Cu&t'), self.cut)
             a.setShortcuts(QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = self._stdMenu.addAction(_('Copy'), self.copy)
+        a = self._stdMenu.addAction(_('&Copy'), self.copy)
         a.setShortcuts(QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Paste'), self.paste)
+            a = self._stdMenu.addAction(_('&Paste'), self.paste)
             a.setShortcuts(QKeySequence.Paste)
-            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText)
+            a = self._stdMenu.addAction(_('&Delete'), self.removeSelectedText)
             a.setShortcuts(QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
         self._stdMenu.addSeparator()
-        a = self._stdMenu.addAction(_('Select All'), self.selectAll)
+        a = self._stdMenu.addAction(_('Select &All'), self.selectAll)
         a.setShortcuts(QKeySequence.SelectAll)
         self._stdMenu.addSeparator()
         qsci = QsciScintilla
-        wrapmenu = QMenu(_('Wrap'), self)
-        for name, mode in ((_('None', 'wrap mode'), qsci.WrapNone),
-                           (_('Word'), qsci.WrapWord),
-                           (_('Character'), qsci.WrapCharacter)):
+        wrapmenu = QMenu(_('&Wrap'), self)
+        for name, mode in ((_('&None', 'wrap mode'), qsci.WrapNone),
+                           (_('&Word'), qsci.WrapWord),
+                           (_('&Character'), qsci.WrapCharacter)):
             def mkaction(n, m):
                 a = wrapmenu.addAction(n)
                 a.setCheckable(True)
                 a.setChecked(self.wrapMode() == m)
                 a.triggered.connect(lambda: self.setWrapMode(m))
             mkaction(name, mode)
-        wsmenu = QMenu(_('Whitespace'), self)
-        for name, mode in ((_('Visible'), qsci.WsVisible),
-                           (_('Invisible'), qsci.WsInvisible),
-                           (_('AfterIndent'), qsci.WsVisibleAfterIndent)):
+        wsmenu = QMenu(_('White&space'), self)
+        for name, mode in ((_('&Visible'), qsci.WsVisible),
+                           (_('&Invisible'), qsci.WsInvisible),
+                           (_('&AfterIndent'), qsci.WsVisibleAfterIndent)):
             def mkaction(n, m):
                 a = wsmenu.addAction(n)
                 a.setCheckable(True)
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
-        vsmenu = QMenu(_('EOL Visibility'), self)
-        for name, mode in ((_('Visible'), True),
-                           (_('Invisible'), False)):
+        vsmenu = QMenu(_('EOL &Visibility'), self)
+        for name, mode in ((_('&Visible'), True),
+                           (_('&Invisible'), False)):
             def mkaction(n, m):
                 a = vsmenu.addAction(n)
                 a.setCheckable(True)
@@ -236,30 +236,30 @@ class Scintilla(QsciScintilla):
         tabindentsmenu = None
         acmenu = None
         if not self.isReadOnly():
-            eolmodemenu = QMenu(_('EOL Mode'), self)
-            for name, mode in ((_('Windows'), qsci.EolWindows),
-                               (_('Unix'), qsci.EolUnix),
-                               (_('Mac'), qsci.EolMac)):
+            eolmodemenu = QMenu(_('EOL &Mode'), self)
+            for name, mode in ((_('&Windows'), qsci.EolWindows),
+                               (_('&Unix'), qsci.EolUnix),
+                               (_('&Mac'), qsci.EolMac)):
                 def mkaction(n, m):
                     a = eolmodemenu.addAction(n)
                     a.setCheckable(True)
                     a.setChecked(self.eolMode() == m)
                     a.triggered.connect(lambda: self.setEolMode(m))
                 mkaction(name, mode)
-            tabindentsmenu = QMenu(_('TAB inserts'), self)
-            for name, mode in ((_('Auto'), -1),
-                               (_('TAB'), True),
-                               (_('Spaces'), False)):
+            tabindentsmenu = QMenu(_('&TAB Inserts'), self)
+            for name, mode in ((_('&Auto'), -1),
+                               (_('&TAB'), True),
+                               (_('&Spaces'), False)):
                 def mkaction(n, m):
                     a = tabindentsmenu.addAction(n)
                     a.setCheckable(True)
                     a.setChecked(self.indentationsUseTabs() == m or \
-                        (self.autoUseTabs and n == 'Auto'))
+                        (self.autoUseTabs and m == -1))
                     a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
                 mkaction(name, mode)
-            acmenu = QMenu(_('Auto-Complete'), self)
-            for name, value in ((_('Enable'), 2),
-                                (_('Disable'), -1)):
+            acmenu = QMenu(_('&Auto-Complete'), self)
+            for name, value in ((_('&Enable'), 2),
+                                (_('&Disable'), -1)):
                 def mkaction(n, v):
                     a = acmenu.addAction(n)
                     a.setCheckable(True)
@@ -267,7 +267,7 @@ class Scintilla(QsciScintilla):
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
 
-        editoptsmenu = QMenu(_('Editor Options'), self)
+        editoptsmenu = QMenu(_('&Editor Options'), self)
         editoptsmenu.addMenu(wrapmenu)
         editoptsmenu.addSeparator()
         editoptsmenu.addMenu(wsmenu)

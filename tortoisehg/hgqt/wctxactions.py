@@ -37,40 +37,41 @@ class WctxActions(QObject):
             parent.addAction(action)
             allactions.append(action)
 
-        make(_('&Diff to parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
-        make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
-        make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
-        make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
+        make(_('&Diff to Parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
+        make(_('&Copy Patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
+        make(_('&Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
+        make(_('&Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
         allactions.append(None)
-        make(_('Open subrepository'), opensubrepo, frozenset('S'),
+        make(_('Open S&ubrepository'), opensubrepo, frozenset('S'),
             'thg-repository-open', 'Shift+Ctrl+O')
-        make(_('Explore subrepository'), explore, frozenset('S'),
+        make(_('E&xplore Subrepository'), explore, frozenset('S'),
             'system-file-manager')
-        make(_('Open terminal in subrepository'), terminal, frozenset('S'),
+        make(_('Open &Terminal'), terminal, frozenset('S'),
             'utilities-terminal')
         allactions.append(None)
-        make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
-        make(_('View missing'), viewmissing, frozenset('R!'))
+        make(_('Copy &Path'), copyPath, frozenset('MARC?!IS'), '')
+        make(_('&View Missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
         make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
-        make(_('File History'), log, frozenset('MARC!'), 'hg-log')
+        make(_('File &History'), log, frozenset('MARC!'), 'hg-log')
         make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
-        make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
+        make(_('De&tect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename')
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
-        make(_('Remove versioned'), remove, frozenset('C'), 'remove')
-        make(_('&Delete unversioned...'), delete, frozenset('?I'), 'hg-purge')
+        make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
+        make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
         allactions.append(None)
-        make(_('Mark unresolved'), unmark, frozenset('r'))
-        make(_('Mark resolved'), mark, frozenset('u'))
+        make(_('&Mark unresolved'), unmark, frozenset('r'))
+        make(_('&Mark resolved'), mark, frozenset('u'))
         if checkable:
+            # no &-shortcut because check/uncheck can be done by space key
             allactions.append(None)
             make(_('Check'), check, frozenset('MARC?!IS'), '')
             make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
@@ -116,12 +117,12 @@ class WctxActions(QObject):
             action.triggered.connect(self.runAction)
 
         if len(repo.parents()) > 1:
-            make(_('View other'), viewother, frozenset('MA'))
+            make(_('View O&ther'), viewother, frozenset('MA'))
 
         if len(selrows) == 1:
             menu.addSeparator()
             make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
-            make(_('Rename...'), rename, frozenset('MC'), 'hg-rename')
+            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
 
         # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
@@ -138,9 +139,9 @@ class WctxActions(QObject):
 
         # Add restart merge actions for resolved files
         if alltypes & frozenset('u'):
-            f = make(_('Restart Merge...'), resolve, frozenset('u'))
+            f = make(_('Restart Mer&ge'), resolve, frozenset('u'))
             files = [f for t, f in selrows if 'u' in t]
-            rmenu = QMenu(_('Restart merge with'), self.parent())
+            rmenu = QMenu(_('Restart Merge &with'), self.parent())
             for tool in hglib.mergetools(repo.ui):
                 def mkaction(rtool):
                     a = rmenu.addAction(hglib.tounicode(rtool))

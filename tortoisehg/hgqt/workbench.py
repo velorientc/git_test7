@@ -81,13 +81,13 @@ class Workbench(QMainWindow):
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
         if sys.platform == 'darwin':
             self.dockMenu = QMenu(self)
-            self.dockMenu.addAction(_('New Workbench...'),
+            self.dockMenu.addAction(_('New &Workbench'),
                                     self.newWorkbench)
-            self.dockMenu.addAction(_('New Repository...'),
+            self.dockMenu.addAction(_('&New Repository...'),
                                     self.newRepository)
-            self.dockMenu.addAction(_('Clone Repository...'),
+            self.dockMenu.addAction(_('Clon&e Repository...'),
                                     self.cloneRepository)
-            self.dockMenu.addAction(_('Open Repository...'),
+            self.dockMenu.addAction(_('&Open Repository...'),
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
 
@@ -142,15 +142,15 @@ class Workbench(QMainWindow):
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
-        self.edittbar = QToolBar(_("Edit Toolbar"), objectName='edittbar')
+        self.edittbar = QToolBar(_("&Edit Toolbar"), objectName='edittbar')
         self.addToolBar(self.edittbar)
-        self.docktbar = QToolBar(_("Dock Toolbar"), objectName='docktbar')
+        self.docktbar = QToolBar(_("&Dock Toolbar"), objectName='docktbar')
         self.addToolBar(self.docktbar)
-        self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
+        self.synctbar = QToolBar(_('S&ync Toolbar'), objectName='synctbar')
         self.addToolBar(self.synctbar)
-        self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
+        self.tasktbar = QToolBar(_('&Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
-        self.customtbar = QToolBar(_('Custom Toolbar'), objectName='custombar')
+        self.customtbar = QToolBar(_('&Custom Toolbar'), objectName='custombar')
         self.addToolBar(self.customtbar)
 
         # availability map of actions; applied by updateMenu()
@@ -161,12 +161,12 @@ class Workbench(QMainWindow):
         newaction = self._addNewAction
         newseparator = self._addNewSeparator
 
-        newaction(_("New &Workbench..."), self.newWorkbench,
+        newaction(_("New &Workbench"), self.newWorkbench,
                   shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
-        newaction(_("Clone Repository..."), self.cloneRepository,
+        newaction(_("Clon&e Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
         newseparator(menu='file')
@@ -175,20 +175,20 @@ class Workbench(QMainWindow):
         newaction(_("&Close Repository"), self.closeRepository,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
-        newaction(_('&Settings...'), self.editSettings, icon='settings_user',
+        newaction(_('&Settings'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
         newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
-        a.setText(_('Show Repository Registry'))
+        a.setText(_('Sh&ow Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
         a.setIcon(qtlib.geticon('thg-reporegistry'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
         a = self.mqpatches.toggleViewAction()
-        a.setText(_('Show Patch Queue'))
+        a.setText(_('Show &Patch Queue'))
         a.setIcon(qtlib.geticon('thg-mq'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
@@ -201,14 +201,14 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(_('Repository Registry Options'))
+        self.menuViewregistryopts = self.menuView.addMenu(_('R&epository Registry Options'))
         self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
-        newaction(_("Choose Log Columns..."), self.setHistoryColumns,
+        newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
                   menu='view')
         self.actionSaveRepos = \
-        newaction(_("Save Open Repositories On Exit"), checkable=True,
+        newaction(_("Save Open Repositories on E&xit"), checkable=True,
                   menu='view')
         newseparator(menu='view')
 
@@ -225,7 +225,7 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'mq': ('thg-qrefresh', _('MQ Patch')),
+            'mq': ('thg-qrefresh', _('M&Q Patch')),
             'pbranch': ('branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'manifest': ('hg-annotate', _('&Manifest')),
@@ -264,56 +264,56 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all revisions"), self.loadall,
+        newaction(_("Load &All Revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
-        newaction(_("&Goto revision..."), self.gotorev,
+        newaction(_("&Goto Revision..."), self.gotorev,
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Start Web Server"), self.serve, enabled='repoopen',
+        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
-        newaction(_("Shelve..."), self._repofwd('shelve'), icon='shelve',
+        newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
-        newaction(_("Import..."), self._repofwd('thgimport'), icon='hg-import',
+        newaction(_("&Import..."), self._repofwd('thgimport'), icon='hg-import',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
+        newaction(_("&Verify"), self._repofwd('verify'), enabled='repoopen',
                   menu='repository')
-        newaction(_("Recover"), self._repofwd('recover'),
+        newaction(_("Re&cover"), self._repofwd('recover'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Resolve..."), self._repofwd('resolve'), icon='hg-merge',
+        newaction(_("&Resolve..."), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Rollback/Undo..."), self._repofwd('rollback'),
+        newaction(_("Rollback/&Undo..."), self._repofwd('rollback'),
                   shortcut='Ctrl+u',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Purge..."), self._repofwd('purge'), enabled='repoopen',
+        newaction(_("&Purge..."), self._repofwd('purge'), enabled='repoopen',
                   icon='hg-purge', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Bisect..."), self._repofwd('bisect'),
+        newaction(_("&Bisect..."), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+X',
+        newaction(_("E&xplore"), self.explore, shortcut='Shift+Ctrl+X',
                   icon='system-file-manager', enabled='repoopen',
                   menu='repository')
-        newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
+        newaction(_("&Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
 
-        newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
-        newaction(_("Explorer Help"), self.onHelpExplorer, menu='help')
+        newaction(_("&Help"), self.onHelp, menu='help', icon='help-browser')
+        newaction(_("E&xplorer Help"), self.onHelpExplorer, menu='help')
         visiblereadme = 'repoopen'
         if  self.ui.config('tortoisehg', 'readme', None):
             visiblereadme = True
-        newaction(_("README"), self.onReadme, menu='help', icon='help-readme',
+        newaction(_("&Readme"), self.onReadme, menu='help', icon='help-readme',
                   visible=visiblereadme, shortcut='Ctrl+F1')
         newseparator(menu='help')
-        newaction(_("About Qt"), QApplication.aboutQt, menu='help')
-        newaction(_("About TortoiseHg"), self.onAbout, menu='help',
+        newaction(_("About &Qt"), QApplication.aboutQt, menu='help')
+        newaction(_("&About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
 
         newseparator(toolbar='edit')
@@ -334,12 +334,12 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit', menu='View')
 
         self.filtertbaction = \
-        newaction(_('Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
+        newaction(_('&Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
                   icon='view-filter', shortcut='Ctrl+S', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
 
-        menu = QMenu(_('Workbench Toolbars'), self)
+        menu = QMenu(_('&Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
         menu.addAction(self.docktbar.toggleViewAction())
         menu.addAction(self.synctbar.toggleViewAction())

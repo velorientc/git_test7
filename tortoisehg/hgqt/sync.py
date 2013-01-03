@@ -628,12 +628,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             acts = []
             menu = QMenu(self)
             for text, cb, icon in (
-                (_('Explore'), self.exploreurl, 'system-file-manager'),
-                (_('Terminal'), self.terminalurl, 'utilities-terminal'),
-                (_('Copy path'), self.copypath, ''),
+                (_('E&xplore'), self.exploreurl, 'system-file-manager'),
+                (_('&Terminal'), self.terminalurl, 'utilities-terminal'),
+                (_('Copy &Path'), self.copypath, ''),
                 separator,
-                (_('Edit...'), self.editurl, 'general'),
-                (_('Remove'), self.removeurl, 'menudelete')):
+                (_('&Edit...'), self.editurl, 'general'),
+                (_('&Remove...'), self.removeurl, 'menudelete')):
                 if text is None:
                     menu.addSeparator()
                     continue

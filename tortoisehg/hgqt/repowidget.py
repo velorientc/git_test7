@@ -1213,85 +1213,85 @@ class RepoWidget(QWidget):
             items.append(act)
         menu = QMenu(self)
         if mode == 'outgoing':
-            submenu = menu.addMenu(_('Push'))
-            entry(submenu, None, isrev, _('Push all'), 'hg-push',
+            submenu = menu.addMenu(_('Pus&h'))
+            entry(submenu, None, isrev, _('Push &All'), 'hg-push',
                   self.pushAll)
-            entry(submenu, None, isrev, _('Push to here'), '',
+            entry(submenu, None, isrev, _('Push to &Here'), '',
                   self.pushToRevision)
-            entry(submenu, None, isrev, _('Push selected branch'), '',
+            entry(submenu, None, isrev, _('Push Selected &Branch'), '',
                   self.pushBranch)
             entry(menu)
-        entry(menu, None, isrev, _('Update...'), 'hg-update',
+        entry(menu, None, isrev, _('&Update...'), 'hg-update',
               self.updateToRevision)
         entry(menu)
-        entry(menu, None, isctx, _('Diff to parent...'), 'visualdiff',
+        entry(menu, None, isctx, _('&Diff to Parent'), 'visualdiff',
               self.visualDiffRevision)
-        entry(menu, None, isrev, _('Diff to local...'), 'ldiff',
+        entry(menu, None, isrev, _('Diff to &Local'), 'ldiff',
               self.visualDiffToLocal)
-        entry(menu, None, isctx, _('Browse at rev...'), 'hg-annotate',
+        entry(menu, None, isctx, _('Bro&wse at Revision'), 'hg-annotate',
               self.manifestRevision)
-        entry(menu, None, isrev, _('Similar revisions...'), 'view-filter',
+        entry(menu, None, isrev, _('&Similar Revisions...'), 'view-filter',
               self.matchRevision)
         entry(menu)
-        entry(menu, None, fixed, _('Merge with local...'), 'hg-merge',
+        entry(menu, None, fixed, _('&Merge with Local...'), 'hg-merge',
               self.mergeWithRevision)
         entry(menu)
-        entry(menu, None, fixed, _('Tag...'), 'hg-tag',
+        entry(menu, None, fixed, _('&Tag...'), 'hg-tag',
               self.tagToRevision)
-        entry(menu, None, fixed, _('Bookmark...'), 'hg-bookmarks',
+        entry(menu, None, fixed, _('Boo&kmark...'), 'hg-bookmarks',
               self.bookmarkRevision)
         entry(menu)
-        entry(menu, None, fixed, _('Backout...'), 'hg-revert',
+        entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
               self.backoutToRevision)
         entry(menu)
 
-        entry(menu, None, isrev, _('Copy hash'), 'copy-hash',
+        entry(menu, None, isrev, _('Copy &Hash'), 'copy-hash',
               self.copyHash)
         entry(menu)
 
-        submenu = menu.addMenu(_('Export'))
-        entry(submenu, None, isrev, _('Export patch...'), 'hg-export',
+        submenu = menu.addMenu(_('E&xport'))
+        entry(submenu, None, isrev, _('E&xport Patch...'), 'hg-export',
               self.exportRevisions)
-        entry(submenu, None, isrev, _('Email patch...'), 'mail-forward',
+        entry(submenu, None, isrev, _('&Email Patch...'), 'mail-forward',
               self.emailRevision)
-        entry(submenu, None, isrev, _('Archive...'), 'hg-archive',
+        entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
-        entry(submenu, None, isrev, _('Bundle rev and descendants...'),
+        entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
               'menurelocate', self.bundleRevisions)
-        entry(submenu, None, isctx, _('Copy patch'), 'copy-patch',
+        entry(submenu, None, isctx, _('&Copy Patch'), 'copy-patch',
               self.copyPatch)
         entry(menu)
 
-        submenu = menu.addMenu(_('Change phase to'))
+        submenu = menu.addMenu(_('Change &Phase to'))
         for pnum, pname in enumerate(phases.phasenames):
             entry(submenu, None, isrev, pname, None,
                   functools.partial(self.changePhase, pnum))
         entry(menu)
 
-        entry(menu, None, fixed, _('Graft to local...'), 'hg-transplant',
+        entry(menu, None, fixed, _('&Graft to Local...'), 'hg-transplant',
               self.graftRevisions)
 
         if 'mq' in exs or 'rebase' in exs:
-            submenu = menu.addMenu(_('Modify history'))
-            entry(submenu, 'mq', qgoto, _('Unapply patch (QGoto parent)'), 'hg-qgoto',
+            submenu = menu.addMenu(_('Modi&fy History'))
+            entry(submenu, 'mq', qgoto, _('&Unapply Patch (qgoto parent)'), 'hg-qgoto',
                   self.qgotoParentRevision)
-            entry(submenu, 'mq', fixed, _('Import to MQ'), 'qimport',
+            entry(submenu, 'mq', fixed, _('Import to &MQ'), 'qimport',
                   self.qimportRevision)
-            entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
+            entry(submenu, 'mq', applied, _('&Finish Patch'), 'qfinish',
                   self.qfinishRevision)
-            entry(submenu, 'mq', applied, _('Rename patch...'), None,
+            entry(submenu, 'mq', applied, _('Re&name Patch...'), None,
                   self.qrename)
             entry(submenu, 'mq')
-            entry(submenu, 'rebase', fixed, _('Rebase...'), 'hg-rebase',
+            entry(submenu, 'rebase', fixed, _('&Rebase...'), 'hg-rebase',
                   self.rebaseRevision)
             entry(submenu, 'rebase')
-            entry(submenu, 'mq', fixed, _('Strip...'), 'menudelete',
+            entry(submenu, 'mq', fixed, _('&Strip...'), 'menudelete',
                   self.stripRevision)
 
-        entry(menu, 'reviewboard', fixed, _('Post to Review Board...'), 'reviewboard',
+        entry(menu, 'reviewboard', fixed, _('Post to Re&view Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
-        entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
+        entry(menu, 'rupdate', fixed, _('&Remote Update...'), 'hg-update',
               self.rupdate)
 
         def _setupCustomSubmenu(menu):

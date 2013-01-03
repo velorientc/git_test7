@@ -94,7 +94,7 @@ class HgRepoView(QTableView):
 
     def createActions(self):
         menu = QMenu(self)
-        act = QAction(_('Choose Log Columns...'), self)
+        act = QAction(_('C&hoose Log Columns...'), self)
         act.triggered.connect(self.setHistoryColumns)
         menu.addAction(act)
         self.headermenu = menu

@@ -236,7 +236,7 @@ class RepoItem(RepoTreeItem):
         acts = ['open', 'clone', 'addsubrepo', None, 'explore',
                 'terminal', 'copypath', None, 'rename', 'remove']
         if self.childCount() > 0:
-            acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+            acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
         acts.extend([None, 'settings'])
         return acts
 
@@ -418,7 +418,7 @@ class SubrepoItem(RepoItem):
             acts = ['open', 'clone', 'addsubrepo', None, 'explore',
                     'terminal', 'copypath']
             if self.childCount() > 0:
-                acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+                acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
             acts.extend([None, 'settings'])
             return acts
 
@@ -467,7 +467,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
-            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
             'reloadRegistry']
 
     def flags(self):
@@ -522,7 +522,7 @@ class AllRepoGroupItem(RepoGroupItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
-            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
             'reloadRegistry']
 
     def undump(self, xr):
