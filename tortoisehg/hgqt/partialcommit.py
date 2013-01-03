@@ -57,7 +57,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
 
     files = [scmutil.canonpath(repo.root, repo.root, f) for f in pats]
 
-    ms = merge.mergestate(self)
+    ms = merge.mergestate(repo)
     for f in files:
         if f in ms and ms[f] == 'u':
             raise error.Abort(_("unresolved merge conflicts "
@@ -72,7 +72,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         # TODO: likely need to copy .hgsub/.hgsubstate code from
         # localrepo.commit() lines 1303-1355, 1396-1404
 
-        p1, p2 = self.dirstate.parents()
+        p1, p2 = repo.dirstate.parents()
         hookp1, hookp2 = hex(p1), (p2 != nullid and hex(p2) or '')
         repo.hook("precommit", throw=True, parent1=hookp1, parent2=hookp2)
 
