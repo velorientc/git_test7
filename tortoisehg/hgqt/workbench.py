@@ -142,15 +142,15 @@ class Workbench(QMainWindow):
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
-        self.edittbar = QToolBar(_("Edit Toolbar"), objectName='edittbar')
+        self.edittbar = QToolBar(_("&Edit Toolbar"), objectName='edittbar')
         self.addToolBar(self.edittbar)
-        self.docktbar = QToolBar(_("Dock Toolbar"), objectName='docktbar')
+        self.docktbar = QToolBar(_("&Dock Toolbar"), objectName='docktbar')
         self.addToolBar(self.docktbar)
-        self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
+        self.synctbar = QToolBar(_('S&ync Toolbar'), objectName='synctbar')
         self.addToolBar(self.synctbar)
-        self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
+        self.tasktbar = QToolBar(_('&Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
-        self.customtbar = QToolBar(_('Custom Toolbar'), objectName='custombar')
+        self.customtbar = QToolBar(_('&Custom Toolbar'), objectName='custombar')
         self.addToolBar(self.customtbar)
 
         # availability map of actions; applied by updateMenu()
@@ -181,14 +181,14 @@ class Workbench(QMainWindow):
         newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
-        a.setText(_('Show Repository Registry'))
+        a.setText(_('Sh&ow Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
         a.setIcon(qtlib.geticon('thg-reporegistry'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
         a = self.mqpatches.toggleViewAction()
-        a.setText(_('Show Patch Queue'))
+        a.setText(_('Show &Patch Queue'))
         a.setIcon(qtlib.geticon('thg-mq'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
@@ -201,31 +201,31 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(_('Repository Registry Options'))
+        self.menuViewregistryopts = self.menuView.addMenu(_('R&epository Registry Options'))
         self.actionShowPaths = \
-        newaction(_("Show Paths"), self.reporegistry.showPaths,
+        newaction(_("Show &Paths"), self.reporegistry.showPaths,
                   checkable=True, menu='viewregistryopts')
 
         self.actionShowSubrepos = \
-            newaction(_("Show Subrepos on Registry"),
+            newaction(_("Show &Subrepos on Registry"),
                 self.reporegistry.setShowSubrepos,
                   checkable=True, menu='viewregistryopts')
 
         self.actionShowNetworkSubrepos = \
-            newaction(_("Show Subrepos for remote repositories"),
+            newaction(_("Show Subrepos for &Remote Repositories"),
                 self.reporegistry.setShowNetworkSubrepos,
                   checkable=True, menu='viewregistryopts')
 
         self.actionShowShortPaths = \
-            newaction(_("Show Short Paths"),
+            newaction(_("Show S&hort Paths"),
                 self.reporegistry.setShowShortPaths,
                   checkable=True, menu='viewregistryopts')
 
         newseparator(menu='view')
-        newaction(_("Choose Log Columns..."), self.setHistoryColumns,
+        newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
                   menu='view')
         self.actionSaveRepos = \
-        newaction(_("Save Open Repositories On Exit"), checkable=True,
+        newaction(_("Save Open Repositories on E&xit"), checkable=True,
                   menu='view')
         newseparator(menu='view')
 
@@ -242,7 +242,7 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'mq': ('thg-qrefresh', _('MQ Patch')),
+            'mq': ('thg-qrefresh', _('M&Q Patch')),
             'pbranch': ('branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'manifest': ('hg-annotate', _('&Manifest')),
@@ -281,10 +281,10 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all revisions"), self.loadall,
+        newaction(_("Load &All Revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
-        newaction(_("&Goto revision..."), self.gotorev,
+        newaction(_("&Goto Revision..."), self.gotorev,
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
@@ -351,12 +351,12 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit', menu='View')
 
         self.filtertbaction = \
-        newaction(_('Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
+        newaction(_('&Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
                   icon='view-filter', shortcut='Ctrl+S', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
 
-        menu = QMenu(_('Workbench Toolbars'), self)
+        menu = QMenu(_('&Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
         menu.addAction(self.docktbar.toggleViewAction())
         menu.addAction(self.synctbar.toggleViewAction())
