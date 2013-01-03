@@ -408,21 +408,18 @@ class FileData(object):
             return
 
         self.olddata = olddata
-        newdate = util.datestr(ctx.date())
-        olddate = util.datestr(ctx2.date())
-        diffopts = patch.diffopts(repo.ui, {})
-        diffopts.git = changeselect
-        if isbfile:
-            olddata += '\0'
-            newdata += '\0'
-
-        diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
-        diff += mdiff.unidiff(olddata, olddate, newdata, newdate, oldname,
-                              wfile, opts=diffopts)
         if changeselect:
+            diffopts = patch.diffopts(repo.ui, {})
+            diffopts.git = True
+            m = match.exact(repo.root, repo.root, [wfile])
+            fp = cStringIO.StringIO()
+            for c in patch.diff(repo, ctx.node(), None, match=m, opts=diffopts):
+                fp.write(c)
+            fp.seek(0)
+
             # feed diffs through record.parsepatch() for more fine grained
             # chunk selection
-            self.changes = record.parsepatch(cStringIO.StringIO(diff))[0]
+            self.changes = record.parsepatch(fp)[0]
             self.changes.excludecount = 0
             values = []
             lines = 0
@@ -436,4 +433,13 @@ class FileData(object):
                 lines += len(val.splitlines())
             self.diff = ''.join(values)
         else:
-            self.diff = diff
+            diffopts = patch.diffopts(repo.ui, {})
+            diffopts.git = False
+            newdate = util.datestr(ctx.date())
+            olddate = util.datestr(ctx2.date())
+            if isbfile:
+                olddata += '\0'
+                newdata += '\0'
+            self.diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
+            self.diff += mdiff.unidiff(olddata, olddate, newdata, newdate,
+                                       oldname, wfile, opts=diffopts)
