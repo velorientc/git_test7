@@ -507,6 +507,7 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self._ctx = None
         self._lastfile = None
+        self._status = None
 
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0,0,0,0)
@@ -550,6 +551,7 @@ class DiffBrowser(QFrame):
         self.layout().addSpacing(2)
         w.hide()
 
+        self._forceviewindicator = None
         self.sci = qscilib.Scintilla(self)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
@@ -663,7 +665,23 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self.updateSummary()
 
-    def displayFile(self, filename, status):
+    def _setupForceViewIndicator(self):
+        if not self._forceviewindicator:
+            self._forceviewindicator = self.sci.indicatorDefine(self.sci.PlainIndicator)
+            self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
+            self.sci.setIndicatorForegroundColor(
+                QColor('blue'), self._forceviewindicator)
+            self.sci.indicatorClicked.connect(self.forceDisplayFile)
+
+    def forceDisplayFile(self):
+        if self.curchunks:
+            return
+        self.sci.setText(_('Please wait while the file is opened ...'))
+        QTimer.singleShot(10,
+            lambda: self.displayFile(self._lastfile, self._status, force=True))
+
+    def displayFile(self, filename, status, force=False):
+        self._status = status
         self.clearDisplay()
         if filename == self._lastfile:
             reenable = [(c.fromline, len(c.before)) for c in self.curchunks[1:]\
@@ -673,7 +691,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = filedata.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status, force=force)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -684,6 +702,13 @@ class DiffBrowser(QFrame):
 
         if not fd.isValid() or not fd.diff:
             self.sci.setText(fd.error or '')
+            forcedisplaymsg = filedata.forcedisplaymsg
+            linkstart = fd.error.find(forcedisplaymsg)
+            if linkstart >= 0:
+                # add the link to force to view the data anyway
+                self._setupForceViewIndicator()
+                self.sci.fillIndicatorRange(
+                    0, linkstart, 0, linkstart+len(forcedisplaymsg), self._forceviewindicator)
             return
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]

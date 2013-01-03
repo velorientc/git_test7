@@ -93,6 +93,7 @@ class HgFileView(QFrame):
 
         self.blk = blockmatcher.BlockList(self)
         self.sci = AnnotateView(repo, self)
+        self._forceviewindicator = None
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
 
@@ -419,7 +420,23 @@ class HgFileView(QFrame):
         if self.updateChunk(chunk, not chunk.excluded):
             self.chunkSelectionChanged.emit()
 
-    def displayFile(self, filename=None, status=None):
+    def _setupForceViewIndicator(self):
+        if not self._forceviewindicator:
+            self._forceviewindicator = self.sci.indicatorDefine(self.sci.PlainIndicator)
+            self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
+            self.sci.setIndicatorForegroundColor(
+                QColor('blue'), self._forceviewindicator)
+            self.sci.indicatorClicked.connect(self.forceDisplayFile)
+
+    def forceDisplayFile(self):
+        if self.changes is not None:
+            return
+        self.sci.setText(_('Please wait while the file is opened ...'))
+        # Wait a little to ensure that the "wait message" is displayed
+        QTimer.singleShot(10,
+            lambda: self.displayFile(self._filename, self._status, force=True))
+
+    def displayFile(self, filename=None, status=None, force=False):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
             status = hglib.fromunicode(status)
@@ -444,7 +461,7 @@ class HgFileView(QFrame):
             ctx2 = self._ctx.p1()
         else:
             ctx2 = self._ctx.p2()
-        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.changeselection)
+        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.changeselection, force=force)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -463,6 +480,14 @@ class HgFileView(QFrame):
             self.blk.setVisible(False)
             self.restrictModes(False, False, False)
             self.newChunkList.emit(uf, None)
+
+            forcedisplaymsg = filedata.forcedisplaymsg
+            linkstart = fd.error.find(forcedisplaymsg)
+            if linkstart >= 0:
+                # add the link to force to view the data anyway
+                self._setupForceViewIndicator()
+                self.sci.fillIndicatorRange(
+                    0, linkstart, 0, linkstart+len(forcedisplaymsg), self._forceviewindicator)
             return
 
         candiff = bool(fd.diff)
