@@ -37,7 +37,7 @@ class WctxActions(QObject):
             parent.addAction(action)
             allactions.append(action)
 
-        make(_('&Diff to parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
+        make(_('&Diff to Parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
         make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')

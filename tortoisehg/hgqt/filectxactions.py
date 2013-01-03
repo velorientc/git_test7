@@ -60,7 +60,7 @@ class FilectxActions(QObject):
              _('Show the history of the selected file'), self.filterfile),
             ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
              _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Diff to parent'), 'visualdiff', 'Ctrl+D',
+            ('diff', _('&Diff to Parent'), 'visualdiff', 'Ctrl+D',
              _('View file changes in external diff tool'), self.vdiff),
             ('ldiff', _('Diff to local'), 'ldiff', 'Shift+Ctrl+D',
              _('View changes to current in external diff tool'),

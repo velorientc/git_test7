@@ -1224,7 +1224,7 @@ class RepoWidget(QWidget):
         entry(menu, None, isrev, _('Update...'), 'hg-update',
               self.updateToRevision)
         entry(menu)
-        entry(menu, None, isctx, _('Diff to parent...'), 'visualdiff',
+        entry(menu, None, isctx, _('&Diff to Parent'), 'visualdiff',
               self.visualDiffRevision)
         entry(menu, None, isrev, _('Diff to local...'), 'ldiff',
               self.visualDiffToLocal)

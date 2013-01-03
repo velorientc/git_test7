@@ -750,7 +750,7 @@ class FileDiffDialog(_AbstractFileDialog):
             return
         if self.menu is None:
             self.menu = menu = QMenu(self)
-            a = menu.addAction(_('Diff to parent...'))
+            a = menu.addAction(_('&Diff to Parent'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
             a = menu.addAction(_('Diff to local...'))
