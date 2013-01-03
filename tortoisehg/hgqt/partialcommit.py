@@ -19,27 +19,21 @@ from mercurial import error, bookmarks, merge
 
 def makememctx(repo, parents, text, user, date, extra, files, store):
     def getfilectx(repo, memctx, path):
-        try:
-            # try patched file contents first
+        if path in memctx.files():
+            # use patched file contents
             data, (islink, isexec), copied = store.getfile(path)
-        except IOError:
-            # fall back to working folder contents
+        else:
+            # fall back to workingctx
             wctx = repo[None]
-            try:
-                fctx = wctx[path]
-            except error.LookupError:
+            if path not in wctx:
                 raise IOError
+            fctx = wctx[path]
             data = fctx.data()
             islink = 'l' in fctx.flags()
             isexec = 'x' in fctx.flags()
-            rp = fctx.renamed()
-            if rp is not None:
-                copied = rp[0]
-            else:
-                copied = None
+            copied = repo.dirstate.copied(path)
+        return context.memfilectx(path, data, islink, isexec, copied)
 
-        return context.memfilectx(path, data, islink=islink, isexec=isexec,
-                                  copied=copied)
     return context.memctx(repo, parents, text, files, getfilectx, user,
                           date, extra)
 
