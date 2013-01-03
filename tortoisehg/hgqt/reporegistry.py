@@ -306,11 +306,11 @@ class RepoRegistryView(QDockWidget):
 
     def _setupSettingActions(self):
         settingtable = [
-            ('showPaths', _('Show Paths'), self._updateColumnVisibility),
-            ('showSubrepos', _('Show Subrepos on Registry'), self.reloadModel),
-            ('showNetworkSubrepos', _('Show Subrepos for remote repositories'),
+            ('showPaths', _('Show &Paths'), self._updateColumnVisibility),
+            ('showSubrepos', _('Show &Subrepos on Registry'), self.reloadModel),
+            ('showNetworkSubrepos', _('Show Subrepos for &Remote Repositories'),
              self.reloadModel),
-            ('showShortPaths', _('Show Short Paths'), self._updateCommonPath),
+            ('showShortPaths', _('Show S&hort Paths'), self._updateCommonPath),
             ]
         self._settingactions = {}
         for i, (key, text, slot) in enumerate(settingtable):
