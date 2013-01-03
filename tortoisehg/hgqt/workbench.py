@@ -321,16 +321,16 @@ class Workbench(QMainWindow):
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
 
-        newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
-        newaction(_("Explorer Help"), self.onHelpExplorer, menu='help')
+        newaction(_("&Help"), self.onHelp, menu='help', icon='help-browser')
+        newaction(_("E&xplorer Help"), self.onHelpExplorer, menu='help')
         visiblereadme = 'repoopen'
         if  self.ui.config('tortoisehg', 'readme', None):
             visiblereadme = True
-        newaction(_("README"), self.onReadme, menu='help', icon='help-readme',
+        newaction(_("&Readme"), self.onReadme, menu='help', icon='help-readme',
                   visible=visiblereadme, shortcut='Ctrl+F1')
         newseparator(menu='help')
-        newaction(_("About Qt"), QApplication.aboutQt, menu='help')
-        newaction(_("About TortoiseHg"), self.onAbout, menu='help',
+        newaction(_("About &Qt"), QApplication.aboutQt, menu='help')
+        newaction(_("&About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
 
         newseparator(toolbar='edit')
