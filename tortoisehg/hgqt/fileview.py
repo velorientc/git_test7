@@ -36,6 +36,8 @@ class HgFileView(QFrame):
     showMessage = pyqtSignal(QString)
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
+    newChunkList = pyqtSignal(QString, object)
+    chunkSelectionChanged = pyqtSignal()
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -51,6 +53,9 @@ class HgFileView(QFrame):
 
         self.repo = repo
         self._diffs = []
+        self.changes = None
+        self.folddiffs = False
+        self.chunkatline = {}
 
         self.topLayout = QVBoxLayout()
 
@@ -94,6 +99,7 @@ class HgFileView(QFrame):
         self.sci.setAnnotationEnabled(False)
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
         self.sci.customContextMenuRequested.connect(self.menuRequest)
+        self.sci.SCN_MARGINCLICK.connect(self.marginClicked)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -225,6 +231,47 @@ class HgFileView(QFrame):
         self.repo = repo
         self.sci.repo = repo
 
+    def enableDiffFolding(self, enable):
+        'Enable the use of a folding margin when a diff view is active'
+        # Should only be called with True from the commit tool when it is in
+        # a 'commit' mode and False for other uses
+        if not enable and self.folddiffs:
+            self.sci.clearFolds()
+        self.folddiffs = enable
+        self._showFoldMargin(enable)
+
+    def updateChunk(self, chunk, exclude):
+        'change chunk exclusion state, update display when necessary'
+        # returns True if the chunk state was changed
+        if exclude:
+            if self.changes.excludecount == 0:
+                # TODO: create a decent QsciStyle for these annotations
+                self.sci.annotate(chunk.lineno,
+                                _('folded changes are excluded from commit'), 4)
+            if chunk.excluded:
+                return False
+            chunk.excluded = True
+            self.changes.excludecount += 1
+            return True
+        else:
+            self.sci.clearAnnotations(chunk.lineno)
+            if not chunk.excluded:
+                return False
+            chunk.excluded = False
+            self.changes.excludecount -= 1
+            return True
+
+    def updateFolds(self):
+        'should be called after chunk states are modified programatically'
+        self.sci.clearFolds()
+        if self.changes is None:
+            return
+        folds = []
+        for chunk in self.changes.hunks:
+            if chunk.excluded:
+                folds.append(chunk.lineno)
+        self.sci.setContractedFolds(folds)
+
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
@@ -310,7 +357,26 @@ class HgFileView(QFrame):
         self.actionPrevDiff.setEnabled(False)
 
         self.maxWidth = 0
+        self.changes = None
+        self.chunkatline = {}
+        self._showFoldMargin(False)
         self.sci.showHScrollBar(False)
+
+    def _showFoldMargin(self, show):
+        'toggle the display of the diff folding margin'
+        self.sci.setFolding(show and qsci.BoxedTreeFoldStyle or qsci.NoFoldStyle, 3)
+        self.sci.setMarginSensitivity(3, show)
+
+    @pyqtSlot(int, int, int)
+    def marginClicked(self, pos, modifiers, margin):
+        'raw margin clicked event, received before folding has responded'
+        line, index = self.sci.lineIndexFromPosition(pos)
+        if line not in self.chunkatline:
+            return
+        assert margin == 3 and index == 0
+        chunk = self.chunkatline[line]
+        if self.updateChunk(chunk, not chunk.excluded):
+            self.chunkSelectionChanged.emit()
 
     def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):
@@ -337,7 +403,7 @@ class HgFileView(QFrame):
             ctx2 = self._ctx.p1()
         else:
             ctx2 = self._ctx.p2()
-        fd = filedata.FileData(self._ctx, ctx2, filename, status)
+        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.folddiffs)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -346,6 +412,8 @@ class HgFileView(QFrame):
             self.extralabel.hide()
         self.filenamelabel.setText(fd.flabel)
 
+        uf = hglib.tounicode(filename)
+
         if not fd.isValid():
             self.sci.setText(fd.error)
             self.sci.setLexer(None)
@@ -353,6 +421,7 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, 0)
             self.blk.setVisible(False)
             self.restrictModes(False, False, False)
+            self.newChunkList.emit(uf, None)
             return
 
         candiff = bool(fd.diff)
@@ -377,17 +446,26 @@ class HgFileView(QFrame):
                 self.blk.setVisible(self._mode != DiffMode)
                 self.sci.setAnnotationEnabled(self._mode == AnnMode)
 
+        if fd.changes is None:
+            self.newChunkList.emit(uf, None)
+
         if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
-            # trim first three lines, for example:
-            # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
-            # --- a/tortoisehg/hgqt/thgrepo.py
-            # +++ b/tortoisehg/hgqt/thgrepo.py
-            if fd.diff:
+            if fd.changes:
+                self._showFoldMargin(True)
+                self.changes = fd.changes
+                for chunk in self.changes.hunks:
+                    self.chunkatline[chunk.lineno] = chunk
+                self.sci.setText(hglib.tounicode(fd.diff))
+            elif fd.diff:
+                # trim first three lines, for example:
+                # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
+                # --- a/tortoisehg/hgqt/mq.py
+                # +++ b/tortoisehg/hgqt/mq.py
                 out = fd.diff.split('\n', 3)
                 if len(out) == 4:
                     self.sci.setText(hglib.tounicode(out[3]))
@@ -423,9 +501,9 @@ class HgFileView(QFrame):
         self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
-        uf = hglib.tounicode(filename)
         uc = hglib.tounicode(fd.contents) or ''
         self.fileDisplayed.emit(uf, uc)
+        self.newChunkList.emit(uf, fd.changes)
 
         if self._mode != DiffMode:
             self.blk.setVisible(True)

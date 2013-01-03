@@ -221,7 +221,7 @@ class CloneDialog(QDialog):
         rev = opts.get('rev')
         if rev:
             self.rev_chk.setChecked(True)
-            self.rev_text.setText(hglib.tounicode(', '.join(rev)))
+            self.rev_text.setText(hglib.tounicode(rev))
         self.noupdate_chk.setChecked(bool(opts.get('noupdate')))
         self.pproto_chk.setChecked(bool(opts.get('pull')))
         self.uncomp_chk.setChecked(bool(opts.get('uncompressed')))

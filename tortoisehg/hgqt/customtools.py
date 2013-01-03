@@ -16,8 +16,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import ui
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
@@ -378,13 +376,14 @@ class ToolListBox(QListWidget):
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
 
-    _enablemappings = {'All items': 'istrue',
-                        'Working Directory': 'iswd',
-                        'All revisions': 'isrev',
-                        'All contexts': 'isctx',
-                        'Fixed revisions': 'fixed',
-                        'Applied patches': 'applied',
-                        'qgoto': 'qgoto'}
+    _enablemappings = [(_('All items'), 'istrue'),
+                       (_('Working directory'), 'iswd'),
+                       (_('All revisions'), 'isrev'),
+                       (_('All contexts'), 'isctx'),
+                       (_('Fixed revisions'), 'fixed'),
+                       (_('Applied patches'), 'applied'),
+                       (_('Applied patches or qparent'), 'qgoto'),
+                       ]
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         QDialog.__init__(self, parent)
@@ -433,8 +432,8 @@ class CustomToolConfigDialog(QDialog):
             'You can also set this value to the absolute path to\n'
             'any icon on your file system.'))
 
-        combo = self._genCombo(self._enablemappings.keys(),
-            self._enable2label(enable), 'All items')
+        combo = self._genCombo([l for l, _v in self._enablemappings],
+                               self._enable2label(enable))
         self.enable = self._addConfigItem(vbox, _('On repowidget, show for'),
             combo,  _('For which kinds of revisions the tool will be enabled\n'
             'It is only taken into account when the tool is shown on the\n'
@@ -464,22 +463,18 @@ class CustomToolConfigDialog(QDialog):
             'command': str(self.command.text()),
             'tooltip': str(self.tooltip.text()),
             'icon': str(self.icon.text()),
-            'enable': self._enablemappings[str(self.enable.currentText())],
+            'enable': self._enablemappings[self.enable.currentIndex()][1],
             'showoutput': str(self.showoutput.currentText()),
         }
         return toolname, toolconfig
 
-    def _genCombo(self, items, selecteditem=None, defaultitem=None):
+    def _genCombo(self, items, selecteditem=None):
         index = 0
         if selecteditem:
             try:
                 index = items.index(selecteditem)
-            except:
-                if defaultitem:
-                    try:
-                        index = items.index(defaultitem)
-                    except:
-                        pass
+            except ValueError:
+                pass
         combo = QComboBox()
         combo.addItems(items)
         if index:
@@ -495,14 +490,8 @@ class CustomToolConfigDialog(QDialog):
         parent.addLayout(hbox)
         return configwidget
 
-    def _enable2label(self, label):
-        return self._dictvalue2key(self._enablemappings, label)
-
-    def _dictvalue2key(self, dictionary, value):
-        for key in dictionary:
-            if value == dictionary[key]:
-                return key
-        return None
+    def _enable2label(self, value):
+        return dict((v, l) for l, v in self._enablemappings).get(value)
 
     def okClicked(self):
         errormsg = self.validateForm()

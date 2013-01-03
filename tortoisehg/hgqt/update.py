@@ -50,12 +50,14 @@ class UpdateDialog(QDialog):
         # updating subrepositories.
         combo.setMinimumWidth(450)
 
-        if rev is None:
-            rev = self.repo.dirstate.branch()
-        else:
-            rev = str(rev)
-        combo.addItem(hglib.tounicode(rev))
-        combo.setCurrentIndex(0)
+        # always include integer revision
+        try:
+            assert not isinstance(rev, (unicode, QString))
+            ctx = self.repo[rev]
+            if isinstance(ctx.rev(), int):  # could be None or patch name
+                combo.addItem(str(ctx.rev()))
+        except error.RepoLookupError:
+            pass
 
         for name in repo.namedbranches:
             combo.addItem(hglib.tounicode(name))
@@ -64,6 +66,16 @@ class UpdateDialog(QDialog):
         tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
+
+        if rev is None:
+            selecturev = hglib.tounicode(self.repo.dirstate.branch())
+        else:
+            selecturev = hglib.tounicode(str(rev))
+        selectindex = combo.findText(selecturev)
+        if selectindex >= 0:
+            combo.setCurrentIndex(selectindex)
+        else:
+            combo.setEditText(selecturev)
 
         ### target revision info
         items = ('%(rev)s', ' %(branch)s', ' %(tags)s', '<br />%(summary)s')
