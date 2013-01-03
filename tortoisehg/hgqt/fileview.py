@@ -631,8 +631,8 @@ class HgFileView(QFrame):
         if self._mode != AnnMode:
             if selection:
                 menu.addSeparator()
-                for name, func in [(_('Search in current file'), sann),
-                        (_('Search in history'), sreq(all=True))]:
+                for name, func in [(_('&Search in Current File'), sann),
+                        (_('Search in &History'), sreq(all=True))]:
                     def add(name, func):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
@@ -640,7 +640,7 @@ class HgFileView(QFrame):
             return menu.exec_(point)
 
         menu.addSeparator()
-        annoptsmenu = QMenu(_('Annotate Options'), self)
+        annoptsmenu = QMenu(_('Annotate Op&tions'), self)
         annoptsmenu.addActions(self.sci.annotateOptionActions())
         menu.addMenu(annoptsmenu)
 
@@ -657,12 +657,12 @@ class HgFileView(QFrame):
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            for name, func in [(_('Search in original revision'),
+            for name, func in [(_('Search in &Original Revision'),
                                 sreq(rev=fctx.rev())),
-                               (_('Search in working revision'),
+                               (_('Search in &Working Revision'),
                                 sreq(rev='.')),
-                               (_('Search in current annotation'), sann),
-                               (_('Search in history'), sreq(all=True))]:
+                               (_('&Search in Current Annotation'), sann),
+                               (_('Search in &History'), sreq(all=True))]:
                 def add(name, func):
                     action = menu.addAction(name)
                     action.triggered.connect(func)
@@ -681,8 +681,8 @@ class HgFileView(QFrame):
         def editorig():
             self.editSelected(*data)
         menu.addSeparator()
-        for name, func in [(_('Annotate originating revision'), annorig),
-                           (_('View originating revision'), editorig)]:
+        for name, func in [(_('A&nnotate Originating Revision'), annorig),
+                           (_('&View Originating Revision'), editorig)]:
             def add(name, func):
                 action = menu.addAction(name)
                 action.triggered.connect(func)
@@ -694,9 +694,9 @@ class HgFileView(QFrame):
                 setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
-            for name, func in [(_('Annotate parent revision %d') % pdata[1],
+            for name, func in [(_('Annotate &Parent Revision %d') % pdata[1],
                                   annparent),
-                               (_('View parent revision %d') % pdata[1],
+                               (_('View Parent &Revision %d') % pdata[1],
                                   editparent)]:
                 def add(name, func):
                     action = menu.addAction(name)
@@ -762,9 +762,9 @@ class AnnotateView(qscilib.Scintilla):
 
     def _initAnnotateOptionActions(self):
         self._annoptactions = []
-        for name, field in [(_('Show Author'), 'author'),
-                            (_('Show Date'), 'date'),
-                            (_('Show Revision'), 'rev')]:
+        for name, field in [(_('Show &Author'), 'author'),
+                            (_('Show &Date'), 'date'),
+                            (_('Show &Revision'), 'rev')]:
             a = QAction(name, self, checkable=True)
             a.setData(field)
             a.triggered.connect(self._updateAnnotateOption)
