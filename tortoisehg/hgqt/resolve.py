@@ -178,7 +178,7 @@ class ResolveDialog(QDialog):
         cmedit.triggered.connect(self.edit)
         cmv3way = self.rtreecmenu.addAction(_('3-Way Diff'))
         cmv3way.triggered.connect(self.v3way)
-        cmvp0 = self.rtreecmenu.addAction(_('Diff to Local'))
+        cmvp0 = self.rtreecmenu.addAction(_('Diff to &Local'))
         cmvp0.triggered.connect(self.vp0)
         cmvp1 = self.rtreecmenu.addAction(_('Diff to Other'))
         cmvp1.triggered.connect(self.vp1)

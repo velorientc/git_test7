@@ -62,7 +62,7 @@ class FilectxActions(QObject):
              _('Compare revisions of the selected file'), self.diffNavigate),
             ('diff', _('&Diff to Parent'), 'visualdiff', 'Ctrl+D',
              _('View file changes in external diff tool'), self.vdiff),
-            ('ldiff', _('Diff to local'), 'ldiff', 'Shift+Ctrl+D',
+            ('ldiff', _('Diff to &Local'), 'ldiff', 'Shift+Ctrl+D',
              _('View changes to current in external diff tool'),
              self.vdifflocal),
             ('edit', _('View at Revision'), 'view-at-revision', 'Shift+Ctrl+E',

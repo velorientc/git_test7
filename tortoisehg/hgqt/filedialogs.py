@@ -753,7 +753,7 @@ class FileDiffDialog(_AbstractFileDialog):
             a = menu.addAction(_('&Diff to Parent'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
-            a = menu.addAction(_('Diff to local...'))
+            a = menu.addAction(_('Diff to &Local'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
