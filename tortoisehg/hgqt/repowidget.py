@@ -9,6 +9,7 @@
 import binascii
 import os
 import shlex, subprocess, functools # used by runCustomCommand
+import urllib
 from mercurial import revset, error, patch, phases
 
 from tortoisehg.util import hglib, shlib, paths
@@ -340,6 +341,14 @@ class RepoWidget(QWidget):
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
         labelslist = unicode(label).split()
         if 'ui.error' in labelslist:
+            # Check if a subrepo is set in the label list
+            subrepo = None
+            subrepolabel = 'subrepo='
+            for label in labelslist:
+                if label.startswith(subrepolabel):
+                    # The subrepo "label" is encoded
+                    subrepo = urllib.unquote(label[len(subrepolabel):])
+                    break
             # Limit the text shown on the info bar to maxlines lines of up to maxwidth chars
             msglines = unicode(msg).strip().splitlines()
             infolines = []
@@ -349,7 +358,8 @@ class RepoWidget(QWidget):
                 infolines.append(line)
             if len(msglines) > maxlines and not infolines[-1].endswith('...'):
                 infolines[-1] += ' ...'
-            self.setInfoBar(qtlib.CommandErrorInfoBar, '\n'.join(infolines))
+            infomsg = qtlib.linkifyMessage('\n'.join(infolines), subrepo=subrepo)
+            self.setInfoBar(qtlib.CommandErrorInfoBar, infomsg)
 
     @pyqtSlot(unicode)
     def _showMessageOnInfoBar(self, msg):

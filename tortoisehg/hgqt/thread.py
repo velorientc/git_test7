@@ -9,19 +9,26 @@
 import os
 import Queue
 import time
-import urllib2
+import urllib2, urllib
 import socket
 import errno
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util, error
+from mercurial import util, error, subrepo
 from mercurial import ui as uimod
 
 from tortoisehg.util import thread2, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
 from tortoisehg.hgqt import qtlib
+
+try:
+    _SubrepoAbort = subrepo.SubrepoAbort
+except AttributeError:
+    # hg <= 2.4
+    class _SubrepoAbort(Exception):
+        pass
 
 local = localgettext()
 
@@ -268,6 +275,14 @@ class CmdThread(QThread):
                 ui.setconfig('defaults', k, '')
             self.ret = 255
             self.ret = hglib.dispatch(ui, self.cmdline) or 0
+        except _SubrepoAbort, e:
+            errormsg = str(e)
+            label = 'ui.error'
+            if e.subrepo:
+                label += ' subrepo=%s' % urllib.quote(e.subrepo)
+            ui.write_err(local._('abort: ') + errormsg + '\n', label=label)
+            if e.hint:
+                ui.write_err(local._('hint: ') + str(e.hint) + '\n', label=label)
         except util.Abort, e:
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:

@@ -859,8 +859,7 @@ class LabeledSeparator(QWidget):
 # Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
 # Currently converting subrepo paths into links only works in English
-_subrepoindicator = '(in subrepo %s)'
-_subreporegex = re.compile(r'\(in subrepo (\S+)\)')
+_subrepoindicatorpattern = '(in subrepo %s)\n'
 
 def _linkifyHash(message, subrepo=''):
     if subrepo:
@@ -873,11 +872,12 @@ def _linkifySubrepoRef(message, subrepo, hash=''):
     if hash:
         hash = '?' + hash
     subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-    linkifiedsubrepoindicator = _subrepoindicator % subrepolink
-    message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+    subrepoindicator = _subrepoindicatorpattern % subrepo
+    linkifiedsubrepoindicator = _subrepoindicatorpattern % subrepolink
+    message = message.replace(subrepoindicator, linkifiedsubrepoindicator)
     return message
 
-def linkifyMessage(message):
+def linkifyMessage(message, subrepo=None):
     r"""Convert revision id hashes and subrepo paths in messages into links
 
     >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
@@ -890,10 +890,6 @@ def linkifyMessage(message):
     (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
     """
     message = unicode(message)
-    subrepo = ''
-    m = _subreporegex.search(message)
-    if m:
-        subrepo = m.group(1)
     message = _linkifyHash(message, subrepo)
     if subrepo:
         hash = ''
@@ -963,7 +959,7 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
@@ -977,7 +973,7 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
@@ -999,7 +995,7 @@ class ConfirmInfoBar(InfoBar):
 
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
