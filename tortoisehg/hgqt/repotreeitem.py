@@ -373,9 +373,8 @@ class SubrepoItem(RepoItem):
           'svn': 'thg-svn-subrepo',
     }
 
-    def __init__(self, repo=None, parent=None, parentrepo=None, subtype='hg'):
+    def __init__(self, repo=None, parent=None, subtype='hg'):
         RepoItem.__init__(self, repo, parent)
-        self._parentrepo = parentrepo
         self._repotype = subtype
         if self._repotype != 'hg':
             # Make sure that we cannot drag non hg subrepos
