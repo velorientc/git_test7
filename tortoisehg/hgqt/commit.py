@@ -394,7 +394,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
-                allowfolding = len(self.repo.parents()) == 1
+                haslf = 'largefiles' in self.repo.extensions()
+                allowfolding = len(self.repo.parents()) == 1 and not haslf
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
