@@ -288,36 +288,36 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Start Web Server"), self.serve, enabled='repoopen',
+        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
-        newaction(_("Shelve..."), self._repofwd('shelve'), icon='shelve',
+        newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
-        newaction(_("Import..."), self._repofwd('thgimport'), icon='hg-import',
+        newaction(_("&Import..."), self._repofwd('thgimport'), icon='hg-import',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
+        newaction(_("&Verify"), self._repofwd('verify'), enabled='repoopen',
                   menu='repository')
-        newaction(_("Recover"), self._repofwd('recover'),
+        newaction(_("Re&cover"), self._repofwd('recover'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Resolve..."), self._repofwd('resolve'), icon='hg-merge',
+        newaction(_("&Resolve..."), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Rollback/Undo..."), self._repofwd('rollback'),
+        newaction(_("Rollback/&Undo..."), self._repofwd('rollback'),
                   shortcut='Ctrl+u',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Purge..."), self._repofwd('purge'), enabled='repoopen',
+        newaction(_("&Purge..."), self._repofwd('purge'), enabled='repoopen',
                   icon='hg-purge', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Bisect..."), self._repofwd('bisect'),
+        newaction(_("&Bisect..."), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+X',
+        newaction(_("E&xplore"), self.explore, shortcut='Shift+Ctrl+X',
                   icon='system-file-manager', enabled='repoopen',
                   menu='repository')
-        newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
+        newaction(_("&Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
 
