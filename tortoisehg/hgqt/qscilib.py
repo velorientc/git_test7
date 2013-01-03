@@ -254,7 +254,7 @@ class Scintilla(QsciScintilla):
                     a = tabindentsmenu.addAction(n)
                     a.setCheckable(True)
                     a.setChecked(self.indentationsUseTabs() == m or \
-                        (self.autoUseTabs and n == 'Auto'))
+                        (self.autoUseTabs and m == -1))
                     a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
                 mkaction(name, mode)
             acmenu = QMenu(_('Auto-Complete'), self)
