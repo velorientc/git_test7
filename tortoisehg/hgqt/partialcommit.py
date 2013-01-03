@@ -20,7 +20,7 @@ from mercurial import merge as mergemod
 
 def makememctx(repo, parents, text, user, date, extra, files, store):
     def getfilectx(repo, memctx, path):
-        if path in memctx.files():
+        if path in store.data or path in store.files:
             # use patched file contents
             data, (islink, isexec), copied = store.getfile(path)
         else:
