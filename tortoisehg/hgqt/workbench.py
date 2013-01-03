@@ -81,13 +81,13 @@ class Workbench(QMainWindow):
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
         if sys.platform == 'darwin':
             self.dockMenu = QMenu(self)
-            self.dockMenu.addAction(_('New Workbench...'),
+            self.dockMenu.addAction(_('New &Workbench'),
                                     self.newWorkbench)
-            self.dockMenu.addAction(_('New Repository...'),
+            self.dockMenu.addAction(_('&New Repository...'),
                                     self.newRepository)
-            self.dockMenu.addAction(_('Clone Repository...'),
+            self.dockMenu.addAction(_('Clon&e Repository...'),
                                     self.cloneRepository)
-            self.dockMenu.addAction(_('Open Repository...'),
+            self.dockMenu.addAction(_('&Open Repository...'),
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
 
@@ -161,12 +161,12 @@ class Workbench(QMainWindow):
         newaction = self._addNewAction
         newseparator = self._addNewSeparator
 
-        newaction(_("New &Workbench..."), self.newWorkbench,
+        newaction(_("New &Workbench"), self.newWorkbench,
                   shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
-        newaction(_("Clone Repository..."), self.cloneRepository,
+        newaction(_("Clon&e Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
         newseparator(menu='file')
@@ -175,7 +175,7 @@ class Workbench(QMainWindow):
         newaction(_("&Close Repository"), self.closeRepository,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
-        newaction(_('&Settings...'), self.editSettings, icon='settings_user',
+        newaction(_('&Settings'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
         newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
