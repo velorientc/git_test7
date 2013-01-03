@@ -271,6 +271,9 @@ class StatusWidget(QWidget):
         if self.refthread.wctx is not None:
             self.updateModel(self.refthread.wctx, self.refthread.patchecked)
         self.refthread = None
+        match = self.le.text()
+        if match:
+            self.setFilter(match)
 
     def canExit(self):
         return not self.refthread
