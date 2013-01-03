@@ -563,10 +563,10 @@ class MatchTree(QTableView):
         self.actions = {}
         self.contextmenu = QMenu(self)
         for key, name, func, shortcut in (
-            ('edit',  _('View file'),      self.onViewFile,      'CTRL+E'),
-            ('ctx',   _('View Changeset'), self.onViewChangeset, 'CTRL+V'),
-            ('vdiff', _('&Diff to Parent'), self.onVisualDiff,   'CTRL+D'),
-            ('ann',   _('Annotate file'),  self.onAnnotateFile,  'CTRL+F')):
+            ('edit',  _('Vi&ew File'),      self.onViewFile,      'CTRL+E'),
+            ('ctx',   _('&View Changeset'), self.onViewChangeset, 'CTRL+V'),
+            ('vdiff', _('&Diff to Parent'), self.onVisualDiff,    'CTRL+D'),
+            ('ann',   _('Annotate &File'),  self.onAnnotateFile,  'CTRL+F')):
             action = QAction(name, self)
             action.triggered.connect(func)
             action.setShortcut(QKeySequence(shortcut))
