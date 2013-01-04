@@ -68,8 +68,8 @@ class WctxActions(QObject):
         make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
         make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
         allactions.append(None)
-        make(_('&Mark unresolved'), unmark, frozenset('r'))
-        make(_('&Mark resolved'), mark, frozenset('u'))
+        make(_('&Mark Unresolved'), unmark, frozenset('r'))
+        make(_('&Mark Resolved'), mark, frozenset('u'))
         if checkable:
             # no &-shortcut because check/uncheck can be done by space key
             allactions.append(None)
