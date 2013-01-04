@@ -767,7 +767,7 @@ class FileDiffDialog(_AbstractFileDialog):
             a = menu.addAction(_('&View at Revision'))
             a.setIcon(qtlib.getmenuicon('view-at-revision'))
             a.triggered.connect(self.onViewFileAtRevision)
-            a = menu.addAction(_('&Save at Revision'))
+            a = menu.addAction(_('&Save at Revision...'))
             a.triggered.connect(self.onSaveFileAtRevision)
             a = menu.addAction(_('&Edit Local'))
             a.setIcon(qtlib.getmenuicon('edit-file'))
