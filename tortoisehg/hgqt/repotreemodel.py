@@ -104,6 +104,8 @@ class RepoTreeModel(QAbstractItemModel):
 
         if not root:
             root = RepoTreeItem(self)
+        # due to issue #1075, 'all' may be missing even if 'root' exists
+        if not all:
             all = AllRepoGroupItem(self)
             root.appendChild(all)
 
