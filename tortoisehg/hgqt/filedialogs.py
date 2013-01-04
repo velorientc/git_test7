@@ -19,7 +19,6 @@ Qt4 dialogs to display hg revisions of a file
 
 import os
 import difflib
-import functools
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -439,7 +438,9 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
 
-    def fileViewMenuRequest(self, sci, point):
+    #@pyqtSlot(QPoint)
+    def fileViewMenuRequest(self, point):
+        sci = self.sender()
         menu = sci.createStandardContextMenu()
         point = sci.viewport().mapToGlobal(point)
         menu.exec_(point)
@@ -469,8 +470,7 @@ class FileDiffDialog(_AbstractFileDialog):
             sci.verticalScrollBar().installEventFilter(self)
 
             sci.setContextMenuPolicy(Qt.CustomContextMenu)
-            sci.customContextMenuRequested.connect(
-                functools.partial(self.fileViewMenuRequest, sci))
+            sci.customContextMenuRequested.connect(self.fileViewMenuRequest)
 
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)

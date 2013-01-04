@@ -343,7 +343,6 @@ class RepoTreeModel(QAbstractItemModel):
     def loadSubrepos(self, root, filterFunc=(lambda r: True)):
         repoList = getRepoItemList(root)
         for n, c in enumerate(repoList):
-            QCoreApplication.processEvents()
             if filterFunc(c.rootpath()):
                 if self.showNetworkSubrepos \
                         or not paths.netdrive_status(c.rootpath()):
@@ -351,7 +350,6 @@ class RepoTreeModel(QAbstractItemModel):
                         _('Updating repository registry'),
                         _('Loading repository %s')
                         % hglib.tounicode(c.rootpath()))
-                    QCoreApplication.processEvents()
                     self.removeRows(0, c.childCount(),
                         self.createIndex(c.row(), 0, c))
                     c.appendSubrepos()
