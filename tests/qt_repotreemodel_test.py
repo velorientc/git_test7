@@ -29,6 +29,7 @@ full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
         <repo root="/qux" shortname="qux" basenode="6c30f00cc82daff63b1260eec198256a9c8e5a56"/>
       </group>
       <repo root="/subroot" shortname="subroot" basenode="b986218ba1c9b0d6a259fac9b050b1724ed8e545">
+        <subrepo root="/subroot/svnsub" repotype="svn"/>
         <subrepo root="/subroot/sub" shortname="sub" basenode="2f425e331c8cdffa5103f3b181358092245bdc10"/>
       </repo>
     </group>

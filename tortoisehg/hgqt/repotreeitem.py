@@ -429,6 +429,18 @@ class AlienSubrepoItem(RepoItem):
     def repotype(self):
         return self._repotype
 
+    def dump(self, xw):
+        xw.writeAttribute('root', hglib.tounicode(self._root))
+        xw.writeAttribute('repotype', self._repotype)
+
+    @classmethod
+    def undump(cls, xr):
+        a = xr.attributes()
+        obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
+                  str(a.value('', 'repotype').toString()))
+        xr.skipCurrentElement()  # no child
+        return obj
+
     def appendSubrepos(self, repo=None):
         raise Exception('unsupported by non-hg subrepo')
 
@@ -439,7 +451,8 @@ def _newSubrepoItem(root, repotype):
         return AlienSubrepoItem(root, repotype=repotype)
 
 def _undumpSubrepoItem(xr):
-    repotype = 'hg'  # TODO
+    a = xr.attributes()
+    repotype = str(a.value('', 'repotype').toString()) or 'hg'
     if repotype == 'hg':
         return SubrepoItem.undump(xr)
     else:
