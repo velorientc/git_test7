@@ -406,7 +406,7 @@ class AlienSubrepoItem(RepoItem):
             return super(AlienSubrepoItem, self).data(column, role)
 
     def menulist(self):
-        return ['remove', None, 'explore', 'terminal']
+        return ['explore', 'terminal', 'copypath']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
