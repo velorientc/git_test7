@@ -355,14 +355,25 @@ class RepoItem(RepoTreeItem):
         return False
 
 
+_subrepoType2IcoMap = {
+    'hg': 'hg',
+    'git': 'thg-git-subrepo',
+    'svn': 'thg-svn-subrepo',
+    }
+
+def _newSubrepoIcon(repotype, valid=True):
+    subiconame = _subrepoType2IcoMap.get(repotype)
+    if subiconame is None:
+        ico = qtlib.geticon('thg-subrepo')
+    else:
+        ico = qtlib.geticon(subiconame)
+        ico = qtlib.getoverlaidicon(ico, qtlib.geticon('thg-subrepo'))
+    if not valid:
+        ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
+    return ico
+
 class SubrepoItem(RepoItem):
     xmltagname = 'subrepo'
-
-    _subrepoType2IcoMap = {
-          'hg': 'hg',
-          'git': 'thg-git-subrepo',
-          'svn': 'thg-svn-subrepo',
-    }
 
     def __init__(self, root=None, shortname=None, basenode=None, parent=None,
                  subtype='hg'):
@@ -382,23 +393,8 @@ class SubrepoItem(RepoItem):
             self.menulist = nonHgMenulist
 
     def data(self, column, role):
-        if role == Qt.DecorationRole:
-            if column == 0:
-                subiconame = SubrepoItem._subrepoType2IcoMap.get(self._repotype, None)
-                if subiconame is None:
-                    # Unknown (or generic) subrepo type
-                    ico = qtlib.geticon('thg-subrepo')
-                else:
-                    # Overlay the "subrepo icon" on top of the selected subrepo
-                    # type icon
-                    ico = qtlib.geticon(subiconame)
-                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('thg-subrepo'))
-
-                if not self._valid:
-                    ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
-
-                return QVariant(ico)
-            return QVariant()
+        if role == Qt.DecorationRole and column == 0:
+            return _newSubrepoIcon(self._repotype, valid=self._valid)
         else:
             return super(SubrepoItem, self).data(column, role)
 
