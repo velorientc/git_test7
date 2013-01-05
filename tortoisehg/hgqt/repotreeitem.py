@@ -375,23 +375,6 @@ def _newSubrepoIcon(repotype, valid=True):
 class SubrepoItem(RepoItem):
     xmltagname = 'subrepo'
 
-    def __init__(self, root=None, shortname=None, basenode=None, parent=None,
-                 subtype='hg'):
-        RepoItem.__init__(self, root, shortname, basenode, parent)
-        self._repotype = subtype
-        if self._repotype != 'hg':
-            # Make sure that we cannot drag non hg subrepos
-            # To do so we disable the dumpObject method for non hg subrepos
-            def doNothing(dummy):
-                pass
-            self.dumpObject = doNothing
-
-            # Limit the context menu to those actions that are valid for non
-            # mercurial subrepos
-            def nonHgMenulist():
-                return ['remove', None, 'explore', 'terminal']
-            self.menulist = nonHgMenulist
-
     def data(self, column, role):
         if role == Qt.DecorationRole and column == 0:
             return _newSubrepoIcon(self._repotype, valid=self._valid)
@@ -423,14 +406,36 @@ class SubrepoItem(RepoItem):
             return (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                 | Qt.ItemIsDragEnabled)
 
-class AlienSubrepoItem(SubrepoItem):
-    pass
+# possibly this should not be a RepoItem because it lacks common functions
+class AlienSubrepoItem(RepoItem):
+    xmltagname = 'subrepo'
+
+    def __init__(self, root, repotype, parent=None):
+        RepoItem.__init__(self, root, parent=parent)
+        self._repotype = repotype
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole and column == 0:
+            return _newSubrepoIcon(self._repotype)
+        else:
+            return super(AlienSubrepoItem, self).data(column, role)
+
+    def menulist(self):
+        return ['remove', None, 'explore', 'terminal']
+
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+
+    def dumpObject(self, xw):
+        # Make sure that we cannot drag non hg subrepos
+        # To do so we disable the dumpObject method for non hg subrepos
+        pass
 
 def _newSubrepoItem(root, repotype):
     if repotype == 'hg':
         return SubrepoItem(root)
     else:
-        return AlienSubrepoItem(root, subtype=repotype)
+        return AlienSubrepoItem(root, repotype=repotype)
 
 def _undumpSubrepoItem(xr):
     repotype = 'hg'  # TODO
