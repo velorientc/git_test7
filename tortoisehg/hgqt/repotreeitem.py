@@ -258,10 +258,6 @@ class RepoItem(RepoTreeItem):
         return None
 
     def appendSubrepos(self, repo=None):
-        # Mercurial repos are the only ones that can have subrepos
-        if self.repotype() != 'hg':
-            return []
-
         invalidRepoList = []
         try:
             sri = None
@@ -426,6 +422,9 @@ class AlienSubrepoItem(RepoItem):
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def appendSubrepos(self, repo=None):
+        raise Exception('unsupported by non-hg subrepo')
 
 def _newSubrepoItem(root, repotype):
     if repotype == 'hg':
