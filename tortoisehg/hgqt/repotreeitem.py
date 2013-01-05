@@ -40,9 +40,7 @@ def classToXml(classname):
 def undumpObject(xr):
     classname = xmlToClass(str(xr.name().toString()))
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    obj = class_()
-    obj.undump(xr)
-    return obj
+    return class_.undump(xr)
 
 def _undumpChild(xr, parent):
     while not xr.atEnd():
@@ -115,8 +113,11 @@ class RepoTreeItem(object):
         for c in self.childs:
             c.dumpObject(xw)
 
-    def undump(self, xr):
-        _undumpChild(xr, parent=self)
+    @classmethod
+    def undump(cls, xr):
+        obj = cls()
+        _undumpChild(xr, parent=obj)
+        return obj
 
     def dumpObject(self, xw):
         xw.writeStartElement(classToXml(self.__class__.__name__))
@@ -144,11 +145,11 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, root=None, parent=None):
+    def __init__(self, root=None, shortname=None, basenode=None, parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root or ''
-        self._shortname = u''
-        self._basenode = node.nullid
+        self._shortname = shortname or u''
+        self._basenode = basenode or node.nullid
         self._repotype = 'hg'
         # The _valid property is used to display a "warning" icon for repos
         # that cannot be open
@@ -251,13 +252,14 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
 
-    def undump(self, xr):
-        self._valid = True
+    @classmethod
+    def undump(cls, xr):
         a = xr.attributes()
-        self._root = hglib.fromunicode(a.value('', 'root').toString())
-        self._shortname = unicode(a.value('', 'shortname').toString())
-        self._basenode = node.bin(str(a.value('', 'basenode').toString()))
-        _undumpChild(xr, parent=self)
+        obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
+                  unicode(a.value('', 'shortname').toString()),
+                  node.bin(str(a.value('', 'basenode').toString())))
+        _undumpChild(xr, parent=obj)
+        return obj
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
@@ -375,8 +377,9 @@ class SubrepoItem(RepoItem):
           'svn': 'thg-svn-subrepo',
     }
 
-    def __init__(self, repo=None, parent=None, subtype='hg'):
-        RepoItem.__init__(self, repo, parent)
+    def __init__(self, root=None, shortname=None, basenode=None, parent=None,
+                 subtype='hg'):
+        RepoItem.__init__(self, root, shortname, basenode, parent)
         self._repotype = subtype
         if self._repotype != 'hg':
             # Make sure that we cannot drag non hg subrepos
@@ -482,10 +485,12 @@ class RepoGroupItem(RepoTreeItem):
         xw.writeAttribute('name', self.name)
         RepoTreeItem.dump(self, xw)
 
-    def undump(self, xr):
+    @classmethod
+    def undump(cls, xr):
         a = xr.attributes()
-        self.name = a.value('', 'name').toString()
-        _undumpChild(xr, parent=self)
+        obj = cls(a.value('', 'name').toString())
+        _undumpChild(xr, parent=obj)
+        return obj
 
     def okToDelete(self):
         return False
@@ -518,17 +523,10 @@ class RepoGroupItem(RepoTreeItem):
         return self._commonpath
 
 class AllRepoGroupItem(RepoGroupItem):
-    def __init__(self, parent=None):
-        RepoGroupItem.__init__(self, name=_('default'), parent=parent)
+    def __init__(self, name=None, parent=None):
+        RepoGroupItem.__init__(self, name or _('default'), parent=parent)
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
             None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
             'reloadRegistry']
-
-    def undump(self, xr):
-        a = xr.attributes()
-        name = a.value('', 'name').toString()
-        if name:
-            self.name = name
-        _undumpChild(xr, parent=self)
