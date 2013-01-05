@@ -1,7 +1,7 @@
 from PyQt4.QtCore import QByteArray, QBuffer, QIODevice
 from nose.tools import *
 from mercurial import node
-from tortoisehg.hgqt.repotreemodel import *
+from tortoisehg.hgqt import repotreemodel
 
 def with_qbuffer(data='', mode=QIODevice.ReadOnly):
     def decorate(func):
@@ -32,7 +32,7 @@ full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
 
 @with_qbuffer(full_data)
 def test_iterrepoitemfromxml(f):
-    repos = list(iterRepoItemFromXml(f))
+    repos = list(repotreemodel.iterRepoItemFromXml(f))
     assert_equals(['/thg', '/mercurial', '/python-vcs'],
                   map(lambda e: e.rootpath(), repos))
     assert_equals('thg', repos[0].shortname())
