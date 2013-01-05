@@ -22,8 +22,12 @@ full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
     <allgroup name="default">
       <repo root="/thg" shortname="thg" basenode="bac32db38e52fd49acb62b94730a55f4f4b0cdee"/>
       <repo root="/mercurial" shortname="hg" basenode="9117c6561b0bd7792fa13b50d28239d51b78e51f"/>
+      <subrepo root="/sub" shortname="sub" basenode="2f425e331c8cdffa5103f3b181358092245bdc10"/>
     </allgroup>
     <group name="bar">
+      <group name="baz">
+        <repo root="/qux" shortname="qux" basenode="6c30f00cc82daff63b1260eec198256a9c8e5a56"/>
+      </group>
       <repo root="/python-vcs" shortname="python-vcs" basenode="b986218ba1c9b0d6a259fac9b050b1724ed8e545"/>
     </group>
   </treeitem>
@@ -41,7 +45,7 @@ def test_readwritexml(f):
 @with_qbuffer(full_data)
 def test_iterrepoitemfromxml(f):
     repos = list(repotreemodel.iterRepoItemFromXml(f))
-    assert_equals(['/thg', '/mercurial', '/python-vcs'],
+    assert_equals(['/thg', '/mercurial', '/sub', '/qux', '/python-vcs'],
                   map(lambda e: e.rootpath(), repos))
     assert_equals('thg', repos[0].shortname())
     assert_equals('bac32db38e52fd49acb62b94730a55f4f4b0cdee',
