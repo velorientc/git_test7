@@ -135,7 +135,6 @@ class RepoItem(RepoTreeItem):
         self._root = root or ''
         self._shortname = shortname or u''
         self._basenode = basenode or node.nullid
-        self._repotype = 'hg'
         # The _valid property is used to display a "warning" icon for repos
         # that cannot be open
         # If root is set we assume that the repo is valid (an actual validity
@@ -160,7 +159,7 @@ class RepoItem(RepoTreeItem):
             return hglib.tounicode(os.path.basename(self._root))
 
     def repotype(self):
-        return self._repotype
+        return 'hg'
 
     def basenode(self):
         """Return node id of revision 0"""
@@ -374,7 +373,7 @@ class SubrepoItem(RepoItem):
 
     def data(self, column, role):
         if role == Qt.DecorationRole and column == 0:
-            return _newSubrepoIcon(self._repotype, valid=self._valid)
+            return _newSubrepoIcon('hg', valid=self._valid)
         else:
             return super(SubrepoItem, self).data(column, role)
 
@@ -422,6 +421,9 @@ class AlienSubrepoItem(RepoItem):
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def repotype(self):
+        return self._repotype
 
     def appendSubrepos(self, repo=None):
         raise Exception('unsupported by non-hg subrepo')
