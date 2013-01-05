@@ -244,7 +244,7 @@ class UpdateDialog(QDialog):
                             'called "<i>%s</i>".<p>Do you want to activate it?'
                             '<br></b><i>You can disable this prompt by configuring '
                             'Settings/Workbench/Activate Bookmarks</i>') \
-                            % (str(rev), bookmarks[0]))
+                            % (hglib.tounicode(rev), bookmarks[0]))
                     if activatebookmark:
                         selectedbookmark = bookmarks[0]
                 else:
@@ -258,7 +258,7 @@ class UpdateDialog(QDialog):
                         'if you don\'t want to activate any of them.<p>'
                         '<p><i>You can disable this prompt by configuring '
                         'Settings/Workbench/Activate Bookmarks</i><p>') \
-                        % (str(rev), len(bookmarks)),
+                        % (hglib.tounicode(rev), len(bookmarks)),
                         self, bookmarks, self.repo._bookmarkcurrent).run()
                 if selectedbookmark:
                     rev = selectedbookmark
