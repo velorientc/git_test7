@@ -2000,17 +2000,37 @@ class RepoWidget(QWidget):
         if currentphase < phase:
             # Ask the user if he wants to force the transition
             title = _('Backwards phase change requested')
-            main = _('Do you really want to <i>force</i> a backwards phase transition?')
-            text = _('You are trying to move the phase of revision %d backwards,\n'
-                    'from "<i>%s</i>" to "<i>%s</i>".\n\n'
-                    'However, "<i>%s</i>" is a lower phase level than "<i>%s</i>".\n\n'
-                    'Moving the phase backwards is not recommended.\n'
-                    'For example, it may result in having multiple heads\nif you '
-                    'modify a revision that you have already pushed\nto a server.\n\n'
-                    'Please be careful!') % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
-                                            phases.phasenames[currentphase])
-            labels = ((QMessageBox.Yes, _('&Force')),
-                      (QMessageBox.No, _('&Cancel')))
+            currentphasestr = phases.phasenames[currentphase]
+            if currentphase == phases.draft and phase == phases.secret:
+                # Here we are sure that the current phase is draft and the target phase is secret
+                # Nevertheless we will not hard-code those phase names on the dialog strings to
+                # make sure that the proper phase name translations are used
+                main = _('Do you really want to make this revision <i>secret</i>?')
+                text = _('Making a "<i>draft</i>" revision "<i>secret</i>" '
+                         'is generally a safe operation.\n\n'
+                         'However, there are a few caveats:\n\n'
+                         '- "secret" revisions are not pushed. '
+                         'This can cause you trouble if you\n'
+                         'refer to a secret subrepo revision.\n\n'
+                         '- If you pulled this revision from '
+                         'a non publishing server it may be\n'
+                         'moved back to "<i>draft</i>" if you pull '
+                         'again from that particular server.\n\n'
+                         'Please be careful!')
+                labels = ((QMessageBox.Yes, _('&Make %s') % phasestr),
+                          (QMessageBox.No, _('&Cancel')))
+            else:
+                main = _('Do you really want to <i>force</i> a backwards phase transition?')
+                text = _('You are trying to move the phase of revision %d backwards,\n'
+                         'from "<i>%s</i>" to "<i>%s</i>".\n\n'
+                         'However, "<i>%s</i>" is a lower phase level than "<i>%s</i>".\n\n'
+                         'Moving the phase backwards is not recommended.\n'
+                         'For example, it may result in having multiple heads\nif you '
+                         'modify a revision that you have already pushed\nto a server.\n\n'
+                         'Please be careful!') % (self.rev, phases.phasenames[currentphase], phasestr, phasestr,
+                                                  phases.phasenames[currentphase])
+                labels = ((QMessageBox.Yes, _('&Force')),
+                          (QMessageBox.No, _('&Cancel')))
             if not qtlib.QuestionMsgBox(title, main, text,
                     labels=labels, parent=self):
                 return
