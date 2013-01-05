@@ -17,6 +17,10 @@ from tortoisehg.hgqt import qtlib, hgrcutil
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+def _dumpChild(xw, parent):
+    for c in parent.childs:
+        c.dumpObject(xw)
+
 def undumpObject(xr):
     xmltagname = str(xr.name().toString())
     obj = _xmlUndumpMap[xmltagname](xr)
@@ -93,8 +97,7 @@ class RepoTreeItem(object):
         return True
 
     def dump(self, xw):
-        for c in self.childs:
-            c.dumpObject(xw)
+        _dumpChild(xw, parent=self)
 
     @classmethod
     def undump(cls, xr):
@@ -485,7 +488,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
-        RepoTreeItem.dump(self, xw)
+        _dumpChild(xw, parent=self)
 
     @classmethod
     def undump(cls, xr):
