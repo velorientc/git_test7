@@ -44,6 +44,17 @@ def undumpObject(xr):
     obj.undump(xr)
     return obj
 
+def _undumpChild(xr, parent):
+    while not xr.atEnd():
+        xr.readNext()
+        if xr.isStartElement():
+            try:
+                item = undumpObject(xr)
+                parent.appendChild(item)
+            except KeyError:
+                pass # ignore unknown classes in xml
+        elif xr.isEndElement():
+            break
 
 class RepoTreeItem(object):
     def __init__(self, parent=None):
@@ -105,16 +116,7 @@ class RepoTreeItem(object):
             c.dumpObject(xw)
 
     def undump(self, xr):
-        while not xr.atEnd():
-            xr.readNext()
-            if xr.isStartElement():
-                try:
-                    item = undumpObject(xr)
-                    self.appendChild(item)
-                except KeyError:
-                    pass # ignore unknown classes in xml
-            elif xr.isEndElement():
-                break
+        _undumpChild(xr, parent=self)
 
     def dumpObject(self, xw):
         xw.writeStartElement(classToXml(self.__class__.__name__))
@@ -255,7 +257,7 @@ class RepoItem(RepoTreeItem):
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         self._shortname = unicode(a.value('', 'shortname').toString())
         self._basenode = node.bin(str(a.value('', 'basenode').toString()))
-        RepoTreeItem.undump(self, xr)
+        _undumpChild(xr, parent=self)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
@@ -483,7 +485,7 @@ class RepoGroupItem(RepoTreeItem):
     def undump(self, xr):
         a = xr.attributes()
         self.name = a.value('', 'name').toString()
-        RepoTreeItem.undump(self, xr)
+        _undumpChild(xr, parent=self)
 
     def okToDelete(self):
         return False
@@ -529,4 +531,4 @@ class AllRepoGroupItem(RepoGroupItem):
         name = a.value('', 'name').toString()
         if name:
             self.name = name
-        RepoTreeItem.undump(self, xr)
+        _undumpChild(xr, parent=self)
