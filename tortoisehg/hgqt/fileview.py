@@ -56,6 +56,7 @@ class HgFileView(QFrame):
         self.changes = None
         self.folddiffs = False
         self.chunkatline = {}
+        self.excludemsg = _('this change has been excluded from the commit')
 
         self.topLayout = QVBoxLayout()
 
@@ -244,10 +245,8 @@ class HgFileView(QFrame):
         'change chunk exclusion state, update display when necessary'
         # returns True if the chunk state was changed
         if exclude:
-            if self.changes.excludecount == 0:
-                # TODO: create a decent QsciStyle for these annotations
-                self.sci.annotate(chunk.lineno,
-                                _('folded changes are excluded from commit'), 4)
+            # TODO: create a decent QsciStyle for these annotations
+            self.sci.annotate(chunk.lineno, self.excludemsg, 4)
             if chunk.excluded:
                 return False
             chunk.excluded = True
