@@ -424,12 +424,7 @@ class AlienSubrepoItem(RepoItem):
         return ['remove', None, 'explore', 'terminal']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
-
-    def dumpObject(self, xw):
-        # Make sure that we cannot drag non hg subrepos
-        # To do so we disable the dumpObject method for non hg subrepos
-        pass
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
 def _newSubrepoItem(root, repotype):
     if repotype == 'hg':
