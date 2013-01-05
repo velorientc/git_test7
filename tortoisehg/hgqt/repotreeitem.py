@@ -27,12 +27,12 @@ def undumpObject(xr):
     assert obj.xmltagname == xmltagname
     return obj
 
-def _undumpChild(xr, parent):
+def _undumpChild(xr, parent, undump=undumpObject):
     while not xr.atEnd():
         xr.readNext()
         if xr.isStartElement():
             try:
-                item = undumpObject(xr)
+                item = undump(xr)
                 parent.appendChild(item)
             except KeyError:
                 pass # ignore unknown classes in xml
@@ -230,7 +230,7 @@ class RepoItem(RepoTreeItem):
         obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
                   unicode(a.value('', 'shortname').toString()),
                   node.bin(str(a.value('', 'basenode').toString())))
-        _undumpChild(xr, parent=obj)
+        _undumpChild(xr, parent=obj, undump=_undumpSubrepoItem)
         return obj
 
     def details(self):
