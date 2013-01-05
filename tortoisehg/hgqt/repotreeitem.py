@@ -278,7 +278,7 @@ class RepoItem(RepoTreeItem):
                     abssubpath = repo.wjoin(subpath)
                     subtype = wctx.substate[subpath][2]
                     sriIsValid = os.path.isdir(abssubpath)
-                    sri = SubrepoItem(abssubpath, subtype=subtype)
+                    sri = _newSubrepoItem(abssubpath, repotype=subtype)
                     sri._valid = sriIsValid
                     self.appendChild(sri)
 
@@ -423,6 +423,21 @@ class SubrepoItem(RepoItem):
             return (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                 | Qt.ItemIsDragEnabled)
 
+class AlienSubrepoItem(SubrepoItem):
+    pass
+
+def _newSubrepoItem(root, repotype):
+    if repotype == 'hg':
+        return SubrepoItem(root)
+    else:
+        return AlienSubrepoItem(root, subtype=repotype)
+
+def _undumpSubrepoItem(xr):
+    repotype = 'hg'  # TODO
+    if repotype == 'hg':
+        return SubrepoItem.undump(xr)
+    else:
+        return AlienSubrepoItem.undump(xr)
 
 class RepoGroupItem(RepoTreeItem):
     xmltagname = 'group'
@@ -522,6 +537,6 @@ _xmlUndumpMap = {
     'allgroup': AllRepoGroupItem.undump,
     'group': RepoGroupItem.undump,
     'repo': RepoItem.undump,
-    'subrepo': SubrepoItem.undump,
+    'subrepo': _undumpSubrepoItem,
     'treeitem': RepoTreeItem.undump,
     }
