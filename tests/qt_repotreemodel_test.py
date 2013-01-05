@@ -1,7 +1,7 @@
 from PyQt4.QtCore import QByteArray, QBuffer, QIODevice
 from nose.tools import *
 from mercurial import node
-from tortoisehg.hgqt import repotreemodel
+from tortoisehg.hgqt import repotreemodel, repotreeitem
 
 def with_qbuffer(data='', mode=QIODevice.ReadOnly):
     def decorate(func):
@@ -53,3 +53,28 @@ def test_iterrepoitemfromxml(f):
     assert_equals('thg', repos[0].shortname())
     assert_equals('bac32db38e52fd49acb62b94730a55f4f4b0cdee',
                   node.hex(repos[0].basenode()))
+
+subrepos_data = r'''<?xml version="1.0" encoding="UTF-8"?>
+<reporegistry>
+  <treeitem>
+    <allgroup name="default">
+      <subrepo root="/subroot/sub" shortname="sub" basenode="2f425e331c8cdffa5103f3b181358092245bdc10"/>
+      <repo root="/subroot" shortname="subroot" basenode="b986218ba1c9b0d6a259fac9b050b1724ed8e545">
+        <subrepo root="/subroot/svnsub" repotype="svn"/>
+        <subrepo root="/subroot/sub" shortname="sub" basenode="2f425e331c8cdffa5103f3b181358092245bdc10"/>
+      </repo>
+    </allgroup>
+  </treeitem>
+</reporegistry>
+'''
+
+@with_qbuffer(subrepos_data)
+def test_undumpsubrepos(f):
+    """<subrepo> element should be mapped to different classes"""
+    root = repotreemodel.readXml(f, 'reporegistry')
+    allgroup = root.child(0)
+    assert type(allgroup.child(0)) is repotreeitem.StandaloneSubrepoItem
+    subroot = allgroup.child(1)
+    assert type(subroot) is repotreeitem.RepoItem
+    assert type(subroot.child(0)) is repotreeitem.AlienSubrepoItem
+    assert type(subroot.child(1)) is repotreeitem.SubrepoItem

@@ -12,7 +12,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem, SubrepoItem
+from repotreeitem import RepoItem, RepoTreeItem, StandaloneSubrepoItem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -285,7 +285,7 @@ class RepoTreeModel(QAbstractItemModel):
 
         self.beginInsertRows(grp, row, row)
         if itemIsSubrepo:
-            ri = SubrepoItem(root)
+            ri = StandaloneSubrepoItem(root)
         else:
             ri = RepoItem(root)
         rgi.insertChild(row, ri)

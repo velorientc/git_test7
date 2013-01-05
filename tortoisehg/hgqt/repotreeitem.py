@@ -356,7 +356,18 @@ def _newSubrepoIcon(repotype, valid=True):
         ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
     return ico
 
+class StandaloneSubrepoItem(RepoItem):
+    """Mercurial repository just decorated as subrepo"""
+    xmltagname = 'subrepo'
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole and column == 0:
+            return _newSubrepoIcon('hg', valid=self._valid)
+        else:
+            return super(StandaloneSubrepoItem, self).data(column, role)
+
 class SubrepoItem(RepoItem):
+    """Actual Mercurial subrepo"""
     xmltagname = 'subrepo'
 
     def data(self, column, role):
@@ -366,32 +377,22 @@ class SubrepoItem(RepoItem):
             return super(SubrepoItem, self).data(column, role)
 
     def menulist(self):
-        if isinstance(self._parent, RepoGroupItem):
-            return super(SubrepoItem, self).menulist()
-        else:
-            acts = ['open', 'clone', 'addsubrepo', None, 'explore',
-                    'terminal', 'copypath']
-            if self.childCount() > 0:
-                acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
-            acts.extend([None, 'settings'])
-            return acts
+        acts = ['open', 'clone', 'addsubrepo', None, 'explore',
+                'terminal', 'copypath']
+        if self.childCount() > 0:
+            acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
+        acts.extend([None, 'settings'])
+        return acts
 
     def getSupportedDragDropActions(self):
-        if issubclass(type(self.parent()), RepoGroupItem):
-            return Qt.MoveAction
-        else:
-            return Qt.CopyAction
+        return Qt.CopyAction
 
     def flags(self):
-        # Only stand-alone subrepo items can be renamed
-        if isinstance(self._parent, RepoGroupItem):
-            return super(SubrepoItem, self).flags()
-        else:
-            return (Qt.ItemIsEnabled | Qt.ItemIsSelectable
-                | Qt.ItemIsDragEnabled)
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
 # possibly this should not be a RepoItem because it lacks common functions
 class AlienSubrepoItem(RepoItem):
+    """Actual non-Mercurial subrepo"""
     xmltagname = 'subrepo'
 
     def __init__(self, root, repotype, parent=None):
@@ -537,6 +538,6 @@ _xmlUndumpMap = {
     'allgroup': AllRepoGroupItem.undump,
     'group': RepoGroupItem.undump,
     'repo': RepoItem.undump,
-    'subrepo': _undumpSubrepoItem,
+    'subrepo': StandaloneSubrepoItem.undump,
     'treeitem': RepoTreeItem.undump,
     }
