@@ -258,82 +258,83 @@ class RepoItem(RepoTreeItem):
         return None
 
     def appendSubrepos(self, repo=None):
-        invalidRepoList = []
-
         # Mercurial repos are the only ones that can have subrepos
-        if self.repotype() == 'hg':
-            try:
+        if self.repotype() != 'hg':
+            return []
+
+        invalidRepoList = []
+        try:
+            sri = None
+            if repo is None:
+                if not os.path.exists(self._root):
+                    self._valid = False
+                    return [self._root]
+                elif not os.path.exists(os.path.join(self._root, '.hgsub')):
+                    return []  # skip repo creation, which is expensive
+                repo = hg.repository(ui.ui(), self._root)
+            wctx = repo['.']
+            sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
+            for subpath in sorted(wctx.substate, key=sortkey):
                 sri = None
-                if repo is None:
-                    if not os.path.exists(self._root):
-                        self._valid = False
-                        return [self._root]
-                    elif not os.path.exists(os.path.join(self._root, '.hgsub')):
-                        return []  # skip repo creation, which is expensive
-                    repo = hg.repository(ui.ui(), self._root)
-                wctx = repo['.']
-                sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
-                for subpath in sorted(wctx.substate, key=sortkey):
-                    sri = None
-                    abssubpath = repo.wjoin(subpath)
-                    subtype = wctx.substate[subpath][2]
-                    sriIsValid = os.path.isdir(abssubpath)
-                    sri = _newSubrepoItem(abssubpath, repotype=subtype)
-                    sri._valid = sriIsValid
-                    self.appendChild(sri)
+                abssubpath = repo.wjoin(subpath)
+                subtype = wctx.substate[subpath][2]
+                sriIsValid = os.path.isdir(abssubpath)
+                sri = _newSubrepoItem(abssubpath, repotype=subtype)
+                sri._valid = sriIsValid
+                self.appendChild(sri)
 
-                    if not sriIsValid:
-                        self._valid = False
-                        sri._valid = False
-                        invalidRepoList.append(repo.wjoin(subpath))
-                        return invalidRepoList
-                        continue
-
-                    if subtype == 'hg':
-                        # Only recurse into mercurial subrepos
-                        sctx = wctx.sub(subpath)
-                        invalidSubrepoList = sri.appendSubrepos(sctx._repo)
-                        if invalidSubrepoList:
-                            self._valid = False
-                            invalidRepoList += invalidSubrepoList
-
-            except (EnvironmentError, error.RepoError, util.Abort), e:
-                # Add the repo to the list of repos/subrepos
-                # that could not be open
-                self._valid = False
-                if sri:
+                if not sriIsValid:
+                    self._valid = False
                     sri._valid = False
-                    invalidRepoList.append(abssubpath)
-                invalidRepoList.append(self._root)
-            except Exception, e:
-                # If any other sort of exception happens, show the corresponding
-                # error message, but do not crash!
-                # Note that we _also_ will mark the offending repos as invalid
-                # It is unfortunate that Python 2.4, which we target does not
-                # support combined try/except/finally clauses, forcing us
-                # to duplicate some code here
-                self._valid = False
-                if sri:
-                    sri._valid = False
-                    invalidRepoList.append(abssubpath)
-                invalidRepoList.append(self._root)
+                    invalidRepoList.append(repo.wjoin(subpath))
+                    return invalidRepoList
+                    continue
 
-                # Show a warning message indicating that there was an error
-                if repo:
-                    rootpath = repo.root
-                else:
-                    rootpath = self._root
-                warningMessage = (_('An exception happened while loading the ' \
-                    'subrepos of:<br><br>"%s"<br><br>') + \
-                    _('The exception error message was:<br><br>%s<br><br>') +\
-                    _('Click OK to continue or Abort to exit.')) \
-                    % (rootpath, e.message)
-                res = qtlib.WarningMsgBox(_('Error loading subrepos'),
-                                    warningMessage,
-                                    buttons = QMessageBox.Ok | QMessageBox.Abort)
-                # Let the user abort so that he gets the full exception info
-                if res == QMessageBox.Abort:
-                    raise
+                if subtype == 'hg':
+                    # Only recurse into mercurial subrepos
+                    sctx = wctx.sub(subpath)
+                    invalidSubrepoList = sri.appendSubrepos(sctx._repo)
+                    if invalidSubrepoList:
+                        self._valid = False
+                        invalidRepoList += invalidSubrepoList
+
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            # Add the repo to the list of repos/subrepos
+            # that could not be open
+            self._valid = False
+            if sri:
+                sri._valid = False
+                invalidRepoList.append(abssubpath)
+            invalidRepoList.append(self._root)
+        except Exception, e:
+            # If any other sort of exception happens, show the corresponding
+            # error message, but do not crash!
+            # Note that we _also_ will mark the offending repos as invalid
+            # It is unfortunate that Python 2.4, which we target does not
+            # support combined try/except/finally clauses, forcing us
+            # to duplicate some code here
+            self._valid = False
+            if sri:
+                sri._valid = False
+                invalidRepoList.append(abssubpath)
+            invalidRepoList.append(self._root)
+
+            # Show a warning message indicating that there was an error
+            if repo:
+                rootpath = repo.root
+            else:
+                rootpath = self._root
+            warningMessage = (_('An exception happened while loading the ' \
+                'subrepos of:<br><br>"%s"<br><br>') + \
+                _('The exception error message was:<br><br>%s<br><br>') +\
+                _('Click OK to continue or Abort to exit.')) \
+                % (rootpath, e.message)
+            res = qtlib.WarningMsgBox(_('Error loading subrepos'),
+                                warningMessage,
+                                buttons = QMessageBox.Ok | QMessageBox.Abort)
+            # Let the user abort so that he gets the full exception info
+            if res == QMessageBox.Abort:
+                raise
         return invalidRepoList
 
     def setActive(self, sel):
