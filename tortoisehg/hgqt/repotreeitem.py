@@ -453,12 +453,9 @@ def _undumpSubrepoItem(xr):
 class RepoGroupItem(RepoTreeItem):
     xmltagname = 'group'
 
-    def __init__(self, name=None, parent=None):
+    def __init__(self, name, parent=None):
         RepoTreeItem.__init__(self, parent)
-        if name:
-            self.name = name
-        else:
-            self.name = QString()
+        self.name = name
         self._commonpath = ''
 
     def data(self, column, role):
