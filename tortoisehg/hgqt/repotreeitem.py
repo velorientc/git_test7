@@ -26,16 +26,8 @@ xmlClassMap = {
       'treeitem': 'RepoTreeItem',
     }
 
-inverseXmlClassMap = {}
-
 def xmlToClass(ele):
     return xmlClassMap[ele]
-
-def classToXml(classname):
-    if len(inverseXmlClassMap) == 0:
-        for k,v in xmlClassMap.iteritems():
-            inverseXmlClassMap[v] = k
-    return inverseXmlClassMap[classname]
 
 def undumpObject(xr):
     classname = xmlToClass(str(xr.name().toString()))
@@ -55,6 +47,8 @@ def _undumpChild(xr, parent):
             break
 
 class RepoTreeItem(object):
+    xmltagname = 'treeitem'
+
     def __init__(self, parent=None):
         self._parent = parent
         self.childs = []
@@ -120,7 +114,7 @@ class RepoTreeItem(object):
         return obj
 
     def dumpObject(self, xw):
-        xw.writeStartElement(classToXml(self.__class__.__name__))
+        xw.writeStartElement(self.xmltagname)
         self.dump(xw)
         xw.writeEndElement()
 
@@ -145,6 +139,8 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
+    xmltagname = 'repo'
+
     def __init__(self, root=None, shortname=None, basenode=None, parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root or ''
@@ -371,6 +367,8 @@ class RepoItem(RepoTreeItem):
 
 
 class SubrepoItem(RepoItem):
+    xmltagname = 'subrepo'
+
     _subrepoType2IcoMap = {
           'hg': 'hg',
           'git': 'thg-git-subrepo',
@@ -442,6 +440,8 @@ class SubrepoItem(RepoItem):
 
 
 class RepoGroupItem(RepoTreeItem):
+    xmltagname = 'group'
+
     def __init__(self, name=None, parent=None):
         RepoTreeItem.__init__(self, parent)
         if name:
@@ -523,6 +523,8 @@ class RepoGroupItem(RepoTreeItem):
         return self._commonpath
 
 class AllRepoGroupItem(RepoGroupItem):
+    xmltagname = 'allgroup'
+
     def __init__(self, name=None, parent=None):
         RepoGroupItem.__init__(self, name or _('default'), parent=parent)
 
