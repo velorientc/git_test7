@@ -133,20 +133,12 @@ class RepoTreeItem(object):
 class RepoItem(RepoTreeItem):
     xmltagname = 'repo'
 
-    def __init__(self, root=None, shortname=None, basenode=None, parent=None):
+    def __init__(self, root, shortname=None, basenode=None, parent=None):
         RepoTreeItem.__init__(self, parent)
-        self._root = root or ''
+        self._root = root
         self._shortname = shortname or u''
         self._basenode = basenode or node.nullid
-        # The _valid property is used to display a "warning" icon for repos
-        # that cannot be open
-        # If root is set we assume that the repo is valid (an actual validity
-        # test would require calling hg.repository() which is expensive)
-        # Regardless, self._valid may be set to False if self.undump() fails
-        if self._root:
-            self._valid = True
-        else:
-            self._valid = False
+        self._valid = True  # expensive check is done at appendSubrepos()
         self._isActiveTab = False
 
     def isRepo(self):
