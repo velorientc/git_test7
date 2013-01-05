@@ -238,6 +238,7 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
+        _dumpChild(xw, parent=self)
 
     @classmethod
     def undump(cls, xr):

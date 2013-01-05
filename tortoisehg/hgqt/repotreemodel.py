@@ -230,8 +230,6 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         if row < 0:
             row = 0
-        if self.showSubrepos:
-            self.loadSubrepos(itemread)
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
