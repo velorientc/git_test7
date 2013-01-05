@@ -19,7 +19,7 @@ def with_qbuffer(data='', mode=QIODevice.ReadOnly):
 full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
 <reporegistry>
   <treeitem>
-    <allgroup>
+    <allgroup name="default">
       <repo root="/thg" shortname="thg" basenode="bac32db38e52fd49acb62b94730a55f4f4b0cdee"/>
       <repo root="/mercurial" shortname="hg" basenode="9117c6561b0bd7792fa13b50d28239d51b78e51f"/>
     </allgroup>
@@ -29,6 +29,14 @@ full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
   </treeitem>
 </reporegistry>
 '''
+
+@with_qbuffer(full_data, QIODevice.ReadWrite)
+def test_readwritexml(f):
+    root = repotreemodel.readXml(f, 'reporegistry')
+    f.buffer().clear()
+    f.reset()
+    repotreemodel.writeXml(f, root, 'reporegistry')
+    assert_equals(full_data.splitlines(), str(f.data()).splitlines())
 
 @with_qbuffer(full_data)
 def test_iterrepoitemfromxml(f):
