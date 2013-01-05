@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import sys, os
+import os
 
 from mercurial import node
 from mercurial import ui, hg, util, error
@@ -17,22 +17,11 @@ from tortoisehg.hgqt import qtlib, hgrcutil
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-
-xmlClassMap = {
-      'allgroup': 'AllRepoGroupItem',
-      'group': 'RepoGroupItem',
-      'repo': 'RepoItem',
-      'subrepo': 'SubrepoItem',
-      'treeitem': 'RepoTreeItem',
-    }
-
-def xmlToClass(ele):
-    return xmlClassMap[ele]
-
 def undumpObject(xr):
-    classname = xmlToClass(str(xr.name().toString()))
-    class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    return class_.undump(xr)
+    xmltagname = str(xr.name().toString())
+    obj = _xmlUndumpMap[xmltagname](xr)
+    assert obj.xmltagname == xmltagname
+    return obj
 
 def _undumpChild(xr, parent):
     while not xr.atEnd():
@@ -532,3 +521,11 @@ class AllRepoGroupItem(RepoGroupItem):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
             None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
             'reloadRegistry']
+
+_xmlUndumpMap = {
+    'allgroup': AllRepoGroupItem.undump,
+    'group': RepoGroupItem.undump,
+    'repo': RepoItem.undump,
+    'subrepo': SubrepoItem.undump,
+    'treeitem': RepoTreeItem.undump,
+    }
