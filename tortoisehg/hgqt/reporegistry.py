@@ -368,29 +368,8 @@ class RepoRegistryView(QDockWidget):
             self.setActiveTabRepo(activeroot)
         self._reloadModelTimer.stop()
 
-    def _getItemAndAncestors(self, it):
-        """Create a list of ancestors (including the selected item)"""
-        from repotreeitem import RepoGroupItem
-        itchain = [it]
-        while(not isinstance(itchain[-1], RepoGroupItem)):
-            itchain.append(itchain[-1].parent())
-        return reversed(itchain)
-
     def expand(self):
         self.tview.expandToDepth(0)
-
-    def scrollTo(self, it=None, scrollHint=RepoTreeView.EnsureVisible):
-        if not it:
-            return
-
-        # Create a list of ancestors (including the selected item)
-        itchain = self._getItemAndAncestors(it)
-
-        m = self.tview.model()
-        idx = self.tview.rootIndex()
-        for it in itchain:
-            idx = m.index(it.row(), 0, idx)
-        self.tview.scrollTo(idx, hint=scrollHint)
 
     def addRepo(self, root, groupname=None):
         """
