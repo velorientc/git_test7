@@ -416,14 +416,10 @@ class RepoRegistryView(QDockWidget):
 
     def setActiveTabRepo(self, root):
         """"The selected tab has changed on the workbench"""
-        root = hglib.fromunicode(root)
         m = self.tview.model()
-        it = m.getRepoItem(root, lookForSubrepos=True)
-        m.setActiveRepoItem(it)
-        if it:
-            # Make sure that the active tab is visible by expanding its parent
-            # and scrolling to it if necessary
-            self.scrollTo(it)
+        index = m.indexFromRepoRoot(root)
+        m.setActiveRepo(index)
+        self.tview.scrollTo(index)
 
     @pyqtSlot()
     def _updateColumnVisibility(self):

@@ -325,6 +325,16 @@ class RepoTreeModel(QAbstractItemModel):
         return self.rootItem.getRepoItem(os.path.normcase(reporoot),
                     lookForSubrepos=lookForSubrepos)
 
+    def indexFromRepoRoot(self, uroot, column=0):
+        item = self.getRepoItem(hglib.fromunicode(uroot), lookForSubrepos=True)
+        return self._indexFromItem(item, column)
+
+    def _indexFromItem(self, item, column=0):
+        if item:
+            return self.createIndex(item.row(), column, item)
+        else:
+            return QModelIndex()
+
     def addGroup(self, name):
         ri = self.rootItem
         cc = ri.childCount()
@@ -346,9 +356,9 @@ class RepoTreeModel(QAbstractItemModel):
                 return count
             count += 1
 
-    # better to accept index instead of internal item object
-    def setActiveRepoItem(self, newitem):
+    def setActiveRepo(self, index):
         """Highlight the specified item as active"""
+        newitem = index.internalPointer()
         if newitem is self._activeRepoItem:
             return
         previtem = self._activeRepoItem
