@@ -355,10 +355,8 @@ class RepoRegistryView(QDockWidget):
 
     @pyqtSlot()
     def reloadModel(self):
-        activeroot = None
         oldmodel = self.tview.model()
-        if oldmodel.activeRepoItem():
-            activeroot = hglib.tounicode(oldmodel.activeRepoItem().rootpath())
+        activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self._isSettingEnabled('showSubrepos'),

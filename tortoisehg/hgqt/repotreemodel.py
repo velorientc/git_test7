@@ -335,6 +335,12 @@ class RepoTreeModel(QAbstractItemModel):
         else:
             return QModelIndex()
 
+    def repoRoot(self, index):
+        item = index.internalPointer()
+        if not isinstance(item, RepoItem):
+            return
+        return hglib.tounicode(item.rootpath())
+
     def addGroup(self, name):
         ri = self.rootItem
         cc = ri.childCount()
@@ -369,8 +375,8 @@ class RepoTreeModel(QAbstractItemModel):
                     self.createIndex(it.row(), 0, it),
                     self.createIndex(it.row(), self.columnCount(), it))
 
-    def activeRepoItem(self):
-        return self._activeRepoItem
+    def activeRepoIndex(self, column=0):
+        return self._indexFromItem(self._activeRepoItem, column)
 
     def loadSubrepos(self, root, filterFunc=(lambda r: True)):
         repoList = getRepoItemList(root)
