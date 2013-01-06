@@ -117,7 +117,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     # overrides from QAbstractItemModel
 
-    def index(self, row, column, parent):
+    def index(self, row, column, parent=QModelIndex()):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if (not parent.isValid()):
@@ -139,7 +139,7 @@ class RepoTreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.column() > 0:
             return 0
         if not parent.isValid():
@@ -148,13 +148,13 @@ class RepoTreeModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role not in (Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole,
@@ -163,7 +163,7 @@ class RepoTreeModel(QAbstractItemModel):
         item = index.internalPointer()
         return item.data(index.column(), role)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
                 if section == 1:
@@ -179,7 +179,7 @@ class RepoTreeModel(QAbstractItemModel):
     def supportedDropActions(self):
         return Qt.CopyAction | Qt.MoveAction | Qt.LinkAction
 
-    def removeRows(self, row, count, parent):
+    def removeRows(self, row, count, parent=QModelIndex()):
         item = parent.internalPointer()
         if item is None:
             item = self.rootItem
@@ -237,7 +237,7 @@ class RepoTreeModel(QAbstractItemModel):
             self.allrepos = itemread
         return True
 
-    def setData(self, index, value, role):
+    def setData(self, index, value, role=Qt.EditRole):
         if not index.isValid() or role != Qt.EditRole:
             return False
         s = value.toString()
