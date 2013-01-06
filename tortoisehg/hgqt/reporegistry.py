@@ -277,7 +277,6 @@ class RepoRegistryView(QDockWidget):
         self._reloadModelTimer = QTimer(self, interval=2000, singleShot=True)
         self._reloadModelTimer.timeout.connect(self.reloadModel)
         self.watcher.fileChanged.connect(self._reloadModelTimer.start)
-        self._activeTabRepo = None
 
         QTimer.singleShot(0, self._initView)
 
@@ -357,10 +356,9 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot()
     def reloadModel(self):
         activeroot = None
-        if self._activeTabRepo:
-            activeroot = hglib.tounicode(self._activeTabRepo.rootpath())
-            self._activeTabRepo = None  # invalid after setModel()
         oldmodel = self.tview.model()
+        if oldmodel.activeRepoItem():
+            activeroot = hglib.tounicode(oldmodel.activeRepoItem().rootpath())
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self._isSettingEnabled('showSubrepos'),
@@ -417,21 +415,12 @@ class RepoRegistryView(QDockWidget):
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
-        """"
-        The selected tab has changed on the workbench
-        Unmark the previously selected tab and mark the new one as selected on
-        the Repo Registry as well
-        """
+        """"The selected tab has changed on the workbench"""
         root = hglib.fromunicode(root)
-        if self._activeTabRepo:
-            self._activeTabRepo.setActive(False)
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
+        m.setActiveRepoItem(it)
         if it:
-            self._activeTabRepo = it
-            it.setActive(True)
-            self.tview.dataChanged(QModelIndex(), QModelIndex())
-
             # Make sure that the active tab is visible by expanding its parent
             # and scrolling to it if necessary
             self.scrollTo(it)

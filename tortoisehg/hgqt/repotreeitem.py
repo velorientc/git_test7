@@ -139,7 +139,6 @@ class RepoItem(RepoTreeItem):
         self._shortname = shortname or u''
         self._basenode = basenode or node.nullid
         self._valid = True  # expensive check is done at appendSubrepos()
-        self._isActiveTab = False
 
     def isRepo(self):
         return True
@@ -177,10 +176,6 @@ class RepoItem(RepoTreeItem):
             if not self._valid:
                 ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
             return ico
-        elif role == Qt.FontRole and self._isActiveTab:
-            font = QFont()
-            font.setBold(True)
-            return font
         elif role == Qt.DisplayRole:
             return [self.shortname, self.shortpath][column]()
 
@@ -319,11 +314,6 @@ class RepoItem(RepoTreeItem):
             if res == QMessageBox.Abort:
                 raise
         return invalidRepoList
-
-    def setActive(self, sel):
-        # Will be set to true when this item corresponds to the currently
-        # selected tab widget on the workbench
-        self._isActiveTab = sel
 
     def setData(self, column, value):
         if column == 0:

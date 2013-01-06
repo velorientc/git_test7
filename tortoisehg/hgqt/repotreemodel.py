@@ -84,6 +84,7 @@ class RepoTreeModel(QAbstractItemModel):
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
+        self._activeRepoItem = None
 
         root = None
         all = None
@@ -161,7 +162,12 @@ class RepoTreeModel(QAbstractItemModel):
                 Qt.FontRole):
             return QVariant()
         item = index.internalPointer()
-        return item.data(index.column(), role)
+        if role == Qt.FontRole and item is self._activeRepoItem:
+            font = QFont()
+            font.setBold(True)
+            return font
+        else:
+            return item.data(index.column(), role)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
@@ -184,6 +190,8 @@ class RepoTreeModel(QAbstractItemModel):
         if item is None:
             item = self.rootItem
         self.beginRemoveRows(parent, row, row+count-1)
+        if self._activeRepoItem in item.childs[row:row + count]:
+            self._activeRepoItem = None
         res = item.removeRows(row, count)
         self.endRemoveRows()
         return res
@@ -337,6 +345,22 @@ class RepoTreeModel(QAbstractItemModel):
             if index.row() < 0:
                 return count
             count += 1
+
+    # better to accept index instead of internal item object
+    def setActiveRepoItem(self, newitem):
+        """Highlight the specified item as active"""
+        if newitem is self._activeRepoItem:
+            return
+        previtem = self._activeRepoItem
+        self._activeRepoItem = newitem
+        for it in [previtem, newitem]:
+            if it:
+                self.dataChanged.emit(
+                    self.createIndex(it.row(), 0, it),
+                    self.createIndex(it.row(), self.columnCount(), it))
+
+    def activeRepoItem(self):
+        return self._activeRepoItem
 
     def loadSubrepos(self, root, filterFunc=(lambda r: True)):
         repoList = getRepoItemList(root)
