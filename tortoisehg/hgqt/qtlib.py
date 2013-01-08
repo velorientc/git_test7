@@ -859,11 +859,9 @@ def _linkifyHash(message, subrepo=''):
 def _linkifySubrepoRef(message, subrepo, hash=''):
     if hash:
         hash = '?' + hash
-    subrepos = _subreporegex.findall(message)
-    if subrepos:
-        subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-        linkifiedsubrepoindicator = _subrepoindicator % subrepolink
-        message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+    subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
+    linkifiedsubrepoindicator = _subrepoindicator % subrepolink
+    message = _subreporegex.sub(linkifiedsubrepoindicator, message)
     return message
 
 def linkifyMessage(message):
