@@ -849,6 +849,23 @@ _hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
 _subrepoindicator = '(in subrepo %s)'
 _subreporegex = re.compile(r'\(in subrepo (\S+)\)')
 
+def _linkifyHash(message, subrepo=''):
+    if subrepo:
+        replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
+    else:
+        replaceexpr = r'<a href="cset:\1">\1</a>'
+    return _hashregex.sub(replaceexpr, message)
+
+def _linkifySubrepoRef(message, subrepo, hash=''):
+    if hash:
+        hash = '?' + hash
+    subrepos = _subreporegex.findall(message)
+    if subrepos:
+        subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
+        linkifiedsubrepoindicator = _subrepoindicator % subrepolink
+        message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+    return message
+
 def linkifyMessage(message):
     r"""Convert revision id hashes and subrepo paths in messages into links
 
@@ -861,35 +878,18 @@ def linkifyMessage(message):
     u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
     (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
     """
-    def linkifyHash(message, subrepo=''):
-        if subrepo:
-            replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
-        else:
-            replaceexpr = r'<a href="cset:\1">\1</a>'
-        return _hashregex.sub(replaceexpr, message)
-
-    def linkifySubrepoRef(message, hash=''):
-        if hash:
-            hash = '?' + hash
-        subrepos = _subreporegex.findall(message)
-        if subrepos:
-            subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-            linkifiedsubrepoindicator = _subrepoindicator % subrepolink
-            message = _subreporegex.sub(linkifiedsubrepoindicator, message)
-        return message
-
     message = unicode(message)
     subrepo = ''
     sname = _subreporegex.findall(message)
     if sname:
         subrepo = sname[0]
-    message = linkifyHash(message, subrepo)
+    message = _linkifyHash(message, subrepo)
     if subrepo:
         hash = ''
         hashes = _hashregex.findall(message)
         if hashes:
             hash = hashes[0]
-        message = linkifySubrepoRef(message, hash)
+        message = _linkifySubrepoRef(message, subrepo, hash)
     return message.replace('\n', '<br>')
 
 class InfoBar(QFrame):
