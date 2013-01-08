@@ -9,12 +9,13 @@ import os
 from mercurial import patch, commands, extensions, context, util, node
 
 def partialcommit(orig, ui, repo, *pats, **opts):
-    if 'partials' in opts:
+    patchfilename = opts.get('partials', None)
+    if patchfilename:
         # attach a patch.filestore to this repo prior to calling commit()
         # the wrapped workingfilectx methods will see this filestore and use
         # the patched file data rather than the working copy data (for only the
         # files modified by the patch)
-        fp = open(opts['partials'], 'rb')
+        fp = open(patchfilename, 'rb')
         store = patch.filestore()
         try:
             try:
@@ -41,8 +42,8 @@ def partialcommit(orig, ui, repo, *pats, **opts):
                 wlock.release()
         return ret
     finally:
-        if 'partials' in opts:
-            os.unlink(opts['partials'])
+        if patchfilename:
+            os.unlink(patchfilename)
 
 def wfctx_data(orig, self):
     'wrapper function for workingfilectx.data()'
