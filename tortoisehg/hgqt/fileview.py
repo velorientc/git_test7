@@ -102,6 +102,11 @@ class HgFileView(QFrame):
         self.sci.customContextMenuRequested.connect(self.menuRequest)
         self.sci.SCN_MARGINCLICK.connect(self.marginClicked)
 
+        if QSettings().value('exclusion-no-annotate').toBool():
+            self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
+        else:
+            self.sci.setAnnotationDisplay(qsci.AnnotationStandard)
+
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
 
@@ -704,8 +709,23 @@ class HgFileView(QFrame):
         def sann():
             self.searchbar.search(selection)
             self.searchbar.show()
+        def anndisplay(m):
+            self.sci.setAnnotationDisplay(m)
+            QSettings().setValue('exclusion-no-annotate',
+                                 m == qsci.AnnotationHidden)
 
         if self._mode != AnnMode:
+            if self.folddiffs:
+                wrapmenu = QMenu(_('&Exclusion Annotations'), self)
+                for name, mode in ((_('&Enable'), qsci.AnnotationStandard),
+                                (_('&Disable'), qsci.AnnotationHidden)):
+                    def mkaction(n, m):
+                        a = wrapmenu.addAction(n)
+                        a.setCheckable(True)
+                        a.setChecked(self.sci.annotationDisplay() == m)
+                        a.triggered.connect(lambda: anndisplay(m))
+                    mkaction(name, mode)
+                menu.addMenu(wrapmenu)
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),
