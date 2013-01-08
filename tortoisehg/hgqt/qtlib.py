@@ -878,15 +878,15 @@ def linkifyMessage(message):
     """
     message = unicode(message)
     subrepo = ''
-    sname = _subreporegex.findall(message)
-    if sname:
-        subrepo = sname[0]
+    m = _subreporegex.search(message)
+    if m:
+        subrepo = m.group(1)
     message = _linkifyHash(message, subrepo)
     if subrepo:
         hash = ''
-        hashes = _hashregex.findall(message)
-        if hashes:
-            hash = hashes[0]
+        m = _hashregex.search(message)
+        if m:
+            hash = m.group(1)
         message = _linkifySubrepoRef(message, subrepo, hash)
     return message.replace('\n', '<br>')
 
