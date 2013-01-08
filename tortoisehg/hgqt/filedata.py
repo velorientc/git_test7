@@ -321,7 +321,7 @@ class FileData(object):
                 }[sstatedesc]
                 self.flabel += ' <i>' + lbl + '</i>'
                 if sactual:
-                    lbl = _(' <a href="repo:%s">open...</a>')
+                    lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
                     self.flabel += lbl % hglib.tounicode(srepo.root)
             except (EnvironmentError, error.RepoError, util.Abort), e:
                 self.error = _('Error previewing subrepo: %s') % \
