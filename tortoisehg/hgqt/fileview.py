@@ -450,9 +450,6 @@ class HgFileView(QFrame):
                 self.blk.setVisible(self._mode != DiffMode)
                 self.sci.setAnnotationEnabled(self._mode == AnnMode)
 
-        if fd.changes is None:
-            self.newChunkList.emit(uf, None)
-
         if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
@@ -476,6 +473,7 @@ class HgFileView(QFrame):
                 else:
                     # there was an error or rename without diffs
                     self.sci.setText(hglib.tounicode(fd.diff))
+            self.newChunkList.emit(uf, fd.changes)
         elif fd.ucontents:
             # subrepo summary and perhaps other data
             self.sci.setText(fd.ucontents)
@@ -483,6 +481,7 @@ class HgFileView(QFrame):
             self.sci.setFont(qtlib.getfont('fontlog').font())
             self.sci.setMarginWidth(1, 0)
             self.blk.setVisible(False)
+            self.newChunkList.emit(uf, None)
             return
         elif fd.contents:
             lexer = lexers.get_lexer(filename, fd.contents, self)
@@ -494,7 +493,9 @@ class HgFileView(QFrame):
             self.sci._updatemarginwidth()
             if self._mode == AnnMode:
                 self.sci._updateannotation(self._ctx, filename)
+            self.newChunkList.emit(uf, None)
         else:
+            self.newChunkList.emit(uf, None)
             return
 
         # Recover the last cursor/scroll position
@@ -507,7 +508,6 @@ class HgFileView(QFrame):
         self.highlightText(*self._lastSearch)
         uc = hglib.tounicode(fd.contents) or ''
         self.fileDisplayed.emit(uf, uc)
-        self.newChunkList.emit(uf, fd.changes)
 
         if self._mode != DiffMode:
             self.blk.setVisible(True)
