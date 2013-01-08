@@ -850,7 +850,17 @@ _subrepoindicator = '(in subrepo %s)'
 _subreporegex = re.compile(r'\(in subrepo (\S+)\)')
 
 def linkifyMessage(message):
-    """Convert revision id hashes and subrepo paths in messages into links"""
+    r"""Convert revision id hashes and subrepo paths in messages into links
+
+    >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
+    u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
+    >>> linkifyMessage('abort: foo (in subrepo bar)\n')
+    u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\n'
+    ...                'hint: foo\n') #doctest: +NORMALIZE_WHITESPACE
+    u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
+    (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
+    """
     def linkifyHash(message, subrepo=''):
         if subrepo:
             replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
