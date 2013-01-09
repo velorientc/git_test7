@@ -419,7 +419,12 @@ class FileData(object):
 
             # feed diffs through record.parsepatch() for more fine grained
             # chunk selection
-            self.changes = record.parsepatch(fp)[0]
+            filediffs = record.parsepatch(fp)
+            if filediffs:
+                self.changes = filediffs[0]
+            else:
+                self.diff = ''
+                return
             self.changes.excludecount = 0
             values = []
             lines = 0
