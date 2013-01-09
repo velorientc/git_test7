@@ -55,6 +55,7 @@ class HgFileView(QFrame):
         self._diffs = []
         self.changes = None
         self.folddiffs = False
+        self.showexcluded = True
         self.chunkatline = {}
         self.excludemsg = _('this change has been excluded from the commit')
 
@@ -122,6 +123,15 @@ class HgFileView(QFrame):
         self.sci.setMarkerBackgroundColor(QColor('#B0FFA0'), self.markerplus)
         self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
         self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
+
+        self.selected = self.sci.markerDefine(qsci.Plus, -1)
+        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
+        self.excludecolor = self.sci.markerDefine(qsci.Background, -1)
+        self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.excludecolor)
+        self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.excludecolor)
+        mask = (1 << self.selected) | (1 << self.unselected) | \
+               (1 << self.excludecolor)
+        self.sci.setMarginMarkerMask(2, mask)
 
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
@@ -256,6 +266,12 @@ class HgFileView(QFrame):
                 return False
             chunk.excluded = True
             self.changes.excludecount += 1
+            if self.showexcluded:
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, -1)
+                    self.sci.markerAdd(chunk.lineno+i+1, self.excludecolor)
+                self.sci.markerDelete(chunk.lineno, self.unselected)
+                self.sci.markerAdd(chunk.lineno, self.selected)
             return True
         else:
             self.sci.clearAnnotations(chunk.lineno)
@@ -263,12 +279,17 @@ class HgFileView(QFrame):
                 return False
             chunk.excluded = False
             self.changes.excludecount -= 1
+            if self.showexcluded:
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, self.excludecolor)
+                self.sci.markerDelete(chunk.lineno, self.selected)
+                self.sci.markerAdd(chunk.lineno, self.unselected)
             return True
 
     def updateFolds(self):
         'should be called after chunk states are modified programatically'
         self.sci.clearFolds()
-        if self.changes is None:
+        if self.changes is None or self.showexcluded:
             return
         folds = []
         for chunk in self.changes.hunks:
@@ -368,8 +389,16 @@ class HgFileView(QFrame):
 
     def _showFoldMargin(self, show):
         'toggle the display of the diff folding margin'
-        self.sci.setFolding(show and qsci.BoxedTreeFoldStyle or qsci.NoFoldStyle, 3)
-        self.sci.setMarginSensitivity(3, show)
+        if self.showexcluded:
+            self.sci.setMarginType(2, qsci.SymbolMargin)
+            self.sci.setMarginWidth(2, show and 15 or 0)
+            self.sci.setMarginSensitivity(2, show)
+            self.sci.setFolding(qsci.NoFoldStyle, 3)
+        else:
+            style = show and qsci.PlainFoldStyle or qsci.NoFoldStyle
+            self.sci.setFolding(style, 3)
+            self.sci.setMarginWidth(2, 0)
+            self.sci.setMarginSensitivity(2, False)
 
     @pyqtSlot(int, int, int)
     def marginClicked(self, pos, modifiers, margin):
@@ -377,7 +406,7 @@ class HgFileView(QFrame):
         line, index = self.sci.lineIndexFromPosition(pos)
         if line not in self.chunkatline:
             return
-        assert margin == 3 and index == 0
+        assert margin in (2, 3) and index == 0
         chunk = self.chunkatline[line]
         if self.updateChunk(chunk, not chunk.excluded):
             self.chunkSelectionChanged.emit()
@@ -459,9 +488,11 @@ class HgFileView(QFrame):
             if fd.changes:
                 self._showFoldMargin(True)
                 self.changes = fd.changes
+                self.sci.setText(hglib.tounicode(fd.diff))
                 for chunk in self.changes.hunks:
                     self.chunkatline[chunk.lineno] = chunk
-                self.sci.setText(hglib.tounicode(fd.diff))
+                    if self.showexcluded:
+                        self.sci.markerAdd(chunk.lineno, self.unselected)
             elif fd.diff:
                 # trim first three lines, for example:
                 # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
