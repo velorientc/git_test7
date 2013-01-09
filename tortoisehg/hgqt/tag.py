@@ -55,6 +55,7 @@ class TagDialog(QDialog):
         self.tagCombo.setEditText(hglib.tounicode(tag))
         self.tagCombo.currentIndexChanged.connect(self.updateStates)
         self.tagCombo.editTextChanged.connect(self.updateStates)
+        qtlib.allowCaseChangingInput(self.tagCombo)
         form.addRow(_('Tag:'), self.tagCombo)
 
         self.tagRevLabel = QLabel('')
