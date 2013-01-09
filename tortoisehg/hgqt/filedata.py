@@ -427,10 +427,11 @@ class FileData(object):
                 buf = cStringIO.StringIO()
                 chunk.write(buf)
                 chunk.excluded = False
-                chunk.lineno = lines
                 val = buf.getvalue()
                 values.append(val)
-                lines += len(val.splitlines())
+                chunk.lineno = lines
+                chunk.linecount = len(val.splitlines())
+                lines += chunk.linecount
             self.diff = ''.join(values)
         else:
             diffopts = patch.diffopts(repo.ui, {})
