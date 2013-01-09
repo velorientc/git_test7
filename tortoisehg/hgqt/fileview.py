@@ -132,6 +132,7 @@ class HgFileView(QFrame):
         mask = (1 << self.selected) | (1 << self.unselected) | \
                (1 << self.excludecolor)
         self.sci.setMarginMarkerMask(2, mask)
+        self.excludeindicator = self.sci.indicatorDefine(qsci.StrikeIndicator)
 
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
@@ -272,6 +273,9 @@ class HgFileView(QFrame):
                     self.sci.markerAdd(chunk.lineno+i+1, self.excludecolor)
                 self.sci.markerDelete(chunk.lineno, self.unselected)
                 self.sci.markerAdd(chunk.lineno, self.selected)
+                self.sci.fillIndicatorRange(chunk.lineno+1, 0, 
+                                            chunk.lineno+chunk.linecount, 0, 
+                                            self.excludeindicator)
             return True
         else:
             self.sci.clearAnnotations(chunk.lineno)
@@ -284,6 +288,9 @@ class HgFileView(QFrame):
                     self.sci.markerDelete(chunk.lineno+i+1, self.excludecolor)
                 self.sci.markerDelete(chunk.lineno, self.selected)
                 self.sci.markerAdd(chunk.lineno, self.unselected)
+                self.sci.clearIndicatorRange(chunk.lineno+1, 0, 
+                                            chunk.lineno+chunk.linecount, 0, 
+                                            self.excludeindicator)
             return True
 
     def updateFolds(self):
