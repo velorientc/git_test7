@@ -693,6 +693,19 @@ def fix_application_font():
     f.setPixelSize(abs(lf.lfHeight))
     QApplication.setFont(f, 'QWidget')
 
+def allowCaseChangingInput(combo):
+    """Allow case-changing input of known combobox item
+
+    QComboBox performs case-insensitive inline completion by default. It's
+    all right, but sadly it implies case-insensitive check for duplicates,
+    i.e. you can no longer enter "Foo" if the combobox contains "foo".
+
+    For details, read QComboBoxPrivate::_q_editingFinished() and matchFlags()
+    of src/gui/widgets/qcombobox.cpp.
+    """
+    assert isinstance(combo, QComboBox) and combo.isEditable()
+    combo.completer().setCaseSensitivity(Qt.CaseSensitive)
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
