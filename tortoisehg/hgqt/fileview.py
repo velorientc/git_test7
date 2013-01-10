@@ -760,26 +760,31 @@ class HgFileView(QFrame):
 
         if self._mode != AnnMode:
             if self.folddiffs:
-                wrapmenu = QMenu(_('&Exclusion Annotations'), self)
+                partialcommitopts = QMenu(_('&Change selection options'), self)
                 def toggleShowExcluded():
                     self.showexcluded = not self.showexcluded
                     self._showFoldMargin(True)
                     self.updateFolds()
                     QSettings().setValue('exclusion-showexcluded',
                         self.showexcluded)
-                actshowexcluded = wrapmenu.addAction(_('Show Excluded Chunks'))
+                actshowexcluded = partialcommitopts.addAction(_('Show excluded changes'))
                 actshowexcluded.setCheckable(True)
                 actshowexcluded.setChecked(self.showexcluded)
                 actshowexcluded.triggered.connect(toggleShowExcluded)
-                for name, mode in ((_('&Enable'), qsci.AnnotationStandard),
-                                (_('&Disable'), qsci.AnnotationHidden)):
-                    def mkaction(n, m):
-                        a = wrapmenu.addAction(n)
-                        a.setCheckable(True)
-                        a.setChecked(self.sci.annotationDisplay() == m)
-                        a.triggered.connect(lambda: anndisplay(m))
-                    mkaction(name, mode)
-                menu.addMenu(wrapmenu)
+
+                def toggleAnnotateExcluded():
+                    if self.sci.annotationDisplay() == qsci.AnnotationStandard:
+                        annmode = qsci.AnnotationHidden
+                    else:
+                        annmode = qsci.AnnotationStandard
+                    anndisplay(annmode)
+                actannotateexcluded = partialcommitopts.addAction(
+                    _('Annotate excluded changes'))
+                actannotateexcluded.setCheckable(True)
+                actannotateexcluded.setChecked(
+                    self.sci.annotationDisplay() == qsci.AnnotationStandard)
+                actannotateexcluded.triggered.connect(toggleAnnotateExcluded)
+                menu.addMenu(partialcommitopts)
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),
