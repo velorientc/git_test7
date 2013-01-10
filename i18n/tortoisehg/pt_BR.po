@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-01-08 13:31-0200\n"
-"PO-Revision-Date: 2013-01-08 16:00+0000\n"
+"PO-Revision-Date: 2013-01-09 10:13+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-01-09 05:13+0000\n"
+"X-Launchpad-Export-Date: 2013-01-10 04:52+0000\n"
 "X-Generator: Launchpad (build 16412)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1670,7 +1670,7 @@ msgstr "&Reverter para Revisão..."
 
 #: tortoisehg/hgqt/filectxactions.py:81 tortoisehg/hgqt/wctxactions.py:45
 msgid "Open S&ubrepository"
-msgstr "Abrir S&ub-repositório"
+msgstr "Abrir S&ub-Repositório"
 
 #: tortoisehg/hgqt/filectxactions.py:82
 msgid "Open the selected subrepository"
@@ -1922,11 +1922,11 @@ msgstr "Avançar"
 
 #: tortoisehg/hgqt/filedialogs.py:215
 msgid "&Diff Selected Changesets"
-msgstr "&Diff das Revisões Selecionadas"
+msgstr "&Diff entre as Revisões Selecionadas"
 
 #: tortoisehg/hgqt/filedialogs.py:217
 msgid "Diff Selected &File Revisions"
-msgstr "Diff das Revisões de &Arquivo Selecionadas"
+msgstr "Diff entre as Revisões de &Arquivo Selecionadas"
 
 #: tortoisehg/hgqt/filedialogs.py:224
 msgid "&Diff Changeset to Parent"
@@ -3827,7 +3827,7 @@ msgstr "&Desabilitar"
 
 #: tortoisehg/hgqt/qscilib.py:270
 msgid "&Editor Options"
-msgstr "OPções do &Editor"
+msgstr "Opções do &Editor"
 
 #: tortoisehg/hgqt/qscilib.py:410
 msgid "### regular expression ###"
@@ -4889,7 +4889,7 @@ msgstr "Pus&h"
 
 #: tortoisehg/hgqt/repowidget.py:1217
 msgid "Push &All"
-msgstr "Push de &Todos"
+msgstr "Push de &Todas"
 
 #: tortoisehg/hgqt/repowidget.py:1219
 msgid "Push to &Here"
@@ -4965,7 +4965,7 @@ msgstr "En&xertar na Local..."
 
 #: tortoisehg/hgqt/repowidget.py:1275
 msgid "Modi&fy History"
-msgstr "Modi&ficar History"
+msgstr "Modi&ficar Histórico"
 
 #: tortoisehg/hgqt/repowidget.py:1276
 msgid "&Unapply Patch (qgoto parent)"
@@ -9430,7 +9430,7 @@ msgstr "&Apagar Não Versionados..."
 
 #: tortoisehg/hgqt/wctxactions.py:71
 msgid "&Mark Unresolved"
-msgstr "Marcar como &Nao Resolvido"
+msgstr "Marcar como &Não Resolvido"
 
 #: tortoisehg/hgqt/wctxactions.py:72
 msgid "&Mark Resolved"
@@ -9462,7 +9462,7 @@ msgstr "Foi renomeado de"
 
 #: tortoisehg/hgqt/wctxactions.py:142
 msgid "Restart Mer&ge"
-msgstr "Reiniciar Mescla&gem..."
+msgstr "Reiniciar Mescla&gem"
 
 #: tortoisehg/hgqt/wctxactions.py:144
 msgid "Restart Merge &with"
@@ -9745,7 +9745,7 @@ msgstr "&Shelve... (Adiar Mudanças)"
 
 #: tortoisehg/hgqt/workbench.py:296
 msgid "&Import..."
-msgstr "&Importar ..."
+msgstr "&Importar..."
 
 #: tortoisehg/hgqt/workbench.py:299
 msgid "&Verify"
@@ -9757,7 +9757,7 @@ msgstr "Re&cuperar"
 
 #: tortoisehg/hgqt/workbench.py:304
 msgid "&Resolve..."
-msgstr "&Resolver..."
+msgstr "&Resolve..."
 
 #: tortoisehg/hgqt/workbench.py:307
 msgid "Rollback/&Undo..."
@@ -9769,7 +9769,7 @@ msgstr "&Purge... (Limpar Repositório)"
 
 #: tortoisehg/hgqt/workbench.py:314
 msgid "&Bisect..."
-msgstr "&Biseccionar..."
+msgstr "&Bisseccionar..."
 
 #: tortoisehg/hgqt/workbench.py:325
 msgid "E&xplorer Help"
