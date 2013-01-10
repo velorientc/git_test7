@@ -55,7 +55,7 @@ class HgFileView(QFrame):
         self._diffs = []
         self.changes = None
         self.folddiffs = False
-        self.showexcluded = True
+        self.showexcluded = QSettings().value('exclusion-showexcluded', True).toBool()
         self.chunkatline = {}
         self.excludemsg = _('this change has been excluded from the commit')
 
@@ -755,6 +755,16 @@ class HgFileView(QFrame):
         if self._mode != AnnMode:
             if self.folddiffs:
                 wrapmenu = QMenu(_('&Exclusion Annotations'), self)
+                def toggleShowExcluded():
+                    self.showexcluded = not self.showexcluded
+                    self._showFoldMargin(True)
+                    self.updateFolds()
+                    QSettings().setValue('exclusion-showexcluded',
+                        self.showexcluded)
+                actshowexcluded = wrapmenu.addAction(_('Show Excluded Chunks'))
+                actshowexcluded.setCheckable(True)
+                actshowexcluded.setChecked(self.showexcluded)
+                actshowexcluded.triggered.connect(toggleShowExcluded)
                 for name, mode in ((_('&Enable'), qsci.AnnotationStandard),
                                 (_('&Disable'), qsci.AnnotationHidden)):
                     def mkaction(n, m):
