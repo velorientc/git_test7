@@ -55,7 +55,7 @@ class HgFileView(QFrame):
         self._diffs = []
         self.changes = None
         self.folddiffs = False
-        self.showexcluded = QSettings().value('exclusion-showexcluded', True).toBool()
+        self.showexcluded = QSettings().value('changes-show-excluded', True).toBool()
         self.chunkatline = {}
         self.excludemsg = _('this change has been excluded from the commit')
 
@@ -103,10 +103,10 @@ class HgFileView(QFrame):
         self.sci.customContextMenuRequested.connect(self.menuRequest)
         self.sci.SCN_MARGINCLICK.connect(self.marginClicked)
 
-        if QSettings().value('exclusion-no-annotate').toBool():
-            self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
-        else:
+        if QSettings().value('changes-annotate-excluded').toBool():
             self.sci.setAnnotationDisplay(qsci.AnnotationStandard)
+        else:
+            self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -755,8 +755,8 @@ class HgFileView(QFrame):
             self.searchbar.show()
         def anndisplay(m):
             self.sci.setAnnotationDisplay(m)
-            QSettings().setValue('exclusion-no-annotate',
-                                 m == qsci.AnnotationHidden)
+            QSettings().setValue('changes-annotate-excluded',
+                                 m == qsci.AnnotationStandard)
 
         if self._mode != AnnMode:
             if self.folddiffs:
@@ -765,7 +765,7 @@ class HgFileView(QFrame):
                     self.showexcluded = not self.showexcluded
                     self._showFoldMargin(True)
                     self.updateFolds()
-                    QSettings().setValue('exclusion-showexcluded',
+                    QSettings().setValue('changes-show-excluded',
                         self.showexcluded)
                 actshowexcluded = partialcommitopts.addAction(_('Show excluded changes'))
                 actshowexcluded.setCheckable(True)
