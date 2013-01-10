@@ -124,13 +124,13 @@ class HgFileView(QFrame):
         self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
         self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
 
-        self.selected = self.sci.markerDefine(qsci.Plus, -1)
-        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
-        self.excludecolor = self.sci.markerDefine(qsci.Background, -1)
-        self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.excludecolor)
-        self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.excludecolor)
-        mask = (1 << self.selected) | (1 << self.unselected) | \
-               (1 << self.excludecolor)
+        self.inclmarker = self.sci.markerDefine(qsci.Plus, -1)
+        self.exclmarker = self.sci.markerDefine(qsci.Minus, -1)
+        self.exclcolor = self.sci.markerDefine(qsci.Background, -1)
+        self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.exclcolor)
+        self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.exclcolor)
+        mask = (1 << self.inclmarker) | (1 << self.exclmarker) | \
+               (1 << self.exclcolor)
         self.sci.setMarginMarkerMask(2, mask)
         self.excludeindicator = self.sci.indicatorDefine(qsci.StrikeIndicator)
 
@@ -270,11 +270,11 @@ class HgFileView(QFrame):
             if self.showexcluded:
                 for i in xrange(chunk.linecount-1):
                     self.sci.markerDelete(chunk.lineno+i+1, -1)
-                    self.sci.markerAdd(chunk.lineno+i+1, self.excludecolor)
-                self.sci.markerDelete(chunk.lineno, self.unselected)
-                self.sci.markerAdd(chunk.lineno, self.selected)
-                self.sci.fillIndicatorRange(chunk.lineno+1, 0, 
-                                            chunk.lineno+chunk.linecount, 0, 
+                    self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.inclmarker)
+                self.sci.markerAdd(chunk.lineno, self.exclmarker)
+                self.sci.fillIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
                                             self.excludeindicator)
             return True
         else:
@@ -285,24 +285,27 @@ class HgFileView(QFrame):
             self.changes.excludecount -= 1
             if self.showexcluded:
                 for i in xrange(chunk.linecount-1):
-                    self.sci.markerDelete(chunk.lineno+i+1, self.excludecolor)
-                self.sci.markerDelete(chunk.lineno, self.selected)
-                self.sci.markerAdd(chunk.lineno, self.unselected)
-                self.sci.clearIndicatorRange(chunk.lineno+1, 0, 
-                                            chunk.lineno+chunk.linecount, 0, 
+                    self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.exclmarker)
+                self.sci.markerAdd(chunk.lineno, self.inclmarker)
+                self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
                                             self.excludeindicator)
             return True
 
     def updateFolds(self):
         'should be called after chunk states are modified programatically'
         self.sci.clearFolds()
-        if self.changes is None or self.showexcluded:
+        if self.changes is None:
             return
         folds = []
         for chunk in self.changes.hunks:
             if chunk.excluded:
                 folds.append(chunk.lineno)
-        self.sci.setContractedFolds(folds)
+                if self.showexcluded:
+                    self.sci.markerAdd(chunk.lineno, self.exclmarker)
+        if not self.showexcluded:
+            self.sci.setContractedFolds(folds)
 
     @pyqtSlot(QAction)
     def setMode(self, action):
@@ -499,7 +502,10 @@ class HgFileView(QFrame):
                 for chunk in self.changes.hunks:
                     self.chunkatline[chunk.lineno] = chunk
                     if self.showexcluded:
-                        self.sci.markerAdd(chunk.lineno, self.unselected)
+                        self.sci.markerAdd(chunk.lineno, self.inclmarker)
+                        self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
+                                            self.excludeindicator)
             elif fd.diff:
                 # trim first three lines, for example:
                 # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
