@@ -132,7 +132,9 @@ class HgFileView(QFrame):
         mask = (1 << self.inclmarker) | (1 << self.exclmarker) | \
                (1 << self.exclcolor)
         self.sci.setMarginMarkerMask(2, mask)
-        self.excludeindicator = self.sci.indicatorDefine(qsci.StrikeIndicator)
+        self.markexcluded = QSettings().value('changes-mark-excluded', True).toBool()
+        self.excludeindicator = -1
+        self.updateChunkIndicatorMarks()
 
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
@@ -248,6 +250,18 @@ class HgFileView(QFrame):
         self.repo = repo
         self.sci.repo = repo
 
+    def updateChunkIndicatorMarks(self):
+        '''
+        This method has some pre-requisites:
+        - self.markexcluded and self.excludeindicator MUST be defined
+        - self.excludeindicator MUST be set to -1 before calling this
+        method for the first time
+        '''
+        indicatortypes = (qsci.HiddenIndicator, qsci.StrikeIndicator)
+        self.excludeindicator = self.sci.indicatorDefine(
+            indicatortypes[self.markexcluded],
+            self.excludeindicator)
+
     def enableDiffFolding(self, enable):
         'Enable the use of a folding margin when a diff view is active'
         # Should only be called with True from the commit tool when it is in
@@ -256,6 +270,16 @@ class HgFileView(QFrame):
             self.sci.clearFolds()
         self.folddiffs = enable
         self._showFoldMargin(enable)
+
+    def updateChunkMarker(self, chunk, exclude):
+        if exclude:
+            self.sci.fillIndicatorRange(chunk.lineno+1, 0,
+                chunk.lineno+chunk.linecount, 0,
+                self.excludeindicator)
+        else:
+            self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                chunk.lineno+chunk.linecount, 0,
+                self.excludeindicator)
 
     def updateChunk(self, chunk, exclude):
         'change chunk exclusion state, update display when necessary'
@@ -273,10 +297,6 @@ class HgFileView(QFrame):
                     self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
                 self.sci.markerDelete(chunk.lineno, self.inclmarker)
                 self.sci.markerAdd(chunk.lineno, self.exclmarker)
-                self.sci.fillIndicatorRange(chunk.lineno+1, 0,
-                                            chunk.lineno+chunk.linecount, 0,
-                                            self.excludeindicator)
-            return True
         else:
             self.sci.clearAnnotations(chunk.lineno)
             if not chunk.excluded:
@@ -288,10 +308,8 @@ class HgFileView(QFrame):
                     self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
                 self.sci.markerDelete(chunk.lineno, self.exclmarker)
                 self.sci.markerAdd(chunk.lineno, self.inclmarker)
-                self.sci.clearIndicatorRange(chunk.lineno+1, 0,
-                                            chunk.lineno+chunk.linecount, 0,
-                                            self.excludeindicator)
-            return True
+        self.updateChunkMarker(chunk, exclude)
+        return True
 
     def updateFolds(self):
         'should be called after chunk states are modified programatically'
@@ -784,6 +802,17 @@ class HgFileView(QFrame):
                 actannotateexcluded.setChecked(
                     self.sci.annotationDisplay() == qsci.AnnotationStandard)
                 actannotateexcluded.triggered.connect(toggleAnnotateExcluded)
+
+                def toggleMarkExcluded():
+                    self.markexcluded = not self.markexcluded
+                    self.updateChunkIndicatorMarks()
+                    QSettings().setValue('changes-mark-excluded',
+                        self.markexcluded)
+                actmarkexcluded = partialcommitopts.addAction(
+                    _('Mark excluded changes'))
+                actmarkexcluded.setCheckable(True)
+                actmarkexcluded.setChecked(self.markexcluded)
+                actmarkexcluded.triggered.connect(toggleMarkExcluded)
                 menu.addMenu(partialcommitopts)
             if selection:
                 menu.addSeparator()
