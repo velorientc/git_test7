@@ -224,14 +224,11 @@ class RepoRegistryView(QDockWidget):
     removeRepo = pyqtSignal(QString)
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, parent, showSubrepos=False, showNetworkSubrepos=False,
-            showShortPaths=False):
+    def __init__(self, parent):
         QDockWidget.__init__(self, parent)
 
         self.watcher = None
-        self.showSubrepos = showSubrepos
-        self.showNetworkSubrepos = showNetworkSubrepos
-        self.showShortPaths = showShortPaths
+        self._setupSettingActions()
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -245,12 +242,6 @@ class RepoRegistryView(QDockWidget):
 
         self.contextmenu = QMenu(self)
         self.tview = tv = RepoTreeView(self)
-
-        sfile = settingsfilename()
-        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
-            showSubrepos=self.showSubrepos,
-            showNetworkSubrepos=self.showNetworkSubrepos))
-
         mainframe.layout().addWidget(tv)
 
         tv.setIndentation(10)
@@ -264,7 +255,14 @@ class RepoRegistryView(QDockWidget):
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
-        QTimer.singleShot(0, self.expand)
+        self._loadSettings()
+
+        sfile = settingsfilename()
+        # start without subrepos because loading them is expensive
+        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
+            showSubrepos=False,
+            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
+            showShortPaths=self._isSettingEnabled('showShortPaths')))
 
         # Setup a file system watcher to update the reporegistry
         # anytime it is modified by another thg instance
@@ -276,28 +274,63 @@ class RepoRegistryView(QDockWidget):
             tv.model().write(sfile)
         self.watcher = QFileSystemWatcher(self)
         self.watcher.addPath(sfile)
-        self.watcher.fileChanged.connect(self.modifiedSettings)
-        self._pendingReloadModel = False
-        self._activeTabRepo = None
+        self._reloadModelTimer = QTimer(self, interval=2000, singleShot=True)
+        self._reloadModelTimer.timeout.connect(self.reloadModel)
+        self.watcher.fileChanged.connect(self._reloadModelTimer.start)
 
-    def setShowSubrepos(self, show, reloadModel=True):
-        if self.showSubrepos != show:
-            self.showSubrepos = show
-            if reloadModel:
-                self.reloadModel()
+        QTimer.singleShot(0, self._initView)
 
-    def setShowNetworkSubrepos(self, show, reloadModel=True):
-        if self.showNetworkSubrepos != show:
-            self.showNetworkSubrepos = show
-            if reloadModel:
-                self.reloadModel()
+    @pyqtSlot()
+    def _initView(self):
+        self.expand()
+        self._updateColumnVisibility()
+        if self._isSettingEnabled('showSubrepos'):
+            self.reloadModel()  # delayed loading of subrepos
 
-    def setShowShortPaths(self, show):
-        if self.showShortPaths != show:
-            self.showShortPaths = show
-            #self.tview.model().showShortPaths = show
-            self.tview.model().updateCommonPaths(show)
-            self.tview.dataChanged(QModelIndex(), QModelIndex())
+    def _loadSettings(self):
+        defaultmap = {'showPaths': False, 'showSubrepos': True,
+                      'showNetworkSubrepos': True, 'showShortPaths': True}
+        s = QSettings()
+        s.beginGroup('Workbench')  # for compatibility with old release
+        for key, action in self._settingactions.iteritems():
+            action.setChecked(s.value(key, defaultmap[key]).toBool())
+        s.endGroup()
+
+    def _saveSettings(self):
+        s = QSettings()
+        s.beginGroup('Workbench')  # for compatibility with old release
+        for key, action in self._settingactions.iteritems():
+            s.setValue(key, action.isChecked())
+        s.endGroup()
+
+    def _setupSettingActions(self):
+        settingtable = [
+            ('showPaths', _('Show &Paths'), self._updateColumnVisibility),
+            ('showSubrepos', _('Show &Subrepos on Registry'), self.reloadModel),
+            ('showNetworkSubrepos', _('Show Subrepos for &Remote Repositories'),
+             self.reloadModel),
+            ('showShortPaths', _('Show S&hort Paths'), self._updateCommonPath),
+            ]
+        self._settingactions = {}
+        for i, (key, text, slot) in enumerate(settingtable):
+            a = QAction(text, self, checkable=True)
+            a.setData(i)  # sort key
+            a.triggered.connect(slot)
+            self._settingactions[key] = a
+
+    def settingActions(self):
+        return sorted(self._settingactions.itervalues(),
+                      key=lambda a: a.data().toInt())
+
+    def _isSettingEnabled(self, key):
+        return self._settingactions[key].isChecked()
+
+    @pyqtSlot()
+    def _updateCommonPath(self):
+        show = self._isSettingEnabled('showShortPaths')
+        self.tview.model().updateCommonPaths(show)
+        # FIXME: access violation; should be done by model
+        self.tview.dataChanged(QModelIndex(), QModelIndex())
 
     def updateSettingsFile(self):
         # If there is a settings watcher, we must briefly stop watching the
@@ -320,60 +353,23 @@ class RepoRegistryView(QDockWidget):
         # file
         QTimer.singleShot(0, self.updateSettingsFile)
 
-    @pyqtSlot(QString)
-    def modifiedSettings(self):
-        UPDATE_DELAY = 2 # seconds
-
-        # Do not update the repo registry more often than
-        # once every UPDATE_DELAY seconds
-        if not self._pendingReloadModel:
-            # There are no pending updates:
-            # -> schedule and update in UPDATE_DELAY seconds.
-            # If other update notifications arrive from now
-            # until now + UPDATE_DELAY, they will be ignored and "rolled into"
-            # the pending update
-            self._pendingReloadModel = True
-            QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
-
+    @pyqtSlot()
     def reloadModel(self):
-        activeroot = None
-        if self._activeTabRepo:
-            activeroot = hglib.tounicode(self._activeTabRepo.rootpath())
-            self._activeTabRepo = None  # invalid after setModel()
         oldmodel = self.tview.model()
+        activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
-                self.showSubrepos, self.showNetworkSubrepos,
-                self.showShortPaths))
+                self._isSettingEnabled('showSubrepos'),
+                self._isSettingEnabled('showNetworkSubrepos'),
+                self._isSettingEnabled('showShortPaths')))
         oldmodel.deleteLater()
         self.expand()
         if activeroot:
             self.setActiveTabRepo(activeroot)
-        self._pendingReloadModel = False
-
-    def _getItemAndAncestors(self, it):
-        """Create a list of ancestors (including the selected item)"""
-        from repotreeitem import RepoGroupItem
-        itchain = [it]
-        while(not isinstance(itchain[-1], RepoGroupItem)):
-            itchain.append(itchain[-1].parent())
-        return reversed(itchain)
+        self._reloadModelTimer.stop()
 
     def expand(self):
         self.tview.expandToDepth(0)
-
-    def scrollTo(self, it=None, scrollHint=RepoTreeView.EnsureVisible):
-        if not it:
-            return
-
-        # Create a list of ancestors (including the selected item)
-        itchain = self._getItemAndAncestors(it)
-
-        m = self.tview.model()
-        idx = self.tview.rootIndex()
-        for it in itchain:
-            idx = m.index(it.row(), 0, idx)
-        self.tview.scrollTo(idx, hint=scrollHint)
 
     def addRepo(self, root, groupname=None):
         """
@@ -396,26 +392,15 @@ class RepoRegistryView(QDockWidget):
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
-        """"
-        The selected tab has changed on the workbench
-        Unmark the previously selected tab and mark the new one as selected on
-        the Repo Registry as well
-        """
-        root = hglib.fromunicode(root)
-        if self._activeTabRepo:
-            self._activeTabRepo.setActive(False)
+        """"The selected tab has changed on the workbench"""
         m = self.tview.model()
-        it = m.getRepoItem(root, lookForSubrepos=True)
-        if it:
-            self._activeTabRepo = it
-            it.setActive(True)
-            self.tview.dataChanged(QModelIndex(), QModelIndex())
+        index = m.indexFromRepoRoot(root)
+        m.setActiveRepo(index)
+        self.tview.scrollTo(index)
 
-            # Make sure that the active tab is visible by expanding its parent
-            # and scrolling to it if necessary
-            self.scrollTo(it)
-
-    def showPaths(self, show):
+    @pyqtSlot()
+    def _updateColumnVisibility(self):
+        show = self._isSettingEnabled('showPaths')
         self.tview.setColumnHidden(1, not show)
         self.tview.setHeaderHidden(not show)
         if show:
@@ -427,6 +412,7 @@ class RepoRegistryView(QDockWidget):
         sfile = settingsfilename()
         self.watcher.removePath(sfile)
         self.tview.model().write(sfile)
+        self._saveSettings()
 
     def _action_defs(self):
         a = [("reloadRegistry", _("&Refresh Repository List"), 'view-refresh',

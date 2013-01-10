@@ -1,4 +1,4 @@
-# thread.py - A seprated thread to run Mercurial command
+# thread.py - A separate thread to run Mercurial commands
 #
 # Copyright 2009 Steve Borho <steve@borho.org>
 # Copyright 2010 Yuki KODAMA <endflow.net@gmail.com>

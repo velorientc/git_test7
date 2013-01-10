@@ -12,7 +12,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem, SubrepoItem
+from repotreeitem import RepoItem, RepoTreeItem, StandaloneSubrepoItem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -84,6 +84,7 @@ class RepoTreeModel(QAbstractItemModel):
         self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
+        self._activeRepoItem = None
 
         root = None
         all = None
@@ -106,7 +107,7 @@ class RepoTreeModel(QAbstractItemModel):
             root = RepoTreeItem(self)
         # due to issue #1075, 'all' may be missing even if 'root' exists
         if not all:
-            all = AllRepoGroupItem(self)
+            all = AllRepoGroupItem()
             root.appendChild(all)
 
         self.rootItem = root
@@ -117,7 +118,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     # overrides from QAbstractItemModel
 
-    def index(self, row, column, parent):
+    def index(self, row, column, parent=QModelIndex()):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if (not parent.isValid()):
@@ -139,7 +140,7 @@ class RepoTreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.column() > 0:
             return 0
         if not parent.isValid():
@@ -148,22 +149,27 @@ class RepoTreeModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role not in (Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole,
                 Qt.FontRole):
             return QVariant()
         item = index.internalPointer()
-        return item.data(index.column(), role)
+        if role == Qt.FontRole and item is self._activeRepoItem:
+            font = QFont()
+            font.setBold(True)
+            return font
+        else:
+            return item.data(index.column(), role)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
                 if section == 1:
@@ -179,11 +185,13 @@ class RepoTreeModel(QAbstractItemModel):
     def supportedDropActions(self):
         return Qt.CopyAction | Qt.MoveAction | Qt.LinkAction
 
-    def removeRows(self, row, count, parent):
+    def removeRows(self, row, count, parent=QModelIndex()):
         item = parent.internalPointer()
         if item is None:
             item = self.rootItem
         self.beginRemoveRows(parent, row, row+count-1)
+        if self._activeRepoItem in item.childs[row:row + count]:
+            self._activeRepoItem = None
         res = item.removeRows(row, count)
         self.endRemoveRows()
         return res
@@ -230,8 +238,6 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         if row < 0:
             row = 0
-        if self.showSubrepos:
-            self.loadSubrepos(itemread)
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
@@ -239,7 +245,7 @@ class RepoTreeModel(QAbstractItemModel):
             self.allrepos = itemread
         return True
 
-    def setData(self, index, value, role):
+    def setData(self, index, value, role=Qt.EditRole):
         if not index.isValid() or role != Qt.EditRole:
             return False
         s = value.toString()
@@ -287,7 +293,7 @@ class RepoTreeModel(QAbstractItemModel):
 
         self.beginInsertRows(grp, row, row)
         if itemIsSubrepo:
-            ri = SubrepoItem(root)
+            ri = StandaloneSubrepoItem(root)
         else:
             ri = RepoItem(root)
         rgi.insertChild(row, ri)
@@ -319,6 +325,22 @@ class RepoTreeModel(QAbstractItemModel):
         return self.rootItem.getRepoItem(os.path.normcase(reporoot),
                     lookForSubrepos=lookForSubrepos)
 
+    def indexFromRepoRoot(self, uroot, column=0):
+        item = self.getRepoItem(hglib.fromunicode(uroot), lookForSubrepos=True)
+        return self._indexFromItem(item, column)
+
+    def _indexFromItem(self, item, column=0):
+        if item:
+            return self.createIndex(item.row(), column, item)
+        else:
+            return QModelIndex()
+
+    def repoRoot(self, index):
+        item = index.internalPointer()
+        if not isinstance(item, RepoItem):
+            return
+        return hglib.tounicode(item.rootpath())
+
     def addGroup(self, name):
         ri = self.rootItem
         cc = ri.childCount()
@@ -340,10 +362,25 @@ class RepoTreeModel(QAbstractItemModel):
                 return count
             count += 1
 
+    def setActiveRepo(self, index):
+        """Highlight the specified item as active"""
+        newitem = index.internalPointer()
+        if newitem is self._activeRepoItem:
+            return
+        previtem = self._activeRepoItem
+        self._activeRepoItem = newitem
+        for it in [previtem, newitem]:
+            if it:
+                self.dataChanged.emit(
+                    self.createIndex(it.row(), 0, it),
+                    self.createIndex(it.row(), self.columnCount(), it))
+
+    def activeRepoIndex(self, column=0):
+        return self._indexFromItem(self._activeRepoItem, column)
+
     def loadSubrepos(self, root, filterFunc=(lambda r: True)):
         repoList = getRepoItemList(root)
         for n, c in enumerate(repoList):
-            QCoreApplication.processEvents()
             if filterFunc(c.rootpath()):
                 if self.showNetworkSubrepos \
                         or not paths.netdrive_status(c.rootpath()):
@@ -351,7 +388,6 @@ class RepoTreeModel(QAbstractItemModel):
                         _('Updating repository registry'),
                         _('Loading repository %s')
                         % hglib.tounicode(c.rootpath()))
-                    QCoreApplication.processEvents()
                     self.removeRows(0, c.childCount(),
                         self.createIndex(c.row(), 0, c))
                     c.appendSubrepos()

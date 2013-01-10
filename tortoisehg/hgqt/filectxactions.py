@@ -306,7 +306,7 @@ class FilectxActions(QObject):
         if os.path.isdir(path):
             spath = path[len(self.repo.root)+1:]
             source, revid, stype = self.ctx.substate[spath]
-            link = u'subrepo:' + hglib.tounicode(path)
+            link = u'repo:' + hglib.tounicode(path)
             if stype == 'hg':
                 link = u'%s?%s' % (link, revid)
             self.linkActivated.emit(link)
