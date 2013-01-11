@@ -1338,8 +1338,23 @@ class SettingsForm(QWidget):
                 return
         self.refresh()
 
+    def focusPage(self, focuspage):
+        'Set change page to focuspage'
+        for i, (meta, info) in enumerate(INFO):
+            if meta['name'] == focuspage:
+                self._activepagename = meta['name']
+                self.pageList.setCurrentRow(i)
+                QTimer.singleShot(0, lambda:
+                    self.activatePage(i))
+                return True
+        return False
+
     def focusField(self, focusfield):
         'Set page and focus to requested datum'
+        if not focusfield:
+            return False
+        if focusfield.find('.') < 0:
+            return self.focusPage(focusfield)
         for i, (meta, info) in enumerate(INFO):
             for n, e in enumerate(info):
                 if e.cpath == focusfield:
