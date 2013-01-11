@@ -425,7 +425,7 @@ class HgFileView(QFrame):
             self.sci.setMarginSensitivity(2, show)
             self.sci.setFolding(qsci.NoFoldStyle, 3)
         else:
-            style = show and qsci.PlainFoldStyle or qsci.NoFoldStyle
+            style = show and qsci.BoxedTreeFoldStyle or qsci.NoFoldStyle
             self.sci.setFolding(style, 3)
             self.sci.setMarginWidth(2, 0)
             self.sci.setMarginSensitivity(2, False)
