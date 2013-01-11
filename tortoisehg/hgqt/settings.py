@@ -1230,7 +1230,11 @@ class SettingsForm(QWidget):
             pageList.addItem(item)
 
         self.refresh()
-        self.focusField(focus or 'ui.merge')
+
+        if not self.focusField(focus):
+            # The selected setting may not exist
+            # (e.g. if an extension has been disabled)
+            self.pageList.setCurrentRow(0)
 
     @pyqtSlot(int)
     def activatePage(self, index):
@@ -1342,7 +1346,8 @@ class SettingsForm(QWidget):
                     self.pageList.setCurrentRow(i)
                     QTimer.singleShot(0, lambda:
                             self.pages[meta['name']][2][n].setFocus())
-                    return
+                    return True
+        return False
 
     def fillFrame(self, info):
         widgets = []
