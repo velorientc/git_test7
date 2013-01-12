@@ -39,6 +39,8 @@ full_data = r'''<?xml version="1.0" encoding="UTF-8"?>
 
 full_data_standalone_repos = ['/thg', '/mercurial', '/subroot/sub',
                               '/qux', '/subroot']
+full_data_all_repos = (full_data_standalone_repos
+                       + ['/subroot/svnsub', '/subroot/sub'])
 
 @with_qbuffer(full_data, QIODevice.ReadWrite)
 def test_readwritexml(f):
@@ -58,9 +60,16 @@ def test_iterrepoitemfromxml(f):
                   node.hex(repos[0].basenode()))
 
 @with_qbuffer(full_data)
-def test_getrepoitemlist(f):
+def test_getrepoitemlist_all(f):
     root = repotreemodel.readXml(f, 'reporegistry')
     items = repotreemodel.getRepoItemList(root)
+    assert_equals(full_data_all_repos,
+                  map(lambda e: e.rootpath(), items))
+
+@with_qbuffer(full_data)
+def test_getrepoitemlist_standalone(f):
+    root = repotreemodel.readXml(f, 'reporegistry')
+    items = repotreemodel.getRepoItemList(root, standalone=True)
     assert_equals(full_data_standalone_repos,
                   map(lambda e: e.rootpath(), items))
 

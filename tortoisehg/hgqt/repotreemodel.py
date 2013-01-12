@@ -60,13 +60,15 @@ def iterRepoItemFromXml(source):
         if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
             yield repotreeitem.undumpObject(xr)
 
-def getRepoItemList(root):
+def getRepoItemList(root, standalone=False):
+    items = []
     if isinstance(root, repotreeitem.RepoItem):
-        return [root]
-    if not isinstance(root, repotreeitem.RepoTreeItem):
-        return []
-    return reduce(lambda a, b: a + b,
-                  (getRepoItemList(c) for c in root.childs), [])
+        items.append(root)
+        if standalone:
+            return items
+    for e in root.childs:
+        items.extend(getRepoItemList(e, standalone=standalone))
+    return items
 
 
 class RepoTreeModel(QAbstractItemModel):
@@ -369,7 +371,7 @@ class RepoTreeModel(QAbstractItemModel):
         return self._indexFromItem(self._activeRepoItem, column)
 
     def loadSubrepos(self, filterFunc=(lambda r: True)):
-        repoList = getRepoItemList(self.rootItem)
+        repoList = getRepoItemList(self.rootItem, standalone=True)
         for n, c in enumerate(repoList):
             if filterFunc(c.rootpath()):
                 if self.showNetworkSubrepos \
