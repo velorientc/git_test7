@@ -379,16 +379,17 @@ class RepoTreeModel(QAbstractItemModel):
         else:
             root = self.rootItem
         repoList = getRepoItemList(root, standalone=True)
+        if not self.showNetworkSubrepos:
+            repoList = [c for c in repoList
+                        if not paths.netdrive_status(c.rootpath())]
         for n, c in enumerate(repoList):
-            if self.showNetworkSubrepos \
-                    or not paths.netdrive_status(c.rootpath()):
-                self.updateProgress.emit(n, len(repoList),
-                    _('Updating repository registry'),
-                    _('Loading repository %s')
-                    % hglib.tounicode(c.rootpath()))
-                self.removeRows(0, c.childCount(),
-                    self.createIndex(c.row(), 0, c))
-                c.appendSubrepos()
+            self.updateProgress.emit(n, len(repoList),
+                _('Updating repository registry'),
+                _('Loading repository %s')
+                % hglib.tounicode(c.rootpath()))
+            self.removeRows(0, c.childCount(),
+                self.createIndex(c.row(), 0, c))
+            c.appendSubrepos()
         self.updateProgress.emit(len(repoList), len(repoList),
             _('Updating repository registry'),
             _('Repository Registry updated'))
