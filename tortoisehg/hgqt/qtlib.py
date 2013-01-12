@@ -15,6 +15,7 @@ import tempfile
 import re
 import weakref
 
+import mercurial.i18n
 from mercurial import commands, extensions, error, util
 
 from tortoisehg.util import hglib, paths
@@ -859,7 +860,7 @@ class LabeledSeparator(QWidget):
 # Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
 # Currently converting subrepo paths into links only works in English
-_subrepoindicatorpattern = '(in subrepo %s)\n'
+_subrepoindicatorpattern = hglib.tounicode(mercurial.i18n._('(in subrepo %s)') + '\n')
 
 def _linkifyHash(message, subrepo=''):
     if subrepo:
