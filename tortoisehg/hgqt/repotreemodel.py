@@ -77,10 +77,9 @@ class RepoTreeModel(QAbstractItemModel):
 
     updateProgress = pyqtSignal(int, int, QString, QString)
 
-    def __init__(self, filename, parent,
+    def __init__(self, filename, parent=None,
             showNetworkSubrepos=False, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
-        self.updateProgress.connect(parent.updateProgress)
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
         self._activeRepoItem = None

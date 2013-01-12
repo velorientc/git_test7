@@ -258,9 +258,11 @@ class RepoRegistryView(QDockWidget):
         self._loadSettings()
 
         sfile = settingsfilename()
-        tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
+        model = repotreemodel.RepoTreeModel(sfile, self,
             showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
-            showShortPaths=self._isSettingEnabled('showShortPaths')))
+            showShortPaths=self._isSettingEnabled('showShortPaths'))
+        model.updateProgress.connect(self.updateProgress)
+        tv.setModel(model)
 
         # Setup a file system watcher to update the reporegistry
         # anytime it is modified by another thg instance
@@ -359,6 +361,7 @@ class RepoRegistryView(QDockWidget):
         newmodel = repotreemodel.RepoTreeModel(settingsfilename(), self,
             self._isSettingEnabled('showNetworkSubrepos'),
             self._isSettingEnabled('showShortPaths'))
+        newmodel.updateProgress.connect(self.updateProgress)
         if self._isSettingEnabled('showSubrepos'):
             newmodel.loadSubrepos(newmodel.rootItem)
         self.tview.setModel(newmodel)
