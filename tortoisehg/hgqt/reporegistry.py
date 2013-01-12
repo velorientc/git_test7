@@ -289,8 +289,8 @@ class RepoRegistryView(QDockWidget):
             m.loadSubrepos()
 
     def _loadSettings(self):
-        defaultmap = {'showPaths': False, 'showSubrepos': True,
-                      'showNetworkSubrepos': True, 'showShortPaths': True}
+        defaultmap = {'showPaths': False, 'showSubrepos': False,
+                      'showNetworkSubrepos': False, 'showShortPaths': True}
         s = QSettings()
         s.beginGroup('Workbench')  # for compatibility with old release
         for key, action in self._settingactions.iteritems():
@@ -307,16 +307,16 @@ class RepoRegistryView(QDockWidget):
     def _setupSettingActions(self):
         settingtable = [
             ('showPaths', _('Show &Paths'), self._updateColumnVisibility),
-            ('showSubrepos', _('Show &Subrepos on Registry'), self.reloadModel),
-            ('showNetworkSubrepos', _('Show Subrepos for &Remote Repositories'),
-             self.reloadModel),
+            ('showSubrepos', _('&Scan Repositories at Startup'), None),
+            ('showNetworkSubrepos', _('Scan &Remote Repositories'), None),
             ('showShortPaths', _('Show S&hort Paths'), self._updateCommonPath),
             ]
         self._settingactions = {}
         for i, (key, text, slot) in enumerate(settingtable):
             a = QAction(text, self, checkable=True)
             a.setData(i)  # sort key
-            a.triggered.connect(slot)
+            if slot:
+                a.triggered.connect(slot)
             self._settingactions[key] = a
 
     def settingActions(self):
