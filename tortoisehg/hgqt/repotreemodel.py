@@ -9,10 +9,7 @@ from mercurial import util, hg, ui
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
-
-from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem, StandaloneSubrepoItem
+from tortoisehg.hgqt import qtlib, repotreeitem
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -49,7 +46,7 @@ def readXml(source, rootElementName):
     if xr.hasError():
         print str(xr.errorString())
     if xr.readNextStartElement():
-        itemread = undumpObject(xr)
+        itemread = repotreeitem.undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
         print str(xr.errorString())
@@ -61,12 +58,12 @@ def iterRepoItemFromXml(source):
     while not xr.atEnd():
         t = xr.readNext()
         if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
-            yield undumpObject(xr)
+            yield repotreeitem.undumpObject(xr)
 
 def getRepoItemList(root, includeSubRepos=False):
-    if not includeSubRepos and isinstance(root, RepoItem):
+    if not includeSubRepos and isinstance(root, repotreeitem.RepoItem):
         return [root]
-    if not isinstance(root, RepoTreeItem):
+    if not isinstance(root, repotreeitem.RepoTreeItem):
         return []
     return reduce(lambda a, b: a + b,
                   (getRepoItemList(c, includeSubRepos=includeSubRepos) \
@@ -94,15 +91,15 @@ class RepoTreeModel(QAbstractItemModel):
                 f.close()
                 if root:
                     for c in root.childs:
-                        if isinstance(c, AllRepoGroupItem):
+                        if isinstance(c, repotreeitem.AllRepoGroupItem):
                             all = c
                             break
 
         if not root:
-            root = RepoTreeItem(self)
+            root = repotreeitem.RepoTreeItem(self)
         # due to issue #1075, 'all' may be missing even if 'root' exists
         if not all:
-            all = AllRepoGroupItem()
+            all = repotreeitem.AllRepoGroupItem()
             root.appendChild(all)
 
         self.rootItem = root
@@ -201,7 +198,7 @@ class RepoTreeModel(QAbstractItemModel):
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
         d.setData(repoRegMimeType, buf)
-        if isinstance(item, RepoItem):
+        if isinstance(item, repotreeitem.RepoItem):
             d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
         else:
             d.setText(QString(item.name))
@@ -219,7 +216,7 @@ class RepoTreeModel(QAbstractItemModel):
                 row = parent.row()
                 parent = parent.parent()
                 group = parent.internalPointer()
-                if row < 0 or not isinstance(group, RepoGroupItem):
+                if row < 0 or not isinstance(group, repotreeitem.RepoGroupItem):
                     # The group was dropped at the top level
                     group = self.rootItem
                     parent = QModelIndex()
@@ -236,7 +233,7 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
-        if isinstance(itemread, AllRepoGroupItem):
+        if isinstance(itemread, repotreeitem.AllRepoGroupItem):
             self.allrepos = itemread
         return True
 
@@ -288,9 +285,9 @@ class RepoTreeModel(QAbstractItemModel):
 
         self.beginInsertRows(grp, row, row)
         if itemIsSubrepo:
-            ri = StandaloneSubrepoItem(root)
+            ri = repotreeitem.StandaloneSubrepoItem(root)
         else:
-            ri = RepoItem(root)
+            ri = repotreeitem.RepoItem(root)
         rgi.insertChild(row, ri)
 
         if not self.showNetworkSubrepos and paths.netdrive_status(root):
@@ -331,7 +328,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     def repoRoot(self, index):
         item = index.internalPointer()
-        if not isinstance(item, RepoItem):
+        if not isinstance(item, repotreeitem.RepoItem):
             return
         return hglib.tounicode(item.rootpath())
 
@@ -339,7 +336,7 @@ class RepoTreeModel(QAbstractItemModel):
         ri = self.rootItem
         cc = ri.childCount()
         self.beginInsertRows(QModelIndex(), cc, cc + 1)
-        ri.appendChild(RepoGroupItem(name, ri))
+        ri.appendChild(repotreeitem.RepoGroupItem(name, ri))
         self.endInsertRows()
 
     def write(self, fn):
@@ -393,7 +390,7 @@ class RepoTreeModel(QAbstractItemModel):
         if not showShortPaths is None:
             self.showShortPaths = showShortPaths
         for grp in self.rootItem.childs:
-            if isinstance(grp, RepoGroupItem):
+            if isinstance(grp, repotreeitem.RepoGroupItem):
                 if self.showShortPaths:
                     grp.updateCommonPath()
                 else:
