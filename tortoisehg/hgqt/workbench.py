@@ -788,6 +788,7 @@ class Workbench(QMainWindow):
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
         self.reporegistry.addRepo(repo.root)
+        self.reporegistry.scanRepo(hglib.tounicode(repo.root))
 
         self.updateMenu()
         return rw
