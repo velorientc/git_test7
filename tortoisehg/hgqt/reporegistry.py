@@ -261,7 +261,6 @@ class RepoRegistryView(QDockWidget):
         model = repotreemodel.RepoTreeModel(sfile, self,
             showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
             showShortPaths=self._isSettingEnabled('showShortPaths'))
-        model.updateProgress.connect(self.updateProgress)
         tv.setModel(model)
 
         # Setup a file system watcher to update the reporegistry
@@ -360,7 +359,6 @@ class RepoRegistryView(QDockWidget):
         newmodel = repotreemodel.RepoTreeModel(settingsfilename(), self,
             self._isSettingEnabled('showNetworkSubrepos'),
             self._isSettingEnabled('showShortPaths'))
-        newmodel.updateProgress.connect(self.updateProgress)
         self.tview.setModel(newmodel)
         oldmodel.deleteLater()
         if self._isSettingEnabled('showSubrepos'):
@@ -783,12 +781,3 @@ class RepoRegistryView(QDockWidget):
             m.loadSubrepos(idx)
         self.progressReceived.emit(
             topic, None, _('Repository Registry updated'), '', None)
-
-    @pyqtSlot(int, int, QString, QString)
-    def updateProgress(self, pos, max, topic, item):
-        if pos == max:
-            #self.progressReceived.emit('Updating repository registry', None, '', '', None)
-            self.progressReceived.emit(topic, None, item, '', None)
-        else:
-            #self.progressReceived.emit('Updating repository registry', pos, 'reporegistry-%s' % topic, '', max)
-            self.progressReceived.emit(topic, pos, item, '', max)

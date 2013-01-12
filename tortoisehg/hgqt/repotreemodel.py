@@ -72,9 +72,6 @@ def getRepoItemList(root, standalone=False):
 
 
 class RepoTreeModel(QAbstractItemModel):
-
-    updateProgress = pyqtSignal(int, int, QString, QString)
-
     def __init__(self, filename, parent=None,
             showNetworkSubrepos=False, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
