@@ -373,8 +373,12 @@ class RepoTreeModel(QAbstractItemModel):
     def activeRepoIndex(self, column=0):
         return self._indexFromItem(self._activeRepoItem, column)
 
-    def loadSubrepos(self, filterFunc=(lambda r: True)):
-        repoList = getRepoItemList(self.rootItem, standalone=True)
+    def loadSubrepos(self, index=QModelIndex(), filterFunc=(lambda r: True)):
+        if index.isValid():
+            root = index.internalPointer()
+        else:
+            root = self.rootItem
+        repoList = getRepoItemList(root, standalone=True)
         for n, c in enumerate(repoList):
             if filterFunc(c.rootpath()):
                 if self.showNetworkSubrepos \
