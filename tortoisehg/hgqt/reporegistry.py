@@ -770,7 +770,19 @@ class RepoRegistryView(QDockWidget):
 
     def _scanAllRepos(self):
         m = self.tview.model()
-        m.loadSubrepos()
+        indexes = m.indexesOfRepoItems(standalone=True)
+        if not self._isSettingEnabled('showNetworkSubrepos'):
+            indexes = [idx for idx in indexes
+                       if not paths.netdrive_status(m.repoRoot(idx))]
+
+        topic = _('Updating repository registry')
+        for n, idx in enumerate(indexes):
+            self.progressReceived.emit(
+                topic, n, _('Loading repository %s') % m.repoRoot(idx), '',
+                len(indexes))
+            m.loadSubrepos(idx)
+        self.progressReceived.emit(
+            topic, None, _('Repository Registry updated'), '', None)
 
     @pyqtSlot(int, int, QString, QString)
     def updateProgress(self, pos, max, topic, item):
