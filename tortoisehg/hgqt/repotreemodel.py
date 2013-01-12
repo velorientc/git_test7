@@ -324,6 +324,10 @@ class RepoTreeModel(QAbstractItemModel):
         item = self.getRepoItem(hglib.fromunicode(uroot), lookForSubrepos=True)
         return self._indexFromItem(item, column)
 
+    def indexesOfRepoItems(self, column=0, standalone=False):
+        return [self._indexFromItem(e, column)
+                for e in getRepoItemList(self.rootItem, standalone)]
+
     def _indexFromItem(self, item, column=0):
         if item:
             return self.createIndex(item.row(), column, item)
