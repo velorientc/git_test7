@@ -771,7 +771,7 @@ class Workbench(QMainWindow):
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
         rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
         rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
-        rw.repoChanged.connect(self.reporegistry.repoChanged)
+        rw.repoChanged.connect(self.reporegistry.scanRepo)
 
         tw = self.repoTabsWidget
         # We can open new tabs next to the current one or next to the last tab

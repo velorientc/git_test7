@@ -763,7 +763,7 @@ class RepoRegistryView(QDockWidget):
             it.setBaseNode(basenode)
 
     @pyqtSlot(QString)
-    def repoChanged(self, uroot):
+    def scanRepo(self, uroot):
         m = self.tview.model()
         index = m.indexFromRepoRoot(uroot)
         if index.isValid():
