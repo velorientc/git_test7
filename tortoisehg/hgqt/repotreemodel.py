@@ -77,11 +77,10 @@ class RepoTreeModel(QAbstractItemModel):
 
     updateProgress = pyqtSignal(int, int, QString, QString)
 
-    def __init__(self, filename, parent, showSubrepos=False,
+    def __init__(self, filename, parent,
             showNetworkSubrepos=False, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
         self.updateProgress.connect(parent.updateProgress)
-        self.showSubrepos = showSubrepos
         self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
         self._activeRepoItem = None
@@ -99,9 +98,6 @@ class RepoTreeModel(QAbstractItemModel):
                         if isinstance(c, AllRepoGroupItem):
                             all = c
                             break
-
-                    if self.showSubrepos:
-                        self.loadSubrepos(root)
 
         if not root:
             root = RepoTreeItem(self)
@@ -298,8 +294,7 @@ class RepoTreeModel(QAbstractItemModel):
             ri = RepoItem(root)
         rgi.insertChild(row, ri)
 
-        if not self.showSubrepos \
-                or (not self.showNetworkSubrepos and paths.netdrive_status(root)):
+        if not self.showNetworkSubrepos and paths.netdrive_status(root):
             self.endInsertRows()
             return
 

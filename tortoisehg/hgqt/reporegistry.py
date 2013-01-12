@@ -258,9 +258,7 @@ class RepoRegistryView(QDockWidget):
         self._loadSettings()
 
         sfile = settingsfilename()
-        # start without subrepos because loading them is expensive
         tv.setModel(repotreemodel.RepoTreeModel(sfile, self,
-            showSubrepos=False,
             showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
             showShortPaths=self._isSettingEnabled('showShortPaths')))
 
@@ -285,7 +283,8 @@ class RepoRegistryView(QDockWidget):
         self.expand()
         self._updateColumnVisibility()
         if self._isSettingEnabled('showSubrepos'):
-            self.reloadModel()  # delayed loading of subrepos
+            m = self.tview.model()
+            m.loadSubrepos(m.rootItem)
 
     def _loadSettings(self):
         defaultmap = {'showPaths': False, 'showSubrepos': True,
@@ -357,11 +356,12 @@ class RepoRegistryView(QDockWidget):
     def reloadModel(self):
         oldmodel = self.tview.model()
         activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
-        self.tview.setModel(
-            repotreemodel.RepoTreeModel(settingsfilename(), self,
-                self._isSettingEnabled('showSubrepos'),
-                self._isSettingEnabled('showNetworkSubrepos'),
-                self._isSettingEnabled('showShortPaths')))
+        newmodel = repotreemodel.RepoTreeModel(settingsfilename(), self,
+            self._isSettingEnabled('showNetworkSubrepos'),
+            self._isSettingEnabled('showShortPaths'))
+        if self._isSettingEnabled('showSubrepos'):
+            newmodel.loadSubrepos(newmodel.rootItem)
+        self.tview.setModel(newmodel)
         oldmodel.deleteLater()
         self.expand()
         if activeroot:
