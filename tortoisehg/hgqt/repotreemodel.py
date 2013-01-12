@@ -373,23 +373,22 @@ class RepoTreeModel(QAbstractItemModel):
     def activeRepoIndex(self, column=0):
         return self._indexFromItem(self._activeRepoItem, column)
 
-    def loadSubrepos(self, index=QModelIndex(), filterFunc=(lambda r: True)):
+    def loadSubrepos(self, index=QModelIndex()):
         if index.isValid():
             root = index.internalPointer()
         else:
             root = self.rootItem
         repoList = getRepoItemList(root, standalone=True)
         for n, c in enumerate(repoList):
-            if filterFunc(c.rootpath()):
-                if self.showNetworkSubrepos \
-                        or not paths.netdrive_status(c.rootpath()):
-                    self.updateProgress.emit(n, len(repoList),
-                        _('Updating repository registry'),
-                        _('Loading repository %s')
-                        % hglib.tounicode(c.rootpath()))
-                    self.removeRows(0, c.childCount(),
-                        self.createIndex(c.row(), 0, c))
-                    c.appendSubrepos()
+            if self.showNetworkSubrepos \
+                    or not paths.netdrive_status(c.rootpath()):
+                self.updateProgress.emit(n, len(repoList),
+                    _('Updating repository registry'),
+                    _('Loading repository %s')
+                    % hglib.tounicode(c.rootpath()))
+                self.removeRows(0, c.childCount(),
+                    self.createIndex(c.row(), 0, c))
+                c.appendSubrepos()
         self.updateProgress.emit(len(repoList), len(repoList),
             _('Updating repository registry'),
             _('Repository Registry updated'))
