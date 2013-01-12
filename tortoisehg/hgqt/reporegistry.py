@@ -286,7 +286,7 @@ class RepoRegistryView(QDockWidget):
         self._updateColumnVisibility()
         if self._isSettingEnabled('showSubrepos'):
             m = self.tview.model()
-            m.loadSubrepos(m.rootItem)
+            m.loadSubrepos()
 
     def _loadSettings(self):
         defaultmap = {'showPaths': False, 'showSubrepos': True,
@@ -363,7 +363,7 @@ class RepoRegistryView(QDockWidget):
             self._isSettingEnabled('showShortPaths'))
         newmodel.updateProgress.connect(self.updateProgress)
         if self._isSettingEnabled('showSubrepos'):
-            newmodel.loadSubrepos(newmodel.rootItem)
+            newmodel.loadSubrepos()
         self.tview.setModel(newmodel)
         oldmodel.deleteLater()
         self.expand()
@@ -773,7 +773,7 @@ class RepoRegistryView(QDockWidget):
             r2 = changedrootpath + "/"
             return r1.startswith(r2) or r2.startswith(r1)
 
-        m.loadSubrepos(m.rootItem, isAboveOrBelowUroot)
+        m.loadSubrepos(isAboveOrBelowUroot)
 
     @pyqtSlot(int, int, QString, QString)
     def updateProgress(self, pos, max, topic, item):
