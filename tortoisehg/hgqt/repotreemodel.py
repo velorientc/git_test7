@@ -314,8 +314,11 @@ class RepoTreeModel(QAbstractItemModel):
                     (root, "<br>".join(invalidRepoList)))
 
     def getRepoItem(self, reporoot, lookForSubrepos=False):
-        return self.rootItem.getRepoItem(os.path.normcase(reporoot),
-                    lookForSubrepos=lookForSubrepos)
+        reporoot = os.path.normcase(reporoot)
+        items = getRepoItemList(self.rootItem, standalone=not lookForSubrepos)
+        for e in items:
+            if os.path.normcase(e.rootpath()) == reporoot:
+                return e
 
     def indexFromRepoRoot(self, uroot, column=0):
         item = self.getRepoItem(hglib.fromunicode(uroot), lookForSubrepos=True)
