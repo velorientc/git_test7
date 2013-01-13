@@ -78,23 +78,19 @@ class RepoTreeModel(QAbstractItemModel):
         self._activeRepoItem = None
 
         root = None
-        all = None
-
         if filename:
             f = QFile(filename)
             if f.open(QIODevice.ReadOnly):
                 root = readXml(f, reporegistryXmlElementName)
                 f.close()
-                if root:
-                    for c in root.childs:
-                        if isinstance(c, repotreeitem.AllRepoGroupItem):
-                            all = c
-                            break
 
         if not root:
             root = repotreeitem.RepoTreeItem(self)
         # due to issue #1075, 'all' may be missing even if 'root' exists
-        if not all:
+        try:
+            all = repotreeitem.find(
+                root, lambda e: isinstance(e, repotreeitem.AllRepoGroupItem))
+        except ValueError:
             all = repotreeitem.AllRepoGroupItem()
             root.appendChild(all)
 

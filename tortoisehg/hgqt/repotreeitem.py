@@ -48,6 +48,13 @@ def flatten(root, stopfunc=None):
         for e in flatten(c, stopfunc):
             yield e
 
+def find(root, targetfunc, stopfunc=None):
+    """Search recursively for item of which targetfunc evaluates to True"""
+    for e in flatten(root, stopfunc):
+        if targetfunc(e):
+            return e
+    raise ValueError('not found')
+
 class RepoTreeItem(object):
     xmltagname = 'treeitem'
 
