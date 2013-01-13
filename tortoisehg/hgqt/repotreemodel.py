@@ -300,6 +300,7 @@ class RepoTreeModel(QAbstractItemModel):
                     '<br><br><i>%s</i>')  %
                     (root, "<br>".join(invalidRepoList)))
 
+    # TODO: merge getRepoItem() to indexFromRepoRoot()
     def getRepoItem(self, reporoot, lookForSubrepos=False):
         reporoot = os.path.normcase(reporoot)
         items = getRepoItemList(self.rootItem, standalone=not lookForSubrepos)
@@ -307,8 +308,9 @@ class RepoTreeModel(QAbstractItemModel):
             if os.path.normcase(e.rootpath()) == reporoot:
                 return e
 
-    def indexFromRepoRoot(self, uroot, column=0):
-        item = self.getRepoItem(hglib.fromunicode(uroot), lookForSubrepos=True)
+    def indexFromRepoRoot(self, uroot, column=0, standalone=False):
+        item = self.getRepoItem(hglib.fromunicode(uroot),
+                                lookForSubrepos=not standalone)
         return self._indexFromItem(item, column)
 
     def indexesOfRepoItems(self, column=0, standalone=False):
