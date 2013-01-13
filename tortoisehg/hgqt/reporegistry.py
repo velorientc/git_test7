@@ -132,7 +132,7 @@ class RepoTreeView(QTreeView):
                 accept = False
                 for u in data.urls():
                     root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
-                    if root and not m.getRepoItem(root):
+                    if root and not m.isKnownRepoRoot(hglib.tounicode(root), standalone=True):
                         repoindex = m.addRepo(root, row, group)
                         m.loadSubrepos(repoindex)
                         accept = True
@@ -376,8 +376,7 @@ class RepoRegistryView(QDockWidget):
         The main use of this method is when the workbench has opened a new repowidget
         """
         m = self.tview.model()
-        it = m.getRepoItem(root, lookForSubrepos=True)
-        if it == None:
+        if not m.isKnownRepoRoot(hglib.tounicode(root)):
             index = m.addRepo(root)
             self._scanAddedRepo(index)
             self.updateSettingsFile()
@@ -509,7 +508,7 @@ class RepoRegistryView(QDockWidget):
         if path:
             m = self.tview.model()
             root = paths.find_root(hglib.fromunicode(path))
-            if root and not m.getRepoItem(root):
+            if root and not m.isKnownRepoRoot(hglib.tounicode(root), standalone=True):
                 index = m.addRepo(root, parent=self.selitem)
                 self._scanAddedRepo(index)
 
@@ -657,7 +656,7 @@ class RepoRegistryView(QDockWidget):
     def _openClone(self, root, sourceroot):
         m = self.tview.model()
         src = m.indexFromRepoRoot(sourceroot, standalone=True)
-        if src.isValid() and not m.indexFromRepoRoot(root).isValid():
+        if src.isValid() and not m.isKnownRepoRoot(root):
             index = m.addRepo(hglib.fromunicode(root), parent=src.parent())
             self._scanAddedRepo(index)
         self.open(root)

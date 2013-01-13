@@ -278,6 +278,9 @@ class RepoTreeModel(QAbstractItemModel):
                                 lookForSubrepos=not standalone)
         return self._indexFromItem(item, column)
 
+    def isKnownRepoRoot(self, uroot, standalone=False):
+        return self.indexFromRepoRoot(uroot, standalone=standalone).isValid()
+
     def indexesOfRepoItems(self, column=0, standalone=False):
         return [self._indexFromItem(e, column)
                 for e in getRepoItemList(self.rootItem, standalone)]
