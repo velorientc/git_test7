@@ -490,7 +490,7 @@ class RepoRegistryView(QDockWidget):
         root = self.selitem.internalPointer().rootpath()
         d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
         d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self.openClone)
+        d.clonedRepository.connect(self._openClone)
         d.show()
 
     def explore(self):
@@ -658,7 +658,8 @@ class RepoRegistryView(QDockWidget):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
 
-    def openClone(self, root=None, sourceroot=None):
+    @pyqtSlot(unicode, unicode)
+    def _openClone(self, root, sourceroot):
         m = self.tview.model()
         src = m.indexFromRepoRoot(sourceroot, standalone=True)
         if src.isValid() and not m.indexFromRepoRoot(root).isValid():
