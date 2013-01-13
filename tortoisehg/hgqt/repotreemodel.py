@@ -239,7 +239,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     # functions not defined in QAbstractItemModel
 
-    def addRepo(self, root, row=-1, parent=QModelIndex()):
+    def addRepo(self, uroot, row=-1, parent=QModelIndex()):
         if not parent.isValid():
             parent = self._indexFromItem(self.allrepos)
         rgi = parent.internalPointer()
@@ -247,7 +247,7 @@ class RepoTreeModel(QAbstractItemModel):
             row = rgi.childCount()
 
         # make sure all paths are properly normalized
-        root = os.path.normpath(root)
+        root = os.path.normpath(hglib.fromunicode(uroot))
 
         # Check whether the repo that we are adding is a subrepo
         knownitem = self.getRepoItem(root, lookForSubrepos=True)

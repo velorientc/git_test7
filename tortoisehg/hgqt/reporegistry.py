@@ -131,9 +131,9 @@ class RepoTreeView(QTreeView):
                 # Event is a drop of an external repo
                 accept = False
                 for u in data.urls():
-                    root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
-                    if root and not m.isKnownRepoRoot(hglib.tounicode(root), standalone=True):
-                        repoindex = m.addRepo(root, row, group)
+                    uroot = paths.find_root(unicode(u.toLocalFile()))
+                    if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
+                        repoindex = m.addRepo(uroot, row, group)
                         m.loadSubrepos(repoindex)
                         accept = True
                 if accept:
@@ -375,9 +375,10 @@ class RepoRegistryView(QDockWidget):
 
         The main use of this method is when the workbench has opened a new repowidget
         """
+        uroot = hglib.tounicode(root)
         m = self.tview.model()
-        if not m.isKnownRepoRoot(hglib.tounicode(root)):
-            index = m.addRepo(root)
+        if not m.isKnownRepoRoot(uroot):
+            index = m.addRepo(uroot)
             self._scanAddedRepo(index)
             self.updateSettingsFile()
 
@@ -507,9 +508,9 @@ class RepoRegistryView(QDockWidget):
                                        options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
             m = self.tview.model()
-            root = paths.find_root(hglib.fromunicode(path))
-            if root and not m.isKnownRepoRoot(hglib.tounicode(root), standalone=True):
-                index = m.addRepo(root, parent=self.selitem)
+            uroot = paths.find_root(unicode(path))
+            if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
+                index = m.addRepo(uroot, parent=self.selitem)
                 self._scanAddedRepo(index)
 
     def addSubrepo(self):
@@ -657,7 +658,7 @@ class RepoRegistryView(QDockWidget):
         m = self.tview.model()
         src = m.indexFromRepoRoot(sourceroot, standalone=True)
         if src.isValid() and not m.isKnownRepoRoot(root):
-            index = m.addRepo(hglib.fromunicode(root), parent=src.parent())
+            index = m.addRepo(root, parent=src.parent())
             self._scanAddedRepo(index)
         self.open(root)
 
