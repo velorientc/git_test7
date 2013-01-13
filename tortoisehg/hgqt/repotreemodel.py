@@ -254,22 +254,10 @@ class RepoTreeModel(QAbstractItemModel):
         root = os.path.normpath(root)
 
         # Check whether the repo that we are adding is a subrepo
-        # This check could be expensive, particularly for network repositories
-        # Thus, only perform this check on network repos if the showNetworkSubrepos
-        # flag is set
-        itemIsSubrepo = False
-        if self.showNetworkSubrepos \
-                or not paths.netdrive_status(root):
-            outerrepopath = paths.find_root(os.path.dirname(root))
-            if outerrepopath:
-                # Check whether repo we are adding is a subrepo of
-                # its containing (outer) repo
-                # This check is currently quite imperfect, since it
-                # only checks the current repo revision
-                outerrepo = hg.repository(ui.ui(), path=outerrepopath)
-                relroot = util.normpath(root[len(outerrepopath)+1:])
-                if relroot in outerrepo['.'].substate:
-                    itemIsSubrepo = True
+        knownitem = self.getRepoItem(root, lookForSubrepos=True)
+        itemIsSubrepo = isinstance(knownitem,
+                                   (repotreeitem.StandaloneSubrepoItem,
+                                    repotreeitem.SubrepoItem))
 
         self.beginInsertRows(parent, row, row)
         if itemIsSubrepo:
