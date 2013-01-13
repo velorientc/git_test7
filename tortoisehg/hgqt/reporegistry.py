@@ -372,7 +372,10 @@ class RepoRegistryView(QDockWidget):
     def addRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""
         m = self.tview.model()
-        if not m.isKnownRepoRoot(uroot):
+        knownindex = m.indexFromRepoRoot(uroot)
+        if knownindex.isValid():
+            self._scanAddedRepo(knownindex)  # just scan stale subrepos
+        else:
             index = m.addRepo(uroot)
             self._scanAddedRepo(index)
             self.updateSettingsFile()
