@@ -256,6 +256,7 @@ class RepoRegistryView(QDockWidget):
 
         self.createActions()
         self._loadSettings()
+        self._updateSettingActions()
 
         sfile = settingsfilename()
         model = repotreemodel.RepoTreeModel(sfile, self,
@@ -314,7 +315,14 @@ class RepoRegistryView(QDockWidget):
             a.setData(i)  # sort key
             if slot:
                 a.triggered.connect(slot)
+            a.triggered.connect(self._updateSettingActions)
             self._settingactions[key] = a
+
+    @pyqtSlot()
+    def _updateSettingActions(self):
+        ax = self._settingactions
+        ax['showNetworkSubrepos'].setEnabled(ax['showSubrepos'].isChecked())
+        ax['showShortPaths'].setEnabled(ax['showPaths'].isChecked())
 
     def settingActions(self):
         return sorted(self._settingactions.itervalues(),
