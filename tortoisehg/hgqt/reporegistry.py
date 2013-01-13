@@ -260,7 +260,6 @@ class RepoRegistryView(QDockWidget):
 
         sfile = settingsfilename()
         model = repotreemodel.RepoTreeModel(sfile, self,
-            showNetworkSubrepos=self._isSettingEnabled('showNetworkSubrepos'),
             showShortPaths=self._isSettingEnabled('showShortPaths'))
         tv.setModel(model)
 
@@ -358,7 +357,6 @@ class RepoRegistryView(QDockWidget):
         oldmodel = self.tview.model()
         activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
         newmodel = repotreemodel.RepoTreeModel(settingsfilename(), self,
-            self._isSettingEnabled('showNetworkSubrepos'),
             self._isSettingEnabled('showShortPaths'))
         self.tview.setModel(newmodel)
         oldmodel.deleteLater()
