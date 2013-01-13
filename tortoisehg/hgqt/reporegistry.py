@@ -134,7 +134,8 @@ class RepoTreeView(QTreeView):
                 for u in data.urls():
                     root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
                     if root and not self.model().getRepoItem(root):
-                        self.model().addRepo(root, row, group)
+                        repoindex = self.model().addRepo(root, row, group)
+                        self.model().loadSubrepos(repoindex)
                         accept = True
                 if accept:
                     event.setDropAction(Qt.LinkAction)
@@ -380,7 +381,8 @@ class RepoRegistryView(QDockWidget):
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
-            m.addRepo(root)
+            index = m.addRepo(root)
+            self._scanAddedRepo(index)
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
@@ -511,12 +513,13 @@ class RepoRegistryView(QDockWidget):
             root = paths.find_root(hglib.fromunicode(path))
             if root and not self.tview.model().getRepoItem(root):
                 try:
-                    self.tview.model().addRepo(root, parent=self.selitem)
+                    index = self.tview.model().addRepo(root, parent=self.selitem)
                 except error.RepoError:
                     qtlib.WarningMsgBox(
                         _('Failed to add repository'),
                         _('%s is not a valid repository') % path, parent=self)
                     return
+                self._scanAddedRepo(index)
 
     def addSubrepo(self):
         'menu action handler for adding a new subrepository'
@@ -663,7 +666,8 @@ class RepoRegistryView(QDockWidget):
         m = self.tview.model()
         src = m.indexFromRepoRoot(sourceroot, standalone=True)
         if src.isValid() and not m.indexFromRepoRoot(root).isValid():
-            m.addRepo(hglib.fromunicode(root), parent=src.parent())
+            index = m.addRepo(hglib.fromunicode(root), parent=src.parent())
+            self._scanAddedRepo(index)
         self.open(root)
 
     def open(self, root=None):
@@ -747,6 +751,26 @@ class RepoRegistryView(QDockWidget):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setBaseNode(basenode)
+
+    def _scanAddedRepo(self, index):
+        m = self.tview.model()
+        invalidpaths = m.loadSubrepos(index)
+        if not invalidpaths:
+            return
+
+        root = m.repoRoot(index)
+        if root in invalidpaths:
+            qtlib.WarningMsgBox(_('Could not get subrepository list'),
+                _('It was not possible to get the subrepository list for '
+                  'the repository in:<br><br><i>%s</i>') % root, paret=self)
+        else:
+            qtlib.WarningMsgBox(_('Could not open some subrepositories'),
+                _('It was not possible to fully load the subrepository '
+                  'list for the repository in:<br><br><i>%s</i><br><br>'
+                  'The following subrepositories may be missing, broken or '
+                  'on an inconsistent state and cannot be accessed:'
+                  '<br><br><i>%s</i>')
+                % (root, "<br>".join(invalidpaths)), parent=self)
 
     @pyqtSlot(QString)
     def scanRepo(self, uroot):

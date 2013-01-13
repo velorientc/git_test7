@@ -265,28 +265,7 @@ class RepoTreeModel(QAbstractItemModel):
         else:
             ri = repotreeitem.RepoItem(root)
         rgi.insertChild(row, ri)
-
-        if not self.showNetworkSubrepos and paths.netdrive_status(root):
-            self.endInsertRows()
-            return self._indexFromItem(ri)
-
-        invalidRepoList = ri.appendSubrepos()
-
         self.endInsertRows()
-
-        if invalidRepoList:
-            if invalidRepoList[0] == root:
-                qtlib.WarningMsgBox(_('Could not get subrepository list'),
-                    _('It was not possible to get the subrepository list for '
-                    'the repository in:<br><br><i>%s</i>') % root)
-            else:
-                qtlib.WarningMsgBox(_('Could not open some subrepositories'),
-                    _('It was not possible to fully load the subrepository '
-                    'list for the repository in:<br><br><i>%s</i><br><br>'
-                    'The following subrepositories may be missing, broken or '
-                    'on an inconsistent state and cannot be accessed:'
-                    '<br><br><i>%s</i>')  %
-                    (root, "<br>".join(invalidRepoList)))
 
         return self._indexFromItem(ri)
 
