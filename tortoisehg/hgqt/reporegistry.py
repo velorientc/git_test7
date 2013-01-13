@@ -507,9 +507,10 @@ class RepoRegistryView(QDockWidget):
         path = FD.getExistingDirectory(caption=caption,
                                        options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
+            m = self.tview.model()
             root = paths.find_root(hglib.fromunicode(path))
-            if root and not self.tview.model().getRepoItem(root):
-                index = self.tview.model().addRepo(root, parent=self.selitem)
+            if root and not m.getRepoItem(root):
+                index = m.addRepo(root, parent=self.selitem)
                 self._scanAddedRepo(index)
 
     def addSubrepo(self):
