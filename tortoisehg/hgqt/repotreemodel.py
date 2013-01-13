@@ -5,14 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import util, hg, ui
-
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, repotreeitem
+from tortoisehg.hgqt import repotreeitem
 
 from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtGui import QFont
 
 import os
 
