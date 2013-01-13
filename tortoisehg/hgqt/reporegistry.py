@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import commands, error, hg, ui, util
+from mercurial import commands, hg, ui, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -512,13 +512,7 @@ class RepoRegistryView(QDockWidget):
         if path:
             root = paths.find_root(hglib.fromunicode(path))
             if root and not self.tview.model().getRepoItem(root):
-                try:
-                    index = self.tview.model().addRepo(root, parent=self.selitem)
-                except error.RepoError:
-                    qtlib.WarningMsgBox(
-                        _('Failed to add repository'),
-                        _('%s is not a valid repository') % path, parent=self)
-                    return
+                index = self.tview.model().addRepo(root, parent=self.selitem)
                 self._scanAddedRepo(index)
 
     def addSubrepo(self):
