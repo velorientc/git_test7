@@ -244,10 +244,9 @@ class RepoTreeModel(QAbstractItemModel):
     # functions not defined in QAbstractItemModel
 
     def addRepo(self, root, row=-1, parent=QModelIndex()):
-        grp = parent
-        if not grp.isValid():
-            grp = self._indexFromItem(self.allrepos)
-        rgi = grp.internalPointer()
+        if not parent.isValid():
+            parent = self._indexFromItem(self.allrepos)
+        rgi = parent.internalPointer()
         if row < 0:
             row = rgi.childCount()
 
@@ -272,7 +271,7 @@ class RepoTreeModel(QAbstractItemModel):
                 if relroot in outerrepo['.'].substate:
                     itemIsSubrepo = True
 
-        self.beginInsertRows(grp, row, row)
+        self.beginInsertRows(parent, row, row)
         if itemIsSubrepo:
             ri = repotreeitem.StandaloneSubrepoItem(root)
         else:
