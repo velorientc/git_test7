@@ -243,9 +243,9 @@ class RepoTreeModel(QAbstractItemModel):
 
     # functions not defined in QAbstractItemModel
 
-    def addRepo(self, group, root, row=-1):
-        grp = group
-        if grp == None:
+    def addRepo(self, root, row=-1, parent=QModelIndex()):
+        grp = parent
+        if not grp.isValid():
             grp = self._indexFromItem(self.allrepos)
         rgi = grp.internalPointer()
         if row < 0:

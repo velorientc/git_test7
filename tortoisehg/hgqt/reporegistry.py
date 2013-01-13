@@ -134,7 +134,7 @@ class RepoTreeView(QTreeView):
                 for u in data.urls():
                     root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
                     if root and not self.model().getRepoItem(root):
-                        self.model().addRepo(group, root, row)
+                        self.model().addRepo(root, row, group)
                         accept = True
                 if accept:
                     event.setDropAction(Qt.LinkAction)
@@ -380,7 +380,7 @@ class RepoRegistryView(QDockWidget):
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
-            group = None
+            group = QModelIndex()
             if groupname:
                 # Get the group index of the RepoGroup corresponding to the target group name
                 for it in m.rootItem.childs:
@@ -388,7 +388,7 @@ class RepoRegistryView(QDockWidget):
                         rootidx = self.tview.rootIndex()
                         group = m.index(it.row(), 0, rootidx)
                         break
-            m.addRepo(group, root, -1)
+            m.addRepo(root, parent=group)
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
@@ -519,7 +519,7 @@ class RepoRegistryView(QDockWidget):
             root = paths.find_root(hglib.fromunicode(path))
             if root and not self.tview.model().getRepoItem(root):
                 try:
-                    self.tview.model().addRepo(self.selitem, root)
+                    self.tview.model().addRepo(root, parent=self.selitem)
                 except error.RepoError:
                     qtlib.WarningMsgBox(
                         _('Failed to add repository'),
