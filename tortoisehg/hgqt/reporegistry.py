@@ -370,11 +370,7 @@ class RepoRegistryView(QDockWidget):
         self.tview.expandToDepth(0)
 
     def addRepo(self, uroot):
-        """
-        Add a repo to the repo registry, optionally specifying the parent repository group
-
-        The main use of this method is when the workbench has opened a new repowidget
-        """
+        """Add repo if not exists; called when the workbench has opened it"""
         m = self.tview.model()
         if not m.isKnownRepoRoot(uroot):
             index = m.addRepo(uroot)
