@@ -367,12 +367,13 @@ class RepoTreeModel(QAbstractItemModel):
         return self._indexFromItem(self._activeRepoItem, column)
 
     def loadSubrepos(self, index):
+        """Scan subrepos of the repo; returns list of invalid paths"""
         item = index.internalPointer()
         if (not isinstance(item, repotreeitem.RepoItem)
             or isinstance(item, repotreeitem.AlienSubrepoItem)):
-            return
+            return []
         self.removeRows(0, item.childCount(), index)
-        item.appendSubrepos()
+        return map(hglib.tounicode, item.appendSubrepos())
 
     def updateCommonPaths(self, showShortPaths=None):
         if not showShortPaths is None:
