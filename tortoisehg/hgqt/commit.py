@@ -219,6 +219,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         upperframe.setLayout(vbox)
 
         self.split = QSplitter(Qt.Vertical)
+        if os.name == 'nt':
+            self.split.setStyle(QStyleFactory.create('Plastique'))
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(0)

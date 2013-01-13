@@ -6,6 +6,8 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import os # for os.name
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filelistview import HgFileListView
@@ -120,6 +122,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         panelframevbox = vbox
 
         self.messagesplitter = QSplitter(self.fileviewframe)
+        if os.name == 'nt':
+            self.messagesplitter.setStyle(QStyleFactory.create('Plastique'))
+
         self.splitternames.append('messagesplitter')
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
