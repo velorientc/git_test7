@@ -371,7 +371,7 @@ class RepoRegistryView(QDockWidget):
     def expand(self):
         self.tview.expandToDepth(0)
 
-    def addRepo(self, root, groupname=None):
+    def addRepo(self, root):
         """
         Add a repo to the repo registry, optionally specifying the parent repository group
 
@@ -380,15 +380,7 @@ class RepoRegistryView(QDockWidget):
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
-            group = QModelIndex()
-            if groupname:
-                # Get the group index of the RepoGroup corresponding to the target group name
-                for it in m.rootItem.childs:
-                    if groupname == it.name:
-                        rootidx = self.tview.rootIndex()
-                        group = m.index(it.row(), 0, rootidx)
-                        break
-            m.addRepo(root, parent=group)
+            m.addRepo(root)
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
@@ -668,10 +660,9 @@ class RepoRegistryView(QDockWidget):
 
     def openClone(self, root=None, sourceroot=None):
         m = self.tview.model()
-        src = m.getRepoItem(hglib.fromunicode(sourceroot))
-        if src:
-            groupname = src.parent().name
-            self.addRepo(hglib.fromunicode(root), groupname)
+        src = m.indexFromRepoRoot(sourceroot, standalone=True)
+        if src.isValid() and not m.indexFromRepoRoot(root).isValid():
+            m.addRepo(hglib.fromunicode(root), parent=src.parent())
         self.open(root)
 
     def open(self, root=None):
