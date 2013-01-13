@@ -120,12 +120,11 @@ class RepoTreeView(QTreeView):
         index, group, row = self.dropLocation(event)
 
         if index:
+            m = self.model()
             if event.source() is self:
                 # Event is an internal move, so pass it to the model
                 col = 0
-                drop = self.model().dropMimeData(data, event.dropAction(), row,
-                                                 col, group)
-                if drop:
+                if m.dropMimeData(data, event.dropAction(), row, col, group):
                     event.accept()
                     self.dropAccepted.emit()
             else:
@@ -133,9 +132,9 @@ class RepoTreeView(QTreeView):
                 accept = False
                 for u in data.urls():
                     root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
-                    if root and not self.model().getRepoItem(root):
-                        repoindex = self.model().addRepo(root, row, group)
-                        self.model().loadSubrepos(repoindex)
+                    if root and not m.getRepoItem(root):
+                        repoindex = m.addRepo(root, row, group)
+                        m.loadSubrepos(repoindex)
                         accept = True
                 if accept:
                     event.setDropAction(Qt.LinkAction)
