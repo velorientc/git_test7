@@ -243,13 +243,10 @@ class RepoTreeModel(QAbstractItemModel):
 
     # functions not defined in QAbstractItemModel
 
-    def allreposIndex(self):
-        return self.createIndex(self.allrepos.row(), 0, self.allrepos)
-
     def addRepo(self, group, root, row=-1):
         grp = group
         if grp == None:
-            grp = self.allreposIndex()
+            grp = self._indexFromItem(self.allrepos)
         rgi = grp.internalPointer()
         if row < 0:
             row = rgi.childCount()
