@@ -280,7 +280,7 @@ class RepoTreeModel(QAbstractItemModel):
 
         if not self.showNetworkSubrepos and paths.netdrive_status(root):
             self.endInsertRows()
-            return
+            return self._indexFromItem(ri)
 
         invalidRepoList = ri.appendSubrepos()
 
@@ -299,6 +299,8 @@ class RepoTreeModel(QAbstractItemModel):
                     'on an inconsistent state and cannot be accessed:'
                     '<br><br><i>%s</i>')  %
                     (root, "<br>".join(invalidRepoList)))
+
+        return self._indexFromItem(ri)
 
     # TODO: merge getRepoItem() to indexFromRepoRoot()
     def getRepoItem(self, reporoot, lookForSubrepos=False):
