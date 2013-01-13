@@ -61,14 +61,12 @@ def iterRepoItemFromXml(source):
             yield repotreeitem.undumpObject(xr)
 
 def getRepoItemList(root, standalone=False):
-    items = []
-    if isinstance(root, repotreeitem.RepoItem):
-        items.append(root)
-        if standalone:
-            return items
-    for e in root.childs:
-        items.extend(getRepoItemList(e, standalone=standalone))
-    return items
+    if standalone:
+        stopfunc = lambda e: isinstance(e, repotreeitem.RepoItem)
+    else:
+        stopfunc = None
+    return [e for e in repotreeitem.flatten(root, stopfunc=stopfunc)
+            if isinstance(e, repotreeitem.RepoItem)]
 
 
 class RepoTreeModel(QAbstractItemModel):

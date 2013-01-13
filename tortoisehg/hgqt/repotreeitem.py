@@ -39,6 +39,15 @@ def _undumpChild(xr, parent, undump=undumpObject):
         elif xr.isEndElement():
             break
 
+def flatten(root, stopfunc=None):
+    """Iterate root and its child items recursively until stop condition"""
+    yield root
+    if stopfunc and stopfunc(root):
+        return
+    for c in root.childs:
+        for e in flatten(c, stopfunc):
+            yield e
+
 class RepoTreeItem(object):
     xmltagname = 'treeitem'
 
