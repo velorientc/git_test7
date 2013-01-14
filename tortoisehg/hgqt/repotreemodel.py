@@ -183,6 +183,8 @@ class RepoTreeModel(QAbstractItemModel):
         item = parent.internalPointer()
         if item is None:
             item = self.rootItem
+        if count <= 0 or row < 0 or row + count > item.childCount():
+            return False
         self.beginRemoveRows(parent, row, row+count-1)
         res = item.removeRows(row, count)
         self.endRemoveRows()
