@@ -131,7 +131,7 @@ class HgFileView(QFrame):
         self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.exclcolor)
         mask = (1 << self.inclmarker) | (1 << self.exclmarker) | \
                (1 << self.exclcolor)
-        self.sci.setMarginMarkerMask(2, mask)
+        self.sci.setMarginMarkerMask(4, mask)
         self.markexcluded = QSettings().value('changes-mark-excluded', True).toBool()
         self.excludeindicator = -1
         self.updateChunkIndicatorMarks()
@@ -420,15 +420,15 @@ class HgFileView(QFrame):
     def _showFoldMargin(self, show):
         'toggle the display of the diff folding margin'
         if self.showexcluded:
-            self.sci.setMarginType(2, qsci.SymbolMargin)
-            self.sci.setMarginWidth(2, show and 15 or 0)
-            self.sci.setMarginSensitivity(2, show)
+            self.sci.setMarginType(4, qsci.SymbolMargin)
+            self.sci.setMarginWidth(4, show and 15 or 0)
+            self.sci.setMarginSensitivity(4, show)
             self.sci.setFolding(qsci.NoFoldStyle, 3)
         else:
             style = show and qsci.BoxedTreeFoldStyle or qsci.NoFoldStyle
             self.sci.setFolding(style, 3)
-            self.sci.setMarginWidth(2, 0)
-            self.sci.setMarginSensitivity(2, False)
+            self.sci.setMarginWidth(4, 0)
+            self.sci.setMarginSensitivity(4, False)
 
     @pyqtSlot(int, int, int)
     def marginClicked(self, pos, modifiers, margin):
@@ -436,7 +436,7 @@ class HgFileView(QFrame):
         line, index = self.sci.lineIndexFromPosition(pos)
         if line not in self.chunkatline:
             return
-        assert margin in (2, 3) and index == 0
+        assert margin in (4, 3) and index == 0
         chunk = self.chunkatline[line]
         if self.updateChunk(chunk, not chunk.excluded):
             self.chunkSelectionChanged.emit()
