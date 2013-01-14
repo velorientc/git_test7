@@ -338,7 +338,7 @@ class RepoItem(RepoTreeItem):
                     'subrepos of:<br><br>"%s"<br><br>') + \
                     _('The exception error message was:<br><br>%s<br><br>') +\
                     _('Click OK to continue or Abort to exit.')) \
-                    % (rootpath, e.message)
+                    % (hglib.tounicode(rootpath), hglib.tounicode(e.message))
                 res = qtlib.WarningMsgBox(_('Error loading subrepos'),
                                     warningMessage,
                                     buttons = QMessageBox.Ok | QMessageBox.Abort)
