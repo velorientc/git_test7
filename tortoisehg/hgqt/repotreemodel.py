@@ -320,6 +320,10 @@ class RepoTreeModel(QAbstractItemModel):
                 return count
             count += 1
 
+    def _emitItemDataChanged(self, item):
+        self.dataChanged.emit(self._indexFromItem(item, 0),
+                              self._indexFromItem(item, self.columnCount()))
+
     def setActiveRepo(self, index):
         """Highlight the specified item as active"""
         newitem = index.internalPointer()
@@ -329,9 +333,7 @@ class RepoTreeModel(QAbstractItemModel):
         self._activeRepoItem = newitem
         for it in [previtem, newitem]:
             if it:
-                self.dataChanged.emit(
-                    self.createIndex(it.row(), 0, it),
-                    self.createIndex(it.row(), self.columnCount(), it))
+                self._emitItemDataChanged(it)
 
     def activeRepoIndex(self, column=0):
         return self._indexFromItem(self._activeRepoItem, column)
