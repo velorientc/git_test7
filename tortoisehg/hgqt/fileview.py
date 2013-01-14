@@ -297,16 +297,6 @@ class HgFileView(QFrame):
         self.folddiffs = enable
         self._showFoldMargin(enable)
 
-    def updateChunkMarker(self, chunk, exclude):
-        if exclude:
-            self.sci.fillIndicatorRange(chunk.lineno+1, 0,
-                chunk.lineno+chunk.linecount, 0,
-                self.excludeindicator)
-        else:
-            self.sci.clearIndicatorRange(chunk.lineno+1, 0,
-                chunk.lineno+chunk.linecount, 0,
-                self.excludeindicator)
-
     def updateChunk(self, chunk, exclude):
         'change chunk exclusion state, update display when necessary'
         # returns True if the chunk state was changed
@@ -318,10 +308,12 @@ class HgFileView(QFrame):
             self.changes.excludecount += 1
             if self.showexcluded:
                 for i in xrange(chunk.linecount-1):
-                    self.sci.markerDelete(chunk.lineno+i+1, -1)
                     self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
                 self.sci.markerDelete(chunk.lineno, self.inclmarker)
                 self.sci.markerAdd(chunk.lineno, self.exclmarker)
+                self.sci.fillIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
+                                            self.excludeindicator)
         else:
             self.sci.clearAnnotations(chunk.lineno)
             if not chunk.excluded:
@@ -333,22 +325,50 @@ class HgFileView(QFrame):
                     self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
                 self.sci.markerDelete(chunk.lineno, self.exclmarker)
                 self.sci.markerAdd(chunk.lineno, self.inclmarker)
-        self.updateChunkMarker(chunk, exclude)
+                self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                             chunk.lineno+chunk.linecount, 0,
+                                             self.excludeindicator)
         return True
 
     def updateFolds(self):
-        'should be called after chunk states are modified programatically'
+        # should be called after chunk states are modified programatically or
+        # display flags are changed
         self.sci.clearFolds()
         if self.changes is None:
             return
-        folds = []
+
+        if not self.showexcluded:
+            folds = []
+            for chunk in self.changes.hunks:
+                self.sci.markerDelete(chunk.lineno, self.inclmarker)
+                self.sci.markerDelete(chunk.lineno, self.exclmarker)
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
+                self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                             chunk.lineno+chunk.linecount, 0,
+                                             self.excludeindicator)
+                if chunk.excluded:
+                    folds.append(chunk.lineno)
+            self.sci.setContractedFolds(folds)
+            return
+
         for chunk in self.changes.hunks:
             if chunk.excluded:
-                folds.append(chunk.lineno)
-                if self.showexcluded:
-                    self.sci.markerAdd(chunk.lineno, self.exclmarker)
-        if not self.showexcluded:
-            self.sci.setContractedFolds(folds)
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.inclmarker)
+                self.sci.markerAdd(chunk.lineno, self.exclmarker)
+                self.sci.fillIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
+                                            self.excludeindicator)
+            else:
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.exclmarker)
+                self.sci.markerAdd(chunk.lineno, self.inclmarker)
+                self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                             chunk.lineno+chunk.linecount, 0,
+                                             self.excludeindicator)
 
     @pyqtSlot(QAction)
     def setMode(self, action):
