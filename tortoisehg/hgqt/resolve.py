@@ -352,9 +352,12 @@ class ResolveDialog(QDialog):
             else:
                 r.append((root, path))
         paths = self.getSelectedPaths(self.utree)
+        oldmodel = self.utree.model()
         self.utree.setModel(PathsModel(u, self))
         self.utree.resizeColumnToContents(0)
         self.utree.resizeColumnToContents(1)
+        if oldmodel:
+            oldmodel.setParent(None)  # gc-ed
 
         model = self.utree.model()
         smodel = self.utree.selectionModel()
@@ -376,9 +379,12 @@ class ResolveDialog(QDialog):
         uchanged(None, None)
 
         paths = self.getSelectedPaths(self.rtree)
+        oldmodel = self.rtree.model()
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
         self.rtree.resizeColumnToContents(1)
+        if oldmodel:
+            oldmodel.setParent(None)  # gc-ed
 
         model = self.rtree.model()
         smodel = self.rtree.selectionModel()
