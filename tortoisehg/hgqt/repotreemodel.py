@@ -345,7 +345,20 @@ class RepoTreeModel(QAbstractItemModel):
             or isinstance(item, repotreeitem.AlienSubrepoItem)):
             return []
         self.removeRows(0, item.childCount(), index)
-        return map(hglib.tounicode, item.appendSubrepos())
+
+        # XXX dirty hack to know childCount _before_ insertion; should be
+        # fixed later when you refactor appendSubrepos().
+        tmpitem = item.__class__(item.rootpath())
+        invalidpaths = tmpitem.appendSubrepos()
+        if tmpitem.childCount() > 0:
+            self.beginInsertRows(index, 0, tmpitem.childCount() - 1)
+            for e in tmpitem.childs:
+                item.appendChild(e)
+            self.endInsertRows()
+        if item._valid != tmpitem._valid:
+            item._valid = tmpitem._valid
+            self._emitItemDataChanged(item)
+        return map(hglib.tounicode, invalidpaths)
 
     def updateCommonPaths(self, showShortPaths=None):
         if not showShortPaths is None:
