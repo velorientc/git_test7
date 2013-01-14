@@ -1065,6 +1065,7 @@ class SettingsDialog(QDialog):
             return _('User')
 
         self.conftabs = QTabWidget()
+        self.conftabs.currentChanged.connect(self._currentFormChanged)
         layout.addWidget(self.conftabs)
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
@@ -1157,6 +1158,20 @@ class SettingsDialog(QDialog):
         s.sync()
         QDialog.reject(self)
 
+    def _getactivepagename(self):
+        if self._activeformidx is None:
+            return ''
+        activeform = self.conftabs.widget(self._activeformidx)
+        if not activeform:
+            return ''
+        return activeform._activepagename
+
+    def _currentFormChanged(self, idx):
+        activepagename = self._getactivepagename()
+        if activepagename:
+            self.conftabs.widget(idx).focusPage(activepagename)
+        self._activeformidx = idx
+
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
@@ -1238,6 +1253,9 @@ class SettingsForm(QWidget):
 
     @pyqtSlot(int)
     def activatePage(self, index):
+        if index >= 0:
+            self._activepagename = unicode(INFO[index][0]['name'])
+
         stackindex = self.pageListIndexToStack.get(index, -1)
         if stackindex >= 0:
             self.stack.setCurrentIndex(stackindex)
