@@ -65,10 +65,6 @@ class RebaseDialog(QDialog):
         self.keepbrancheschk.setChecked(opts.get('keepbranches', False))
         self.layout().addWidget(self.keepbrancheschk)
 
-        self.detachchk = QCheckBox(_('Force detach of rebased changesets '
-                                     'from their original branch'))
-        self.detachchk.setChecked(opts.get('detach', True))
-        self.layout().addWidget(self.detachchk)
         self.collapsechk = QCheckBox(_('Collapse the rebased changesets '))
         self.collapsechk.setChecked(opts.get('collapse', False))
         self.layout().addWidget(self.collapsechk)
@@ -105,7 +101,7 @@ class RebaseDialog(QDialog):
         self.bbox = bbox
 
         if self.checkResolve() or not (s or d):
-            for w in (srcb, destb, sep, self.keepchk, self.detachchk, 
+            for w in (srcb, destb, sep, self.keepchk,
                       self.collapsechk, self.keepbrancheschk):
                 w.setHidden(True)
             self.cmd.setShowOutput(True)
@@ -158,7 +154,6 @@ class RebaseDialog(QDialog):
         self.cancelbtn.setShown(False)
         self.keepchk.setEnabled(False)
         self.keepbrancheschk.setEnabled(False)
-        self.detachchk.setEnabled(False)
         self.collapsechk.setEnabled(False)
         cmdline = ['rebase', '--repository', self.repo.root]
         cmdline += ['--config', 'ui.merge=internal:' +
@@ -170,8 +165,6 @@ class RebaseDialog(QDialog):
                 cmdline += ['--keep']
             if self.keepbrancheschk.isChecked():
                 cmdline += ['--keepbranches']
-            if self.detachchk.isChecked():
-                cmdline += ['--detach']
             if self.collapsechk.isChecked():
                 cmdline += ['--collapse']
             if self.svnchk is not None and self.svnchk.isChecked():

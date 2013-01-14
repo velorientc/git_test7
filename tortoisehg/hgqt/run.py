@@ -1079,7 +1079,7 @@ table = {
              '(only a repository)')),
           ('u', 'updaterev', '',
            _('revision, tag or branch to check out')),
-          ('r', 'rev', [], _('include the specified changeset')),
+          ('r', 'rev', '', _('include the specified changeset')),
           ('b', 'branch', [],
            _('clone only the specified branch')),
           ('', 'pull', None, _('use pull protocol to copy metadata')),
@@ -1110,7 +1110,7 @@ table = {
          _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
-         [('l', 'limit', '', _('limit number of changes displayed'))],
+         [('l', 'limit', '', _('(DEPRECATED)'))],
          _('thg log [OPTIONS] [FILE]')),
     "manifest":
         (manifest,
@@ -1148,13 +1148,12 @@ table = {
     "^rebase": (rebase,
         [('', 'keep', False, _('keep original changesets')),
          ('', 'keepbranches', False, _('keep original branch names')),
-         ('', 'detach', False, _('force detaching of source from its original '
-                                'branch')),
+         ('', 'detach', False, _('(DEPRECATED)')),
          ('s', 'source', '',
           _('rebase from the specified changeset')),
          ('d', 'dest', '',
           _('rebase onto the specified changeset'))],
-        _('thg rebase -s REV -d REV [--keep] [--detach]')),
+        _('thg rebase -s REV -d REV [--keep]')),
     "^tag":
         (tag,
          [('f', 'force', None, _('replace existing tag')),

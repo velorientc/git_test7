@@ -7,6 +7,7 @@
 
 import os
 import re
+import tempfile
 
 from mercurial import ui, util, error, scmutil, phases
 
@@ -15,7 +16,7 @@ from tortoisehg.util import hglib, shlib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n
+from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n, partialcommit
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -218,6 +219,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         upperframe.setLayout(vbox)
 
         self.split = QSplitter(Qt.Vertical)
+        if os.name == 'nt':
+            self.split.setStyle(QStyleFactory.create('Plastique'))
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(0)
@@ -356,6 +359,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(bool)
     def commitSetAction(self, refresh=False, actionName=None):
+        allowfolding = False
         if actionName:
             selectedAction = \
                 [act for act in self.mqgroup.actions() \
@@ -392,6 +396,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
+                allowfolding = len(self.repo.parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
@@ -399,6 +404,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
+        self.stwidget.fileview.enableDiffFolding(allowfolding)
+        if not allowfolding:
+            self.stwidget.partials = {}
         if refreshwctx:
             self.stwidget.refreshWctx()
         self.committb.setText(curraction._text)
@@ -779,7 +787,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 from tortoisehg.hgqt import settings
                 settings.SettingsDialog(parent=self, focus='ui.username').exec_()
             return
-  
+
         try:
             msg = self.getMessage(False)
         except UnicodeEncodeError:
@@ -831,12 +839,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
+        partials = []
         if len(repo.parents()) > 1:
             merge = True
             self.files = []
         else:
             merge = False
-            self.files = self.stwidget.getChecked('MAR?!S')
+            files = self.stwidget.getChecked('MAR?!S')
+            # make list of files with partial change selections
+            for fname, c in self.stwidget.partials.iteritems():
+                if c.excludecount > 0 and c.excludecount < len(c.hunks):
+                    partials.append(fname)
+            self.files = set(files + partials)
         canemptycommit = bool(brcmd or newbranch or amend)
         if not (self.files or canemptycommit or merge):
             qtlib.WarningMsgBox(_('No files checked'),
@@ -914,6 +928,24 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd
 
+        if partials:
+            partialcommit.uisetup(repo.ui)
+
+            # write patch for partial change selections to temp file
+            fd, tmpname = tempfile.mkstemp(prefix='thg-patch-')
+            fp = os.fdopen(fd, 'wb')
+            for fname in partials:
+                changes = self.stwidget.partials[fname]
+                changes.write(fp)
+                for chunk in changes.hunks:
+                    if not chunk.excluded:
+                        chunk.write(fp)
+            fp.close()
+
+            cmdline.append('--partials')
+            cmdline.append(tmpname)
+            assert not amend
+
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
 
@@ -923,6 +955,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if not self.files and canemptycommit and not merge:
             # make sure to commit empty changeset by excluding all files
             cmdline.extend(['--exclude', repo.root])
+            assert not self.stwidget.partials
 
         cmdline.append('--')
         cmdline.extend([repo.wjoin(f) for f in self.files])
@@ -959,6 +992,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            self.stwidget.partials = {}
             if self.currentAction == 'rollback':
                 shlib.shell_notify([self.repo.root])
                 return
@@ -1100,7 +1134,7 @@ class DetailsDialog(QDialog):
         if mode != 'merge':
             #self.autoinccb.setVisible(False)
             layout.addLayout(hbox)
-        
+
         hbox = QHBoxLayout()
         recursesave = QPushButton(_('Save in Repo'))
         recursesave.clicked.connect(self.saveRecurseInSubrepos)
@@ -1108,14 +1142,14 @@ class DetailsDialog(QDialog):
         SP = QSizePolicy
         self.recursecb.setSizePolicy(SP(SP.Expanding, SP.Minimum))
         #self.recursecb.toggled.connect(recursesave.setEnabled)
-        
+
         if opts.get('recurseinsubrepos'):
             self.recursecb.setChecked(True)
-            
+
         hbox.addWidget(self.recursecb)
         hbox.addWidget(recursesave)
         layout.addLayout(hbox)
-        
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1272,7 +1306,7 @@ class DetailsDialog(QDialog):
             outopts['recurseinsubrepos'] = 'true'
         else:
             outopts['recurseinsubrepos'] = ''
-        
+
         self.outopts = outopts
         QDialog.accept(self)
 
@@ -1340,7 +1374,7 @@ class CommitDialog(QDialog):
 
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
-        if link.startswith('subrepo:'):
+        if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[8:])
         if link.startswith('shelve:'):
@@ -1385,7 +1419,7 @@ class CommitDialog(QDialog):
             s.setValue('commit/geom', self.saveGeometry())
             self.commit.saveSettings(s, 'committool')
         return exit
-    
+
     def accept(self):
         self.commit.commit()
 

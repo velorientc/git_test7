@@ -693,6 +693,19 @@ def fix_application_font():
     f.setPixelSize(abs(lf.lfHeight))
     QApplication.setFont(f, 'QWidget')
 
+def allowCaseChangingInput(combo):
+    """Allow case-changing input of known combobox item
+
+    QComboBox performs case-insensitive inline completion by default. It's
+    all right, but sadly it implies case-insensitive check for duplicates,
+    i.e. you can no longer enter "Foo" if the combobox contains "foo".
+
+    For details, read QComboBoxPrivate::_q_editingFinished() and matchFlags()
+    of src/gui/widgets/qcombobox.cpp.
+    """
+    assert isinstance(combo, QComboBox) and combo.isEditable()
+    combo.completer().setCaseSensitivity(Qt.CaseSensitive)
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
@@ -843,6 +856,53 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+# Strings and regexes used to convert hashes and subrepo paths into links
+_hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
+# Currently converting subrepo paths into links only works in English
+_subrepoindicator = '(in subrepo %s)'
+_subreporegex = re.compile(r'\(in subrepo (\S+)\)')
+
+def _linkifyHash(message, subrepo=''):
+    if subrepo:
+        replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
+    else:
+        replaceexpr = r'<a href="cset:\1">\1</a>'
+    return _hashregex.sub(replaceexpr, message)
+
+def _linkifySubrepoRef(message, subrepo, hash=''):
+    if hash:
+        hash = '?' + hash
+    subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
+    linkifiedsubrepoindicator = _subrepoindicator % subrepolink
+    message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+    return message
+
+def linkifyMessage(message):
+    r"""Convert revision id hashes and subrepo paths in messages into links
+
+    >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
+    u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
+    >>> linkifyMessage('abort: foo (in subrepo bar)\n')
+    u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\n'
+    ...                'hint: foo\n') #doctest: +NORMALIZE_WHITESPACE
+    u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
+    (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
+    """
+    message = unicode(message)
+    subrepo = ''
+    m = _subreporegex.search(message)
+    if m:
+        subrepo = m.group(1)
+    message = _linkifyHash(message, subrepo)
+    if subrepo:
+        hash = ''
+        m = _hashregex.search(message)
+        if m:
+            hash = m.group(1)
+        message = _linkifySubrepoRef(message, subrepo, hash)
+    return message.replace('\n', '<br>')
+
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
 
@@ -903,7 +963,8 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(linkifyMessage(message), self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -916,7 +977,8 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(linkifyMessage(message), self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -937,7 +999,7 @@ class ConfirmInfoBar(InfoBar):
 
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(linkifyMessage(message), self,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)

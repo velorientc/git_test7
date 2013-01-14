@@ -54,6 +54,7 @@ class BookmarkDialog(QDialog):
         self.bookmarkCombo.setEditable(True)
         self.bookmarkCombo.currentIndexChanged.connect(self.bookmarkTextChanged)
         self.bookmarkCombo.editTextChanged.connect(self.bookmarkTextChanged)
+        qtlib.allowCaseChangingInput(self.bookmarkCombo)
         form.addRow(_('Bookmark:'), self.bookmarkCombo)
 
         ### Rename input

@@ -36,6 +36,8 @@ class HgFileView(QFrame):
     showMessage = pyqtSignal(QString)
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
+    newChunkList = pyqtSignal(QString, object)
+    chunkSelectionChanged = pyqtSignal()
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -51,6 +53,11 @@ class HgFileView(QFrame):
 
         self.repo = repo
         self._diffs = []
+        self.changes = None
+        self.folddiffs = False
+        self.showexcluded = QSettings().value('changes-show-excluded', True).toBool()
+        self.chunkatline = {}
+        self.excludemsg = _('this change has been excluded from the commit')
 
         self.topLayout = QVBoxLayout()
 
@@ -94,6 +101,12 @@ class HgFileView(QFrame):
         self.sci.setAnnotationEnabled(False)
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
         self.sci.customContextMenuRequested.connect(self.menuRequest)
+        self.sci.SCN_MARGINCLICK.connect(self.marginClicked)
+
+        if QSettings().value('changes-annotate-excluded').toBool():
+            self.sci.setAnnotationDisplay(qsci.AnnotationStandard)
+        else:
+            self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -110,6 +123,44 @@ class HgFileView(QFrame):
         self.sci.setMarkerBackgroundColor(QColor('#B0FFA0'), self.markerplus)
         self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
         self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
+
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.state |= QStyle.State_On
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._checkedpix = pix
+        self.inclmarker = self.sci.markerDefine(self._checkedpix, -1)
+
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.state |= QStyle.State_Off
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._uncheckedpix = pix
+        self.exclmarker = self.sci.markerDefine(self._uncheckedpix, -1)
+
+        self.exclcolor = self.sci.markerDefine(qsci.Background, -1)
+        self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.exclcolor)
+        self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.exclcolor)
+        mask = (1 << self.inclmarker) | (1 << self.exclmarker) | \
+               (1 << self.exclcolor)
+        self.sci.setMarginMarkerMask(4, mask)
+        self.markexcluded = QSettings().value('changes-mark-excluded', True).toBool()
+        self.excludeindicator = -1
+        self.updateChunkIndicatorMarks()
+        self.sci.setIndicatorDrawUnder(True, self.excludeindicator)
+        self.sci.setIndicatorForegroundColor(QColor('gray'), self.excludeindicator)
 
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
@@ -225,6 +276,81 @@ class HgFileView(QFrame):
         self.repo = repo
         self.sci.repo = repo
 
+    def updateChunkIndicatorMarks(self):
+        '''
+        This method has some pre-requisites:
+        - self.markexcluded and self.excludeindicator MUST be defined
+        - self.excludeindicator MUST be set to -1 before calling this
+        method for the first time
+        '''
+        indicatortypes = (qsci.HiddenIndicator, qsci.StrikeIndicator)
+        self.excludeindicator = self.sci.indicatorDefine(
+            indicatortypes[self.markexcluded],
+            self.excludeindicator)
+
+    def enableDiffFolding(self, enable):
+        'Enable the use of a folding margin when a diff view is active'
+        # Should only be called with True from the commit tool when it is in
+        # a 'commit' mode and False for other uses
+        if not enable and self.folddiffs:
+            self.sci.clearFolds()
+        self.folddiffs = enable
+        self._showFoldMargin(enable)
+
+    def updateChunkMarker(self, chunk, exclude):
+        if exclude:
+            self.sci.fillIndicatorRange(chunk.lineno+1, 0,
+                chunk.lineno+chunk.linecount, 0,
+                self.excludeindicator)
+        else:
+            self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                chunk.lineno+chunk.linecount, 0,
+                self.excludeindicator)
+
+    def updateChunk(self, chunk, exclude):
+        'change chunk exclusion state, update display when necessary'
+        # returns True if the chunk state was changed
+        if exclude:
+            # TODO: create a decent QsciStyle for these annotations
+            self.sci.annotate(chunk.lineno, self.excludemsg, 4)
+            if chunk.excluded:
+                return False
+            chunk.excluded = True
+            self.changes.excludecount += 1
+            if self.showexcluded:
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, -1)
+                    self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.inclmarker)
+                self.sci.markerAdd(chunk.lineno, self.exclmarker)
+        else:
+            self.sci.clearAnnotations(chunk.lineno)
+            if not chunk.excluded:
+                return False
+            chunk.excluded = False
+            self.changes.excludecount -= 1
+            if self.showexcluded:
+                for i in xrange(chunk.linecount-1):
+                    self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
+                self.sci.markerDelete(chunk.lineno, self.exclmarker)
+                self.sci.markerAdd(chunk.lineno, self.inclmarker)
+        self.updateChunkMarker(chunk, exclude)
+        return True
+
+    def updateFolds(self):
+        'should be called after chunk states are modified programatically'
+        self.sci.clearFolds()
+        if self.changes is None:
+            return
+        folds = []
+        for chunk in self.changes.hunks:
+            if chunk.excluded:
+                folds.append(chunk.lineno)
+                if self.showexcluded:
+                    self.sci.markerAdd(chunk.lineno, self.exclmarker)
+        if not self.showexcluded:
+            self.sci.setContractedFolds(folds)
+
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
@@ -310,7 +436,34 @@ class HgFileView(QFrame):
         self.actionPrevDiff.setEnabled(False)
 
         self.maxWidth = 0
+        self.changes = None
+        self.chunkatline = {}
+        self._showFoldMargin(False)
         self.sci.showHScrollBar(False)
+
+    def _showFoldMargin(self, show):
+        'toggle the display of the diff folding margin'
+        if self.showexcluded:
+            self.sci.setMarginType(4, qsci.SymbolMargin)
+            self.sci.setMarginWidth(4, show and 15 or 0)
+            self.sci.setMarginSensitivity(4, show)
+            self.sci.setFolding(qsci.NoFoldStyle, 3)
+        else:
+            style = show and qsci.BoxedTreeFoldStyle or qsci.NoFoldStyle
+            self.sci.setFolding(style, 3)
+            self.sci.setMarginWidth(4, 0)
+            self.sci.setMarginSensitivity(4, False)
+
+    @pyqtSlot(int, int, int)
+    def marginClicked(self, pos, modifiers, margin):
+        'raw margin clicked event, received before folding has responded'
+        line, index = self.sci.lineIndexFromPosition(pos)
+        if line not in self.chunkatline:
+            return
+        assert margin in (4, 3) and index == 0
+        chunk = self.chunkatline[line]
+        if self.updateChunk(chunk, not chunk.excluded):
+            self.chunkSelectionChanged.emit()
 
     def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):
@@ -337,7 +490,7 @@ class HgFileView(QFrame):
             ctx2 = self._ctx.p1()
         else:
             ctx2 = self._ctx.p2()
-        fd = filedata.FileData(self._ctx, ctx2, filename, status)
+        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.folddiffs)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -346,6 +499,8 @@ class HgFileView(QFrame):
             self.extralabel.hide()
         self.filenamelabel.setText(fd.flabel)
 
+        uf = hglib.tounicode(filename)
+
         if not fd.isValid():
             self.sci.setText(fd.error)
             self.sci.setLexer(None)
@@ -353,6 +508,7 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, 0)
             self.blk.setVisible(False)
             self.restrictModes(False, False, False)
+            self.newChunkList.emit(uf, None)
             return
 
         candiff = bool(fd.diff)
@@ -383,17 +539,29 @@ class HgFileView(QFrame):
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
-            # trim first three lines, for example:
-            # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
-            # --- a/tortoisehg/hgqt/thgrepo.py
-            # +++ b/tortoisehg/hgqt/thgrepo.py
-            if fd.diff:
+            if fd.changes:
+                self._showFoldMargin(True)
+                self.changes = fd.changes
+                self.sci.setText(hglib.tounicode(fd.diff))
+                for chunk in self.changes.hunks:
+                    self.chunkatline[chunk.lineno] = chunk
+                    if self.showexcluded:
+                        self.sci.markerAdd(chunk.lineno, self.inclmarker)
+                        self.sci.clearIndicatorRange(chunk.lineno+1, 0,
+                                            chunk.lineno+chunk.linecount, 0,
+                                            self.excludeindicator)
+            elif fd.diff:
+                # trim first three lines, for example:
+                # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
+                # --- a/tortoisehg/hgqt/mq.py
+                # +++ b/tortoisehg/hgqt/mq.py
                 out = fd.diff.split('\n', 3)
                 if len(out) == 4:
                     self.sci.setText(hglib.tounicode(out[3]))
                 else:
                     # there was an error or rename without diffs
                     self.sci.setText(hglib.tounicode(fd.diff))
+            self.newChunkList.emit(uf, fd.changes)
         elif fd.ucontents:
             # subrepo summary and perhaps other data
             self.sci.setText(fd.ucontents)
@@ -401,6 +569,7 @@ class HgFileView(QFrame):
             self.sci.setFont(qtlib.getfont('fontlog').font())
             self.sci.setMarginWidth(1, 0)
             self.blk.setVisible(False)
+            self.newChunkList.emit(uf, None)
             return
         elif fd.contents:
             lexer = lexers.get_lexer(filename, fd.contents, self)
@@ -412,7 +581,9 @@ class HgFileView(QFrame):
             self.sci._updatemarginwidth()
             if self._mode == AnnMode:
                 self.sci._updateannotation(self._ctx, filename)
+            self.newChunkList.emit(uf, None)
         else:
+            self.newChunkList.emit(uf, None)
             return
 
         # Recover the last cursor/scroll position
@@ -423,7 +594,6 @@ class HgFileView(QFrame):
         self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
-        uf = hglib.tounicode(filename)
         uc = hglib.tounicode(fd.contents) or ''
         self.fileDisplayed.emit(uf, uc)
 
@@ -627,8 +797,49 @@ class HgFileView(QFrame):
         def sann():
             self.searchbar.search(selection)
             self.searchbar.show()
+        def anndisplay(m):
+            self.sci.setAnnotationDisplay(m)
+            QSettings().setValue('changes-annotate-excluded',
+                                 m == qsci.AnnotationStandard)
 
         if self._mode != AnnMode:
+            if self.folddiffs:
+                partialcommitopts = QMenu(_('&Change selection options'), self)
+                def toggleShowExcluded():
+                    self.showexcluded = not self.showexcluded
+                    self._showFoldMargin(True)
+                    self.updateFolds()
+                    QSettings().setValue('changes-show-excluded',
+                        self.showexcluded)
+                actshowexcluded = partialcommitopts.addAction(_('Show excluded changes'))
+                actshowexcluded.setCheckable(True)
+                actshowexcluded.setChecked(self.showexcluded)
+                actshowexcluded.triggered.connect(toggleShowExcluded)
+
+                def toggleAnnotateExcluded():
+                    if self.sci.annotationDisplay() == qsci.AnnotationStandard:
+                        annmode = qsci.AnnotationHidden
+                    else:
+                        annmode = qsci.AnnotationStandard
+                    anndisplay(annmode)
+                actannotateexcluded = partialcommitopts.addAction(
+                    _('Annotate excluded changes'))
+                actannotateexcluded.setCheckable(True)
+                actannotateexcluded.setChecked(
+                    self.sci.annotationDisplay() == qsci.AnnotationStandard)
+                actannotateexcluded.triggered.connect(toggleAnnotateExcluded)
+
+                def toggleMarkExcluded():
+                    self.markexcluded = not self.markexcluded
+                    self.updateChunkIndicatorMarks()
+                    QSettings().setValue('changes-mark-excluded',
+                        self.markexcluded)
+                actmarkexcluded = partialcommitopts.addAction(
+                    _('Mark excluded changes'))
+                actmarkexcluded.setCheckable(True)
+                actmarkexcluded.setChecked(self.markexcluded)
+                actmarkexcluded.triggered.connect(toggleMarkExcluded)
+                menu.addMenu(partialcommitopts)
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),

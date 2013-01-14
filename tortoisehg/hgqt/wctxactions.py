@@ -233,7 +233,7 @@ def opensubrepo(parent, ui, repo, files):
     for filename in files:
         path = os.path.join(repo.root, filename)
         if os.path.isdir(path):
-            parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+            parent.linkActivated.emit(u'repo:' + hglib.tounicode(path))
         else:
             QMessageBox.warning(parent,
                 _("Cannot open subrepository"),
@@ -404,7 +404,7 @@ def resolve_with(tool, repo, files):
     return True
 
 def check(parent, ui, repo, files):
-    parent.tv.model().check(files)
+    parent.tv.model().check(files, True)
     return True
 
 def uncheck(parent, ui, repo, files):

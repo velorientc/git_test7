@@ -61,15 +61,14 @@ class ServeDialog(QDialog):
         self._webconf_form.setEnabled(not self.isstarted())
 
     def _updatestatus(self):
-        def statustext():
-            if self.isstarted():
-                # TODO: escape special chars
-                link = '<a href="%s">%s</a>' % (self.rooturl, self.rooturl)
-                return _('Running at %s') % link
-            else:
-                return _('Stopped')
+        if self.isstarted():
+            # TODO: escape special chars
+            link = '<a href="%s">%s</a>' % (self.rooturl, self.rooturl)
+            msg = _('Running at %s') % link
+        else:
+            msg = _('Stopped')
 
-        self._qui.status_edit.setText(statustext())
+        self._qui.status_edit.setText(msg)
 
     @pyqtSlot()
     def start(self):
@@ -193,6 +192,8 @@ class ServeDialog(QDialog):
     @pyqtSlot()
     def _minimizetotray(self):
         self._trayicon.show()
+        self._trayicon.showMessage(_('TortoiseHg Web Server'),
+                                   _('Running at %s') % self.rooturl)
         self.hide()
 
     @pyqtSlot()

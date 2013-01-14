@@ -5,17 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import util, hg, ui
-
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
-
-from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
-from repotreeitem import RepoItem, RepoTreeItem, SubrepoItem
+from tortoisehg.hgqt import repotreeitem
 
 from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtGui import QFont
 
 import os
 
@@ -49,7 +44,7 @@ def readXml(source, rootElementName):
     if xr.hasError():
         print str(xr.errorString())
     if xr.readNextStartElement():
-        itemread = undumpObject(xr)
+        itemread = repotreeitem.undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
         print str(xr.errorString())
@@ -61,52 +56,38 @@ def iterRepoItemFromXml(source):
     while not xr.atEnd():
         t = xr.readNext()
         if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
-            yield undumpObject(xr)
+            yield repotreeitem.undumpObject(xr)
 
-def getRepoItemList(root, includeSubRepos=False):
-    if not includeSubRepos and isinstance(root, RepoItem):
-        return [root]
-    if not isinstance(root, RepoTreeItem):
-        return []
-    return reduce(lambda a, b: a + b,
-                  (getRepoItemList(c, includeSubRepos=includeSubRepos) \
-                    for c in root.childs), [])
+def getRepoItemList(root, standalone=False):
+    if standalone:
+        stopfunc = lambda e: isinstance(e, repotreeitem.RepoItem)
+    else:
+        stopfunc = None
+    return [e for e in repotreeitem.flatten(root, stopfunc=stopfunc)
+            if isinstance(e, repotreeitem.RepoItem)]
 
 
 class RepoTreeModel(QAbstractItemModel):
-
-    updateProgress = pyqtSignal(int, int, QString, QString)
-
-    def __init__(self, filename, parent, showSubrepos=False,
-            showNetworkSubrepos=False, showShortPaths=False):
+    def __init__(self, filename, parent=None, showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
-        self.updateProgress.connect(parent.updateProgress)
-        self.showSubrepos = showSubrepos
-        self.showNetworkSubrepos = showNetworkSubrepos
         self.showShortPaths = showShortPaths
+        self._activeRepoItem = None
 
         root = None
-        all = None
-
         if filename:
             f = QFile(filename)
             if f.open(QIODevice.ReadOnly):
                 root = readXml(f, reporegistryXmlElementName)
                 f.close()
-                if root:
-                    for c in root.childs:
-                        if isinstance(c, AllRepoGroupItem):
-                            all = c
-                            break
-
-                    if self.showSubrepos:
-                        self.loadSubrepos(root)
 
         if not root:
-            root = RepoTreeItem(self)
+            root = repotreeitem.RepoTreeItem(self)
         # due to issue #1075, 'all' may be missing even if 'root' exists
-        if not all:
-            all = AllRepoGroupItem(self)
+        try:
+            all = repotreeitem.find(
+                root, lambda e: isinstance(e, repotreeitem.AllRepoGroupItem))
+        except ValueError:
+            all = repotreeitem.AllRepoGroupItem()
             root.appendChild(all)
 
         self.rootItem = root
@@ -117,7 +98,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     # overrides from QAbstractItemModel
 
-    def index(self, row, column, parent):
+    def index(self, row, column, parent=QModelIndex()):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if (not parent.isValid()):
@@ -139,7 +120,7 @@ class RepoTreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.column() > 0:
             return 0
         if not parent.isValid():
@@ -148,22 +129,27 @@ class RepoTreeModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role not in (Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole,
                 Qt.FontRole):
             return QVariant()
         item = index.internalPointer()
-        return item.data(index.column(), role)
+        if role == Qt.FontRole and item is self._activeRepoItem:
+            font = QFont()
+            font.setBold(True)
+            return font
+        else:
+            return item.data(index.column(), role)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
                 if section == 1:
@@ -179,13 +165,15 @@ class RepoTreeModel(QAbstractItemModel):
     def supportedDropActions(self):
         return Qt.CopyAction | Qt.MoveAction | Qt.LinkAction
 
-    def removeRows(self, row, count, parent):
+    def removeRows(self, row, count, parent=QModelIndex()):
         item = parent.internalPointer()
         if item is None:
             item = self.rootItem
         if count <= 0 or row < 0 or row + count > item.childCount():
             return False
         self.beginRemoveRows(parent, row, row+count-1)
+        if self._activeRepoItem in item.childs[row:row + count]:
+            self._activeRepoItem = None
         res = item.removeRows(row, count)
         self.endRemoveRows()
         return res
@@ -200,7 +188,7 @@ class RepoTreeModel(QAbstractItemModel):
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
         d.setData(repoRegMimeType, buf)
-        if isinstance(item, RepoItem):
+        if isinstance(item, repotreeitem.RepoItem):
             d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
         else:
             d.setText(QString(item.name))
@@ -218,7 +206,7 @@ class RepoTreeModel(QAbstractItemModel):
                 row = parent.row()
                 parent = parent.parent()
                 group = parent.internalPointer()
-                if row < 0 or not isinstance(group, RepoGroupItem):
+                if row < 0 or not isinstance(group, repotreeitem.RepoGroupItem):
                     # The group was dropped at the top level
                     group = self.rootItem
                     parent = QModelIndex()
@@ -232,16 +220,14 @@ class RepoTreeModel(QAbstractItemModel):
             return False
         if row < 0:
             row = 0
-        if self.showSubrepos:
-            self.loadSubrepos(itemread)
         self.beginInsertRows(parent, row, row)
         group.insertChild(row, itemread)
         self.endInsertRows()
-        if isinstance(itemread, AllRepoGroupItem):
+        if isinstance(itemread, repotreeitem.AllRepoGroupItem):
             self.allrepos = itemread
         return True
 
-    def setData(self, index, value, role):
+    def setData(self, index, value, role=Qt.EditRole):
         if not index.isValid() or role != Qt.EditRole:
             return False
         s = value.toString()
@@ -255,77 +241,69 @@ class RepoTreeModel(QAbstractItemModel):
 
     # functions not defined in QAbstractItemModel
 
-    def allreposIndex(self):
-        return self.createIndex(self.allrepos.row(), 0, self.allrepos)
-
-    def addRepo(self, group, root, row=-1):
-        grp = group
-        if grp == None:
-            grp = self.allreposIndex()
-        rgi = grp.internalPointer()
+    def addRepo(self, uroot, row=-1, parent=QModelIndex()):
+        if not parent.isValid():
+            parent = self._indexFromItem(self.allrepos)
+        rgi = parent.internalPointer()
         if row < 0:
             row = rgi.childCount()
 
         # make sure all paths are properly normalized
-        root = os.path.normpath(root)
+        root = os.path.normpath(hglib.fromunicode(uroot))
 
         # Check whether the repo that we are adding is a subrepo
-        # This check could be expensive, particularly for network repositories
-        # Thus, only perform this check on network repos if the showNetworkSubrepos
-        # flag is set
-        itemIsSubrepo = False
-        if self.showNetworkSubrepos \
-                or not paths.netdrive_status(root):
-            outerrepopath = paths.find_root(os.path.dirname(root))
-            if outerrepopath:
-                # Check whether repo we are adding is a subrepo of
-                # its containing (outer) repo
-                # This check is currently quite imperfect, since it
-                # only checks the current repo revision
-                outerrepo = hg.repository(ui.ui(), path=outerrepopath)
-                relroot = util.normpath(root[len(outerrepopath)+1:])
-                if relroot in outerrepo['.'].substate:
-                    itemIsSubrepo = True
+        knownitem = self.getRepoItem(root, lookForSubrepos=True)
+        itemIsSubrepo = isinstance(knownitem,
+                                   (repotreeitem.StandaloneSubrepoItem,
+                                    repotreeitem.SubrepoItem))
 
-        self.beginInsertRows(grp, row, row)
+        self.beginInsertRows(parent, row, row)
         if itemIsSubrepo:
-            ri = SubrepoItem(root)
+            ri = repotreeitem.StandaloneSubrepoItem(root)
         else:
-            ri = RepoItem(root)
+            ri = repotreeitem.RepoItem(root)
         rgi.insertChild(row, ri)
-
-        if not self.showSubrepos \
-                or (not self.showNetworkSubrepos and paths.netdrive_status(root)):
-            self.endInsertRows()
-            return
-
-        invalidRepoList = ri.appendSubrepos()
-
         self.endInsertRows()
 
-        if invalidRepoList:
-            if invalidRepoList[0] == root:
-                qtlib.WarningMsgBox(_('Could not get subrepository list'),
-                    _('It was not possible to get the subrepository list for '
-                    'the repository in:<br><br><i>%s</i>') % root)
-            else:
-                qtlib.WarningMsgBox(_('Could not open some subrepositories'),
-                    _('It was not possible to fully load the subrepository '
-                    'list for the repository in:<br><br><i>%s</i><br><br>'
-                    'The following subrepositories may be missing, broken or '
-                    'on an inconsistent state and cannot be accessed:'
-                    '<br><br><i>%s</i>')  %
-                    (root, "<br>".join(invalidRepoList)))
+        return self._indexFromItem(ri)
 
+    # TODO: merge getRepoItem() to indexFromRepoRoot()
     def getRepoItem(self, reporoot, lookForSubrepos=False):
-        return self.rootItem.getRepoItem(os.path.normcase(reporoot),
-                    lookForSubrepos=lookForSubrepos)
+        reporoot = os.path.normcase(reporoot)
+        items = getRepoItemList(self.rootItem, standalone=not lookForSubrepos)
+        for e in items:
+            if os.path.normcase(e.rootpath()) == reporoot:
+                return e
+
+    def indexFromRepoRoot(self, uroot, column=0, standalone=False):
+        item = self.getRepoItem(hglib.fromunicode(uroot),
+                                lookForSubrepos=not standalone)
+        return self._indexFromItem(item, column)
+
+    def isKnownRepoRoot(self, uroot, standalone=False):
+        return self.indexFromRepoRoot(uroot, standalone=standalone).isValid()
+
+    def indexesOfRepoItems(self, column=0, standalone=False):
+        return [self._indexFromItem(e, column)
+                for e in getRepoItemList(self.rootItem, standalone)]
+
+    def _indexFromItem(self, item, column=0):
+        if item:
+            return self.createIndex(item.row(), column, item)
+        else:
+            return QModelIndex()
+
+    def repoRoot(self, index):
+        item = index.internalPointer()
+        if not isinstance(item, repotreeitem.RepoItem):
+            return
+        return hglib.tounicode(item.rootpath())
 
     def addGroup(self, name):
         ri = self.rootItem
         cc = ri.childCount()
         self.beginInsertRows(QModelIndex(), cc, cc + 1)
-        ri.appendChild(RepoGroupItem(name, ri))
+        ri.appendChild(repotreeitem.RepoGroupItem(name, ri))
         self.endInsertRows()
 
     def write(self, fn):
@@ -342,30 +320,36 @@ class RepoTreeModel(QAbstractItemModel):
                 return count
             count += 1
 
-    def loadSubrepos(self, root, filterFunc=(lambda r: True)):
-        repoList = getRepoItemList(root)
-        for n, c in enumerate(repoList):
-            QCoreApplication.processEvents()
-            if filterFunc(c.rootpath()):
-                if self.showNetworkSubrepos \
-                        or not paths.netdrive_status(c.rootpath()):
-                    self.updateProgress.emit(n, len(repoList),
-                        _('Updating repository registry'),
-                        _('Loading repository %s')
-                        % hglib.tounicode(c.rootpath()))
-                    QCoreApplication.processEvents()
-                    self.removeRows(0, c.childCount(),
-                        self.createIndex(c.row(), 0, c))
-                    c.appendSubrepos()
-        self.updateProgress.emit(len(repoList), len(repoList),
-            _('Updating repository registry'),
-            _('Repository Registry updated'))
+    def setActiveRepo(self, index):
+        """Highlight the specified item as active"""
+        newitem = index.internalPointer()
+        if newitem is self._activeRepoItem:
+            return
+        previtem = self._activeRepoItem
+        self._activeRepoItem = newitem
+        for it in [previtem, newitem]:
+            if it:
+                self.dataChanged.emit(
+                    self.createIndex(it.row(), 0, it),
+                    self.createIndex(it.row(), self.columnCount(), it))
+
+    def activeRepoIndex(self, column=0):
+        return self._indexFromItem(self._activeRepoItem, column)
+
+    def loadSubrepos(self, index):
+        """Scan subrepos of the repo; returns list of invalid paths"""
+        item = index.internalPointer()
+        if (not isinstance(item, repotreeitem.RepoItem)
+            or isinstance(item, repotreeitem.AlienSubrepoItem)):
+            return []
+        self.removeRows(0, item.childCount(), index)
+        return map(hglib.tounicode, item.appendSubrepos())
 
     def updateCommonPaths(self, showShortPaths=None):
         if not showShortPaths is None:
             self.showShortPaths = showShortPaths
         for grp in self.rootItem.childs:
-            if isinstance(grp, RepoGroupItem):
+            if isinstance(grp, repotreeitem.RepoGroupItem):
                 if self.showShortPaths:
                     grp.updateCommonPath()
                 else:

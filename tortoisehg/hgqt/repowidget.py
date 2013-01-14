@@ -283,12 +283,18 @@ class RepoWidget(QWidget):
         """Toggle display repowidget filter bar"""
         self.filterbar.setVisible(checked)
 
+    def _openRepoLink(self, upath):
+        path = hglib.fromunicode(upath)
+        if not os.path.isabs(path):
+            path = self.repo.wjoin(path)
+        self.repoLinkClicked.emit(hglib.tounicode(path))
+
     @pyqtSlot(unicode)
     def _openLink(self, link):
         link = unicode(link)
         handlers = {'cset': self.goto,
                     'log': lambda a: self.makeLogVisible.emit(True),
-                    'subrepo': self.repoLinkClicked.emit,
+                    'repo': self._openRepoLink,
                     'shelve' : self.shelve}
         if ':' in link:
             scheme, param = link.split(':', 1)
@@ -1681,7 +1687,22 @@ class RepoWidget(QWidget):
             dlg.deleteLater()
 
     def updateToRevision(self):
-        dlg = update.UpdateDialog(self.repo, self.rev, self)
+        ctx = self.repo[self.rev]
+        bookmarks = ctx.bookmarks()
+        if ctx in self.repo.parents():
+            # keep bookmark unchanged when updating to current rev
+            if self.repo._bookmarkcurrent in bookmarks:
+                rev = self.repo._bookmarkcurrent
+            else:
+                rev = self.rev
+        else:
+            # more common switching bookmark, rather than deselecting it
+            if bookmarks:
+                rev = bookmarks[0]
+            else:
+                rev = self.rev
+
+        dlg = update.UpdateDialog(self.repo, rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
@@ -1815,11 +1836,7 @@ class RepoWidget(QWidget):
         _ui.pushbuffer()
         try:
             if self.rev and len(self.menuselection) == 1:
-                class Writable(object):
-                    def write(self, *args, **opts): _ui.write(*args, **opts)
-                    def close(self): pass
-                    def __len__(self): return 0
-                commands.export(_ui, self.repo, self.rev, output=Writable())
+                commands.export(_ui, self.repo, self.rev, output='')
             else:
                 revs = self.rev and self.menuselection or None
                 commands.diff(_ui, self.repo, rev=revs)
