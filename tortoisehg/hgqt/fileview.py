@@ -131,7 +131,7 @@ class HgFileView(QFrame):
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
-        option.rect = QRect(QPoint(0,0), QPoint(16,16));
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
         option.state |= QStyle.State_On
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._checkedpix = pix
@@ -144,7 +144,7 @@ class HgFileView(QFrame):
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
-        option.rect = QRect(QPoint(0,0), QPoint(16,16));
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
         option.state |= QStyle.State_Off
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._uncheckedpix = pix
