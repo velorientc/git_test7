@@ -135,7 +135,7 @@ class HgFileView(QFrame):
         option.state |= QStyle.State_On
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._checkedpix = pix
-        self.inclmarker = self.sci.markerDefine(pix, -1)
+        self.inclmarker = self.sci.markerDefine(self._checkedpix, -1)
 
         pix = QPixmap(16,16)
         painter = QPainter(pix)
@@ -148,7 +148,7 @@ class HgFileView(QFrame):
         option.state |= QStyle.State_Off
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._uncheckedpix = pix
-        self.exclmarker = self.sci.markerDefine(pix, -1)
+        self.exclmarker = self.sci.markerDefine(self._uncheckedpix, -1)
 
         self.exclcolor = self.sci.markerDefine(qsci.Background, -1)
         self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.exclcolor)
