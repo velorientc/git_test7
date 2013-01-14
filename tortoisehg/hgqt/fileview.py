@@ -311,7 +311,6 @@ class HgFileView(QFrame):
         'change chunk exclusion state, update display when necessary'
         # returns True if the chunk state was changed
         if exclude:
-            # TODO: create a decent QsciStyle for these annotations
             self.sci.annotate(chunk.lineno, self.excludemsg, 4)
             if chunk.excluded:
                 return False
