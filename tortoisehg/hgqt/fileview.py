@@ -124,8 +124,32 @@ class HgFileView(QFrame):
         self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
         self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
 
-        self.inclmarker = self.sci.markerDefine(qsci.Plus, -1)
-        self.exclmarker = self.sci.markerDefine(qsci.Minus, -1)
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16));
+        option.state |= QStyle.State_On
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._checkedpix = pix
+        self.inclmarker = self.sci.markerDefine(pix, -1)
+
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16));
+        option.state |= QStyle.State_Off
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._uncheckedpix = pix
+        self.exclmarker = self.sci.markerDefine(pix, -1)
+
         self.exclcolor = self.sci.markerDefine(qsci.Background, -1)
         self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.exclcolor)
         self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.exclcolor)
