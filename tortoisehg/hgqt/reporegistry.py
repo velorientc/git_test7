@@ -760,7 +760,7 @@ class RepoRegistryView(QDockWidget):
         if root in invalidpaths:
             qtlib.WarningMsgBox(_('Could not get subrepository list'),
                 _('It was not possible to get the subrepository list for '
-                  'the repository in:<br><br><i>%s</i>') % root, paret=self)
+                  'the repository in:<br><br><i>%s</i>') % root, parent=self)
         else:
             qtlib.WarningMsgBox(_('Could not open some subrepositories'),
                 _('It was not possible to fully load the subrepository '
