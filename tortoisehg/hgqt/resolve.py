@@ -484,17 +484,17 @@ class PathsModel(QAbstractTableModel):
     def __len__(self):
         return len(self.rows)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0 # no child
         return len(self.rows)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0 # no child
         return len(self.headers)
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
@@ -502,7 +502,7 @@ class PathsModel(QAbstractTableModel):
             return QVariant(hglib.tounicode(data))
         return QVariant()
 
-    def headerData(self, col, orientation, role):
+    def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
         else:
