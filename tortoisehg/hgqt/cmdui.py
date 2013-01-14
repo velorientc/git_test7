@@ -351,11 +351,13 @@ class Core(QObject):
             self.stbar.showMessage(status, error)
 
         self.display = None
+        self.thread.setParent(None)  # assist gc
         if ret == 0 and self.runNext():
             return # run next command
         else:
             self.queue = []
             text = self.thread.rawoutput.join('')
+            self.thread = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)
