@@ -10,8 +10,6 @@ from PyQt4.QtGui import *
 
 import os
 
-from mercurial import merge as mergemod
-
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, csinfo, visdiff, thgrepo
