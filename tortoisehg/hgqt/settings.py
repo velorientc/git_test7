@@ -1048,6 +1048,10 @@ class SettingsDialog(QDialog):
                            'view is readonly.'), parent=self)
             print 'Please install http://code.google.com/p/iniparse/'
 
+        if not focus:
+            focus = QSettings().value('settings/lastpage', 'log').toString()
+        focus = unicode(focus)
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -1064,6 +1068,7 @@ class SettingsDialog(QDialog):
                 return hglib.tounicode(name)
             return _('User')
 
+        self._activeformidx = configrepo and CONF_REPO or CONF_GLOBAL
         self.conftabs = QTabWidget()
         self.conftabs.currentChanged.connect(self._currentFormChanged)
         layout.addWidget(self.conftabs)
@@ -1109,8 +1114,7 @@ class SettingsDialog(QDialog):
         self.bb = bb
 
         self._restartreqs = set()
-
-        self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
+        self.conftabs.setCurrentIndex(self._activeformidx)
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
@@ -1147,6 +1151,7 @@ class SettingsDialog(QDialog):
         self.applyChanges()
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.accept(self)
 
@@ -1155,6 +1160,7 @@ class SettingsDialog(QDialog):
             return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.reject(self)
 
