@@ -359,7 +359,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(bool)
     def commitSetAction(self, refresh=False, actionName=None):
-        allowfolding = False
+        allowcs = False
         if actionName:
             selectedAction = \
                 [act for act in self.mqgroup.actions() \
@@ -396,7 +396,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
-                allowfolding = len(self.repo.parents()) == 1
+                allowcs = len(self.repo.parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
@@ -404,8 +404,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
-        self.stwidget.fileview.enableDiffFolding(allowfolding)
-        if not allowfolding:
+        self.stwidget.fileview.enableChangeSelection(allowcs)
+        if not allowcs:
             self.stwidget.partials = {}
         if refreshwctx:
             self.stwidget.refreshWctx()

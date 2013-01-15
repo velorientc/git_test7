@@ -259,7 +259,6 @@ class StatusWidget(QWidget):
             if wfile not in self.getChecked():
                 for chunk in changes.hunks:
                     self.fileview.updateChunk(chunk, True)
-        self.fileview.updateFolds()
         self.chunkSelectionChanged()
         self.partials[wfile] = changes
 
@@ -439,7 +438,6 @@ class StatusWidget(QWidget):
             if wfile == self.fileview._filename:
                 for chunk in self.partials[wfile].hunks:
                     self.fileview.updateChunk(chunk, not checked)
-                self.fileview.updateFolds()
             else:
                 del self.partials[wfile]
 
