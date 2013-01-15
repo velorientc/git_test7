@@ -563,8 +563,33 @@ class DiffBrowser(QFrame):
         self.sci.setMarginWidth(1, QFontMetrics(self.font()).width('XX'))
         self.sci.setMarginSensitivity(1, True)
         self.sci.marginClicked.connect(self.marginClicked)
-        self.selected = self.sci.markerDefine(qsci.Plus, -1)
-        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
+
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.state |= QStyle.State_On
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._checkedpix = pix
+        self.selected = self.sci.markerDefine(self._checkedpix, -1)
+
+        pix = QPixmap(16,16)
+        painter = QPainter(pix)
+        # QSci doesn't appear to use Qt.gray exactly
+        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        option = QStyleOptionButton()
+        style = QApplication.style()
+        option.initFrom(self)
+        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.state |= QStyle.State_Off
+        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+        self._uncheckedpix = pix
+        self.unselected = self.sci.markerDefine(self._uncheckedpix, -1)
+
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
         self.divider = self.sci.markerDefine(qsci.Background, -1)
         self.selcolor = self.sci.markerDefine(qsci.Background, -1)
