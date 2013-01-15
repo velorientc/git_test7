@@ -126,7 +126,7 @@ class HgFileView(QFrame):
         pix = QPixmap(16,16)
         painter = QPainter(pix)
         # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        painter.fillRect(0, 0, 16, 16, QColor('#B0FFA0'))
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
@@ -139,7 +139,7 @@ class HgFileView(QFrame):
         pix = QPixmap(16,16)
         painter = QPainter(pix)
         # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, Qt.gray)
+        painter.fillRect(0, 0, 16, 16, QColor('#B0FFA0'))
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
