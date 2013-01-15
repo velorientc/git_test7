@@ -56,7 +56,7 @@ class HgFileView(QFrame):
         self.changes = None
         self.changeselection = False
         self.chunkatline = {}
-        self.excludemsg = _('this change has been excluded from the commit')
+        self.excludemsg = _('this change will be excluded from the next commit')
 
         self.topLayout = QVBoxLayout()
 
