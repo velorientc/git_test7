@@ -110,18 +110,13 @@ in a bug fix while excluding all your debug instrumentation so that you
 can continue debugging after the commit.
 
 When the user has excluded one or more of the changes made to a file,
-TortoiseHg considers the file partially selected (and this feature is
-sometimes referred to as **partial commit**).  Partially selected files
-are displayed in the file list with a special partial check state.
+TortoiseHg considers the file partially selected (and this change
+selection feature is sometimes referred to as **partial commit**).
+Partially selected files are displayed in the file list with a special
+partial check state.
 
-The diff view pane has context menu options for configuring the display
-of the excluded changes.  :menuselection:`Change selection options --> Annotate excluded changes`
-toggles the insertion of annotations on excluded changes labeled
-:guilabel:`this change will be excluded from the next commit`.
-Users will want to disable these annotations as soon as they are 
-comfortable with the change selection interface.
-
-:menuselection:`Change selection options --> Mark excluded changes`
+The diff view pane has a context menu option for configuring the 
+marking of excluded changes.  :menuselection:`Mark excluded changes`
 toggles a strike-through indicator on excluded changes.  This setting is
 primarily a personal preference, but future versions of TortoiseHg may
 extend the use of the strike-through indicator for partial exclusion of
@@ -131,13 +126,15 @@ This new partial selection feature is similar to hgtk's
 `chunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_,
 but is superior in several ways:
 
-# Change selection is integrated directly into the diff view.  No
-  mode switch is required.
-# The working copy files are not modified during partial commit.
-  This avoids serious file permission problems on Windows.
-# Change selection is possible for copied or renamed files, with one
-  exception.  You cannot exclude all of the changes because this
-  excludes the entire file from the commit.
+1) Change selection is integrated directly into the diff view. No mode
+   switch is required.
+
+2) The working copy files are not modified during partial commit. This
+   avoids serious file permission problems on Windows.
+
+3) Change selection is possible for copied or renamed files, with one
+   exception. You cannot exclude all of the changes because this
+   excludes the entire file from the commit.
 
 TortoiseHg has had a shelve tool since version 2.0 which can move
 selected changes from the working directory to a patch (or between
