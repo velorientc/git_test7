@@ -883,10 +883,10 @@ def linkifyMessage(message, subrepo=None):
 
     >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
     u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
-    >>> linkifyMessage('abort: foo (in subrepo bar)\n')
+    >>> linkifyMessage('abort: foo (in subrepo bar)\n', subrepo='bar')
     u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\n'
-    ...                'hint: foo\n') #doctest: +NORMALIZE_WHITESPACE
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\nhint: foo\n',
+    ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
     u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
     (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
     """
