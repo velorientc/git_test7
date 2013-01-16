@@ -118,32 +118,12 @@ class HgFileView(QFrame):
         self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
         self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
 
-        pix = QPixmap(16,16)
-        painter = QPainter(pix)
-        # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, QColor('#B0FFA0'))
-        option = QStyleOptionButton()
-        style = QApplication.style()
-        option.initFrom(self)
-        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
-        option.rect.moveTo(1, 1)
-        option.state |= QStyle.State_On
-        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
-        self._checkedpix = pix
+        self._checkedpix = qtlib.getcheckboxpixmap(QStyle.State_On,
+                                                   QColor('#B0FFA0'), self)
         self.inclmarker = self.sci.markerDefine(self._checkedpix, -1)
 
-        pix = QPixmap(16,16)
-        painter = QPainter(pix)
-        # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, QColor('#B0FFA0'))
-        option = QStyleOptionButton()
-        style = QApplication.style()
-        option.initFrom(self)
-        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
-        option.rect.moveTo(1, 1)
-        option.state |= QStyle.State_Off
-        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
-        self._uncheckedpix = pix
+        self._uncheckedpix = qtlib.getcheckboxpixmap(QStyle.State_Off,
+                                                     QColor('#B0FFA0'), self)
         self.exclmarker = self.sci.markerDefine(self._uncheckedpix, -1)
 
         self.exclcolor = self.sci.markerDefine(qsci.Background, -1)

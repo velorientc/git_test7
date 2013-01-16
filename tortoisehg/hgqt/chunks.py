@@ -564,32 +564,12 @@ class DiffBrowser(QFrame):
         self.sci.setMarginSensitivity(1, True)
         self.sci.marginClicked.connect(self.marginClicked)
 
-        pix = QPixmap(16,16)
-        painter = QPainter(pix)
-        # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, Qt.gray)
-        option = QStyleOptionButton()
-        style = QApplication.style()
-        option.initFrom(self)
-        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
-        option.rect.moveTo(1, 1)
-        option.state |= QStyle.State_On
-        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
-        self._checkedpix = pix
+        self._checkedpix = qtlib.getcheckboxpixmap(QStyle.State_On,
+                                                   Qt.gray, self)
         self.selected = self.sci.markerDefine(self._checkedpix, -1)
 
-        pix = QPixmap(16,16)
-        painter = QPainter(pix)
-        # QSci doesn't appear to use Qt.gray exactly
-        painter.fillRect(0, 0, 16, 16, Qt.gray)
-        option = QStyleOptionButton()
-        style = QApplication.style()
-        option.initFrom(self)
-        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
-        option.rect.moveTo(1, 1)
-        option.state |= QStyle.State_Off
-        style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
-        self._uncheckedpix = pix
+        self._uncheckedpix = qtlib.getcheckboxpixmap(QStyle.State_Off,
+                                                     Qt.gray, self)
         self.unselected = self.sci.markerDefine(self._uncheckedpix, -1)
 
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)

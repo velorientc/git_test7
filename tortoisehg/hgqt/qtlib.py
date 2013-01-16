@@ -525,6 +525,19 @@ def getpixmap(name, width=16, height=16):
     _pixmapcache[key] = pixmap
     return pixmap
 
+def getcheckboxpixmap(state, bgcolor, widget):
+    pix = QPixmap(16,16)
+    painter = QPainter(pix)
+    painter.fillRect(0, 0, 16, 16, bgcolor)
+    option = QStyleOptionButton()
+    style = QApplication.style()
+    option.initFrom(widget)
+    option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+    option.rect.moveTo(1, 1)
+    option.state |= state
+    style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+    return pix
+
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)
     def __init__(self, name):
