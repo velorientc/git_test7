@@ -705,10 +705,10 @@ class DiffBrowser(QFrame):
         self.sci.markerDeleteAll(-1)
         for chunk in chunks[1:]:
             chunk.lrange = (start, start+len(chunk.lines))
-            chunk.mline = start + len(chunk.lines)/2
+            chunk.mline = start
             if start:
                 self.sci.markerAdd(start-1, self.divider)
-            for i in xrange(1,len(chunk.lines)-1):
+            for i in xrange(0,len(chunk.lines)):
                 if start + i == chunk.mline:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                 else:
