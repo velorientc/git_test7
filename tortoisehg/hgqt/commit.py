@@ -773,21 +773,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def commit(self, amend=False):
         repo = self.repo
-        defaultusername = ui.ui().config('ui', 'username')
-        if not defaultusername:
-            res = qtlib.CustomPrompt(
-                _('Default username is not configured'),
-                _('A default username is not configured. '
-                  'This username is used when you commit '
-                  'unless you set a different username on a given repository.\n\n'
-                  'You must configure a default username before being able to commit.\n\n'
-                  'Do you want to configure your default username now?'), self,
-                (_('&Configure'), _('Cancel')), 0, 1, []).run()
-            if res == 0:
-                from tortoisehg.hgqt import settings
-                settings.SettingsDialog(parent=self, focus='ui.username').exec_()
-            return
-
         try:
             msg = self.getMessage(False)
         except UnicodeEncodeError:
