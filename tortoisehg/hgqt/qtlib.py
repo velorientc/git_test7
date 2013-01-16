@@ -1141,6 +1141,17 @@ class Spacer(QWidget):
     def sizeHint(self):
         return QSize(self.width, self.height)
 
+def _configuredusername(ui):
+    # need to check the existence before calling ui.username(); otherwise it
+    # may fall back to the system default.
+    if (not os.environ.get('HGUSER') and not ui.config('ui', 'username')
+        and not os.environ.get('EMAIL')):
+        return None
+    try:
+        return ui.username()
+    except error.Abort:
+        return None
+
 def getCurrentUsername(widget, repo, opts=None):
     if opts:
         # 1. Override has highest priority
@@ -1149,10 +1160,9 @@ def getCurrentUsername(widget, repo, opts=None):
             return user
 
     # 2. Read from repository
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        pass
+    user = _configuredusername(repo.ui)
+    if user:
+        return user
 
     # 3. Get a username from the user
     QMessageBox.information(widget, _('Please enter a username'),
@@ -1162,10 +1172,7 @@ def getCurrentUsername(widget, repo, opts=None):
     dlg = SettingsDialog(False, focus='ui.username')
     dlg.exec_()
     repo.invalidateui()
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        return None
+    return _configuredusername(repo.ui)
 
 class _EncodingSafeInputDialog(QInputDialog):
     def accept(self):
