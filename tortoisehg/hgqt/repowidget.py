@@ -346,8 +346,9 @@ class RepoWidget(QWidget):
             subrepolabel = 'subrepo='
             for label in labelslist:
                 if label.startswith(subrepolabel):
-                    # The subrepo "label" is encoded
-                    subrepo = urllib.unquote(label[len(subrepolabel):])
+                    # The subrepo "label" is encoded ascii
+                    subrepo = hglib.tounicode(
+                        urllib.unquote(str(label)[len(subrepolabel):]))
                     break
             # Limit the text shown on the info bar to maxlines lines of up to maxwidth chars
             msglines = unicode(msg).strip().splitlines()
