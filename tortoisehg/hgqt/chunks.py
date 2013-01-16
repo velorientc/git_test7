@@ -571,7 +571,8 @@ class DiffBrowser(QFrame):
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
-        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+        option.rect.moveTo(1, 1)
         option.state |= QStyle.State_On
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._checkedpix = pix
@@ -584,7 +585,8 @@ class DiffBrowser(QFrame):
         option = QStyleOptionButton()
         style = QApplication.style()
         option.initFrom(self)
-        option.rect = QRect(QPoint(0,0), QPoint(16,16))
+        option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+        option.rect.moveTo(1, 1)
         option.state |= QStyle.State_Off
         style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
         self._uncheckedpix = pix
