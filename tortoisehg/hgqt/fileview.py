@@ -321,7 +321,9 @@ class HgFileView(QFrame):
             llen = self.sci.text(chunk.lineno).length()
             mlen = len(self.excludemsg)
             pos = self.sci.positionFromLineIndex(chunk.lineno, llen-mlen-1)
-            self.sci.SendScintilla(qsci.SCI_DELETERANGE, pos, mlen)
+            self.sci.SendScintilla(qsci.SCI_SETTARGETSTART, pos)
+            self.sci.SendScintilla(qsci.SCI_SETTARGETEND, pos + mlen)
+            self.sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
             self.sci.setReadOnly(True)
 
             self.sci.markerDelete(chunk.lineno, self.exclmarker)
