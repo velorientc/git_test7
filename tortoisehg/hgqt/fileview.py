@@ -56,7 +56,7 @@ class HgFileView(QFrame):
         self.changes = None
         self.changeselection = False
         self.chunkatline = {}
-        self.excludemsg = _('this change will be excluded from the next commit')
+        self.excludemsg = _(' (excluded from the next commit)')
 
         self.topLayout = QVBoxLayout()
 
@@ -101,11 +101,6 @@ class HgFileView(QFrame):
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
         self.sci.customContextMenuRequested.connect(self.menuRequest)
         self.sci.marginClicked.connect(self.marginClicked)
-
-        if QSettings().value('changes-annotate-excluded').toBool():
-            self.sci.setAnnotationDisplay(qsci.AnnotationStandard)
-        else:
-            self.sci.setAnnotationDisplay(qsci.AnnotationHidden)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -298,12 +293,17 @@ class HgFileView(QFrame):
     def updateChunk(self, chunk, exclude):
         'change chunk exclusion state, update display when necessary'
         # returns True if the chunk state was changed
+        if chunk.excluded == exclude:
+            return False
         if exclude:
-            self.sci.annotate(chunk.lineno, self.excludemsg, 4)
-            if chunk.excluded:
-                return False
             chunk.excluded = True
             self.changes.excludecount += 1
+
+            self.sci.setReadOnly(False)
+            llen = self.sci.text(chunk.lineno).length()
+            self.sci.insertAt(self.excludemsg, chunk.lineno, llen-1)
+            self.sci.setReadOnly(True)
+
             self.sci.markerDelete(chunk.lineno, self.inclmarker)
             self.sci.markerAdd(chunk.lineno, self.exclmarker)
             for i in xrange(chunk.linecount-1):
@@ -312,11 +312,16 @@ class HgFileView(QFrame):
                                         chunk.lineno+chunk.linecount, 0,
                                         self.excludeindicator)
         else:
-            self.sci.clearAnnotations(chunk.lineno)
-            if not chunk.excluded:
-                return False
             chunk.excluded = False
             self.changes.excludecount -= 1
+
+            self.sci.setReadOnly(False)
+            llen = self.sci.text(chunk.lineno).length()
+            mlen = len(self.excludemsg)
+            pos = self.sci.positionFromLineIndex(chunk.lineno, llen-mlen-1)
+            self.sci.SendScintilla(qsci.SCI_DELETERANGE, pos, mlen)
+            self.sci.setReadOnly(True)
+
             self.sci.markerDelete(chunk.lineno, self.exclmarker)
             self.sci.markerAdd(chunk.lineno, self.inclmarker)
             for i in xrange(chunk.linecount-1):
@@ -758,38 +763,18 @@ class HgFileView(QFrame):
         def sann():
             self.searchbar.search(selection)
             self.searchbar.show()
-        def anndisplay(m):
-            self.sci.setAnnotationDisplay(m)
-            QSettings().setValue('changes-annotate-excluded',
-                                 m == qsci.AnnotationStandard)
 
         if self._mode != AnnMode:
             if self.changeselection:
-                partialcommitopts = QMenu(_('&Change selection options'), self)
-                def toggleAnnotateExcluded():
-                    if self.sci.annotationDisplay() == qsci.AnnotationStandard:
-                        annmode = qsci.AnnotationHidden
-                    else:
-                        annmode = qsci.AnnotationStandard
-                    anndisplay(annmode)
-                actannotateexcluded = partialcommitopts.addAction(
-                    _('Annotate excluded changes'))
-                actannotateexcluded.setCheckable(True)
-                actannotateexcluded.setChecked(
-                    self.sci.annotationDisplay() == qsci.AnnotationStandard)
-                actannotateexcluded.triggered.connect(toggleAnnotateExcluded)
-
                 def toggleMarkExcluded():
                     self.markexcluded = not self.markexcluded
                     self.updateChunkIndicatorMarks()
                     QSettings().setValue('changes-mark-excluded',
                         self.markexcluded)
-                actmarkexcluded = partialcommitopts.addAction(
-                    _('Mark excluded changes'))
+                actmarkexcluded = menu.addAction(_('Mark excluded changes'))
                 actmarkexcluded.setCheckable(True)
                 actmarkexcluded.setChecked(self.markexcluded)
                 actmarkexcluded.triggered.connect(toggleMarkExcluded)
-                menu.addMenu(partialcommitopts)
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),
