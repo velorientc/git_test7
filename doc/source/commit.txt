@@ -105,7 +105,7 @@ New in TortoiseHg 2.7, the commit tool now allows one to partially
 select modified files.  This means you can now exclude a portion of the
 changes you have made to the file.  This further violates Mercurial's
 precept of committing the state of the working copy, but it is a very
-useful feature.  The most commonly sited example is being able to check
+useful feature.  The most commonly cited example is being able to check
 in a bug fix while excluding all your debug instrumentation so that you
 can continue debugging after the commit.
 
