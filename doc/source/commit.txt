@@ -147,13 +147,13 @@ still remain in the working copy.
 When the commit button is pressed, the commit tool checks if any of the
 checked files are partially excluded.  If any such partial commits are
 required, the commit tool builds a temporary patch file which describes
-how to generate the contents of those files the user has requested and
-passes that patch file to TortoiseHg's partial commit extension.  This
+how to generate the contents of the partially excluded files and passes
+that patch file to TortoiseHg's partial commit extension.  This
 extension triggers Mercurial's commit command with special hooks so that
-the partially committed file contents come from patched tempfiles
-instead of being read from the actual working copy files.  After the
-commit the temporary files and patch are deleted but the working copy
-files are completely untouched.
+the partial commit file contents come from patched tempfiles instead of
+being read from the working copy.  After the commit the temporary files
+and patch are deleted but the working copy files are completely
+untouched.
 
 Keyboard navigation
 -------------------
