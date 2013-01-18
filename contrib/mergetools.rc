@@ -68,6 +68,19 @@ kdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
 kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
 kdiff3.dirdiff=True
 
+; copy of kdiff3 above, dropping --auto
+kdiff3-noauto.priority=-4
+kdiff3-noauto.args=--L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
+kdiff3-noauto.regkey=Software\KDiff3
+kdiff3-noauto.regkeyalt=Software\Wow6432Node\KDiff3
+kdiff3-noauto.regappend=\kdiff3.exe
+kdiff3-noauto.fixeol=False
+kdiff3-noauto.premerge=False
+kdiff3-noauto.gui=True
+kdiff3-noauto.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
+kdiff3-noauto.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
+kdiff3-noauto.dirdiff=True
+
 diffmerge.regkey=Software\SourceGear\SourceGear DiffMerge\
 diffmerge.regkeyalt=Software\Wow6432Node\SourceGear\SourceGear DiffMerge\
 diffmerge.regname=Location
