@@ -1219,8 +1219,7 @@ class RepoWidget(QWidget):
             if ext and ext not in exs:
                 return
             if desc is None:
-                menu.addSeparator()
-                return
+                return menu.addSeparator()
             act = QAction(desc, self)
             act.triggered.connect(cb)
             if icon:
@@ -1228,6 +1227,7 @@ class RepoWidget(QWidget):
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
+            return act
         menu = QMenu(self)
         if mode == 'outgoing':
             submenu = menu.addMenu(_('Pus&h'))
