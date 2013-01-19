@@ -975,6 +975,7 @@ class AnnotateView(qscilib.Scintilla):
             return ann
         self._lineannotation = lineannotation
 
+    @pyqtSlot()
     def configChanged(self):
         self.setIndentationWidth(self.repo.tabwidth)
         self.setTabWidth(self.repo.tabwidth)
