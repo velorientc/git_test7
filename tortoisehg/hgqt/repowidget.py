@@ -1221,7 +1221,8 @@ class RepoWidget(QWidget):
             if desc is None:
                 return menu.addSeparator()
             act = QAction(desc, self)
-            act.triggered.connect(cb)
+            if cb:
+                act.triggered.connect(cb)
             if icon:
                 act.setIcon(qtlib.getmenuicon(icon))
             act.enableFunc = func
