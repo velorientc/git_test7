@@ -977,6 +977,7 @@ class RepoWidget(QWidget):
         'Repository has detected itself to be deleted'
         self.closeSelfSignal.emit(self)
 
+    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         if self.isVisible():
@@ -994,6 +995,7 @@ class RepoWidget(QWidget):
         # Update the repo registry entries related to the current repo
         self.repoChanged.emit(hglib.tounicode(self.repo.root))
 
+    @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
