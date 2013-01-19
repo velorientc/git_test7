@@ -8,7 +8,7 @@
 
 import binascii
 import os
-import shlex, subprocess, functools # used by runCustomCommand
+import shlex, subprocess  # used by runCustomCommand
 import urllib
 from mercurial import revset, error, patch, phases
 
@@ -1326,6 +1326,7 @@ class RepoWidget(QWidget):
 
             entry(menu)
             submenu = menu.addMenu(_('Custom Tools'))
+            submenu.triggered.connect(self._runCustomCommandByMenu)
             for name in toollist:
                 if name == '|':
                     entry(submenu)
@@ -1344,9 +1345,8 @@ class RepoWidget(QWidget):
                     enable = enablefuncs[enable]
                 else:
                     continue
-                menufunc = functools.partial(self.runCustomCommand, command,
-                    showoutput)
-                entry(submenu, None, enable, label, icon, menufunc)
+                a = entry(submenu, None, enable, label, icon)
+                a.setData((command, showoutput))
 
         _setupCustomSubmenu(menu)
 
@@ -2095,6 +2095,11 @@ class RepoWidget(QWidget):
                 'Please check that the command path is valid and '
                 'that it is a valid application') % hglib.tounicode(ex.strerror))
         return res
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        command, showoutput = action.data().toPyObject()
+        self.runCustomCommand(command, showoutput)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
