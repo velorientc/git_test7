@@ -1281,9 +1281,9 @@ class RepoWidget(QWidget):
         entry(menu)
 
         submenu = menu.addMenu(_('Change &Phase to'))
+        submenu.triggered.connect(self._changePhaseByMenu)
         for pnum, pname in enumerate(phases.phasenames):
-            entry(submenu, None, isrev, pname, None,
-                  functools.partial(self.changePhase, pnum))
+            entry(submenu, None, isrev, pname).setData(pnum)
         entry(menu)
 
         entry(menu, None, fixed, _('&Graft to Local...'), 'hg-transplant',
@@ -1903,6 +1903,11 @@ class RepoWidget(QWidget):
             cmdlines.append('--force')
         self.runCommand(cmdlines)
         self.reload()
+
+    @pyqtSlot(QAction)
+    def _changePhaseByMenu(self, action):
+        phasenum, _ok = action.data().toInt()
+        self.changePhase(phasenum)
 
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
