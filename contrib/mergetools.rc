@@ -145,6 +145,15 @@ winmergeu.diffargs=/r /e /x /ub /wl /dl '$plabel1' /dr '$clabel' $parent $child
 winmergeu.diff3args=
 winmergeu.dirdiff=True
 
+meld.regkey=SOFTWARE\Meld\Executable
+meld.regaltkey=SOFTWARE\Wow6432Node\Meld\Executable
+meld.gui=True
+meld.args=--label='local' $local --label='base' $base --label='other' $other
+meld.priority=-2
+meld.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
+meld.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
+meld.dirdiff=True
+
 ; TortoiseHg diff wrapper for some binary documents, not for merge general use
 docdiff.priority=-100
 docdiff.regkey=Software\TortoiseHg
@@ -191,13 +200,6 @@ bcompare.gui=True
 bcompare.diffargs=-lro -lefttitle='$plabel1' -righttitle='$clabel' -solo -expandall $parent $child
 bcompare.diff3args=$parent1 $parent2 $child -lefttitle='$plabel1' -centertitle='$clabel' -righttitle='$plabel2' -solo -expandall
 bcompare.dirdiff=True
-
-meld.gui=True
-meld.args=--label='local' $local --label='base' $base --label='other' $other
-meld.priority=-2
-meld.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
-meld.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
-meld.dirdiff=True
 
 diffuse.priority=-3
 diffuse.args=$local $base $other
