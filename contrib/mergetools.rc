@@ -145,8 +145,9 @@ winmergeu.diffargs=/r /e /x /ub /wl /dl '$plabel1' /dr '$clabel' $parent $child
 winmergeu.diff3args=
 winmergeu.dirdiff=True
 
-meld.regkey=SOFTWARE\Meld\Executable
-meld.regaltkey=SOFTWARE\Wow6432Node\Meld\Executable
+meld.regkey=SOFTWARE\Meld
+meld.regkeyalt=SOFTWARE\Wow6432Node\Meld
+meld.regname=Executable
 meld.gui=True
 meld.args=--label='local' $local --label='base' $base --label='other' $other
 meld.priority=-2
