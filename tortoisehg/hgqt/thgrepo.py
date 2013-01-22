@@ -51,6 +51,8 @@ def repository(_ui=None, path='', create=False, bundle=None):
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path, create)
+            # get unfiltered repo in version safe manner
+            repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
             repo._pyqtobj = ThgRepoWrapper(repo)
             _repocache[path] = repo
