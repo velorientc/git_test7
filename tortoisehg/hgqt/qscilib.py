@@ -398,7 +398,7 @@ class Scintilla(QsciScintilla):
             QsciScintilla.StrikeIndicator = self.INDIC_STRIKE
 
         if not hasattr(self, 'indicatorDefine'):
-            def indicatorDefine(style, indicatorNumber):
+            def indicatorDefine(style, indicatorNumber=-1):
                 # compatibility layer allows only one indicator to be defined
                 if indicatorNumber == -1:
                     indicatorNumber = 1
