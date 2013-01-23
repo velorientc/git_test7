@@ -426,7 +426,12 @@ class HgFileView(QFrame):
             self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
             self.sci.setIndicatorForegroundColor(
                 QColor('blue'), self._forceviewindicator)
-            self.sci.indicatorClicked.connect(self.forceDisplayFile)
+            if hasattr(self.sci, 'indicatorClicked'):
+                self.sci.indicatorClicked.connect(self.forceDisplayFile)
+            else:
+                # for older QScintilla versions, we do not care the arguments
+                # are different
+                self.sci.SCN_INDICATORCLICK.connect(self.forceDisplayFile)
 
     def forceDisplayFile(self):
         if self.changes is not None:
