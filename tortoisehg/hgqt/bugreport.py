@@ -70,6 +70,8 @@ class BugReport(QDialog):
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
+        elif os.name == 'posix':
+            text += '** System: %s\n' % hglib.tounicode(' '.join(os.uname()))
         text += ('** Qt-%s PyQt-%s QScintilla-%s\n'
                  % (QT_VERSION_STR, PYQT_VERSION_STR, QSCINTILLA_VERSION_STR))
         text += hglib.tounicode(opts.get('error', 'N/A'))
