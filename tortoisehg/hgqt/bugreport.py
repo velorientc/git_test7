@@ -15,6 +15,11 @@ from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+try:
+    from PyQt4.Qsci import QSCINTILLA_VERSION_STR
+except (ImportError, AttributeError):
+    # show BugReport dialog even if QScintilla is missing
+    QSCINTILLA_VERSION_STR = '(unknown)'
 
 class BugReport(QDialog):
 
@@ -65,7 +70,8 @@ class BugReport(QDialog):
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
-        text += '** Qt-%s PyQt-%s\n' % (QT_VERSION_STR, PYQT_VERSION_STR)
+        text += ('** Qt-%s PyQt-%s QScintilla-%s\n'
+                 % (QT_VERSION_STR, PYQT_VERSION_STR, QSCINTILLA_VERSION_STR))
         text += hglib.tounicode(opts.get('error', 'N/A'))
         # Bitbucket wiki marker for code: 4 spaces indent (Markdown syntax)
         regexp = re.compile(r'^', re.MULTILINE)
