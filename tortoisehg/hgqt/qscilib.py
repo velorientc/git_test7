@@ -392,7 +392,8 @@ class Scintilla(QsciScintilla):
         # compability mode with QScintilla from Ubuntu 10.04
         if not hasattr(QsciScintilla, 'HiddenIndicator'):
             QsciScintilla.HiddenIndicator = self.INDIC_HIDDEN
-
+        if not hasattr(QsciScintilla, 'PlainIndicator'):
+            QsciScintilla.PlainIndicator = self.INDIC_PLAIN
         if not hasattr(QsciScintilla, 'StrikeIndicator'):
             QsciScintilla.StrikeIndicator = self.INDIC_STRIKE
 
