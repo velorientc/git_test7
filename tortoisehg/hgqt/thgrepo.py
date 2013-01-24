@@ -602,7 +602,11 @@ def _createchangectxcls(parentcls):
         def sub(self, path):
             srepo = super(thgchangectx, self).sub(path)
             if isinstance(srepo, subrepo.hgsubrepo):
-                srepo._repo.__class__ = _extendrepo(srepo._repo)
+                r = srepo._repo
+                # get unfiltered repo in version safe manner
+                r = getattr(r, 'unfiltered', lambda: r)()
+                r.__class__ = _extendrepo(r)
+                srepo._repo = r
             return srepo
 
         def thgtags(self):
