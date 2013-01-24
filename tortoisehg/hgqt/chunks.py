@@ -701,7 +701,10 @@ class DiffBrowser(QFrame):
         self.filenamelabel.setText(fd.flabel)
 
         if not fd.isValid() or not fd.diff:
-            self.sci.setText(fd.error or '')
+            if fd.error is None:
+                self.sci.clear()
+                return
+            self.sci.setText(fd.error)
             forcedisplaymsg = filedata.forcedisplaymsg
             linkstart = fd.error.find(forcedisplaymsg)
             if linkstart >= 0:
