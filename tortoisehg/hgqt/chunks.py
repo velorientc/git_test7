@@ -711,7 +711,8 @@ class DiffBrowser(QFrame):
                 # add the link to force to view the data anyway
                 self._setupForceViewIndicator()
                 self.sci.fillIndicatorRange(
-                    0, linkstart, 0, linkstart+len(forcedisplaymsg), self._forceviewindicator)
+                    0, linkstart, 0, linkstart+len(forcedisplaymsg),
+                    self._forceviewindicator)
             return
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
