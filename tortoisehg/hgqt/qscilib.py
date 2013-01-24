@@ -132,7 +132,7 @@ class Scintilla(QsciScintilla):
         self._resetfindcond()
         unbindConflictedKeys(self)
         self._setupcompatibilitylayer()
-        
+
     def read(self, f):
         result = super(Scintilla, self).read(f)
         self.setDefaultEolMode()
@@ -404,12 +404,12 @@ class Scintilla(QsciScintilla):
                     indicatorNumber = 1
                 self.SendScintilla(self.SCI_INDICSETSTYLE, indicatorNumber, style)
                 return indicatorNumber
-                
+
             self.indicatorDefine = indicatorDefine
-        
+
         if not hasattr(self, 'setIndicatorDrawUnder'):
             def setIndicatorDrawUnder(under, indicatorNumber):
-               self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
+                self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
 
             self.setIndicatorDrawUnder = setIndicatorDrawUnder
 
@@ -417,27 +417,27 @@ class Scintilla(QsciScintilla):
             def setIndicatorForegroundColor(color, indicatorNumber):
                 self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
                 self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber, color.alpha());
-       
+
             self.setIndicatorForegroundColor = setIndicatorForegroundColor
 
         if not hasattr(self, 'clearIndicatorRange'):
             def clearIndicatorRange(lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
                 start = self.positionFromLineIndex(lineFrom, indexFrom)
                 finish = self.positionFromLineIndex(lineTo, indexTo)
-                 
+
                 self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
                 self.SendScintilla(self.SCI_INDICATORCLEARRANGE, start, finish - start);
-       
+
             self.clearIndicatorRange = clearIndicatorRange
-                 
+
         if not hasattr(self, 'fillIndicatorRange'):
             def fillIndicatorRange(lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
                 start = self.positionFromLineIndex(lineFrom, indexFrom)
                 finish = self.positionFromLineIndex(lineTo, indexTo)
-                 
+
                 self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
                 self.SendScintilla(self.SCI_INDICATORFILLRANGE, start, finish - start);
-       
+
             self.fillIndicatorRange = fillIndicatorRange
 
 class SearchToolBar(QToolBar):
