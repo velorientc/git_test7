@@ -20,7 +20,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
-qsci = Qsci.QsciScintilla
+qsci = qscilib.Scintilla
 
 DiffMode = 1
 FileMode = 2
