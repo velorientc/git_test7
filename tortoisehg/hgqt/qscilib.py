@@ -131,7 +131,6 @@ class Scintilla(QsciScintilla):
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
         unbindConflictedKeys(self)
-        self._setupcompatibilitylayer()
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
@@ -388,57 +387,47 @@ class Scintilla(QsciScintilla):
             tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
         super(Scintilla, self).setIndentationsUseTabs(tabs)
 
-    def _setupcompatibilitylayer(self):
-        # compability mode with QScintilla from Ubuntu 10.04
-        if not hasattr(QsciScintilla, 'HiddenIndicator'):
-            QsciScintilla.HiddenIndicator = self.INDIC_HIDDEN
-        if not hasattr(QsciScintilla, 'PlainIndicator'):
-            QsciScintilla.PlainIndicator = self.INDIC_PLAIN
-        if not hasattr(QsciScintilla, 'StrikeIndicator'):
-            QsciScintilla.StrikeIndicator = self.INDIC_STRIKE
+    # compability mode with QScintilla from Ubuntu 10.04
+    if not hasattr(QsciScintilla, 'HiddenIndicator'):
+        HiddenIndicator = QsciScintilla.INDIC_HIDDEN
+    if not hasattr(QsciScintilla, 'PlainIndicator'):
+        PlainIndicator = QsciScintilla.INDIC_PLAIN
+    if not hasattr(QsciScintilla, 'StrikeIndicator'):
+        StrikeIndicator = QsciScintilla.INDIC_STRIKE
 
-        if not hasattr(self, 'indicatorDefine'):
-            def indicatorDefine(style, indicatorNumber=-1):
-                # compatibility layer allows only one indicator to be defined
-                if indicatorNumber == -1:
-                    indicatorNumber = 1
-                self.SendScintilla(self.SCI_INDICSETSTYLE, indicatorNumber, style)
-                return indicatorNumber
+    if not hasattr(QsciScintilla, 'indicatorDefine'):
+        def indicatorDefine(self, style, indicatorNumber=-1):
+            # compatibility layer allows only one indicator to be defined
+            if indicatorNumber == -1:
+                indicatorNumber = 1
+            self.SendScintilla(self.SCI_INDICSETSTYLE, indicatorNumber, style)
+            return indicatorNumber
 
-            self.indicatorDefine = indicatorDefine
+    if not hasattr(QsciScintilla, 'setIndicatorDrawUnder'):
+        def setIndicatorDrawUnder(self, under, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
 
-        if not hasattr(self, 'setIndicatorDrawUnder'):
-            def setIndicatorDrawUnder(under, indicatorNumber):
-                self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
+    if not hasattr(QsciScintilla, 'setIndicatorForegroundColor'):
+        def setIndicatorForegroundColor(self, color, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
+            self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber, color.alpha());
 
-            self.setIndicatorDrawUnder = setIndicatorDrawUnder
+    if not hasattr(QsciScintilla, 'clearIndicatorRange'):
+        def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
 
-        if not hasattr(self, 'setIndicatorForegroundColor'):
-            def setIndicatorForegroundColor(color, indicatorNumber):
-                self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
-                self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber, color.alpha());
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_INDICATORCLEARRANGE, start, finish - start);
 
-            self.setIndicatorForegroundColor = setIndicatorForegroundColor
+    if not hasattr(QsciScintilla, 'fillIndicatorRange'):
+        def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
 
-        if not hasattr(self, 'clearIndicatorRange'):
-            def clearIndicatorRange(lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
-                start = self.positionFromLineIndex(lineFrom, indexFrom)
-                finish = self.positionFromLineIndex(lineTo, indexTo)
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_INDICATORFILLRANGE, start, finish - start);
 
-                self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
-                self.SendScintilla(self.SCI_INDICATORCLEARRANGE, start, finish - start);
-
-            self.clearIndicatorRange = clearIndicatorRange
-
-        if not hasattr(self, 'fillIndicatorRange'):
-            def fillIndicatorRange(lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
-                start = self.positionFromLineIndex(lineFrom, indexFrom)
-                finish = self.positionFromLineIndex(lineTo, indexTo)
-
-                self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
-                self.SendScintilla(self.SCI_INDICATORFILLRANGE, start, finish - start);
-
-            self.fillIndicatorRange = fillIndicatorRange
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
