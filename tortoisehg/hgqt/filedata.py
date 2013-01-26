@@ -282,7 +282,9 @@ class FileData(object):
                             self.error = _('Not a Mercurial subrepo, not previewable')
                             return
                 except (util.Abort, KeyError), e:
-                    sactual = ''
+                    self.error = (_('Error previewing subrepo: %s')
+                                  % hglib.tounicode(str(e)))
+                    return
 
                 out = []
                 _ui = uimod.ui()
