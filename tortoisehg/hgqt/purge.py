@@ -85,6 +85,8 @@ class PurgeDialog(QDialog):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.25)
         self.restoreGeometry(s.value('purge/geom').toByteArray())
+
+        self.th = None
         QTimer.singleShot(0, self.checkStatus)
 
     def checkStatus(self):
@@ -146,6 +148,8 @@ class PurgeDialog(QDialog):
                 self.tcb.setEnabled(True)
 
     def reject(self):
+        if self.th and self.th.isRunning():
+            return
         s = QSettings()
         s.setValue('purge/geom', self.saveGeometry())
         super(PurgeDialog, self).reject()
