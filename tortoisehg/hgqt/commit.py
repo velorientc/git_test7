@@ -562,15 +562,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
             self.refresh()
 
+    @pyqtSlot()
     def workingBranchChanged(self):
         'Repository has detected a change in .hg/branch'
         self.refresh()
 
+    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
 
+    @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.refresh()
