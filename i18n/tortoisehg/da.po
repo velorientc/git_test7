@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2013-01-16 21:10-0200\n"
-"PO-Revision-Date: 2012-11-17 07:17+0000\n"
+"PO-Revision-Date: 2013-01-23 11:58+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-01-17 04:43+0000\n"
-"X-Generator: Launchpad (build 16430)\n"
+"X-Launchpad-Export-Date: 2013-01-24 04:48+0000\n"
+"X-Generator: Launchpad (build 16445)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -1630,7 +1630,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filectxactions.py:81 tortoisehg/hgqt/wctxactions.py:45
 msgid "Open S&ubrepository"
-msgstr ""
+msgstr "Åben &underdepot"
 
 #: tortoisehg/hgqt/filectxactions.py:82
 msgid "Open the selected subrepository"
@@ -1671,7 +1671,7 @@ msgstr "Kan ikke åbne underdepot"
 
 #: tortoisehg/hgqt/filectxactions.py:316 tortoisehg/hgqt/wctxactions.py:240
 msgid "The selected subrepository does not exist on the working directory"
-msgstr ""
+msgstr "Det valgte underdepot findes ikke i arbejdskataloget"
 
 #: tortoisehg/hgqt/filedata.py:43
 msgid "File or diffs not displayed: "
@@ -1738,7 +1738,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filedata.py:207
 msgid "Subrepo removed from repository."
-msgstr ""
+msgstr "Underdepot fjernet fra depot."
 
 #: tortoisehg/hgqt/filedata.py:211
 msgid "Subrepo was not changed."
@@ -1765,7 +1765,7 @@ msgstr "Fra:"
 
 #: tortoisehg/hgqt/filedata.py:234
 msgid "Subrepository not found in the working directory."
-msgstr ""
+msgstr "Underdepot ikke fundet i arbejdskataloget"
 
 #: tortoisehg/hgqt/filedata.py:236 tortoisehg/hgqt/filedata.py:242
 msgid "Further subrepository revision information cannot be retrieved."
@@ -2626,7 +2626,7 @@ msgstr "Gør depot kompatibelt med Mercurial <1.7"
 
 #: tortoisehg/hgqt/hginit.py:49
 msgid "Show in Workbench after init"
-msgstr ""
+msgstr "Vis på arbejdsbord efter init"
 
 #: tortoisehg/hgqt/hginit.py:56
 msgid "Create"
@@ -2634,7 +2634,7 @@ msgstr "Opret"
 
 #: tortoisehg/hgqt/hginit.py:85
 msgid "New Repository"
-msgstr ""
+msgstr "Nyt depot"
 
 #: tortoisehg/hgqt/hginit.py:127 tortoisehg/hgqt/hginit.py:159
 #: tortoisehg/hgqt/hginit.py:173 tortoisehg/hgqt/hginit.py:183
@@ -4173,12 +4173,12 @@ msgstr "Forfatter"
 #: tortoisehg/hgqt/repomodel.py:50
 msgctxt "column header"
 msgid "Tags"
-msgstr ""
+msgstr "Mærker"
 
 #: tortoisehg/hgqt/repomodel.py:51
 msgctxt "column header"
 msgid "Latest tags"
-msgstr ""
+msgstr "Nyeste mærker"
 
 #: tortoisehg/hgqt/repomodel.py:52
 msgctxt "column header"
@@ -4188,7 +4188,7 @@ msgstr ""
 #: tortoisehg/hgqt/repomodel.py:53
 msgctxt "column header"
 msgid "Age"
-msgstr ""
+msgstr "Alder"
 
 #: tortoisehg/hgqt/repomodel.py:54
 msgctxt "column header"
@@ -4264,7 +4264,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:415
 msgid "&Refresh Repository List"
-msgstr ""
+msgstr "&Opdater depotliste"
 
 #: tortoisehg/hgqt/reporegistry.py:416
 msgid "Refresh the Repository Registry list"
@@ -4321,7 +4321,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:432
 msgid "Clone Repository"
-msgstr ""
+msgstr "Klon depot"
 
 #: tortoisehg/hgqt/reporegistry.py:433 tortoisehg/hgqt/sync.py:631
 #: tortoisehg/hgqt/workbench.py:300
@@ -4423,7 +4423,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/reporegistry.py:570
 msgid "Cannot open repository"
-msgstr ""
+msgstr "Kan ikke åbne depot"
 
 #: tortoisehg/hgqt/reporegistry.py:571
 #, python-format
@@ -4590,7 +4590,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:179
 msgid "Workbench Log Columns"
-msgstr ""
+msgstr "Arbejdsbord log kolonner"
 
 #: tortoisehg/hgqt/repowidget.py:214
 msgctxt "tab tooltip"
@@ -5004,7 +5004,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1627 tortoisehg/hgqt/repowidget.py:1647
 msgid "Replace"
-msgstr ""
+msgstr "Erstat"
 
 #: tortoisehg/hgqt/repowidget.py:1627
 msgid "Append"
@@ -5812,7 +5812,7 @@ msgstr "læs fil-liste fra fil med utf-8 kodning"
 
 #: tortoisehg/hgqt/run.py:1054
 msgid "open a new workbench window"
-msgstr ""
+msgstr "åben et nyt arbejdsbordsvindue"
 
 #: tortoisehg/hgqt/run.py:1058
 msgid "thg about"
@@ -6418,7 +6418,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:600
 msgid "Single Workbench Window"
-msgstr ""
+msgstr "Kun et arbejdsbordsvindue"
 
 #: tortoisehg/hgqt/settings.py:601
 msgid ""
@@ -6426,6 +6426,10 @@ msgid ""
 "this setting you will get a new workbench window everytime that you use the "
 "\"Hg Workbench\"command on the explorer context menu. Default: True"
 msgstr ""
+"Vælg om du vil have højst et vindue til arbejdsbordet. Hvis du slår denne "
+"indstilling fra så kommer der et nyt vindue med arbejdsbord hver gang du "
+"bruger \"Hg Workbench\" kommandoen i stifinder kontekst-menuen. Standard: "
+"Falsk"
 
 #: tortoisehg/hgqt/settings.py:605
 msgid "Default widget"
@@ -9161,11 +9165,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:51 tortoisehg/hgqt/workbench.py:653
 msgid "TortoiseHg Workbench"
-msgstr ""
+msgstr "TortoiseHg arbejdsbord"
 
 #: tortoisehg/hgqt/workbench.py:84 tortoisehg/hgqt/workbench.py:164
 msgid "New &Workbench"
-msgstr ""
+msgstr "Nyt &Arbejdsbord"
 
 #: tortoisehg/hgqt/workbench.py:86 tortoisehg/hgqt/workbench.py:167
 msgid "&New Repository..."
@@ -9177,7 +9181,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:90 tortoisehg/hgqt/workbench.py:173
 msgid "&Open Repository..."
-msgstr ""
+msgstr "&Åben depot..."
 
 #: tortoisehg/hgqt/workbench.py:139
 msgid "&File"
@@ -9350,11 +9354,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:315
 msgid "About &Qt"
-msgstr ""
+msgstr "Om &Qt"
 
 #: tortoisehg/hgqt/workbench.py:316
 msgid "&About TortoiseHg"
-msgstr ""
+msgstr "&Om TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:321 tortoisehg/hgqt/workbench.py:322
 msgid "Go to current revision"
@@ -9416,12 +9420,12 @@ msgstr ""
 #: tortoisehg/hgqt/workbench.py:655
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
-msgstr ""
+msgstr "%s - TortoiseHg arbejdsbord - %s"
 
 #: tortoisehg/hgqt/workbench.py:658
 #, python-format
 msgid "%s - TortoiseHg Workbench"
-msgstr ""
+msgstr "%s - TortoiseHg arbejdsbord"
 
 #: tortoisehg/hgqt/workbench.py:728 tortoisehg/hgqt/workbench.py:733
 #: tortoisehg/hgqt/workbench.py:1047 tortoisehg/hgqt/workbench.py:1053
@@ -9447,7 +9451,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:919
 msgid "Failed to open repository"
-msgstr ""
+msgstr "Kunne ikke åbne depot"
 
 #: tortoisehg/hgqt/workbench.py:1003
 msgid "README not configured"
@@ -9478,6 +9482,7 @@ msgstr ""
 #: tortoisehg/util/bugtraq.py:89
 msgid "This error will not be shown again until you restart the workbench"
 msgstr ""
+"Denne fejl vil ikke blive vist igen før du har genstartet arbejdsbordet"
 
 #: tortoisehg/util/bugtraq.py:112
 msgid "Error getting commit message information from Issue Tracker plugin"
@@ -9505,60 +9510,60 @@ msgstr "win32text er ikke kompatibel med eol"
 
 #: tortoisehg/util/hglib.py:304
 msgid "hgsubversion is incompatible with perfarce"
-msgstr ""
+msgstr "hgsubversion er ikke kompatibel med perfarce"
 
 #: tortoisehg/util/hglib.py:306
 msgid "perfarce is incompatible with hgsubversion"
-msgstr ""
+msgstr "perfarce er ikke kompatibel med hgsubversion"
 
 #: tortoisehg/util/hglib.py:646
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d år"
+msgstr[1] "%d år"
 
 #: tortoisehg/util/hglib.py:647
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d måned"
+msgstr[1] "%d måneder"
 
 #: tortoisehg/util/hglib.py:648
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d uge"
+msgstr[1] "%d uger"
 
 #: tortoisehg/util/hglib.py:649
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dag"
+msgstr[1] "%d dage"
 
 #: tortoisehg/util/hglib.py:650
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d time"
+msgstr[1] "%d timer"
 
 #: tortoisehg/util/hglib.py:651
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minut"
+msgstr[1] "%d minutter"
 
 #: tortoisehg/util/hglib.py:652
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d sekund"
+msgstr[1] "%d sekunder"
 
 #: tortoisehg/util/hglib.py:662
 msgid "in the future"
@@ -9566,7 +9571,7 @@ msgstr ""
 
 #: tortoisehg/util/hglib.py:666
 msgid "now"
-msgstr ""
+msgstr "nu"
 
 #: tortoisehg/util/menuthg.py:19
 msgid "Commit..."
@@ -13156,3 +13161,15 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Refresh repository list"
 #~ msgstr "Opdater depotliste"
+
+#~ msgctxt "changesets"
+#~ msgid "All"
+#~ msgstr "Alle"
+
+#~ msgid ""
+#~ "Adjust the display of the main toolbar in the Repository Explorer.  Values: "
+#~ "small, large, or theme. Default: theme"
+#~ msgstr ""
+#~ "Juster visningen af hovedværktøjslinjen i Depot Stifinderen. Værdier: "
+#~ "\"small\" (lille), \"large\" (stor), eller \"theme\" (følg tema). Standard: "
+#~ "theme"
