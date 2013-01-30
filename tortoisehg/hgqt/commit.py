@@ -1415,10 +1415,6 @@ class CommitDialog(QDialog):
         if self.promptExit():
             QDialog.reject(self)
 
-    def closeEvent(self, event):
-        if not self.promptExit():
-            event.ignore()
-
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
