@@ -61,7 +61,11 @@ class _AbstractFileDialog(QMainWindow):
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
         if repoviewer:
-            repoviewer.finished.connect(lambda x: self.setRepoViewer(None))
+            repoviewer.finished.connect(self._clearRepoViewer)
+
+    @pyqtSlot()
+    def _clearRepoViewer(self):
+        self.setRepoViewer(None)
 
     def reload(self):
         'Reload toolbar action handler'
