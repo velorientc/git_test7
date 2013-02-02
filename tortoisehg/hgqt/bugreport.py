@@ -107,8 +107,7 @@ class BugReport(QDialog):
 
     def save(self):
         try:
-            fd = QFileDialog(self)
-            fname = fd.getSaveFileName(self,
+            fname = QFileDialog.getSaveFileName(self,
                         _('Save error report to'),
                         os.path.join(_safegetcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
