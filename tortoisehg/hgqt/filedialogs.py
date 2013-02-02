@@ -34,6 +34,8 @@ sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
 class _AbstractFileDialog(QMainWindow):
+    finished = pyqtSignal(int)
+
     def __init__(self, repo, filename, repoviewer=None):
         QMainWindow.__init__(self)
         self.repo = repo
@@ -51,6 +53,10 @@ class _AbstractFileDialog(QMainWindow):
 
         self.setupViews()
         self.setupModels()
+
+    def closeEvent(self, event):
+        super(_AbstractFileDialog, self).closeEvent(event)
+        self.finished.emit(0)  # mimic QDialog exit
 
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
