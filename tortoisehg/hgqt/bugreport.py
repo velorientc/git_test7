@@ -21,6 +21,12 @@ except (ImportError, AttributeError):
     # show BugReport dialog even if QScintilla is missing
     QSCINTILLA_VERSION_STR = '(unknown)'
 
+def _safegetcwd():
+    try:
+        return os.getcwd()
+    except OSError:
+        return '.'
+
 class BugReport(QDialog):
 
     def __init__(self, opts, parent=None):
@@ -63,7 +69,7 @@ class BugReport(QDialog):
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
-        text += '** CWD: %s\n' % hglib.tounicode(os.getcwd())
+        text += '** CWD: %s\n' % hglib.tounicode(_safegetcwd())
         text += '** Encoding: %s\n' % encoding.encoding
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
@@ -104,7 +110,7 @@ class BugReport(QDialog):
             fd = QFileDialog(self)
             fname = fd.getSaveFileName(self,
                         _('Save error report to'),
-                        os.path.join(os.getcwd(), 'bugreport.txt'),
+                        os.path.join(_safegetcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
                 open(fname, 'wb').write(hglib.fromunicode(self.text))
