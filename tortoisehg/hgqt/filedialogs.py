@@ -526,8 +526,9 @@ class FileDiffDialog(_AbstractFileDialog):
             table.revisionSelected.connect(self.onRevisionSelected)
             table.revisionActivated.connect(self.onRevisionActivated)
 
-            self.viewers[side].verticalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.sbar_changed(value, side))
+        l, r = (self.viewers[k].verticalScrollBar() for k in sides)
+        l.valueChanged.connect(self.sbar_changed_left)
+        r.valueChanged.connect(self.sbar_changed_right)
 
         l, r = (self.viewers[k].horizontalScrollBar() for k in sides)
         l.valueChanged.connect(r.setValue)
@@ -721,6 +722,14 @@ class FileDiffDialog(_AbstractFileDialog):
                 self.viewers[side].setText(u'\n'.join(self.filedata[side]))
             self.update_page_steps(keeppos)
             self.timer.start()
+
+    @pyqtSlot(int)
+    def sbar_changed_left(self, value):
+        self.sbar_changed(value, 'left')
+
+    @pyqtSlot(int)
+    def sbar_changed_right(self, value):
+        self.sbar_changed(value, 'right')
 
     def sbar_changed(self, value, side):
         """
