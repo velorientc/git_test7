@@ -394,6 +394,9 @@ class RenameSearchThread(QThread):
 
     def run(self):
         def emit(topic, pos, item='', unit='', total=None):
+            topic = hglib.tounicode(topic or '')
+            item = hglib.tounicode(item or '')
+            unit = hglib.tounicode(unit or '')
             self.progress.emit(topic, pos, item, unit, total)
         self.repo.ui.progress = emit
         try:
