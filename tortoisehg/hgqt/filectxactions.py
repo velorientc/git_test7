@@ -267,6 +267,8 @@ class FilectxActions(QObject):
                     repoviewer = self.parent().window()
                 dlg = dlgclass(repo, filename, repoviewer=repoviewer)
                 dlgdict[self._currentfile] = dlg
+                assert dlg.filename == self._currentfile
+                dlg.finished.connect(self._forgetnavdialog)
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
                 dlg.setWindowIcon(qtlib.geticon('hg-log'))
@@ -275,6 +277,15 @@ class FilectxActions(QObject):
             dlg.show()
             dlg.raise_()
             dlg.activateWindow()
+
+    #@pyqtSlot()
+    def _forgetnavdialog(self):
+        dlg = self.sender()
+        dlg.finished.disconnect(self._forgetnavdialog)
+        if isinstance(dlg, FileLogDialog):
+            del self._nav_dialogs[dlg.filename]
+        elif isinstance(dlg, FileDiffDialog):
+            del self._diff_dialogs[dlg.filename]
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths
