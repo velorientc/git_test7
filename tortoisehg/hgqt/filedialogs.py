@@ -366,7 +366,8 @@ class FileLogDialog(_AbstractFileDialog):
     # It does not make sense to select more than two revisions at a time.
     # Rather than enforcing a max selection size we simply let the user
     # know when it has selected too many revisions by using the status bar
-    def _checkValidSelection(self, selected, deselected):
+    @pyqtSlot()
+    def _checkValidSelection(self):
         selection = self.repoview.selectedRevisions()
         if len(selection) > 2:
             msg = _('Too many rows selected for menu')
