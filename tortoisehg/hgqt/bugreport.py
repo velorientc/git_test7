@@ -50,7 +50,7 @@ class BugReport(QDialog):
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Save)
-        bb.accepted.connect(self.accept)
+        bb.button(BB.Ok).clicked.connect(self.accept)
         bb.button(BB.Save).clicked.connect(self.save)
         bb.button(BB.Ok).setDefault(True)
         bb.addButton(_('Copy'), BB.HelpRole).clicked.connect(self.copyText)
