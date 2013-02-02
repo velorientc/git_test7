@@ -265,7 +265,7 @@ class DetectRenameDialog(QDialog):
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
         date = hglib.displaytime(ctx.date())
-        difftext = mdiff.unidiff(rr, date, aa, date, src, dest, None)
+        difftext = mdiff.unidiff(rr, date, aa, date, src, dest)
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % \
                     (hglib.tounicode(src), hglib.tounicode(dest))
