@@ -137,18 +137,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
-
-        # It does not make sense to select more than two revisions at a time.
-        # Rather than enforcing a max selection size we simply let the user
-        # know when it has selected too many revisions by using the status bar
-        def checkValidSelection(selected, deselected):
-            selection = self.repoview.selectedRevisions()
-            if len(selection) > 2:
-                msg = _('Too many rows selected for menu')
-            else:
-                msg = ''
-            self.textView.showMessage.emit(msg)
-        self.repoview.revisionSelectionChanged.connect(checkValidSelection)
+        self.repoview.revisionSelectionChanged.connect(
+            self._checkValidSelection)
 
         self.contentframe = QFrame(self.splitter)
 
@@ -372,6 +362,17 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.verticalScrollBar().setValue(pos)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
+
+    # It does not make sense to select more than two revisions at a time.
+    # Rather than enforcing a max selection size we simply let the user
+    # know when it has selected too many revisions by using the status bar
+    def _checkValidSelection(self, selected, deselected):
+        selection = self.repoview.selectedRevisions()
+        if len(selection) > 2:
+            msg = _('Too many rows selected for menu')
+        else:
+            msg = ''
+        self.textView.showMessage.emit(msg)
 
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)
