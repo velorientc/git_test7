@@ -527,9 +527,11 @@ class FileDiffDialog(_AbstractFileDialog):
             table.revisionActivated.connect(self.onRevisionActivated)
 
             self.viewers[side].verticalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.sbar_changed(value, side, 'vertical'))
-            self.viewers[side].horizontalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.sbar_changed(value, side, 'horizontal'))
+                    lambda value, side=side: self.sbar_changed(value, side))
+
+        l, r = (self.viewers[k].horizontalScrollBar() for k in sides)
+        l.valueChanged.connect(r.setValue)
+        r.valueChanged.connect(l.setValue)
 
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
@@ -720,7 +722,7 @@ class FileDiffDialog(_AbstractFileDialog):
             self.update_page_steps(keeppos)
             self.timer.start()
 
-    def sbar_changed(self, value, side, bartype='vertical'):
+    def sbar_changed(self, value, side):
         """
         Callback called when a scrollbar of a file viewer
         is changed, so we can update the position of the other file
@@ -738,10 +740,7 @@ class FileDiffDialog(_AbstractFileDialog):
         dv = value - lo
 
         blo, bhi = self._diffmatch[oside][i]
-        if bartype == 'vertical':
-            vbar = self.viewers[oside].verticalScrollBar()
-        else:
-            vbar = self.viewers[oside].horizontalScrollBar()
+        vbar = self.viewers[oside].verticalScrollBar()
         if (dv) < (bhi - blo):
             bvalue = blo + dv
         else:
