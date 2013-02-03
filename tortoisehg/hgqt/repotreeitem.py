@@ -461,6 +461,12 @@ class RepoGroupItem(RepoTreeItem):
             return True
         return False
 
+    def rootpath(self):  # for sortbypath()
+        return ''  # may be okay to return _commonpath instead?
+
+    def shortname(self):  # for sortbyname()
+        return unicode(self.name)
+
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
             None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
