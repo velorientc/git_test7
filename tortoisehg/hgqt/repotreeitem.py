@@ -471,7 +471,7 @@ class RepoGroupItem(RepoTreeItem):
             | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
 
     def childRoots(self):
-        return [c._root for c in self.childs]
+        return [c._root for c in self.childs if isinstance(c, RepoItem)]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
