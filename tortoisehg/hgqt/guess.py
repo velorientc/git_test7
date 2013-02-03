@@ -297,13 +297,15 @@ class DetectRenameDialog(QDialog):
             QDialog.reject(self)
 
 
+def _aspercent(s):
+    return '%d%%' % (s * 100)
+
 class MatchModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.rows = []
         self.headers = (_('Source'), _('Dest'), _('% Match'))
-        self.displayformats = (hglib.tounicode, hglib.tounicode,
-                               lambda s: '%d%%' % (s * 100))
+        self.displayformats = (hglib.tounicode, hglib.tounicode, _aspercent)
 
     def rowCount(self, parent):
         return len(self.rows)
