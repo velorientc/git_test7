@@ -298,7 +298,8 @@ class DetectRenameDialog(QDialog):
 
 
 def _aspercent(s):
-    return '%d%%' % (s * 100)
+    # i18n: percent format
+    return _('%d%%') % (s * 100)
 
 class MatchModel(QAbstractTableModel):
     def __init__(self, parent=None):
