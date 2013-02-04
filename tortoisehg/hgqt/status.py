@@ -1043,7 +1043,7 @@ class StatusDialog(QDialog):
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, self.stwidget.repo.ui, root=link[8:])
+            qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
         if link.startswith('shelve:'):
             from tortoisehg.hgqt import shelve
             dlg = shelve.ShelveDialog(self.stwidget.repo, self)

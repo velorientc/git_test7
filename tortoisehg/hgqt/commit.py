@@ -1364,7 +1364,7 @@ class CommitDialog(QDialog):
         link = hglib.fromunicode(link)
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
-            qtrun(run, ui.ui(), root=link[8:])
+            qtrun(run, ui.ui(), root=link[len('repo:'):])
         if link.startswith('shelve:'):
             repo = self.commit.repo
             from tortoisehg.hgqt import shelve
