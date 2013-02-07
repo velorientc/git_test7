@@ -796,8 +796,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not host and not folder:
             self.switchToRequest.emit('sync')
             qtlib.WarningMsgBox(_('No remote repository URL or path set'),
-                    _('No valid <i>default</i> remote repository URL or path has been configured for this repository.<p>'
-                    'Please type and save a remote repository path on the Sync widget.'),
+                    _('No valid <i>default</i> remote repository URL or path '
+                      'has been configured for this repository.<p>Please type '
+                      'and save a remote repository path on the Sync widget.'),
                     parent=self)
             return
 
