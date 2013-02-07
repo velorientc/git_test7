@@ -1096,7 +1096,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not pushall and rev is None and branch is None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
-            if defaultpush == 'all':
+            if self.targetcheckbox.isChecked():
+                # target selection overrides defaultpush
+                pass
+            elif defaultpush == 'all':
                 # This is the default
                 pass
             elif defaultpush == 'branch':
