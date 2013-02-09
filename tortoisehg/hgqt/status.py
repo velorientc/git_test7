@@ -62,6 +62,8 @@ class StatusWidget(QWidget):
         self.pctx = None
         self.savechecks = True
         self.refthread = None
+        self.refreshWctxLater = QTimer(self, interval=10, singleShot=True)
+        self.refreshWctxLater.timeout.connect(self.refreshWctx)
         self.partials = {}
         self.manualCheckAllUpdate = False
 
@@ -284,9 +286,12 @@ class StatusWidget(QWidget):
             self.savechecks = True
         self.pctx = pctx
 
+    @pyqtSlot()
     def refreshWctx(self, synchronous=False):
         if self.refthread:
+            self.refreshWctxLater.start()
             return
+        self.refreshWctxLater.stop()
         self.fileview.clearDisplay()
 
         # store selected paths or current path
