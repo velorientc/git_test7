@@ -58,7 +58,33 @@ Panel se seznamem souborů má pět (šest) sloupců:
 	If the commit tool was started with a file pattern or selection, a
 	button will appear at the bottom of the file list that can clear the
 	file pattern and give you an unfiltered view of the entire working
-	directory.	
+	directory.
+	
+Výběr změn
+----------
+
+Proces výběru změn spočívá ve výběru těch změn v pracovním adresáři, které mají být zahrnuty do následného komitu. Nástroj pro komit umožňuje vyloučit některé změněné (nebo přidané či odebrané) soubory z komitu.
+
+Toto poněkud porušuje zásadu Mercurialu, že každý changeset popisuje stav repozitáře v daném časovém okamžiku. Když vyloučíte soubory z komitu, nemusel vytvořený changeset nikdy existovat. Protože výběr souborů je někdy při komitu potřebný a Mercurial jej podporuje, je tato možnost součástí komitu již od první verze THg.
+
+Nově v TortoiseHg 2.7 umožňuje nástroj komitu částečný výběr dat z jednotlivých upravených souborů. Znamená to, že můžete vyloučit jen část provedených změn v souboru. To opět porušuje zásadu Mercurialu pro komitování stavu pracovní kopie ale je to velice užitečná vlastnost. Nejčastěji citovaným příkladem je schopnost registrovat opravu chyby při vyloučení všech ostatních opravných nástrojů, takže po komitu můžete pokračovat v odlaďování.
+
+Když uživatel vyloučí jednu nebo více změn souboru, považuje TortoiseHg tento soubor za částečně vybraný (tato možnost výběru změn je někdy označována jako **částečný komit**). Částečně vybrané soubory jsou v seznamu souborů uvedeny se speciálním označením.
+
+Panel pro zobrazení diffů má v kontextové nabídce možnost konfigurace označení vyloučených změn. Volba :menuselection:`Označit vyloučené změny` je přepínač pro přeškrtnutí vyloučených změn. Toto nastavení je primárně osobní preference ale budoucí verze TortoiseHg mohou rozšířit použití tohoto proškrtnutí pro částečné  vyloučení individuálních změn.
+
+Tato nová možnost částečného výběru je podobná proceduře `chunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_ u hgtk a to v několika ohledech:
+
+1) Výběr změn je integrován přímo do zobrazení diffu. Žádný přepínač režimu není potřebný.
+
+2) Soubory pracovní kopie se během částečného komitu nemění. Tak je možné se vyhnout vážnému problému s povolením souboru ve Windows.
+
+3) Výběr změn je možný pro kopírované či přejmenované soubory s jednou výjimkou - nelze vyloučit všechny změny, protože se tím vylučuje celý soubor z komitu.
+
+TortoiseHg má od verze 2.0 odkládací (shelve) nástroj který umí přesunout vybrané změny z pracovního adresáře do oprávky (patch) nebo mezi oprávkami ale možnost částečného komitu je velice odlišná a sice v tom, že nikdy nemění soubory pracovní kopie. Vše co činí je to, že vyloučí část změn z komitované verze souboru. Po komitu zůstávají všechny vyloučené změny stále v pracovní kopii.
+
+Po stisknutí tlačítka Commit zkontroluje komitový nástroj zda některý z ověřovaných souborů není částečně vyloučený. Je-li nějaký částečný komit potřebný, vytvoří komitový nástroj prozatimní oprávkový soubor, který popisuje jak generovat obsah částečně komitovaných souborů a předá tento oprávkový soubor extenzi TortoiseHg pro částečný komit. Tato extenze spouští komitový příkaz Mercurialu se specielními háčky (hooks), v důsledku čehož přicházejí obsahy pro částečný komit z dočasných oprávkových souborů místo aby byly čteny z pracovní kopie. Po komitu jsou tyto dočasné soubory vymazány a soubory pracovní kopie zůstávají nedotčeny.
+
 
 Klávesová navigace
 ------------------

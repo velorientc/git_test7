@@ -1,25 +1,25 @@
-﻿TortoiseHg Documentation
+TortoiseHg Documentation
 
 Pro vytvoření dokumentace ve formátu HTML je potřebná instalace sphinx. V Ubuntu je sphinx balíčkem Pythonu. Ve Windows je zřejmě nejlepší easy_install. Sphinx musí být novější než 0.6.
 
-Pro vytvoření souborů PDF jsou potřebné balíčky latex. V Ubuntu to jsou 'texlive-latex-extra' a všechny jeho dependence. Ve Windows je nejlepší miktex. 
+Pro vytvoření souborů PDF jsou potřebné balíčky LaTeX. V Ubuntu to jsou 'texlive-latex-extra' a všechny jeho dependence. Ve Windows je nejlepší MikTeX. 
 
-Jsou-li všechny potřebné rekvizity k disposici, lze použít makefile pro vytvoření cílů: html htmlhelp latex.
+Jsou-li všechny potřebné rekvizity k disposici, lze použít makefile pro vytvoření cílů: 'make html htmlhelp latex'.
 
-Máme-li latex vybudován, nacédujeme se do jeho výstupního adresáře a spuštěním make all-pdf vytvoříme vlastní soubor PDF.
+Máme-li 'latex' vybudován, nacédujeme se do jeho výstupního adresáře a spuštěním 'make all-pdf' vytvoříme vlastní soubor PDF.
 
-Máme-li vybudován htmlhelp, musíme ve Windows použít jejich  vlastní help compiler. 
+Máme-li vybudován 'htmlhelp', musíme ve Windows použít jejich  vlastní HTML Help Compiler. 
 
-Pokud ve Window nemáme žádný nástroj 'make', můžeme použít build.bat. Je-li nainstalován HTML compiler a miktex, můžeme formáty chm (build chm) a pdf (build pdf) generovat přímo.
+Pokud ve Window nemáme žádný nástroj 'make', můžeme použít build.bat. Je-li nainstalován HTML Help Compiler a MikTeX, můžeme formáty chm a pdf generovat přímo ('build chm' či 'build pdf').
 
 
-Hacking the source
-==================
+Formování zdrojového textu
+==========================
 
-Please follow this rules when hacking the doc source files.
+Následujte prosím tato pravidla při úpravě textů ve zdrojových souborech dokumentace.
 
-- As suggested by Sphinx (see http://sphinx.pocoo.org/rest.html#sections)
-  use:
+- Jak navrženo ve Sphinxu (see http://sphinx.pocoo.org/rest.html#sections),
+  použijte:
   
   *************
   Chapter title
@@ -34,28 +34,27 @@ Please follow this rules when hacking the doc source files.
   Subsubsection title
   ^^^^^^^^^^^^^^^^^^^
 
-- To indicate a key or a combination of keys use :kbd:, for example:
+- K uvedení klávesy nebo kombinace kláves použijte :kbd:, například:
 
   :kbd:`Ctrl-A`
   
-- To indicate a label, button or anything that appears in user interfaces 
-  use :guilabel:, for example:
+- K uvedení štítku, tlačítka nebo čehokoli, co se objeví v uživatelském rozhraní, použijte :guilabel:, například:
 
   :guilabel:`Commit`
 
-- To indicate a menu choise use :menuselection: and -->, for example:
+- K uvedení nabídky použijte :menuselection: a -->, například:
 
   :menuselection:`TortoiseHg... --> About`
   
-- To indicate a file use :file:, for example:
+- K uvedení souboru použijte :file:, například:
 
   :file:`.hg/hgrc`
  
-- To indicate a command to enter into command window use :command:, for example:
+- K uvedení příkazu, zadávaného na příkazovém řádku, použijte :command:, například:
 
   :command:`hgtk log`
 
-- To indicate a text to enter into a text input field in the GUI use ``, for example:
+- K uvedení textu, vkládaného do vstupního pole GUI použijte ``, například:
 
   ``myproxy:8000``
 
