@@ -281,9 +281,8 @@ class StatusWidget(QWidget):
 
     def setPatchContext(self, pctx):
         if pctx != self.pctx:
+            # clear out the current checked state on next refreshWctx()
             self.savechecks = False
-        else:
-            self.savechecks = True
         self.pctx = pctx
 
     @pyqtSlot()
@@ -356,6 +355,7 @@ class StatusWidget(QWidget):
         if self.checkable:
             tm.checkToggled.connect(self.checkToggled)
             tm.checkCountChanged.connect(self.updateCheckCount)
+        self.savechecks = True
 
         oldtm = self.tv.model()
         self.tv.setModel(tm)
