@@ -613,6 +613,8 @@ class RepoRegistryView(QDockWidget):
                                 _('The .hgsub file already contains the '
                                 'line:<br><br>%s') % line, parent=self)
                             return
+                    if not linesep:
+                        linesep = os.linesep
 
                     # Append the new subrepo to the end of the .hgsub file
                     lines.append(hglib.fromunicode('%s = %s'
@@ -622,7 +624,7 @@ class RepoRegistryView(QDockWidget):
                     # and update the .hgsub file
                     try:
                         fsub = repo.wopener('.hgsub', 'w')
-                        fsub.write(linesep.join(lines))
+                        fsub.write(linesep.join(lines) + linesep)
                         fsub.close()
                         if not hasHgsub:
                             commands.add(ui.ui(), repo, repo.wjoin('.hgsub'))
