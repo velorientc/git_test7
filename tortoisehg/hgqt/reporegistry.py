@@ -527,7 +527,7 @@ class RepoRegistryView(QDockWidget):
         path = unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
-            path = os.path.normcase(os.path.normpath(path))
+            path = os.path.normpath(path)
             sroot = paths.find_root(path)
 
             root = os.path.normcase(os.path.normpath(root))
@@ -542,12 +542,12 @@ class RepoRegistryView(QDockWidget):
                     _('"%s" is not a folder') % sroot,
                     parent=self)
                 return
-            elif sroot == root:
+            elif os.path.normcase(sroot) == root:
                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
                     _('A repository cannot be added as a subrepo of itself'),
                     parent=self)
                 return
-            elif root != paths.find_root(os.path.dirname(path)):
+            elif root != paths.find_root(os.path.dirname(os.path.normcase(path))):
                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
                     _('The selected folder:<br><br>%s<br><br>'
                     'is not inside the target repository.<br><br>'
