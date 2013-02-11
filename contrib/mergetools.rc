@@ -192,6 +192,7 @@ codecompare_merge.args=/SC=TortoiseHg /TF=$other /MF=$local /RF=$output /BF=$bas
 codecompare_merge.binary=False
 codecompare_merge.gui=True
 codecompare_merge.checkconflicts=True
+codecompare_merge.premerge=Keep
 
 ; Linux only diff tools, listed here for reference
 bcompare.priority=-1
