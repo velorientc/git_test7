@@ -68,6 +68,19 @@ kdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
 kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
 kdiff3.dirdiff=True
 
+; copy of kdiff3 above, dropping --auto
+kdiff3-noauto.priority=-4
+kdiff3-noauto.args=--L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
+kdiff3-noauto.regkey=Software\KDiff3
+kdiff3-noauto.regkeyalt=Software\Wow6432Node\KDiff3
+kdiff3-noauto.regappend=\kdiff3.exe
+kdiff3-noauto.fixeol=False
+kdiff3-noauto.premerge=False
+kdiff3-noauto.gui=True
+kdiff3-noauto.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
+kdiff3-noauto.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
+kdiff3-noauto.dirdiff=True
+
 diffmerge.regkey=Software\SourceGear\SourceGear DiffMerge\
 diffmerge.regkeyalt=Software\Wow6432Node\SourceGear\SourceGear DiffMerge\
 diffmerge.regname=Location
@@ -132,6 +145,16 @@ winmergeu.diffargs=/r /e /x /ub /wl /dl '$plabel1' /dr '$clabel' $parent $child
 winmergeu.diff3args=
 winmergeu.dirdiff=True
 
+meld.regkey=SOFTWARE\Meld
+meld.regkeyalt=SOFTWARE\Wow6432Node\Meld
+meld.regname=Executable
+meld.gui=True
+meld.args=--label='local' $local --label='base' $base --label='other' $other
+meld.priority=-2
+meld.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
+meld.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
+meld.dirdiff=True
+
 ; TortoiseHg diff wrapper for some binary documents, not for merge general use
 docdiff.priority=-100
 docdiff.regkey=Software\TortoiseHg
@@ -178,13 +201,6 @@ bcompare.gui=True
 bcompare.diffargs=-lro -lefttitle='$plabel1' -righttitle='$clabel' -solo -expandall $parent $child
 bcompare.diff3args=$parent1 $parent2 $child -lefttitle='$plabel1' -centertitle='$clabel' -righttitle='$plabel2' -solo -expandall
 bcompare.dirdiff=True
-
-meld.gui=True
-meld.args=--label='local' $local --label='base' $base --label='other' $other
-meld.priority=-2
-meld.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
-meld.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
-meld.dirdiff=True
 
 diffuse.priority=-3
 diffuse.args=$local $base $other

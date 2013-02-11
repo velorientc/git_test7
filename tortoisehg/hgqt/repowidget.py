@@ -8,7 +8,8 @@
 
 import binascii
 import os
-import shlex, subprocess, functools # used by runCustomCommand
+import shlex, subprocess  # used by runCustomCommand
+import urllib
 from mercurial import revset, error, patch, phases
 
 from tortoisehg.util import hglib, shlib, paths
@@ -340,6 +341,15 @@ class RepoWidget(QWidget):
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
         labelslist = unicode(label).split()
         if 'ui.error' in labelslist:
+            # Check if a subrepo is set in the label list
+            subrepo = None
+            subrepolabel = 'subrepo='
+            for label in labelslist:
+                if label.startswith(subrepolabel):
+                    # The subrepo "label" is encoded ascii
+                    subrepo = hglib.tounicode(
+                        urllib.unquote(str(label)[len(subrepolabel):]))
+                    break
             # Limit the text shown on the info bar to maxlines lines of up to maxwidth chars
             msglines = unicode(msg).strip().splitlines()
             infolines = []
@@ -349,7 +359,8 @@ class RepoWidget(QWidget):
                 infolines.append(line)
             if len(msglines) > maxlines and not infolines[-1].endswith('...'):
                 infolines[-1] += ' ...'
-            self.setInfoBar(qtlib.CommandErrorInfoBar, '\n'.join(infolines))
+            infomsg = qtlib.linkifyMessage('\n'.join(infolines), subrepo=subrepo)
+            self.setInfoBar(qtlib.CommandErrorInfoBar, infomsg)
 
     @pyqtSlot(unicode)
     def _showMessageOnInfoBar(self, msg):
@@ -966,6 +977,7 @@ class RepoWidget(QWidget):
         'Repository has detected itself to be deleted'
         self.closeSelfSignal.emit(self)
 
+    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         if self.isVisible():
@@ -983,6 +995,7 @@ class RepoWidget(QWidget):
         # Update the repo registry entries related to the current repo
         self.repoChanged.emit(hglib.tounicode(self.repo.root))
 
+    @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
@@ -1208,15 +1221,16 @@ class RepoWidget(QWidget):
             if ext and ext not in exs:
                 return
             if desc is None:
-                menu.addSeparator()
-                return
+                return menu.addSeparator()
             act = QAction(desc, self)
-            act.triggered.connect(cb)
+            if cb:
+                act.triggered.connect(cb)
             if icon:
                 act.setIcon(qtlib.getmenuicon(icon))
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
+            return act
         menu = QMenu(self)
         if mode == 'outgoing':
             submenu = menu.addMenu(_('Pus&h'))
@@ -1269,9 +1283,9 @@ class RepoWidget(QWidget):
         entry(menu)
 
         submenu = menu.addMenu(_('Change &Phase to'))
+        submenu.triggered.connect(self._changePhaseByMenu)
         for pnum, pname in enumerate(phases.phasenames):
-            entry(submenu, None, isrev, pname, None,
-                  functools.partial(self.changePhase, pnum))
+            entry(submenu, None, isrev, pname).setData(pnum)
         entry(menu)
 
         entry(menu, None, fixed, _('&Graft to Local...'), 'hg-transplant',
@@ -1314,6 +1328,7 @@ class RepoWidget(QWidget):
 
             entry(menu)
             submenu = menu.addMenu(_('Custom Tools'))
+            submenu.triggered.connect(self._runCustomCommandByMenu)
             for name in toollist:
                 if name == '|':
                     entry(submenu)
@@ -1332,9 +1347,8 @@ class RepoWidget(QWidget):
                     enable = enablefuncs[enable]
                 else:
                     continue
-                menufunc = functools.partial(self.runCustomCommand, command,
-                    showoutput)
-                entry(submenu, None, enable, label, icon, menufunc)
+                a = entry(submenu, None, enable, label, icon)
+                a.setData((command, showoutput))
 
         _setupCustomSubmenu(menu)
 
@@ -1892,6 +1906,11 @@ class RepoWidget(QWidget):
         self.runCommand(cmdlines)
         self.reload()
 
+    @pyqtSlot(QAction)
+    def _changePhaseByMenu(self, action):
+        phasenum, _ok = action.data().toInt()
+        self.changePhase(phasenum)
+
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
         opts = {'source' : self.rev, 'dest': self.repo['.'].rev()}
@@ -2078,6 +2097,11 @@ class RepoWidget(QWidget):
                 'Please check that the command path is valid and '
                 'that it is a valid application') % hglib.tounicode(ex.strerror))
         return res
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        command, showoutput = action.data().toPyObject()
+        self.runCustomCommand(command, showoutput)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():

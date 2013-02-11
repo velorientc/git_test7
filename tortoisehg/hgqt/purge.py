@@ -85,6 +85,8 @@ class PurgeDialog(QDialog):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.25)
         self.restoreGeometry(s.value('purge/geom').toByteArray())
+
+        self.th = None
         QTimer.singleShot(0, self.checkStatus)
 
     def checkStatus(self):
@@ -111,40 +113,43 @@ class PurgeDialog(QDialog):
                 except Exception, e:
                     self.error = str(e)
 
-        def completed():
-            self.th.wait()
-            self.files = self.th.files
-            self.bb.setEnabled(True)
-            self.progress.emit(*cmdui.stopProgress(_('Checking')))
-            if self.th.error:
-                self.showMessage.emit(hglib.tounicode(self.th.error))
-            else:
-                self.showMessage.emit(_('Ready to purge.'))
-                U, I, T = self.files
-                if U:
-                    self.ucb.setText(ngettext(
-                        'Delete %d unknown file',
-                        'Delete %d unknown files', len(U)) % len(U))
-                    self.ucb.setChecked(True)
-                    self.ucb.setEnabled(True)
-                if I:
-                    self.icb.setText(ngettext(
-                       'Delete %d ignored file',
-                       'Delete %d ignored files', len(I)) % len(I))
-                    self.icb.setChecked(True)
-                    self.icb.setEnabled(True)
-                if T:
-                    self.tcb.setText(ngettext(
-                        'Delete %d file in .hg/Trashcan',
-                        'Delete %d files in .hg/Trashcan', len(T)) % len(T))
-                    self.tcb.setChecked(True)
-                    self.tcb.setEnabled(True)
-
         self.th = CheckThread(self)
-        self.th.finished.connect(completed)
+        self.th.finished.connect(self._checkCompleted)
         self.th.start()
 
+    @pyqtSlot()
+    def _checkCompleted(self):
+        self.th.wait()
+        self.files = self.th.files
+        self.bb.setEnabled(True)
+        self.progress.emit(*cmdui.stopProgress(_('Checking')))
+        if self.th.error:
+            self.showMessage.emit(hglib.tounicode(self.th.error))
+        else:
+            self.showMessage.emit(_('Ready to purge.'))
+            U, I, T = self.files
+            if U:
+                self.ucb.setText(ngettext(
+                    'Delete %d unknown file',
+                    'Delete %d unknown files', len(U)) % len(U))
+                self.ucb.setChecked(True)
+                self.ucb.setEnabled(True)
+            if I:
+                self.icb.setText(ngettext(
+                   'Delete %d ignored file',
+                   'Delete %d ignored files', len(I)) % len(I))
+                self.icb.setChecked(True)
+                self.icb.setEnabled(True)
+            if T:
+                self.tcb.setText(ngettext(
+                    'Delete %d file in .hg/Trashcan',
+                    'Delete %d files in .hg/Trashcan', len(T)) % len(T))
+                self.tcb.setChecked(True)
+                self.tcb.setEnabled(True)
+
     def reject(self):
+        if self.th and self.th.isRunning():
+            return
         s = QSettings()
         s.setValue('purge/geom', self.saveGeometry())
         super(PurgeDialog, self).reject()
@@ -164,25 +169,26 @@ class PurgeDialog(QDialog):
             parent=self):
             return
 
-        def completed():
-            self.th.wait()
-            F = self.th.failures
-            if F:
-                qtlib.InfoMsgBox(_('Deletion failures'), ngettext(
-                    'Unable to delete %d file or folder',
-                    'Unable to delete %d files or folders', len(F)) % len(F),
-                    parent=self)
-            if F is not None:
-                self.reject()
-
         opts = dict(unknown=unknown, ignored=ignored, trash=trash,
                     delfolders=delfolders, keephg=keephg)
 
         self.th = PurgeThread(self.repo, opts, self)
         self.th.progress.connect(self.progress)
         self.th.showMessage.connect(self.showMessage)
-        self.th.finished.connect(completed)
+        self.th.finished.connect(self._purgeCompleted)
         self.th.start()
+
+    @pyqtSlot()
+    def _purgeCompleted(self):
+        self.th.wait()
+        F = self.th.failures
+        if F:
+            qtlib.InfoMsgBox(_('Deletion failures'), ngettext(
+                'Unable to delete %d file or folder',
+                'Unable to delete %d files or folders', len(F)) % len(F),
+                parent=self)
+        if F is not None:
+            self.reject()
 
 class PurgeThread(QThread):
     progress = pyqtSignal(QString, object, QString, QString, object)

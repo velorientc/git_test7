@@ -1048,6 +1048,10 @@ class SettingsDialog(QDialog):
                            'view is readonly.'), parent=self)
             print 'Please install http://code.google.com/p/iniparse/'
 
+        if not focus:
+            focus = QSettings().value('settings/lastpage', 'log').toString()
+        focus = unicode(focus)
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -1064,7 +1068,9 @@ class SettingsDialog(QDialog):
                 return hglib.tounicode(name)
             return _('User')
 
+        self._activeformidx = configrepo and CONF_REPO or CONF_GLOBAL
         self.conftabs = QTabWidget()
+        self.conftabs.currentChanged.connect(self._currentFormChanged)
         layout.addWidget(self.conftabs)
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
@@ -1108,8 +1114,7 @@ class SettingsDialog(QDialog):
         self.bb = bb
 
         self._restartreqs = set()
-
-        self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
+        self.conftabs.setCurrentIndex(self._activeformidx)
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
@@ -1146,6 +1151,7 @@ class SettingsDialog(QDialog):
         self.applyChanges()
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.accept(self)
 
@@ -1154,8 +1160,23 @@ class SettingsDialog(QDialog):
             return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.reject(self)
+
+    def _getactivepagename(self):
+        if self._activeformidx is None:
+            return ''
+        activeform = self.conftabs.widget(self._activeformidx)
+        if not activeform:
+            return ''
+        return activeform._activepagename
+
+    def _currentFormChanged(self, idx):
+        activepagename = self._getactivepagename()
+        if activepagename:
+            self.conftabs.widget(idx).focusPage(activepagename)
+        self._activeformidx = idx
 
 class SettingsForm(QWidget):
     """Widget for each settings file"""
@@ -1230,10 +1251,17 @@ class SettingsForm(QWidget):
             pageList.addItem(item)
 
         self.refresh()
-        self.focusField(focus or 'ui.merge')
+
+        if not self.focusField(focus):
+            # The selected setting may not exist
+            # (e.g. if an extension has been disabled)
+            self.pageList.setCurrentRow(0)
 
     @pyqtSlot(int)
     def activatePage(self, index):
+        if index >= 0:
+            self._activepagename = unicode(INFO[index][0]['name'])
+
         stackindex = self.pageListIndexToStack.get(index, -1)
         if stackindex >= 0:
             self.stack.setCurrentIndex(stackindex)
@@ -1334,15 +1362,31 @@ class SettingsForm(QWidget):
                 return
         self.refresh()
 
+    def focusPage(self, focuspage):
+        'Set change page to focuspage'
+        for i, (meta, info) in enumerate(INFO):
+            if meta['name'] == focuspage:
+                self._activepagename = meta['name']
+                self.pageList.setCurrentRow(i)
+                QTimer.singleShot(0, lambda:
+                    self.activatePage(i))
+                return True
+        return False
+
     def focusField(self, focusfield):
         'Set page and focus to requested datum'
+        if not focusfield:
+            return False
+        if focusfield.find('.') < 0:
+            return self.focusPage(focusfield)
         for i, (meta, info) in enumerate(INFO):
             for n, e in enumerate(info):
                 if e.cpath == focusfield:
                     self.pageList.setCurrentRow(i)
                     QTimer.singleShot(0, lambda:
                             self.pages[meta['name']][2][n].setFocus())
-                    return
+                    return True
+        return False
 
     def fillFrame(self, info):
         widgets = []

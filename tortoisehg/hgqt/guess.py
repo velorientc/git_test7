@@ -265,7 +265,7 @@ class DetectRenameDialog(QDialog):
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
         date = hglib.displaytime(ctx.date())
-        difftext = mdiff.unidiff(rr, date, aa, date, src, dest, None)
+        difftext = mdiff.unidiff(rr, date, aa, date, src, dest)
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % \
                     (hglib.tounicode(src), hglib.tounicode(dest))
@@ -297,11 +297,16 @@ class DetectRenameDialog(QDialog):
             QDialog.reject(self)
 
 
+def _aspercent(s):
+    # i18n: percent format
+    return _('%d%%') % (s * 100)
+
 class MatchModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.rows = []
         self.headers = (_('Source'), _('Dest'), _('% Match'))
+        self.displayformats = (hglib.tounicode, hglib.tounicode, _aspercent)
 
     def rowCount(self, parent):
         return len(self.rows)
@@ -314,7 +319,8 @@ class MatchModel(QAbstractTableModel):
             return QVariant()
         if role == Qt.DisplayRole:
             s = self.rows[index.row()][index.column()]
-            return QVariant(hglib.tounicode(s))
+            f = self.displayformats[index.column()]
+            return QVariant(f(s))
         '''
         elif role == Qt.TextColorRole:
             src, dst, pct = self.rows[index.row()]
@@ -391,6 +397,9 @@ class RenameSearchThread(QThread):
 
     def run(self):
         def emit(topic, pos, item='', unit='', total=None):
+            topic = hglib.tounicode(topic or '')
+            item = hglib.tounicode(item or '')
+            unit = hglib.tounicode(unit or '')
             self.progress.emit(topic, pos, item, unit, total)
         self.repo.ui.progress = emit
         try:
@@ -422,7 +431,7 @@ class RenameSearchThread(QThread):
                 return
             old, new = o.path(), n.path()
             exacts.append(old)
-            self.match.emit([old, new, '100%'])
+            self.match.emit([old, new, 1.0])
         if self.minpct == 1.0:
             return
         removed = [r for r in removed if r.path() not in exacts]
@@ -430,7 +439,7 @@ class RenameSearchThread(QThread):
         for o, n, s in gen:
             if self.stopped:
                 return
-            old, new, sim = o.path(), n.path(), '%d%%' % (s*100)
+            old, new, sim = o.path(), n.path(), s
             self.match.emit([old, new, sim])
 
 def run(ui, *pats, **opts):

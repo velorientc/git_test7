@@ -132,6 +132,7 @@ class Scintilla(QsciScintilla):
         self._resetfindcond()
         self.highlightLines = set()
         unbindConflictedKeys(self)
+
     def read(self, f):
         result = super(Scintilla, self).read(f)
         self.setDefaultEolMode()
@@ -354,12 +355,14 @@ class Scintilla(QsciScintilla):
                                m.start(), m.end() - m.start())
             line = self.lineIndexFromPosition(m.start())[0]
             self.highlightLines.add(line)
+
     @pyqtSlot()
     def clearHighlightText(self):
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
         self.SendScintilla(self.SCI_INDICATORCLEARRANGE, 0, self.length())
         self.highlightLines.clear()
+
     @util.propertycache
     def _highlightIndicator(self):
         """Return indicator number for highlight after initializing it"""
@@ -387,6 +390,48 @@ class Scintilla(QsciScintilla):
         if self.autoUseTabs and self.lines():
             tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
         super(Scintilla, self).setIndentationsUseTabs(tabs)
+
+    # compability mode with QScintilla from Ubuntu 10.04
+    if not hasattr(QsciScintilla, 'HiddenIndicator'):
+        HiddenIndicator = QsciScintilla.INDIC_HIDDEN
+    if not hasattr(QsciScintilla, 'PlainIndicator'):
+        PlainIndicator = QsciScintilla.INDIC_PLAIN
+    if not hasattr(QsciScintilla, 'StrikeIndicator'):
+        StrikeIndicator = QsciScintilla.INDIC_STRIKE
+
+    if not hasattr(QsciScintilla, 'indicatorDefine'):
+        def indicatorDefine(self, style, indicatorNumber=-1):
+            # compatibility layer allows only one indicator to be defined
+            if indicatorNumber == -1:
+                indicatorNumber = 1
+            self.SendScintilla(self.SCI_INDICSETSTYLE, indicatorNumber, style)
+            return indicatorNumber
+
+    if not hasattr(QsciScintilla, 'setIndicatorDrawUnder'):
+        def setIndicatorDrawUnder(self, under, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
+
+    if not hasattr(QsciScintilla, 'setIndicatorForegroundColor'):
+        def setIndicatorForegroundColor(self, color, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
+            self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber, color.alpha());
+
+    if not hasattr(QsciScintilla, 'clearIndicatorRange'):
+        def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
+
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_INDICATORCLEARRANGE, start, finish - start);
+
+    if not hasattr(QsciScintilla, 'fillIndicatorRange'):
+        def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
+
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_INDICATORFILLRANGE, start, finish - start);
+
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)

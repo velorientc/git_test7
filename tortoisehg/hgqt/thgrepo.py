@@ -51,6 +51,8 @@ def repository(_ui=None, path='', create=False, bundle=None):
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path, create)
+            # get unfiltered repo in version safe manner
+            repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
             repo._pyqtobj = ThgRepoWrapper(repo)
             _repocache[path] = repo
@@ -567,13 +569,13 @@ def _extendrepo(repo):
             if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
                 path = _kbfregex.sub('', path)
             return path
-        
+
         def bfStandin(self, path):
             return '.kbf/' + path
 
         def lfStandin(self, path):
             return '.hglf/' + path
-        
+
     return thgrepository
 
 _maxchangectxclscache = 10
@@ -600,7 +602,11 @@ def _createchangectxcls(parentcls):
         def sub(self, path):
             srepo = super(thgchangectx, self).sub(path)
             if isinstance(srepo, subrepo.hgsubrepo):
-                srepo._repo.__class__ = _extendrepo(srepo._repo)
+                r = srepo._repo
+                # get unfiltered repo in version safe manner
+                r = getattr(r, 'unfiltered', lambda: r)()
+                r.__class__ = _extendrepo(r)
+                srepo._repo = r
             return srepo
 
         def thgtags(self):
@@ -664,7 +670,7 @@ def _createchangectxcls(parentcls):
                     summary += u' \u2026' # ellipsis ...
 
             return summary
-        
+
         def hasStandin(self, file):
             if 'largefiles' in self._repo.extensions():
                 if self._repo.lfStandin(file) in self.manifest():
@@ -676,10 +682,10 @@ def _createchangectxcls(parentcls):
 
         def isStandin(self, path):
             return self._repo.isStandin(path)
-        
+
         def removeStandin(self, path):
             return self._repo.removeStandin(path)
-        
+
         def findStandin(self, file):
             if 'largefiles' in self._repo.extensions():
                 if self._repo.lfStandin(file) in self.manifest():

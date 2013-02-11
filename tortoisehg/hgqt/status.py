@@ -62,6 +62,8 @@ class StatusWidget(QWidget):
         self.pctx = None
         self.savechecks = True
         self.refthread = None
+        self.refreshWctxLater = QTimer(self, interval=10, singleShot=True)
+        self.refreshWctxLater.timeout.connect(self.refreshWctx)
         self.partials = {}
         self.manualCheckAllUpdate = False
 
@@ -259,7 +261,6 @@ class StatusWidget(QWidget):
             if wfile not in self.getChecked():
                 for chunk in changes.hunks:
                     self.fileview.updateChunk(chunk, True)
-        self.fileview.updateFolds()
         self.chunkSelectionChanged()
         self.partials[wfile] = changes
 
@@ -280,14 +281,16 @@ class StatusWidget(QWidget):
 
     def setPatchContext(self, pctx):
         if pctx != self.pctx:
+            # clear out the current checked state on next refreshWctx()
             self.savechecks = False
-        else:
-            self.savechecks = True
         self.pctx = pctx
 
+    @pyqtSlot()
     def refreshWctx(self, synchronous=False):
         if self.refthread:
+            self.refreshWctxLater.start()
             return
+        self.refreshWctxLater.stop()
         self.fileview.clearDisplay()
 
         # store selected paths or current path
@@ -352,6 +355,7 @@ class StatusWidget(QWidget):
         if self.checkable:
             tm.checkToggled.connect(self.checkToggled)
             tm.checkCountChanged.connect(self.updateCheckCount)
+        self.savechecks = True
 
         oldtm = self.tv.model()
         self.tv.setModel(tm)
@@ -439,7 +443,6 @@ class StatusWidget(QWidget):
             if wfile == self.fileview._filename:
                 for chunk in self.partials[wfile].hunks:
                     self.fileview.updateChunk(chunk, not checked)
-                self.fileview.updateFolds()
             else:
                 del self.partials[wfile]
 
@@ -1045,7 +1048,7 @@ class StatusDialog(QDialog):
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, self.stwidget.repo.ui, root=link[8:])
+            qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
         if link.startswith('shelve:'):
             from tortoisehg.hgqt import shelve
             dlg = shelve.ShelveDialog(self.stwidget.repo, self)

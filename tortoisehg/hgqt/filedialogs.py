@@ -34,6 +34,8 @@ sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
 class _AbstractFileDialog(QMainWindow):
+    finished = pyqtSignal(int)
+
     def __init__(self, repo, filename, repoviewer=None):
         QMainWindow.__init__(self)
         self.repo = repo
@@ -52,10 +54,18 @@ class _AbstractFileDialog(QMainWindow):
         self.setupViews()
         self.setupModels()
 
+    def closeEvent(self, event):
+        super(_AbstractFileDialog, self).closeEvent(event)
+        self.finished.emit(0)  # mimic QDialog exit
+
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
         if repoviewer:
-            repoviewer.finished.connect(lambda x: self.setRepoViewer(None))
+            repoviewer.finished.connect(self._clearRepoViewer)
+
+    @pyqtSlot()
+    def _clearRepoViewer(self):
+        self.setRepoViewer(None)
 
     def reload(self):
         'Reload toolbar action handler'
@@ -127,18 +137,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
-
-        # It does not make sense to select more than two revisions at a time.
-        # Rather than enforcing a max selection size we simply let the user
-        # know when it has selected too many revisions by using the status bar
-        def checkValidSelection(selected, deselected):
-            selection = self.repoview.selectedRevisions()
-            if len(selection) > 2:
-                msg = _('Too many rows selected for menu')
-            else:
-                msg = ''
-            self.textView.showMessage.emit(msg)
-        self.repoview.revisionSelectionChanged.connect(checkValidSelection)
+        self.repoview.revisionSelectionChanged.connect(
+            self._checkValidSelection)
 
         self.contentframe = QFrame(self.splitter)
 
@@ -363,6 +363,17 @@ class FileLogDialog(_AbstractFileDialog):
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
 
+    # It does not make sense to select more than two revisions at a time.
+    # Rather than enforcing a max selection size we simply let the user
+    # know when it has selected too many revisions by using the status bar
+    def _checkValidSelection(self, selected, deselected):
+        selection = self.repoview.selectedRevisions()
+        if len(selection) > 2:
+            msg = _('Too many rows selected for menu')
+        else:
+            msg = ''
+        self.textView.showMessage.emit(msg)
+
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)
         if index is not None:
@@ -515,10 +526,13 @@ class FileDiffDialog(_AbstractFileDialog):
             table.revisionSelected.connect(self.onRevisionSelected)
             table.revisionActivated.connect(self.onRevisionActivated)
 
-            self.viewers[side].verticalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.sbar_changed(value, side, 'vertical'))
-            self.viewers[side].horizontalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.sbar_changed(value, side, 'horizontal'))
+        l, r = (self.viewers[k].verticalScrollBar() for k in sides)
+        l.valueChanged.connect(self.sbar_changed_left)
+        r.valueChanged.connect(self.sbar_changed_right)
+
+        l, r = (self.viewers[k].horizontalScrollBar() for k in sides)
+        l.valueChanged.connect(r.setValue)
+        r.valueChanged.connect(l.setValue)
 
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
@@ -709,7 +723,15 @@ class FileDiffDialog(_AbstractFileDialog):
             self.update_page_steps(keeppos)
             self.timer.start()
 
-    def sbar_changed(self, value, side, bartype='vertical'):
+    @pyqtSlot(int)
+    def sbar_changed_left(self, value):
+        self.sbar_changed(value, 'left')
+
+    @pyqtSlot(int)
+    def sbar_changed_right(self, value):
+        self.sbar_changed(value, 'right')
+
+    def sbar_changed(self, value, side):
         """
         Callback called when a scrollbar of a file viewer
         is changed, so we can update the position of the other file
@@ -727,10 +749,7 @@ class FileDiffDialog(_AbstractFileDialog):
         dv = value - lo
 
         blo, bhi = self._diffmatch[oside][i]
-        if bartype == 'vertical':
-            vbar = self.viewers[oside].verticalScrollBar()
-        else:
-            vbar = self.viewers[oside].horizontalScrollBar()
+        vbar = self.viewers[oside].verticalScrollBar()
         if (dv) < (bhi - blo):
             bvalue = blo + dv
         else:

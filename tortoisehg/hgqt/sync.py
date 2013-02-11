@@ -796,8 +796,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not host and not folder:
             self.switchToRequest.emit('sync')
             qtlib.WarningMsgBox(_('No remote repository URL or path set'),
-                    _('No valid <i>default</i> remote repository URL or path has been configured for this repository.<p>'
-                    'Please type and save a remote repository path on the Sync widget.'),
+                    _('No valid <i>default</i> remote repository URL or path '
+                      'has been configured for this repository.<p>Please type '
+                      'and save a remote repository path on the Sync widget.'),
                     parent=self)
             return
 
@@ -1095,7 +1096,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not pushall and rev is None and branch is None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
-            if defaultpush == 'all':
+            if self.targetcheckbox.isChecked():
+                # target selection overrides defaultpush
+                pass
+            elif defaultpush == 'all':
                 # This is the default
                 pass
             elif defaultpush == 'branch':

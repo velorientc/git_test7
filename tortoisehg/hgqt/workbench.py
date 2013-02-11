@@ -548,10 +548,10 @@ class Workbench(QMainWindow):
 
     def removeRepo(self, root):
         """ Close tab if the repo is removed from reporegistry [unicode] """
-        root = hglib.fromunicode(root)
+        root = os.path.normpath(hglib.fromunicode(root))
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
+            if w.repo.root == root:
                 self.repoTabCloseRequested(i)
                 return
 
@@ -1108,7 +1108,7 @@ class Workbench(QMainWindow):
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         twrepo = (w and w.repo.root or '')
-        sd = SettingsDialog(configrepo=False, focus='tortoisehg.authorcolor',
+        sd = SettingsDialog(configrepo=False,
                             parent=self, root=twrepo)
         sd.exec_()
 

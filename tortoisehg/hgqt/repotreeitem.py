@@ -461,6 +461,12 @@ class RepoGroupItem(RepoTreeItem):
             return True
         return False
 
+    def rootpath(self):  # for sortbypath()
+        return ''  # may be okay to return _commonpath instead?
+
+    def shortname(self):  # for sortbyname()
+        return unicode(self.name)
+
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
             None, (_('&Sort'), ['sortbyname', 'sortbypath']), None,
@@ -471,7 +477,7 @@ class RepoGroupItem(RepoTreeItem):
             | Qt.ItemIsDragEnabled | Qt.ItemIsEditable)
 
     def childRoots(self):
-        return [c._root for c in self.childs]
+        return [c._root for c in self.childs if isinstance(c, RepoItem)]
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)

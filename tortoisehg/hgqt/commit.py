@@ -359,7 +359,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(bool)
     def commitSetAction(self, refresh=False, actionName=None):
-        allowfolding = False
+        allowcs = False
         if actionName:
             selectedAction = \
                 [act for act in self.mqgroup.actions() \
@@ -396,7 +396,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
-                allowfolding = len(self.repo.parents()) == 1
+                allowcs = len(self.repo.parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsg = self.msgte.text()
@@ -404,8 +404,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
-        self.stwidget.fileview.enableDiffFolding(allowfolding)
-        if not allowfolding:
+        self.stwidget.fileview.enableChangeSelection(allowcs)
+        if not allowcs:
             self.stwidget.partials = {}
         if refreshwctx:
             self.stwidget.refreshWctx()
@@ -562,15 +562,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
             self.refresh()
 
+    @pyqtSlot()
     def workingBranchChanged(self):
         'Repository has detected a change in .hg/branch'
         self.refresh()
 
+    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
 
+    @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.refresh()
@@ -773,21 +776,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def commit(self, amend=False):
         repo = self.repo
-        defaultusername = ui.ui().config('ui', 'username')
-        if not defaultusername:
-            res = qtlib.CustomPrompt(
-                _('Default username is not configured'),
-                _('A default username is not configured. '
-                  'This username is used when you commit '
-                  'unless you set a different username on a given repository.\n\n'
-                  'You must configure a default username before being able to commit.\n\n'
-                  'Do you want to configure your default username now?'), self,
-                (_('&Configure'), _('Cancel')), 0, 1, []).run()
-            if res == 0:
-                from tortoisehg.hgqt import settings
-                settings.SettingsDialog(parent=self, focus='ui.username').exec_()
-            return
-
         try:
             msg = self.getMessage(False)
         except UnicodeEncodeError:
@@ -1376,7 +1364,7 @@ class CommitDialog(QDialog):
         link = hglib.fromunicode(link)
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
-            qtrun(run, ui.ui(), root=link[8:])
+            qtrun(run, ui.ui(), root=link[len('repo:'):])
         if link.startswith('shelve:'):
             repo = self.commit.repo
             from tortoisehg.hgqt import shelve
@@ -1426,10 +1414,6 @@ class CommitDialog(QDialog):
     def reject(self):
         if self.promptExit():
             QDialog.reject(self)
-
-    def closeEvent(self, event):
-        if not self.promptExit():
-            event.ignore()
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths

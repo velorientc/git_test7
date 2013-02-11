@@ -352,9 +352,12 @@ class ResolveDialog(QDialog):
             else:
                 r.append((root, path))
         paths = self.getSelectedPaths(self.utree)
+        oldmodel = self.utree.model()
         self.utree.setModel(PathsModel(u, self))
         self.utree.resizeColumnToContents(0)
         self.utree.resizeColumnToContents(1)
+        if oldmodel:
+            oldmodel.setParent(None)  # gc-ed
 
         model = self.utree.model()
         smodel = self.utree.selectionModel()
@@ -376,9 +379,12 @@ class ResolveDialog(QDialog):
         uchanged(None, None)
 
         paths = self.getSelectedPaths(self.rtree)
+        oldmodel = self.rtree.model()
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
         self.rtree.resizeColumnToContents(1)
+        if oldmodel:
+            oldmodel.setParent(None)  # gc-ed
 
         model = self.rtree.model()
         smodel = self.rtree.selectionModel()
@@ -414,7 +420,7 @@ class ResolveDialog(QDialog):
     def reject(self):
         s = QSettings()
         s.setValue('resolve/geom', self.saveGeometry())
-        if len(self.utree.model()):
+        if self.utree.model().rowCount() > 0:
             main = _('Exit without finishing resolve?')
             text = _('Unresolved conflicts remain. Are you sure?')
             labels = ((QMessageBox.Yes, _('E&xit')),
@@ -480,9 +486,6 @@ class PathsModel(QAbstractTableModel):
         for root, path in pathlist:
             name, ext = os.path.splitext(path)
             self.rows.append([path, ext, root])
-
-    def __len__(self):
-        return len(self.rows)
 
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():

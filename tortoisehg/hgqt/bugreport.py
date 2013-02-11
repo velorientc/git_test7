@@ -15,6 +15,17 @@ from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+try:
+    from PyQt4.Qsci import QSCINTILLA_VERSION_STR
+except (ImportError, AttributeError):
+    # show BugReport dialog even if QScintilla is missing
+    QSCINTILLA_VERSION_STR = '(unknown)'
+
+def _safegetcwd():
+    try:
+        return os.getcwd()
+    except OSError:
+        return '.'
 
 class BugReport(QDialog):
 
@@ -39,7 +50,7 @@ class BugReport(QDialog):
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Save)
-        bb.accepted.connect(self.accept)
+        bb.button(BB.Ok).clicked.connect(self.accept)
         bb.button(BB.Save).clicked.connect(self.save)
         bb.button(BB.Ok).setDefault(True)
         bb.addButton(_('Copy'), BB.HelpRole).clicked.connect(self.copyText)
@@ -58,14 +69,17 @@ class BugReport(QDialog):
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
-        text += '** CWD: %s\n' % hglib.tounicode(os.getcwd())
+        text += '** CWD: %s\n' % hglib.tounicode(_safegetcwd())
         text += '** Encoding: %s\n' % encoding.encoding
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
-        text += '** Qt-%s PyQt-%s\n' % (QT_VERSION_STR, PYQT_VERSION_STR)
+        elif os.name == 'posix':
+            text += '** System: %s\n' % hglib.tounicode(' '.join(os.uname()))
+        text += ('** Qt-%s PyQt-%s QScintilla-%s\n'
+                 % (QT_VERSION_STR, PYQT_VERSION_STR, QSCINTILLA_VERSION_STR))
         text += hglib.tounicode(opts.get('error', 'N/A'))
         # Bitbucket wiki marker for code: 4 spaces indent (Markdown syntax)
         regexp = re.compile(r'^', re.MULTILINE)
@@ -93,10 +107,9 @@ class BugReport(QDialog):
 
     def save(self):
         try:
-            fd = QFileDialog(self)
-            fname = fd.getSaveFileName(self,
+            fname = QFileDialog.getSaveFileName(self,
                         _('Save error report to'),
-                        os.path.join(os.getcwd(), 'bugreport.txt'),
+                        os.path.join(_safegetcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
                 open(fname, 'wb').write(hglib.fromunicode(self.text))

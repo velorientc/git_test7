@@ -71,7 +71,6 @@ class FileRevModel(HgRepoListModel):
             self.heads = [fl.index[fl.rev(x)][4] for x in fl.heads()]
             self.ensureBuilt(row=self.fill_step/2)
             QTimer.singleShot(0, lambda: self.filled.emit())
-            self._fill_timer = self.startTimer(500)
         else:
             self.graph = None
             self.heads = []

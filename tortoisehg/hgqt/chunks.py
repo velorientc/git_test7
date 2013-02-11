@@ -507,6 +507,7 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self._ctx = None
         self._lastfile = None
+        self._status = None
 
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0,0,0,0)
@@ -550,6 +551,7 @@ class DiffBrowser(QFrame):
         self.layout().addSpacing(2)
         w.hide()
 
+        self._forceviewindicator = None
         self.sci = qscilib.Scintilla(self)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
@@ -563,8 +565,15 @@ class DiffBrowser(QFrame):
         self.sci.setMarginWidth(1, QFontMetrics(self.font()).width('XX'))
         self.sci.setMarginSensitivity(1, True)
         self.sci.marginClicked.connect(self.marginClicked)
-        self.selected = self.sci.markerDefine(qsci.Plus, -1)
-        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
+
+        self._checkedpix = qtlib.getcheckboxpixmap(QStyle.State_On,
+                                                   Qt.gray, self)
+        self.selected = self.sci.markerDefine(self._checkedpix, -1)
+
+        self._uncheckedpix = qtlib.getcheckboxpixmap(QStyle.State_Off,
+                                                     Qt.gray, self)
+        self.unselected = self.sci.markerDefine(self._uncheckedpix, -1)
+
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
         self.divider = self.sci.markerDefine(qsci.Background, -1)
         self.selcolor = self.sci.markerDefine(qsci.Background, -1)
@@ -656,7 +665,23 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self.updateSummary()
 
-    def displayFile(self, filename, status):
+    def _setupForceViewIndicator(self):
+        if not self._forceviewindicator:
+            self._forceviewindicator = self.sci.indicatorDefine(self.sci.PlainIndicator)
+            self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
+            self.sci.setIndicatorForegroundColor(
+                QColor('blue'), self._forceviewindicator)
+            self.sci.indicatorClicked.connect(self.forceDisplayFile)
+
+    def forceDisplayFile(self):
+        if self.curchunks:
+            return
+        self.sci.setText(_('Please wait while the file is opened ...'))
+        QTimer.singleShot(10,
+            lambda: self.displayFile(self._lastfile, self._status, force=True))
+
+    def displayFile(self, filename, status, force=False):
+        self._status = status
         self.clearDisplay()
         if filename == self._lastfile:
             reenable = [(c.fromline, len(c.before)) for c in self.curchunks[1:]\
@@ -666,7 +691,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = filedata.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status, force=force)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -676,7 +701,18 @@ class DiffBrowser(QFrame):
         self.filenamelabel.setText(fd.flabel)
 
         if not fd.isValid() or not fd.diff:
-            self.sci.setText(fd.error or '')
+            if fd.error is None:
+                self.sci.clear()
+                return
+            self.sci.setText(fd.error)
+            forcedisplaymsg = filedata.forcedisplaymsg
+            linkstart = fd.error.find(forcedisplaymsg)
+            if linkstart >= 0:
+                # add the link to force to view the data anyway
+                self._setupForceViewIndicator()
+                self.sci.fillIndicatorRange(
+                    0, linkstart, 0, linkstart+len(forcedisplaymsg),
+                    self._forceviewindicator)
             return
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
@@ -698,10 +734,10 @@ class DiffBrowser(QFrame):
         self.sci.markerDeleteAll(-1)
         for chunk in chunks[1:]:
             chunk.lrange = (start, start+len(chunk.lines))
-            chunk.mline = start + len(chunk.lines)/2
+            chunk.mline = start
             if start:
                 self.sci.markerAdd(start-1, self.divider)
-            for i in xrange(1,len(chunk.lines)-1):
+            for i in xrange(0,len(chunk.lines)):
                 if start + i == chunk.mline:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                 else:

@@ -15,6 +15,7 @@ import tempfile
 import re
 import weakref
 
+from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
 from tortoisehg.util import hglib, paths
@@ -524,6 +525,19 @@ def getpixmap(name, width=16, height=16):
     _pixmapcache[key] = pixmap
     return pixmap
 
+def getcheckboxpixmap(state, bgcolor, widget):
+    pix = QPixmap(16,16)
+    painter = QPainter(pix)
+    painter.fillRect(0, 0, 16, 16, bgcolor)
+    option = QStyleOptionButton()
+    style = QApplication.style()
+    option.initFrom(widget)
+    option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+    option.rect.moveTo(1, 1)
+    option.state |= state
+    style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+    return pix
+
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)
     def __init__(self, name):
@@ -859,8 +873,7 @@ class LabeledSeparator(QWidget):
 # Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
 # Currently converting subrepo paths into links only works in English
-_subrepoindicator = '(in subrepo %s)'
-_subreporegex = re.compile(r'\(in subrepo (\S+)\)')
+_subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
 
 def _linkifyHash(message, subrepo=''):
     if subrepo:
@@ -873,27 +886,24 @@ def _linkifySubrepoRef(message, subrepo, hash=''):
     if hash:
         hash = '?' + hash
     subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-    linkifiedsubrepoindicator = _subrepoindicator % subrepolink
-    message = _subreporegex.sub(linkifiedsubrepoindicator, message)
+    subrepoindicator = _subrepoindicatorpattern % subrepo
+    linkifiedsubrepoindicator = _subrepoindicatorpattern % subrepolink
+    message = message.replace(subrepoindicator, linkifiedsubrepoindicator)
     return message
 
-def linkifyMessage(message):
+def linkifyMessage(message, subrepo=None):
     r"""Convert revision id hashes and subrepo paths in messages into links
 
     >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
     u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
-    >>> linkifyMessage('abort: foo (in subrepo bar)\n')
+    >>> linkifyMessage('abort: foo (in subrepo bar)\n', subrepo='bar')
     u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\n'
-    ...                'hint: foo\n') #doctest: +NORMALIZE_WHITESPACE
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\nhint: foo\n',
+    ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
     u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
     (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
     """
     message = unicode(message)
-    subrepo = ''
-    m = _subreporegex.search(message)
-    if m:
-        subrepo = m.group(1)
     message = _linkifyHash(message, subrepo)
     if subrepo:
         hash = ''
@@ -963,7 +973,7 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
@@ -977,7 +987,7 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
@@ -999,7 +1009,7 @@ class ConfirmInfoBar(InfoBar):
 
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
-        self._msglabel = QLabel(linkifyMessage(message), self,
+        self._msglabel = QLabel(message, self,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -1144,6 +1154,17 @@ class Spacer(QWidget):
     def sizeHint(self):
         return QSize(self.width, self.height)
 
+def _configuredusername(ui):
+    # need to check the existence before calling ui.username(); otherwise it
+    # may fall back to the system default.
+    if (not os.environ.get('HGUSER') and not ui.config('ui', 'username')
+        and not os.environ.get('EMAIL')):
+        return None
+    try:
+        return ui.username()
+    except error.Abort:
+        return None
+
 def getCurrentUsername(widget, repo, opts=None):
     if opts:
         # 1. Override has highest priority
@@ -1152,10 +1173,9 @@ def getCurrentUsername(widget, repo, opts=None):
             return user
 
     # 2. Read from repository
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        pass
+    user = _configuredusername(repo.ui)
+    if user:
+        return user
 
     # 3. Get a username from the user
     QMessageBox.information(widget, _('Please enter a username'),
@@ -1165,10 +1185,7 @@ def getCurrentUsername(widget, repo, opts=None):
     dlg = SettingsDialog(False, focus='ui.username')
     dlg.exec_()
     repo.invalidateui()
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        return None
+    return _configuredusername(repo.ui)
 
 class _EncodingSafeInputDialog(QInputDialog):
     def accept(self):

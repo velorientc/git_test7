@@ -527,7 +527,7 @@ class RepoRegistryView(QDockWidget):
         path = unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
-            path = os.path.normcase(os.path.normpath(path))
+            path = os.path.normpath(path)
             sroot = paths.find_root(path)
 
             root = os.path.normcase(os.path.normpath(root))
@@ -542,12 +542,12 @@ class RepoRegistryView(QDockWidget):
                     _('"%s" is not a folder') % sroot,
                     parent=self)
                 return
-            elif sroot == root:
+            elif os.path.normcase(sroot) == root:
                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
                     _('A repository cannot be added as a subrepo of itself'),
                     parent=self)
                 return
-            elif root != paths.find_root(os.path.dirname(path)):
+            elif root != paths.find_root(os.path.dirname(os.path.normcase(path))):
                 qtlib.WarningMsgBox(_('Cannot add subrepository'),
                     _('The selected folder:<br><br>%s<br><br>'
                     'is not inside the target repository.<br><br>'
@@ -613,6 +613,8 @@ class RepoRegistryView(QDockWidget):
                                 _('The .hgsub file already contains the '
                                 'line:<br><br>%s') % line, parent=self)
                             return
+                    if not linesep:
+                        linesep = os.linesep
 
                     # Append the new subrepo to the end of the .hgsub file
                     lines.append(hglib.fromunicode('%s = %s'
@@ -622,7 +624,7 @@ class RepoRegistryView(QDockWidget):
                     # and update the .hgsub file
                     try:
                         fsub = repo.wopener('.hgsub', 'w')
-                        fsub.write(linesep.join(lines))
+                        fsub.write(linesep.join(lines) + linesep)
                         fsub.close()
                         if not hasHgsub:
                             commands.add(ui.ui(), repo, repo.wjoin('.hgsub'))

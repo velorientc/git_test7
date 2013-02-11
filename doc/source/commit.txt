@@ -85,6 +85,76 @@ pattern.  Neither of those file types are shown by default, unless a the
 user includes such a file in a selection (explorer) or provides the file
 name on the command line.
 
+Change Selection
+----------------
+
+Change selection is the process of selecting which of the changes you
+have made to the working directory will be included in the next commit.
+The commit tool allows one to exclude modified (or added or removed)
+files from a commit, leaving them with their same state after the
+commit.
+
+This somewhat violates Mercurial's precept that each changeset
+describes the state of the repository at a single point in time.  When
+you exclude files from the commit, the changeset you create may never
+have existed.  But since file selection during commit is sometimes
+convenient, and is supported by Mercurial itself, our commit tool has
+supported this feature from its first release.
+
+New in TortoiseHg 2.7, the commit tool now allows one to partially
+select modified files.  This means you can now exclude a portion of the
+changes you have made to the file.  This further violates Mercurial's
+precept of committing the state of the working copy, but it is a very
+useful feature.  The most commonly cited example is being able to check
+in a bug fix while excluding all your debug instrumentation so that you
+can continue debugging after the commit.
+
+When the user has excluded one or more of the changes made to a file,
+TortoiseHg considers the file partially selected (and this change
+selection feature is sometimes referred to as **partial commit**).
+Partially selected files are displayed in the file list with a special
+partial check state.
+
+The diff view pane has a context menu option for configuring the 
+marking of excluded changes.  :menuselection:`Mark excluded changes`
+toggles a strike-through indicator on excluded changes.  This setting is
+primarily a personal preference, but future versions of TortoiseHg may
+extend the use of the strike-through indicator for partial exclusion of
+individual changes.
+
+This new partial selection feature is similar to hgtk's
+`chunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_,
+but is superior in several ways:
+
+1) Change selection is integrated directly into the diff view. No mode
+   switch is required.
+
+2) The working copy files are not modified during partial commit. This
+   avoids serious file permission problems on Windows.
+
+3) Change selection is possible for copied or renamed files, with one
+   exception. You cannot exclude all of the changes because this
+   excludes the entire file from the commit.
+
+TortoiseHg has had a shelve tool since version 2.0 which can move
+selected changes from the working directory to a patch (or between
+patches) but the partial commit feature is very different in that it
+never modifies the working copy files.  All it is doing is excluding a
+portion of your changes from the version of the file which is committed
+to the repository.  After the commit, all of your excluded changes will
+still remain in the working copy.
+
+When the commit button is pressed, the commit tool checks if any of the
+checked files are partially excluded.  If any such partial commits are
+required, the commit tool builds a temporary patch file which describes
+how to generate the contents of the partially excluded files and passes
+that patch file to TortoiseHg's partial commit extension.  This
+extension triggers Mercurial's commit command with special hooks so that
+the partial commit file contents come from patched tempfiles instead of
+being read from the working copy.  After the commit the temporary files
+and patch are deleted but the working copy files are completely
+untouched.
+
 Keyboard navigation
 -------------------
 

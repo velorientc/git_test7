@@ -258,7 +258,8 @@ class FilectxActions(QObject):
     def _navigate(self, dlgclass, dlgdict):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
-            if self._currentfile not in dlgdict:
+            fullpath = repo.wjoin(filename)
+            if fullpath not in dlgdict:
                 # dirty hack to pass workbench only if available
                 from tortoisehg.hgqt import workbench  # avoid cyclic dep
                 repoviewer = None
@@ -266,15 +267,27 @@ class FilectxActions(QObject):
                                                 workbench.Workbench):
                     repoviewer = self.parent().window()
                 dlg = dlgclass(repo, filename, repoviewer=repoviewer)
-                dlgdict[self._currentfile] = dlg
+                dlgdict[fullpath] = dlg
+                assert dlg.repo.wjoin(dlg.filename) == fullpath
+                dlg.finished.connect(self._forgetnavdialog)
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
                 dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = dlgdict[self._currentfile]
+            dlg = dlgdict[fullpath]
             dlg.goto(rev)
             dlg.show()
             dlg.raise_()
             dlg.activateWindow()
+
+    #@pyqtSlot()
+    def _forgetnavdialog(self):
+        dlg = self.sender()
+        dlg.finished.disconnect(self._forgetnavdialog)
+        fullpath = dlg.repo.wjoin(dlg.filename)
+        if isinstance(dlg, FileLogDialog):
+            del self._nav_dialogs[fullpath]
+        elif isinstance(dlg, FileDiffDialog):
+            del self._diff_dialogs[fullpath]
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths
