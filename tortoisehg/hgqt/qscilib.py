@@ -130,6 +130,7 @@ class Scintilla(QsciScintilla):
         self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
+        self.highlightLines = set()
         unbindConflictedKeys(self)
 
     def read(self, f):
@@ -352,12 +353,15 @@ class Scintilla(QsciScintilla):
         for m in pat.finditer(unicode(self.text()).encode('utf-8')):
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
                                m.start(), m.end() - m.start())
+            line = self.lineIndexFromPosition(m.start())[0]
+            self.highlightLines.add(line)
 
     @pyqtSlot()
     def clearHighlightText(self):
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
         self.SendScintilla(self.SCI_INDICATORCLEARRANGE, 0, self.length())
+        self.highlightLines.clear()
 
     @util.propertycache
     def _highlightIndicator(self):
