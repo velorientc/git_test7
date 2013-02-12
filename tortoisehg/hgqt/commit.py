@@ -496,6 +496,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         'Status widget is displaying a new file'
         if not (wfile and contents):
             return
+        if self.msgte.autoCompletionThreshold() < 0:
+            # do not search for tokens if auto completion is disabled
+            # pygments has several infinite loop problems we'd like to avoid
+            return
         wfile = unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
