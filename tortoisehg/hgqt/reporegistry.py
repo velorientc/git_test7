@@ -200,6 +200,8 @@ class RepoTreeView(QTreeView):
     def removeSelected(self):
         'remove selected repository'
         s = self.selitem
+        if not s:
+            return
         item = s.internalPointer()
         if 'remove' not in item.menulist():  # check capability
             return
