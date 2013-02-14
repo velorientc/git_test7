@@ -26,6 +26,13 @@ import itertools
 
 from mercurial import util, error
 
+try:
+    from mercurial import repoview
+    _filterrevs = repoview.filterrevs
+except ImportError: # hg < 2.5
+    def _filterrevs(repo, filtername):
+        return []
+
 def revision_grapher(repo, **opts):
     """incremental revision grapher
 
@@ -52,16 +59,17 @@ def revision_grapher(repo, **opts):
 
     revset = opts.get('revset', None)
     branch = opts.get('branch', None)
+    revhidden = _filterrevs(repo, 'visible')
     if revset:
         start_rev = max(revset)
         stop_rev = min(revset)
         follow = False
-        hidden = lambda rev: rev not in revset
+        hidden = lambda rev: (rev not in revset) or (rev in revhidden)
     else:
         start_rev = opts.get('start_rev', None)
         stop_rev = opts.get('stop_rev', 0)
         follow = opts.get('follow', False)
-        hidden = lambda rev: False
+        hidden = lambda rev: rev in revhidden
 
     assert start_rev is None or start_rev >= stop_rev
 

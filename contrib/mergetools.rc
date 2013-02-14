@@ -113,6 +113,7 @@ p4merge.gui=True
 p4merge.diffargs=$parent $child
 p4merge.diff3args=$child $parent1 $parent2
 p4merge.dirdiff=False
+p4merge.checkchanged = True
 
 tortoisemerge.priority=-9
 tortoisemerge.args=/base:$base /mine:$local /theirs:$other /merged:$output
