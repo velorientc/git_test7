@@ -975,6 +975,13 @@ class InfoBar(QFrame):
             self.close()
         super(InfoBar, self).keyPressEvent(event)
 
+    def heightForWidth(self, width):
+        # loosely based on the internal strategy of QBoxLayout
+        if self.layout().hasHeightForWidth():
+            return super(InfoBar, self).heightForWidth(width)
+        else:
+            return self.sizeHint().height()
+
 class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
