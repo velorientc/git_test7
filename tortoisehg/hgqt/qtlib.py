@@ -923,6 +923,7 @@ class InfoBar(QFrame):
 
         |widgets ...                |right widgets ...|x|
     """
+    finished = pyqtSignal(int)  # mimic QDialog
     linkActivated = pyqtSignal(unicode)
 
     # type of InfoBar (the number denotes its priority)
@@ -963,6 +964,11 @@ class InfoBar(QFrame):
 
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
+
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.finished.emit(0)
+        super(InfoBar, self).closeEvent(event)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -1028,17 +1034,21 @@ class ConfirmInfoBar(InfoBar):
 
     def closeEvent(self, event):
         if self.isVisible():
+            self.finished.emit(1)
             self.rejected.emit()
+            self.hide()  # avoid double emission of finished signal
         super(ConfirmInfoBar, self).closeEvent(event)
 
     @pyqtSlot()
     def _accept(self):
+        self.finished.emit(0)
         self.accepted.emit()
         self.hide()
         self.close()
 
     @pyqtSlot()
     def _reject(self):
+        self.finished.emit(1)
         self.rejected.emit()
         self.hide()
         self.close()
