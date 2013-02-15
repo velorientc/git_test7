@@ -346,11 +346,24 @@ class RepoWidget(QWidget):
         self._activeInfoBar.setParent(None)
         self._activeInfoBar = None
 
+        # clear margin for overlay
+        h = self.repoview.horizontalHeader()
+        if h.minimumSize() != QSize(0, 0):
+            h.setMinimumSize(0, 0)
+            h.geometriesChanged.emit()
+
     def _updateInfoBarGeometry(self):
         if not self._activeInfoBar:
             return
         w = self._activeInfoBar
         w.setGeometry(0, 0, self.width(), w.heightForWidth(self.width()))
+
+        # give margin; first row should be visible without closing confirmation
+        if w.infobartype >= qtlib.InfoBar.CONFIRM:
+            h = self.repoview.horizontalHeader()
+            y = h.mapTo(self, h.pos()).y()
+            h.setMinimumSize(0, max(w.height() - y, 0))
+            h.geometriesChanged.emit()
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
