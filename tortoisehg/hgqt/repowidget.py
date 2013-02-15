@@ -161,6 +161,7 @@ class RepoWidget(QWidget):
 
         self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
         self.layout().addLayout(self._infobarlayout)
+        self._activeInfoBar = None
 
         self.filterbar = RepoFilterBar(self.repo, self)
         self.layout().addWidget(self.filterbar)
@@ -317,7 +318,9 @@ class RepoWidget(QWidget):
         if not cleared:
             return
         w = cls(*args, **kwargs)
+        w.finished.connect(self._freeInfoBar)
         w.linkActivated.connect(self._openLink)
+        self._activeInfoBar = w
         self._infobarlayout.insertWidget(0, w)
         w.setFocus()  # to handle key press by InfoBar
         return w
@@ -326,16 +329,24 @@ class RepoWidget(QWidget):
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
         it = self._infobarlayout.itemAt(0)
-        if not it:
+        assert it is self._activeInfoBar or it.widget() is self._activeInfoBar
+        if not self._activeInfoBar:
             return True
-        if priority is None or it.widget().infobartype <= priority:
+        if priority is None or self._activeInfoBar.infobartype <= priority:
             # removes current infobar explicitly, because close() seems to
             # delay deletion until next eventloop.
             self._infobarlayout.removeItem(it)
-            it.widget().close()
+            self._activeInfoBar.finished.disconnect(self._freeInfoBar)
+            self._activeInfoBar.close()
+            self._freeInfoBar()  # call directly in case of event delay
             return True
         else:
             return False
+
+    @pyqtSlot()
+    def _freeInfoBar(self):
+        """Disown closed infobar"""
+        self._activeInfoBar = None
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
