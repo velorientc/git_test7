@@ -387,6 +387,14 @@ class Scintilla(QsciScintilla):
             tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
         super(Scintilla, self).setIndentationsUseTabs(tabs)
 
+    def lineNearPoint(self, point):
+        """Return the closest line to the pixel position; similar to lineAt(),
+        but returns valid line number even if no character fount at point"""
+        # lineAt() uses the strict request, SCI_POSITIONFROMPOINTCLOSE
+        chpos = self.SendScintilla(self.SCI_POSITIONFROMPOINT,
+                                   point.x(), point.y())
+        return self.SendScintilla(self.SCI_LINEFROMPOSITION, chpos)
+
     # compability mode with QScintilla from Ubuntu 10.04
     if not hasattr(QsciScintilla, 'HiddenIndicator'):
         HiddenIndicator = QsciScintilla.INDIC_HIDDEN

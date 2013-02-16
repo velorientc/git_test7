@@ -768,7 +768,7 @@ class HgFileView(QFrame):
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         menu = self.sci.createStandardContextMenu()
-        line = self.sci.lineAt(point)
+        line = self.sci.lineNearPoint(point)
         point = self.sci.viewport().mapToGlobal(point)
 
         selection = self.sci.selectedText()
