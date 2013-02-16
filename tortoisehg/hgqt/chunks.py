@@ -671,7 +671,9 @@ class DiffBrowser(QFrame):
             self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
             self.sci.setIndicatorForegroundColor(
                 QColor('blue'), self._forceviewindicator)
-            self.sci.indicatorClicked.connect(self.forceDisplayFile)
+            # delay until next event-loop in order to complete mouse release
+            self.sci.SCN_INDICATORRELEASE.connect(self.forceDisplayFile,
+                                                  Qt.QueuedConnection)
 
     def forceDisplayFile(self):
         if self.curchunks:
