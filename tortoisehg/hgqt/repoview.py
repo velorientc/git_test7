@@ -94,6 +94,7 @@ class HgRepoView(QTableView):
         menu.addAction(act)
         self.headermenu = menu
 
+    @pyqtSlot(QPoint)
     def headerMenuRequest(self, point):
         self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
 
