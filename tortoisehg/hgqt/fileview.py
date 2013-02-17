@@ -855,10 +855,12 @@ class HgFileView(QFrame):
             self.editSelected(*data)
         menu.addSeparator()
         origrev = fctx.rev()
-        for name, func in [(_('A&nnotate Originating Revision (%d)') % origrev, annorig),
-                           (_('&View Originating Revision (%d)') % origrev, editorig)]:
+        anngotomenu = QMenu(_('Annotate'), self)
+        annviewmenu = QMenu(_('View File at'), self)
+        for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
+                           (_('&Originating Revision'), editorig, annviewmenu)]:
             def add(name, func):
-                action = menu.addAction(name)
+                action = smenu.addAction(name)
                 action.triggered.connect(func)
             add(name, func)
         for pfctx in fctx.parents():
@@ -868,16 +870,18 @@ class HgFileView(QFrame):
                 setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
-            for name, func in [(_('Annotate &Parent Revision (%d)') % pdata[1],
-                                  annparent),
-                               (_('View Parent &Revision (%d)') % pdata[1],
-                                  editparent)]:
+            for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
+                                  annparent, anngotomenu),
+                               (_('&Parent Revision (%d)') % pdata[1],
+                                  editparent, annviewmenu)]:
                 def add(name, func):
-                    action = menu.addAction(name)
+                    action = smenu.addAction(name)
                     action.data = pdata
                     action.run = lambda: func(action.data)
                     action.triggered.connect(action.run)
                 add(name, func)
+        menu.addMenu(anngotomenu)
+        menu.addMenu(annviewmenu)
         menu.exec_(point)
 
     def resizeEvent(self, event):
