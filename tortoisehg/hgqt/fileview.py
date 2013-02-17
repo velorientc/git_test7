@@ -868,9 +868,9 @@ class HgFileView(QFrame):
                 setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
-            for name, func in [(_('Annotate &Parent Revision %d') % pdata[1],
+            for name, func in [(_('Annotate &Parent Revision (%d)') % pdata[1],
                                   annparent),
-                               (_('View Parent &Revision %d') % pdata[1],
+                               (_('View Parent &Revision (%d)') % pdata[1],
                                   editparent)]:
                 def add(name, func):
                     action = menu.addAction(name)
