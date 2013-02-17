@@ -389,14 +389,14 @@ class SummaryPanel(SummaryBase, QWidget):
             self.revlabel = QLabel()
             self.revlabel.linkActivated.connect(
                  lambda s: self.linkActivated.emit(s))
-            self.layout().addWidget(self.revlabel, alignment=Qt.AlignTop)
+            self.layout().addWidget(self.revlabel, 0, Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
             if self.expand_btn.parentWidget() is None:
                 self.expand_btn.clicked.connect(lambda: self.update())
                 margin = QHBoxLayout()
                 margin.setMargin(3)
-                margin.addWidget(self.expand_btn, alignment=Qt.AlignTop)
+                margin.addWidget(self.expand_btn, 0, Qt.AlignTop)
                 self.layout().insertLayout(0, margin)
             self.expand_btn.setShown(True)
         elif self.expand_btn.parentWidget() is not None:

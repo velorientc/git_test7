@@ -76,7 +76,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     endSuppressPrompt = pyqtSignal()
 
     def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
-        QWidget.__init__(self, parent=parent)
+        QWidget.__init__(self, parent)
 
         repo.configChanged.connect(self.configChanged)
         repo.repositoryChanged.connect(self.repositoryChanged)

@@ -63,7 +63,8 @@ class HgRepoView(QTableView):
         self.htmlDelegate = htmldelegate.HTMLDelegate(self)
 
         self.setAcceptDrops(True)
-        self.setDefaultDropAction(Qt.MoveAction)
+        if PYQT_VERSION_STR.split('.') >= ['4', '7']:
+            self.setDefaultDropAction(Qt.MoveAction)
         self.setDragEnabled(True)
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)

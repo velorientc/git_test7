@@ -28,7 +28,7 @@ def stopProgress(topic):
 class ProgressMonitor(QWidget):
     'Progress bar for use in workbench status bar'
     def __init__(self, topic, parent):
-        super(ProgressMonitor, self).__init__(parent=parent)
+        super(ProgressMonitor, self).__init__(parent)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
@@ -72,7 +72,7 @@ class ThgStatusBar(QStatusBar):
     linkActivated = pyqtSignal(QString)
 
     def __init__(self, parent=None):
-        QStatusBar.__init__(self, parent=parent)
+        QStatusBar.__init__(self, parent)
         self.topics = {}
         self.lbl = QLabel()
         self.lbl.linkActivated.connect(self.linkActivated)

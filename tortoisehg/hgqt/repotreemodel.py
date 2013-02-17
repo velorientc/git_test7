@@ -33,6 +33,8 @@ def writeXml(target, item, rootElementName):
     xw.writeEndDocument()
 
 def readXml(source, rootElementName):
+    if PYQT_VERSION_STR.split('.') < ['4', '7']:
+        return
     itemread = None
     xr = QXmlStreamReader(source)
     if xr.readNextStartElement():

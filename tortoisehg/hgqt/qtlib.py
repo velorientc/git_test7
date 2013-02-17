@@ -25,7 +25,7 @@ from hgext.color import _styles
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
+if PYQT_VERSION_STR.split('.') < ['4', '6'] or \
    QT_VERSION_STR.split('.') < ['4', '6']:
     sys.stderr.write('TortoiseHg requires Qt 4.6 and PyQt 4.7\n')
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
@@ -486,7 +486,7 @@ def geticon(name):
     This searches for the icon from theme, Qt resource or icons directory,
     named as 'name.(svg|png|ico)'.
     """
-    if QIcon.hasThemeIcon(name):
+    if hasattr(QIcon, 'hasThemeIcon') and QIcon.hasThemeIcon(name):
         return QIcon.fromTheme(name)
 
     try:

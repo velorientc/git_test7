@@ -108,10 +108,6 @@ class YAMLLexerSelector(_FilenameLexerSelector):
     extensions = ('.yml',)
     _lexer = Qsci.QsciLexerYAML
 
-class VerilogLexerSelector(_FilenameLexerSelector):
-    extensions = ('.v', '.vh')
-    _lexer = Qsci.QsciLexerVerilog
-
 class VHDLLexerSelector(_FilenameLexerSelector):
     extensions = ('.vhd', '.vhdl')
     _lexer = Qsci.QsciLexerVHDL
@@ -170,7 +166,19 @@ class Fortran77LexerSelector(_FilenameLexerSelector):
 
 class SpiceLexerSelector(_FilenameLexerSelector):
     extensions = ('.cir', '.sp',)
-    _lexer = Qsci.QsciLexerSpice
+    try:
+        _lexer = Qsci.QsciLexerSpice
+    except AttributeError:
+        # is there a better fallback?
+        _lexer = Qsci.QsciLexerCPP
+
+class VerilogLexerSelector(_FilenameLexerSelector):
+    extensions = ('.v', '.vh')
+    try:
+        _lexer = Qsci.QsciLexerVerilog
+    except AttributeError:
+        # is there a better fallback?
+        _lexer = Qsci.QsciLexerCPP
 
 class PropertyLexerSelector(_FilenameLexerSelector):
     extensions = ('.ini', '.properties')
