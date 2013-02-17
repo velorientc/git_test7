@@ -123,6 +123,8 @@ class HgRepoListModel(QAbstractTableModel):
     _allcolnames = dict(COLUMNHEADERS)
 
     _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags', 'Phase',)
+    _columnfonts = {'Node': QFont("Monospace"),
+                    'Converted': QFont("Monospace")}
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
@@ -455,6 +457,10 @@ class HgRepoListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
+        # font is not cached in self._cache since it is equal for all rows
+        if role == Qt.FontRole:
+            column = self._columns[index.column()]
+            return self._columnfonts.get(column, nullvariant)
         if role not in self._roleoffsets:
             return nullvariant
         try:
