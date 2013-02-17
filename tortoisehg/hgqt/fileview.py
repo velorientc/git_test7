@@ -854,8 +854,9 @@ class HgFileView(QFrame):
         def editorig():
             self.editSelected(*data)
         menu.addSeparator()
-        for name, func in [(_('A&nnotate Originating Revision'), annorig),
-                           (_('&View Originating Revision'), editorig)]:
+        origrev = fctx.rev()
+        for name, func in [(_('A&nnotate Originating Revision (%d)') % origrev, annorig),
+                           (_('&View Originating Revision (%d)') % origrev, editorig)]:
             def add(name, func):
                 action = menu.addAction(name)
                 action.triggered.connect(func)
