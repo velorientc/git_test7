@@ -989,7 +989,7 @@ class AnnotateView(qscilib.Scintilla):
         return super(AnnotateView, self).keyPressEvent(event)
 
     def mouseMoveEvent(self, event):
-        self._emitRevisionHintAtLine(self.lineAt(event.pos()))
+        self._emitRevisionHintAtLine(self.lineNearPoint(event.pos()))
         super(AnnotateView, self).mouseMoveEvent(event)
 
     def _emitRevisionHintAtLine(self, line):
