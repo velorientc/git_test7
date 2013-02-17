@@ -11,7 +11,7 @@ Všechny nástroje TortoiseHg jsou přístupné ze třech míst:
 
 1. Z aplikace :guilabel:`Workbench`
  
-   Verpánek spustíme z menu Start nebo z kontextového menu aktivovaného poklepem pravé klávesy myši s kurzorem kdekoli v pracovní ploše (anglicky: by right clicking on the Desktop) - `Hg Workbench`. 
+   Verpánek (Workbench) spustíme z menu Start nebo z kontextového menu aktivovaného poklepem pravé klávesy myši s kurzorem kdekoli v pracovní ploše. 
 	
    .. figure:: figures/desktop-workbench.png
     :alt: Desktop Context Menu
@@ -27,7 +27,7 @@ Všechny nástroje TortoiseHg jsou přístupné ze třech míst:
  
    V konzoli cmd.exe nebo Windows PowerShell zadáme příkaz :command:`thg <command> [opce]`.
      
-V tomto stručném přehledu bychom rádi vysvětlili, jak používat aplikaci Workbench ale i jiné způsoby práce v TortoiseHg.
+V tomto stručném přehledu bychom rádi vysvětlili, jak používat aplikaci Workbench (Verpánek) ale i jiné způsoby práce v TortoiseHg.
 
 Příkazy Mercurialu jsou dostupné také z příkazového řádku příkazem :command:`hg <command>`. 
 

@@ -4,28 +4,33 @@ Archivace
 .. module:: archive.dialog
 	:synopsis: Dialog used to make an archive of a repository
 
-Při tvorbě archivu repozitáře lze vybírat z řady nabízených formátů.
-Je možné vytvářet komprimované formáty. Je také možné vytvořit obyčejnou složku souborů mimo pracovní adresář (jako klon ale bez složky .hg). To může být použitelné při tvorbě sestav (builds), viz 'svn export'. Lze vytvořit archiv pouze ze souborů vybrané revize. To lze použít pro posílání změn partnerům, kteří nemají přístup k repozitáři.
+Při tvorbě archivu repozitáře lze vybírat z řady formátů.
+Jsou to obvyklé komprimované formáty ale také možné vytvořit složku nekomprimovaných souborů v jiném místě než v pracovním adresáři (jako klon ale bez složky .hg). Takové archivy mohou být užitečné například při tvorbě sestav (builds - podobně jako při 'svn export'). Archivy s vybraným obsahem mohou být také užitečné při posílání změn extením osobám bez přístupu k repozitáři
 
 
-V kontextovém menu vybraného changesetu ve Verpánku volíte :menuselection:`Exportovat > Archive...`, nebo - byvše nacédován do složky, zadáte z příkazového řádku  :command:`thg archive`.
+Spuštění z Verpánku
+-------------------
+
+V kontextovém menu vybraného changesetu ve Verpánku volíte :menuselection:`Exportovat > Archivovat`.
 
 .. figure:: figures/archive.png
 	:alt: Archive dialog
 
 	Repository Archive Dialog
 
-:guilabel:`Revision`
+:guilabel:`Revize`
 	Zadání revize, kterou chcete archivovat nebo exportovat.
-:guilabel:`Only files modified/created in this revision`
+:guilabel:`Pouze soubory upravené či vytvořené v této revizi`
 	Omezíte si počet souborů v archivu.
-:guilabel:`Destination path`
+:guilabel:`Zabočit do subrepozitářů`
+	Umožňuje přístup do subrepozitářů.	
+:guilabel:`Destinace`
 	Jméno souboru nebo složky, kde bude archiv vytvořen. Jméno se skládá z názvu aktuálního repozitáře s připojeným číslem vybrané revize, případně s příponou vybraného formátu archivního souboru.
-	:guilabel:`Archive types`
+	:guilabel:`Typy archivů`
 	Zde můžete zvolit typ vytvářeného archivu od prosté složky se soubory až k řadě standardních archivních typů.
-	:guilabel:`Hg command`
+	:guilabel:`Příkaz Hg`
 	Toto pole zobrazuje příkaz, který bude proveden.
-	:guilabel:`Always show output`
+	:guilabel:`Vždy zobrazit výstup`
 	Pro zobrazení záznamového panelu s výsledky prováděného příkazu.
 	
 Archivovat repozitář znamená vytvořit archivní soubor nebo podadresář s obsahem vybrané revize.
