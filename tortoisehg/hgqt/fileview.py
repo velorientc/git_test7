@@ -828,16 +828,18 @@ class HgFileView(QFrame):
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            for name, func in [(_('Search in &Original Revision'),
+            annsearchmenu = QMenu(_('Search Selected Text'), self)
+            for name, func in [(_('In &Original Revision'),
                                 sreq(rev=fctx.rev())),
-                               (_('Search in &Working Revision'),
+                               (_('In &Working Revision'),
                                 sreq(rev='.')),
-                               (_('&Search in Current Annotation'), sann),
-                               (_('Search in &History'), sreq(all=True))]:
+                               (_('In &Current Annotation'), sann),
+                               (_('In &History'), sreq(all=True))]:
                 def add(name, func):
-                    action = menu.addAction(name)
+                    action = annsearchmenu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
+            menu.addMenu(annsearchmenu)
 
         def setSource(path, rev, line):
             self.revisionSelected.emit(rev)
