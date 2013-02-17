@@ -855,7 +855,7 @@ class HgFileView(QFrame):
             self.editSelected(*data)
         menu.addSeparator()
         origrev = fctx.rev()
-        anngotomenu = QMenu(_('Annotate'), self)
+        anngotomenu = QMenu(_('Go to'), self)
         annviewmenu = QMenu(_('View File at'), self)
         for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
                            (_('&Originating Revision'), editorig, annviewmenu)]:
