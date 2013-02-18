@@ -784,6 +784,7 @@ class HgFileView(QFrame):
 
         selection = self.sci.selectedText()
         def sreq(**opts):
+            opts['search'] = True
             return lambda: self.grepRequested.emit(selection, opts)
         def sann():
             self.searchbar.search(selection)
@@ -823,6 +824,7 @@ class HgFileView(QFrame):
         fctx, line = self.sci._links[line]
         if selection:
             def sreq(**opts):
+                opts['search'] = True
                 return lambda: self.grepRequested.emit(selection, opts)
             def sann():
                 self.searchbar.search(selection)
