@@ -1049,12 +1049,6 @@ class StatusDialog(QDialog):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
             qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
-        if link.startswith('shelve:'):
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
 
     def loadSettings(self):
         s = QSettings()
