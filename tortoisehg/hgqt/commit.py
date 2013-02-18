@@ -67,6 +67,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     commitButtonEnable = pyqtSignal(bool)
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
+    grepRequested = pyqtSignal(unicode, dict)
     commitComplete = pyqtSignal()
 
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -95,6 +96,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
+        self.stwidget.grepRequested.connect(self.grepRequested)
         self.msghistory = []
         self.runner = cmdui.Runner(not embedded, self)
         self.runner.setTitle(_('Commit', 'window title'))

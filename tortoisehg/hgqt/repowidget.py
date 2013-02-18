@@ -410,6 +410,7 @@ class RepoWidget(QWidget):
         cw.endSuppressPrompt.connect(self.endSuppressPrompt)
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
+        cw.grepRequested.connect(self.grep)
         QTimer.singleShot(0, cw.reload)
         return cw
 

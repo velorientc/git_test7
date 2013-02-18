@@ -47,6 +47,7 @@ class StatusWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
+    grepRequested = pyqtSignal(unicode, dict)
 
     def __init__(self, repo, pats, opts, parent=None, checkable=True,
                  defcheck='MAR!S'):
@@ -191,6 +192,7 @@ class StatusWidget(QWidget):
         self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.newChunkList.connect(self.updatePartials)
         self.fileview.chunkSelectionChanged.connect(self.chunkSelectionChanged)
+        self.fileview.grepRequested.connect(self.grepRequested)
         self.fileview.setContext(self.repo[None])
         self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
