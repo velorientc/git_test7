@@ -737,10 +737,12 @@ class PMButton(QPushButton):
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 
-        def clicked():
-            icon = self.is_expanded() and self.plus or self.minus
-            self.setIcon(icon)
-        self.clicked.connect(clicked)
+        self.clicked.connect(self._toggle_icon)
+
+    @pyqtSlot()
+    def _toggle_icon(self):
+        icon = self.is_expanded() and self.plus or self.minus
+        self.setIcon(icon)
 
     def set_expanded(self, state=True):
         icon = state and self.minus or self.plus
