@@ -803,7 +803,7 @@ class HgFileView(QFrame):
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),
-                        (_('Search in &History'), sreq(all=True))]:
+                        (_('Search in All &History'), sreq(all=True))]:
                     def add(name, func):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
