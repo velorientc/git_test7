@@ -829,11 +829,11 @@ class HgFileView(QFrame):
                 self.searchbar.show()
             menu.addSeparator()
             annsearchmenu = QMenu(_('Search Selected Text'), self)
-            for name, func in [(_('In &Original Revision'),
-                                sreq(rev=fctx.rev())),
+            for name, func in [(_('In &Current Annotation'), sann),
                                (_('In &Working Revision'),
                                 sreq(rev='.')),
-                               (_('In &Current Annotation'), sann),
+                               (_('In &Original Revision'),
+                                sreq(rev=fctx.rev())),
                                (_('In &History'), sreq(all=True))]:
                 def add(name, func):
                     action = annsearchmenu.addAction(name)
