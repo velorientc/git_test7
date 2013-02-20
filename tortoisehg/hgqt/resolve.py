@@ -220,11 +220,7 @@ class ResolveDialog(QDialog):
         repo.configChanged.connect(self.configChanged)
         repo.repositoryChanged.connect(self.repositoryChanged)
 
-    def done(self, ret):
-        self.repo.configChanged.disconnect(self.configChanged)
-        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
-        super(ResolveDialog, self).done(ret)
-
+    @pyqtSlot()
     def repositoryChanged(self):
         self.refresh()
 
@@ -338,6 +334,7 @@ class ResolveDialog(QDialog):
             if dlg:
                 dlg.exec_()
 
+    @pyqtSlot()
     def configChanged(self):
         'repository has detected a change to config files'
         self.tcombo.reset()
