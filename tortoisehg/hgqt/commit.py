@@ -1369,13 +1369,6 @@ class CommitDialog(QDialog):
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[len('repo:'):])
-        if link.startswith('shelve:'):
-            repo = self.commit.repo
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
 
     def updateUndo(self):
         BB = QDialogButtonBox

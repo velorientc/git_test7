@@ -20,7 +20,6 @@ from PyQt4.QtGui import *
 
 class ShelveDialog(QDialog):
 
-    finished = pyqtSignal(int)
     wdir = _('Working Directory')
 
     def __init__(self, repo, parent):

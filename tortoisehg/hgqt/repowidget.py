@@ -159,8 +159,7 @@ class RepoWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
-        self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
-        self.layout().addLayout(self._infobarlayout)
+        self._activeInfoBar = None
 
         self.filterbar = RepoFilterBar(self.repo, self)
         self.layout().addWidget(self.filterbar)
@@ -317,25 +316,54 @@ class RepoWidget(QWidget):
         if not cleared:
             return
         w = cls(*args, **kwargs)
+        w.setParent(self)
+        w.finished.connect(self._freeInfoBar)
         w.linkActivated.connect(self._openLink)
-        self._infobarlayout.insertWidget(0, w)
+        self._activeInfoBar = w
+        self._updateInfoBarGeometry()
+        w.show()
         w.setFocus()  # to handle key press by InfoBar
         return w
 
     @pyqtSlot()
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
-        it = self._infobarlayout.itemAt(0)
-        if not it:
+        if not self._activeInfoBar:
             return True
-        if priority is None or it.widget().infobartype <= priority:
-            # removes current infobar explicitly, because close() seems to
-            # delay deletion until next eventloop.
-            self._infobarlayout.removeItem(it)
-            it.widget().close()
+        if priority is None or self._activeInfoBar.infobartype <= priority:
+            self._activeInfoBar.finished.disconnect(self._freeInfoBar)
+            self._activeInfoBar.close()
+            self._freeInfoBar()  # call directly in case of event delay
             return True
         else:
             return False
+
+    @pyqtSlot()
+    def _freeInfoBar(self):
+        """Disown closed infobar"""
+        if not self._activeInfoBar:
+            return
+        self._activeInfoBar.setParent(None)
+        self._activeInfoBar = None
+
+        # clear margin for overlay
+        h = self.repoview.horizontalHeader()
+        if h.minimumSize() != QSize(0, 0):
+            h.setMinimumSize(0, 0)
+            h.geometriesChanged.emit()
+
+    def _updateInfoBarGeometry(self):
+        if not self._activeInfoBar:
+            return
+        w = self._activeInfoBar
+        w.setGeometry(0, 0, self.width(), w.heightForWidth(self.width()))
+
+        # give margin; first row should be visible without closing confirmation
+        if w.infobartype >= qtlib.InfoBar.CONFIRM:
+            h = self.repoview.horizontalHeader()
+            y = h.mapTo(self, h.pos()).y()
+            h.setMinimumSize(0, max(w.height() - y, 0))
+            h.geometriesChanged.emit()
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
@@ -639,6 +667,10 @@ class RepoWidget(QWidget):
             print 'page was dirty, reloading...'
             self.reload()
             self.dirty = False
+
+    def resizeEvent(self, event):
+        QWidget.resizeEvent(self, event)
+        self._updateInfoBarGeometry()
 
     def createActions(self):
         QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
