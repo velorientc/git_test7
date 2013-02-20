@@ -43,9 +43,11 @@ class BackoutDialog(QWizard):
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.configChanged.connect(self.configChanged)
 
+    @pyqtSlot()
     def repositoryChanged(self):
         self.currentPage().repositoryChanged()
 
+    @pyqtSlot()
     def configChanged(self):
         self.currentPage().configChanged()
 
