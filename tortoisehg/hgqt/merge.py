@@ -52,9 +52,11 @@ class MergeDialog(QWizard):
         repo.configChanged.connect(self.configChanged)
         self.repo = repo
 
+    @pyqtSlot()
     def repositoryChanged(self):
         self.currentPage().repositoryChanged()
 
+    @pyqtSlot()
     def configChanged(self):
         self.currentPage().configChanged()
 
@@ -65,11 +67,6 @@ class MergeDialog(QWizard):
     def reject(self):
         if self.currentPage().canExit():
             super(MergeDialog, self).reject()
-
-    def done(self, ret):
-        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
-        self.repo.configChanged.disconnect(self.configChanged)
-        super(MergeDialog, self).done(ret)
 
 
 class BasePage(QWizardPage):
