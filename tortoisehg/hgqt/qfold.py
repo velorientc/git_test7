@@ -118,6 +118,7 @@ class QFoldDialog(QDialog):
               [hglib.tounicode(self.repo.changectx(p).description())
                for p in ['qtip'] + patches])
 
+    @pyqtSlot()
     def configChanged(self):
         '''Repository is reporting its config files have changed'''
         self.msgte.refresh(self.repo)
