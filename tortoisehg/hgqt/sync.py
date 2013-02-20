@@ -412,6 +412,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
+    @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
