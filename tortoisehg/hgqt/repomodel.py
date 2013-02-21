@@ -146,6 +146,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.unicodexinabox = True
         self.cfgname = cfgname
         self.latesttags = {-1: 'null'}
+        self.fullauthorname = False
 
         # To be deleted
         self._user_colors = {}
@@ -197,6 +198,7 @@ class HgRepoListModel(QAbstractTableModel):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
+        self.fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
 
     def updateColumns(self):
         s = QSettings()
@@ -662,7 +664,10 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getauthor(self, ctx, gnode):
         try:
-            return hglib.username(ctx.user())
+            user = ctx.user()
+            if not self.fullauthorname:
+                user = hglib.username(user)
+            return user
         except error.Abort:
             return _('Mercurial User')
 
