@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-02-13 13:57-0200\n"
-"PO-Revision-Date: 2013-01-25 13:56+0000\n"
+"PO-Revision-Date: 2013-02-14 19:22+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-02-14 04:41+0000\n"
+"X-Launchpad-Export-Date: 2013-02-15 04:41+0000\n"
 "X-Generator: Launchpad (build 16491)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
@@ -778,7 +778,7 @@ msgstr "Morceaux sélectionnés : %d / %d"
 
 #: tortoisehg/hgqt/chunks.py:679 tortoisehg/hgqt/fileview.py:439
 msgid "Please wait while the file is opened ..."
-msgstr ""
+msgstr "Veuillez attendre l'ouverture du fichier..."
 
 #: tortoisehg/hgqt/clone.py:61 tortoisehg/hgqt/rename.py:66
 #: tortoisehg/hgqt/thgimport.py:63
@@ -1725,7 +1725,7 @@ msgstr "Le sous-dépôt sélectionné n'existe pas dans le répertoire de travai
 
 #: tortoisehg/hgqt/filedata.py:18
 msgid "Display the file anyway"
-msgstr ""
+msgstr "Afficher le fichier de toute façon"
 
 #: tortoisehg/hgqt/filedata.py:45
 msgid "File or diffs not displayed: "
@@ -2432,7 +2432,7 @@ msgstr ""
 #: tortoisehg/hgqt/guess.py:302
 #, python-format
 msgid "%d%%"
-msgstr ""
+msgstr "%d %%"
 
 #: tortoisehg/hgqt/guess.py:308
 msgid "Source"
