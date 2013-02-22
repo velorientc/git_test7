@@ -359,8 +359,8 @@ class RepoWidget(QWidget):
         top = self.repoview.mapTo(self, QPoint(0, 0)).y()
         w.setGeometry(0, top, self.width(), w.heightForWidth(self.width()))
 
-        # give margin; first row should be visible without closing confirmation
-        if w.infobartype >= qtlib.InfoBar.CONFIRM:
+        # give margin to make first row visible, except for auto-hide infobar
+        if w.infobartype > qtlib.InfoBar.INFO:
             h = self.repoview.horizontalHeader()
             y = h.mapTo(self.repoview, QPoint(0, 0)).y()
             h.setMinimumSize(0, max(w.height() - y, 0))
