@@ -356,12 +356,13 @@ class RepoWidget(QWidget):
         if not self._activeInfoBar:
             return
         w = self._activeInfoBar
-        w.setGeometry(0, 0, self.width(), w.heightForWidth(self.width()))
+        top = self.repoview.mapTo(self, QPoint(0, 0)).y()
+        w.setGeometry(0, top, self.width(), w.heightForWidth(self.width()))
 
         # give margin; first row should be visible without closing confirmation
         if w.infobartype >= qtlib.InfoBar.CONFIRM:
             h = self.repoview.horizontalHeader()
-            y = h.mapTo(self, h.pos()).y()
+            y = h.mapTo(self.repoview, QPoint(0, 0)).y()
             h.setMinimumSize(0, max(w.height() - y, 0))
             h.geometriesChanged.emit()
 
@@ -672,6 +673,11 @@ class RepoWidget(QWidget):
     def resizeEvent(self, event):
         QWidget.resizeEvent(self, event)
         self._updateInfoBarGeometry()
+
+    def event(self, event):
+        if event.type() == QEvent.LayoutRequest:
+            self._updateInfoBarGeometry()
+        return QWidget.event(self, event)
 
     def createActions(self):
         QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
