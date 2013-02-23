@@ -242,6 +242,7 @@ class RepoFilterBar(QToolBar):
         self._branchCombo = QComboBox()
         self._branchCombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False
 
