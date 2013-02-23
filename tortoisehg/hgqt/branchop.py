@@ -50,7 +50,7 @@ class BranchOpDialog(QDialog):
             branchCombo.setEditable(True)
             qtlib.allowCaseChangingInput(branchCombo)
 
-            wbu = hglib.tounicode(wctx.branch())
+            wbu = wctx.branch()
             for name in repo.namedbranches:
                 if name == wbu:
                     continue
