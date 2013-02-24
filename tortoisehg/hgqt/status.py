@@ -144,15 +144,10 @@ class StatusWidget(QWidget):
         vbox.addWidget(tv)
         split.addWidget(frame)
 
-        if self.pats:
-            def clearPattern():
-                self.pats = []
-                self.refreshWctx()
-                cpb.setVisible(False)
-                self.titleTextChanged.emit(self.getTitle())
-            cpb = QPushButton(_('Remove filter, show root'))
-            vbox.addWidget(cpb)
-            cpb.clicked.connect(clearPattern)
+        self.clearPatternBtn = QPushButton(_('Remove filter, show root'))
+        vbox.addWidget(self.clearPatternBtn)
+        self.clearPatternBtn.clicked.connect(self.clearPattern)
+        self.clearPatternBtn.setVisible(bool(self.pats))
 
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
@@ -422,6 +417,13 @@ class StatusWidget(QWidget):
         if model:
             model.setFilter(match)
             self.tv.enablefilterpalette(bool(match))
+
+    @pyqtSlot()
+    def clearPattern(self):
+        self.pats = []
+        self.refreshWctx()
+        self.clearPatternBtn.setVisible(False)
+        self.titleTextChanged.emit(self.getTitle())
 
     @pyqtSlot()
     def updateCheckCount(self):
