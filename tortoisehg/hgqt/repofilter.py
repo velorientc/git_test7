@@ -145,6 +145,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(-1)
 
     def showEvent(self, event):
+        super(RepoFilterBar, self).showEvent(event)
         self.revsetcombo.lineEdit().setFocus()
 
     def openEditor(self):
