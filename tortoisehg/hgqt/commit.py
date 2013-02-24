@@ -1359,19 +1359,13 @@ class CommitDialog(QDialog):
         self.commit.msgte.setFocus()
         qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
 
-    def done(self, ret):
-        self.commit.repo.configChanged.disconnect(self.commit.configChanged)
-        self.commit.repo.repositoryChanged.disconnect(self.commit.repositoryChanged)
-        self.commit.repo.workingBranchChanged.disconnect(self.commit.workingBranchChanged)
-        self.commit.repo.repositoryChanged.disconnect(self.updateUndo)
-        super(CommitDialog, self).done(ret)
-
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[len('repo:'):])
 
+    @pyqtSlot()
     def updateUndo(self):
         BB = QDialogButtonBox
         undomsg = self.commit.canUndo()
