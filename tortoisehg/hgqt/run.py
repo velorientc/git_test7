@@ -29,8 +29,7 @@ from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.bugreport import run as bugrun
+from tortoisehg.hgqt import bugreport, qtlib
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
@@ -76,8 +75,10 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = traceback.format_exc()
-        opts['nofork'] = True
-        return qtrun(bugrun, u, **opts)
+        main = QApplication(sys.argv)
+        dlg = bugreport.BugReport(opts)
+        dlg.exec_()
+        return -1
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
 
