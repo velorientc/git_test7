@@ -22,7 +22,7 @@ class ShelveDialog(QDialog):
 
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
@@ -490,4 +490,4 @@ def run(ui, *pats, **opts):
         from tortoisehg.util import paths
         from tortoisehg.hgqt import thgrepo
         repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo, None)
+    return ShelveDialog(repo)
