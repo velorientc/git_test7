@@ -1267,7 +1267,7 @@ class PaletteSwitcher(object):
     enablefilterpalette() method.
     """
     def __init__(self, targetwidget):
-        self._targetwidget = targetwidget
+        self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
         bgcolor = self._defaultpalette.color(QPalette.Base)
         if bgcolor.black() <= 128:
@@ -1280,8 +1280,11 @@ class PaletteSwitcher(object):
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)
 
     def enablefilterpalette(self, enabled=False):
+        targetwidget = self._targetwref()
+        if not targetwidget:
+            return
         if enabled:
             pl = self._filterpalette
         else:
             pl = self._defaultpalette
-        self._targetwidget.setPalette(pl)
+        targetwidget.setPalette(pl)
