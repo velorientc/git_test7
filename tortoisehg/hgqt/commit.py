@@ -79,9 +79,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
         QWidget.__init__(self, parent)
 
-        repo.configChanged.connect(self.configChanged)
+        repo.configChanged.connect(self.refresh)
         repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        repo.workingBranchChanged.connect(self.refresh)
         self.repo = repo
         self._rev = rev
         self.lastAction = None
@@ -569,20 +569,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.refresh()
 
     @pyqtSlot()
-    def workingBranchChanged(self):
-        'Repository has detected a change in .hg/branch'
-        self.refresh()
-
-    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
-
-    @pyqtSlot()
-    def configChanged(self):
-        'Repository is reporting its config files have changed'
-        self.refresh()
 
     @pyqtSlot()
     def refreshWctx(self):
@@ -596,6 +586,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
 
+    @pyqtSlot()
     def refresh(self):
         ispatch = self.repo.changectx('.').thgmqappliedpatch()
         if not self.hasmqbutton:
