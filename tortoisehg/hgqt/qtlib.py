@@ -918,9 +918,6 @@ def linkifyMessage(message, subrepo=None):
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
 
-    You shouldn't reuse InfoBar object after close(). It is automatically
-    deleted.
-
     Layout::
 
         |widgets ...                |right widgets ...|x|
@@ -944,8 +941,6 @@ class InfoBar(QFrame):
     def __init__(self, parent=None):
         super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
                                       frameShadow=QFrame.Plain)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
