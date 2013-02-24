@@ -162,13 +162,7 @@ class StatusWidget(QWidget):
         tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
-        def statusTypeTrigger(status):
-            status = str(status)
-            for s in statusTypes:
-                val = statusTypes[s]
-                self.opts[val.name] = s in status
-            self.refreshWctx()
-        self.statusfilter.statusChanged.connect(statusTypeTrigger)
+        self.statusfilter.statusChanged.connect(self.setStatusFilter)
 
         self.tv = tv
         self.le = le
@@ -413,6 +407,14 @@ class StatusWidget(QWidget):
                 u'repo:' + hglib.tounicode(self.repo.wjoin(path)))
         elif status in 'C?':
             qtlib.editfiles(self.repo, [path])
+
+    @pyqtSlot(str)
+    def setStatusFilter(self, status):
+        status = str(status)
+        for s in statusTypes:
+            val = statusTypes[s]
+            self.opts[val.name] = s in status
+        self.refreshWctx()
 
     @pyqtSlot(QString)
     def setFilter(self, match):
