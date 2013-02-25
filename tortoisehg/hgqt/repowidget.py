@@ -1308,7 +1308,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'mq', fixed, _('&Strip...'), 'menudelete',
                   self.stripRevision)
 
-        entry(menu, 'reviewboard', fixed, _('Post to Re&view Board...'), 'reviewboard',
+        entry(menu, 'reviewboard', isrev, _('Post to Re&view Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
         entry(menu, 'rupdate', fixed, _('&Remote Update...'), 'hg-update',
