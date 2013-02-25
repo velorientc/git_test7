@@ -145,6 +145,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(-1)
 
     def showEvent(self, event):
+        super(RepoFilterBar, self).showEvent(event)
         self.revsetcombo.lineEdit().setFocus()
 
     def openEditor(self):
@@ -242,6 +243,7 @@ class RepoFilterBar(QToolBar):
         self._branchCombo = QComboBox()
         self._branchCombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False
 
