@@ -1316,7 +1316,7 @@ class RepoWidget(QWidget):
         entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
         entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
-              'menurelocate', self.bundleRevisions)
+              'hg-bundle', self.bundleRevisions)
         entry(submenu, None, isctx, _('&Copy Patch'), 'copy-patch',
               self.copyPatch)
         entry(menu)
