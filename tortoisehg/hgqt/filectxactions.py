@@ -78,7 +78,7 @@ class FilectxActions(QObject):
              _('Revert file(s) to contents at this revision'),
              self.revertfile),
             ('opensubrepo', _('Open S&ubrepository'), 'thg-repository-open',
-             'Shift+Ctrl+O', _('Open the selected subrepository'),
+             None, _('Open the selected subrepository'),
              self.opensubrepo),
             ('explore', _('E&xplore Folder'), 'system-file-manager',
              None, _('Open the selected folder in the system file manager'),

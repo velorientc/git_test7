@@ -43,7 +43,7 @@ class WctxActions(QObject):
         make(_('&Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
         allactions.append(None)
         make(_('Open S&ubrepository'), opensubrepo, frozenset('S'),
-            'thg-repository-open', 'Shift+Ctrl+O')
+            'thg-repository-open')
         make(_('E&xplore Subrepository'), explore, frozenset('S'),
             'system-file-manager')
         make(_('Open &Terminal'), terminal, frozenset('S'),
