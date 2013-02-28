@@ -134,7 +134,7 @@ class HgFileView(QFrame):
                (1 << self.exclcolor)
         self.sci.setMarginType(4, qsci.SymbolMargin)
         self.sci.setMarginMarkerMask(4, mask)
-        self.markexcluded = QSettings().value('changes-mark-excluded', True).toBool()
+        self.markexcluded = QSettings().value('changes-mark-excluded').toBool()
         self.excludeindicator = -1
         self.updateChunkIndicatorMarks()
         self.sci.setIndicatorDrawUnder(True, self.excludeindicator)
