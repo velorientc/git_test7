@@ -502,6 +502,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             # do not search for tokens if auto completion is disabled
             # pygments has several infinite loop problems we'd like to avoid
             return
+        if self.msgte.lexer() is None:
+            # qsci will crash if None is passed to QsciAPIs constructor
+            return
         wfile = unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
