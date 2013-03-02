@@ -37,8 +37,6 @@ class MessageEntry(qscilib.Scintilla):
         self.setMatchedBraceBackgroundColor(Qt.yellow)
         self.setIndentationsUseTabs(False)
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        #self.setIndentationGuidesBackgroundColor(QColor("#e6e6de"))
-        #self.setFolding(QsciScintilla.BoxedFoldStyle)
         # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
