@@ -7,9 +7,7 @@
 
 import re
 
-from PyQt4 import Qsci
-from PyQt4.QtGui import *
-
+from PyQt4 import Qsci, QtGui
 from tortoisehg.hgqt import qtlib
 
 class _LexerSelector(object):
@@ -189,18 +187,16 @@ class DiffLexerSelector(_ScriptLexerSelector):
     _lexer = Qsci.QsciLexerDiff
     regex = re.compile(r'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
     def cfg_lexer(self, lexer):
-        #lexer.setDefaultPaper(QtGui.QColor(cfg.getDiffBGColor()))
-        #lexer.setColor(QtGui.QColor(cfg.getDiffFGColor()), -1)
         for label, i in (('diff.inserted', 6),
                          ('diff.deleted', 5),
                          ('diff.hunk', 4)):
             effect = qtlib.geteffect(label)
             for e in effect.split(';'):
                 if e.startswith('color:'):
-                    lexer.setColor(QColor(e[7:]), i)
+                    lexer.setColor(QtGui.QColor(e[7:]), i)
                 if e.startswith('background-color:'):
                     lexer.setEolFill(True, i)
-                    lexer.setPaper(QColor(e[18:]), i)
+                    lexer.setPaper(QtGui.QColor(e[18:]), i)
         font = qtlib.getfont('fontdiff').font()
         lexer.setFont(font, -1)
         return lexer
@@ -211,7 +207,6 @@ for clsname, cls in globals().items():
     if clsname.startswith('_'):
         continue
     if isinstance(cls, type) and issubclass(cls, _LexerSelector):
-        #print clsname
         lexers.append(cls())
 
 def get_diff_lexer(parent):
