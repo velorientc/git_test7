@@ -470,7 +470,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
         try:
             contents = open(self.repo.wjoin(self.filename), "rb").read(1024)
-            lexer = lexers.get_lexer(self.filename, contents, self)
+            lexer = lexers.getlexer(self.repo.ui, self.filename, contents, self)
         except Exception:
             lexer = None
 

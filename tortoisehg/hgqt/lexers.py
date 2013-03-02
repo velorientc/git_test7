@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import re
 
 from PyQt4 import Qsci, QtGui
@@ -209,10 +210,18 @@ for clsname, cls in globals().items():
     if isinstance(cls, type) and issubclass(cls, _LexerSelector):
         lexers.append(cls())
 
-def get_diff_lexer(parent):
+def difflexer(parent):
     return DiffLexerSelector().lexer(parent)
 
-def get_lexer(filename, filedata, parent):
+def getlexer(ui, filename, filedata, parent):
+    _, ext = os.path.splitext(filename)
+    if ext and len(ext) > 1:
+        ext = ext.lower()[1:]
+        pref = ui.config('thg-lexer', ext)
+        if pref:
+            lexer = getattr(Qsci, 'QsciLexer' + pref)
+            if lexer and isinstance(lexer, type):
+                return lexer(parent)
     for lselector in lexers:
         if lselector.match(filename, filedata):
             return lselector.lexer(parent)

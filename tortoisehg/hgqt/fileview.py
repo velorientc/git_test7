@@ -521,7 +521,7 @@ class HgFileView(QFrame):
 
         if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
-            lexer = lexers.get_diff_lexer(self)
+            lexer = lexers.difflexer(self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
@@ -554,7 +554,7 @@ class HgFileView(QFrame):
             self.newChunkList.emit(uf, None)
             return
         elif fd.contents:
-            lexer = lexers.get_lexer(filename, fd.contents, self)
+            lexer = lexers.getlexer(self.repo.ui, filename, fd.contents, self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
