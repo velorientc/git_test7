@@ -16,7 +16,12 @@ def _findtool(ui, tool):
             if p:
                 return p
     exe = _toolstr(ui, tool, "executable", tool)
-    return util.findexe(util.expandpath(exe))
+    path = util.findexe(util.expandpath(exe))
+    if path:
+        return path
+    elif tool != exe:
+        return util.findexe(tool)
+    return None
 
 def _findeditor(repo, files):
     '''returns tuple of editor name and editor path.
