@@ -90,7 +90,11 @@ def openlocalurl(path):
     return QDesktopServices.openUrl(qurl)
 
 def detecteditor(ui):
-    return ui.config('tortoisehg', 'editor')
+    editor = ui.config('tortoisehg', 'editor')
+    if not editor:
+        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
+                 or os.environ.get('EDITOR', 'vi')
+    return editor
 
 def openfiles(repo, files, parent=None):
     for filename in files:
@@ -109,42 +113,8 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         cwd = repo.root
     files = [util.shellquote(util.localpath(f)) for f in files]
     assert len(files) == 1 or lineno == None
+
     editor = detecteditor(repo.ui)
-    if editor:
-        try:
-            regexp = re.compile('\[([^\]]*)\]')
-            expanded = []
-            pos = 0
-            for m in regexp.finditer(editor):
-                expanded.append(editor[pos:m.start()-1])
-                phrase = editor[m.start()+1:m.end()-1]
-                pos = m.end()+1
-                if '$LINENUM' in phrase:
-                    if lineno is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$LINENUM', str(lineno))
-                elif '$SEARCH' in phrase:
-                    if search is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$SEARCH', search)
-                if '$FILE' in phrase:
-                    phrase = phrase.replace('$FILE', files[0])
-                    files = []
-                expanded.append(phrase)
-            expanded.append(editor[pos:])
-            cmdline = ' '.join(expanded + files)
-        except ValueError, e:
-            # '[' or ']' not found
-            cmdline = ' '.join([editor] + files)
-        except TypeError, e:
-            # variable expansion failed
-            cmdline = ' '.join([editor] + files)
-    else:
-        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
-                 or os.environ.get('EDITOR', 'vi')
-        cmdline = ' '.join([editor] + files)
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
         res = QMessageBox.critical(parent,
                     _('No visual editor configured'),
@@ -154,6 +124,37 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         dlg.exec_()
         return
 
+    cmdline = ' '.join([editor] + files)
+    try:
+        regexp = re.compile('\[([^\]]*)\]')
+        expanded = []
+        pos = 0
+        for m in regexp.finditer(editor):
+            expanded.append(editor[pos:m.start()-1])
+            phrase = editor[m.start()+1:m.end()-1]
+            pos = m.end()+1
+            if '$LINENUM' in phrase:
+                if lineno is None:
+                    # throw away phrase
+                    continue
+                phrase = phrase.replace('$LINENUM', str(lineno))
+            elif '$SEARCH' in phrase:
+                if search is None:
+                    # throw away phrase
+                    continue
+                phrase = phrase.replace('$SEARCH', search)
+            if '$FILE' in phrase:
+                phrase = phrase.replace('$FILE', files[0])
+                files = []
+            expanded.append(phrase)
+        expanded.append(editor[pos:])
+        cmdline = ' '.join(expanded + files)
+    except ValueError, e:
+        # '[' or ']' not found
+        pass
+    except TypeError, e:
+        # variable expansion failed
+        pass
     cmdline = util.quotecommand(cmdline)
     shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
