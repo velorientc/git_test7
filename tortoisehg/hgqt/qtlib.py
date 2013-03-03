@@ -165,7 +165,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
-    return False
 
 def savefiles(repo, files, rev, parent=None):
     for curfile in files:
