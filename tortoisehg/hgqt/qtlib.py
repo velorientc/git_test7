@@ -18,7 +18,7 @@ import weakref
 from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, editor
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
@@ -89,13 +89,6 @@ def openlocalurl(path):
         qurl = QUrl.fromLocalFile(path)
     return QDesktopServices.openUrl(qurl)
 
-def detecteditor(ui):
-    editor = ui.config('tortoisehg', 'editor')
-    if not editor:
-        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
-                 or os.environ.get('EDITOR', 'vi')
-    return editor
-
 def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
@@ -111,11 +104,9 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         files = [os.path.basename(path)]
     else:
         cwd = repo.root
-    files = [util.shellquote(util.localpath(f)) for f in files]
-    assert len(files) == 1 or lineno == None
 
-    editor = detecteditor(repo.ui)
-    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+    toolpath, args = editor.detecteditor(repo, files)
+    if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
         res = QMessageBox.critical(parent,
                     _('No visual editor configured'),
                     _('Please configure a visual editor.'))
@@ -124,14 +115,17 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         dlg.exec_()
         return
 
-    cmdline = ' '.join([editor] + files)
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    assert len(files) == 1 or lineno == None
+    cmdline = ' '.join([toolpath] + files)
+
     try:
         regexp = re.compile('\[([^\]]*)\]')
         expanded = []
         pos = 0
-        for m in regexp.finditer(editor):
-            expanded.append(editor[pos:m.start()-1])
-            phrase = editor[m.start()+1:m.end()-1]
+        for m in regexp.finditer(args):
+            expanded.append(args[pos:m.start()-1])
+            phrase = args[m.start()+1:m.end()-1]
             pos = m.end()+1
             if '$LINENUM' in phrase:
                 if lineno is None:
@@ -147,8 +141,8 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 phrase = phrase.replace('$FILE', files[0])
                 files = []
             expanded.append(phrase)
-        expanded.append(editor[pos:])
-        cmdline = ' '.join(expanded + files)
+        expanded.append(args[pos:])
+        cmdline = ' '.join([toolpath] + expanded + files)
     except ValueError, e:
         # '[' or ']' not found
         pass
