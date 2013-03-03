@@ -24,7 +24,7 @@ scite.args = ["-open:$FILE" -goto:$LINENUM] ["-find:$SEARCH"]
 ; get the executable path from its shell extension entry
 notepadpp.regkey=Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
 notepadpp.regname=Path
-notepadpp.args = ["$FILE" -n$LINENUM] -multiInst -nosession
+notepadpp.args = [$FILE -n$LINENUM] -multiInst -nosession
 
 textpad.executable = TextPad
 textpad.args = [$FILE($LINENUM)]
