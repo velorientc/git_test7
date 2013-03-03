@@ -250,7 +250,7 @@ class RejectBrowser(qscilib.Scintilla):
         mask = (1 << self.addedMark) | (1 << self.removedMark) | \
                (1 << self.addedColor) | (1 << self.removedColor)
         self.setMarginMarkerMask(1, mask)
-        lexer = lexers.get_diff_lexer(self)
+        lexer = lexers.difflexer(self)
         self.setLexer(lexer)
 
     def menuRequested(self, point):
