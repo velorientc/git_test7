@@ -89,6 +89,9 @@ def openlocalurl(path):
         qurl = QUrl.fromLocalFile(path)
     return QDesktopServices.openUrl(qurl)
 
+def detecteditor(ui):
+    return ui.config('tortoisehg', 'editor')
+
 def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
@@ -105,7 +108,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     else:
         cwd = repo.root
     files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = repo.ui.config('tortoisehg', 'editor')
+    editor = detecteditor(repo.ui)
     assert len(files) == 1 or lineno == None
     if editor:
         try:
