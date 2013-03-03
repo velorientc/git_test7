@@ -108,8 +108,8 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     else:
         cwd = repo.root
     files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = detecteditor(repo.ui)
     assert len(files) == 1 or lineno == None
+    editor = detecteditor(repo.ui)
     if editor:
         try:
             regexp = re.compile('\[([^\]]*)\]')
