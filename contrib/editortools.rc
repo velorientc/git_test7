@@ -13,7 +13,7 @@
 [editor-tools]
 
 gvim.executable = ${ProgramFiles(x86)}/Vim/Vim73/gvim.exe
-gvim.args = -f [-c':set hls' -c'/$SEARCH/'] [+$LINENUM $FILE]
+gvim.args = -f [-c":set hls" -c"/$SEARCH/"] [+$LINENUM $FILE]
 
 emacs.args = [+$LINENUM $FILE] [--eval '(highlight-regexp "$SEARCH")']
 
