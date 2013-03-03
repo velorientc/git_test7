@@ -93,7 +93,7 @@ def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
 
-def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
+def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
         filename = files[0].strip()
         if not filename:
@@ -107,8 +107,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
     files = [util.shellquote(util.localpath(f)) for f in files]
     editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
-    if not editor:
-        editor = repo.ui.config('tortoisehg', 'editor')
     if editor:
         try:
             regexp = re.compile('\[([^\]]*)\]')
