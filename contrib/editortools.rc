@@ -1,0 +1,37 @@
+; TortoiseHg 2.8 adds the ability to detect editors on your system
+; and use them optimally,
+;
+; $LINENUM and $SEARCH are key-phrases. If you specify them in a
+; bracketed section and those parameters are not passed to the editor,
+; the entire bracketed phrase is removed from the command line.
+;
+; $FILE is optional. If it is not expanded in any phrase, the filename
+; will be appended at the end of the command line.  When $FILE is
+; specified, only one file may be opened by the editor (remaining
+; filenames are dropped)
+
+[editor-tools]
+
+gvim.executable = ${ProgramFiles(x86)}/Vim/Vim73/gvim.exe
+gvim.args = -f [-c':set hls' -c'/$SEARCH/'] [+$LINENUM $FILE]
+
+emacs.args = [+$LINENUM $FILE] [--eval '(highlight-regexp "$SEARCH")']
+
+gedit.args = [+$LINENUM]
+
+scite.args = ["-open:$FILE" -goto:$LINENUM] ["-find:$SEARCH"]
+
+notepadpp.executable = Notepad++
+notepadpp.args = ["$FILE" -n$LINENUM] -multiInst -nosession
+
+textpad.executable = TextPad
+textpad.args = [$FILE($LINENUM)]
+
+sublime.executable = sublime_text
+sublime.args = [$FILE:$LINENUM]
+
+textwrangler.executable = edit
+textwrangler.args = [+$LINENUM --wait $FILE]
+
+textmate.executable = mate
+textmate.args = --wait [--line $LINENUM $FILE]
