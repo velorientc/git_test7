@@ -9,6 +9,10 @@
 ; will be appended at the end of the command line.  When $FILE is
 ; specified, only one file may be opened by the editor (remaining
 ; filenames are dropped)
+;
+; Arguments within square braces [] are discarded from the argument list if
+; no data is given for expansion.  ie: [-l$LINENUM] would be removed
+; from the command line if no line number is specified.
 
 [editor-tools]
 
