@@ -123,6 +123,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         regexp = re.compile('\[([^\]]*)\]')
         expanded = []
         pos = 0
+        args = ' '.join([toolpath, args])
         for m in regexp.finditer(args):
             expanded.append(args[pos:m.start()-1])
             phrase = args[m.start()+1:m.end()-1]
@@ -142,7 +143,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 files = []
             expanded.append(phrase)
         expanded.append(args[pos:])
-        cmdline = ' '.join([toolpath] + expanded + files)
+        cmdline = ' '.join(expanded + files)
     except ValueError, e:
         # '[' or ']' not found
         pass
