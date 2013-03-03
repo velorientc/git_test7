@@ -68,3 +68,17 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;bb = http://bitbucket.org/
 ;bb+ssh = ssh://hg@bitbucket.org/
 ;py = http://code.python.org/hg/
+
+; Configure syntax highlighting lexers to be used by TortoiseHg content
+; display widgets.  Pattern is EXTENSION = LEXER
+;
+; The following lexers are available in QScintilla 2.7
+; 'Bash', 'Batch', 'CMake', 'CPP', 'CSS', 'CSharp', 'Custom', 'D', 'Diff',
+; 'Fortran', 'Fortran77', 'HTML', 'IDL', 'Java', 'JavaScri pt', 'Lua',
+; 'Makefile', 'Matlab', 'Octave', 'POV', 'Pascal', 'Perl', 'PostScript',
+; 'Properties', 'Python', 'Ruby', 'SQL', 'Spice', 'TCL', 'TeX', 'VHDL',
+; 'Verilog', 'XML', 'YAML'
+
+[thg-lexer]
+; Display CUDA (*.cu) files with C++ lexer
+;cu = CPP
