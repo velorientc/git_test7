@@ -192,6 +192,7 @@
               <File Id='mergetools.rc' Name='MergeTools.rc' ReadOnly='yes'
                     Source='contrib\mergetools.rc'
               />
+            </Component>
             <Component Id='editortools.rc' Guid='$(var.editortools.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='editortools.rc' Name='EditorTools.rc' ReadOnly='yes'
                     Source='contrib\editortools.rc'
