@@ -41,8 +41,8 @@ scite.argssearch = "-open:$FILE" -goto:$LINENUM "-find:$SEARCH"
 ; shell extension registry key has the executable path
 notepadpp.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
 notepadpp.regname = Path
-notepadpp.args = $FILES
-notepadpp.argsln = $FILE -n$LINENUM
+notepadpp.args = $FILES -nosession
+notepadpp.argsln = $FILE -n$LINENUM -nosession
 
 textpad.executable = TextPad
 textpad.args = $FILES
@@ -59,6 +59,30 @@ textwrangler.argsln = +$LINENUM --wait $FILE
 textmate.executable = mate
 textmate.args = --wait $FILES
 textmate.argsln = --wait --line $LINENUM $FILE
+
+; PSPad homepage: http://gogogadgetscott.info/pspad
+pspad.args = $FILES
+pspad.argsln = -$LINENUM $FILE
+
+eclipse.args = --launcher.openFile $FILE
+
+; UltraEdit home page: http://www.ultraedit.com
+ultraedit.executable = uedit32
+ultraedit.args = $FILES
+ultraedit.argsln = $FILE --lx $LINENUM
+ultraedit.argssearch = $FILE --lx $LINENUM -f$SEARCH
+
+; textadept command line info: http://foicica.com/textadept/13_Help.html
+; On OSX the textadept executable is called 'ta'.
+; TortoiseHg will try to find ta[.exe], then textadapt[.exe]
+textadapt.executable = ta
+textadept.args = -f -n $FILES
+textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
+textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
+
+; kate info: http://docs.kde.org/stable/en/kde-baseapps/kate
+kate.args = $FILES
+kate.argsln = --line $LINENUM $FILE
 
 ; last gasp
 notepad.priority = -1
