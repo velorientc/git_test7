@@ -9,7 +9,7 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil, phases
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n, editor
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
@@ -499,6 +499,9 @@ def findDiffTools():
 def findMergeTools():
     return hglib.mergetools(ui.ui())
 
+def findEditors():
+    return editor.findeditors(ui.ui())
+
 def genCheckBox(opts):
     opts['nohist'] = True
     return SettingsCheckBox(**opts)
@@ -547,11 +550,12 @@ INFO = (
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the selected merge tool. '
           'Failing that it uses the first applicable tool it finds.')),
-    _fi(_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
-        _('Specify the visual editor used to view files.  Format:<br>'
-          'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
-          'See <a href="%s">OpenAtLine</a>'
-          % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
+    _fi(_('Visual Editor'), 'tortoisehg.editor',
+        (genDeferredCombo, findEditors),
+        _('Specify visual editor, as described in the [editor-tools] '
+          'section of your Mercurial configuration files.  If left '
+          'unspecified, TortoiseHg will use the first applicable tool '
+          'it finds.')),
     _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '

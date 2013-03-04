@@ -82,3 +82,10 @@ def detecteditor(repo, files):
         toolpath = pathorconfig
         args = _toolstr(repo.ui, name, "args")
     return toolpath, args
+
+def findeditors(ui):
+    seen = set()
+    for key, value in ui.configitems('editor-tools'):
+        t = key.split('.')[0]
+        seen.add(t)
+    return [t for t in seen if _findtool(ui, t)]
