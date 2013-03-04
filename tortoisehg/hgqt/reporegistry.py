@@ -45,7 +45,7 @@ class RepoTreeView(QTreeView):
         self.setAcceptDrops(True)
         self.setAutoScroll(True)
         self.setDragDropMode(QAbstractItemView.DragDrop)
-        if PYQT_VERSION_STR.split('.') >= ['4', '7']:
+        if PYQT_VERSION >= 0x40700:
             self.setDefaultDropAction(Qt.MoveAction)
         self.setDropIndicatorShown(True)
         self.setEditTriggers(QAbstractItemView.DoubleClicked
