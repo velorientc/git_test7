@@ -20,7 +20,7 @@
 [ui]
 ; editor used to enter commit logs, etc.  Most any text editor
 ; will suffice.
-editor = notepad
+;editor = notepad
 
 ; In order to push/pull over ssh you must specify a ssh tool
 ssh = "TortoisePlink.exe" -ssh -2
