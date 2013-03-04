@@ -294,7 +294,8 @@ class ToolListBox(QListWidget):
         # Enable drag and drop to reorder the tools
         self.setDragEnabled(True)
         self.setDragDropMode(self.InternalMove)
-        self.setDefaultDropAction(Qt.MoveAction)
+        if PYQT_VERSION >= 0x40700:
+            self.setDefaultDropAction(Qt.MoveAction)
 
     def _guidef2toollist(self, guidef):
         toollist = []
