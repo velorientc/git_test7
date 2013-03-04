@@ -356,7 +356,7 @@ class UpdateDialog(QDialog):
                 dlg.setText(msg)
                 dlg.exec_()
                 clicked = buttonnames.get(dlg.clickedButton())
-                return clicked, opts
+                return clicked
 
             # If merge-by-default, we want to merge whenever possible,
             # without prompting user (similar to command-line behavior)
@@ -365,16 +365,16 @@ class UpdateDialog(QDialog):
             if clean:
                 cmdline.append('--check')
             elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                clicked, options = confirmupdate(clean)
+                clicked = confirmupdate(clean)
                 if clicked == 'discard':
                     cmdline.append('--clean')
-                elif 'shelve' in options and clicked == 'shelve':
+                elif clicked == 'shelve':
                     from tortoisehg.hgqt import shelve
                     dlg = shelve.ShelveDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
-                elif 'merge' in options and clicked == 'merge':
+                elif clicked == 'merge':
                     pass # no args
                 else:
                     return
