@@ -1217,7 +1217,7 @@ class SettingsForm(QWidget):
         tophbox.addWidget(reload)
 
         bothbox = QHBoxLayout()
-        layout.addLayout(bothbox, stretch=8)
+        layout.addLayout(bothbox, 8)
         pageList = QListWidget()
         pageList.setResizeMode(QListView.Fixed)
         stack = QStackedWidget()
@@ -1232,7 +1232,7 @@ class SettingsForm(QWidget):
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
-        layout.addWidget(desctext, stretch=2)
+        layout.addWidget(desctext, 2)
         self.desctext = desctext
 
         self.settings = QSettings()
