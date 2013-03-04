@@ -436,7 +436,7 @@ def genEditCombo(opts, defaults=[]):
 def genIntEditCombo(opts):
     'EditCombo, only allows integer values'
     opts['canedit'] = True
-    opts['validator'] = QIntValidator()
+    opts['validator'] = QIntValidator(None)  # missing parent=None on PyQt4.6
     return SettingsCombo(**opts)
 
 def genLineEditBox(opts):
