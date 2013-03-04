@@ -94,6 +94,7 @@ class FileLogDialog(_AbstractFileDialog):
         self._readSettings()
         self.menu = None
         self.dualmenu = None
+        self.revdetails = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -244,6 +245,10 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('&Revert to Revision...'))
             a.setIcon(qtlib.getmenuicon('hg-revert'))
             a.triggered.connect(self.onRevertFileToRevision)
+            menu.addSeparator()
+            a = menu.addAction(_('Show Revision &Details'))
+            a.setIcon(qtlib.getmenuicon('hg-log'))
+            a.triggered.connect(self.onShowRevisionDetails)
         else:
             menu = self.menu
         self.selection = selection
@@ -342,6 +347,16 @@ class FileLogDialog(_AbstractFileDialog):
             return
         else:
             qtlib.savefiles(self.repo, files, rev, parent=self)
+
+    def onShowRevisionDetails(self):
+        rev = self.selection[0]
+        if not self.revdetails:
+            from tortoisehg.hgqt.revdetails import RevDetailsDialog
+            self.revdetails = RevDetailsDialog(self.repo, rev=rev)
+        else:
+            self.revdetails.setRev(rev)
+        self.revdetails.show()
+        self.revdetails.raise_()
 
     @pyqtSlot(QString)
     def onLinkActivated(self, link):
