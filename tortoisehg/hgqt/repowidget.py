@@ -1786,6 +1786,12 @@ class RepoWidget(QWidget):
         run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
 
     def mergeWithRevision(self):
+        pctx = self.repo['.']
+        octx = self.repo[self.rev]
+        if pctx == octx:
+            QMessageBox.warning(self, _('Unable to merge'),
+                _('You cannot merge a revision with itself'))
+            return
         dlg = merge.MergeDialog(self.rev, self.repo, self)
         dlg.exec_()
         dlg.deleteLater()
