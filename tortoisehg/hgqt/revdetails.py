@@ -317,13 +317,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 class RevDetailsDialog(QDialog):
     'Standalone revision details tool, a wrapper for RevDetailsWidget'
 
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repo, rev='.', parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-log'))
         self.repoviewer = None
-        self.pats = pats
-        self.opts = opts
 
         layout = QVBoxLayout()
         layout.setMargin(0)
@@ -333,7 +331,6 @@ class RevDetailsDialog(QDialog):
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
 
-        rev = opts.get('rev', '.')
         revdetails = RevDetailsWidget(repo, parent, rev=rev)
         toplayout.addWidget(revdetails, 1)
 
@@ -406,4 +403,5 @@ def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return RevDetailsDialog(repo, pats, opts)
+    rev = opts.get('rev', '.')
+    return RevDetailsDialog(repo, rev=rev)
