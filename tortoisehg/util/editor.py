@@ -4,7 +4,11 @@ from mercurial import util, match
 def _toolstr(ui, tool, part, default=""):
     return ui.config("editor-tools", tool + "." + part, default)
 
+toolcache = {}
 def _findtool(ui, tool):
+    global toolcache
+    if tool in toolcache:
+        return toolcache[tool]
     for kn in ("regkey", "regkeyalt"):
         k = _toolstr(ui, tool, kn)
         if not k:
@@ -13,13 +17,18 @@ def _findtool(ui, tool):
         if p:
             p = util.findexe(p + _toolstr(ui, tool, "regappend"))
             if p:
+                toolcache[tool] = p
                 return p
     exe = _toolstr(ui, tool, "executable", tool)
     path = util.findexe(util.expandpath(exe))
     if path:
+        toolcache[tool] = path
         return path
     elif tool != exe:
-        return util.findexe(tool)
+        path = util.findexe(tool)
+        toolcache[tool] = path
+        return path
+    toolcache[tool] = None
     return None
 
 def _findeditor(repo, files):
