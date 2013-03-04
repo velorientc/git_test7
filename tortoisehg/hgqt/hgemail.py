@@ -314,7 +314,7 @@ class EmailDialog(QDialog):
             w.setUtf8(True)
             w.setReadOnly(True)
             w.setMarginWidth(1, 0)  # hide area for line numbers
-            self.lexer = lex = lexers.get_diff_lexer(self)
+            self.lexer = lex = lexers.difflexer(self)
             fh = qtlib.getfont('fontdiff')
             fh.changed.connect(self.forwardFont)
             lex.setFont(fh.font())

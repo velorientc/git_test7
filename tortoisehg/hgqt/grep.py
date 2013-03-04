@@ -243,6 +243,8 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         elif opts.get('rev'):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
+        if opts.get('search'):
+            self.searchActivated()
 
     def stopClicked(self):
         if self.thread and self.thread.isRunning():

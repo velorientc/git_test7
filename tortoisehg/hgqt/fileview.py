@@ -92,10 +92,12 @@ class HgFileView(QFrame):
         l.addLayout(hbox)
 
         self.blk = blockmatcher.BlockList(self)
+        self.blksearch = blockmatcher.BlockList(self)
         self.sci = AnnotateView(repo, self)
         self._forceviewindicator = None
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
+        hbox.addWidget(self.blksearch)
 
         self.sci.showMessage.connect(self.showMessage)
         self.sci.setAnnotationEnabled(False)
@@ -105,6 +107,8 @@ class HgFileView(QFrame):
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
+        self.blksearch.linkScrollBar(self.sci.verticalScrollBar())
+        self.blksearch.setVisible(False)
 
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
@@ -393,6 +397,7 @@ class HgFileView(QFrame):
     def clearMarkup(self):
         self.sci.clear()
         self.blk.clear()
+        self.blksearch.clear()
         # Setting the label to ' ' rather than clear() keeps the label
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
@@ -516,7 +521,7 @@ class HgFileView(QFrame):
 
         if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
-            lexer = lexers.get_diff_lexer(self)
+            lexer = lexers.difflexer(self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
@@ -549,7 +554,7 @@ class HgFileView(QFrame):
             self.newChunkList.emit(uf, None)
             return
         elif fd.contents:
-            lexer = lexers.get_lexer(filename, fd.contents, self)
+            lexer = lexers.getlexer(self.repo.ui, filename, fd.contents, self)
             self.sci.setLexer(lexer)
             if lexer is None:
                 self.sci.setFont(qtlib.getfont('fontlog').font())
@@ -577,6 +582,7 @@ class HgFileView(QFrame):
         if self._mode != DiffMode:
             self.blk.setVisible(True)
             self.blk.syncPageStep()
+        self.blksearch.syncPageStep()
 
         if fd.contents and fd.olddata:
             if self.timer.isActive():
@@ -633,6 +639,14 @@ class HgFileView(QFrame):
     def highlightText(self, match, icase=False):
         self._lastSearch = match, icase
         self.sci.highlightText(match, icase)
+        blk = self.blksearch
+        blk.clear()
+        blk.setUpdatesEnabled(False)
+        blk.clear()
+        for l in self.sci.highlightLines:
+            blk.addBlock('s', l, l + 1)
+        blk.setVisible(bool(match))
+        blk.setUpdatesEnabled(True)
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
@@ -770,6 +784,7 @@ class HgFileView(QFrame):
 
         selection = self.sci.selectedText()
         def sreq(**opts):
+            opts['search'] = True
             return lambda: self.grepRequested.emit(selection, opts)
         def sann():
             self.searchbar.search(selection)
@@ -789,7 +804,7 @@ class HgFileView(QFrame):
             if selection:
                 menu.addSeparator()
                 for name, func in [(_('&Search in Current File'), sann),
-                        (_('Search in &History'), sreq(all=True))]:
+                        (_('Search in All &History'), sreq(all=True))]:
                     def add(name, func):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
@@ -809,21 +824,24 @@ class HgFileView(QFrame):
         fctx, line = self.sci._links[line]
         if selection:
             def sreq(**opts):
+                opts['search'] = True
                 return lambda: self.grepRequested.emit(selection, opts)
             def sann():
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            for name, func in [(_('Search in &Original Revision'),
-                                sreq(rev=fctx.rev())),
-                               (_('Search in &Working Revision'),
+            annsearchmenu = QMenu(_('Search Selected Text'), self)
+            for name, func in [(_('In Current &File'), sann),
+                               (_('In &Current Revision'),
                                 sreq(rev='.')),
-                               (_('&Search in Current Annotation'), sann),
-                               (_('Search in &History'), sreq(all=True))]:
+                               (_('In &Original Revision'),
+                                sreq(rev=fctx.rev())),
+                               (_('In All &History'), sreq(all=True))]:
                 def add(name, func):
-                    action = menu.addAction(name)
+                    action = annsearchmenu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
+            menu.addMenu(annsearchmenu)
 
         def setSource(path, rev, line):
             self.revisionSelected.emit(rev)
@@ -838,10 +856,13 @@ class HgFileView(QFrame):
         def editorig():
             self.editSelected(*data)
         menu.addSeparator()
-        for name, func in [(_('A&nnotate Originating Revision'), annorig),
-                           (_('&View Originating Revision'), editorig)]:
+        origrev = fctx.rev()
+        anngotomenu = QMenu(_('Go to'), self)
+        annviewmenu = QMenu(_('View File at'), self)
+        for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
+                           (_('&Originating Revision'), editorig, annviewmenu)]:
             def add(name, func):
-                action = menu.addAction(name)
+                action = smenu.addAction(name)
                 action.triggered.connect(func)
             add(name, func)
         for pfctx in fctx.parents():
@@ -851,16 +872,18 @@ class HgFileView(QFrame):
                 setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
-            for name, func in [(_('Annotate &Parent Revision %d') % pdata[1],
-                                  annparent),
-                               (_('View Parent &Revision %d') % pdata[1],
-                                  editparent)]:
+            for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
+                                  annparent, anngotomenu),
+                               (_('&Parent Revision (%d)') % pdata[1],
+                                  editparent, annviewmenu)]:
                 def add(name, func):
-                    action = menu.addAction(name)
+                    action = smenu.addAction(name)
                     action.data = pdata
                     action.run = lambda: func(action.data)
                     action.triggered.connect(action.run)
                 add(name, func)
+        menu.addMenu(anngotomenu)
+        menu.addMenu(annviewmenu)
         menu.exec_(point)
 
     def resizeEvent(self, event):

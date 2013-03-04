@@ -20,10 +20,9 @@ from PyQt4.QtGui import *
 
 class ShelveDialog(QDialog):
 
-    finished = pyqtSignal(int)
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
@@ -194,10 +193,6 @@ class ShelveDialog(QDialog):
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
-
-    def done(self, ret):
-        self.repo.repositoryChanged.disconnect(self.refreshCombos)
-        super(ShelveDialog, self).done(ret)
 
     @pyqtSlot()
     def moveFileRight(self):
@@ -495,4 +490,4 @@ def run(ui, *pats, **opts):
         from tortoisehg.util import paths
         from tortoisehg.hgqt import thgrepo
         repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo, None)
+    return ShelveDialog(repo)

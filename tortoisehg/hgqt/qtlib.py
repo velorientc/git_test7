@@ -18,7 +18,7 @@ import weakref
 from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, editor
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
@@ -93,7 +93,7 @@ def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
 
-def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
+def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
         filename = files[0].strip()
         if not filename:
@@ -104,47 +104,9 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
         files = [os.path.basename(path)]
     else:
         cwd = repo.root
-    files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = repo.ui.config('tortoisehg', 'editor')
-    assert len(files) == 1 or lineno == None
-    if not editor:
-        editor = repo.ui.config('tortoisehg', 'editor')
-    if editor:
-        try:
-            regexp = re.compile('\[([^\]]*)\]')
-            expanded = []
-            pos = 0
-            for m in regexp.finditer(editor):
-                expanded.append(editor[pos:m.start()-1])
-                phrase = editor[m.start()+1:m.end()-1]
-                pos = m.end()+1
-                if '$LINENUM' in phrase:
-                    if lineno is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$LINENUM', str(lineno))
-                elif '$SEARCH' in phrase:
-                    if search is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$SEARCH', search)
-                if '$FILE' in phrase:
-                    phrase = phrase.replace('$FILE', files[0])
-                    files = []
-                expanded.append(phrase)
-            expanded.append(editor[pos:])
-            cmdline = ' '.join(expanded + files)
-        except ValueError, e:
-            # '[' or ']' not found
-            cmdline = ' '.join([editor] + files)
-        except TypeError, e:
-            # variable expansion failed
-            cmdline = ' '.join([editor] + files)
-    else:
-        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
-                 or os.environ.get('EDITOR', 'vi')
-        cmdline = ' '.join([editor] + files)
-    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+
+    toolpath, args = editor.detecteditor(repo, files)
+    if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
         res = QMessageBox.critical(parent,
                     _('No visual editor configured'),
                     _('Please configure a visual editor.'))
@@ -153,6 +115,41 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
         dlg.exec_()
         return
 
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    assert len(files) == 1 or lineno == None
+    cmdline = ' '.join([toolpath] + files)
+
+    try:
+        regexp = re.compile('\[([^\]]*)\]')
+        expanded = []
+        pos = 0
+        args = ' '.join([toolpath, args])
+        for m in regexp.finditer(args):
+            expanded.append(args[pos:m.start()-1])
+            phrase = args[m.start()+1:m.end()-1]
+            pos = m.end()+1
+            if '$LINENUM' in phrase:
+                if lineno is None:
+                    # throw away phrase
+                    continue
+                phrase = phrase.replace('$LINENUM', str(lineno))
+            elif '$SEARCH' in phrase:
+                if search is None:
+                    # throw away phrase
+                    continue
+                phrase = phrase.replace('$SEARCH', search)
+            if '$FILE' in phrase:
+                phrase = phrase.replace('$FILE', files[0])
+                files = []
+            expanded.append(phrase)
+        expanded.append(args[pos:])
+        cmdline = ' '.join(expanded + files)
+    except ValueError, e:
+        # '[' or ']' not found
+        pass
+    except TypeError, e:
+        # variable expansion failed
+        pass
     cmdline = util.quotecommand(cmdline)
     shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
@@ -163,7 +160,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
-    return False
 
 def savefiles(repo, files, rev, parent=None):
     for curfile in files:
@@ -737,10 +733,12 @@ class PMButton(QPushButton):
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 
-        def clicked():
-            icon = self.is_expanded() and self.plus or self.minus
-            self.setIcon(icon)
-        self.clicked.connect(clicked)
+        self.clicked.connect(self._toggle_icon)
+
+    @pyqtSlot()
+    def _toggle_icon(self):
+        icon = self.is_expanded() and self.plus or self.minus
+        self.setIcon(icon)
 
     def set_expanded(self, state=True):
         icon = state and self.minus or self.plus
@@ -916,13 +914,11 @@ def linkifyMessage(message, subrepo=None):
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
 
-    You shouldn't reuse InfoBar object after close(). It is automatically
-    deleted.
-
     Layout::
 
         |widgets ...                |right widgets ...|x|
     """
+    finished = pyqtSignal(int)  # mimic QDialog
     linkActivated = pyqtSignal(unicode)
 
     # type of InfoBar (the number denotes its priority)
@@ -941,8 +937,6 @@ class InfoBar(QFrame):
     def __init__(self, parent=None):
         super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
                                       frameShadow=QFrame.Plain)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
@@ -964,10 +958,22 @@ class InfoBar(QFrame):
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
 
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.finished.emit(0)
+        super(InfoBar, self).closeEvent(event)
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.close()
         super(InfoBar, self).keyPressEvent(event)
+
+    def heightForWidth(self, width):
+        # loosely based on the internal strategy of QBoxLayout
+        if self.layout().hasHeightForWidth():
+            return super(InfoBar, self).heightForWidth(width)
+        else:
+            return self.sizeHint().height()
 
 class StatusInfoBar(InfoBar):
     """Show status message"""
@@ -1028,17 +1034,21 @@ class ConfirmInfoBar(InfoBar):
 
     def closeEvent(self, event):
         if self.isVisible():
+            self.finished.emit(1)
             self.rejected.emit()
+            self.hide()  # avoid double emission of finished signal
         super(ConfirmInfoBar, self).closeEvent(event)
 
     @pyqtSlot()
     def _accept(self):
+        self.finished.emit(0)
         self.accepted.emit()
         self.hide()
         self.close()
 
     @pyqtSlot()
     def _reject(self):
+        self.finished.emit(1)
         self.rejected.emit()
         self.hide()
         self.close()
@@ -1253,7 +1263,7 @@ class PaletteSwitcher(object):
     enablefilterpalette() method.
     """
     def __init__(self, targetwidget):
-        self._targetwidget = targetwidget
+        self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
         bgcolor = self._defaultpalette.color(QPalette.Base)
         if bgcolor.black() <= 128:
@@ -1266,8 +1276,11 @@ class PaletteSwitcher(object):
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)
 
     def enablefilterpalette(self, enabled=False):
+        targetwidget = self._targetwref()
+        if not targetwidget:
+            return
         if enabled:
             pl = self._filterpalette
         else:
             pl = self._defaultpalette
-        self._targetwidget.setPalette(pl)
+        targetwidget.setPalette(pl)

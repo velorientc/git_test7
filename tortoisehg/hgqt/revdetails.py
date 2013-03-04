@@ -13,7 +13,8 @@ from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import filectxactions, qtlib
+from tortoisehg.hgqt import filectxactions, qtlib, cmdui
+from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -26,11 +27,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     revisionSelected = pyqtSignal(int)
     updateToRevision = pyqtSignal(int)
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent, rev=None):
         QWidget.__init__(self, parent)
 
         self.repo = repo
-        self.ctx = repo[None]
+        self.ctx = repo[rev]
         self.splitternames = []
 
         self.setupUi()
@@ -311,3 +312,98 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         expanded = s.value(wb + 'revpanel.expanded', False).toBool()
         self.revpanel.set_expanded(expanded)
         self.fileview.loadSettings(s, 'revpanel/fileview')
+
+
+class RevDetailsDialog(QDialog):
+    'Standalone revision details tool, a wrapper for RevDetailsWidget'
+
+    def __init__(self, repo, pats, opts, parent=None):
+        QDialog.__init__(self, parent)
+        self.setWindowFlags(Qt.Window)
+        self.setWindowIcon(qtlib.geticon('hg-log'))
+        self.repoviewer = None
+        self.pats = pats
+        self.opts = opts
+
+        layout = QVBoxLayout()
+        layout.setMargin(0)
+        self.setLayout(layout)
+
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(5, 5, 5, 0)
+        layout.addLayout(toplayout)
+
+        rev = opts.get('rev', '.')
+        revdetails = RevDetailsWidget(repo, parent, rev=rev)
+        toplayout.addWidget(revdetails, 1)
+
+        self.statusbar = cmdui.ThgStatusBar(self)
+        revdetails.showMessage.connect(self.statusbar.showMessage)
+        revdetails.linkActivated.connect(self.linkActivated)
+
+        layout.addWidget(self.statusbar)
+
+        s = QSettings()
+        self.restoreGeometry(s.value('revdetails/geom').toByteArray())
+        revdetails.loadSettings(s)
+        repo.repositoryChanged.connect(self.refresh)
+
+        self.revdetails = revdetails
+        self.setRev(rev)
+        qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
+
+    def setRev(self, rev):
+        self.revdetails.onRevisionSelected(rev)
+        self.refresh()
+
+    def linkActivated(self, link):
+        link = hglib.fromunicode(link)
+        link = link.split(':', 1)
+        if len(link) == 1:
+            linktype = 'cset:'
+            linktarget = link[0]
+        else:
+            linktype = link[0]
+            linktarget = link[1]
+
+        if linktype == 'cset':
+            self.setRev(linktarget)
+        elif linktype == 'repo':
+            try:
+                linkpath, rev = linktarget.split('?', 1)
+            except ValueError:
+                linkpath = linktarget
+                rev = None
+            if self.repoviewer is None:
+                # prevent recursive import
+                from workbench import Workbench
+                self.repoviewer = Workbench()
+            self.repoviewer.show()
+            self.repoviewer.activateWindow()
+            self.repoviewer.raise_()
+            self.repoviewer.showRepo(hglib.tounicode(linkpath))
+            self.repoviewer.goto(linkpath, rev)
+
+    @pyqtSlot()
+    def refresh(self):
+        rev = revnum = self.revdetails.ctx.rev()
+        if rev is None:
+            revstr = _('Working Directory')
+        else:
+            hash = self.revdetails.ctx.hex()[:12]
+            revstr = '@%s: %s' % (str(revnum), hash)
+        self.setWindowTitle(_('%s - Revision Details (%s)') % (self.revdetails.repo.displayname, revstr))
+        self.revdetails.reload()
+
+    def done(self, ret):
+        s = QSettings()
+        s.setValue('revdetails/geom', self.saveGeometry())
+        super(RevDetailsDialog, self).done(ret)
+
+def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    pats = hglib.canonpaths(pats)
+    os.chdir(repo.root)
+    return RevDetailsDialog(repo, pats, opts)
