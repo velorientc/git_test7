@@ -345,16 +345,18 @@ class UpdateDialog(QDialog):
 
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
                                   '', QMessageBox.Cancel, self)
-                buttons = {}
+                buttonnames = {}
                 for name in opts:
                     label, desc = data[name]
                     msg += '\n'
                     msg += desc
-                    buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                    btn = dlg.addButton(label, QMessageBox.ActionRole)
+                    buttonnames[btn] = name
                 dlg.setDefaultButton(QMessageBox.Cancel)
                 dlg.setText(msg)
                 dlg.exec_()
-                return buttons, dlg.clickedButton(), opts
+                clicked = buttonnames.get(dlg.clickedButton())
+                return clicked, opts
 
             # If merge-by-default, we want to merge whenever possible,
             # without prompting user (similar to command-line behavior)
@@ -363,16 +365,16 @@ class UpdateDialog(QDialog):
             if clean:
                 cmdline.append('--check')
             elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                buttons, clicked, options = confirmupdate(clean)
-                if buttons['discard'] == clicked:
+                clicked, options = confirmupdate(clean)
+                if clicked == 'discard':
                     cmdline.append('--clean')
-                elif 'shelve' in options and buttons['shelve'] == clicked:
+                elif 'shelve' in options and clicked == 'shelve':
                     from tortoisehg.hgqt import shelve
                     dlg = shelve.ShelveDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
-                elif 'merge' in options and buttons['merge'] == clicked:
+                elif 'merge' in options and clicked == 'merge':
                     pass # no args
                 else:
                     return
