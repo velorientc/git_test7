@@ -1,4 +1,3 @@
-import shlex
 import os
 from mercurial import util, match
 
@@ -75,13 +74,12 @@ def detecteditor(repo, files):
     'returns tuple of editor tool path and arguments'
     name, pathorconfig = _findeditor(repo, files)
     if name is None:
-        cmds = shlex.split(pathorconfig)
-        toolpath = cmds[0]
-        args = ' '.join(cmds[1:])
+        return (pathorconfig, None, None, None)
     else:
-        toolpath = pathorconfig
         args = _toolstr(repo.ui, name, "args")
-    return toolpath, args
+        argsln = _toolstr(repo.ui, name, "argsln")
+        argssearch = _toolstr(repo.ui, name, "argssearch")
+        return (pathorconfig, args, argsln, argssearch)
 
 def findeditors(ui):
     seen = set()

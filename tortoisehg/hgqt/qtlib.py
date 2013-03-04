@@ -95,6 +95,7 @@ def openfiles(repo, files, parent=None):
 
 def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
+        # if editing a single file, open in cwd context of that file
         filename = files[0].strip()
         if not filename:
             return
@@ -103,9 +104,10 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         cwd = os.path.dirname(path)
         files = [os.path.basename(path)]
     else:
+        # else edit in cwd context of repo root
         cwd = repo.root
 
-    toolpath, args = editor.detecteditor(repo, files)
+    toolpath, args, argsln, argssearch = editor.detecteditor(repo, files)
     if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
         res = QMessageBox.critical(parent,
                     _('No visual editor configured'),
@@ -117,44 +119,82 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
     files = [util.shellquote(util.localpath(f)) for f in files]
     assert len(files) == 1 or lineno == None
-    cmdline = ' '.join([toolpath] + files)
 
-    try:
-        regexp = re.compile('\[([^\]]*)\]')
-        expanded = []
-        pos = 0
-        args = ' '.join([toolpath, args])
-        for m in regexp.finditer(args):
-            expanded.append(args[pos:m.start()-1])
-            phrase = args[m.start()+1:m.end()-1]
-            pos = m.end()+1
-            if '$LINENUM' in phrase:
-                if lineno is None:
-                    # throw away phrase
-                    continue
-                phrase = phrase.replace('$LINENUM', str(lineno))
-            elif '$SEARCH' in phrase:
-                if search is None:
-                    # throw away phrase
-                    continue
-                phrase = phrase.replace('$SEARCH', search)
-            if '$FILE' in phrase:
-                phrase = phrase.replace('$FILE', files[0])
-                files = []
-            expanded.append(phrase)
-        expanded.append(args[pos:])
-        cmdline = ' '.join(expanded + files)
-    except ValueError, e:
-        # '[' or ']' not found
-        pass
-    except TypeError, e:
-        # variable expansion failed
-        pass
-    cmdline = util.quotecommand(cmdline)
+    cmdline = None
+    if search:
+        assert lineno is not None
+        if argssearch:
+            cmdline = ' '.join([toolpath, argssearch])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+            cmdline = cmdline.replace('$SEARCH', search)
+        elif argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    elif lineno:
+        if argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    else:
+        if args:
+            cmdline = ' '.join([toolpath, args])
+
+    if cmdline is None:
+        # editor was not specified by editor-tools configuration, fall
+        # back to older tortoisehg.editor OpenAtLine parsing
+        cmdline = ' '.join([toolpath] + files) # default
+        try:
+            regexp = re.compile('\[([^\]]*)\]')
+            expanded = []
+            pos = 0
+            for m in regexp.finditer(toolpath):
+                expanded.append(toolpath[pos:m.start()-1])
+                phrase = toolpath[m.start()+1:m.end()-1]
+                pos = m.end()+1
+                if '$LINENUM' in phrase:
+                    if lineno is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$LINENUM', str(lineno))
+                elif '$SEARCH' in phrase:
+                    if search is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$SEARCH', search)
+                if '$FILE' in phrase:
+                    phrase = phrase.replace('$FILE', files[0])
+                    files = []
+                expanded.append(phrase)
+            expanded.append(toolpath[pos:])
+            cmdline = ' '.join(expanded + files)
+        except ValueError, e:
+            # '[' or ']' not found
+            pass
+        except TypeError, e:
+            # variable expansion failed
+            pass
+
     shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
-        subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
-                         stderr=None, stdout=None, stdin=None, cwd=cwd)
+        if '$FILES' in cmdline:
+            cmdline = cmdline.replace('$FILES', ' '.join(files))
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
+        elif '$FILE' in cmdline:
+            for file in files:
+                cmd = cmdline.replace('$FILE', file)
+                cmd = util.quotecommand(cmd)
+                subprocess.Popen(cmd, shell=shell, creationflags=openflags,
+                                 stderr=None, stdout=None, stdin=None, cwd=cwd)
+        else:
+            # assume filenames were expanded already
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
