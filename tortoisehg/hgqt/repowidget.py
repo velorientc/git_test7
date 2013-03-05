@@ -1493,7 +1493,7 @@ class RepoWidget(QWidget):
                 (None, None, None),
                 (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
-                (_('Bundle DAG Range...'), bundleDagRange, 'menurelocate'),
+                (_('Bundle DAG Range...'), bundleDagRange, 'hg-bundle'),
                 (None, None, None),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
