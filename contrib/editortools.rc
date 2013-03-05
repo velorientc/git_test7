@@ -91,6 +91,13 @@ chrimsonedit.executable = cedit
 chrimsonedit.args = $FILES
 chrimsonedit.argsln = /L:$LINENUM $FILE
 
+; PyScripter (Python IDE)
+; Homepage: http://code.google.com/p/pyscripter
+pyscripter.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
+pyscripter.regkeyalt = SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
+pyscripter.regname = DisplayIcon
+pyscripter.args = $FILES
+
 ; Sigasi (Eclipse based VHDL / Verilog editor)
 ; Home page: http://www.sigasi.com
 sigasi.executable = ${SystemDrive}/Sigasi/sigasi
