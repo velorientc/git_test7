@@ -466,6 +466,11 @@ def genDeferredCombo(opts, func):
     opts['nohist'] = True
     return SettingsCombo(**opts)
 
+def genEditableDeferredCombo(opts, func):
+    'Values retrieved from a function at popup time'
+    opts['canedit'] = True
+    return genDeferredCombo(opts, func)
+
 def genFontEdit(opts):
     return FontEntry(**opts)
 
