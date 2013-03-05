@@ -74,8 +74,8 @@ ultraedit.argssearch = $FILE --lx $LINENUM -f$SEARCH
 
 ; textadept command line info: http://foicica.com/textadept/13_Help.html
 ; On OSX the textadept executable is called 'ta'.
-; TortoiseHg will try to find ta[.exe], then textadapt[.exe]
-textadapt.executable = ta
+; TortoiseHg will try to find ta[.exe], then textadept[.exe]
+textadept.executable = ta
 textadept.args = -f -n $FILES
 textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
 textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
