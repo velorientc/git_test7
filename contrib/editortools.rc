@@ -91,6 +91,12 @@ chrimsonedit.executable = cedit
 chrimsonedit.args = $FILES
 chrimsonedit.argsln = /L:$LINENUM $FILE
 
+; Sigasi (Eclipse based VHDL / Verilog editor)
+; Home page: http://www.sigasi.com
+sigasi.executable = ${SystemDrive}/Sigasi/sigasi
+sigasi.args = $FILES
+sigasi.argsln = $FILE +$LINENUM
+
 ; last gasp
 notepad.priority = -1
 notepad.args = $FILES
