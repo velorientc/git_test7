@@ -84,6 +84,10 @@ textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_
 kate.args = $FILES
 kate.argsln = --line $LINENUM $FILE
 
+chrimsonedit.executable = cedit
+chrimsonedit.args = $FILES
+chrimsonedit.argsln = /L:$LINENUM $FILE
+
 ; last gasp
 notepad.priority = -1
 notepad.args = $FILES
