@@ -39,10 +39,10 @@ scite.argssearch = "-open:$FILE" -goto:$LINENUM "-find:$SEARCH"
 
 ; TODO: not sure how stable or portable this GUID is
 ; shell extension registry key has the executable path
-notepadpp.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
-notepadpp.regname = Path
-notepadpp.args = $FILES -nosession
-notepadpp.argsln = $FILE -n$LINENUM -nosession
+notepad++.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
+notepad++.regname = Path
+notepad++.args = $FILES -nosession
+notepad++.argsln = $FILE -n$LINENUM -nosession
 
 textpad.executable = TextPad
 textpad.args = $FILES
