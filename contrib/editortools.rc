@@ -80,6 +80,9 @@ textadept.args = -f -n $FILES
 textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
 textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
 
+VisualStudio.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\devenv.exe
+VisualStudio.args = /EDIT $FILES
+
 ; kate info: http://docs.kde.org/stable/en/kde-baseapps/kate
 kate.args = $FILES
 kate.argsln = --line $LINENUM $FILE
