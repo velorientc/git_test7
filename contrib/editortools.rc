@@ -1,0 +1,118 @@
+# Editor tool descriptions
+#
+# tool.regkey, tool.regname specify a registry key with the editor path
+# tool.executable specifies the editor executable name or full path
+# Failing those two, TortoiseHg will search for the tool name in $PATH,
+# with appropriate file extensions (*.exe) on Windows.
+#
+# tool.args       - $FILE is expanded to a single filename (editor per file)
+#                   $FILES is expanded to all filenames (single editor instance)
+# tool.argsln     - $LINENUM is expanded to an integer line number
+#                   $FILE is expanded to a single filename
+# tool.argssearch - $LINENUM is expanded to an integer line number
+#                   $FILE is expanded to a single filename
+#                   $SEARCH is expanded to a search string to be highlighted
+#
+# If the editor does not support highlighting strings from the command
+# line, do not configure a tools.argssearch command line for it.  TortoiseHg
+# will fallback to tool.argsln (if supported) or tool.args. tool.args
+# must be configured.
+
+[editor-tools]
+
+gvim.regkey = SOFTWARE\Vim\Gvim
+gvim.regname = path
+gvim.args = -f $FILES
+gvim.argsln = -f +$LINENUM $FILE
+gvim.argssearch = -f -c":set hls" -c"/$SEARCH/" +$LINENUM $FILE
+
+emacs.args = $FILES
+emacs.argsln = +$LINENUM $FILE
+emacs.argssearch = +$LINENUM $FILE --eval '(highlight-regexp "$SEARCH")'
+
+gedit.args = $FILES
+gedit.argsln = +$LINENUM $FILE
+
+scite.args = "-open:$FILE"
+scite.argsln = "-open:$FILE" -goto:$LINENUM
+scite.argssearch = "-open:$FILE" -goto:$LINENUM "-find:$SEARCH"
+
+; TODO: not sure how stable or portable this GUID is
+; shell extension registry key has the executable path
+notepad++.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
+notepad++.regname = Path
+notepad++.args = $FILES -nosession
+notepad++.argsln = $FILE -n$LINENUM -nosession
+
+textpad.executable = TextPad
+textpad.args = $FILES
+textpad.argsln = $FILE($LINENUM)
+
+sublime.executable = sublime_text
+sublime.args = $FILES
+sublime.argsln = $FILE:$LINENUM
+
+textwrangler.executable = edit
+textwrangler.args = --wait $FILES
+textwrangler.argsln = +$LINENUM --wait $FILE
+
+textmate.executable = mate
+textmate.args = --wait $FILES
+textmate.argsln = --wait --line $LINENUM $FILE
+
+; PSPad homepage: http://gogogadgetscott.info/pspad
+pspad.args = $FILES
+pspad.argsln = -$LINENUM $FILE
+
+eclipse.args = --launcher.openFile $FILE
+
+; UltraEdit home page: http://www.ultraedit.com
+ultraedit.executable = uedit32
+ultraedit.args = $FILES
+ultraedit.argsln = $FILE --lx $LINENUM
+ultraedit.argssearch = $FILE --lx $LINENUM -f$SEARCH
+
+; textadept command line info: http://foicica.com/textadept/13_Help.html
+; On OSX the textadept executable is called 'ta'.
+; TortoiseHg will try to find ta[.exe], then textadept[.exe]
+textadept.executable = ta
+textadept.args = -f -n $FILES
+textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
+textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
+
+VisualStudio.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\devenv.exe
+VisualStudio.args = /EDIT $FILES
+
+; kate info: http://docs.kde.org/stable/en/kde-baseapps/kate
+kate.args = $FILES
+kate.argsln = --line $LINENUM $FILE
+
+chrimsonedit.executable = cedit
+chrimsonedit.args = $FILES
+chrimsonedit.argsln = /L:$LINENUM $FILE
+
+; PyScripter (Python IDE)
+; Homepage: http://code.google.com/p/pyscripter
+pyscripter.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
+pyscripter.regkeyalt = SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
+pyscripter.regname = DisplayIcon
+pyscripter.args = $FILES
+
+; Sigasi (Eclipse based VHDL / Verilog editor)
+; Home page: http://www.sigasi.com
+sigasi.executable = ${SystemDrive}/Sigasi/sigasi
+sigasi.args = $FILES
+sigasi.argsln = $FILE +$LINENUM
+
+; last gasp
+notepad.priority = -1
+notepad.args = $FILES
+
+
+[editor-patterns]
+# Use Mercurial glob patterns to specify editors to use for a given
+# filename pattern.  If the specified tool is not found, TortoiseHg will
+# fallback to basic editor detection.
+
+; Example: prefer gvim to edit Python files
+;**.py = gvim

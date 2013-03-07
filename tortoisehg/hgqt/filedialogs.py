@@ -44,8 +44,7 @@ class _AbstractFileDialog(QMainWindow):
         self.setRepoViewer(repoviewer)
         self._show_rev = None
 
-        if isinstance(filename, (unicode, QString)):
-            filename = hglib.fromunicode(filename)
+        assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
         self.createActions()
@@ -95,6 +94,7 @@ class FileLogDialog(_AbstractFileDialog):
         self._readSettings()
         self.menu = None
         self.dualmenu = None
+        self.revdetails = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -245,6 +245,10 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('&Revert to Revision...'))
             a.setIcon(qtlib.getmenuicon('hg-revert'))
             a.triggered.connect(self.onRevertFileToRevision)
+            menu.addSeparator()
+            a = menu.addAction(_('Show Revision &Details'))
+            a.setIcon(qtlib.getmenuicon('hg-log'))
+            a.triggered.connect(self.onShowRevisionDetails)
         else:
             menu = self.menu
         self.selection = selection
@@ -344,6 +348,16 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             qtlib.savefiles(self.repo, files, rev, parent=self)
 
+    def onShowRevisionDetails(self):
+        rev = self.selection[0]
+        if not self.revdetails:
+            from tortoisehg.hgqt.revdetails import RevDetailsDialog
+            self.revdetails = RevDetailsDialog(self.repo, rev=rev)
+        else:
+            self.revdetails.setRev(rev)
+        self.revdetails.show()
+        self.revdetails.raise_()
+
     @pyqtSlot(QString)
     def onLinkActivated(self, link):
         link = unicode(link)
@@ -366,7 +380,8 @@ class FileLogDialog(_AbstractFileDialog):
     # It does not make sense to select more than two revisions at a time.
     # Rather than enforcing a max selection size we simply let the user
     # know when it has selected too many revisions by using the status bar
-    def _checkValidSelection(self, selected, deselected):
+    @pyqtSlot()
+    def _checkValidSelection(self):
         selection = self.repoview.selectedRevisions()
         if len(selection) > 2:
             msg = _('Too many rows selected for menu')
@@ -470,7 +485,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
         try:
             contents = open(self.repo.wjoin(self.filename), "rb").read(1024)
-            lexer = lexers.get_lexer(self.filename, contents, self)
+            lexer = lexers.getlexer(self.repo.ui, self.filename, contents, self)
         except Exception:
             lexer = None
 

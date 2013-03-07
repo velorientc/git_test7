@@ -29,16 +29,9 @@ class MessageEntry(qscilib.Scintilla):
         self.setAutoIndent(True)
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         self.setAutoCompletionFillupsEnabled(True)
-        self.setLexer(QsciLexerMakefile(self))
-        font = qtlib.getfont('fontcomment').font()
-        self.fontHeight = QFontMetrics(font).height()
-        self.lexer().setFont(font)
-        self.lexer().setColor(QColor(Qt.red), QsciLexerMakefile.Error)
         self.setMatchedBraceBackgroundColor(Qt.yellow)
         self.setIndentationsUseTabs(False)
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        #self.setIndentationGuidesBackgroundColor(QColor("#e6e6de"))
-        #self.setFolding(QsciScintilla.BoxedFoldStyle)
         # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -48,15 +41,28 @@ class MessageEntry(qscilib.Scintilla):
         self.getChecked = getCheckedFunc
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
+        self.applylexer()
 
     def setText(self, text):
         result = super(MessageEntry, self).setText(text)
         self.setDefaultEolMode()
         return result
 
+    def applylexer(self):
+        font = qtlib.getfont('fontcomment').font()
+        self.fontHeight = QFontMetrics(font).height()
+        if QSettings().value('msgentry/lexer', True).toBool():
+            self.setLexer(QsciLexerMakefile(self))
+            self.lexer().setColor(QColor(Qt.red), QsciLexerMakefile.Error)
+            self.lexer().setFont(font)
+        else:
+            self.setLexer(None)
+            self.setFont(font)
+
     def menuRequested(self, point):
         line = self.lineAt(point)
         point = self.viewport().mapToGlobal(point)
+        lexerenabled = self.lexer() is not None
 
         def apply():
             line = 0
@@ -71,8 +77,16 @@ class MessageEntry(qscilib.Scintilla):
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
             dlg.exec_()
+        def togglelexer():
+            QSettings().setValue('msgentry/lexer', not lexerenabled)
+            self.applylexer()
 
         menu = self.createStandardContextMenu()
+        menu.addSeparator()
+        a = menu.addAction(_('Syntax Highlighting'))
+        a.setCheckable(True)
+        a.setChecked(lexerenabled)
+        a.triggered.connect(togglelexer)
         menu.addSeparator()
         if self.getChecked:
             action = menu.addAction(_('Paste &Filenames'))
