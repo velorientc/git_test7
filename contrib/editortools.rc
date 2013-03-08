@@ -20,79 +20,124 @@
 
 [editor-tools]
 
+;
+; user choices. If installed the user probably wants to use them
+;
+
+; Notepad++ shell extension registry key has the executable path
+; TODO: not sure how stable or portable this GUID is
+notepad++.priority = -1
+notepad++.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
+notepad++.regname = Path
+notepad++.args = $FILES -nosession
+notepad++.argsln = $FILE -n$LINENUM -nosession
+
+chrimsonedit.priority = -1
+chrimsonedit.executable = cedit
+chrimsonedit.args = $FILES
+chrimsonedit.argsln = /L:$LINENUM $FILE
+
+; UltraEdit home page: http://www.ultraedit.com
+ultraedit.priority = -1
+ultraedit.executable = uedit32
+ultraedit.args = $FILES
+ultraedit.argsln = $FILE --lx $LINENUM
+ultraedit.argssearch = $FILE --lx $LINENUM -f$SEARCH
+
+textpad.priority = -1
+textpad.executable = TextPad
+textpad.args = $FILES
+textpad.argsln = $FILE($LINENUM)
+
+sublime.priority = -1
+sublime.executable = sublime_text
+sublime.args = $FILES
+sublime.argsln = $FILE:$LINENUM
+
+textwrangler.priority = -1
+textwrangler.executable = edit
+textwrangler.args = --wait $FILES
+textwrangler.argsln = +$LINENUM --wait $FILE
+
+textmate.priority = -1
+textmate.executable = mate
+textmate.args = --wait $FILES
+textmate.argsln = --wait --line $LINENUM $FILE
+
+; textadept command line info: http://foicica.com/textadept/13_Help.html
+; On OSX the textadept executable is called 'ta'.
+; TortoiseHg will try to find ta[.exe], then textadept[.exe]
+textadept.priority = -1
+textadept.executable = ta
+textadept.args = -f -n $FILES
+textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
+textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
+
+; PSPad homepage: http://gogogadgetscott.info/pspad
+pspad.priority = -1
+pspad.args = $FILES
+pspad.argsln = -$LINENUM $FILE
+
+scite.priority = -1
+scite.args = "-open:$FILE"
+scite.argsln = "-open:$FILE" -goto:$LINENUM
+scite.argssearch = "-open:$FILE" -goto:$LINENUM "-find:$SEARCH"
+
+
+;
+; system editors - KDE/Gnome defaults
+;
+
+; kate info: http://docs.kde.org/stable/en/kde-baseapps/kate
+kate.priority = -3
+kate.args = $FILES
+kate.argsln = --line $LINENUM $FILE
+
+gedit.priority = -3
+gedit.args = $FILES
+gedit.argsln = +$LINENUM $FILE
+
+;
+; baseline editors - often installed on Unix but not preferred
+;
+
+gvim.priority = -5
 gvim.regkey = SOFTWARE\Vim\Gvim
 gvim.regname = path
 gvim.args = -f $FILES
 gvim.argsln = -f +$LINENUM $FILE
 gvim.argssearch = -f -c":set hls" -c"/$SEARCH/" +$LINENUM $FILE
 
+emacs.priority = -5
 emacs.args = $FILES
 emacs.argsln = +$LINENUM $FILE
 emacs.argssearch = +$LINENUM $FILE --eval '(highlight-regexp "$SEARCH")'
 
-gedit.args = $FILES
-gedit.argsln = +$LINENUM $FILE
+;
+; developer environments - may be installed but not preferred
+;
 
-scite.args = "-open:$FILE"
-scite.argsln = "-open:$FILE" -goto:$LINENUM
-scite.argssearch = "-open:$FILE" -goto:$LINENUM "-find:$SEARCH"
-
-; TODO: not sure how stable or portable this GUID is
-; shell extension registry key has the executable path
-notepad++.regkey = Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings
-notepad++.regname = Path
-notepad++.args = $FILES -nosession
-notepad++.argsln = $FILE -n$LINENUM -nosession
-
-textpad.executable = TextPad
-textpad.args = $FILES
-textpad.argsln = $FILE($LINENUM)
-
-sublime.executable = sublime_text
-sublime.args = $FILES
-sublime.argsln = $FILE:$LINENUM
-
-textwrangler.executable = edit
-textwrangler.args = --wait $FILES
-textwrangler.argsln = +$LINENUM --wait $FILE
-
-textmate.executable = mate
-textmate.args = --wait $FILES
-textmate.argsln = --wait --line $LINENUM $FILE
-
-; PSPad homepage: http://gogogadgetscott.info/pspad
-pspad.args = $FILES
-pspad.argsln = -$LINENUM $FILE
-
+eclipse.priority = -7
 eclipse.args = --launcher.openFile $FILE
 
-; UltraEdit home page: http://www.ultraedit.com
-ultraedit.executable = uedit32
-ultraedit.args = $FILES
-ultraedit.argsln = $FILE --lx $LINENUM
-ultraedit.argssearch = $FILE --lx $LINENUM -f$SEARCH
-
-; textadept command line info: http://foicica.com/textadept/13_Help.html
-; On OSX the textadept executable is called 'ta'.
-; TortoiseHg will try to find ta[.exe], then textadept[.exe]
-textadept.executable = ta
-textadept.args = -f -n $FILES
-textadept.argsln = -f -n $FILE -e "goto_line($LINENUM)"
-textadept.argssearch = -f -n $FILE -e "goto_line($LINENUM)" -e "find.find_entry_text=\"$SEARCH\"]];find.find_next()"
-
+VisualStudio.priority = -7
 VisualStudio.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\devenv.exe
 VisualStudio.args = /EDIT $FILES
 
-; kate info: http://docs.kde.org/stable/en/kde-baseapps/kate
-kate.args = $FILES
-kate.argsln = --line $LINENUM $FILE
+;
+; last gasp - better than nothing (sometimes)
+;
 
-chrimsonedit.executable = cedit
-chrimsonedit.args = $FILES
-chrimsonedit.argsln = /L:$LINENUM $FILE
+notepad.priority = -9
+notepad.args = $FILES
+
+;
+; special purpose editors - probably should not be preferred for most projects
+;
 
 ; PyScripter (Python IDE)
 ; Homepage: http://code.google.com/p/pyscripter
+pyscripter.priority = -10
 pyscripter.regkey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
 pyscripter.regkeyalt = SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\PyScripter_is1
 pyscripter.regname = DisplayIcon
@@ -100,13 +145,10 @@ pyscripter.args = $FILES
 
 ; Sigasi (Eclipse based VHDL / Verilog editor)
 ; Home page: http://www.sigasi.com
+sigasi.priority = -10
 sigasi.executable = ${SystemDrive}/Sigasi/sigasi
 sigasi.args = $FILES
 sigasi.argsln = $FILE +$LINENUM
-
-; last gasp
-notepad.priority = -1
-notepad.args = $FILES
 
 
 [editor-patterns]
@@ -114,5 +156,5 @@ notepad.args = $FILES
 # filename pattern.  If the specified tool is not found, TortoiseHg will
 # fallback to basic editor detection.
 
-; Example: prefer gvim to edit Python files
-;**.py = gvim
+**.py = pyscripter
+**.v = sigasi
