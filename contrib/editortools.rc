@@ -54,8 +54,9 @@ sublime.executable = sublime_text
 sublime.args = $FILES
 sublime.argsln = $FILE:$LINENUM
 
+; TextWrangler homepage: http://www.barebones.com/products/textwrangler
 textwrangler.priority = -1
-textwrangler.executable = edit
+textwrangler.executable = /usr/local/bin/edit
 textwrangler.args = --wait $FILES
 textwrangler.argsln = +$LINENUM --wait $FILE
 
