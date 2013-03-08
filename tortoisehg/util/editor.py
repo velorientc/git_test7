@@ -47,9 +47,9 @@ def _findeditor(repo, files):
     # first check for tool specified by file patterns.  The first file pattern
     # which matches one of the files being edited selects the editor
     for pat, tool in ui.configitems("editor-patterns"):
-        mf = match.match(repo.root, '', files)
+        mf = match.match(repo.root, '', [pat])
         toolpath = _findtool(ui, tool)
-        if mf(path) and toolpath:
+        if mf(files[0]) and toolpath:
             return (tool, util.shellquote(toolpath))
 
     # then editor-tools
