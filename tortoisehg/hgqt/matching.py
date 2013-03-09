@@ -208,7 +208,7 @@ class MatchDialog(QDialog):
         validrevset = False
         try:
             func = revset.match(self.repo.ui, new_rev)
-            rset = [c for c in func(self.repo, range(len(self.repo)))]
+            rset = [c for c in func(self.repo, list(self.repo))]
             if len(rset) > 1:
                 self.rev_to_match_info_lbl.setText(_('Revisions to Match:'))
                 csinfo_set_text(_('Match any of <b><i>%d</i></b> revisions') \
