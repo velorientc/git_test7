@@ -63,8 +63,8 @@ def dispatch(args):
         errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                       '<a href="#edit:%(arg1)s">edit</a> your config')
         main = QApplication(sys.argv)
-        dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts,
-                              parent=None)
+        dlg = ExceptionMsgBox(hglib.tounicode(str(e)),
+                              hglib.tounicode(errstring), opts, parent=None)
         dlg.exec_()
     except SystemExit:
         pass
