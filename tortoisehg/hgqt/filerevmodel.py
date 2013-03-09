@@ -36,7 +36,7 @@ class FileRevModel(HgRepoListModel):
     _allcolumns = tuple(h[0] for h in FILE_COLUMNHEADERS)
     _allcolnames = dict(FILE_COLUMNHEADERS)
 
-    _columns = ('Rev', 'Branch', 'Description', 'Author', 'Age', 'Filename')
+    _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Filename')
     _stretchs = {'Description': 1, }
     _getcolumns = "getFilelogColumns"
 

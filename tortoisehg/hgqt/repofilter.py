@@ -62,7 +62,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo = combo = QComboBox()
         combo.setEditable(True)
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        combo.setMinimumContentsLength(10)
         qtlib.allowCaseChangingInput(combo)
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
@@ -241,8 +241,7 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setMenu(self._branchMenu)
 
         self._branchCombo = QComboBox()
-        self._branchCombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self._branchCombo.setMinimumContentsLength(10)
         self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False
