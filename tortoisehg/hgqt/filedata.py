@@ -457,6 +457,10 @@ class FileData(object):
             if isbfile:
                 olddata += '\0'
                 newdata += '\0'
-            self.diff = 'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
-            self.diff += mdiff.unidiff(olddata, olddate, newdata, newdate,
-                                       oldname, wfile, opts=diffopts)
+            difftext = mdiff.unidiff(olddata, olddate, newdata, newdate,
+                                     oldname, wfile, opts=diffopts)
+            if difftext:
+                self.diff = ('diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
+                             + difftext)
+            else:
+                self.diff = ''
