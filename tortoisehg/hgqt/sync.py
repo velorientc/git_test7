@@ -679,6 +679,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
             self.setUrl(hglib.fromunicode(dlg.urlentry.text()))
+            self.reload()
 
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
@@ -1186,6 +1187,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
+        self.reload()
 
 
 class PostPullDialog(QDialog):
