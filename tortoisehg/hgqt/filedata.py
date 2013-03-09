@@ -79,7 +79,10 @@ class FileData(object):
                 if renamed:
                     oldname, node = renamed
                     fr = hglib.tounicode(oldname)
-                    self.flabel += _(' <i>(renamed from %s)</i>') % fr
+                    if oldname in ctx:
+                        self.flabel += _(' <i>(copied from %s)</i>') % fr
+                    else:
+                        self.flabel += _(' <i>(renamed from %s)</i>') % fr
                 else:
                     self.flabel += _(' <i>(was added)</i>')
 
@@ -406,7 +409,10 @@ class FileData(object):
 
             oldname, node = renamed
             fr = hglib.tounicode(oldname)
-            self.flabel += _(' <i>(renamed from %s)</i>') % fr
+            if oldname in ctx:
+                self.flabel += _(' <i>(copied from %s)</i>') % fr
+            else:
+                self.flabel += _(' <i>(renamed from %s)</i>') % fr
             olddata = repo.filectx(oldname, fileid=node).data()
         elif status == 'M':
             if wfile not in ctx2:
