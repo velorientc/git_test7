@@ -163,3 +163,4 @@ sigasi.argsln = $FILE +$LINENUM
 
 **.py = pyscripter
 **.v = sigasi
+**.vhd = sigasi
