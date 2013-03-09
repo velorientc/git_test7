@@ -265,6 +265,7 @@ class SummaryPage(BasePage):
         self.groups.set_visible(True, 'prog')
         self.th.start()
 
+    @pyqtSlot()
     def threadFinished(self):
         self.groups.set_visible(False, 'prog')
         if self.th.canceled:
