@@ -14,8 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport, scmutil, httpconnection
-from mercurial import merge as mergemod
+from mercurial import hg, ui, url, util, scmutil, httpconnection
 
 from tortoisehg.util import hglib, wconfig, paths
 from tortoisehg.hgqt.i18n import _
