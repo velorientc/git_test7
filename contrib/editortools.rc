@@ -49,10 +49,10 @@ textpad.executable = TextPad
 textpad.args = $FILES
 textpad.argsln = $FILE($LINENUM)
 
-sublime.priority = -1
-sublime.executable = sublime_text
-sublime.args = $FILES
-sublime.argsln = $FILE:$LINENUM
+sublime_text.priority = -1
+sublime_text.executable = subl
+sublime_text.args = $FILES
+sublime_text.argsln = $FILE:$LINENUM
 
 bbedit.priority = -1
 bbedit.args = --wait $FILES
