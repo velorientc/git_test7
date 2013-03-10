@@ -323,7 +323,8 @@ class RepoWidget(QWidget):
         self._activeInfoBar = w
         self._updateInfoBarGeometry()
         w.show()
-        w.setFocus()  # to handle key press by InfoBar
+        if w.infobartype > qtlib.InfoBar.INFO:
+            w.setFocus()  # to handle key press by InfoBar
         return w
 
     @pyqtSlot()
@@ -663,6 +664,12 @@ class RepoWidget(QWidget):
         self.currentMessage = msg
         if self.isVisible():
             self.showMessageSignal.emit(msg)
+
+    def keyPressEvent(self, event):
+        if self._activeInfoBar and event.key() == Qt.Key_Escape:
+            self.clearInfoBar(qtlib.InfoBar.INFO)
+        else:
+            QWidget.keyPressEvent(self, event)
 
     def showEvent(self, event):
         QWidget.showEvent(self, event)
