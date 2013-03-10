@@ -10,6 +10,7 @@ import os
 from mercurial import ui, util, error, extensions, scmutil, phases
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n, editor
+from tortoisehg.util import terminal
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
@@ -507,6 +508,9 @@ def findMergeTools():
 def findEditors():
     return editor.findeditors(ui.ui())
 
+def findTerminals():
+    return terminal.findterminals(ui.ui())
+
 def genCheckBox(opts):
     opts['nohist'] = True
     return SettingsCheckBox(**opts)
@@ -561,7 +565,8 @@ INFO = (
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the first applicable tool '
           'it finds.')),
-    _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
+    _fi(_('Shell'), 'tortoisehg.shell',
+        (genEditableDeferredCombo, findTerminals),
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '
           'name of the repository will be substituted in place of '

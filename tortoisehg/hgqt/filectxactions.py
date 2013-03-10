@@ -333,4 +333,4 @@ class FilectxActions(QObject):
     def terminal(self):
         root = self.repo.wjoin(self._currentfile)
         if os.path.isdir(root):
-            qtlib.openshell(root, self._currentfile)
+            qtlib.openshell(root, self._currentfile, self.repo.ui)

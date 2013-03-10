@@ -1,0 +1,60 @@
+# Terminal tool descriptions
+#
+# tool.regkey, tool.regname specify a registry key with the editor path
+# tool.executable specifies the editor executable name or full path
+# Failing those two, TortoiseHg will search for the tool name in $PATH,
+# with appropriate file extensions (*.exe) on Windows.
+#
+# You can also set tool.args to set the arguments that will be passed
+# to the terminal.
+#
+# You can use environment variables, which will be expanded before execution.
+# In addition, the string "%(reponame)s" (without quotes) will be replaced by
+# the name or the path of the repository name or path.
+
+[terminal-tools]
+
+# Windows specific terminals
+windows_command_prompt.priority = -10
+windows_command_prompt.executable = cmd
+windows_command_prompt.args = /K title %(reponame)s
+
+powershell.priority = -11
+powershell.executable_win = powershell
+powershell.args = -NoExit -Command "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell - %(reponame)s'"
+
+bash_prompt.priority = -1
+bash_prompt.executable_win = c:\cygwin\bin\bash
+
+# Linux specific terminals
+gnome-terminal.priority = -1
+gnome-terminal.executable_linux = gnome-terminal
+
+xterm.priority = -10
+xterm.executable_unix = xterm
+xterm.args = -T "%(reponame)s"'
+
+# Generic terminals
+qtconsole27.priority = -20
+qtconsole27.executable-win = c:\Python27\Scripts\ipython.bat
+qtconsole27.executable = ipython
+qtconsole27.args = qtconsole
+
+ipython27.priority = -20
+ipython27.executable-win = c:\Python27\Scripts\ipython.bat
+ipython27.executable = ipython
+
+qtconsole26.priority = -21
+qtconsole26.executable-win = c:\Python26\Scripts\ipython.bat
+qtconsole26.executable = ipython
+qtconsole26.args = qtconsole
+
+ipython26.priority = -21
+ipython26.executable-win = c:\Python26\Scripts\ipython.bat
+ipython26.executable = ipython
+
+ipython25.priority = -22
+ipython25.executable-win = c:\Python25\Scripts\ipython.bat
+ipython25.executable = ipython
+
+tchlsh.priority = -30

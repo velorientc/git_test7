@@ -18,7 +18,7 @@ import weakref
 from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
-from tortoisehg.util import hglib, paths, editor
+from tortoisehg.util import hglib, paths, editor, terminal
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
@@ -225,17 +225,19 @@ def savefiles(repo, files, rev, parent=None):
         finally:
             os.chdir(cwd)
 
-_user_shell = None
-def openshell(root, reponame):
+def openshell(root, reponame, ui=None):
     if not os.path.exists(root):
         WarningMsgBox(
             _('Failed to open path in terminal'),
             _('"%s" is not a valid directory') % hglib.tounicode(root))
         return
-    if _user_shell:
+    shell, args = terminal.detectterminal(ui)
+    if shell:
         cwd = os.getcwd()
         try:
-            shellcmd = _user_shell % {'reponame': reponame}
+            if args:
+                shell = shell + ' ' + util.expandpath(args)
+            shellcmd = shell % {'reponame': reponame}
             os.chdir(root)
             started = QProcess.startDetached(shellcmd)
         finally:
@@ -246,18 +248,6 @@ def openshell(root, reponame):
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
-
-def configureshell(ui):
-    global _user_shell
-    _user_shell = ui.config('tortoisehg', 'shell')
-    if _user_shell:
-        return
-    if sys.platform == 'darwin':
-        return # Terminal.App does not support open-to-folder
-    elif os.name == 'nt':
-        _user_shell = 'cmd.exe /K title %(reponame)s'
-    else:
-        _user_shell = 'xterm -T "%(reponame)s"'
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
@@ -291,8 +281,6 @@ thgstylesheet = '* { white-space: pre; font-family: monospace;' \
 tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
-    configureshell(ui)
-
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))
