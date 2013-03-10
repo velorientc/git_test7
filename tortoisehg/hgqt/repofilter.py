@@ -20,6 +20,14 @@ _permanent_queries = ('head()', 'merge()',
                       'tagged()', 'bookmark()',
                       'file(".hgsubstate") or file(".hgsub")')
 
+def _firstword(query):
+    try:
+        for token, value, _pos in hgrevset.tokenize(hglib.fromunicode(query)):
+            if token == 'symbol' or token == 'string':
+                return value  # localstr
+    except error.ParseError:
+        pass
+
 def _querytype(repo, query):
     """
     >>> repo = set('0 1 2 3 . stable'.split())
@@ -31,6 +39,12 @@ def _querytype(repo, query):
     'revset'
     >>> _querytype(repo, u'stable')
     'revset'
+    >>> _querytype(repo, u'0::2')  # symbol
+    'revset'
+    >>> _querytype(repo, u'::"stable"')  # string
+    'revset'
+    >>> _querytype(repo, u'"')  # unterminated string
+    'keyword'
     >>> _querytype(repo, u'tagged()')
     'revset'
     """
@@ -38,7 +52,9 @@ def _querytype(repo, query):
         return
     if '(' in query:
         return 'revset'
-    changeid = hglib.fromunicode(query)
+    changeid = _firstword(query)
+    if not changeid:
+        return 'keyword'
     try:
         if changeid in repo:
             return 'revset'
