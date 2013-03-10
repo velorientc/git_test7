@@ -2,7 +2,11 @@
 #
 # tool.regkey, tool.regname specify a registry key with the editor path
 # tool.executable specifies the editor executable name or full path
-# Failing those two, TortoiseHg will search for the tool name in $PATH,
+# You can also set platform specific executables (i.e. executable-win,
+# executable-unix, executable-osx). If the one corresponding to the
+# current platform is set, it will be used instead of tool.executable.
+#
+# Failing those, TortoiseHg will search for the tool name in $PATH,
 # with appropriate file extensions (*.exe) on Windows.
 #
 # tool.args       - $FILE is expanded to a single filename (editor per file)

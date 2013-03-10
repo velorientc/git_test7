@@ -1,5 +1,16 @@
-import os
+import os, sys
 from mercurial import util, match
+
+def _getplatformexecutablekey():
+    if sys.platform == 'darwin':
+        key = 'executable-osx'
+    elif os.name == 'nt':
+        key = 'executable-win'
+    else:
+        key = 'executable-unix'
+    return key
+
+_platformexecutablekey = _getplatformexecutablekey()
 
 def _toolstr(ui, tool, part, default=""):
     return ui.config("editor-tools", tool + "." + part, default)
@@ -19,7 +30,10 @@ def _findtool(ui, tool):
             if p:
                 toolcache[tool] = p
                 return p
-    exe = _toolstr(ui, tool, "executable", tool)
+    global _platformexecutablekey
+    exe = _toolstr(ui, tool, _platformexecutablekey)
+    if not exe:
+        exe = _toolstr(ui, tool, 'executable', tool)
     path = util.findexe(util.expandpath(exe))
     if path:
         toolcache[tool] = path
