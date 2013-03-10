@@ -103,6 +103,7 @@ class HgFileView(QFrame):
         self.sci.setAnnotationEnabled(False)
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
         self.sci.customContextMenuRequested.connect(self.menuRequest)
+        self.annmarginclicked = False
         self.sci.marginClicked.connect(self.marginClicked)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
@@ -382,6 +383,12 @@ class HgFileView(QFrame):
         self.actionFirstParent.setEnabled(len(ctx.parents()) == 2)
         self.actionSecondParent.setEnabled(len(ctx.parents()) == 2)
 
+    def setSource(self, path, rev, line):
+        self.revisionSelected.emit(rev)
+        self.setContext(self.repo[rev])
+        self.displayFile(path, None)
+        self.showLine(line)
+
     def showLine(self, line):
         if line < self.sci.lines():
             self.sci.setCursorPosition(line, 0)
@@ -419,6 +426,34 @@ class HgFileView(QFrame):
     #@pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, state):
         'margin clicked event'
+        if margin == 2:
+            if self.annmarginclicked or state == Qt.ControlModifier:
+                fctx, line = self.sci._links[line]
+                self.setSource(hglib.tounicode(fctx.path()), fctx.rev(), line)
+            else:
+                self.annmarginclicked = True
+                def disableClick():
+                    self.annmarginclicked = False
+                QTimer.singleShot(QApplication.doubleClickInterval(), disableClick)
+
+                # mimic the default "border selection" behavior,
+                # which is disabled when you use setMarginSensitivity()
+                if state == Qt.ShiftModifier:
+                    sellinetop, selchartop, sellinebottom, selcharbottom = self.sci.getSelection()
+                    if sellinetop <= line:
+                        sline = sellinetop
+                        eline = line + 1
+                    else:
+                        sline = line
+                        eline = sellinebottom
+                        if selcharbottom != 0:
+                            eline += 1
+                else:
+                    sline = line
+                    eline = line + 1
+                self.sci.setSelection(sline, 0, eline, 0)
+            return
+
         if line not in self.chunkatline:
             return
         chunk = self.chunkatline[line]
@@ -843,16 +878,10 @@ class HgFileView(QFrame):
                 add(name, func)
             menu.addMenu(annsearchmenu)
 
-        def setSource(path, rev, line):
-            self.revisionSelected.emit(rev)
-            self.setContext(self.repo[rev])
-            self.displayFile(path, None)
-            self.showLine(line)
-
         data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
         def annorig():
-            setSource(*data)
+            self.setSource(*data)
         def editorig():
             self.editSelected(*data)
         menu.addSeparator()
@@ -869,7 +898,7 @@ class HgFileView(QFrame):
             pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
                      line]
             def annparent(data):
-                setSource(*data)
+                self.setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
             for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
@@ -1126,12 +1155,14 @@ class AnnotateView(qscilib.Scintilla):
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
-        if self.isAnnotationEnabled() and self._anncache:
+        showannmargin = bool(self.isAnnotationEnabled() and self._anncache)
+        if showannmargin:
             # add 2 for margin
             maxwidth = 2 + max(len(s) for s in self._anncache.itervalues())
             self.setMarginWidth(2, 'M' * maxwidth)
         else:
             self.setMarginWidth(2, 0)
+        self.setMarginSensitivity(2, showannmargin)
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
