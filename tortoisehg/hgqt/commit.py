@@ -791,6 +791,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                      (_('&Replace'), _('Cancel')), 0, 1, []).run()
             if res == 0:
                 msg = self.getMessage(True)
+                msg = str(msg)  # drop round-trip utf8 data
                 self.msgte.setText(hglib.tounicode(msg))
             self.msgte.setFocus()
             return
