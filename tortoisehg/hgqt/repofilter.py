@@ -113,8 +113,8 @@ class RepoFilterBar(QToolBar):
         self.refresh()
 
     def onClearButtonClicked(self):
-        if self.revsetcombo.lineEdit().text():
-            self.revsetcombo.lineEdit().clear()
+        if self.revsetcombo.currentText():
+            self.revsetcombo.clearEditText()
         else:
             self.hide()
         self.clearRevisionSet.emit()
@@ -146,10 +146,10 @@ class RepoFilterBar(QToolBar):
 
     def showEvent(self, event):
         super(RepoFilterBar, self).showEvent(event)
-        self.revsetcombo.lineEdit().setFocus()
+        self.revsetcombo.setFocus()
 
     def openEditor(self):
-        query = self.revsetcombo.lineEdit().text().simplified()
+        query = self.revsetcombo.currentText().simplified()
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
@@ -158,12 +158,12 @@ class RepoFilterBar(QToolBar):
     @pyqtSlot(int)
     def comboSelectionActivated(self, row):
         text = self.revsetcombo.itemText(row)
-        self.revsetcombo.lineEdit().setText(text)
+        self.revsetcombo.setEditText(text)
         self.entrydlg.entry.setText(text)
         self.entrydlg.runQuery()
 
     def queryIssued(self, query, revset):
-        self.revsetcombo.lineEdit().setText(query)
+        self.revsetcombo.setEditText(query)
         if revset:
             self.setRevisionSet.emit(revset)
         else:
@@ -173,7 +173,7 @@ class RepoFilterBar(QToolBar):
 
     def returnPressed(self):
         'Return pressed on revset line entry, forward to dialog'
-        query = self.revsetcombo.lineEdit().text().simplified()
+        query = self.revsetcombo.currentText().simplified()
         if query:
             self.entrydlg.entry.setText(query)
             self.entrydlg.runQuery()
@@ -181,7 +181,7 @@ class RepoFilterBar(QToolBar):
             self.clearRevisionSet.emit()
 
     def saveQuery(self):
-        query = self.revsetcombo.lineEdit().text()
+        query = self.revsetcombo.currentText()
         if query in self.revsethist:
             self.revsethist.remove(query)
         if query not in self._permanent_queries:
