@@ -62,15 +62,14 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo = combo = QComboBox()
         combo.setEditable(True)
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        combo.setMinimumContentsLength(10)
         qtlib.allowCaseChangingInput(combo)
         le = combo.lineEdit()
-        le.returnPressed.connect(self.returnPressed)
+        le.returnPressed.connect(self.runQuery)
         le.selectionChanged.connect(self.selectionChanged)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
-        combo.activated.connect(self.comboSelectionActivated)
-        self.revsetle = le
+        combo.activated.connect(self.runQuery)
 
         self.clearBtn = QToolButton(self)
         self.clearBtn.setIcon(qtlib.geticon('filedelete'))
@@ -84,7 +83,7 @@ class RepoFilterBar(QToolBar):
         self.searchBtn = QToolButton(self)
         self.searchBtn.setIcon(qtlib.geticon('view-filter'))
         self.searchBtn.setToolTip(_('Trigger revision set query'))
-        self.searchBtn.clicked.connect(self.returnPressed)
+        self.searchBtn.clicked.connect(self.runQuery)
         self.addWidget(self.searchBtn)
 
         self.editorBtn = QToolButton()
@@ -113,8 +112,8 @@ class RepoFilterBar(QToolBar):
         self.refresh()
 
     def onClearButtonClicked(self):
-        if self.revsetcombo.lineEdit().text():
-            self.revsetcombo.lineEdit().clear()
+        if self.revsetcombo.currentText():
+            self.revsetcombo.clearEditText()
         else:
             self.hide()
         self.clearRevisionSet.emit()
@@ -146,24 +145,17 @@ class RepoFilterBar(QToolBar):
 
     def showEvent(self, event):
         super(RepoFilterBar, self).showEvent(event)
-        self.revsetcombo.lineEdit().setFocus()
+        self.revsetcombo.setFocus()
 
     def openEditor(self):
-        query = self.revsetcombo.lineEdit().text().simplified()
+        query = self.revsetcombo.currentText().simplified()
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
         self.entrydlg.setShown(True)
 
-    @pyqtSlot(int)
-    def comboSelectionActivated(self, row):
-        text = self.revsetcombo.itemText(row)
-        self.revsetcombo.lineEdit().setText(text)
-        self.entrydlg.entry.setText(text)
-        self.entrydlg.runQuery()
-
     def queryIssued(self, query, revset):
-        self.revsetcombo.lineEdit().setText(query)
+        self.revsetcombo.setEditText(query)
         if revset:
             self.setRevisionSet.emit(revset)
         else:
@@ -171,9 +163,13 @@ class RepoFilterBar(QToolBar):
         self.saveQuery()
         self.revsetcombo.lineEdit().selectAll()
 
-    def returnPressed(self):
-        'Return pressed on revset line entry, forward to dialog'
-        query = self.revsetcombo.lineEdit().text().simplified()
+    def setQuery(self, query):
+        self.revsetcombo.setEditText(query)
+
+    @pyqtSlot()
+    def runQuery(self):
+        'Run the current revset query or request to clear the previous result'
+        query = self.revsetcombo.currentText().simplified()
         if query:
             self.entrydlg.entry.setText(query)
             self.entrydlg.runQuery()
@@ -181,7 +177,7 @@ class RepoFilterBar(QToolBar):
             self.clearRevisionSet.emit()
 
     def saveQuery(self):
-        query = self.revsetcombo.lineEdit().text()
+        query = self.revsetcombo.currentText()
         if query in self.revsethist:
             self.revsethist.remove(query)
         if query not in self._permanent_queries:
@@ -241,8 +237,7 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setMenu(self._branchMenu)
 
         self._branchCombo = QComboBox()
-        self._branchCombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self._branchCombo.setMinimumContentsLength(10)
         self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False

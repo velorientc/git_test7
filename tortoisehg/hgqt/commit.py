@@ -67,6 +67,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     commitButtonEnable = pyqtSignal(bool)
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
+    grepRequested = pyqtSignal(unicode, dict)
     commitComplete = pyqtSignal()
 
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -78,9 +79,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
         QWidget.__init__(self, parent)
 
-        repo.configChanged.connect(self.configChanged)
+        repo.configChanged.connect(self.refresh)
         repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        repo.workingBranchChanged.connect(self.refresh)
         self.repo = repo
         self._rev = rev
         self.lastAction = None
@@ -95,6 +96,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
+        self.stwidget.grepRequested.connect(self.grepRequested)
         self.msghistory = []
         self.runner = cmdui.Runner(not embedded, self)
         self.runner.setTitle(_('Commit', 'window title'))
@@ -500,6 +502,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             # do not search for tokens if auto completion is disabled
             # pygments has several infinite loop problems we'd like to avoid
             return
+        if self.msgte.lexer() is None:
+            # qsci will crash if None is passed to QsciAPIs constructor
+            return
         wfile = unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
@@ -567,20 +572,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.refresh()
 
     @pyqtSlot()
-    def workingBranchChanged(self):
-        'Repository has detected a change in .hg/branch'
-        self.refresh()
-
-    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
-
-    @pyqtSlot()
-    def configChanged(self):
-        'Repository is reporting its config files have changed'
-        self.refresh()
 
     @pyqtSlot()
     def refreshWctx(self):
@@ -594,6 +589,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
 
+    @pyqtSlot()
     def refresh(self):
         ispatch = self.repo.changectx('.').thgmqappliedpatch()
         if not self.hasmqbutton:
@@ -1358,26 +1354,13 @@ class CommitDialog(QDialog):
         self.commit.msgte.setFocus()
         qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
 
-    def done(self, ret):
-        self.commit.repo.configChanged.disconnect(self.commit.configChanged)
-        self.commit.repo.repositoryChanged.disconnect(self.commit.repositoryChanged)
-        self.commit.repo.workingBranchChanged.disconnect(self.commit.workingBranchChanged)
-        self.commit.repo.repositoryChanged.disconnect(self.updateUndo)
-        super(CommitDialog, self).done(ret)
-
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
         if link.startswith('repo:'):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[len('repo:'):])
-        if link.startswith('shelve:'):
-            repo = self.commit.repo
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
 
+    @pyqtSlot()
     def updateUndo(self):
         BB = QDialogButtonBox
         undomsg = self.commit.canUndo()

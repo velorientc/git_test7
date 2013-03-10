@@ -14,8 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport, scmutil, httpconnection
-from mercurial import merge as mergemod
+from mercurial import hg, ui, url, util, scmutil, httpconnection
 
 from tortoisehg.util import hglib, wconfig, paths
 from tortoisehg.hgqt.i18n import _
@@ -117,7 +116,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if val:
                 self.opts[opt] = val
 
-        self.repo.configChanged.connect(self.configChanged)
+        self.repo.configChanged.connect(self.reload)
 
         if self.embedded:
             layout.setContentsMargins(2, 2, 2, 2)
@@ -412,11 +411,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
-    @pyqtSlot()
-    def configChanged(self):
-        'Repository is reporting its config files have changed'
-        self.reload()
-
     def editOptions(self):
         dlg = OptionsDialog(self.opts, self)
         dlg.setWindowFlags(Qt.Sheet)
@@ -431,6 +425,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     val = hglib.tounicode(val)
                 s.setValue('sync/' + opt, val)
 
+    @pyqtSlot()
     def reload(self):
         # Refresh configured paths
         self.paths = {}

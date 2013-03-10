@@ -193,6 +193,11 @@
                     Source='contrib\mergetools.rc'
               />
             </Component>
+            <Component Id='editortools.rc' Guid='$(var.editortools.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='editortools.rc' Name='EditorTools.rc' ReadOnly='yes'
+                    Source='contrib\editortools.rc'
+              />
+            </Component>
             <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
                     ReadOnly='yes' KeyPath='yes'
@@ -256,6 +261,7 @@
         <ComponentRef Id='COPYING' />
         <ComponentRef Id='mercurial.rc' />
         <ComponentRef Id='mergetools.rc' />
+        <ComponentRef Id='editortools.rc' />
         <ComponentRef Id='paths.rc' />
         <ComponentRef Id='cacert.pem' />
         <ComponentRef Id='ExtensionVersions' />
