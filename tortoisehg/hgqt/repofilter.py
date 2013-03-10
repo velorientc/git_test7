@@ -69,7 +69,7 @@ class RepoFilterBar(QToolBar):
         le.selectionChanged.connect(self.selectionChanged)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
-        combo.activated.connect(self.comboSelectionActivated)
+        combo.activated.connect(self.returnPressed)
         self.revsetle = le
 
         self.clearBtn = QToolButton(self)
@@ -155,12 +155,6 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.entry.setFocus()
         self.entrydlg.setShown(True)
 
-    @pyqtSlot(int)
-    def comboSelectionActivated(self, row):
-        text = self.revsetcombo.currentText()
-        self.entrydlg.entry.setText(text)
-        self.entrydlg.runQuery()
-
     def queryIssued(self, query, revset):
         self.revsetcombo.setEditText(query)
         if revset:
@@ -170,6 +164,7 @@ class RepoFilterBar(QToolBar):
         self.saveQuery()
         self.revsetcombo.lineEdit().selectAll()
 
+    @pyqtSlot()
     def returnPressed(self):
         'Return pressed on revset line entry, forward to dialog'
         query = self.revsetcombo.currentText().simplified()
