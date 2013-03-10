@@ -157,8 +157,7 @@ class RepoFilterBar(QToolBar):
 
     @pyqtSlot(int)
     def comboSelectionActivated(self, row):
-        text = self.revsetcombo.itemText(row)
-        self.revsetcombo.setEditText(text)
+        text = self.revsetcombo.currentText()
         self.entrydlg.entry.setText(text)
         self.entrydlg.runQuery()
 
