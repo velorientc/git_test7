@@ -148,7 +148,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setFocus()
 
     def openEditor(self):
-        query = self.revsetcombo.currentText().simplified()
+        query = self._prepareQuery()
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
@@ -163,13 +163,17 @@ class RepoFilterBar(QToolBar):
         self.saveQuery()
         self.revsetcombo.lineEdit().selectAll()
 
+    def _prepareQuery(self):
+        query = unicode(self.revsetcombo.currentText()).strip()
+        return query
+
     def setQuery(self, query):
         self.revsetcombo.setEditText(query)
 
     @pyqtSlot()
     def runQuery(self):
         'Run the current revset query or request to clear the previous result'
-        query = self.revsetcombo.currentText().simplified()
+        query = self._prepareQuery()
         if query:
             self.entrydlg.entry.setText(query)
             self.entrydlg.runQuery()
