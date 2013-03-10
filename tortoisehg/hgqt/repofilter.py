@@ -113,6 +113,13 @@ class RepoFilterBar(QToolBar):
             le.setPlaceholderText(_('### revision set query ###'))
         combo.activated.connect(self.runQuery)
 
+        self._revsettypelabel = QLabel(le)
+        self._revsettypetimer = QTimer(self, interval=200, singleShot=True)
+        self._revsettypetimer.timeout.connect(self._updateQueryType)
+        combo.editTextChanged.connect(self._revsettypetimer.start)
+        self._updateQueryType()
+        le.installEventFilter(self)
+
         self.clearBtn = QToolButton(self)
         self.clearBtn.setIcon(qtlib.geticon('filedelete'))
         self.clearBtn.setToolTip(_('Clear current query and query text'))
@@ -189,6 +196,13 @@ class RepoFilterBar(QToolBar):
         super(RepoFilterBar, self).showEvent(event)
         self.revsetcombo.setFocus()
 
+    def eventFilter(self, watched, event):
+        if watched is self.revsetcombo.lineEdit():
+            if event.type() == QEvent.Resize:
+                self._updateQueryTypeGeometry()
+            return False
+        return super(RepoFilterBar, self).eventFilter(watched, event)
+
     def openEditor(self):
         query = self._prepareQuery()
         self.entrydlg.entry.setText(query)
@@ -213,6 +227,40 @@ class RepoFilterBar(QToolBar):
             return hglib.tounicode(hgrevset.formatspec('keyword(%s)', s))
         else:
             return query
+
+    @pyqtSlot()
+    def _updateQueryType(self):
+        query = unicode(self.revsetcombo.currentText()).strip()
+        qtype = _querytype(self._repo, query)
+        if not qtype:
+            self._revsettypelabel.hide()
+            self._updateQueryTypeGeometry()
+            return
+
+        name, bordercolor, bgcolor = {
+            'keyword': (_('Keyword Search'), '#cccccc', '#eeeeee'),
+            'revset':  (_('Revision Set'),   '#f6dd82', '#fcf1ca'),
+            }[qtype]
+        label = self._revsettypelabel
+        label.setText(name)
+        label.setStyleSheet('border: 1px solid %s; background-color: %s; '
+                            'color: black;' % (bordercolor, bgcolor))
+        label.show()
+        self._updateQueryTypeGeometry()
+
+    def _updateQueryTypeGeometry(self):
+        le = self.revsetcombo.lineEdit()
+        label = self._revsettypelabel
+        # show label in right corner
+        w = label.minimumSizeHint().width()
+        label.setGeometry(le.width() - w - 1, 1, w, le.height() - 2)
+        # right margin for label
+        margins = list(le.getContentsMargins())
+        if label.isHidden():
+            margins[2] = 0
+        else:
+            margins[2] = w + 1
+        le.setContentsMargins(*margins)
 
     def setQuery(self, query):
         self.revsetcombo.setEditText(query)
