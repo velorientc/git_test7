@@ -394,9 +394,7 @@ class RevsetThread(QThread):
         try:
             os.chdir(self.repo.root)
             func = revset.match(self.repo.ui, self.text)
-            l = []
-            for c in func(self.repo, list(self.repo)):
-                l.append(c)
+            l = list(func(self.repo, list(self.repo)))
             if len(l):
                 self.showMessage.emit(_('%d matches found') % len(l))
             else:
