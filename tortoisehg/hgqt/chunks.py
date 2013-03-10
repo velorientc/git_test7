@@ -585,7 +585,7 @@ class DiffBrowser(QFrame):
 
         self.layout().addWidget(self.sci, 1)
 
-        lexer = lexers.get_diff_lexer(self)
+        lexer = lexers.difflexer(self)
         self.sci.setLexer(lexer)
         self.clearDisplay()
 

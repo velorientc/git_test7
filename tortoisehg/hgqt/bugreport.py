@@ -15,6 +15,7 @@ from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 try:
     from PyQt4.Qsci import QSCINTILLA_VERSION_STR
 except (ImportError, AttributeError):
@@ -47,6 +48,12 @@ class BugReport(QDialog):
         tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
 
+        self.download_url_lbl = QLabel(_('Checking for updates...'))
+        self.download_url_lbl.setMouseTracking(True)
+        self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
+        self.download_url_lbl.setOpenExternalLinks(True)
+        layout.addWidget(self.download_url_lbl)
+
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Save)
@@ -62,6 +69,49 @@ class BugReport(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
         self.resize(650, 400)
         self._readsettings()
+        QTimer.singleShot(0, self.getUpdateInfo)
+
+    def getUpdateInfo(self):
+        verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
+        # If we use QNetworkAcessManager elsewhere, it should be shared
+        # through the application.
+        self._netmanager = QNetworkAccessManager(self)
+        self._newverreply = self._netmanager.get(QNetworkRequest(QUrl(verurl)))
+        self._newverreply.finished.connect(self.uFinished)
+
+    def uFinished(self):
+        newver = (0,0,0)
+        try:
+            f = self._newverreply.readAll().data().splitlines()
+            self._newverreply.close()
+            self._newverreply = None
+            newver = tuple([int(p) for p in f[0].split('.')])
+            upgradeurl = f[1] # generic download URL
+            platform = sys.platform
+            if platform == 'win32':
+                from win32process import IsWow64Process as IsX64
+                platform = IsX64() and 'x64' or 'x86'
+            # linux2 for Linux, darwin for OSX
+            for line in f[2:]:
+                p, _url = line.split(':', 1)
+                if platform == p:
+                    upgradeurl = _url.strip()
+                    break
+        except (IndexError, ImportError, ValueError):
+            pass
+        try:
+            thgv = version.version()
+            if '+' in thgv:
+                thgv = thgv[:thgv.index('+')]
+            curver = tuple([int(p) for p in thgv.split('.')])
+        except ValueError:
+            curver = (0,0,0)
+        if newver > curver:
+            url_lbl = _('Upgrading to a more recent TortoiseHg is recommended.')
+            urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
+            self.download_url_lbl.setText(urldata)
+        else:
+            self.download_url_lbl.setText(_('Your TortoiseHg is up to date.'))
 
     def gettext(self, opts):
         # TODO: make this more uniformly unicode safe
