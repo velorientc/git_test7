@@ -595,8 +595,7 @@ class Workbench(QMainWindow):
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == path:
-                w.filterbar.revsetle.setText(filter)
-                w.filterbar.returnPressed()
+                w.setFilter(filter)
                 return
 
     def find_root(self, url):
