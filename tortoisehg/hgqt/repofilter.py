@@ -10,7 +10,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import revset as hgrevset
+from mercurial import error, revset as hgrevset
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -19,6 +19,32 @@ from tortoisehg.hgqt import revset, qtlib
 _permanent_queries = ('head()', 'merge()',
                       'tagged()', 'bookmark()',
                       'file(".hgsubstate") or file(".hgsub")')
+
+def _querytype(repo, query):
+    """
+    >>> repo = set('0 1 2 3 . stable'.split())
+    >>> _querytype(repo, u'') is None
+    True
+    >>> _querytype(repo, u'quick fox')
+    'keyword'
+    >>> _querytype(repo, u'0')
+    'revset'
+    >>> _querytype(repo, u'stable')
+    'revset'
+    >>> _querytype(repo, u'tagged()')
+    'revset'
+    """
+    if not query:
+        return
+    if '(' in query:
+        return 'revset'
+    changeid = hglib.fromunicode(query)
+    try:
+        if changeid in repo:
+            return 'revset'
+    except error.LookupError:  # ambiguous changeid
+        pass
+    return 'keyword'
 
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
@@ -155,7 +181,8 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.setShown(True)
 
     def queryIssued(self, query, revset):
-        self.revsetcombo.setEditText(query)
+        if self._prepareQuery() != unicode(query):  # keep keyword query as-is
+            self.revsetcombo.setEditText(query)
         if revset:
             self.setRevisionSet.emit(revset)
         else:
@@ -165,7 +192,11 @@ class RepoFilterBar(QToolBar):
 
     def _prepareQuery(self):
         query = unicode(self.revsetcombo.currentText()).strip()
-        return query
+        if _querytype(self._repo, query) == 'keyword':
+            s = hglib.fromunicode(query)
+            return hglib.tounicode(hgrevset.formatspec('keyword(%s)', s))
+        else:
+            return query
 
     def setQuery(self, query):
         self.revsetcombo.setEditText(query)
