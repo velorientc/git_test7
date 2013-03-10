@@ -465,7 +465,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QString)
     def setFilter(self, filter):
-        self.filterbar.revsetle.setText(filter)
+        self.filterbar.setQuery(filter)
         self.filterbar.setVisible(True)
         self.filterbar.runQuery()
 
@@ -481,7 +481,7 @@ class RepoWidget(QWidget):
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
         self.manifestDemand.forward('setRepo', self.repo)
-        self.filterbar.revsetle.setText('incoming()')
+        self.filterbar.setQuery('incoming()')
         self.filterbar.setEnableFilter(False)
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
@@ -504,7 +504,7 @@ class RepoWidget(QWidget):
 
     def clearBundle(self):
         self.filterbar.setEnableFilter(True)
-        self.filterbar.revsetle.setText('')
+        self.filterbar.setQuery('')
         self.revset = []
         self.repomodel.revset = self.revset
         self.bundle = None
@@ -554,7 +554,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def clearRevisionSet(self):
-        self.filterbar.revsetle.clear()
+        self.filterbar.setQuery('')
         return self._unapplyRevisionSet()
 
     @pyqtSlot()
@@ -595,7 +595,7 @@ class RepoWidget(QWidget):
             self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     def setOutgoingNodes(self, nodes):
-        self.filterbar.revsetle.setText('outgoing()')
+        self.filterbar.setQuery('outgoing()')
         self.setRevisionSet([self.repo[n].rev() for n in nodes])
         self.outgoingMode = True
 
@@ -960,7 +960,7 @@ class RepoWidget(QWidget):
                                    'cleared'))
             elif self.revset:
                 self.revset = []
-                self.filterbar.revsetle.clear()
+                self.filterbar.setQuery('')
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)

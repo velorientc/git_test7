@@ -70,7 +70,6 @@ class RepoFilterBar(QToolBar):
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
         combo.activated.connect(self.runQuery)
-        self.revsetle = le
 
         self.clearBtn = QToolButton(self)
         self.clearBtn.setIcon(qtlib.geticon('filedelete'))
@@ -163,6 +162,9 @@ class RepoFilterBar(QToolBar):
             self.clearRevisionSet.emit()
         self.saveQuery()
         self.revsetcombo.lineEdit().selectAll()
+
+    def setQuery(self, query):
+        self.revsetcombo.setEditText(query)
 
     @pyqtSlot()
     def runQuery(self):
