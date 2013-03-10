@@ -467,7 +467,7 @@ class RepoWidget(QWidget):
     def setFilter(self, filter):
         self.filterbar.revsetle.setText(filter)
         self.filterbar.setVisible(True)
-        self.filterbar.returnPressed()
+        self.filterbar.runQuery()
 
     @pyqtSlot(QString, QString)
     def setBundle(self, bfile, bsource=None):

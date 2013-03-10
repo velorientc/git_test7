@@ -65,11 +65,11 @@ class RepoFilterBar(QToolBar):
         combo.setMinimumContentsLength(10)
         qtlib.allowCaseChangingInput(combo)
         le = combo.lineEdit()
-        le.returnPressed.connect(self.returnPressed)
+        le.returnPressed.connect(self.runQuery)
         le.selectionChanged.connect(self.selectionChanged)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
-        combo.activated.connect(self.returnPressed)
+        combo.activated.connect(self.runQuery)
         self.revsetle = le
 
         self.clearBtn = QToolButton(self)
@@ -84,7 +84,7 @@ class RepoFilterBar(QToolBar):
         self.searchBtn = QToolButton(self)
         self.searchBtn.setIcon(qtlib.geticon('view-filter'))
         self.searchBtn.setToolTip(_('Trigger revision set query'))
-        self.searchBtn.clicked.connect(self.returnPressed)
+        self.searchBtn.clicked.connect(self.runQuery)
         self.addWidget(self.searchBtn)
 
         self.editorBtn = QToolButton()
@@ -165,8 +165,8 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.lineEdit().selectAll()
 
     @pyqtSlot()
-    def returnPressed(self):
-        'Return pressed on revset line entry, forward to dialog'
+    def runQuery(self):
+        'Run the current revset query or request to clear the previous result'
         query = self.revsetcombo.currentText().simplified()
         if query:
             self.entrydlg.entry.setText(query)
