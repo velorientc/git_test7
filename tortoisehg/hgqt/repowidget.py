@@ -167,6 +167,7 @@ class RepoWidget(QWidget):
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
+        self.filterbar.showMessage.connect(self._showMessageOnInfoBar)
         self.filterbar.setRevisionSet.connect(self.setRevisionSet)
         self.filterbar.clearRevisionSet.connect(self._unapplyRevisionSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
@@ -585,6 +586,7 @@ class RepoWidget(QWidget):
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
         self.repoview._paletteswitcher.enablefilterpalette(revs)
+        self.clearInfoBar(qtlib.InfoBar.INFO)  # clear progress message
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):
