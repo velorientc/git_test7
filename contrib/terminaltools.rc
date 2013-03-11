@@ -47,6 +47,11 @@ xterm.priority = -10
 xterm.executable-unix = xterm
 xterm.args = -T "%(reponame)s"'
 
+# OSX specific terminals
+terminal_app.priority = -10
+terminal_app.executable-osx = open
+terminal_app.args = -a Terminal "%(root)s"
+
 # Generic terminals
 qtconsole27.priority = -20
 qtconsole27.executable-win = c:\Python27\Scripts\ipython.bat
