@@ -599,30 +599,88 @@ class RepoWidget(QWidget):
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.setQuery('outgoing()')
-        self.setRevisionSet([self.repo[n].rev() for n in nodes])
+        revs = [self.repo[n].rev() for n in nodes]
+        self.setRevisionSet(revs)
         self.outgoingMode = True
-
-        w = self.setInfoBar(qtlib.ConfirmInfoBar,
-                            _('%d outgoing changesets') % len(nodes))
-        assert w
+        numnodes = len(nodes)
+        numoutgoing = numnodes
 
         # Read the tortoisehg.defaultpush setting to determine what to push
         # by default, and set the button label and action accordingly
-        acceptbuttontext = _('Push')
         defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
         rev = None
         branch = None
         pushall = False
+        # note that we assume that none of the revisions
+        # on the nodes/revs lists is secret
         if defaultpush == 'branch':
             branch = self.repo['.'].branch()
-            acceptbuttontext = _('Push current branch (%s)') \
-                % hglib.tounicode(branch)
+            ubranch = hglib.tounicode(branch)
+            # Get the list of revs that will be actually pushed
+            outgoingrevs = self.repo.revs('%ld and branch(.)', revs)
+            numoutgoing = len(outgoingrevs)
         elif defaultpush == 'revision':
             rev = self.repo['.'].rev()
-            acceptbuttontext = _('Push current revision (%d)') % rev
+            # Get the list of revs that will be actually pushed
+            # excluding (potentially) the current rev
+            outgoingrevs = self.repo.revs('%ld and ::.', revs)
+            numoutgoing = len(outgoingrevs)
+            maxrev = rev
+            if numoutgoing > 0:
+                maxrev = max(outgoingrevs)
         else:
             pushall = True
 
+        # Set the default acceptbuttontext
+        # Note that the pushall case uses the default accept button text
+        if branch is not None:
+            acceptbuttontext = _('Push current branch (%s)') % ubranch
+        elif rev is not None:
+            if maxrev == rev:
+                acceptbuttontext = _('Push up to current revision (#%d)') % rev
+            else:
+                acceptbuttontext = _('Push up to revision #%d') % maxrev
+        else:
+            acceptbuttontext = _('Push all')
+
+        if numnodes == 0:
+            msg = _('no outgoing changesets')
+        elif numoutgoing == 0:
+            if branch:
+                msg = _('no outgoing changesets in current branch (%s) '
+                    '/ %d in total') % (ubranch, numnodes)
+            elif rev is not None:
+                if maxrev == rev:
+                    msg = _('no outgoing changesets up to current revision '
+                            '(#%d) / %d in total') % (rev, numnodes)
+                else:
+                    msg = _('no outgoing changesets up to revision #%d '
+                            '/ %d in total') % (maxrev, numnodes)
+        elif numoutgoing == numnodes:
+            # This case includes 'Push all' among others
+            msg = _('%d outgoing changesets') % numoutgoing
+        elif branch:
+            msg = _('%d outgoing changesets in current branch (%s) '
+                    '/ %d in total') % (numoutgoing, ubranch, numnodes)
+        elif rev:
+            if maxrev == rev:
+                msg = _('%d outgoing changesets up to current revision (#%d) '
+                        '/ %d in total') % (numoutgoing, rev, numnodes)
+            else:
+                msg = _('%d outgoing changesets up to revision #%d '
+                        '/ %d in total') % (numoutgoing, maxrev, numnodes)
+        else:
+            # This should never happen but we leave this else clause
+            # in case there is a flaw in the logic above (e.g. due to
+            # a future change in the code)
+            msg = _('%d outgoing changesets') % numoutgoing
+
+        w = self.setInfoBar(qtlib.ConfirmInfoBar, msg.strip())
+        assert w
+
+        if numoutgoing == 0:
+            acceptbuttontext = _('Nothing to push')
+            w.acceptButton.setEnabled(False)
         w.acceptButton.setText(acceptbuttontext)
         w.accepted.connect(lambda: self.push(False,
             rev=rev, branch=branch, pushall=pushall))  # TODO: to the same URL
