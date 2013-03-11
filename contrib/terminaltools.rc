@@ -20,18 +20,18 @@ windows_command_prompt.executable = cmd
 windows_command_prompt.args = /K title %(reponame)s
 
 powershell.priority = -11
-powershell.executable_win = powershell
+powershell.executable-win = powershell
 powershell.args = -NoExit -Command "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell - %(reponame)s'"
 
 bash_prompt.priority = -1
-bash_prompt.executable_win = c:\cygwin\bin\bash
+bash_prompt.executable-win = c:\cygwin\bin\bash
 
 # Linux specific terminals
 gnome-terminal.priority = -1
-gnome-terminal.executable_linux = gnome-terminal
+gnome-terminal.executable-linux = gnome-terminal
 
 xterm.priority = -10
-xterm.executable_unix = xterm
+xterm.executable-unix = xterm
 xterm.args = -T "%(reponame)s"'
 
 # Generic terminals
