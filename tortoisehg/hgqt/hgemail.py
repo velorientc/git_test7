@@ -76,6 +76,9 @@ class EmailDialog(QDialog):
             w = getattr(self._qui, '%s_edit' % k)
             w.addItems(s.value('email/%s_history' % k).toStringList())
             w.setCurrentIndex(-1)  # unselect
+        for k in ('body', 'attach', 'inline', 'diffstat'):
+            w = getattr(self._qui, '%s_check' % k)
+            w.setChecked(s.value('email/%s' % k).toBool())
 
     def _writehistory(self):
         def itercombo(w):
@@ -89,6 +92,9 @@ class EmailDialog(QDialog):
         for k in ('to', 'cc', 'from', 'flag', 'subject'):
             w = getattr(self._qui, '%s_edit' % k)
             s.setValue('email/%s_history' % k, list(itercombo(w))[:10])
+        for k in ('body', 'attach', 'inline', 'diffstat'):
+            w = getattr(self._qui, '%s_check' % k)
+            s.setValue('email/%s' % k, w.isChecked())
 
     def _initchangesets(self, revs):
         def purerevs(revs):
