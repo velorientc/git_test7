@@ -72,7 +72,7 @@ class EmailDialog(QDialog):
 
     def _readhistory(self):
         s = QSettings()
-        for k in ('to', 'cc', 'from', 'flag'):
+        for k in ('to', 'cc', 'from', 'flag', 'subject'):
             w = getattr(self._qui, '%s_edit' % k)
             w.addItems(s.value('email/%s_history' % k).toStringList())
             w.setCurrentIndex(-1)  # unselect
@@ -86,7 +86,7 @@ class EmailDialog(QDialog):
                     yield w.itemText(i)
 
         s = QSettings()
-        for k in ('to', 'cc', 'from', 'flag'):
+        for k in ('to', 'cc', 'from', 'flag', 'subject'):
             w = getattr(self._qui, '%s_edit' % k)
             s.setValue('email/%s_history' % k, list(itercombo(w))[:10])
 
@@ -198,7 +198,7 @@ class EmailDialog(QDialog):
 
         opts['intro'] = self._qui.writeintro_check.isChecked()
         if opts['intro']:
-            opts['subject'] = headertext(self._qui.subject_edit.text())
+            opts['subject'] = headertext(self._qui.subject_edit.currentText())
             opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
@@ -214,7 +214,7 @@ class EmailDialog(QDialog):
             if not getattr(self._qui, e).currentText():
                 return False
 
-        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.text():
+        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.currentText():
             return False
 
         if not self._revs:
@@ -302,7 +302,7 @@ class EmailDialog(QDialog):
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
-        self._qui.subject_edit.textChanged.connect(self._updateforms)
+        self._qui.subject_edit.editTextChanged.connect(self._updateforms)
         self._qui.writeintro_check.toggled.connect(self._updateforms)
 
     def _introrequired(self):
