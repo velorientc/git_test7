@@ -9,8 +9,13 @@
 # to the terminal.
 #
 # You can use environment variables, which will be expanded before execution.
-# In addition, the string "%(reponame)s" (without quotes) will be replaced by
-# the name or the path of the repository name or path.
+#
+# In addition, you can use the following special strings (without the quotes):
+#
+# - "%(root)s" : will be replaced by the path where the terminal will be open.
+# - "%(reponame)s" : will be replaced by the name of the repository (note that
+#                    sometimes the "repository name" is in fact the repository
+#                    path.
 
 [terminal-tools]
 

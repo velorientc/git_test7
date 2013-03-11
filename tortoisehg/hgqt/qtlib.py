@@ -237,7 +237,7 @@ def openshell(root, reponame, ui=None):
         try:
             if args:
                 shell = shell + ' ' + util.expandpath(args)
-            shellcmd = shell % {'reponame': reponame}
+            shellcmd = shell % {'root': root, 'reponame': reponame}
             os.chdir(root)
             started = QProcess.startDetached(shellcmd)
         finally:
