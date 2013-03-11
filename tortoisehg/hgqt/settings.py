@@ -556,7 +556,7 @@ INFO = (
           'unspecified, TortoiseHg will use the selected merge tool. '
           'Failing that it uses the first applicable tool it finds.')),
     _fi(_('Visual Editor'), 'tortoisehg.editor',
-        (genDeferredCombo, findEditors),
+        (genEditableDeferredCombo, findEditors),
         _('Specify visual editor, as described in the [editor-tools] '
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the first applicable tool '
