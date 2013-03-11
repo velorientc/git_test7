@@ -198,6 +198,11 @@
                     Source='contrib\editortools.rc'
               />
             </Component>
+            <Component Id='terminaltools.rc' Guid='$(var.terminaltools.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='terminaltools.rc' Name='TerminalTools.rc' ReadOnly='yes'
+                    Source='contrib\terminaltools.rc'
+              />
+            </Component>
             <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
                     ReadOnly='yes' KeyPath='yes'
@@ -262,6 +267,7 @@
         <ComponentRef Id='mercurial.rc' />
         <ComponentRef Id='mergetools.rc' />
         <ComponentRef Id='editortools.rc' />
+        <ComponentRef Id='terminaltools.rc' />
         <ComponentRef Id='paths.rc' />
         <ComponentRef Id='cacert.pem' />
         <ComponentRef Id='ExtensionVersions' />

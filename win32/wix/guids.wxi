@@ -64,6 +64,7 @@
   <?define mercurial.rc.guid = {97EC54BA-02F7-40CD-B876-0572AF7D894B} ?>
   <?define mergetools.rc.guid = {EA7F7766-FC75-489F-91AE-3B16E5FE936E} ?>
   <?define editortools.rc.guid = {DA15A594-0DE2-4A2A-8CFB-B7EC7B13E346} ?>
+  <?define terminaltools.rc.guid = {F77C4BF6-D887-40E8-81CB-CE67FC36305C} ?>
   <?define mergepatterns.rc.guid = {3372ED83-BCE1-4AD3-B5EA-65158C715B54} ?>
   <?define paths.rc.guid = {2D94117B-32EC-4507-8E77-AF9D5BC5EA87} ?>
   <?define cacert.pem.guid = {37D0A0FC-817D-4DD0-8A07-3841E13092E6} ?>
