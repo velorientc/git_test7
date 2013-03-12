@@ -53,6 +53,26 @@ terminal_app.executable-osx = open
 terminal_app.args = -a Terminal "%(root)s"
 
 # Generic terminals
+pyshqt.priority = -20
+pyshqt.executable-win = c:\Python27\Scripts\ipython.bat
+pyshqt.executable = ipython
+pyshqt.args = qtconsole --profile pysh
+
+pysh.priority = -20
+pysh.executable-win = c:\Python27\Scripts\ipython.bat
+pysh.executable = ipython
+pysh.args = --profile pysh
+
+pyshqt_py26.priority = -21
+pyshqt_py26.executable-win = c:\Python26\Scripts\ipython.bat
+pyshqt_py26.executable = ipython
+pyshqt_py26.args = qtconsole --profile pysh
+
+pysh_py26.priority = -21
+pysh_py26.executable-win = c:\Python26\Scripts\ipython.bat
+pysh_py26.executable = ipython
+pysh_py26.args = --profile pysh
+
 qtconsole27.priority = -20
 qtconsole27.executable-win = c:\Python27\Scripts\ipython.bat
 qtconsole27.executable = ipython
