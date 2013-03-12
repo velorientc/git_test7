@@ -28,7 +28,15 @@ powershell.priority = -11
 powershell.executable-win = powershell
 powershell.args = -NoExit -Command "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell - %(reponame)s'"
 
-bash_prompt.priority = -1
+rxvt_native.priority = -1
+rxvt_native.executable-win = C:\cygwin\bin\rxvt.exe
+rxvt_native.args = -display :0 -fn "Lucida Console-14" -tn rxvt-cygwin-native -e /bin/bash --login
+
+cygwin_terminal.priority = -2
+cygwin_terminal.executable-win = C:\cygwin\bin\mintty.exe
+cygwin_termimal.args = -i /Cygwin-Terminal.ico -
+
+bash_prompt.priority = -3
 bash_prompt.executable-win = c:\cygwin\bin\bash
 
 # Linux specific terminals
