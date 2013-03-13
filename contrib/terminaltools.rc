@@ -20,23 +20,23 @@
 [terminal-tools]
 
 # Windows specific terminals
-windows_command_prompt.priority = -10
+windows_command_prompt.priority = -1
 windows_command_prompt.executable = cmd
 windows_command_prompt.args = /K title %(reponame)s
 
-powershell.priority = -11
+powershell.priority = -2
 powershell.executable-win = powershell
 powershell.args = -NoExit -Command "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell - %(reponame)s'"
 
-rxvt_native.priority = -1
+rxvt_native.priority = -3
 rxvt_native.executable-win = C:\cygwin\bin\rxvt.exe
 rxvt_native.args = -display :0 -fn "Lucida Console-14" -tn rxvt-cygwin-native -e /bin/bash
 
-cygwin_terminal.priority = -2
+cygwin_terminal.priority = -4
 cygwin_terminal.executable-win = C:\cygwin\bin\mintty.exe
 cygwin_termimal.args = -i /Cygwin-Terminal.ico -
 
-bash_prompt.priority = -3
+bash_prompt.priority = -5
 bash_prompt.executable-win = c:\cygwin\bin\bash
 
 # Linux specific terminals
@@ -48,7 +48,7 @@ xterm.executable-unix = xterm
 xterm.args = -T "%(reponame)s"'
 
 # OSX specific terminals
-terminal_app.priority = -10
+terminal_app.priority = -1
 terminal_app.executable-osx = open
 terminal_app.args = -a Terminal "%(root)s"
 
