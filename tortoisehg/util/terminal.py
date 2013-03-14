@@ -75,7 +75,7 @@ def _findterminal(ui):
             try:
                 priority = int(_toolstr(ui, t, "priority", "0"))
             except ValueError, e:
-                priority = 0
+                priority = -100
             tools[t] = priority
     names = tools.keys()
     tools = sorted([(-p, t) for t, p in tools.items()])
