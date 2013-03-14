@@ -72,7 +72,11 @@ def _findterminal(ui):
     for k, v in ui.configitems("terminal-tools"):
         t = k.split('.')[0]
         if t not in tools:
-            tools[t] = int(_toolstr(ui, t, "priority", "0"))
+            try:
+                priority = int(_toolstr(ui, t, "priority", "0"))
+            except ValueError, e:
+                priority = 0
+            tools[t] = priority
     names = tools.keys()
     tools = sorted([(-p, t) for t, p in tools.items()])
     terminal = ui.config('tortoisehg', 'shell')
