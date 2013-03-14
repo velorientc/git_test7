@@ -131,7 +131,15 @@ class Scintilla(QsciScintilla):
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
         self.highlightLines = set()
+        self._setMultipleSelectionOptions()
         unbindConflictedKeys(self)
+
+    def _setMultipleSelectionOptions(self):
+        if hasattr(QsciScintilla, 'SCI_SETMULTIPLESELECTION'):
+            self.SendScintilla(QsciScintilla.SCI_SETMULTIPLESELECTION, True)
+            self.SendScintilla(QsciScintilla.SCI_SETADDITIONALSELECTIONTYPING, True)
+            self.SendScintilla(QsciScintilla.SCI_SETMULTIPASTE, QsciScintilla.SC_MULTIPASTE_EACH)
+            self.SendScintilla(QsciScintilla.SCI_SETVIRTUALSPACEOPTIONS, QsciScintilla.SCVS_RECTANGULARSELECTION)
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
