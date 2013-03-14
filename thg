@@ -22,9 +22,12 @@ if 'THG_OSX_APP' in os.environ:
     sys.path.insert(0, os.path.join(bundlepath, 'lib/python2.6/lib-dynload'))
 
 if hasattr(sys, "frozen"):
-    if sys.frozen == 'windows_exe' and 'THGDEBUG' in os.environ:
-        import win32traceutil
-        print 'starting'
+    if sys.frozen == 'windows_exe':
+        # sys.stdin is invalid, should be None.  Fixes svn, git subrepos
+        sys.stdin = None
+        if 'THGDEBUG' in os.environ:
+            import win32traceutil
+            print 'starting'
     # os.Popen() needs this, and Mercurial still uses os.Popen
     if 'COMSPEC' not in os.environ:
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
