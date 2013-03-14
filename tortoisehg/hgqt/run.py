@@ -221,7 +221,7 @@ def _parse(ui, args):
         c.append((o[0], o[1], options[o[1]], o[3]))
 
     try:
-        args = fancyopts.fancyopts(args, c, cmdoptions)
+        args = fancyopts.fancyopts(args, c, cmdoptions, True)
     except fancyopts.getopt.GetoptError, inst:
         raise error.CommandError(cmd, inst)
 
@@ -834,6 +834,11 @@ def thgimport(ui, *pats, **opts):
     from tortoisehg.hgqt.thgimport import run
     return qtrun(run, ui, *pats, **opts)
 
+def revdetails(ui, *pats, **opts):
+    """revision details tool"""
+    from tortoisehg.hgqt.revdetails import run
+    return qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -1113,6 +1118,10 @@ table = {
         (log,
          [('l', 'limit', '', _('(DEPRECATED)'))],
          _('thg log [OPTIONS] [FILE]')),
+    "^revdetails":
+        (revdetails,
+         [('r', 'rev', '', _('the revision to show'))],
+         _('thg revdetails [-r REV]')),
     "manifest":
         (manifest,
          [('r', 'rev', '', _('revision to display')),

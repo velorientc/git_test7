@@ -24,11 +24,6 @@ from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class HgRepoViewHeader(QHeaderView):
-    menuRequested = pyqtSignal(QPoint)
-    def contextMenuEvent(self, event):
-        self.menuRequested.emit(event.globalPos())
-
 class HgRepoView(QTableView):
 
     revisionClicked = pyqtSignal(object)
@@ -52,10 +47,10 @@ class HgRepoView(QTableView):
         vh.hide()
         vh.setDefaultSectionSize(20)
 
-        header = HgRepoViewHeader(Qt.Horizontal, self)
+        header = self.horizontalHeader()
         header.setHighlightSections(False)
-        header.menuRequested.connect(self.headerMenuRequest)
-        self.setHorizontalHeader(header)
+        header.setContextMenuPolicy(Qt.CustomContextMenu)
+        header.customContextMenuRequested.connect(self.headerMenuRequest)
 
         self.createActions()
 
@@ -100,8 +95,9 @@ class HgRepoView(QTableView):
         menu.addAction(act)
         self.headermenu = menu
 
+    @pyqtSlot(QPoint)
     def headerMenuRequest(self, point):
-        self.headermenu.exec_(point)
+        self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
 
     def setHistoryColumns(self):
         dlg = ColumnSelectDialog(self.colselect[0], self.colselect[1],

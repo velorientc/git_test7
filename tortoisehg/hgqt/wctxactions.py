@@ -246,7 +246,7 @@ def terminal(parent, ui, repo, files):
     for filename in files:
         root = repo.wjoin(filename)
         if os.path.isdir(root):
-            qtlib.openshell(root, filename)
+            qtlib.openshell(root, filename, repo.ui)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])

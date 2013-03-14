@@ -595,8 +595,7 @@ class Workbench(QMainWindow):
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == path:
-                w.filterbar.revsetle.setText(filter)
-                w.filterbar.returnPressed()
+                w.setFilter(filter)
                 return
 
     def find_root(self, url):
@@ -1102,7 +1101,7 @@ class Workbench(QMainWindow):
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            qtlib.openshell(w.repo.root, w.repo.displayname)
+            qtlib.openshell(w.repo.root, w.repo.displayname, w.repo.ui)
 
     def editSettings(self):
         tw = self.repoTabsWidget
