@@ -565,6 +565,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.finishfunc:
             output = self.cmd.core.rawoutput()
             self.finishfunc(ret, output)
+            self.finishfunc = None # allow GC to clean temp functions
 
     def run(self, cmdline, details):
         if self.cmd.core.running():
