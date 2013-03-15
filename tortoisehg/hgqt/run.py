@@ -698,10 +698,9 @@ def mq(ui, *pats, **opts):
     from tortoisehg.hgqt.mq import run
     return qtrun(run, ui, *pats, **opts)
 
-def test(ui, *pats, **opts):
-    """test arbitrary widgets"""
-    from tortoisehg.hgqt.mq import run
-    return qtrun(run, ui, *pats, **opts)
+def debugbugreport(ui, *pats, **opts):
+    """open bugreport dialog by exception"""
+    raise Exception(' '.join(pats))
 
 def purge(ui, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
@@ -1174,7 +1173,7 @@ table = {
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
     "shelve|unshelve": (shelve, [], _('thg shelve')),
     "rejects": (rejects, [], _('thg rejects [FILE]')),
-    "test": (test, [], _('thg test')),
+    "debugbugreport": (debugbugreport, [], _('thg debugbugreport [TEXT]')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
     "^qreorder": (qreorder, [], _('thg qreorder')),
