@@ -229,7 +229,7 @@ class PostReviewDialog(QDialog):
 
     def getSummary(self):
         comboText = self.qui.review_id_combo.currentText().split(":")
-        return str(comboText[1])
+        return hglib.fromunicode(comboText[1])
 
     def postReviewOpts(self, **opts):
         """Generate opts for reviewboard by form values"""
