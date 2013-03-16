@@ -96,11 +96,17 @@ class Workbench(QMainWindow):
         self.lastClosedRepoRootList = []
         self.progressDialog.close()
         self.progressDialog = None
+        self._dialogs = []
 
         self.server = None
         if createserver:
             # Enable the Workbench Server that is used to maintain a single workbench instance
             self.createWorkbenchServer()
+
+    def _forgetdialog(self, dlg):
+        """forget the dialog to be garbage collectable"""
+        assert dlg in self._dialogs
+        self._dialogs.remove(dlg)
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -889,7 +895,9 @@ class Workbench(QMainWindow):
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.clonedRepository.connect(self.showClonedRepo)
-        dlg.exec_()
+        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
+        dlg.show()
+        self._dialogs.append(dlg)
 
     def openRepository(self):
         """ Open repo from File menu """
