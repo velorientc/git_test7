@@ -17,8 +17,9 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 try:
     from PyQt4.Qsci import QSCINTILLA_VERSION_STR
-except (ImportError, AttributeError):
+except (ImportError, AttributeError, RuntimeError):
     # show BugReport dialog even if QScintilla is missing
+    # or incompatible (RuntimeError: the sip module implements API v...)
     QSCINTILLA_VERSION_STR = '(unknown)'
 
 def _safegetcwd():
