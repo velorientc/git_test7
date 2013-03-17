@@ -463,18 +463,20 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def exploreurl(self):
         url = hglib.fromunicode(self.menuurl)
-        if parseurl(url).scheme == 'local':
-            qtlib.openlocalurl(folder)
+        u = parseurl(url)
+        if u.scheme == 'local':
+            qtlib.openlocalurl(u.path)
         else:
             QDesktopServices.openUrl(QUrl(url))
 
     def terminalurl(self):
         url = hglib.fromunicode(self.menuurl)
-        if parseurl(url).scheme != 'local':
+        u = parseurl(url)
+        if u.scheme != 'local':
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        qtlib.openshell(folder, 'repo ' + folder)
+        qtlib.openshell(u.folder, 'repo ' + u.folder)
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
@@ -686,7 +688,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             def finished(ret, output):
                 if ret == 0 and os.path.exists(bfile):
                     self.showMessage.emit(_('Found incoming changesets from %s') % link)
-                    self.incomingBundle.emit(hglib.tounicode(bfile), urlu)
+                    self.incomingBundle.emit(hglib.tounicode(bfile), url)
                 elif ret == 1:
                     self.showMessage.emit(_('No incoming changesets from %s') % link)
                 else:
@@ -794,7 +796,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def p4pending(self):
-        p4url = self.currentUrl(False)
+        p4url = hglib.fromunicode(self.currentUrl())
         def finished(ret, output):
             pending = {}
             if ret == 0:
@@ -1185,18 +1187,18 @@ class SecureDialog(QDialog):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
-            if port is None:
+            if u.port is None:
                 portnum = 443
             else:
                 try:
-                    portnum = int(port)
+                    portnum = int(u.port)
                 except ValueError:
                     qtlib.WarningMsgBox(_('Certificate Query Error'),
                                         _('Invalid port number: %s')
-                                        % hglib.tounicode(port), parent=self)
+                                        % hglib.tounicode(u.port), parent=self)
                     return
             try:
-                pem = ssl.get_server_certificate( (host, portnum) )
+                pem = ssl.get_server_certificate( (u.host, portnum) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Certificate Query Error'),
