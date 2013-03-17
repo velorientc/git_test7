@@ -137,9 +137,12 @@ class Scintilla(QsciScintilla):
     def _setMultipleSelectionOptions(self):
         if hasattr(QsciScintilla, 'SCI_SETMULTIPLESELECTION'):
             self.SendScintilla(QsciScintilla.SCI_SETMULTIPLESELECTION, True)
-            self.SendScintilla(QsciScintilla.SCI_SETADDITIONALSELECTIONTYPING, True)
-            self.SendScintilla(QsciScintilla.SCI_SETMULTIPASTE, QsciScintilla.SC_MULTIPASTE_EACH)
-            self.SendScintilla(QsciScintilla.SCI_SETVIRTUALSPACEOPTIONS, QsciScintilla.SCVS_RECTANGULARSELECTION)
+            self.SendScintilla(QsciScintilla.SCI_SETADDITIONALSELECTIONTYPING,
+                               True)
+            self.SendScintilla(QsciScintilla.SCI_SETMULTIPASTE,
+                               QsciScintilla.SC_MULTIPASTE_EACH)
+            self.SendScintilla(QsciScintilla.SCI_SETVIRTUALSPACEOPTIONS,
+                               QsciScintilla.SCVS_RECTANGULARSELECTION)
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
@@ -430,23 +433,28 @@ class Scintilla(QsciScintilla):
     if not hasattr(QsciScintilla, 'setIndicatorForegroundColor'):
         def setIndicatorForegroundColor(self, color, indicatorNumber):
             self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
-            self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber, color.alpha());
+            self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber,
+                               color.alpha());
 
     if not hasattr(QsciScintilla, 'clearIndicatorRange'):
-        def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+        def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
+                                indicatorNumber):
             start = self.positionFromLineIndex(lineFrom, indexFrom)
             finish = self.positionFromLineIndex(lineTo, indexTo)
 
             self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
-            self.SendScintilla(self.SCI_INDICATORCLEARRANGE, start, finish - start);
+            self.SendScintilla(self.SCI_INDICATORCLEARRANGE,
+                               start, finish - start);
 
     if not hasattr(QsciScintilla, 'fillIndicatorRange'):
-        def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo, indicatorNumber):
+        def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
+                               indicatorNumber):
             start = self.positionFromLineIndex(lineFrom, indexFrom)
             finish = self.positionFromLineIndex(lineTo, indexTo)
 
             self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
-            self.SendScintilla(self.SCI_INDICATORFILLRANGE, start, finish - start);
+            self.SendScintilla(self.SCI_INDICATORFILLRANGE,
+                               start, finish - start);
 
 
 class SearchToolBar(QToolBar):
@@ -655,7 +663,9 @@ def findTabIndentsInLines(lines, linestocheck=100):
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMaximizeButtonHint)
+    dialog.setWindowFlags(dialog.windowFlags()
+                          & ~Qt.WindowContextHelpButtonHint
+                          | Qt.WindowMaximizeButtonHint)
     dialog.setWindowTitle(filename)
     dialog.setLayout(QVBoxLayout())
     editor = Scintilla()
