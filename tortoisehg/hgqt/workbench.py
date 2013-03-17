@@ -363,6 +363,8 @@ class Workbench(QMainWindow):
         newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
                   tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
+        self.urlCombo = QComboBox(self)
+        self.synctbar.addWidget(self.urlCombo)
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
                   tooltip=_('Detect outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
@@ -371,6 +373,24 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
 
         self.updateMenu()
+
+    def _setupUrlCombo(self, repo):
+        'repository has been switched, fill urlCombo with URLs'
+        aliases = [alias for alias, path in repo.ui.configitems('paths')]
+        if 'default' in aliases:
+            aliases.remove('default')
+            aliases.insert(0, 'default')
+        for a in aliases[:]:
+            if a + '-push' in aliases:
+                # add foo,foo-push entry to top of menu
+                aliases.insert(0, u'\u2193 %s | %s-push \u2191' % (a,a))
+                # move foo,foo-push individual entries to bottom
+                aliases.remove(a)
+                aliases.remove(a + '-push')
+                aliases.append(a)
+                aliases.append(a + '-push')
+        self.urlCombo.clear()
+        self.urlCombo.addItems(aliases)
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
@@ -746,6 +766,7 @@ class Workbench(QMainWindow):
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
                 self._setupCustomTools(w.repo.ui)
+                self._setupUrlCombo(w.repo)
         else:
             self.activeRepoChanged.emit("")
         repo = w and w.repo or None
