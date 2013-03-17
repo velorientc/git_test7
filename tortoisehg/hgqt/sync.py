@@ -255,13 +255,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
 
-    def refreshStatusTips(self):
-        urlu = self.currentUrl()
-        self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % urlu)
-        self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % urlu)
-        self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % urlu)
-        self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % urlu)
-
     def loadTargets(self, ctx):
         self.targetcombo.clear()
         #The parallel targetargs record is the argument list to pass to hg
@@ -402,7 +395,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         'User has selected a new URL: newurl is expected in local encoding'
         self.urlentry.setText(newurl)
         self.refreshUrl()
-        self.refreshStatusTips()
 
     def dragEnterEvent(self, event):
         data = event.mimeData()
