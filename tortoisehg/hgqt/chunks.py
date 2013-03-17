@@ -16,7 +16,7 @@ from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, visdiff, revert
-from tortoisehg.hgqt import filelistmodel, filelistview, filedata
+from tortoisehg.hgqt import filelistmodel, filelistview, filedata, blockmatcher
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -526,6 +526,11 @@ class DiffBrowser(QFrame):
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
 
+        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar.hide()
+        self.searchbar.searchRequested.connect(self.find)
+        self.searchbar.conditionChanged.connect(self.highlightText)
+
         guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
         self.sumlabel.setFont(guifont)
@@ -539,6 +544,15 @@ class DiffBrowser(QFrame):
         self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setShortcut(QKeySequence.New)
         self.nonebutton.clicked.connect(self.selectNone)
+        self.actionFind = self.searchbar.toggleViewAction()
+        self.actionFind.setIcon(qtlib.geticon('edit-find'))
+        self.actionFind.setToolTip(_('Toggle display of text search bar'))
+        qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.searchbar.show)
+        self.diffToolbar = QToolBar(_('Diff Toolbar'))
+        self.diffToolbar.setIconSize(QSize(16, 16))
+        self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
+        self.diffToolbar.addAction(self.actionFind)
+        hbox.addWidget(self.diffToolbar)
         hbox.addStretch(1)
         hbox.addWidget(self.sumlabel)
         hbox.addWidget(self.allbutton)
@@ -583,10 +597,20 @@ class DiffBrowser(QFrame):
                (1 << self.vertical) | (1 << self.selcolor) | (1 << self.divider)
         self.sci.setMarginMarkerMask(1, mask)
 
-        self.layout().addWidget(self.sci, 1)
+        self.blksearch = blockmatcher.BlockList(self)
+        self.blksearch.linkScrollBar(self.sci.verticalScrollBar())
+        self.blksearch.setVisible(False)
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sci)
+        hbox.addWidget(self.blksearch)
 
         lexer = lexers.difflexer(self)
         self.sci.setLexer(lexer)
+
+        self.layout().addLayout(hbox)
+        self.layout().addWidget(self.searchbar)
+
         self.clearDisplay()
 
     def menuRequested(self, point):
@@ -659,6 +683,7 @@ class DiffBrowser(QFrame):
         self.sci.clear()
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+        self.blksearch.clear()
 
     def clearChunks(self):
         self.curchunks = []
@@ -752,3 +777,20 @@ class DiffBrowser(QFrame):
             if (c.fromline, len(c.before)) in reenable:
                 self.toggleChunk(c)
         self.updateSummary()
+
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, exp, icase=True, wrap=False, forward=True):
+        self.sci.find(exp, icase, wrap, forward)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, match, icase=False):
+        self._lastSearch = match, icase
+        self.sci.highlightText(match, icase)
+        blk = self.blksearch
+        blk.clear()
+        blk.setUpdatesEnabled(False)
+        blk.clear()
+        for l in self.sci.highlightLines:
+            blk.addBlock('s', l, l + 1)
+        blk.setVisible(bool(match))
+        blk.setUpdatesEnabled(True)
