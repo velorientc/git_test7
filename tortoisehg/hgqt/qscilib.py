@@ -432,9 +432,9 @@ class Scintilla(QsciScintilla):
 
     if not hasattr(QsciScintilla, 'setIndicatorForegroundColor'):
         def setIndicatorForegroundColor(self, color, indicatorNumber):
-            self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color);
+            self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color)
             self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber,
-                               color.alpha());
+                               color.alpha())
 
     if not hasattr(QsciScintilla, 'clearIndicatorRange'):
         def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
@@ -442,9 +442,9 @@ class Scintilla(QsciScintilla):
             start = self.positionFromLineIndex(lineFrom, indexFrom)
             finish = self.positionFromLineIndex(lineTo, indexTo)
 
-            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber)
             self.SendScintilla(self.SCI_INDICATORCLEARRANGE,
-                               start, finish - start);
+                               start, finish - start)
 
     if not hasattr(QsciScintilla, 'fillIndicatorRange'):
         def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
@@ -452,9 +452,9 @@ class Scintilla(QsciScintilla):
             start = self.positionFromLineIndex(lineFrom, indexFrom)
             finish = self.positionFromLineIndex(lineTo, indexTo)
 
-            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber);
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber)
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
-                               start, finish - start);
+                               start, finish - start)
 
 
 class SearchToolBar(QToolBar):
