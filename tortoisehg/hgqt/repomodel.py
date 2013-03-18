@@ -23,6 +23,7 @@ from mercurial.context import workingctx
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
+from tortoisehg.hgqt.graph import LINE_TYPE_GRAFT
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qreorder import writeSeries
 
@@ -70,6 +71,16 @@ def get_color(n, ignore=()):
     if not colors: # ghh, no more available colors...
         colors = COLORS
     return colors[n % len(colors)]
+
+def get_style(line_type):
+    if line_type == LINE_TYPE_GRAFT:
+        return Qt.DashLine
+    return Qt.SolidLine
+
+def get_width(line_type):
+    if line_type == LINE_TYPE_GRAFT:
+        return 1
+    return 2
 
 def _parsebranchcolors(value):
     r"""Parse tortoisehg.branchcolors setting
@@ -373,10 +384,11 @@ class HgRepoListModel(QAbstractTableModel):
             ymid = (y1 + y4)/2
             y3 = y1 + 3 * (y4 - y1)/4
 
-            for start, end, color in lines:
+            for start, end, color, line_type in lines:
                 lpen = QPen(pen)
                 lpen.setColor(QColor(get_color(color)))
-                lpen.setWidth(2)
+                lpen.setStyle(get_style(line_type))
+                lpen.setWidth(get_width(line_type))
                 painter.setPen(lpen)
                 x1 = self.col2x(start)
                 x2 = self.col2x(end)

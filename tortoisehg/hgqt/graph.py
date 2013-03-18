@@ -30,6 +30,9 @@ import itertools
 
 from mercurial import util, error
 
+LINE_TYPE_PARENT = 0
+LINE_TYPE_GRAFT = 1
+
 try:
     from mercurial import repoview
     _filterrevs = repoview.filterrevs
@@ -59,8 +62,8 @@ def revision_grapher(repo, **opts):
       - current revision
       - column of the current node in the set of ongoing edges
       - color of the node (?)
-      - lines; a list of (col, next_col, color) indicating the edges between
-        the current row and the next row
+      - lines; a list of (col, next_col, color_no, line_type) defining
+	    the edges between the current row and the next row
       - parent revisions of current revision
     """
 
@@ -153,11 +156,11 @@ def revision_grapher(repo, **opts):
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color) )
+                lines.append( (i, next_revs.index(rev), color, LINE_TYPE_PARENT) )
             elif rev == curr_rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color) )
+                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT) )
 
         yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
