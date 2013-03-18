@@ -16,8 +16,12 @@
 
 """helper functions and classes to ease hg revision graph building
 
-Based on graphlog's algorithm, with insipration stolen from TortoiseHg
+Based on graphlog's algorithm, with inspiration stolen from TortoiseHg
 revision grapher (now stolen back).
+
+The primary interface are the *_grapher functions, which are generators
+of Graph instances that describe a revision set graph. These generators
+are used by repomodel.py which renders them on a widget.
 """
 
 import time
@@ -36,6 +40,17 @@ except ImportError: # hg < 2.5
 def revision_grapher(repo, **opts):
     """incremental revision grapher
 
+    param repo       The repository
+    opt   start_rev  Tip-most revision of range to graph
+    opt   stop_rev   0-most revision of range to graph
+    opt   follow     True means graph only ancestors of start_rev
+    opt   revset     set of revisions to graph.
+                     If used, then start_rev, stop_rev, and follow is ignored
+    opt   branch     Only graph this branch
+    opt   allparents If set in addition to branch, then cset outside the
+                     branch that are ancestors to some cset inside the branch
+                     is also graphed
+
     This generator function walks through the revision history from
     revision start_rev to revision stop_rev (which must be less than
     or equal to start_rev) and for each revision emits tuples with the
@@ -47,14 +62,6 @@ def revision_grapher(repo, **opts):
       - lines; a list of (col, next_col, color) indicating the edges between
         the current row and the next row
       - parent revisions of current revision
-
-    If follow is True, only generated the subtree from the start_rev head.
-
-    If branch is set, only generated the subtree for the given named branch.
-
-    If allparents is set, include the branch heads for the selected named
-    branch heads and all ancestors. If not set, include only the revisions
-    on the selected named branch.
     """
 
     revset = opts.get('revset', None)
@@ -93,7 +100,6 @@ def revision_grapher(repo, **opts):
 
         # Compute revs and next_revs.
         ctx = repo[curr_rev]
-        # Compute revs and next_revs.
         if curr_rev not in revs:
             if branch and ctx.branch() != branch:
                 if curr_rev is None:
@@ -234,7 +240,7 @@ def mq_patch_grapher(repo):
 
 class GraphNode(object):
     """
-    Simple class to encapsulate e hg node in the revision graph. Does
+    Simple class to encapsulate a hg node in the revision graph. Does
     nothing but declaring attributes.
     """
     def __init__(self, rev, xposition, color, lines, parents, ncols=None,
@@ -253,7 +259,7 @@ class GraphNode(object):
 class Graph(object):
     """
     Graph object to ease hg repo navigation. The Graph object
-    instanciate a `revision_grapher` generator, and provide a `fill`
+    instantiate a `revision_grapher` generator, and provide a `fill`
     method to build the graph progressively.
     """
     #@timeit
