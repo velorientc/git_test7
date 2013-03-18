@@ -85,6 +85,7 @@ def revision_grapher(repo, **opts):
 
     curr_rev = start_rev
     revs = []
+    links = [] # smallest link type that applies
     rev_color = {}
     nextcolor = 0
 
@@ -117,6 +118,7 @@ def revision_grapher(repo, **opts):
                 curr_rev -= 1
                 continue
             revs.append(curr_rev)
+            links.append(LINE_TYPE_PARENT)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
             p_revs = getparents(ctx)
@@ -129,17 +131,24 @@ def revision_grapher(repo, **opts):
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
+        next_links = links[:]
 
         # Add parents to next_revs.
-        parents = [p for p in getparents(ctx) if not hidden(p)]
+        parents = [(p,LINE_TYPE_PARENT) for p in getparents(ctx) if not hidden(p)]
+        if 'source' in ctx.extra():
+            src_rev_str = ctx.extra()['source']
+            if src_rev_str in repo:
+                parents.append((repo[src_rev_str].rev(), LINE_TYPE_GRAFT))
         parents_to_add = []
+        links_to_add = []
         if len(parents) > 1:
             preferred_color = None
         else:
             preferred_color = curcolor
-        for parent in parents:
+        for parent, link_type in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
+                links_to_add.append(link_type)
                 if parent not in rev_color:
                     if preferred_color:
                         rev_color[parent] = preferred_color
@@ -147,23 +156,30 @@ def revision_grapher(repo, **opts):
                     else:
                         rev_color[parent] = nextcolor
                         nextcolor += 1
+            else:
+                # Merging lines should have the most solid style
+                #  (= lowest style value)
+                i = next_revs.index(parent)
+                next_links[i] = min(next_links[i], link_type)
             preferred_color = None
 
         # parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
+        next_links[rev_index:rev_index + 1] = links_to_add
 
         lines = []
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, LINE_TYPE_PARENT) )
+                lines.append( (i, next_revs.index(rev), color, links[i]) )
             elif rev == curr_rev:
-                for parent in parents:
+                for parent, link_type in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT) )
+                    lines.append( (i, next_revs.index(parent), color, link_type) )
 
         yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
+        links = next_links
         if curr_rev is None:
             curr_rev = len(repo)
         else:
