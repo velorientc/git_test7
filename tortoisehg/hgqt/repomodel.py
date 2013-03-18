@@ -123,6 +123,8 @@ class HgRepoListModel(QAbstractTableModel):
     _allcolnames = dict(COLUMNHEADERS)
 
     _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags', 'Phase',)
+    _columnfonts = {'Node': QFont("Monospace"),
+                    'Converted': QFont("Monospace")}
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
@@ -144,6 +146,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.unicodexinabox = True
         self.cfgname = cfgname
         self.latesttags = {-1: 'null'}
+        self.fullauthorname = False
 
         # To be deleted
         self._user_colors = {}
@@ -195,6 +198,7 @@ class HgRepoListModel(QAbstractTableModel):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
+        self.fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
 
     def updateColumns(self):
         s = QSettings()
@@ -455,6 +459,10 @@ class HgRepoListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
+        # font is not cached in self._cache since it is equal for all rows
+        if role == Qt.FontRole:
+            column = self._columns[index.column()]
+            return self._columnfonts.get(column, nullvariant)
         if role not in self._roleoffsets:
             return nullvariant
         try:
@@ -656,7 +664,10 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getauthor(self, ctx, gnode):
         try:
-            return hglib.username(ctx.user())
+            user = ctx.user()
+            if not self.fullauthorname:
+                user = hglib.username(user)
+            return user
         except error.Abort:
             return _('Mercurial User')
 

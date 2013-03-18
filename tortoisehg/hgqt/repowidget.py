@@ -159,8 +159,7 @@ class RepoWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
-        self._infobarlayout = QVBoxLayout()  # placeholder for InfoBar
-        self.layout().addLayout(self._infobarlayout)
+        self._activeInfoBar = None
 
         self.filterbar = RepoFilterBar(self.repo, self)
         self.layout().addWidget(self.filterbar)
@@ -168,6 +167,7 @@ class RepoWidget(QWidget):
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
+        self.filterbar.showMessage.connect(self._showMessageOnInfoBar)
         self.filterbar.setRevisionSet.connect(self.setRevisionSet)
         self.filterbar.clearRevisionSet.connect(self._unapplyRevisionSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
@@ -317,25 +317,56 @@ class RepoWidget(QWidget):
         if not cleared:
             return
         w = cls(*args, **kwargs)
+        w.setParent(self)
+        w.finished.connect(self._freeInfoBar)
         w.linkActivated.connect(self._openLink)
-        self._infobarlayout.insertWidget(0, w)
-        w.setFocus()  # to handle key press by InfoBar
+        self._activeInfoBar = w
+        self._updateInfoBarGeometry()
+        w.show()
+        if w.infobartype > qtlib.InfoBar.INFO:
+            w.setFocus()  # to handle key press by InfoBar
         return w
 
     @pyqtSlot()
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
-        it = self._infobarlayout.itemAt(0)
-        if not it:
+        if not self._activeInfoBar:
             return True
-        if priority is None or it.widget().infobartype <= priority:
-            # removes current infobar explicitly, because close() seems to
-            # delay deletion until next eventloop.
-            self._infobarlayout.removeItem(it)
-            it.widget().close()
+        if priority is None or self._activeInfoBar.infobartype <= priority:
+            self._activeInfoBar.finished.disconnect(self._freeInfoBar)
+            self._activeInfoBar.close()
+            self._freeInfoBar()  # call directly in case of event delay
             return True
         else:
             return False
+
+    @pyqtSlot()
+    def _freeInfoBar(self):
+        """Disown closed infobar"""
+        if not self._activeInfoBar:
+            return
+        self._activeInfoBar.setParent(None)
+        self._activeInfoBar = None
+
+        # clear margin for overlay
+        h = self.repoview.horizontalHeader()
+        if h.minimumSize() != QSize(0, 0):
+            h.setMinimumSize(0, 0)
+            h.geometriesChanged.emit()
+
+    def _updateInfoBarGeometry(self):
+        if not self._activeInfoBar:
+            return
+        w = self._activeInfoBar
+        top = self.repoview.mapTo(self, QPoint(0, 0)).y()
+        w.setGeometry(0, top, self.width(), w.heightForWidth(self.width()))
+
+        # give margin to make first row visible, except for auto-hide infobar
+        if w.infobartype > qtlib.InfoBar.INFO:
+            h = self.repoview.horizontalHeader()
+            y = h.mapTo(self.repoview, QPoint(0, 0)).y()
+            h.setMinimumSize(0, max(w.height() - y, 0))
+            h.geometriesChanged.emit()
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
@@ -382,6 +413,7 @@ class RepoWidget(QWidget):
         cw.endSuppressPrompt.connect(self.endSuppressPrompt)
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
+        cw.grepRequested.connect(self.grep)
         QTimer.singleShot(0, cw.reload)
         return cw
 
@@ -435,9 +467,9 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QString)
     def setFilter(self, filter):
-        self.filterbar.revsetle.setText(filter)
+        self.filterbar.setQuery(filter)
         self.filterbar.setVisible(True)
-        self.filterbar.returnPressed()
+        self.filterbar.runQuery()
 
     @pyqtSlot(QString, QString)
     def setBundle(self, bfile, bsource=None):
@@ -451,7 +483,7 @@ class RepoWidget(QWidget):
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
         self.manifestDemand.forward('setRepo', self.repo)
-        self.filterbar.revsetle.setText('incoming()')
+        self.filterbar.setQuery('incoming()')
         self.filterbar.setEnableFilter(False)
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
@@ -474,7 +506,7 @@ class RepoWidget(QWidget):
 
     def clearBundle(self):
         self.filterbar.setEnableFilter(True)
-        self.filterbar.revsetle.setText('')
+        self.filterbar.setQuery('')
         self.revset = []
         self.repomodel.revset = self.revset
         self.bundle = None
@@ -524,7 +556,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def clearRevisionSet(self):
-        self.filterbar.revsetle.clear()
+        self.filterbar.setQuery('')
         return self._unapplyRevisionSet()
 
     @pyqtSlot()
@@ -555,6 +587,7 @@ class RepoWidget(QWidget):
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
         self.repoview._paletteswitcher.enablefilterpalette(revs)
+        self.clearInfoBar(qtlib.InfoBar.INFO)  # clear progress message
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):
@@ -565,31 +598,89 @@ class RepoWidget(QWidget):
             self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     def setOutgoingNodes(self, nodes):
-        self.filterbar.revsetle.setText('outgoing()')
-        self.setRevisionSet([self.repo[n].rev() for n in nodes])
+        self.filterbar.setQuery('outgoing()')
+        revs = [self.repo[n].rev() for n in nodes]
+        self.setRevisionSet(revs)
         self.outgoingMode = True
-
-        w = self.setInfoBar(qtlib.ConfirmInfoBar,
-                            _('%d outgoing changesets') % len(nodes))
-        assert w
+        numnodes = len(nodes)
+        numoutgoing = numnodes
 
         # Read the tortoisehg.defaultpush setting to determine what to push
         # by default, and set the button label and action accordingly
-        acceptbuttontext = _('Push')
         defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
         rev = None
         branch = None
         pushall = False
+        # note that we assume that none of the revisions
+        # on the nodes/revs lists is secret
         if defaultpush == 'branch':
             branch = self.repo['.'].branch()
-            acceptbuttontext = _('Push current branch (%s)') \
-                % hglib.tounicode(branch)
+            ubranch = hglib.tounicode(branch)
+            # Get the list of revs that will be actually pushed
+            outgoingrevs = self.repo.revs('%ld and branch(.)', revs)
+            numoutgoing = len(outgoingrevs)
         elif defaultpush == 'revision':
             rev = self.repo['.'].rev()
-            acceptbuttontext = _('Push current revision (%d)') % rev
+            # Get the list of revs that will be actually pushed
+            # excluding (potentially) the current rev
+            outgoingrevs = self.repo.revs('%ld and ::.', revs)
+            numoutgoing = len(outgoingrevs)
+            maxrev = rev
+            if numoutgoing > 0:
+                maxrev = max(outgoingrevs)
         else:
             pushall = True
 
+        # Set the default acceptbuttontext
+        # Note that the pushall case uses the default accept button text
+        if branch is not None:
+            acceptbuttontext = _('Push current branch (%s)') % ubranch
+        elif rev is not None:
+            if maxrev == rev:
+                acceptbuttontext = _('Push up to current revision (#%d)') % rev
+            else:
+                acceptbuttontext = _('Push up to revision #%d') % maxrev
+        else:
+            acceptbuttontext = _('Push all')
+
+        if numnodes == 0:
+            msg = _('no outgoing changesets')
+        elif numoutgoing == 0:
+            if branch:
+                msg = _('no outgoing changesets in current branch (%s) '
+                    '/ %d in total') % (ubranch, numnodes)
+            elif rev is not None:
+                if maxrev == rev:
+                    msg = _('no outgoing changesets up to current revision '
+                            '(#%d) / %d in total') % (rev, numnodes)
+                else:
+                    msg = _('no outgoing changesets up to revision #%d '
+                            '/ %d in total') % (maxrev, numnodes)
+        elif numoutgoing == numnodes:
+            # This case includes 'Push all' among others
+            msg = _('%d outgoing changesets') % numoutgoing
+        elif branch:
+            msg = _('%d outgoing changesets in current branch (%s) '
+                    '/ %d in total') % (numoutgoing, ubranch, numnodes)
+        elif rev:
+            if maxrev == rev:
+                msg = _('%d outgoing changesets up to current revision (#%d) '
+                        '/ %d in total') % (numoutgoing, rev, numnodes)
+            else:
+                msg = _('%d outgoing changesets up to revision #%d '
+                        '/ %d in total') % (numoutgoing, maxrev, numnodes)
+        else:
+            # This should never happen but we leave this else clause
+            # in case there is a flaw in the logic above (e.g. due to
+            # a future change in the code)
+            msg = _('%d outgoing changesets') % numoutgoing
+
+        w = self.setInfoBar(qtlib.ConfirmInfoBar, msg.strip())
+        assert w
+
+        if numoutgoing == 0:
+            acceptbuttontext = _('Nothing to push')
+            w.acceptButton.setEnabled(False)
         w.acceptButton.setText(acceptbuttontext)
         w.accepted.connect(lambda: self.push(False,
             rev=rev, branch=branch, pushall=pushall))  # TODO: to the same URL
@@ -632,6 +723,12 @@ class RepoWidget(QWidget):
         if self.isVisible():
             self.showMessageSignal.emit(msg)
 
+    def keyPressEvent(self, event):
+        if self._activeInfoBar and event.key() == Qt.Key_Escape:
+            self.clearInfoBar(qtlib.InfoBar.INFO)
+        else:
+            QWidget.keyPressEvent(self, event)
+
     def showEvent(self, event):
         QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
@@ -639,6 +736,15 @@ class RepoWidget(QWidget):
             print 'page was dirty, reloading...'
             self.reload()
             self.dirty = False
+
+    def resizeEvent(self, event):
+        QWidget.resizeEvent(self, event)
+        self._updateInfoBarGeometry()
+
+    def event(self, event):
+        if event.type() == QEvent.LayoutRequest:
+            self._updateInfoBarGeometry()
+        return QWidget.event(self, event)
 
     def createActions(self):
         QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
@@ -921,7 +1027,7 @@ class RepoWidget(QWidget):
                                    'cleared'))
             elif self.revset:
                 self.revset = []
-                self.filterbar.revsetle.clear()
+                self.filterbar.setQuery('')
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)
@@ -1277,7 +1383,7 @@ class RepoWidget(QWidget):
         entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
         entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
-              'menurelocate', self.bundleRevisions)
+              'hg-bundle', self.bundleRevisions)
         entry(submenu, None, isctx, _('&Copy Patch'), 'copy-patch',
               self.copyPatch)
         entry(menu)
@@ -1454,7 +1560,7 @@ class RepoWidget(QWidget):
                 (None, None, None),
                 (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
-                (_('Bundle DAG Range...'), bundleDagRange, 'menurelocate'),
+                (_('Bundle DAG Range...'), bundleDagRange, 'hg-bundle'),
                 (None, None, None),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),

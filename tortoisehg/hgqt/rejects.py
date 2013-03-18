@@ -8,7 +8,7 @@
 import cStringIO
 import os
 
-from mercurial import hg, util, patch, commands
+from mercurial import hg, util, patch, commands, ui
 from hgext import record
 
 from tortoisehg.util import hglib
@@ -109,7 +109,7 @@ class RejectsDialog(QDialog):
         f.seek(0)
         editor.read(f)
         editor.setModified(False)
-        lexer = lexers.get_lexer(path, earlybytes, self)
+        lexer = lexers.getlexer(ui.ui(), path, earlybytes, self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
@@ -250,7 +250,7 @@ class RejectBrowser(qscilib.Scintilla):
         mask = (1 << self.addedMark) | (1 << self.removedMark) | \
                (1 << self.addedColor) | (1 << self.removedColor)
         self.setMarginMarkerMask(1, mask)
-        lexer = lexers.get_diff_lexer(self)
+        lexer = lexers.difflexer(self)
         self.setLexer(lexer)
 
     def menuRequested(self, point):
