@@ -159,7 +159,7 @@ def revision_grapher(repo, **opts):
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color) )
 
-        yield (curr_rev, rev_index, curcolor, lines, parents)
+        yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
         if curr_rev is None:
             curr_rev = len(repo)
@@ -222,8 +222,8 @@ def filelog_grapher(repo, path):
                     lines.append( (i, next_revs.index(parent), color) )
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
-        yield (fctx.rev(), index, curcolor, lines, pcrevs,
-               _paths.get(fctx.rev(), path))
+        yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
+               extra=_paths.get(fctx.rev(), path))
         revs = next_revs
 
         if revs:
@@ -236,7 +236,7 @@ def filelog_grapher(repo, path):
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield (patchname, 0, "", [], [], "")
+        yield GraphNode(patchname, 0, "", [], [], extra="")
 
 class GraphNode(object):
     """
@@ -313,21 +313,18 @@ class Graph(object):
         stopped = False
         mcol = set([self.max_cols])
 
-        for vnext in self.grapher:
-            if vnext is None:
+        for gnode in self.grapher:
+            if gnode is None:
                 continue
-            nrev, xpos, color, lines, parents = vnext[:5]
-            if not type(nrev) == str and nrev >= self.maxlog:
+            if not type(gnode.rev) == str and gnode.rev >= self.maxlog:
                 continue
-            gnode = GraphNode(nrev, xpos, color, lines, parents,
-                              extra=vnext[5:])
             if self.nodes:
                 gnode.toplines = self.nodes[-1].bottomlines
             self.nodes.append(gnode)
-            self.nodesdict[nrev] = gnode
-            mcol = mcol.union(set([xpos]))
+            self.nodesdict[gnode.rev] = gnode
+            mcol = mcol.union(set([gnode.x]))
             mcol = mcol.union(set([max(x[:2]) for x in gnode.bottomlines]))
-            if rev is not None and nrev <= rev:
+            if rev is not None and gnode.rev <= rev:
                 rev = None # we reached rev, switching to nnode counter
             if rev is None:
                 if nnodes is not None:
