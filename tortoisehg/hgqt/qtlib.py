@@ -184,7 +184,7 @@ def savefiles(repo, files, rev, parent=None):
                 commands.cat(repo.ui, repo, curfile, rev=rev,
                              output=hglib.fromunicode(result))
             except (util.Abort, IOError), e:
-                QMessageBox.critical(self, _('Unable to save file'),
+                QMessageBox.critical(parent, _('Unable to save file'),
                                      hglib.tounicode(str(e)))
         finally:
             os.chdir(cwd)
