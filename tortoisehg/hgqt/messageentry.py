@@ -70,10 +70,12 @@ class MessageEntry(qscilib.Scintilla):
                 line = 0
             else:
                 line = firstline
+            self.beginUndoAction()
             while True:
                 line = self.reflowBlock(line)
                 if line is None or (line > lastline > -1):
                     break;
+            self.endUndoAction()
 
         def paste():
             files = self.getChecked()
