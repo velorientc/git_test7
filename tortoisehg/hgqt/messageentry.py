@@ -14,6 +14,8 @@ from PyQt4.Qsci import QsciScintilla, QsciLexerMakefile
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib
 
+import re
+
 class MessageEntry(qscilib.Scintilla):
 
     def __init__(self, parent, getCheckedFunc=None):
@@ -42,6 +44,8 @@ class MessageEntry(qscilib.Scintilla):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.applylexer()
+
+        self._re_boundary = re.compile('[0-9i#]+\.|\(?[0-9i#]+\)|\(@\)')
 
     def setText(self, text):
         result = super(MessageEntry, self).setText(text)
@@ -120,12 +124,58 @@ class MessageEntry(qscilib.Scintilla):
             return line+1
 
         # find boundaries (empty lines or bounds)
+        def istopboundary(linetext):
+            # top boundary lines are those that begin with a Markdown style marker
+            # or are empty
+            if not linetext:
+                return True
+            if (linetext[0] in '#-*+'):
+                return True
+            if len(linetext) >= 2:
+                if linetext[:2] in ('> ', '| '):
+                    return True
+                if self._re_boundary.match(linetext):
+                    return True
+            return False
+
+        def isbottomboundary(linetext):
+            # bottom boundary lines are those that end with a period
+            # or are empty
+            if not linetext or linetext[-1] == '.':
+                return True
+            return False
+
+        def isanyboundary(linetext):
+            if len(linetext) >= 3:
+                if linetext[:3] in ('~~~', '```', '---', '==='):
+                    return True
+            return False
+
         b = line
         while b and len(lines[b-1]) > 1:
-            b = b - 1
+            linetext = unicode(lines[b].trimmed())
+            if istopboundary(linetext) or isanyboundary(linetext):
+                break
+            if b >= 1:
+                nextlinetext = unicode(lines[b - 1].trimmed())
+                if isbottomboundary(nextlinetext) \
+                        or isanyboundary(nextlinetext):
+                    break
+            b -= 1
+
         e = line
         while e+1 < len(lines) and len(lines[e+1]) > 1:
-            e = e + 1
+            linetext = unicode(lines[e].trimmed())
+            if isbottomboundary(linetext) or isanyboundary(linetext):
+                break
+            nextlinetext =  unicode(lines[e+1].trimmed())
+            if isanyboundary(nextlinetext) or istopboundary(nextlinetext):
+                break
+            e += 1
+
+        if b == e:
+            return line + 1
+
         group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
         sentence = group.join(' ')
         parts = sentence.split(' ', QString.SkipEmptyParts)
