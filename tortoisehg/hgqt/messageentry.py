@@ -65,11 +65,16 @@ class MessageEntry(qscilib.Scintilla):
         lexerenabled = self.lexer() is not None
 
         def apply():
-            line = 0
+            firstline, firstcol, lastline, lastcol = self.getSelection()
+            if firstline < 0:
+                line = 0
+            else:
+                line = firstline
             while True:
                 line = self.reflowBlock(line)
-                if line is None:
+                if line is None or (line > lastline > -1):
                     break;
+
         def paste():
             files = self.getChecked()
             self.insert(', '.join(files))
