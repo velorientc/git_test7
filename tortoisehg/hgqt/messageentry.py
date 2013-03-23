@@ -74,7 +74,7 @@ class MessageEntry(qscilib.Scintilla):
             while True:
                 line = self.reflowBlock(line)
                 if line is None or (line > lastline > -1):
-                    break;
+                    break
             self.endUndoAction()
 
         def paste():
