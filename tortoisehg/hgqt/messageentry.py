@@ -177,16 +177,26 @@ class MessageEntry(qscilib.Scintilla):
             return line + 1
 
         group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
+        firstlinetext = unicode(lines[b])
+        if firstlinetext:
+            indentcount = len(firstlinetext) - len(firstlinetext.lstrip())
+            firstindent = firstlinetext[:indentcount]
+        else:
+            indentcount = 0
+            firstindent = ''
         sentence = group.join(' ')
         parts = sentence.split(' ', QString.SkipEmptyParts)
 
         outlines = QStringList()
         line = QStringList()
-        partslen = 0
+        partslen = indentcount - 1
         for part in parts:
             if partslen + len(line) + len(part) + 1 > self.summarylen:
                 if line:
-                    outlines.append(line.join(' '))
+                    linetext = line.join(' ')
+                    if len(outlines) == 0 and firstindent:
+                        linetext = firstindent + linetext
+                    outlines.append(linetext)
                 line, partslen = QStringList(), 0
             line.append(part)
             partslen += len(part)
