@@ -186,7 +186,13 @@ class StripDialog(QDialog):
             self.strip_btn.setDisabled(True)
 
     def strip(self):
-        cmdline = ['strip', '--repository', self.repo.root, '--verbose']
+        # Note that we have discussed that --hidden should only be passed to
+        # mercurial commands when hidden revisions are shown.
+        # However in the case of strip we can always pass it --hidden safely,
+        # since strip will always strip all the descendants of a revision.
+        # Thus in this case --hidden will just let us choose a hidden revision
+        # as the base revision to strip.
+        cmdline = ['strip', '--repository', self.repo.root, '--verbose', '--hidden']
         rev = hglib.fromunicode(self.rev_combo.currentText())
         if not rev:
             return
