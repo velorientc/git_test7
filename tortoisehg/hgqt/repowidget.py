@@ -2218,7 +2218,7 @@ class RepoWidget(QWidget):
                 cmd += ['--repository', self.repo.root]
             return self.runCommand(cmd)
 
-        # Otherwise, run the selected command in the brackground
+        # Otherwise, run the selected command in the background
         try:
             res = subprocess.Popen(command, cwd=self.repo.root)
         except OSError, ex:
