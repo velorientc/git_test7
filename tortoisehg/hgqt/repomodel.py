@@ -421,6 +421,7 @@ class HgRepoListModel(QAbstractTableModel):
         dot_color = QColor(self.namedbranch_color(ctx.branch()))
         dotcolor = dot_color.lighter()
         pencolor = dot_color.darker()
+        truewhite = QColor("white")
         white = QColor("white")
         fillcolor = gnode.rev is None and white or dotcolor
 
@@ -450,26 +451,43 @@ class HgRepoListModel(QAbstractTableModel):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
+        hiddenrev = ctx.hidden()
+        if hiddenrev:
+            painter.setBrush(truewhite)
+            white.setAlpha(64)
+            fillcolor.setAlpha(64)
         if ctx.thgmqappliedpatch():  # diamonds for patches
+            symbolsize = radius / 1.5
+            if hiddenrev:
+                diamond(symbolsize)
             if ctx.thgwdparent():
                 painter.setBrush(white)
-                diamond(2 * 0.9 * radius / 1.5)
+                diamond(2 * 0.9 * symbolsize)
             painter.setBrush(fillcolor)
-            diamond(radius / 1.5)
+            diamond(symbolsize)
         elif ctx.thgmqunappliedpatch():
+            symbolsize = radius / 1.5
+            if hiddenrev:
+                diamond(symbolsize)
             patchcolor = QColor('#dddddd')
             painter.setBrush(patchcolor)
             painter.setPen(patchcolor)
-            diamond(radius / 1.5)
+            diamond(symbolsize)
         elif ctx.extra().get('close'):
+            symbolsize = 0.5 * radius
+            if hiddenrev:
+                closesymbol(symbolsize)
             painter.setBrush(fillcolor)
-            closesymbol(0.5 * radius)
+            closesymbol(symbolsize)
         else:  # circles for normal revisions
+            symbolsize = 0.5 * radius
+            if hiddenrev:
+                circle(symbolsize)
             if ctx.thgwdparent():
                 painter.setBrush(white)
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
-            circle(0.5 * radius)
+            circle(symbolsize)
 
     def invalidateCache(self):
         self._cache = []
