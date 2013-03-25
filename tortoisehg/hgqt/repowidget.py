@@ -1445,6 +1445,7 @@ class RepoWidget(QWidget):
                 command = info.get('command', None)
                 if not command:
                     continue
+                workingdir = info.get('workingdir', '')
                 showoutput = info.get('showoutput', False)
                 label = info.get('label', name)
                 icon = info.get('icon', 'tools-spanner-hammer')
@@ -1454,7 +1455,7 @@ class RepoWidget(QWidget):
                 else:
                     continue
                 a = entry(submenu, None, enable, label, icon)
-                a.setData((command, showoutput))
+                a.setData((command, showoutput, workingdir))
 
         _setupCustomSubmenu(menu)
 
@@ -2186,7 +2187,7 @@ class RepoWidget(QWidget):
         shlib.shell_notify([self.repo.root])
 
 
-    def runCustomCommand(self, command, showoutput=False):
+    def runCustomCommand(self, command, showoutput=False, workingdir=''):
         """Execute 'custom commands', on the selected repository"""
         # Perform variable expansion
         # This is done in two steps:
@@ -2196,6 +2197,8 @@ class RepoWidget(QWidget):
             InfoMsgBox(_('Invalid command'),
                        _('The selected command is empty'))
             return
+        if workingdir:
+            workingdir = os.path.expandvars(workingdir).strip()
 
         # 2. Expand internal workbench variables
         vars = {
@@ -2205,6 +2208,10 @@ class RepoWidget(QWidget):
         }
         for var in vars:
             command = command.replace('{%s}' % var, str(vars[var]))
+            if workingdir:
+                workingdir = workingdir.replace('{%s}' % var, str(vars[var]))
+        if not workingdir:
+            workingdir = self.repo.root
 
         # Show the Output Log if configured to do so
         if showoutput:
@@ -2220,7 +2227,7 @@ class RepoWidget(QWidget):
 
         # Otherwise, run the selected command in the background
         try:
-            res = subprocess.Popen(command, cwd=self.repo.root)
+            res = subprocess.Popen(command, cwd=workingdir)
         except OSError, ex:
             res = 1
             qtlib.ErrorMsgBox(_('Failed to execute custom command'),
@@ -2232,8 +2239,8 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QAction)
     def _runCustomCommandByMenu(self, action):
-        command, showoutput = action.data().toPyObject()
-        self.runCustomCommand(command, showoutput)
+        command, showoutput, workingdir = action.data().toPyObject()
+        self.runCustomCommand(command, showoutput, workingdir)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
