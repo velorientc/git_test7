@@ -69,7 +69,11 @@ def revision_grapher(repo, **opts):
 
     revset = opts.get('revset', None)
     branch = opts.get('branch', None)
-    revhidden = _filterrevs(repo, 'visible')
+    showhidden = opts.get('showhidden', None)
+    if showhidden:
+        revhidden = []
+    else:
+        revhidden = _filterrevs(repo, 'visible')
     if revset:
         start_rev = max(revset)
         stop_rev = min(revset)

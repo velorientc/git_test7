@@ -75,6 +75,8 @@ class RepoFilterBar(QToolBar):
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
 
+    showHiddenChanged = pyqtSignal(bool)
+
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
     def __init__(self, repo, parent=None):
@@ -157,6 +159,14 @@ class RepoFilterBar(QToolBar):
         self.addWidget(f)
         self.addSeparator()
 
+        self.showHiddenBtn = QToolButton()
+        self.showHiddenBtn.setIcon(qtlib.geticon('view-hidden'))
+        self.showHiddenBtn.setCheckable(True)
+        self.showHiddenBtn.setToolTip(_('Show/Hide hidden changesets'))
+        self.showHiddenBtn.clicked.connect(self.showHiddenChanged)
+        self.addWidget(self.showHiddenBtn)
+        self.addSeparator()
+
         self._initBranchFilter()
         self.refresh()
 
@@ -177,6 +187,7 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.setEnabled(enabled)
         self._branchLabel.setEnabled(enabled)
         self.filterEnabled = enabled
+        self.showHiddenBtn.setEnabled(enabled)
 
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -298,6 +309,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
         self.setVisible(s.value('showrepofilterbar').toBool())
+        self.showHiddenBtn.setChecked(s.value('showhidden').toBool())
         self._loadBranchFilterSettings(s)
         s.endGroup()
 
@@ -312,6 +324,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('filter', self.filtercb.isChecked())
         s.setValue('showrepofilterbar', not self.isHidden())
         self._saveBranchFilterSettings(s)
+        s.setValue('showhidden', self.showHiddenBtn.isChecked())
         s.endGroup()
 
     def _initBranchFilter(self):
@@ -405,6 +418,9 @@ class RepoFilterBar(QToolBar):
             return ''
         else:
             return unicode(self._branchCombo.currentText())
+
+    def getShowHidden(self):
+        return self.showHiddenBtn.isChecked()
 
     @pyqtSlot()
     def _emitBranchChanged(self):
