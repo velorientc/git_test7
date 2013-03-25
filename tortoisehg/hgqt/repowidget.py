@@ -2017,7 +2017,7 @@ class RepoWidget(QWidget):
                          'moved back to "<i>draft</i>" if you pull '
                          'again from that particular server.\n\n'
                          'Please be careful!')
-                labels = ((QMessageBox.Yes, _('&Make %s') % phasestr),
+                labels = ((QMessageBox.Yes, _('&Make secret')),
                           (QMessageBox.No, _('&Cancel')))
             else:
                 main = _('Do you really want to <i>force</i> a backwards phase transition?')
