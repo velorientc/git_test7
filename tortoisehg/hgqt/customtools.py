@@ -463,6 +463,7 @@ class CustomToolConfigDialog(QDialog):
         vbox.addStretch()
         self.hbox.addLayout(vbox)
         self.setLayout(self.hbox)
+        self._readsettings()
 
     def value(self):
         toolname = str(self.name.text()).strip()
@@ -518,3 +519,15 @@ class CustomToolConfigDialog(QDialog):
         if not config['command']:
             return _('You must set a command to run.')
         return '' # No error
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('customtools/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('customtools/geom', self.saveGeometry())
+
+    def done(self, r):
+        self._writesettings()
+        super(CustomToolConfigDialog, self).done(r)
