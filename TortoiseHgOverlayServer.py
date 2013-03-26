@@ -89,7 +89,7 @@ def SetIcon(hwnd, name, add=False):
     iconPathName = get_tortoise_icon(name)
     if iconPathName and os.path.isfile(iconPathName):
         icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-        hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
+        hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 16, 16, icon_flags)
     else:
         print "Can't find a Python icon file - using default"
         hicon = LoadIcon(0, win32con.IDI_APPLICATION)

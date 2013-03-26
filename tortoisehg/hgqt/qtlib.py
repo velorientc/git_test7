@@ -220,7 +220,7 @@ def savefiles(repo, files, rev, parent=None):
                 commands.cat(repo.ui, repo, curfile, rev=rev,
                              output=hglib.fromunicode(result))
             except (util.Abort, IOError), e:
-                QMessageBox.critical(self, _('Unable to save file'),
+                QMessageBox.critical(parent, _('Unable to save file'),
                                      hglib.tounicode(str(e)))
         finally:
             os.chdir(cwd)
@@ -902,9 +902,10 @@ _subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
 
 def _linkifyHash(message, subrepo=''):
     if subrepo:
-        replaceexpr = r'<a href="repo:%s?\1">\1</a>' % subrepo
+        p = 'repo:%s?' % subrepo
     else:
-        replaceexpr = r'<a href="cset:\1">\1</a>'
+        p = 'cset:'
+    replaceexpr = lambda m: '<a href="%s">%s</a>' % (p + m.group(0), m.group(0))
     return _hashregex.sub(replaceexpr, message)
 
 def _linkifySubrepoRef(message, subrepo, hash=''):
@@ -927,6 +928,13 @@ def linkifyMessage(message, subrepo=None):
     ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
     u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
     (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
+
+    subrepo name containing regexp backreference, \g:
+
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo foo\\goo)\n',
+    ...                subrepo='foo\\goo') #doctest: +NORMALIZE_WHITESPACE
+    u'abort: <a href="repo:foo\\goo?0123456789ab">0123456789ab</a>!
+    (in subrepo <a href="repo:foo\\goo?0123456789ab">foo\\goo</a>)<br>'
     """
     message = unicode(message)
     message = _linkifyHash(message, subrepo)
