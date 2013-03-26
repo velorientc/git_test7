@@ -394,7 +394,7 @@ class CustomToolConfigDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.hbox = QHBoxLayout()
-        vbox = QVBoxLayout()
+        vbox = QFormLayout()
 
         command = toolconfig.get('command', '')
         workingdir = toolconfig.get('workingdir', '')
@@ -494,10 +494,7 @@ class CustomToolConfigDialog(QDialog):
     def _addConfigItem(self, parent, label, configwidget, tooltip=None):
         if tooltip:
             configwidget.setToolTip(tooltip)
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(label))
-        hbox.addWidget(configwidget)
-        parent.addLayout(hbox)
+        parent.addRow(label, configwidget)
         return configwidget
 
     def _enable2label(self, value):
