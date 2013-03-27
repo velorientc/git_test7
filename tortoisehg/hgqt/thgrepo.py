@@ -160,7 +160,7 @@ class ThgRepoWrapper(QObject):
             self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._branchmtime = os.path.getmtime(self.repo.join('branch'))
             self._rawbranch = self.repo.opener('branch').read()
-        except EnvironmentError, ValueError:
+        except EnvironmentError:
             self._dirstatemtime = None
             self._branchmtime = None
             self._rawbranch = None
