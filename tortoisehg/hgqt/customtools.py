@@ -129,7 +129,7 @@ class ToolsFrame(QFrame):
         if item is None:
             return
         toolname = item.text()
-        self.forwardToCurrentToolList('addOrInsertItem', toolname)
+        self.forwardToCurrentToolList('addOrInsertItem', toolname, icon=item.icon())
 
     def forwardToCurrentToolList(self, funcname, *args, **opts):
         w = self.getCurrentToolList()
@@ -142,7 +142,8 @@ class ToolsFrame(QFrame):
         res = td.exec_()
         if res:
             toolname, toolconfig = td.value()
-            self.globaltoollist.addOrInsertItem(toolname)
+            self.globaltoollist.addOrInsertItem(
+                toolname, icon=toolconfig.get('icon', None))
             self.tortoisehgtools[toolname] = toolconfig
 
     def editTool(self, row=None):
@@ -160,8 +161,13 @@ class ToolsFrame(QFrame):
             res = td.exec_()
             if res:
                 toolname, toolconfig = td.value()
+                icon = toolconfig.get('icon', None)
+                if icon:
+                    item = QListWidgetItem(qtlib.geticon(icon), toolname)
+                else:
+                    item = toolname
                 gtl.takeItem(row)
-                gtl.insertItem(row, toolname)
+                gtl.insertItem(row, item)
                 gtl.setCurrentRow(row)
                 self.tortoisehgtools[toolname] = toolconfig
 
@@ -321,13 +327,19 @@ class ToolListBox(QListWidget):
             guidef.append(name)
         return guidef
 
-    def addOrInsertItem(self, text):
+    def addOrInsertItem(self, text, icon=None):
+        if icon:
+            if isinstance(icon, str):
+                icon = qtlib.geticon(icon)
+            item = QListWidgetItem(icon, text)
+        else:
+            item = text
         row = self.currentIndex().row()
         if row < 0:
-            self.addItem(text)
+            self.addItem(item)
             self.setCurrentRow(self.count()-1)
         else:
-            self.insertItem(row+1, text)
+            self.insertItem(row+1, item)
             self.setCurrentRow(row+1)
 
     def deleteTool(self, row=None, remove=False):
@@ -337,7 +349,7 @@ class ToolListBox(QListWidget):
             self.takeItem(row)
 
     def addSeparator(self):
-        self.addOrInsertItem(self.SEPARATOR)
+        self.addOrInsertItem(self.SEPARATOR, icon=None)
 
     def values(self):
         out = []
@@ -361,7 +373,9 @@ class ToolListBox(QListWidget):
         self.toollist = self._guidef2toollist(guidef)
         self.setValue(guidef)
         self.clear()
-        self.addItems(self.toollist)
+        for toolname in self.toollist:
+            icon = toolsdefs.get(toolname, {}).get('icon', None)
+            self.addOrInsertItem(toolname, icon=icon)
 
     def removeInvalid(self, validtools):
         validguidef = []
@@ -372,7 +386,9 @@ class ToolListBox(QListWidget):
             validguidef.append(toolname)
         self.clear()
         self.toollist = self._guidef2toollist(validguidef)
-        self.addItems(self.toollist)
+        for toolname in self.toollist:
+            icon = validtools.get(toolname, {}).get('icon', None)
+            self.addOrInsertItem(toolname, icon=icon)
 
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
