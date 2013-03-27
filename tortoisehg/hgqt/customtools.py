@@ -463,6 +463,7 @@ class CustomToolConfigDialog(QDialog):
         vbox.addStretch()
         self.hbox.addLayout(vbox)
         self.setLayout(self.hbox)
+        self.setMaximumHeight(self.sizeHint().height())
         self._readsettings()
 
     def value(self):
