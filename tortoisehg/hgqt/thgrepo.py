@@ -96,19 +96,14 @@ class ThgRepoWrapper(QObject):
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
             self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
-            self.watcher.directoryChanged.connect(self.onDirChange)
-            self.watcher.fileChanged.connect(self.onFileChange)
+            self.watcher.directoryChanged.connect(self._pollChanges)
+            self.watcher.fileChanged.connect(self._pollChanges)
             self.addMissingPaths()
 
     @pyqtSlot()
-    def onDirChange(self):
-        'Catch any writes to .hg/ folder, most importantly lock files'
-        self.pollStatus()
-        self.addMissingPaths()
-
-    @pyqtSlot()
-    def onFileChange(self):
-        'Catch writes or deletions of files we are interested in'
+    def _pollChanges(self):
+        '''Catch writes or deletions of files, or writes to .hg/ folder,
+        most importantly lock files'''
         self.pollStatus()
         self.addMissingPaths()
 
