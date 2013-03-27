@@ -480,8 +480,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
-        url = hglib.fromunicode(self.menuurl)
-        dlg = SaveDialog(self.repo, alias, url, self, edit=True)
+        urlu = unicode(self.menuurl)
+        dlg = SaveDialog(self.repo, alias, urlu, self, edit=True)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
