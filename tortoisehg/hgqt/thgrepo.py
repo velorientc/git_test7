@@ -100,14 +100,14 @@ class ThgRepoWrapper(QObject):
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
 
-    @pyqtSlot(QString)
-    def onDirChange(self, directory):
+    @pyqtSlot()
+    def onDirChange(self):
         'Catch any writes to .hg/ folder, most importantly lock files'
         self.pollStatus()
         self.addMissingPaths()
 
-    @pyqtSlot(QString)
-    def onFileChange(self, file):
+    @pyqtSlot()
+    def onFileChange(self):
         'Catch writes or deletions of files we are interested in'
         self.pollStatus()
         self.addMissingPaths()
