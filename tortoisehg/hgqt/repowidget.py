@@ -1494,7 +1494,7 @@ class RepoWidget(QWidget):
                                hglib.tounicode(os.path.join(root, filename)))
             if not file:
                 return
-            diff = self.copyPatch(returnval=True)
+            diff = self._buildPatch()
             try:
                 f = open(file, "wb")
                 try:
@@ -1957,7 +1957,7 @@ class RepoWidget(QWidget):
         cmdline.append(hglib.fromunicode(file))
         self.runCommand(cmdline)
 
-    def copyPatch(self, returnval=False):
+    def _buildPatch(self):
         from mercurial import commands
         _ui = self.repo.ui
         _ui.pushbuffer()
@@ -1976,10 +1976,12 @@ class RepoWidget(QWidget):
                 import traceback
                 traceback.print_exc()
             return
-        output = _ui.popbuffer()
-        if returnval:
-            return output
-        else:
+        return _ui.popbuffer()
+
+    @pyqtSlot()
+    def copyPatch(self):
+        output = self._buildPatch()
+        if output:
             mdata = QMimeData()
             mdata.setData('text/x-diff', output)  # for lossless import
             mdata.setText(hglib.tounicode(output))
