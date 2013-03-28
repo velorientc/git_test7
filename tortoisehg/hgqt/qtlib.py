@@ -490,6 +490,17 @@ _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(32, 32), '32x32/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 
+def getallicons():
+    """Get a sorted, unique list of all available icons"""
+    iconset = set()
+    for size, subdir, sfx in _SCALABLE_ICON_PATHS:
+        path = ':/icons/%s' % (subdir)
+        d = QDir(path)
+        d.setNameFilters(['*%s' % sfx])
+        for iconname in d.entryList():
+            iconset.add(unicode(iconname).rsplit('.', 1)[0])
+    return sorted(iconset)
+
 def _findscalableicon(name):
     """Find icon from qrc by using freedesktop-like icon lookup"""
     o = QIcon()
