@@ -106,10 +106,12 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types, icon=None):
+        def make(text, func, types, icon=None, inmenu=None):
             if not types & alltypes:
                 return
-            action = menu.addAction(text)
+            if inmenu is None:
+                inmenu = menu
+            action = inmenu.addAction(text)
             action._filetypes = types
             action._runfunc = func
             if icon:
