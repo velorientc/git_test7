@@ -10,7 +10,7 @@ import binascii
 import os
 import shlex, subprocess  # used by runCustomCommand
 import urllib
-from mercurial import revset, error, patch, phases
+from mercurial import revset, error, patch, phases, util
 
 from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt.i18n import _
@@ -2212,10 +2212,16 @@ class RepoWidget(QWidget):
             workingdir = os.path.expandvars(workingdir).strip()
 
         # 2. Expand internal workbench variables
+        def filelist2str(filelist):
+            return ' '.join(util.shellquote(
+                            os.path.normpath(self.repo.wjoin(filename)))
+                            for filename in filelist)
         vars = {
             'ROOT': self.repo.root,
             'REVID': str(self.repo[self.rev]),
-            'REV': self.rev
+            'REV': self.rev,
+            'FILES': filelist2str(self.repo[self.rev].files()),
+            'ALLFILES': filelist2str(self.repo[self.rev]),
         }
         for var in vars:
             command = command.replace('{%s}' % var, str(vars[var]))

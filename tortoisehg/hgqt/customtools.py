@@ -411,15 +411,19 @@ class CustomToolConfigDialog(QDialog):
             QLineEdit(command), _('The command that will be executed.\n'
             'To execute a mercurial command use "hg" (rather than "hg.exe") '
             'as the executable command.\n'
-            'You can use {ROOT} as an alias of the current repository root and\n'
-            '{REV} / {REVID} as an alias of the selected revision number / '
-            'hexadecimal identifier respectively.'))
+            'You can use several {VARIABLES} to compose your command:\n'
+            '- {ROOT}: The path to the current repository root.\n'
+            '- {REV} / {REVID}: the selected revision number / '
+            'hexadecimal revision id hash respectively.\n'
+            '- {FILES}: The list of files touched by the selected revision.\n'
+            '- {ALLFILES}: All the files tracked by mercurial on the selected'
+            ' revision.'))
         self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
             QLineEdit(workingdir),
             _('The directory where the command will be be executed.\n'
             'If this is not set, the root of the current repository'
             'will be used instead.\n'
-            'You can use the same "aliases" as on the "Command" setting.\n'))
+            'You can use the same {VARIABLES} as on the "Command" setting.\n'))
         self.label = self._addConfigItem(vbox, _('Tool label'),
             QLineEdit(label),
             _('The tool label, which is what will be shown '
