@@ -1494,7 +1494,7 @@ class RepoWidget(QWidget):
                                hglib.tounicode(os.path.join(root, filename)))
             if not file:
                 return
-            diff = self._buildPatch()
+            diff = self._buildPatch('diff')
             try:
                 f = open(file, "wb")
                 try:
@@ -1957,13 +1957,20 @@ class RepoWidget(QWidget):
         cmdline.append(hglib.fromunicode(file))
         self.runCommand(cmdline)
 
-    def _buildPatch(self):
+    def _buildPatch(self, command=None):
+        if not command:
+            # workingdir revision cannot be exported
+            command = self.rev and 'export' or 'diff'
+        assert command in ('export', 'diff')
+
         from mercurial import commands
         _ui = self.repo.ui
         _ui.pushbuffer()
         try:
-            if self.rev and len(self.menuselection) == 1:
-                commands.export(_ui, self.repo, self.rev, output='')
+            if command == 'export':
+                # patches should be in chronological order
+                revs = sorted(self.menuselection)
+                commands.export(_ui, self.repo, rev=revs, output='')
             else:
                 revs = self.rev and self.menuselection or None
                 commands.diff(_ui, self.repo, rev=revs)
