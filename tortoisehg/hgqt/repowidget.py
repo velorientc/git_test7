@@ -1558,6 +1558,7 @@ class RepoWidget(QWidget):
                 (None, None, None),
                 (_('Export Selected...'), exportPair, 'hg-export'),
                 (_('Email Selected...'), emailPair, 'mail-forward'),
+                (_('Copy Selected as Patch'), self.copyPatch, 'copy-patch'),
                 (None, None, None),
                 (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
@@ -1647,6 +1648,7 @@ class RepoWidget(QWidget):
         for name, cb, icon in (
                 (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
+                (_('Copy Selected as Patch'), self.copyPatch, 'copy-patch'),
                 (None, None, None),
                 (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
                 (_('Similar revisions...'), self.matchRevision, 'view-filter'),
