@@ -301,11 +301,7 @@ class RepoFilterBar(QToolBar):
         self.setBranch(s.value('revset/' + repoid + '/branch').toString())
         self._branchCombo.blockSignals(False)
 
-        # Show the filter bar if necessary
-        if s.value('revset/' + repoid + '/showrepofilterbar').toBool():
-            self.show()
-        else:
-            self.hide()
+        self.setVisible(s.value('revset/' + repoid + '/showrepofilterbar').toBool())
 
     def saveSettings(self, s):
         try:
