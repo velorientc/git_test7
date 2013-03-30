@@ -297,9 +297,9 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
-        self._branchReloading = True
+        self._branchCombo.blockSignals(True)
         self.setBranch(s.value('revset/' + repoid + '/branch').toString())
-        self._branchReloading = False
+        self._branchCombo.blockSignals(False)
 
         # Show the filter bar if necessary
         if s.value('revset/' + repoid + '/showrepofilterbar').toBool():
@@ -339,7 +339,6 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.setMinimumContentsLength(10)
         self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
-        self._branchReloading = False
 
         self.addWidget(self._branchLabel)
         self.addWidget(qtlib.Spacer(2, 2))
@@ -362,7 +361,7 @@ class RepoFilterBar(QToolBar):
         priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
         branches = sorted(branches, key=lambda e: priomap.get(e, 0))
 
-        self._branchReloading = True
+        self._branchCombo.blockSignals(True)
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
@@ -371,7 +370,7 @@ class RepoFilterBar(QToolBar):
                                           hglib.tounicode(branch),
                                           Qt.ToolTipRole)
         self._branchCombo.setEnabled(self.filterEnabled and bool(branches))
-        self._branchReloading = False
+        self._branchCombo.blockSignals(False)
 
         if curbranch and curbranch not in branches:
             self._emitBranchChanged()  # falls back to "show all"
@@ -397,9 +396,8 @@ class RepoFilterBar(QToolBar):
 
     @pyqtSlot()
     def _emitBranchChanged(self):
-        if not self._branchReloading:
-            self.branchChanged.emit(self.branch(),
-                                    self._allparAction.isChecked())
+        self.branchChanged.emit(self.branch(),
+                                self._allparAction.isChecked())
 
     @pyqtSlot()
     def refresh(self):
