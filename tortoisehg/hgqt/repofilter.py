@@ -297,12 +297,8 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
-
-        self._branchCombo.blockSignals(True)
-        self.setBranch(s.value('branch').toString())
-        self._branchCombo.blockSignals(False)
-
         self.setVisible(s.value('showrepofilterbar').toBool())
+        self._loadBranchFilterSettings(s)
         s.endGroup()
 
     def saveSettings(self, s):
@@ -315,7 +311,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('queries', self.revsethist)
         s.setValue('filter', self.filtercb.isChecked())
         s.setValue('showrepofilterbar', not self.isHidden())
-        s.setValue('branch', self.branch())
+        self._saveBranchFilterSettings(s)
         s.endGroup()
 
     def _initBranchFilter(self):
@@ -343,6 +339,14 @@ class RepoFilterBar(QToolBar):
         self.addWidget(self._branchLabel)
         self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(self._branchCombo)
+
+    def _loadBranchFilterSettings(self, s):
+        self._branchCombo.blockSignals(True)
+        self.setBranch(s.value('branch').toString())
+        self._branchCombo.blockSignals(False)
+
+    def _saveBranchFilterSettings(self, s):
+        s.setValue('branch', self.branch())
 
     def _updateBranchFilter(self):
         """Update the list of branches"""
