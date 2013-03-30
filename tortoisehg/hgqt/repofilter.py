@@ -157,7 +157,7 @@ class RepoFilterBar(QToolBar):
         self.addWidget(f)
         self.addSeparator()
 
-        self._initbranchfilter()
+        self._initBranchFilter()
         self.refresh()
 
     def onClearButtonClicked(self):
@@ -318,7 +318,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('revset/' + repoid + '/showrepofilterbar', not self.isHidden())
         s.setValue('revset/' + repoid + '/branch', self.branch())
 
-    def _initbranchfilter(self):
+    def _initBranchFilter(self):
         self._branchLabel = QToolButton(
             text=_('Branch'), popupMode=QToolButton.MenuButtonPopup,
             statusTip=_('Display graph the named branch only'))
@@ -344,7 +344,7 @@ class RepoFilterBar(QToolBar):
         self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(self._branchCombo)
 
-    def _updatebranchfilter(self):
+    def _updateBranchFilter(self):
         """Update the list of branches"""
         curbranch = self.branch()
 
@@ -401,4 +401,4 @@ class RepoFilterBar(QToolBar):
 
     @pyqtSlot()
     def refresh(self):
-        self._updatebranchfilter()
+        self._updateBranchFilter()
