@@ -341,12 +341,20 @@ class RepoFilterBar(QToolBar):
         self.addWidget(self._branchCombo)
 
     def _loadBranchFilterSettings(self, s):
+        branch = unicode(s.value('branch').toString())
+        if branch == '.':
+            branch = hglib.tounicode(self._repo.dirstate.branch())
         self._branchCombo.blockSignals(True)
-        self.setBranch(s.value('branch').toString())
+        self.setBranch(branch)
         self._branchCombo.blockSignals(False)
 
     def _saveBranchFilterSettings(self, s):
-        s.setValue('branch', self.branch())
+        branch = self.branch()
+        if branch == hglib.tounicode(self._repo.dirstate.branch()):
+            # special case for working branch: it's common to have multiple
+            # clones which are updated to particular branches.
+            branch = '.'
+        s.setValue('branch', branch)
 
     def _updateBranchFilter(self):
         """Update the list of branches"""
