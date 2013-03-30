@@ -357,10 +357,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             ctx = self._repo[rev]
             if hglib.fromunicode(self.path) in ctx:
                 self._fileview.displayFile(path, self.status)
-                if line:
-                    self._fileview.showLine(int(line) - 1)
             else:
                 self._fileview.clearDisplay()
+                return
+        if line:
+            self._fileview.showLine(int(line) - 1)
 
     @property
     def path(self):
