@@ -289,30 +289,34 @@ class RepoFilterBar(QToolBar):
 
     def loadSettings(self, s):
         repoid = str(self._repo[0])
-        self.entrydlg.restoreGeometry(s.value('revset/' + repoid + '/geom').toByteArray())
-        self.revsethist = list(s.value('revset/' + repoid + '/queries').toStringList())
-        self.filtercb.setChecked(s.value('revset/' + repoid + '/filter', True).toBool())
+        s.beginGroup('revset/' + repoid)
+        self.entrydlg.restoreGeometry(s.value('geom').toByteArray())
+        self.revsethist = list(s.value('queries').toStringList())
+        self.filtercb.setChecked(s.value('filter', True).toBool())
         full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
         self._branchCombo.blockSignals(True)
-        self.setBranch(s.value('revset/' + repoid + '/branch').toString())
+        self.setBranch(s.value('branch').toString())
         self._branchCombo.blockSignals(False)
 
-        self.setVisible(s.value('revset/' + repoid + '/showrepofilterbar').toBool())
+        self.setVisible(s.value('showrepofilterbar').toBool())
+        s.endGroup()
 
     def saveSettings(self, s):
         try:
             repoid = str(self._repo[0])
         except EnvironmentError:
             return
-        s.setValue('revset/' + repoid + '/geom', self.entrydlg.saveGeometry())
-        s.setValue('revset/' + repoid + '/queries', self.revsethist)
-        s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
-        s.setValue('revset/' + repoid + '/showrepofilterbar', not self.isHidden())
-        s.setValue('revset/' + repoid + '/branch', self.branch())
+        s.beginGroup('revset/' + repoid)
+        s.setValue('geom', self.entrydlg.saveGeometry())
+        s.setValue('queries', self.revsethist)
+        s.setValue('filter', self.filtercb.isChecked())
+        s.setValue('showrepofilterbar', not self.isHidden())
+        s.setValue('branch', self.branch())
+        s.endGroup()
 
     def _initBranchFilter(self):
         self._branchLabel = QToolButton(
