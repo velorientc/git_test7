@@ -255,7 +255,7 @@ def filelog_grapher(repo, path):
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield GraphNode(patchname, 0, "", [], [], extra=[""])
+        yield GraphNode(patchname, 0, "", [], [])
 
 class GraphNode(object):
     """
