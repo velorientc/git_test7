@@ -477,9 +477,11 @@ class HgRepoListModel(QAbstractTableModel):
             return self._columnfonts.get(column, nullvariant)
         if role not in self._roleoffsets:
             return nullvariant
+        # repo may be changed while reading in case of postpull=rebase for
+        # example, and result in RevlogError. (issue #429)
         try:
             return self.safedata(index, role)
-        except Exception, e:
+        except error.RevlogError, e:
             if role == Qt.DisplayRole:
                 return QVariant(hglib.tounicode(str(e)))
             else:
