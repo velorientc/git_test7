@@ -242,7 +242,7 @@ def filelog_grapher(repo, path):
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
-               extra=_paths.get(fctx.rev(), path))
+                        extra=[_paths.get(fctx.rev(), path)])
         revs = next_revs
 
         if revs:
@@ -255,7 +255,7 @@ def filelog_grapher(repo, path):
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield GraphNode(patchname, 0, "", [], [], extra="")
+        yield GraphNode(patchname, 0, "", [], [], extra=[""])
 
 class GraphNode(object):
     """
