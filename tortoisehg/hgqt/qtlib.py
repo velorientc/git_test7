@@ -896,7 +896,7 @@ class LabeledSeparator(QWidget):
         self.setLayout(box)
 
 # Strings and regexes used to convert hashes and subrepo paths into links
-_hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
+_hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
 # Currently converting subrepo paths into links only works in English
 _subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
 
@@ -942,7 +942,7 @@ def linkifyMessage(message, subrepo=None):
         hash = ''
         m = _hashregex.search(message)
         if m:
-            hash = m.group(1)
+            hash = m.group(0)
         message = _linkifySubrepoRef(message, subrepo, hash)
     return message.replace('\n', '<br>')
 
