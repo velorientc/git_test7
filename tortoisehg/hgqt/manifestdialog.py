@@ -361,7 +361,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 self._fileview.clearDisplay()
                 return
         if line:
-            self._fileview.showLine(int(line) - 1)
+            self._fileview.showLine(line - 1)
 
     @property
     def path(self):
