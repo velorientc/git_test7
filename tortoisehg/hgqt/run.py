@@ -221,7 +221,7 @@ def _parse(ui, args):
         c.append((o[0], o[1], options[o[1]], o[3]))
 
     try:
-        args = fancyopts.fancyopts(args, c, cmdoptions)
+        args = fancyopts.fancyopts(args, c, cmdoptions, True)
     except fancyopts.getopt.GetoptError, inst:
         raise error.CommandError(cmd, inst)
 
@@ -698,10 +698,9 @@ def mq(ui, *pats, **opts):
     from tortoisehg.hgqt.mq import run
     return qtrun(run, ui, *pats, **opts)
 
-def test(ui, *pats, **opts):
-    """test arbitrary widgets"""
-    from tortoisehg.hgqt.mq import run
-    return qtrun(run, ui, *pats, **opts)
+def debugbugreport(ui, *pats, **opts):
+    """open bugreport dialog by exception"""
+    raise Exception(' '.join(pats))
 
 def purge(ui, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
@@ -832,6 +831,11 @@ def drag_copy(ui, *pats, **opts):
 def thgimport(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
+    return qtrun(run, ui, *pats, **opts)
+
+def revdetails(ui, *pats, **opts):
+    """revision details tool"""
+    from tortoisehg.hgqt.revdetails import run
     return qtrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
@@ -1113,6 +1117,10 @@ table = {
         (log,
          [('l', 'limit', '', _('(DEPRECATED)'))],
          _('thg log [OPTIONS] [FILE]')),
+    "^revdetails":
+        (revdetails,
+         [('r', 'rev', '', _('the revision to show'))],
+         _('thg revdetails [-r REV]')),
     "manifest":
         (manifest,
          [('r', 'rev', '', _('revision to display')),
@@ -1165,7 +1173,7 @@ table = {
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
     "shelve|unshelve": (shelve, [], _('thg shelve')),
     "rejects": (rejects, [], _('thg rejects [FILE]')),
-    "test": (test, [], _('thg test')),
+    "debugbugreport": (debugbugreport, [], _('thg debugbugreport [TEXT]')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
     "^qreorder": (qreorder, [], _('thg qreorder')),

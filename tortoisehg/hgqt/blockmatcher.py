@@ -44,6 +44,7 @@ class BlockList(QWidget):
         self.blockTypes = {'+': QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
                            '-': QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
                            'x': QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
+                           's': QColor(0xFF, 0xA5, 0x00, ),#0xa5),
                            }
         self._sbar = None
         self._value = 0

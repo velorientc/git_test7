@@ -47,6 +47,7 @@ class StatusWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
+    grepRequested = pyqtSignal(unicode, dict)
 
     def __init__(self, repo, pats, opts, parent=None, checkable=True,
                  defcheck='MAR!S'):
@@ -143,15 +144,10 @@ class StatusWidget(QWidget):
         vbox.addWidget(tv)
         split.addWidget(frame)
 
-        if self.pats:
-            def clearPattern():
-                self.pats = []
-                self.refreshWctx()
-                cpb.setVisible(False)
-                self.titleTextChanged.emit(self.getTitle())
-            cpb = QPushButton(_('Remove filter, show root'))
-            vbox.addWidget(cpb)
-            cpb.clicked.connect(clearPattern)
+        self.clearPatternBtn = QPushButton(_('Remove filter, show root'))
+        vbox.addWidget(self.clearPatternBtn)
+        self.clearPatternBtn.clicked.connect(self.clearPattern)
+        self.clearPatternBtn.setVisible(bool(self.pats))
 
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
@@ -161,13 +157,7 @@ class StatusWidget(QWidget):
         tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
-        def statusTypeTrigger(status):
-            status = str(status)
-            for s in statusTypes:
-                val = statusTypes[s]
-                self.opts[val.name] = s in status
-            self.refreshWctx()
-        self.statusfilter.statusChanged.connect(statusTypeTrigger)
+        self.statusfilter.statusChanged.connect(self.setStatusFilter)
 
         self.tv = tv
         self.le = le
@@ -191,6 +181,7 @@ class StatusWidget(QWidget):
         self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.newChunkList.connect(self.updatePartials)
         self.fileview.chunkSelectionChanged.connect(self.chunkSelectionChanged)
+        self.fileview.grepRequested.connect(self.grepRequested)
         self.fileview.setContext(self.repo[None])
         self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
@@ -412,12 +403,27 @@ class StatusWidget(QWidget):
         elif status in 'C?':
             qtlib.editfiles(self.repo, [path])
 
+    @pyqtSlot(str)
+    def setStatusFilter(self, status):
+        status = str(status)
+        for s in statusTypes:
+            val = statusTypes[s]
+            self.opts[val.name] = s in status
+        self.refreshWctx()
+
     @pyqtSlot(QString)
     def setFilter(self, match):
         model = self.tv.model()
         if model:
             model.setFilter(match)
             self.tv.enablefilterpalette(bool(match))
+
+    @pyqtSlot()
+    def clearPattern(self):
+        self.pats = []
+        self.refreshWctx()
+        self.clearPatternBtn.setVisible(False)
+        self.titleTextChanged.emit(self.getTitle())
 
     @pyqtSlot()
     def updateCheckCount(self):
@@ -1049,12 +1055,6 @@ class StatusDialog(QDialog):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
             qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
-        if link.startswith('shelve:'):
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
 
     def loadSettings(self):
         s = QSettings()
@@ -1079,8 +1079,6 @@ class StatusDialog(QDialog):
         QDialog.reject(self)
 
 def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)

@@ -220,7 +220,7 @@ class ToolsFrame(QFrame):
         # custom tool configurations, and then set all the configuration
         # settings anew:
         section = 'tortoisehg-tools'
-        fieldnames = ('command', 'label', 'tooltip',
+        fieldnames = ('command', 'workingdir', 'label', 'tooltip',
                       'icon', 'location', 'enable', 'showoutput',)
         for name in self.curvalue:
             for field in fieldnames:
@@ -394,9 +394,10 @@ class CustomToolConfigDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.hbox = QHBoxLayout()
-        vbox = QVBoxLayout()
+        vbox = QFormLayout()
 
         command = toolconfig.get('command', '')
+        workingdir = toolconfig.get('workingdir', '')
         label = toolconfig.get('label', '')
         tooltip = toolconfig.get('tooltip', '')
         ico = toolconfig.get('icon', '')
@@ -413,6 +414,12 @@ class CustomToolConfigDialog(QDialog):
             'You can use {ROOT} as an alias of the current repository root and\n'
             '{REV} / {REVID} as an alias of the selected revision number / '
             'hexadecimal identifier respectively.'))
+        self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
+            QLineEdit(workingdir),
+            _('The directory where the command will be be executed.\n'
+            'If this is not set, the root of the current repository'
+            'will be used instead.\n'
+            'You can use the same "aliases" as on the "Command" setting.\n'))
         self.label = self._addConfigItem(vbox, _('Tool label'),
             QLineEdit(label),
             _('The tool label, which is what will be shown '
@@ -456,12 +463,15 @@ class CustomToolConfigDialog(QDialog):
         vbox.addStretch()
         self.hbox.addLayout(vbox)
         self.setLayout(self.hbox)
+        self.setMaximumHeight(self.sizeHint().height())
+        self._readsettings()
 
     def value(self):
         toolname = str(self.name.text()).strip()
         toolconfig = {
             'label': str(self.label.text()),
             'command': str(self.command.text()),
+            'workingdir': str(self.workingdir.text()),
             'tooltip': str(self.tooltip.text()),
             'icon': str(self.icon.text()),
             'enable': self._enablemappings[self.enable.currentIndex()][1],
@@ -485,10 +495,7 @@ class CustomToolConfigDialog(QDialog):
     def _addConfigItem(self, parent, label, configwidget, tooltip=None):
         if tooltip:
             configwidget.setToolTip(tooltip)
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(label))
-        hbox.addWidget(configwidget)
-        parent.addLayout(hbox)
+        parent.addRow(label, configwidget)
         return configwidget
 
     def _enable2label(self, value):
@@ -510,3 +517,15 @@ class CustomToolConfigDialog(QDialog):
         if not config['command']:
             return _('You must set a command to run.')
         return '' # No error
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('customtools/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('customtools/geom', self.saveGeometry())
+
+    def done(self, r):
+        self._writesettings()
+        super(CustomToolConfigDialog, self).done(r)

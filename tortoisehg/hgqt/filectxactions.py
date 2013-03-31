@@ -48,7 +48,6 @@ class FilectxActions(QObject):
         self._itemissubrepo = False
         self._itemisdir = False
 
-        self._diff_dialogs = {}
         self._nav_dialogs = {}
         self._contextmenus = {}
 
@@ -173,10 +172,10 @@ class FilectxActions(QObject):
         return contextmenu
 
     def navigate(self):
-        self._navigate(FileLogDialog, self._nav_dialogs)
+        self._navigate(FileLogDialog)
 
     def diffNavigate(self):
-        self._navigate(FileDiffDialog, self._diff_dialogs)
+        self._navigate(FileDiffDialog)
 
     def filterfile(self):
         """Ask to only show the revisions in which files on that folder are
@@ -255,11 +254,11 @@ class FilectxActions(QObject):
                                   parent=self.parent())
         dlg.exec_()
 
-    def _navigate(self, dlgclass, dlgdict):
+    def _navigate(self, dlgclass):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
             fullpath = repo.wjoin(filename)
-            if fullpath not in dlgdict:
+            if (dlgclass, fullpath) not in self._nav_dialogs:
                 # dirty hack to pass workbench only if available
                 from tortoisehg.hgqt import workbench  # avoid cyclic dep
                 repoviewer = None
@@ -267,13 +266,13 @@ class FilectxActions(QObject):
                                                 workbench.Workbench):
                     repoviewer = self.parent().window()
                 dlg = dlgclass(repo, filename, repoviewer=repoviewer)
-                dlgdict[fullpath] = dlg
+                self._nav_dialogs[dlgclass, fullpath] = dlg
                 assert dlg.repo.wjoin(dlg.filename) == fullpath
                 dlg.finished.connect(self._forgetnavdialog)
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
                 dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = dlgdict[fullpath]
+            dlg = self._nav_dialogs[dlgclass, fullpath]
             dlg.goto(rev)
             dlg.show()
             dlg.raise_()
@@ -284,10 +283,7 @@ class FilectxActions(QObject):
         dlg = self.sender()
         dlg.finished.disconnect(self._forgetnavdialog)
         fullpath = dlg.repo.wjoin(dlg.filename)
-        if isinstance(dlg, FileLogDialog):
-            del self._nav_dialogs[fullpath]
-        elif isinstance(dlg, FileDiffDialog):
-            del self._diff_dialogs[fullpath]
+        del self._nav_dialogs[dlg.__class__, fullpath]
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths
@@ -337,4 +333,4 @@ class FilectxActions(QObject):
     def terminal(self):
         root = self.repo.wjoin(self._currentfile)
         if os.path.isdir(root):
-            qtlib.openshell(root, self._currentfile)
+            qtlib.openshell(root, self._currentfile, self.repo.ui)
