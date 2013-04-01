@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
 "POT-Creation-Date: 2013-03-18 11:26-0300\n"
-"PO-Revision-Date: 2013-02-27 22:18+0000\n"
-"Last-Translator: Xfrom9 <xfrom9@ya.ru>\n"
+"PO-Revision-Date: 2013-03-31 00:19+0000\n"
+"Last-Translator: Дьяченко Александр <Unknown>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-03-19 05:40+0000\n"
-"X-Generator: Launchpad (build 16532)\n"
+"X-Launchpad-Export-Date: 2013-04-01 05:09+0000\n"
+"X-Generator: Launchpad (build 16546)\n"
 "Language: ru\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -1649,7 +1649,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/filectxactions.py:81 tortoisehg/hgqt/wctxactions.py:45
 msgid "Open S&ubrepository"
-msgstr ""
+msgstr "Открыть подхранилище"
 
 #: tortoisehg/hgqt/filectxactions.py:82
 msgid "Open the selected subrepository"
@@ -2682,7 +2682,7 @@ msgstr "Создать"
 
 #: tortoisehg/hgqt/hginit.py:85
 msgid "New Repository"
-msgstr ""
+msgstr "Новое хранилище"
 
 #: tortoisehg/hgqt/hginit.py:127 tortoisehg/hgqt/hginit.py:159
 #: tortoisehg/hgqt/hginit.py:173 tortoisehg/hgqt/hginit.py:183
@@ -4448,7 +4448,7 @@ msgstr "Открыть терминал на корневом каталоге �
 
 #: tortoisehg/hgqt/reporegistry.py:440
 msgid "&Add Repository..."
-msgstr ""
+msgstr "Добавить хранилище..."
 
 #: tortoisehg/hgqt/reporegistry.py:441
 msgid "Add a repository to this group"
@@ -4456,7 +4456,7 @@ msgstr "Добавить хранилище в эту группу"
 
 #: tortoisehg/hgqt/reporegistry.py:442
 msgid "A&dd Subrepository..."
-msgstr ""
+msgstr "Добавить подхранилище..."
 
 #: tortoisehg/hgqt/reporegistry.py:443
 msgid "Convert an existing repository into a subrepository"
@@ -8537,7 +8537,7 @@ msgid ""
 "repository?"
 msgstr ""
 "Некоторые наборы изменений из тех, что вы пытаетесь протолкнуть, вызовуть "
-"создание новой ветки. Вы правда хотите создать ноую ветку в отдалённом "
+"создание новой ветки. Вы правда хотите создать новую ветку в отдалённом "
 "хранилище?"
 
 #: tortoisehg/hgqt/sync.py:1112
@@ -9636,7 +9636,7 @@ msgstr "Обновить изображение текущего хранили�
 
 #: tortoisehg/hgqt/workbench.py:262
 msgid "Refresh &Task Tab"
-msgstr "Обновить изображение панели &задач"
+msgstr "Обновить панель &задач"
 
 #: tortoisehg/hgqt/workbench.py:265
 msgid "Refresh only the current task tab"
@@ -9665,7 +9665,7 @@ msgstr "Запустить Web-сервер"
 
 #: tortoisehg/hgqt/workbench.py:277
 msgid "&Shelve..."
-msgstr ""
+msgstr "&Отложить..."
 
 #: tortoisehg/hgqt/workbench.py:279
 msgid "&Import..."
@@ -9709,7 +9709,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:316
 msgid "&About TortoiseHg"
-msgstr ""
+msgstr "О &TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:321 tortoisehg/hgqt/workbench.py:322
 msgid "Go to current revision"
@@ -9725,7 +9725,7 @@ msgstr "Фильтровать граф по наборам ревизий ил�
 
 #: tortoisehg/hgqt/workbench.py:342
 msgid "&Workbench Toolbars"
-msgstr ""
+msgstr "Панели рабочей среды"
 
 #: tortoisehg/hgqt/workbench.py:350
 msgid "Incoming"
@@ -10016,7 +10016,7 @@ msgstr "Просмотреть историю изменений выбранн�
 
 #: tortoisehg/util/menuthg.py:52
 msgid "Shelve Changes"
-msgstr ""
+msgstr "Отложить изменения"
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Move changes between working dir and patch"
