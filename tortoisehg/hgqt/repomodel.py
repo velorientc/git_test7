@@ -73,13 +73,13 @@ def get_color(n, ignore=()):
         colors = COLORS
     return colors[n % len(colors)]
 
-def get_style(line_type):
+def get_style(line_type, active):
     if line_type == LINE_TYPE_GRAFT:
         return Qt.DashLine
     return Qt.SolidLine
 
-def get_width(line_type):
-    if line_type == LINE_TYPE_GRAFT:
+def get_width(line_type, active):
+    if line_type == LINE_TYPE_GRAFT or not active:
         return 1
     return 2
 
@@ -225,6 +225,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def setRevset(self, revset):
         self.revset = revset
+        self.invalidateCache()
 
     def reloadConfig(self):
         _ui = self.repo.ui
@@ -387,6 +388,8 @@ class HgRepoListModel(QAbstractTableModel):
         return QVariant(pix)
 
     def _drawgraphctx(self, painter, pix, ctx, gnode):
+        revset = self.revset
+        rev = gnode.rev
         h = pix.height()
         dot_y = h / 2
 
@@ -399,17 +402,26 @@ class HgRepoListModel(QAbstractTableModel):
         lpen = QPen(pen)
         lpen.setColor(Qt.black)
         painter.setPen(lpen)
+        if revset:
+            def isactive(start, end, color, line_type, children, rev):
+                return rev in revset and util.any(r in revset for r in children)
+        else:
+            def isactive(start, end, color, line_type, children, rev):
+                return True
+
         for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
                               (dot_y - h, dot_y, gnode.toplines)):
             y2 = y1 + 1 * (y4 - y1)/4
             ymid = (y1 + y4)/2
             y3 = y1 + 3 * (y4 - y1)/4
 
-            for start, end, color, line_type in lines:
+            lines = sorted((isactive(*l), l) for l in lines)
+
+            for active, (start, end, color, line_type, children, rev) in lines:
                 lpen = QPen(pen)
-                lpen.setColor(QColor(get_color(color)))
-                lpen.setStyle(get_style(line_type))
-                lpen.setWidth(get_width(line_type))
+                lpen.setColor(QColor(active and get_color(color) or "gray"))
+                lpen.setStyle(get_style(line_type, active))
+                lpen.setWidth(get_width(line_type, active))
                 painter.setPen(lpen)
                 x1 = self.col2x(start)
                 x2 = self.col2x(end)
@@ -424,7 +436,12 @@ class HgRepoListModel(QAbstractTableModel):
                 painter.drawPath(path)
 
         # Draw node
-        dot_color = QColor(self.namedbranch_color(ctx.branch()))
+        if revset and gnode.rev not in revset:
+            dot_color = QColor("gray")
+            radius = self.dotradius * 0.8
+        else:
+            dot_color = QColor(self.namedbranch_color(ctx.branch()))
+            radius = self.dotradius
         dotcolor = dot_color.lighter()
         pencolor = dot_color.darker()
         truewhite = QColor("white")
@@ -435,7 +452,6 @@ class HgRepoListModel(QAbstractTableModel):
         pen.setWidthF(1.5)
         painter.setPen(pen)
 
-        radius = self.dotradius
         centre_x = self.col2x(gnode.x)
         centre_y = h/2
 

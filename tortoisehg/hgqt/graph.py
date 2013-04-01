@@ -55,8 +55,11 @@ def revision_grapher(repo, **opts):
       - current revision
       - column of the current node in the set of ongoing edges
       - color of the node (?)
-      - lines; a list of (col, next_col, color_no, line_type) defining
-        the edges between the current row and the next row
+      - lines: a list of (col, next_col, color_no, line_type, children, parent)
+          children: tuple of revs which connected to top of this line.
+                    (or current rev if node is on the line.)
+          parent:   rev which connected to bottom of this line.
+        defining the edges between the current row and the next row
       - parent revisions of current revision
     """
 
@@ -82,6 +85,7 @@ def revision_grapher(repo, **opts):
 
     curr_rev = start_rev
     revs = []
+    children = [()]
     links = [] # smallest link type that applies
     rev_color = {}
     nextcolor = 0
@@ -117,6 +121,7 @@ def revision_grapher(repo, **opts):
             revs.append(curr_rev)
             links.append(LINE_TYPE_PARENT)
             rev_color[curr_rev] = curcolor = nextcolor
+            children.append(())
             nextcolor += 1
             p_revs = getparents(ctx)
             while p_revs:
@@ -129,6 +134,7 @@ def revision_grapher(repo, **opts):
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
         next_links = links[:]
+        next_children = children[:]
 
         # Add parents to next_revs.
         parents = [(p,LINE_TYPE_PARENT) for p in getparents(ctx) if not hidden(p)]
@@ -140,6 +146,7 @@ def revision_grapher(repo, **opts):
                     parents.append((src_rev, LINE_TYPE_GRAFT))
         parents_to_add = []
         links_to_add = []
+        children_to_add = []
         if len(parents) > 1:
             preferred_color = None
         else:
@@ -148,6 +155,7 @@ def revision_grapher(repo, **opts):
             if parent not in next_revs:
                 parents_to_add.append(parent)
                 links_to_add.append(link_type)
+                children_to_add.append((curr_rev,))
                 if parent not in rev_color:
                     if preferred_color:
                         rev_color[parent] = preferred_color
@@ -160,25 +168,28 @@ def revision_grapher(repo, **opts):
                 #  (= lowest style value)
                 i = next_revs.index(parent)
                 next_links[i] = min(next_links[i], link_type)
+                next_children[i] += (curr_rev,)
             preferred_color = None
 
         # parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
         next_links[rev_index:rev_index + 1] = links_to_add
+        next_children[rev_index:rev_index + 1] = children_to_add
 
         lines = []
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, links[i]) )
+                lines.append( (i, next_revs.index(rev), color, links[i], children[i], rev) )
             elif rev == curr_rev:
                 for parent, link_type in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, link_type) )
+                    lines.append( (i, next_revs.index(parent), color, link_type, (curr_rev,), parent) )
 
         yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
         links = next_links
+        children = next_children
         if curr_rev is None:
             curr_rev = len(repo)
         else:
@@ -233,11 +244,11 @@ def filelog_grapher(repo, path):
         for i, nrev in enumerate(revs):
             if nrev in next_revs:
                 color = rev_color[nrev]
-                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT) )
+                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT, (), nrev) )
             elif nrev == rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT) )
+                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT, (), parent) )
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
