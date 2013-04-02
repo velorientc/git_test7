@@ -161,11 +161,10 @@ class ToolsFrame(QFrame):
             res = td.exec_()
             if res:
                 toolname, toolconfig = td.value()
-                icon = toolconfig.get('icon', None)
-                if icon:
-                    item = QListWidgetItem(qtlib.geticon(icon), toolname)
-                else:
-                    item = toolname
+                icon = toolconfig.get('icon', '')
+                if not icon:
+                    icon = td._defaulticonname
+                item = QListWidgetItem(qtlib.geticon(icon), toolname)
                 gtl.takeItem(row)
                 gtl.insertItem(row, item)
                 gtl.setCurrentRow(row)
@@ -328,12 +327,14 @@ class ToolListBox(QListWidget):
         return guidef
 
     def addOrInsertItem(self, text, icon=None):
-        if icon:
+        if text == self.SEPARATOR:
+            item = text
+        else:
+            if not icon:
+                icon = CustomToolConfigDialog._defaulticonname
             if isinstance(icon, str):
                 icon = qtlib.geticon(icon)
             item = QListWidgetItem(icon, text)
-        else:
-            item = text
         row = self.currentIndex().row()
         if row < 0:
             self.addItem(item)
@@ -401,6 +402,7 @@ class CustomToolConfigDialog(QDialog):
                        (_('Applied patches'), 'applied'),
                        (_('Applied patches or qparent'), 'qgoto'),
                        ]
+    _defaulticonname = 'tools-spanner-hammer'
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         QDialog.__init__(self, parent)
