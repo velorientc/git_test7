@@ -403,11 +403,12 @@ class CustomToolConfigDialog(QDialog):
                        (_('Applied patches or qparent'), 'qgoto'),
                        ]
     _defaulticonname = 'tools-spanner-hammer'
+    _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         QDialog.__init__(self, parent)
 
-        self.setWindowIcon(qtlib.geticon('tools-spanner-hammer'))
+        self.setWindowIcon(qtlib.geticon(self._defaulticonname))
         self.setWindowTitle(_('Configure Custom Tool'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -453,8 +454,25 @@ class CustomToolConfigDialog(QDialog):
             _('The tooltip that will be shown on the tool button.\n'
             'This is only shown when the tool button is shown on\n'
             'the workbench toolbar.'))
+
+        iconnames = qtlib.getallicons()
+        combo = QComboBox()
+        if not ico:
+            ico = self._defaulticonstring
+        elif ico not in iconnames:
+            combo.addItem(qtlib.geticon(ico), ico)
+        combo.addItem(qtlib.geticon(self._defaulticonname),
+                      self._defaulticonstring)
+        for name in iconnames:
+            combo.addItem(qtlib.geticon(name), name)
+        combo.setEditable(True)
+        idx = combo.findText(ico)
+        # note that idx will always be >= 0 because if ico not in iconnames
+        # it will have been added as the first element on the combobox!
+        combo.setCurrentIndex(idx)
+
         self.icon = self._addConfigItem(vbox, _('Icon'),
-            QLineEdit(ico),
+            combo,
             _('The tool icon.\n'
             'You can use any built-in TortoiseHg icon\n'
             'by setting this value to a valid TortoiseHg icon name\n'
@@ -495,10 +513,12 @@ class CustomToolConfigDialog(QDialog):
             'command': str(self.command.text()),
             'workingdir': str(self.workingdir.text()),
             'tooltip': str(self.tooltip.text()),
-            'icon': str(self.icon.text()),
+            'icon': str(self.icon.currentText()),
             'enable': self._enablemappings[self.enable.currentIndex()][1],
             'showoutput': str(self.showoutput.currentText()),
         }
+        if toolconfig['icon'] == self._defaulticonstring:
+            toolconfig['icon'] = ''
         return toolname, toolconfig
 
     def _genCombo(self, items, selecteditem=None):
