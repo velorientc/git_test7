@@ -947,8 +947,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                     directory=self.repo.root,
                                     filter=_FILE_FILTER)
         if bundlefile:
-            # Select the "Local" scheme
-            self.schemecombo.setCurrentIndex(0)
             # Set the pull source to the selected bundle file
             self.urlentry.setText(bundlefile)
             # Execute the incomming command, which will show the revisions in
