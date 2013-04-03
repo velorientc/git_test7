@@ -135,7 +135,9 @@ def revision_grapher(repo, **opts):
         if 'source' in ctx.extra():
             src_rev_str = ctx.extra()['source']
             if src_rev_str in repo:
-                parents.append((repo[src_rev_str].rev(), LINE_TYPE_GRAFT))
+                src_rev = repo[src_rev_str].rev()
+                if stop_rev <= src_rev < curr_rev and not hidden(src_rev):
+                    parents.append((src_rev, LINE_TYPE_GRAFT))
         parents_to_add = []
         links_to_add = []
         if len(parents) > 1:
