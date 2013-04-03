@@ -370,7 +370,6 @@ class ToolListBox(QListWidget):
                 if toolname not in validtools:
                     continue
             validguidef.append(toolname)
-        self.setValue(validguidef)
         self.clear()
         self.addItems(self._guidef2toollist(validguidef))
 
