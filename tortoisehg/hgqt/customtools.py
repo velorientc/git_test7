@@ -371,7 +371,8 @@ class ToolListBox(QListWidget):
                     continue
             validguidef.append(toolname)
         self.clear()
-        self.addItems(self._guidef2toollist(validguidef))
+        self.toollist = self._guidef2toollist(validguidef)
+        self.addItems(self.toollist)
 
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
