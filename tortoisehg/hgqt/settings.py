@@ -637,6 +637,10 @@ INFO = (
           'the changes are colored green for merge, red for '
           'non-trivial parents, black for normal. '
           'Default: False')),
+    _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
+        _('Show full authorname in Logview. If not enabled, '
+          'only a short part, usually name withour email is shown. '
+          'Default: False')),
     _fi(_('Task Tabs'), 'tortoisehg.tasktabs', (genDefaultCombo,
          ['east', 'west', 'off']),
         _('Show tabs along the side of the bottom half of each repo '
