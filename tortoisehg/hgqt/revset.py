@@ -382,21 +382,11 @@ class RevsetThread(QThread):
         self.query = query
 
     def run(self):
-        if '(' not in self.text:
-            try:
-                ctx = self.repo[self.text]
-                self.showMessage.emit(_('found revision'))
-                self.queryIssued.emit(self.query, [ctx.rev()])
-                return
-            except (error.RepoError, error.LookupError, error.Abort):
-                self.text = 'keyword("%s")' % self.text
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
             func = revset.match(self.repo.ui, self.text)
-            l = []
-            for c in func(self.repo, list(self.repo)):
-                l.append(c)
+            l = list(func(self.repo, list(self.repo)))
             if len(l):
                 self.showMessage.emit(_('%d matches found') % len(l))
             else:

@@ -18,7 +18,7 @@ import weakref
 from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, editor, terminal
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
@@ -92,8 +92,9 @@ def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
 
-def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
+def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
+        # if editing a single file, open in cwd context of that file
         filename = files[0].strip()
         if not filename:
             return
@@ -102,20 +103,55 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
         cwd = os.path.dirname(path)
         files = [os.path.basename(path)]
     else:
+        # else edit in cwd context of repo root
         cwd = repo.root
+
+    toolpath, args, argsln, argssearch = editor.detecteditor(repo, files)
+    if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
+        res = QMessageBox.critical(parent,
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
+        return
+
     files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
-    if not editor:
-        editor = repo.ui.config('tortoisehg', 'editor')
-    if editor:
+
+    cmdline = None
+    if search:
+        assert lineno is not None
+        if argssearch:
+            cmdline = ' '.join([toolpath, argssearch])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+            cmdline = cmdline.replace('$SEARCH', search)
+        elif argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    elif lineno:
+        if argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    else:
+        if args:
+            cmdline = ' '.join([toolpath, args])
+
+    if cmdline is None:
+        # editor was not specified by editor-tools configuration, fall
+        # back to older tortoisehg.editor OpenAtLine parsing
+        cmdline = ' '.join([toolpath] + files) # default
         try:
             regexp = re.compile('\[([^\]]*)\]')
             expanded = []
             pos = 0
-            for m in regexp.finditer(editor):
-                expanded.append(editor[pos:m.start()-1])
-                phrase = editor[m.start()+1:m.end()-1]
+            for m in regexp.finditer(toolpath):
+                expanded.append(toolpath[pos:m.start()-1])
+                phrase = toolpath[m.start()+1:m.end()-1]
                 pos = m.end()+1
                 if '$LINENUM' in phrase:
                     if lineno is None:
@@ -131,38 +167,38 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
                     phrase = phrase.replace('$FILE', files[0])
                     files = []
                 expanded.append(phrase)
-            expanded.append(editor[pos:])
+            expanded.append(toolpath[pos:])
             cmdline = ' '.join(expanded + files)
         except ValueError, e:
             # '[' or ']' not found
-            cmdline = ' '.join([editor] + files)
+            pass
         except TypeError, e:
             # variable expansion failed
-            cmdline = ' '.join([editor] + files)
-    else:
-        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
-                 or os.environ.get('EDITOR', 'vi')
-        cmdline = ' '.join([editor] + files)
-    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-        res = QMessageBox.critical(parent,
-                    _('No visual editor configured'),
-                    _('Please configure a visual editor.'))
-        from tortoisehg.hgqt.settings import SettingsDialog
-        dlg = SettingsDialog(False, focus='tortoisehg.editor')
-        dlg.exec_()
-        return
+            pass
 
-    cmdline = util.quotecommand(cmdline)
     shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
-        subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
-                         stderr=None, stdout=None, stdin=None, cwd=cwd)
+        if '$FILES' in cmdline:
+            cmdline = cmdline.replace('$FILES', ' '.join(files))
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
+        elif '$FILE' in cmdline:
+            for file in files:
+                cmd = cmdline.replace('$FILE', file)
+                cmd = util.quotecommand(cmd)
+                subprocess.Popen(cmd, shell=shell, creationflags=openflags,
+                                 stderr=None, stdout=None, stdin=None, cwd=cwd)
+        else:
+            # assume filenames were expanded already
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
-    return False
 
 def savefiles(repo, files, rev, parent=None):
     for curfile in files:
@@ -189,17 +225,19 @@ def savefiles(repo, files, rev, parent=None):
         finally:
             os.chdir(cwd)
 
-_user_shell = None
-def openshell(root, reponame):
+def openshell(root, reponame, ui=None):
     if not os.path.exists(root):
         WarningMsgBox(
             _('Failed to open path in terminal'),
             _('"%s" is not a valid directory') % hglib.tounicode(root))
         return
-    if _user_shell:
+    shell, args = terminal.detectterminal(ui)
+    if shell:
         cwd = os.getcwd()
         try:
-            shellcmd = _user_shell % {'reponame': reponame}
+            if args:
+                shell = shell + ' ' + util.expandpath(args)
+            shellcmd = shell % {'root': root, 'reponame': reponame}
             os.chdir(root)
             started = QProcess.startDetached(shellcmd)
         finally:
@@ -210,18 +248,6 @@ def openshell(root, reponame):
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
-
-def configureshell(ui):
-    global _user_shell
-    _user_shell = ui.config('tortoisehg', 'shell')
-    if _user_shell:
-        return
-    if sys.platform == 'darwin':
-        return # Terminal.App does not support open-to-folder
-    elif os.name == 'nt':
-        _user_shell = 'cmd.exe /K title %(reponame)s'
-    else:
-        _user_shell = 'xterm -T "%(reponame)s"'
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
@@ -255,8 +281,6 @@ thgstylesheet = '* { white-space: pre; font-family: monospace;' \
 tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
-    configureshell(ui)
-
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))
@@ -736,10 +760,12 @@ class PMButton(QPushButton):
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 
-        def clicked():
-            icon = self.is_expanded() and self.plus or self.minus
-            self.setIcon(icon)
-        self.clicked.connect(clicked)
+        self.clicked.connect(self._toggle_icon)
+
+    @pyqtSlot()
+    def _toggle_icon(self):
+        icon = self.is_expanded() and self.plus or self.minus
+        self.setIcon(icon)
 
     def set_expanded(self, state=True):
         icon = state and self.minus or self.plus
@@ -870,7 +896,7 @@ class LabeledSeparator(QWidget):
         self.setLayout(box)
 
 # Strings and regexes used to convert hashes and subrepo paths into links
-_hashregex = re.compile(r'\b([0-9a-fA-F]{12,})')
+_hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
 # Currently converting subrepo paths into links only works in English
 _subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
 
@@ -916,20 +942,18 @@ def linkifyMessage(message, subrepo=None):
         hash = ''
         m = _hashregex.search(message)
         if m:
-            hash = m.group(1)
+            hash = m.group(0)
         message = _linkifySubrepoRef(message, subrepo, hash)
     return message.replace('\n', '<br>')
 
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
 
-    You shouldn't reuse InfoBar object after close(). It is automatically
-    deleted.
-
     Layout::
 
         |widgets ...                |right widgets ...|x|
     """
+    finished = pyqtSignal(int)  # mimic QDialog
     linkActivated = pyqtSignal(unicode)
 
     # type of InfoBar (the number denotes its priority)
@@ -948,8 +972,6 @@ class InfoBar(QFrame):
     def __init__(self, parent=None):
         super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
                                       frameShadow=QFrame.Plain)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
@@ -971,10 +993,22 @@ class InfoBar(QFrame):
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
 
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.finished.emit(0)
+        super(InfoBar, self).closeEvent(event)
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.close()
         super(InfoBar, self).keyPressEvent(event)
+
+    def heightForWidth(self, width):
+        # loosely based on the internal strategy of QBoxLayout
+        if self.layout().hasHeightForWidth():
+            return super(InfoBar, self).heightForWidth(width)
+        else:
+            return self.sizeHint().height()
 
 class StatusInfoBar(InfoBar):
     """Show status message"""
@@ -1035,17 +1069,21 @@ class ConfirmInfoBar(InfoBar):
 
     def closeEvent(self, event):
         if self.isVisible():
+            self.finished.emit(1)
             self.rejected.emit()
+            self.hide()  # avoid double emission of finished signal
         super(ConfirmInfoBar, self).closeEvent(event)
 
     @pyqtSlot()
     def _accept(self):
+        self.finished.emit(0)
         self.accepted.emit()
         self.hide()
         self.close()
 
     @pyqtSlot()
     def _reject(self):
+        self.finished.emit(1)
         self.rejected.emit()
         self.hide()
         self.close()
@@ -1260,7 +1298,7 @@ class PaletteSwitcher(object):
     enablefilterpalette() method.
     """
     def __init__(self, targetwidget):
-        self._targetwidget = targetwidget
+        self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
         bgcolor = self._defaultpalette.color(QPalette.Base)
         if bgcolor.black() <= 128:
@@ -1273,8 +1311,11 @@ class PaletteSwitcher(object):
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)
 
     def enablefilterpalette(self, enabled=False):
+        targetwidget = self._targetwref()
+        if not targetwidget:
+            return
         if enabled:
             pl = self._filterpalette
         else:
             pl = self._defaultpalette
-        self._targetwidget.setPalette(pl)
+        targetwidget.setPalette(pl)
