@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import binascii, re
+import binascii, os, re
 
 from mercurial import util, error
 from mercurial.util import propertycache
@@ -482,6 +482,8 @@ class HgRepoListModel(QAbstractTableModel):
         try:
             return self.safedata(index, role)
         except error.RevlogError, e:
+            if 'THGDEBUG' in os.environ:
+                raise
             if role == Qt.DisplayRole:
                 return QVariant(hglib.tounicode(str(e)))
             else:
