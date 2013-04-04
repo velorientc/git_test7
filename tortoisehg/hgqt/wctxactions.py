@@ -12,11 +12,12 @@ from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, QObject, QDir
+from PyQt4.QtCore import Qt, QObject, QDir, pyqtSignal, pyqtSlot
 from PyQt4.QtGui import *
 
 class WctxActions(QObject):
     'container class for working context actions'
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
@@ -128,6 +129,38 @@ class WctxActions(QObject):
             make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
             make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
 
+        def _setupCustomSubmenu(menu):
+            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
+                selectedlocation='workbench.commit.custom-menu')
+            if not tools:
+                return
+            menu.addSeparator()
+            submenu = menu.addMenu(_('Custom Tools'))
+            submenu.triggered.connect(self._runCustomCommandByMenu)
+            emptysubmenu = True
+            for name in toollist:
+                if name == '|':
+                    submenu.addSeparator()
+                    continue
+                info = tools.get(name, None)
+                if info is None:
+                    continue
+                command = info.get('command', None)
+                if not command:
+                    continue
+                label = info.get('label', name)
+                icon = info.get('icon', 'tools-spanner-hammer')
+                status = info.get('status', 'MAR!C?S')
+                a = make(label, None, frozenset(status),
+                    icon=icon, inmenu=submenu)
+                if a is not None:
+                    a.setData(name)
+                    emptysubmenu = False
+            if emptysubmenu:
+                menu.removeAction(submenu.menuAction())
+
+        _setupCustomSubmenu(menu)
+
         # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
         wctx = self.repo[None]
@@ -154,6 +187,12 @@ class WctxActions(QObject):
             menu.addSeparator()
             menu.addMenu(rmenu)
         return menu
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        self.runCustomCommandRequested.emit(
+            str(action.data().toString()), files)
 
     def runAction(self):
         'run wrapper for all action methods'

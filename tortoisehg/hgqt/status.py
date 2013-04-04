@@ -48,6 +48,7 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
     grepRequested = pyqtSignal(unicode, dict)
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, pats, opts, parent=None, checkable=True,
                  defcheck='MAR!S'):
@@ -139,6 +140,8 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self.repo, self, checkable)
+        self.actions.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
         tv = WctxFileTree(self.repo, checkable=checkable)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)

@@ -454,6 +454,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -522,6 +523,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.messageEditor.refresh(repo)
 
         self.stwidget = status.StatusWidget(repo, None, opts, self)
+        self.stwidget.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
 
         self.fileview = self.stwidget.fileview
         self.fileview.showMessage.connect(self.showMessage)

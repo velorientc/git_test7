@@ -414,6 +414,8 @@ class RepoWidget(QWidget):
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
         cw.grepRequested.connect(self.grep)
+        cw.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         QTimer.singleShot(0, cw.reload)
         return cw
 
@@ -701,6 +703,8 @@ class RepoWidget(QWidget):
         mqw.progress.connect(self.progress)
         mqw.makeLogVisible.connect(self.makeLogVisible)
         mqw.showMessage.connect(self.showMessage)
+        mqw.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         return mqw
 
     def createPatchBranchWidget(self):
@@ -2199,7 +2203,8 @@ class RepoWidget(QWidget):
         shlib.shell_notify([self.repo.root])
 
 
-    def runCustomCommand(self, command, showoutput=False, workingdir=''):
+    def runCustomCommand(self, command, showoutput=False, workingdir='',
+            files=None):
         """Execute 'custom commands', on the selected repository"""
         # Perform variable expansion
         # This is done in two steps:
@@ -2217,12 +2222,15 @@ class RepoWidget(QWidget):
             return ' '.join(util.shellquote(
                             os.path.normpath(self.repo.wjoin(filename)))
                             for filename in filelist)
+        if files is None:
+            files = []
         vars = {
             'ROOT': self.repo.root,
             'REVID': str(self.repo[self.rev]),
             'REV': self.rev,
             'FILES': filelist2str(self.repo[self.rev].files()),
             'ALLFILES': filelist2str(self.repo[self.rev]),
+            'SELECTEDFILES': filelist2str(files),
         }
         for var in vars:
             command = command.replace('{%s}' % var, str(vars[var]))
@@ -2259,6 +2267,17 @@ class RepoWidget(QWidget):
     def _runCustomCommandByMenu(self, action):
         command, showoutput, workingdir = action.data().toPyObject()
         self.runCustomCommand(command, showoutput, workingdir)
+
+    @pyqtSlot(str, list)
+    def handleRunCustomCommandRequest(self, toolname, files):
+        tools, toollist = hglib.tortoisehgtools(self.repo.ui)
+        if not tools or toolname not in toollist:
+            return
+        toolname = str(toolname)
+        command = tools[toolname].get('command', '')
+        showoutput = tools[toolname].get('showoutput', False)
+        workingdir = tools[toolname].get('workingdir', '')
+        self.runCustomCommand(command, showoutput, workingdir, files)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
