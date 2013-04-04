@@ -116,7 +116,9 @@ class WctxActions(QObject):
             action._runfunc = func
             if icon:
                 action.setIcon(qtlib.getmenuicon(icon))
-            action.triggered.connect(self.runAction)
+            if func is not None:
+                action.triggered.connect(self.runAction)
+            return action
 
         if len(repo.parents()) > 1:
             make(_('View O&ther'), viewother, frozenset('MA'))
