@@ -449,8 +449,8 @@ def difftools(ui):
 
 
 tortoisehgtoollocations = {
-    'workbench.custom-toolbar': 'Workbench custom toolbar',
-    'workbench.revdetails.custom-menu': 'Revision details context menu',
+    'workbench.custom-toolbar': _('Workbench custom toolbar'),
+    'workbench.revdetails.custom-menu': _('Revision details context menu'),
 }
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
