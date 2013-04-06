@@ -948,6 +948,9 @@ INFO = (
 ({'name': 'tools', 'label': _('Tools'), 'icon': 'tools-spanner-hammer'}, (
     )),
 
+({'name': 'hooks', 'label': _('Hooks'), 'icon': 'tools-hooks'}, (
+    )),
+
 ({'name': 'issue', 'label': _('Issue Tracking'), 'icon': 'edit-file'}, (
     _fi(_('Issue Regex'), 'tortoisehg.issue.regex', genEditCombo,
         _('Defines the regex to match when picking up issue numbers.')),
@@ -1359,6 +1362,8 @@ class SettingsForm(QWidget):
                 self.validateextensions()
         elif name == 'tools':
             self.toolsFrame.refresh()
+        elif name == 'hooks':
+            self.hooksFrame.refresh()
         else:
             for row, e in enumerate(info):
                 if not e.cpath:
@@ -1475,6 +1480,11 @@ class SettingsForm(QWidget):
         self.stack.addWidget(frame)
         return (), [frame]
 
+    def fillHooksFrame(self):
+        self.hooksFrame = frame = customtools.HooksFrame(self.ini, parent=self)
+        self.stack.addWidget(frame)
+        return (), [frame]
+
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
@@ -1495,6 +1505,9 @@ class SettingsForm(QWidget):
         elif name == 'tools':
             toolsinfo, widgets = self.fillToolsFrame()
             self.pages[name] = name, toolsinfo, widgets
+        elif name == 'hooks':
+            hooksinfo, widgets = self.fillHooksFrame()
+            self.pages[name] = name, hooksinfo, widgets
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
@@ -1554,6 +1567,8 @@ class SettingsForm(QWidget):
                 self.applyChangesForExtensions()
             elif name == 'tools':
                 self.applyChangesForTools()
+            elif name == 'hooks':
+                self.applyChangesForHooks()
             else:
                 for row, e in enumerate(info):
                     if not e.cpath:
@@ -1634,6 +1649,10 @@ class SettingsForm(QWidget):
     def applyChangesForTools(self):
         if self.toolsFrame.applyChanges(self.ini):
             self.restartRequested.emit(_('Tools'))
+
+    def applyChangesForHooks(self):
+        if self.hooksFrame.applyChanges(self.ini):
+            self.restartRequested.emit(_('Hooks'))
 
 def run(ui, *pats, **opts):
     return SettingsDialog(opts.get('alias') == 'repoconfig',
