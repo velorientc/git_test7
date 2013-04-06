@@ -527,8 +527,8 @@ class _QtRunner(QObject):
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
         self._mainapp = QApplication(sys.argv)
-        self._gc = GarbageCollector(self, self.debug)
         try:
+            self._gc = GarbageCollector(self, self.debug)
             # default org is used by QSettings
             self._mainapp.setApplicationName('TortoiseHgQt')
             self._mainapp.setOrganizationName('TortoiseHg')
