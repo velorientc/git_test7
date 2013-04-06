@@ -465,6 +465,14 @@ def descriptionhtmlizer(ui):
 
 _iconcache = {}
 
+if hasattr(QIcon, 'hasThemeIcon'):  # PyQt>=4.7
+    def _findthemeicon(name):
+        if QIcon.hasThemeIcon(name):
+            return QIcon.fromTheme(name)
+else:
+    def _findthemeicon(name):
+        pass
+
 def _findicon(name):
     # TODO: icons should be placed at single location before release
     if os.path.isabs(name):
@@ -520,13 +528,12 @@ def geticon(name):
     This searches for the icon from theme, Qt resource or icons directory,
     named as 'name.(svg|png|ico)'.
     """
-    if hasattr(QIcon, 'hasThemeIcon') and QIcon.hasThemeIcon(name):
-        return QIcon.fromTheme(name)
-
     try:
         return _iconcache[name]
     except KeyError:
-        _iconcache[name] = (_findscalableicon(name) or _findicon(name)
+        _iconcache[name] = (_findthemeicon(name)
+                            or _findscalableicon(name)
+                            or _findicon(name)
                             or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
 
