@@ -556,6 +556,8 @@ class _QtRunner(QObject):
             if dlg:
                 dlg.show()
                 dlg.raise_()
+            else:
+                return -1
         except:
             # Exception before starting eventloop needs to be postponed;
             # otherwise it will be ignored silently.
