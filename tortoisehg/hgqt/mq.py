@@ -132,7 +132,6 @@ class MQPatchesWidget(QDockWidget):
 
         self.layout().setContentsMargins(2, 2, 2, 2)
 
-        self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
     def setrepo(self, repo):
@@ -467,16 +466,7 @@ class MQPatchesWidget(QDockWidget):
         self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
-    def loadConfigs(self):
-        'Load history, etc, from QSettings instance'
-        pass
-
-    def storeConfigs(self):
-        'Save history, etc, in QSettings instance'
-        pass
-
     def canExit(self):
-        self.storeConfigs()
         return not self.cmd.core.running()
 
     def keyPressEvent(self, event):
