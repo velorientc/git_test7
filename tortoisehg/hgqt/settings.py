@@ -1070,7 +1070,6 @@ class SettingsDialog(QDialog):
 
         self._activeformidx = configrepo and CONF_REPO or CONF_GLOBAL
         self.conftabs = QTabWidget()
-        self.conftabs.currentChanged.connect(self._currentFormChanged)
         layout.addWidget(self.conftabs)
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
@@ -1115,6 +1114,7 @@ class SettingsDialog(QDialog):
 
         self._restartreqs = set()
         self.conftabs.setCurrentIndex(self._activeformidx)
+        self.conftabs.currentChanged.connect(self._currentFormChanged)
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
