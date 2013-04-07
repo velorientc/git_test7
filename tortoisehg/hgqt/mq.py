@@ -239,19 +239,6 @@ class MQPatchesWidget(QDockWidget):
         self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
-    @pyqtSlot()
-    def onPushMove(self):
-        if self.cmd.running():
-            return
-        patch = self.queueListWidget.currentItem()._thgpatch
-        cmdline = ['qpush', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--move', '--', patch]
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
     def onQreorder(self):
         if self.cmd.running():
             return
