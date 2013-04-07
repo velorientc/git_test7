@@ -66,7 +66,7 @@ class ToolsFrame(QFrame):
         self.globaltoollist.doubleClicked.connect(self.editToolItem)
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
-        for location in hglib.tortoisehgtoollocations:
+        for location, locationdesc in hglib.tortoisehgtoollocations:
             self.locationcombo.addItem(location)
             toollist = ToolListBox(self.ini, location=location,
                 minimumwidth=100, parent=self)
