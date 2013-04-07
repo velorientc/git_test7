@@ -2071,7 +2071,8 @@ class RepoWidget(QWidget):
 
         # Check whether there are existing patches in the MQ queue whose name
         # collides with the revisions that are going to be imported
-        func = revset.match(self.repo.ui, '%s::%s' % (self.rev, endrev))
+        func = revset.match(self.repo.ui, '%s::%s and not hidden()'
+                                          % (self.rev, endrev))
         revList = [c for c in func(self.repo, range(len(self.repo)))]
 
         if endrev and not revList:
