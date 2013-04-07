@@ -644,26 +644,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.finishfunc = finished
         self.cmd.run(cmdline)
 
-    def onQreorder(self):
-        if self.cmd.running():
-            return
-        def checkGuardsOrComments():
-            cont = True
-            for p in self.repo.mq.fullseries:
-                if '#' in p:
-                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
-                            _('<p>ATTENTION!<br>'
-                              'Guard or comment found.<br>'
-                              'Reordering patches will destroy them.<br>'
-                              '<br>Continue?</p>'), parent=self,
-                              defaultbutton=QMessageBox.No)
-                    break
-            return cont
-        if checkGuardsOrComments():
-            dlg = qreorder.QReorderDialog(self.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-
     def qgotoRevision(self, rev):
         if self.cmd.running():
             return
