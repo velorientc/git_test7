@@ -239,6 +239,7 @@ class MQPatchesWidget(QDockWidget):
         self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
+    @pyqtSlot()
     def onQreorder(self):
         if self.cmd.running():
             return
