@@ -136,11 +136,11 @@ class MQPatchesWidget(QDockWidget):
 
     def setrepo(self, repo):
         if self.repo:
-            self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
+            self.repo.repositoryChanged.disconnect(self.reload)
         self.repo = None
         if repo and 'mq' in repo.extensions():
             self.repo = repo
-            self.repo.repositoryChanged.connect(self.onRepositoryChanged)
+            self.repo.repositoryChanged.connect(self.reload)
         QTimer.singleShot(0, self.reload)
 
     def getUserOptions(self, *optionlist):
@@ -157,11 +157,6 @@ class MQPatchesWidget(QDockWidget):
                 out.append('--' + opt)
                 out.append(val)
         return out
-
-    @pyqtSlot()
-    def onRepositoryChanged(self):
-        'Repository is reporting its changelog has changed'
-        self.reload()
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
@@ -345,6 +340,7 @@ class MQPatchesWidget(QDockWidget):
     def refreshStatus(self):
         self.refreshing = False
 
+    @pyqtSlot()
     def reload(self):
         self.refreshing = True
         self.reselectPatchItem = None
@@ -577,7 +573,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
 
         self.repo.configChanged.connect(self.onConfigChanged)
-        self.repo.repositoryChanged.connect(self.onRepositoryChanged)
+        self.repo.repositoryChanged.connect(self.reload)
         self.setAcceptDrops(True)
 
         if parent:
@@ -598,7 +594,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
     def closeEvent(self, event):
         self.repo.configChanged.disconnect(self.onConfigChanged)
-        self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
+        self.repo.repositoryChanged.disconnect(self.reload)
         super(MQWidget, self).closeEvent(event)
 
     def getUserOptions(self, *optionlist):
@@ -608,11 +604,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
-
-    @pyqtSlot()
-    def onRepositoryChanged(self):
-        'Repository is reporting its changelog has changed'
-        self.reload()
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
@@ -790,6 +781,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.stwidget.refreshWctx(synchronous=True)
         self.refreshing = False
 
+    @pyqtSlot()
     def reload(self):
         self.refreshing = True
         try:
