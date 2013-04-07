@@ -839,34 +839,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.patchNameLE.setEnabled(False)
         self.refreshStatus()
 
-    def refreshSelectedGuards(self):
-        total = len(self.allguards)
-        count = len(self.repo.mq.active())
-        oldmenu = self.guardSelBtn.menu()
-        if oldmenu:
-            oldmenu.setParent(None)
-        menu = QMenu(self)
-        for guard in self.allguards:
-            a = menu.addAction(hglib.tounicode(guard))
-            a.setCheckable(True)
-            a.setChecked(guard in self.repo.mq.active())
-            a.triggered.connect(self.onGuardSelectionChange)
-        self.guardSelBtn.setMenu(menu)
-        self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
-        self.guardSelBtn.setEnabled(bool(total))
-
-    def onGuardSelectionChange(self, isChecked):
-        guard = hglib.fromunicode(self.sender().text())
-        newguards = self.repo.mq.active()[:]
-        if isChecked:
-            newguards.append(guard)
-        elif guard in newguards:
-            newguards.remove(guard)
-        cmdline = ['qselect', '-R', self.repo.root]
-        cmdline += newguards or ['--none']
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
-
     # Capture drop events, try to import into current patch queue
 
     def detectPatches(self, paths):
