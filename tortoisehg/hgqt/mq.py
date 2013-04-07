@@ -600,7 +600,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(QString)
     def qqueueActivate(self, uqueue):
-        if self.refreshing:
+        if self.refreshing or self.stwidget.isRefreshingWctx():
             return
         queue = hglib.fromunicode(uqueue)
         if queue == self.repo.thgactivemqname:
@@ -694,28 +694,15 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
 
     def refreshStatus(self):
-        self.refreshing = True
         pctx = self.repo.changectx('.')
-
-        # Refresh the wctx in synchronous (blocking) mode, since MQ can fire
-        # multiple refresh requests in rapid succession (e.g. when QNew is
-        # pressed).  The first would launch the background status thread but
-        # the last request (with pctx.tags and newCheckBox set up properly)
-        # would return immediately from stwidget.refreshWctx because refthread
-        # was still running, so the final status display after QNew would not
-        # correctly show the status of the new patch.
-        #
-        # This could be tuned for better performance; the current synchronous
-        # approach is the closest equivalent to the pre-StatusWidget behavior.
         if 'qtip' in pctx.tags() and not self.newCheckBox.isChecked():
             # qrefresh (qdiff) diffs
             self.stwidget.setPatchContext(pctx)
-            self.stwidget.refreshWctx(synchronous=True)
+            self.stwidget.refreshWctx()
         elif self.newCheckBox.isChecked():
             # qnew (working) diffs
             self.stwidget.setPatchContext(None)
-            self.stwidget.refreshWctx(synchronous=True)
-        self.refreshing = False
+            self.stwidget.refreshWctx()
 
     @pyqtSlot()
     def reload(self):

@@ -277,7 +277,7 @@ class StatusWidget(QWidget):
         self.pctx = pctx
 
     @pyqtSlot()
-    def refreshWctx(self, synchronous=False):
+    def refreshWctx(self):
         if self.refthread:
             self.refreshWctxLater.start()
             return
@@ -303,12 +303,9 @@ class StatusWidget(QWidget):
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
-        if not synchronous:
-            self.refthread.finished.connect(self.reloadComplete)
+        self.refthread.finished.connect(self.reloadComplete)
         self.refthread.showMessage.connect(self.showMessage)
         self.refthread.start()
-        if synchronous:
-            self.reloadComplete()
 
     def reloadComplete(self):
         self.refthread.wait()
