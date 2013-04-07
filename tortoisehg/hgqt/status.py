@@ -326,8 +326,11 @@ class StatusWidget(QWidget):
         if match:
             self.setFilter(match)
 
+    def isRefreshingWctx(self):
+        return bool(self.refthread)
+
     def canExit(self):
-        return not self.refthread
+        return not self.isRefreshingWctx()
 
     def updateModel(self, wctx, patchecked):
         self.tv.setSortingEnabled(False)
