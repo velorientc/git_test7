@@ -197,26 +197,6 @@ class MQPatchesWidget(QDockWidget):
                 dlg.exec_()
         self.refreshStatus()
 
-    @pyqtSlot(QString)
-    def qqueueActivate(self, uqueue):
-        if self.refreshing:
-            return
-        queue = hglib.fromunicode(uqueue)
-        if queue == self.repo.thgactivemqname:
-            return
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        cmdline = ['qqueue', '-R', self.repo.root, queue]
-        def finished(ret):
-            if ret:
-                for i in xrange(self.queueCombo.count()):
-                    if (hglib.fromunicode(self.queueCombo.itemText(i))
-                            == self.repo.thgactivemqname):
-                        self.queueCombo.setCurrentIndex(i)
-                        break
-        self.finishfunc = finished
-        self.cmd.run(cmdline)
-
     @pyqtSlot()
     def onPushAll(self):
         if self.cmd.running():
