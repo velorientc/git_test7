@@ -47,7 +47,7 @@ class ToolsFrame(QFrame):
             toolTip=_('Select the toolbar or menu to change'))
 
         def selectlocation(index):
-            location = self.locationcombo.itemText(index)
+            location = self.locationcombo.itemData(index).toString()
             for widget in self.widgets:
                 if widget.location == location:
                     widget.removeInvalid(self.value())
@@ -67,7 +67,8 @@ class ToolsFrame(QFrame):
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
         for location, locationdesc in hglib.tortoisehgtoollocations:
-            self.locationcombo.addItem(location)
+            self.locationcombo.addItem(locationdesc.decode('utf-8'),
+                                       userData=location)
             toollist = ToolListBox(self.ini, location=location,
                 minimumwidth=100, parent=self)
             toollist.doubleClicked.connect(self.editToolFromName)
@@ -114,7 +115,7 @@ class ToolsFrame(QFrame):
 
     def getCurrentToolList(self):
         index = self.locationcombo.currentIndex()
-        location = self.locationcombo.itemText(index)
+        location = self.locationcombo.itemData(index).toString()
         for widget in self.widgets:
             if widget.location == location:
                 return widget
@@ -248,7 +249,7 @@ class ToolsFrame(QFrame):
 
         # 2. Save the new guidefs
         for n, toollistwidget in enumerate(self.widgets):
-            toollocation = self.locationcombo.itemText(n)
+            toollocation = self.locationcombo.itemData(n).toString()
             if not toollistwidget.isDirty():
                 continue
             emitChanged = True
