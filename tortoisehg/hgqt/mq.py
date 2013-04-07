@@ -654,18 +654,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
-    #@pyqtSlot(QListWidgetItem)
-    def onGotoPatch(self, item):
-        'Patch has been activated (return), issue qgoto'
-        if self.cmd.running():
-            return
-        cmdline = ['qgoto', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--', item._thgpatch]
-        self.repo.incrementBusyCount()
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
     @pyqtSlot(int)
     def onMessageSelected(self, row):
         if self.messageEditor.text() and self.messageEditor.isModified():
