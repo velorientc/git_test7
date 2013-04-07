@@ -639,7 +639,7 @@ INFO = (
           'Default: False')),
     _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
         _('Show full authorname in Logview. If not enabled, '
-          'only a short part, usually name withour email is shown. '
+          'only a short part, usually name without email is shown. '
           'Default: False')),
     _fi(_('Task Tabs'), 'tortoisehg.tasktabs', (genDefaultCombo,
          ['east', 'west', 'off']),
