@@ -466,15 +466,10 @@ class MQPatchesWidget(QDockWidget):
         self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
-    def canExit(self):
-        return not self.cmd.core.running()
-
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             if self.cmd.core.running():
                 self.cmd.cancel()
-            elif not self.parent() and self.canExit():
-                self.close()
         else:
             return super(MQPatchesWidget, self).keyPressEvent(event)
 
