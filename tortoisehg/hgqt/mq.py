@@ -6,7 +6,6 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -16,7 +15,7 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, qscilib, thgrepo, status
+from tortoisehg.hgqt import qtlib, cmdui, qscilib, thgrepo, status
 from tortoisehg.hgqt import qqueue, qreorder, thgimport, messageentry, mqutil
 from tortoisehg.hgqt.qtlib import geticon
 
@@ -167,21 +166,8 @@ class MQPatchesWidget(QDockWidget):
             self.finishfunc = None
 
     def checkForRejects(self, ret):
-        if ret is 0:
-            self.refreshStatus()
-            return
-        rejre = re.compile('saving rejects to file (.*).rej')
-        for m in rejre.finditer(self.cmd.core.rawoutput()):
-            wfile = m.groups()[0]
-            if not os.path.exists(self.repo.wjoin(wfile)):
-                continue
-            ufile = hglib.tounicode(wfile)
-            if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
-                                    _('%s had rejected chunks, edit patched '
-                                      'file together with rejects?') % ufile,
-                                    parent=self):
-                dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
-                dlg.exec_()
+        if ret != 0:
+            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
         self.refreshStatus()
 
     @pyqtSlot()
@@ -608,21 +594,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.finishfunc = None
 
     def checkForRejects(self, ret):
-        if ret is 0:
-            self.refreshStatus()
-            return
-        rejre = re.compile('saving rejects to file (.*).rej')
-        for m in rejre.finditer(self.cmd.core.rawoutput()):
-            wfile = m.groups()[0]
-            if not os.path.exists(self.repo.wjoin(wfile)):
-                continue
-            ufile = hglib.tounicode(wfile)
-            if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
-                                    _('%s had rejected chunks, edit patched '
-                                      'file together with rejects?') % ufile,
-                                    parent=self):
-                dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
-                dlg.exec_()
+        if ret != 0:
+            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
         self.refreshStatus()
 
     @pyqtSlot(QString)
