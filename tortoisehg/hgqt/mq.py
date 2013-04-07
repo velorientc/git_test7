@@ -136,12 +136,10 @@ class MQPatchesWidget(QDockWidget):
 
     def setrepo(self, repo):
         if self.repo:
-            self.repo.configChanged.disconnect(self.onConfigChanged)
             self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
         self.repo = None
         if repo and 'mq' in repo.extensions():
             self.repo = repo
-            self.repo.configChanged.connect(self.onConfigChanged)
             self.repo.repositoryChanged.connect(self.onRepositoryChanged)
         QTimer.singleShot(0, self.reload)
 
@@ -159,11 +157,6 @@ class MQPatchesWidget(QDockWidget):
                 out.append('--' + opt)
                 out.append(val)
         return out
-
-    @pyqtSlot()
-    def onConfigChanged(self):
-        'Repository is reporting its config files have changed'
-        pass
 
     @pyqtSlot()
     def onRepositoryChanged(self):
