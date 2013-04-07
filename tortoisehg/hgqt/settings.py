@@ -9,7 +9,7 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil, phases
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n, editor
+from tortoisehg.util import hglib, paths, wconfig, i18n, editor
 from tortoisehg.util import terminal
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
