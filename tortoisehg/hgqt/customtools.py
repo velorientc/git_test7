@@ -47,7 +47,7 @@ class ToolsFrame(QFrame):
             toolTip=_('Select the toolbar or menu to change'))
 
         def selectlocation(index):
-            location = self.locationcombo.itemText(index)
+            location = self.locationcombo.itemData(index).toString()
             for widget in self.widgets:
                 if widget.location == location:
                     widget.removeInvalid(self.value())
@@ -66,8 +66,9 @@ class ToolsFrame(QFrame):
         self.globaltoollist.doubleClicked.connect(self.editToolItem)
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
-        for location in hglib.tortoisehgtoollocations:
-            self.locationcombo.addItem(location)
+        for location, locationdesc in hglib.tortoisehgtoollocations:
+            self.locationcombo.addItem(locationdesc.decode('utf-8'),
+                                       userData=location)
             toollist = ToolListBox(self.ini, location=location,
                 minimumwidth=100, parent=self)
             toollist.doubleClicked.connect(self.editToolFromName)
@@ -114,7 +115,7 @@ class ToolsFrame(QFrame):
 
     def getCurrentToolList(self):
         index = self.locationcombo.currentIndex()
-        location = self.locationcombo.itemText(index)
+        location = self.locationcombo.itemData(index).toString()
         for widget in self.widgets:
             if widget.location == location:
                 return widget
@@ -129,7 +130,7 @@ class ToolsFrame(QFrame):
         if item is None:
             return
         toolname = item.text()
-        self.forwardToCurrentToolList('addOrInsertItem', toolname)
+        self.forwardToCurrentToolList('addOrInsertItem', toolname, icon=item.icon())
 
     def forwardToCurrentToolList(self, funcname, *args, **opts):
         w = self.getCurrentToolList()
@@ -142,7 +143,8 @@ class ToolsFrame(QFrame):
         res = td.exec_()
         if res:
             toolname, toolconfig = td.value()
-            self.globaltoollist.addOrInsertItem(toolname)
+            self.globaltoollist.addOrInsertItem(
+                toolname, icon=toolconfig.get('icon', None))
             self.tortoisehgtools[toolname] = toolconfig
 
     def editTool(self, row=None):
@@ -160,8 +162,12 @@ class ToolsFrame(QFrame):
             res = td.exec_()
             if res:
                 toolname, toolconfig = td.value()
+                icon = toolconfig.get('icon', '')
+                if not icon:
+                    icon = td._defaulticonname
+                item = QListWidgetItem(qtlib.geticon(icon), toolname)
                 gtl.takeItem(row)
-                gtl.insertItem(row, toolname)
+                gtl.insertItem(row, item)
                 gtl.setCurrentRow(row)
                 self.tortoisehgtools[toolname] = toolconfig
 
@@ -220,7 +226,7 @@ class ToolsFrame(QFrame):
         # custom tool configurations, and then set all the configuration
         # settings anew:
         section = 'tortoisehg-tools'
-        fieldnames = ('command', 'label', 'tooltip',
+        fieldnames = ('command', 'workingdir', 'label', 'tooltip',
                       'icon', 'location', 'enable', 'showoutput',)
         for name in self.curvalue:
             for field in fieldnames:
@@ -243,7 +249,7 @@ class ToolsFrame(QFrame):
 
         # 2. Save the new guidefs
         for n, toollistwidget in enumerate(self.widgets):
-            toollocation = self.locationcombo.itemText(n)
+            toollocation = self.locationcombo.itemData(n).toString()
             if not toollistwidget.isDirty():
                 continue
             emitChanged = True
@@ -321,13 +327,21 @@ class ToolListBox(QListWidget):
             guidef.append(name)
         return guidef
 
-    def addOrInsertItem(self, text):
+    def addOrInsertItem(self, text, icon=None):
+        if text == self.SEPARATOR:
+            item = text
+        else:
+            if not icon:
+                icon = CustomToolConfigDialog._defaulticonname
+            if isinstance(icon, str):
+                icon = qtlib.geticon(icon)
+            item = QListWidgetItem(icon, text)
         row = self.currentIndex().row()
         if row < 0:
-            self.addItem(text)
+            self.addItem(item)
             self.setCurrentRow(self.count()-1)
         else:
-            self.insertItem(row+1, text)
+            self.insertItem(row+1, item)
             self.setCurrentRow(row+1)
 
     def deleteTool(self, row=None, remove=False):
@@ -337,7 +351,7 @@ class ToolListBox(QListWidget):
             self.takeItem(row)
 
     def addSeparator(self):
-        self.addOrInsertItem(self.SEPARATOR)
+        self.addOrInsertItem(self.SEPARATOR, icon=None)
 
     def values(self):
         out = []
@@ -361,7 +375,9 @@ class ToolListBox(QListWidget):
         self.toollist = self._guidef2toollist(guidef)
         self.setValue(guidef)
         self.clear()
-        self.addItems(self.toollist)
+        for toolname in self.toollist:
+            icon = toolsdefs.get(toolname, {}).get('icon', None)
+            self.addOrInsertItem(toolname, icon=icon)
 
     def removeInvalid(self, validtools):
         validguidef = []
@@ -370,9 +386,11 @@ class ToolListBox(QListWidget):
                 if toolname not in validtools:
                     continue
             validguidef.append(toolname)
-        self.setValue(validguidef)
         self.clear()
-        self.addItems(self._guidef2toollist(validguidef))
+        self.toollist = self._guidef2toollist(validguidef)
+        for toolname in self.toollist:
+            icon = validtools.get(toolname, {}).get('icon', None)
+            self.addOrInsertItem(toolname, icon=icon)
 
 class CustomToolConfigDialog(QDialog):
     'Dialog for editing the a custom tool configuration'
@@ -385,18 +403,21 @@ class CustomToolConfigDialog(QDialog):
                        (_('Applied patches'), 'applied'),
                        (_('Applied patches or qparent'), 'qgoto'),
                        ]
+    _defaulticonname = 'tools-spanner-hammer'
+    _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         QDialog.__init__(self, parent)
 
-        self.setWindowIcon(qtlib.geticon('tools-spanner-hammer'))
+        self.setWindowIcon(qtlib.geticon(self._defaulticonname))
         self.setWindowTitle(_('Configure Custom Tool'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.hbox = QHBoxLayout()
-        vbox = QVBoxLayout()
+        vbox = QFormLayout()
 
         command = toolconfig.get('command', '')
+        workingdir = toolconfig.get('workingdir', '')
         label = toolconfig.get('label', '')
         tooltip = toolconfig.get('tooltip', '')
         ico = toolconfig.get('icon', '')
@@ -410,9 +431,19 @@ class CustomToolConfigDialog(QDialog):
             QLineEdit(command), _('The command that will be executed.\n'
             'To execute a mercurial command use "hg" (rather than "hg.exe") '
             'as the executable command.\n'
-            'You can use {ROOT} as an alias of the current repository root and\n'
-            '{REV} / {REVID} as an alias of the selected revision number / '
-            'hexadecimal identifier respectively.'))
+            'You can use several {VARIABLES} to compose your command:\n'
+            '- {ROOT}: The path to the current repository root.\n'
+            '- {REV} / {REVID}: the selected revision number / '
+            'hexadecimal revision id hash respectively.\n'
+            '- {FILES}: The list of files touched by the selected revision.\n'
+            '- {ALLFILES}: All the files tracked by mercurial on the selected'
+            ' revision.'))
+        self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
+            QLineEdit(workingdir),
+            _('The directory where the command will be be executed.\n'
+            'If this is not set, the root of the current repository'
+            'will be used instead.\n'
+            'You can use the same {VARIABLES} as on the "Command" setting.\n'))
         self.label = self._addConfigItem(vbox, _('Tool label'),
             QLineEdit(label),
             _('The tool label, which is what will be shown '
@@ -424,8 +455,25 @@ class CustomToolConfigDialog(QDialog):
             _('The tooltip that will be shown on the tool button.\n'
             'This is only shown when the tool button is shown on\n'
             'the workbench toolbar.'))
+
+        iconnames = qtlib.getallicons()
+        combo = QComboBox()
+        if not ico:
+            ico = self._defaulticonstring
+        elif ico not in iconnames:
+            combo.addItem(qtlib.geticon(ico), ico)
+        combo.addItem(qtlib.geticon(self._defaulticonname),
+                      self._defaulticonstring)
+        for name in iconnames:
+            combo.addItem(qtlib.geticon(name), name)
+        combo.setEditable(True)
+        idx = combo.findText(ico)
+        # note that idx will always be >= 0 because if ico not in iconnames
+        # it will have been added as the first element on the combobox!
+        combo.setCurrentIndex(idx)
+
         self.icon = self._addConfigItem(vbox, _('Icon'),
-            QLineEdit(ico),
+            combo,
             _('The tool icon.\n'
             'You can use any built-in TortoiseHg icon\n'
             'by setting this value to a valid TortoiseHg icon name\n'
@@ -456,17 +504,22 @@ class CustomToolConfigDialog(QDialog):
         vbox.addStretch()
         self.hbox.addLayout(vbox)
         self.setLayout(self.hbox)
+        self.setMaximumHeight(self.sizeHint().height())
+        self._readsettings()
 
     def value(self):
         toolname = str(self.name.text()).strip()
         toolconfig = {
             'label': str(self.label.text()),
             'command': str(self.command.text()),
+            'workingdir': str(self.workingdir.text()),
             'tooltip': str(self.tooltip.text()),
-            'icon': str(self.icon.text()),
+            'icon': str(self.icon.currentText()),
             'enable': self._enablemappings[self.enable.currentIndex()][1],
             'showoutput': str(self.showoutput.currentText()),
         }
+        if toolconfig['icon'] == self._defaulticonstring:
+            toolconfig['icon'] = ''
         return toolname, toolconfig
 
     def _genCombo(self, items, selecteditem=None):
@@ -485,10 +538,7 @@ class CustomToolConfigDialog(QDialog):
     def _addConfigItem(self, parent, label, configwidget, tooltip=None):
         if tooltip:
             configwidget.setToolTip(tooltip)
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(label))
-        hbox.addWidget(configwidget)
-        parent.addLayout(hbox)
+        parent.addRow(label, configwidget)
         return configwidget
 
     def _enable2label(self, value):
@@ -510,3 +560,15 @@ class CustomToolConfigDialog(QDialog):
         if not config['command']:
             return _('You must set a command to run.')
         return '' # No error
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('customtools/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('customtools/geom', self.saveGeometry())
+
+    def done(self, r):
+        self._writesettings()
+        super(CustomToolConfigDialog, self).done(r)

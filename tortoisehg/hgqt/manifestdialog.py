@@ -361,7 +361,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 self._fileview.clearDisplay()
                 return
         if line:
-            self._fileview.showLine(int(line) - 1)
+            self._fileview.showLine(line - 1)
 
     @property
     def path(self):
@@ -410,6 +410,14 @@ def run(ui, *pats, **opts):
         qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
                           hglib.tounicode(e.message))
         return
+    try:
+        line = opts.get('line') and int(opts['line']) or None
+    except ValueError:
+        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
+                          _('The specified line number "%s" is invalid.')
+                          % hglib.tounicode(opts.get('line')))
+        return
+
     dlg = ManifestDialog(repo, rev)
 
     # set initial state after dialog visible
@@ -421,7 +429,6 @@ def run(ui, *pats, **opts):
                 path = opts['canonpath']
             else:
                 return
-            line = opts.get('line') and int(opts['line']) or None
             dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])

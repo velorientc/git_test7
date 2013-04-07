@@ -20,10 +20,9 @@ from PyQt4.QtGui import *
 
 class ShelveDialog(QDialog):
 
-    finished = pyqtSignal(int)
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
@@ -123,7 +122,7 @@ class ShelveDialog(QDialog):
         a.setIcon(qtlib.geticon('thg-shelve-move-right-file'))
         self.lefttbar.addAction(self.fileright)
         self.editfilea = a = QAction(_('Edit file'), self)
-        a.setIcon(qtlib.geticon('edit-find'))
+        a.setIcon(qtlib.geticon('edit-file'))
         self.lefttbar.addAction(self.editfilea)
         self.chunksright = a = QAction(_('Move selected chunks right'), self)
         self.chunksright.triggered.connect(self.moveChunksRight)
@@ -153,7 +152,7 @@ class ShelveDialog(QDialog):
         a.setIcon(qtlib.geticon('thg-shelve-move-left-chunks'))
         self.righttbar.addAction(self.chunksleft)
         self.editfileb = a = QAction(_('Edit file'), self)
-        a.setIcon(qtlib.geticon('edit-find'))
+        a.setIcon(qtlib.geticon('edit-file'))
         self.righttbar.addAction(self.editfileb)
         self.fileleft = a = QAction(_('Move selected file left'), self)
         self.fileleft.triggered.connect(self.moveFileLeft)
@@ -194,10 +193,6 @@ class ShelveDialog(QDialog):
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
-
-    def done(self, ret):
-        self.repo.repositoryChanged.disconnect(self.refreshCombos)
-        super(ShelveDialog, self).done(ret)
 
     @pyqtSlot()
     def moveFileRight(self):
@@ -495,4 +490,4 @@ def run(ui, *pats, **opts):
         from tortoisehg.util import paths
         from tortoisehg.hgqt import thgrepo
         repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo, None)
+    return ShelveDialog(repo)

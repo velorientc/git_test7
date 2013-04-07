@@ -9,7 +9,8 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil, phases
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n
+from tortoisehg.util import hglib, paths, wconfig, i18n, editor
+from tortoisehg.util import terminal
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
@@ -466,6 +467,11 @@ def genDeferredCombo(opts, func):
     opts['nohist'] = True
     return SettingsCombo(**opts)
 
+def genEditableDeferredCombo(opts, func):
+    'Values retrieved from a function at popup time'
+    opts['canedit'] = True
+    return genDeferredCombo(opts, func)
+
 def genFontEdit(opts):
     return FontEntry(**opts)
 
@@ -498,6 +504,12 @@ def findDiffTools():
 
 def findMergeTools():
     return hglib.mergetools(ui.ui())
+
+def findEditors():
+    return editor.findeditors(ui.ui())
+
+def findTerminals():
+    return terminal.findterminals(ui.ui())
 
 def genCheckBox(opts):
     opts['nohist'] = True
@@ -547,12 +559,14 @@ INFO = (
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the selected merge tool. '
           'Failing that it uses the first applicable tool it finds.')),
-    _fi(_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
-        _('Specify the visual editor used to view files.  Format:<br>'
-          'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
-          'See <a href="%s">OpenAtLine</a>'
-          % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
-    _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
+    _fi(_('Visual Editor'), 'tortoisehg.editor',
+        (genEditableDeferredCombo, findEditors),
+        _('Specify visual editor, as described in the [editor-tools] '
+          'section of your Mercurial configuration files.  If left '
+          'unspecified, TortoiseHg will use the first applicable tool '
+          'it finds.')),
+    _fi(_('Shell'), 'tortoisehg.shell',
+        (genEditableDeferredCombo, findTerminals),
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '
           'name of the repository will be substituted in place of '
@@ -622,6 +636,10 @@ INFO = (
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '
           'non-trivial parents, black for normal. '
+          'Default: False')),
+    _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
+        _('Show full authorname in Logview. If not enabled, '
+          'only a short part, usually name withour email is shown. '
           'Default: False')),
     _fi(_('Task Tabs'), 'tortoisehg.tasktabs', (genDefaultCombo,
          ['east', 'west', 'off']),

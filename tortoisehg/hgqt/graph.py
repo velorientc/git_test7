@@ -16,8 +16,12 @@
 
 """helper functions and classes to ease hg revision graph building
 
-Based on graphlog's algorithm, with insipration stolen from TortoiseHg
+Based on graphlog's algorithm, with inspiration stolen from TortoiseHg
 revision grapher (now stolen back).
+
+The primary interface are the *_grapher functions, which are generators
+of Graph instances that describe a revision set graph. These generators
+are used by repomodel.py which renders them on a widget.
 """
 
 import time
@@ -25,6 +29,9 @@ import os
 import itertools
 
 from mercurial import util, error
+
+LINE_TYPE_PARENT = 0
+LINE_TYPE_GRAFT = 1
 
 try:
     from mercurial import repoview
@@ -36,6 +43,17 @@ except ImportError: # hg < 2.5
 def revision_grapher(repo, **opts):
     """incremental revision grapher
 
+    param repo       The repository
+    opt   start_rev  Tip-most revision of range to graph
+    opt   stop_rev   0-most revision of range to graph
+    opt   follow     True means graph only ancestors of start_rev
+    opt   revset     set of revisions to graph.
+                     If used, then start_rev, stop_rev, and follow is ignored
+    opt   branch     Only graph this branch
+    opt   allparents If set in addition to branch, then cset outside the
+                     branch that are ancestors to some cset inside the branch
+                     is also graphed
+
     This generator function walks through the revision history from
     revision start_rev to revision stop_rev (which must be less than
     or equal to start_rev) and for each revision emits tuples with the
@@ -44,17 +62,9 @@ def revision_grapher(repo, **opts):
       - current revision
       - column of the current node in the set of ongoing edges
       - color of the node (?)
-      - lines; a list of (col, next_col, color) indicating the edges between
-        the current row and the next row
+      - lines; a list of (col, next_col, color_no, line_type) defining
+	    the edges between the current row and the next row
       - parent revisions of current revision
-
-    If follow is True, only generated the subtree from the start_rev head.
-
-    If branch is set, only generated the subtree for the given named branch.
-
-    If allparents is set, include the branch heads for the selected named
-    branch heads and all ancestors. If not set, include only the revisions
-    on the selected named branch.
     """
 
     revset = opts.get('revset', None)
@@ -75,6 +85,7 @@ def revision_grapher(repo, **opts):
 
     curr_rev = start_rev
     revs = []
+    links = [] # smallest link type that applies
     rev_color = {}
     nextcolor = 0
 
@@ -93,7 +104,6 @@ def revision_grapher(repo, **opts):
 
         # Compute revs and next_revs.
         ctx = repo[curr_rev]
-        # Compute revs and next_revs.
         if curr_rev not in revs:
             if branch and ctx.branch() != branch:
                 if curr_rev is None:
@@ -108,6 +118,7 @@ def revision_grapher(repo, **opts):
                 curr_rev -= 1
                 continue
             revs.append(curr_rev)
+            links.append(LINE_TYPE_PARENT)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
             p_revs = getparents(ctx)
@@ -120,17 +131,24 @@ def revision_grapher(repo, **opts):
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
+        next_links = links[:]
 
         # Add parents to next_revs.
-        parents = [p for p in getparents(ctx) if not hidden(p)]
+        parents = [(p,LINE_TYPE_PARENT) for p in getparents(ctx) if not hidden(p)]
+        if 'source' in ctx.extra():
+            src_rev_str = ctx.extra()['source']
+            if src_rev_str in repo:
+                parents.append((repo[src_rev_str].rev(), LINE_TYPE_GRAFT))
         parents_to_add = []
+        links_to_add = []
         if len(parents) > 1:
             preferred_color = None
         else:
             preferred_color = curcolor
-        for parent in parents:
+        for parent, link_type in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
+                links_to_add.append(link_type)
                 if parent not in rev_color:
                     if preferred_color:
                         rev_color[parent] = preferred_color
@@ -138,23 +156,30 @@ def revision_grapher(repo, **opts):
                     else:
                         rev_color[parent] = nextcolor
                         nextcolor += 1
+            else:
+                # Merging lines should have the most solid style
+                #  (= lowest style value)
+                i = next_revs.index(parent)
+                next_links[i] = min(next_links[i], link_type)
             preferred_color = None
 
         # parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
+        next_links[rev_index:rev_index + 1] = links_to_add
 
         lines = []
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color) )
+                lines.append( (i, next_revs.index(rev), color, links[i]) )
             elif rev == curr_rev:
-                for parent in parents:
+                for parent, link_type in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color) )
+                    lines.append( (i, next_revs.index(parent), color, link_type) )
 
-        yield (curr_rev, rev_index, curcolor, lines, parents)
+        yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
+        links = next_links
         if curr_rev is None:
             curr_rev = len(repo)
         else:
@@ -209,15 +234,15 @@ def filelog_grapher(repo, path):
         for i, nrev in enumerate(revs):
             if nrev in next_revs:
                 color = rev_color[nrev]
-                lines.append( (i, next_revs.index(nrev), color) )
+                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT) )
             elif nrev == rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color) )
+                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT) )
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
-        yield (fctx.rev(), index, curcolor, lines, pcrevs,
-               _paths.get(fctx.rev(), path))
+        yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
+                        extra=[_paths.get(fctx.rev(), path)])
         revs = next_revs
 
         if revs:
@@ -230,11 +255,11 @@ def filelog_grapher(repo, path):
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield (patchname, 0, "", [], [], "")
+        yield GraphNode(patchname, 0, "", [], [])
 
 class GraphNode(object):
     """
-    Simple class to encapsulate e hg node in the revision graph. Does
+    Simple class to encapsulate a hg node in the revision graph. Does
     nothing but declaring attributes.
     """
     def __init__(self, rev, xposition, color, lines, parents, ncols=None,
@@ -253,7 +278,7 @@ class GraphNode(object):
 class Graph(object):
     """
     Graph object to ease hg repo navigation. The Graph object
-    instanciate a `revision_grapher` generator, and provide a `fill`
+    instantiate a `revision_grapher` generator, and provide a `fill`
     method to build the graph progressively.
     """
     #@timeit
@@ -307,21 +332,18 @@ class Graph(object):
         stopped = False
         mcol = set([self.max_cols])
 
-        for vnext in self.grapher:
-            if vnext is None:
+        for gnode in self.grapher:
+            if gnode is None:
                 continue
-            nrev, xpos, color, lines, parents = vnext[:5]
-            if not type(nrev) == str and nrev >= self.maxlog:
+            if not type(gnode.rev) == str and gnode.rev >= self.maxlog:
                 continue
-            gnode = GraphNode(nrev, xpos, color, lines, parents,
-                              extra=vnext[5:])
             if self.nodes:
                 gnode.toplines = self.nodes[-1].bottomlines
             self.nodes.append(gnode)
-            self.nodesdict[nrev] = gnode
-            mcol = mcol.union(set([xpos]))
+            self.nodesdict[gnode.rev] = gnode
+            mcol = mcol.union(set([gnode.x]))
             mcol = mcol.union(set([max(x[:2]) for x in gnode.bottomlines]))
-            if rev is not None and nrev <= rev:
+            if rev is not None and gnode.rev <= rev:
                 rev = None # we reached rev, switching to nnode counter
             if rev is None:
                 if nnodes is not None:
