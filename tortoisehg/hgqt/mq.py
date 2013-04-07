@@ -592,11 +592,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
-    def closeEvent(self, event):
-        self.repo.configChanged.disconnect(self.onConfigChanged)
-        self.repo.repositoryChanged.disconnect(self.reload)
-        super(MQWidget, self).closeEvent(event)
-
     def getUserOptions(self, *optionlist):
         return mqutil.getUserOptions(self.opts, *optionlist)
 
