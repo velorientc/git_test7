@@ -213,6 +213,7 @@ class HgFileView(QFrame):
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
+        self.actionFind.triggered.connect(self.searchbarTriggered)
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.showsearchbar)
 
         self.actionShelf = QAction('Shelve', self)
@@ -683,11 +684,19 @@ class HgFileView(QFrame):
         blk.setVisible(bool(match))
         blk.setUpdatesEnabled(True)
 
-    @pyqtSlot()
-    def showsearchbar(self):
+    def loadSelectionIntoSearchbar(self):
         text = self.sci.selectedText()
         if text:
             self.searchbar.setPattern(text)
+
+    @pyqtSlot(bool)
+    def searchbarTriggered(self, checked):
+        if checked:
+            self.loadSelectionIntoSearchbar()
+
+    @pyqtSlot()
+    def showsearchbar(self):
+        self.loadSelectionIntoSearchbar()
         self.searchbar.show()
 
     def verticalScrollBar(self):
