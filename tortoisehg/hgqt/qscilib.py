@@ -683,6 +683,9 @@ def fileEditor(filename, **opts):
     searchbar.conditionChanged.connect(editor.highlightText)
     searchbar.hide()
     def showsearchbar():
+        text = editor.selectedText()
+        if text:
+            searchbar.setPattern(text)
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
     qtlib.newshortcutsforstdkey(QKeySequence.Find, dialog, showsearchbar)
