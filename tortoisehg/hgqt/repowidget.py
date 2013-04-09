@@ -2243,7 +2243,8 @@ class RepoWidget(QWidget):
         if showoutput:
             self.makeLogVisible.emit(True)
 
-        # If the use wants to run mercurial, do so via our usual runCommand method
+        # If the user wants to run mercurial,
+        # do so via our usual runCommand method
         cmd = shlex.split(command)
         if cmd[0].lower() == 'hg':
             cmd = cmd[1:]
