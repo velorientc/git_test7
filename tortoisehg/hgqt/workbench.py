@@ -181,7 +181,7 @@ class Workbench(QMainWindow):
         newseparator(menu='file')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file')
-        newaction(_("&Close Repository"), self.closeRepository,
+        newaction(_("&Close Repository"), self.closeCurrentRepoTab,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
         newaction(_('&Settings'), self.editSettings, icon='settings_user',
@@ -1106,7 +1106,8 @@ class Workbench(QMainWindow):
                 return False
         return True
 
-    def closeRepository(self):
+    @pyqtSlot()
+    def closeCurrentRepoTab(self):
         """close the current repo tab"""
         self.repoTabCloseRequested(self.repoTabsWidget.currentIndex())
 
