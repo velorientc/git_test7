@@ -51,7 +51,6 @@ class RepoWidget(QWidget):
     # The following signals should be exchanged directly between workbench and
     # thgrepo. But it isn't possible because workbench cannot filter out known
     # repo from the result of thgrepo.repository().
-    closeSelfSignal = pyqtSignal(QWidget)
     repoChanged = pyqtSignal(QString)
     repoConfigChanged = pyqtSignal(QString)
     shortNameChanged = pyqtSignal(QString, QString)
@@ -72,7 +71,6 @@ class RepoWidget(QWidget):
 
         self.repo = repo
         repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
         self.bundle = None  # bundle file name [local encoding]
@@ -1107,11 +1105,6 @@ class RepoWidget(QWidget):
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
         self.filterbar.refresh()
-
-    @pyqtSlot()
-    def repositoryDestroyed(self):
-        'Repository has detected itself to be deleted'
-        self.closeSelfSignal.emit(self)
 
     @pyqtSlot()
     def repositoryChanged(self):

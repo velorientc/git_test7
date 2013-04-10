@@ -44,6 +44,7 @@ class Workbench(QMainWindow):
 
         self.ui = ui
         self._repomanager = repomanager
+        self._repomanager.repositoryDestroyed.connect(self.closeRepo)
 
         self.setupUi()
         self.setWindowTitle(_('TortoiseHg Workbench'))
@@ -799,10 +800,6 @@ class Workbench(QMainWindow):
         self.actionBack.setEnabled(rw.canGoBack())
         self.actionForward.setEnabled(rw.canGoForward())
 
-    def repoTabCloseSelf(self, widget):
-        index = self.repoTabsWidget.indexOf(widget)
-        self.repoTabCloseRequested(index)
-
     @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
@@ -855,7 +852,6 @@ class Workbench(QMainWindow):
         repo = repoagent.rawRepo()  # TODO: pass repoagent to RepoWidget
         rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
-        rw.closeSelfSignal.connect(self.repoTabCloseSelf)
         rw.progress.connect(self._showRepoWidgetProgress)
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
