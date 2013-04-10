@@ -973,6 +973,7 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.reload()
         self.filterbar.refresh()
 
+    @pyqtSlot()
     def repositoryDestroyed(self):
         'Repository has detected itself to be deleted'
         self.closeSelfSignal.emit(self)
