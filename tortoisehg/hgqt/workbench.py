@@ -42,7 +42,8 @@ class Workbench(QMainWindow):
 
     def __init__(self, createserver=False):
         QMainWindow.__init__(self)
-        self.progressDialog = QProgressDialog('TortoiseHg - Initializing Workbench', QString(), 0, 100)
+        self.progressDialog = QProgressDialog(
+            'TortoiseHg - Initializing Workbench', QString(), 0, 100)
         self.progressDialog.setAutoClose(False)
 
         self.ui = ui.ui()
@@ -100,7 +101,8 @@ class Workbench(QMainWindow):
 
         self.server = None
         if createserver:
-            # Enable the Workbench Server that is used to maintain a single workbench instance
+            # Enable the Workbench Server that is used to maintain a single
+            # workbench instance
             self.createWorkbenchServer()
 
     def _forgetdialog(self, dlg):
@@ -122,7 +124,8 @@ class Workbench(QMainWindow):
         tw.setMovable(True)
         tw.tabBar().hide()
         tw.tabBar().setContextMenuPolicy(Qt.CustomContextMenu)
-        tw.tabBar().customContextMenuRequested.connect(self.tabBarContextMenuRequest)
+        tw.tabBar().customContextMenuRequested.connect(
+            self.tabBarContextMenuRequest)
         tw.lastClickedTab = -1 # No tab clicked yet
 
         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -207,7 +210,8 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(_('R&epository Registry Options'))
+        self.menuViewregistryopts = self.menuView.addMenu(
+            _('R&epository Registry Options'))
         self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
@@ -324,12 +328,12 @@ class Workbench(QMainWindow):
 
         newseparator(toolbar='edit')
         self.actionCurrentRev = \
-        newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
-                  tooltip=_('Go to current revision'),
+        newaction(_("Go to current revision"), self._repofwd('gotoParent'),
+                  icon='go-home', tooltip=_('Go to current revision'),
                   enabled=True, toolbar='edit', shortcut='Ctrl+.')
         self.actionGoTo = \
-        newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
-                  tooltip=_('Go to a specific revision'),
+        newaction(_("Go to a specific revision"), self.gotorev,
+                  icon='go-to-rev', tooltip=_('Go to a specific revision'),
                   enabled=True, toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
@@ -394,7 +398,8 @@ class Workbench(QMainWindow):
             icon = info.get('icon', 'tools-spanner-hammer')
 
             self._addNewAction(label,
-                self._repofwd('runCustomCommand', [command, showoutput, workingdir]),
+                self._repofwd('runCustomCommand',
+                              [command, showoutput, workingdir]),
                 icon=icon, tooltip=tooltip,
                 enabled=True, toolbar='custom')
 
@@ -724,7 +729,8 @@ class Workbench(QMainWindow):
     def reopenLastClosedTabs(self):
         for n, reporoot in enumerate(self.lastClosedRepoRootList):
             self.progress(_('Reopening tabs'), n,
-                _('Reopening repository %s') % reporoot, '', len(self.lastClosedRepoRootList))
+                _('Reopening repository %s') % reporoot, '',
+                len(self.lastClosedRepoRootList))
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
         self.lastClosedRepoRootList = []
@@ -946,16 +952,20 @@ class Workbench(QMainWindow):
         qtlib.openhelpcontents('explorer.html')
 
     def onReadme(self, *args):
-        """ Display the README file or URL for the current repo, or the global README if no repo is open"""
+        """Display the README file or URL for the current repo, or the global
+        README if no repo is open"""
         readme = None
         def getCurrentReadme(repo):
             """
             Get the README file that is configured for the current repo.
 
-            README files can be set in 3 ways, which are checked in the following order of decreasing priority:
-            - From the tortoisehg.readme key on the current repo's configuration file
+            README files can be set in 3 ways, which are checked in the
+            following order of decreasing priority:
+            - From the tortoisehg.readme key on the current repo's configuration
+              file
             - An existing "README" file found on the repository root
-                * Valid README files are those called README and whose extension is one of the following:
+                * Valid README files are those called README and whose extension
+                  is one of the following:
                     ['', '.txt', '.html', '.pdf', '.doc', '.docx', '.ppt', '.pptx',
                      '.markdown', '.textile', '.rdoc', '.org', '.creole',
                      '.mediawiki','.rst', '.asciidoc', '.pod']
@@ -974,22 +984,27 @@ class Workbench(QMainWindow):
                         # The readme is set on the current repo configuration file
                         return readme
 
-                # Otherwise try to see if there is a file at the root of the repository
-                # that matches any of the valid README file names (in a non case-sensitive way)
+                # Otherwise try to see if there is a file at the root of the
+                # repository that matches any of the valid README file names
+                # (in a non case-sensitive way)
                 # Note that we try to match the valid README names in order
                 validreadmes = ['readme.txt', 'read.me', 'readme.html',
-                                'readme.pdf', 'readme.doc', 'readme.docx', 'readme.ppt', 'readme.pptx',
-                                'readme.md', 'readme.markdown', 'readme.mkdn', 'readme.rst', 'readme.textile', 'readme.rdoc',
+                                'readme.pdf', 'readme.doc', 'readme.docx',
+                                'readme.ppt', 'readme.pptx',
+                                'readme.md', 'readme.markdown', 'readme.mkdn',
+                                'readme.rst', 'readme.textile', 'readme.rdoc',
                                 'readme.asciidoc', 'readme.org', 'readme.creole',
                                 'readme.mediawiki', 'readme.pod', 'readme']
 
-                readmefiles = [filename for filename in os.listdir(repo.root) if filename.lower().startswith('read')]
+                readmefiles = [filename for filename in os.listdir(repo.root)
+                               if filename.lower().startswith('read')]
                 for validname in validreadmes:
                     for filename in readmefiles:
                         if filename.lower() == validname:
                             return repo.wjoin(filename)
 
-            # Otherwise try use the global setting (or None if readme is just not configured)
+            # Otherwise try use the global setting (or None if readme is just
+            # not configured)
             return readmeglobal
 
         w = self.repoTabsWidget.currentWidget()
@@ -1035,9 +1050,10 @@ class Workbench(QMainWindow):
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
 
-        # Reload the all the repos that were open on the last session
-        # This may be a lengthy operation, which happens before the Workbench GUI is open
-        # We use a progress dialog to let the user know that the workbench is being loaded
+        # Reload the all the repos that were open on the last session.
+        # This may be a lengthy operation, which happens before the Workbench
+        # GUI is open. We use a progress dialog to let the user know that the
+        # workbench is being loaded
         openreposvalue = unicode(s.value(wb + 'openrepos').toString())
         if openreposvalue:
             openrepos = openreposvalue.split(',')
