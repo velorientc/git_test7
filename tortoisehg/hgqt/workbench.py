@@ -54,7 +54,7 @@ class Workbench(QMainWindow):
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
         rr.openRepo.connect(self.openRepo)
-        rr.removeRepo.connect(self.removeRepo)
+        rr.removeRepo.connect(self.closeRepo)
         rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
@@ -558,7 +558,8 @@ class Workbench(QMainWindow):
         root = hglib.fromunicode(root)
         self._openRepo(root, reuse)
 
-    def removeRepo(self, root):
+    @pyqtSlot(QString)
+    def closeRepo(self, root):
         """ Close tab if the repo is removed from reporegistry [unicode] """
         root = os.path.normpath(hglib.fromunicode(root))
         for i in xrange(self.repoTabsWidget.count()):
