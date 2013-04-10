@@ -6,7 +6,6 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -16,7 +15,7 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, qscilib, thgrepo, status
+from tortoisehg.hgqt import qtlib, cmdui, qscilib, thgrepo, status
 from tortoisehg.hgqt import qqueue, qreorder, thgimport, messageentry, mqutil
 from tortoisehg.hgqt.qtlib import geticon
 
@@ -132,18 +131,15 @@ class MQPatchesWidget(QDockWidget):
 
         self.layout().setContentsMargins(2, 2, 2, 2)
 
-        self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
     def setrepo(self, repo):
         if self.repo:
-            self.repo.configChanged.disconnect(self.onConfigChanged)
-            self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
+            self.repo.repositoryChanged.disconnect(self.reload)
         self.repo = None
         if repo and 'mq' in repo.extensions():
             self.repo = repo
-            self.repo.configChanged.connect(self.onConfigChanged)
-            self.repo.repositoryChanged.connect(self.onRepositoryChanged)
+            self.repo.repositoryChanged.connect(self.reload)
         QTimer.singleShot(0, self.reload)
 
     def getUserOptions(self, *optionlist):
@@ -161,16 +157,6 @@ class MQPatchesWidget(QDockWidget):
                 out.append(val)
         return out
 
-    @pyqtSlot()
-    def onConfigChanged(self):
-        'Repository is reporting its config files have changed'
-        pass
-
-    @pyqtSlot()
-    def onRepositoryChanged(self):
-        'Repository is reporting its changelog has changed'
-        self.reload()
-
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
         self.qtbar.setEnabled(True)
@@ -180,42 +166,9 @@ class MQPatchesWidget(QDockWidget):
             self.finishfunc = None
 
     def checkForRejects(self, ret):
-        if ret is 0:
-            self.refreshStatus()
-            return
-        rejre = re.compile('saving rejects to file (.*).rej')
-        for m in rejre.finditer(self.cmd.core.rawoutput()):
-            wfile = m.groups()[0]
-            if not os.path.exists(self.repo.wjoin(wfile)):
-                continue
-            ufile = hglib.tounicode(wfile)
-            if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
-                                    _('%s had rejected chunks, edit patched '
-                                      'file together with rejects?') % ufile,
-                                    parent=self):
-                dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
-                dlg.exec_()
+        if ret != 0:
+            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
         self.refreshStatus()
-
-    @pyqtSlot(QString)
-    def qqueueActivate(self, uqueue):
-        if self.refreshing:
-            return
-        queue = hglib.fromunicode(uqueue)
-        if queue == self.repo.thgactivemqname:
-            return
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        cmdline = ['qqueue', '-R', self.repo.root, queue]
-        def finished(ret):
-            if ret:
-                for i in xrange(self.queueCombo.count()):
-                    if (hglib.fromunicode(self.queueCombo.itemText(i))
-                            == self.repo.thgactivemqname):
-                        self.queueCombo.setCurrentIndex(i)
-                        break
-        self.finishfunc = finished
-        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPushAll(self):
@@ -260,18 +213,6 @@ class MQPatchesWidget(QDockWidget):
         self.cmd.run(cmdline)
 
     @pyqtSlot()
-    def onPushMove(self):
-        if self.cmd.running():
-            return
-        patch = self.queueListWidget.currentItem()._thgpatch
-        cmdline = ['qpush', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--move', '--', patch]
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
     def onQreorder(self):
         if self.cmd.running():
             return
@@ -335,17 +276,6 @@ class MQPatchesWidget(QDockWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.reload()
 
-    def qgotoRevision(self, rev):
-        if self.cmd.running():
-            return
-        cmdline = ['qgoto', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--', str(rev)]
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
     #@pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
@@ -396,6 +326,7 @@ class MQPatchesWidget(QDockWidget):
     def refreshStatus(self):
         self.refreshing = False
 
+    @pyqtSlot()
     def reload(self):
         self.refreshing = True
         self.reselectPatchItem = None
@@ -510,24 +441,10 @@ class MQPatchesWidget(QDockWidget):
         self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
-    def loadConfigs(self):
-        'Load history, etc, from QSettings instance'
-        pass
-
-    def storeConfigs(self):
-        'Save history, etc, in QSettings instance'
-        pass
-
-    def canExit(self):
-        self.storeConfigs()
-        return not self.cmd.core.running()
-
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             if self.cmd.core.running():
                 self.cmd.cancel()
-            elif not self.parent() and self.canExit():
-                self.close()
         else:
             return super(MQPatchesWidget, self).keyPressEvent(event)
 
@@ -537,6 +454,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
@@ -605,6 +523,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.messageEditor.refresh(repo)
 
         self.stwidget = status.StatusWidget(repo, None, opts, self)
+        self.stwidget.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
 
         self.fileview = self.stwidget.fileview
         self.fileview.showMessage.connect(self.showMessage)
@@ -642,7 +562,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
 
         self.repo.configChanged.connect(self.onConfigChanged)
-        self.repo.repositoryChanged.connect(self.onRepositoryChanged)
+        self.repo.repositoryChanged.connect(self.reload)
         self.setAcceptDrops(True)
 
         if parent:
@@ -661,11 +581,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
-    def closeEvent(self, event):
-        self.repo.configChanged.disconnect(self.onConfigChanged)
-        self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
-        super(MQWidget, self).closeEvent(event)
-
     def getUserOptions(self, *optionlist):
         return mqutil.getUserOptions(self.opts, *optionlist)
 
@@ -673,11 +588,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
-
-    @pyqtSlot()
-    def onRepositoryChanged(self):
-        'Repository is reporting its changelog has changed'
-        self.reload()
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
@@ -687,26 +597,13 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.finishfunc = None
 
     def checkForRejects(self, ret):
-        if ret is 0:
-            self.refreshStatus()
-            return
-        rejre = re.compile('saving rejects to file (.*).rej')
-        for m in rejre.finditer(self.cmd.core.rawoutput()):
-            wfile = m.groups()[0]
-            if not os.path.exists(self.repo.wjoin(wfile)):
-                continue
-            ufile = hglib.tounicode(wfile)
-            if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
-                                    _('%s had rejected chunks, edit patched '
-                                      'file together with rejects?') % ufile,
-                                    parent=self):
-                dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
-                dlg.exec_()
+        if ret != 0:
+            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
         self.refreshStatus()
 
     @pyqtSlot(QString)
     def qqueueActivate(self, uqueue):
-        if self.refreshing:
+        if self.refreshing or self.stwidget.isRefreshingWctx():
             return
         queue = hglib.fromunicode(uqueue)
         if queue == self.repo.thgactivemqname:
@@ -723,44 +620,12 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.finishfunc = finished
         self.cmd.run(cmdline)
 
-    def onQreorder(self):
-        if self.cmd.running():
-            return
-        def checkGuardsOrComments():
-            cont = True
-            for p in self.repo.mq.fullseries:
-                if '#' in p:
-                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
-                            _('<p>ATTENTION!<br>'
-                              'Guard or comment found.<br>'
-                              'Reordering patches will destroy them.<br>'
-                              '<br>Continue?</p>'), parent=self,
-                              defaultbutton=QMessageBox.No)
-                    break
-            return cont
-        if checkGuardsOrComments():
-            dlg = qreorder.QReorderDialog(self.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-
     def qgotoRevision(self, rev):
         if self.cmd.running():
             return
         cmdline = ['qgoto', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
         cmdline += ['--', str(rev)]
-        self.repo.incrementBusyCount()
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
-    #@pyqtSlot(QListWidgetItem)
-    def onGotoPatch(self, item):
-        'Patch has been activated (return), issue qgoto'
-        if self.cmd.running():
-            return
-        cmdline = ['qgoto', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--', item._thgpatch]
         self.repo.incrementBusyCount()
         self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
@@ -832,29 +697,17 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
 
     def refreshStatus(self):
-        self.refreshing = True
         pctx = self.repo.changectx('.')
-
-        # Refresh the wctx in synchronous (blocking) mode, since MQ can fire
-        # multiple refresh requests in rapid succession (e.g. when QNew is
-        # pressed).  The first would launch the background status thread but
-        # the last request (with pctx.tags and newCheckBox set up properly)
-        # would return immediately from stwidget.refreshWctx because refthread
-        # was still running, so the final status display after QNew would not
-        # correctly show the status of the new patch.
-        #
-        # This could be tuned for better performance; the current synchronous
-        # approach is the closest equivalent to the pre-StatusWidget behavior.
         if 'qtip' in pctx.tags() and not self.newCheckBox.isChecked():
             # qrefresh (qdiff) diffs
             self.stwidget.setPatchContext(pctx)
-            self.stwidget.refreshWctx(synchronous=True)
+            self.stwidget.refreshWctx()
         elif self.newCheckBox.isChecked():
             # qnew (working) diffs
             self.stwidget.setPatchContext(None)
-            self.stwidget.refreshWctx(synchronous=True)
-        self.refreshing = False
+            self.stwidget.refreshWctx()
 
+    @pyqtSlot()
     def reload(self):
         self.refreshing = True
         try:
@@ -948,34 +801,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
                 self.setMessage('')
             self.patchNameLE.setEnabled(False)
         self.refreshStatus()
-
-    def refreshSelectedGuards(self):
-        total = len(self.allguards)
-        count = len(self.repo.mq.active())
-        oldmenu = self.guardSelBtn.menu()
-        if oldmenu:
-            oldmenu.setParent(None)
-        menu = QMenu(self)
-        for guard in self.allguards:
-            a = menu.addAction(hglib.tounicode(guard))
-            a.setCheckable(True)
-            a.setChecked(guard in self.repo.mq.active())
-            a.triggered.connect(self.onGuardSelectionChange)
-        self.guardSelBtn.setMenu(menu)
-        self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
-        self.guardSelBtn.setEnabled(bool(total))
-
-    def onGuardSelectionChange(self, isChecked):
-        guard = hglib.fromunicode(self.sender().text())
-        newguards = self.repo.mq.active()[:]
-        if isChecked:
-            newguards.append(guard)
-        elif guard in newguards:
-            newguards.remove(guard)
-        cmdline = ['qselect', '-R', self.repo.root]
-        cmdline += newguards or ['--none']
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
 
     # Capture drop events, try to import into current patch queue
 

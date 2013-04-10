@@ -448,10 +448,11 @@ def difftools(ui):
     return tools
 
 
-tortoisehgtoollocations = {
-    'workbench.custom-toolbar': 'Workbench custom toolbar',
-    'workbench.revdetails.custom-menu': 'Revision details context menu',
-}
+tortoisehgtoollocations = (
+    ('workbench.custom-toolbar', _('Workbench custom toolbar')),
+    ('workbench.revdetails.custom-menu', _('Revision details context menu')),
+    ('workbench.commit.custom-menu', _('Commit context menu')),
+)
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
     """Parse 'tortoisehg-tools' section of ini file.
@@ -581,7 +582,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         return tools, sorted(tools.keys())
 
     # Only return the tools that are linked to the selected location
-    if selectedlocation not in tortoisehgtoollocations:
+    if selectedlocation not in dict(tortoisehgtoollocations):
         raise ValueError('invalid location %r' % selectedlocation)
 
     guidef = configlist('tortoisehg', selectedlocation) or []

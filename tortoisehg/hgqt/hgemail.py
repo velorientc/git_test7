@@ -43,13 +43,13 @@ class EmailDialog(QDialog):
         self._initpreviewtab()
         self._initenvelopebox()
         self._qui.bundle_radio.toggled.connect(self._updateforms)
-        self._qui.body_check.toggled.connect(self._body_mode_clicked)
-        self._qui.attach_check.toggled.connect(self._attach_mode_clicked)
-        self._qui.inline_check.toggled.connect(self._inline_mode_clicked)
+        self._qui.attach_check.toggled.connect(self._updateattachmodes)
+        self._qui.inline_check.toggled.connect(self._updateattachmodes)
         self._initintrobox()
         self._readhistory()
         self._filldefaults()
         self._updateforms()
+        self._updateattachmodes()
         self._readsettings()
         QShortcut(QKeySequence('CTRL+Return'), self, self.accept)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
@@ -72,10 +72,13 @@ class EmailDialog(QDialog):
 
     def _readhistory(self):
         s = QSettings()
-        for k in ('to', 'cc', 'from', 'flag'):
+        for k in ('to', 'cc', 'from', 'flag', 'subject'):
             w = getattr(self._qui, '%s_edit' % k)
             w.addItems(s.value('email/%s_history' % k).toStringList())
             w.setCurrentIndex(-1)  # unselect
+        for k in ('body', 'attach', 'inline', 'diffstat'):
+            w = getattr(self._qui, '%s_check' % k)
+            w.setChecked(s.value('email/%s' % k).toBool())
 
     def _writehistory(self):
         def itercombo(w):
@@ -86,9 +89,12 @@ class EmailDialog(QDialog):
                     yield w.itemText(i)
 
         s = QSettings()
-        for k in ('to', 'cc', 'from', 'flag'):
+        for k in ('to', 'cc', 'from', 'flag', 'subject'):
             w = getattr(self._qui, '%s_edit' % k)
             s.setValue('email/%s_history' % k, list(itercombo(w))[:10])
+        for k in ('body', 'attach', 'inline', 'diffstat'):
+            w = getattr(self._qui, '%s_check' % k)
+            s.setValue('email/%s' % k, w.isChecked())
 
     def _initchangesets(self, revs):
         def purerevs(revs):
@@ -198,7 +204,7 @@ class EmailDialog(QDialog):
 
         opts['intro'] = self._qui.writeintro_check.isChecked()
         if opts['intro']:
-            opts['subject'] = headertext(self._qui.subject_edit.text())
+            opts['subject'] = headertext(self._qui.subject_edit.currentText())
             opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
@@ -214,7 +220,7 @@ class EmailDialog(QDialog):
             if not getattr(self._qui, e).currentText():
                 return False
 
-        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.text():
+        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.currentText():
             return False
 
         if not self._revs:
@@ -241,32 +247,22 @@ class EmailDialog(QDialog):
         if self._introrequired():
             self._qui.writeintro_check.setChecked(True)
 
-    def _body_mode_clicked(self):
-        # Only allow a single attachment type to be active at a time
-        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
-        if not sendattachment:
-            # If no attachment, ensure that the body mode is enabled
-            self._qui.body_check.setChecked(True)
+    #@pyqtSlot()
+    def _updateattachmodes(self):
+        """Update checkboxes to select the embedding style of the patch"""
+        attachmodes = [self._qui.attach_check, self._qui.inline_check]
+        body = self._qui.body_check
 
-    def _attach_mode_clicked(self):
-        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
-        self._qui.body_check.setDisabled(not sendattachment)
-        if not sendattachment:
-            self._qui.body_check.setChecked(True)
+        # --attach and --inline are exclusive
+        if self.sender() in attachmodes and self.sender().isChecked():
+            for w in attachmodes:
+                if w is not self.sender():
+                    w.setChecked(False)
 
-        # Only allow a single attachment type to be active at a time
-        if self._qui.attach_check.isChecked():
-            self._qui.inline_check.setChecked(False)
-
-    def _inline_mode_clicked(self):
-        sendattachment = self._qui.attach_check.isChecked() or self._qui.inline_check.isChecked()
-        self._qui.body_check.setDisabled(not sendattachment)
-        if not sendattachment:
-            self._qui.body_check.setChecked(True)
-
-        # Only allow a single attachment type to be active at a time
-        if self._qui.inline_check.isChecked():
-            self._qui.attach_check.setChecked(False)
+        # --body is mandatory if no attach modes are specified
+        body.setEnabled(util.any(w.isChecked() for w in attachmodes))
+        if not body.isEnabled():
+            body.setChecked(True)
 
     def _initenvelopebox(self):
         for e in ('to_edit', 'from_edit'):
@@ -302,7 +298,7 @@ class EmailDialog(QDialog):
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
-        self._qui.subject_edit.textChanged.connect(self._updateforms)
+        self._qui.subject_edit.editTextChanged.connect(self._updateforms)
         self._qui.writeintro_check.toggled.connect(self._updateforms)
 
     def _introrequired(self):
@@ -314,7 +310,7 @@ class EmailDialog(QDialog):
             w.setUtf8(True)
             w.setReadOnly(True)
             w.setMarginWidth(1, 0)  # hide area for line numbers
-            self.lexer = lex = lexers.get_diff_lexer(self)
+            self.lexer = lex = lexers.difflexer(self)
             fh = qtlib.getfont('fontdiff')
             fh.changed.connect(self.forwardFont)
             lex.setFont(fh.font())

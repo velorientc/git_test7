@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import binascii, re
+import binascii, os, re
 
 from mercurial import util, error
 from mercurial.util import propertycache
@@ -23,6 +23,7 @@ from mercurial.context import workingctx
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
+from tortoisehg.hgqt.graph import LINE_TYPE_GRAFT
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qreorder import writeSeries
 
@@ -70,6 +71,16 @@ def get_color(n, ignore=()):
     if not colors: # ghh, no more available colors...
         colors = COLORS
     return colors[n % len(colors)]
+
+def get_style(line_type):
+    if line_type == LINE_TYPE_GRAFT:
+        return Qt.DashLine
+    return Qt.SolidLine
+
+def get_width(line_type):
+    if line_type == LINE_TYPE_GRAFT:
+        return 1
+    return 2
 
 def _parsebranchcolors(value):
     r"""Parse tortoisehg.branchcolors setting
@@ -123,6 +134,8 @@ class HgRepoListModel(QAbstractTableModel):
     _allcolnames = dict(COLUMNHEADERS)
 
     _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags', 'Phase',)
+    _columnfonts = {'Node': QFont("Monospace"),
+                    'Converted': QFont("Monospace")}
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
@@ -144,6 +157,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.unicodexinabox = True
         self.cfgname = cfgname
         self.latesttags = {-1: 'null'}
+        self.fullauthorname = False
 
         # To be deleted
         self._user_colors = {}
@@ -195,6 +209,7 @@ class HgRepoListModel(QAbstractTableModel):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
+        self.fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
 
     def updateColumns(self):
         s = QSettings()
@@ -369,10 +384,11 @@ class HgRepoListModel(QAbstractTableModel):
             ymid = (y1 + y4)/2
             y3 = y1 + 3 * (y4 - y1)/4
 
-            for start, end, color in lines:
+            for start, end, color, line_type in lines:
                 lpen = QPen(pen)
                 lpen.setColor(QColor(get_color(color)))
-                lpen.setWidth(2)
+                lpen.setStyle(get_style(line_type))
+                lpen.setWidth(get_width(line_type))
                 painter.setPen(lpen)
                 x1 = self.col2x(start)
                 x2 = self.col2x(end)
@@ -455,11 +471,19 @@ class HgRepoListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
+        # font is not cached in self._cache since it is equal for all rows
+        if role == Qt.FontRole:
+            column = self._columns[index.column()]
+            return self._columnfonts.get(column, nullvariant)
         if role not in self._roleoffsets:
             return nullvariant
+        # repo may be changed while reading in case of postpull=rebase for
+        # example, and result in RevlogError. (issue #429)
         try:
             return self.safedata(index, role)
-        except Exception, e:
+        except error.RevlogError, e:
+            if 'THGDEBUG' in os.environ:
+                raise
             if role == Qt.DisplayRole:
                 return QVariant(hglib.tounicode(str(e)))
             else:
@@ -656,7 +680,10 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getauthor(self, ctx, gnode):
         try:
-            return hglib.username(ctx.user())
+            user = ctx.user()
+            if not self.fullauthorname:
+                user = hglib.username(user)
+            return user
         except error.Abort:
             return _('Mercurial User')
 

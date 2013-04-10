@@ -273,6 +273,10 @@ class CmdThread(QThread):
 
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
+            # disable worker because it only works in main thread:
+            #   signal.signal(signal.SIGINT, signal.SIG_IGN)
+            #   ValueError: signal only works in main thread
+            ui.setconfig('worker', 'numcpus', 1)
             self.ret = 255
             self.ret = hglib.dispatch(ui, self.cmdline) or 0
         except _SubrepoAbort, e:

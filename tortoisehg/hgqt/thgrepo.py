@@ -96,19 +96,14 @@ class ThgRepoWrapper(QObject):
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
             self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
-            self.watcher.directoryChanged.connect(self.onDirChange)
-            self.watcher.fileChanged.connect(self.onFileChange)
+            self.watcher.directoryChanged.connect(self._pollChanges)
+            self.watcher.fileChanged.connect(self._pollChanges)
             self.addMissingPaths()
 
-    @pyqtSlot(QString)
-    def onDirChange(self, directory):
-        'Catch any writes to .hg/ folder, most importantly lock files'
-        self.pollStatus()
-        self.addMissingPaths()
-
-    @pyqtSlot(QString)
-    def onFileChange(self, file):
-        'Catch writes or deletions of files we are interested in'
+    @pyqtSlot()
+    def _pollChanges(self):
+        '''Catch writes or deletions of files, or writes to .hg/ folder,
+        most importantly lock files'''
         self.pollStatus()
         self.addMissingPaths()
 
@@ -165,7 +160,7 @@ class ThgRepoWrapper(QObject):
             self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._branchmtime = os.path.getmtime(self.repo.join('branch'))
             self._rawbranch = self.repo.opener('branch').read()
-        except EnvironmentError, ValueError:
+        except EnvironmentError:
             self._dirstatemtime = None
             self._branchmtime = None
             self._rawbranch = None
