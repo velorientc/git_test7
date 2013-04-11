@@ -184,6 +184,9 @@ class patchctx(object):
     def phasestr(self):
         return self._phase
 
+    def hidden(self):
+        return False
+
     @propertycache
     def _files(self):
         if not hasattr(self, '_ph') or not self._ph.haspatch:
