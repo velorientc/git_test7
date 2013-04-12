@@ -310,6 +310,7 @@ class StatusWidget(QWidget):
         self.refthread.showMessage.connect(self.showMessage)
         self.refthread.start()
 
+    @pyqtSlot()
     def reloadComplete(self):
         self.refthread.wait()
         if self.checkable:
