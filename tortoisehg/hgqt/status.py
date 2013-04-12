@@ -319,6 +319,7 @@ class StatusWidget(QWidget):
         if synchronous:
             self.reloadComplete()
 
+    @pyqtSlot()
     def reloadComplete(self):
         self.refthread.wait()
         if self.checkable:
