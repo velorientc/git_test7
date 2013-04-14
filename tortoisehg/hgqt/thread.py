@@ -6,7 +6,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
 import Queue
 import time
 import urllib2, urllib
@@ -363,10 +362,8 @@ class CmdThread(QThread):
             else:
                 ui.warn(local._("abort: %s\n") % inst.strerror)
         except Exception, inst:
-            if 'THGDEBUG' in os.environ:
-                import traceback
-                traceback.print_exc()
             ui.write_err(str(inst) + '\n')
+            raise
         except KeyboardInterrupt:
             self.ret = -1
 
