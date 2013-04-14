@@ -28,17 +28,10 @@ import time
 import os
 import itertools
 
-from mercurial import util, error
+from mercurial import repoview, util, error
 
 LINE_TYPE_PARENT = 0
 LINE_TYPE_GRAFT = 1
-
-try:
-    from mercurial import repoview
-    _filterrevs = repoview.filterrevs
-except ImportError: # hg < 2.5
-    def _filterrevs(repo, filtername):
-        return []
 
 def revision_grapher(repo, **opts):
     """incremental revision grapher
@@ -69,7 +62,7 @@ def revision_grapher(repo, **opts):
 
     revset = opts.get('revset', None)
     branch = opts.get('branch', None)
-    revhidden = _filterrevs(repo, 'visible')
+    revhidden = repoview.filterrevs(repo, 'visible')
     if revset:
         start_rev = max(revset)
         stop_rev = min(revset)
