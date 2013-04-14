@@ -23,13 +23,6 @@ from tortoisehg.util import thread2, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
 from tortoisehg.hgqt import qtlib
 
-try:
-    _SubrepoAbort = subrepo.SubrepoAbort
-except AttributeError:
-    # hg <= 2.4
-    class _SubrepoAbort(Exception):
-        pass
-
 local = localgettext()
 
 class DataWrapper(object):
@@ -279,7 +272,7 @@ class CmdThread(QThread):
             ui.setconfig('worker', 'numcpus', 1)
             self.ret = 255
             self.ret = hglib.dispatch(ui, self.cmdline) or 0
-        except _SubrepoAbort, e:
+        except subrepo.SubrepoAbort, e:
             errormsg = str(e)
             label = 'ui.error'
             if e.subrepo:
