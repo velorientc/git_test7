@@ -429,14 +429,14 @@ class CustomToolConfigDialog(QDialog):
             # Execute a mercurial command. These _MUST_ start with "hg"
         self.command = self._addConfigItem(vbox, _('Command'),
             QLineEdit(command), _('The command that will be executed.\n'
-            'To execute a mercurial command use "hg" (rather than "hg.exe") '
+            'To execute a Mercurial command use "hg" (rather than "hg.exe") '
             'as the executable command.\n'
             'You can use several {VARIABLES} to compose your command:\n'
             '- {ROOT}: The path to the current repository root.\n'
             '- {REV} / {REVID}: the selected revision number / '
             'hexadecimal revision id hash respectively.\n'
             '- {FILES}: The list of files touched by the selected revision.\n'
-            '- {ALLFILES}: All the files tracked by mercurial on the selected'
+            '- {ALLFILES}: All the files tracked by Mercurial on the selected'
             ' revision.'))
         self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
             QLineEdit(workingdir),

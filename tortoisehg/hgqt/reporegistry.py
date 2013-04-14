@@ -174,7 +174,7 @@ class RepoTreeView(QTreeView):
             else:
                 qtlib.WarningMsgBox(
                     _('Unsupported repository type (%s)') % repotype,
-                    _('Cannot open non mercurial repositories or subrepositories'),
+                    _('Cannot open non Mercurial repositories or subrepositories'),
                     parent=self)
         else:
             # a double-click on non-repo rows opens an editor
@@ -689,7 +689,7 @@ class RepoRegistryView(QDockWidget):
         else:
             qtlib.WarningMsgBox(
                 _('Unsupported repository type (%s)') % repotype,
-                _('Cannot open non mercurial repositories or subrepositories'),
+                _('Cannot open non Mercurial repositories or subrepositories'),
                 parent=self)
 
     def copyPath(self):

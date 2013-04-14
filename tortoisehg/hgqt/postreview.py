@@ -53,7 +53,7 @@ class LoadReviewDataThread(QThread):
                 msg = e.msg
             except TypeError:
                 msg = _("Invalid reviewboard plugin. Please download the "
-                        "mercurial reviewboard plugin version 3.5 or higher "
+                        "Mercurial reviewboard plugin version 3.5 or higher "
                         "from the website below.\n\n %s") % \
                         u'http://bitbucket.org/mdelagra/mercurial-reviewboard/'
 
