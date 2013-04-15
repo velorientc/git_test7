@@ -443,7 +443,7 @@ class ModelTest(QtCore.QObject):
                 # recursively go down the children
                 if self.model.hasChildren(index) and depth < 10:
                     # qDebug() << r << c << "hasChildren" << self.model.rowCount(index)
-                    self.checkChildren(index, ++depth)
+                    self.checkChildren(index, depth+1)
                 #else:
                 #   if depth >= 10:
                 #       qDebug() << "checked 10 deep"
