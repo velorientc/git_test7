@@ -56,7 +56,7 @@ def revision_grapher(repo, **opts):
       - column of the current node in the set of ongoing edges
       - color of the node (?)
       - lines; a list of (col, next_col, color_no, line_type) defining
-	    the edges between the current row and the next row
+        the edges between the current row and the next row
       - parent revisions of current revision
     """
 
