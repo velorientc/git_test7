@@ -691,10 +691,6 @@ class PatchBranchModel(QAbstractTableModel):
             return QVariant(text)
         elif role == Qt.ForegroundRole:
             return gnode.node.color
-            if ctx.thgpbunappliedpatch():
-                return QColor(UNAPPLIED_PATCH_COLOR)
-            if column == 'Name':
-                return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
             if column == 'Graph':
                 return self.graphctx(ctx, gnode)
