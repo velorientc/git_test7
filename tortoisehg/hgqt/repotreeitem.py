@@ -267,7 +267,6 @@ class RepoItem(RepoTreeItem):
                     sri._valid = False
                     invalidRepoList.append(repo.wjoin(subpath))
                     return invalidRepoList
-                    continue
 
                 if subtype == 'hg':
                     # Only recurse into mercurial subrepos
