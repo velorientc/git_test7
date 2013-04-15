@@ -840,7 +840,7 @@ class PNewDialog(QDialog):
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon("fileadd"))
         self.setWindowTitle(_('New Patch Branch'))
-        
+
         def AddField(var, label, optional=False):
             hbox = QHBoxLayout()
             SP = QSizePolicy
@@ -851,7 +851,7 @@ class PNewDialog(QDialog):
                 le.setEnabled(False)
                 cb.toggled.connect(le.setEnabled)
                 hbox.addWidget(cb)
-                setattr(self, var+'cb', cb) 
+                setattr(self, var+'cb', cb)
             else:
                 hbox.addWidget(QLabel(label))
             hbox.addWidget(le)
@@ -869,7 +869,7 @@ class PNewDialog(QDialog):
             self.commitButton.setText(_('Commit', 'action button'))
             self.bb = bb
             return bb
-            
+
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(layout)
@@ -884,7 +884,7 @@ class PNewDialog(QDialog):
 
     def patchname(self):
         return self.patchnamele.text()
-    
+
     def getCmd(self, cwd):
         cmd = ['pnew', '--cwd', cwd, hglib.fromunicode(self.patchname())]
         optList = [('patchtext','--text'),
