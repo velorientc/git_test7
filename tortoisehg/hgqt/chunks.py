@@ -346,7 +346,6 @@ class ChunksWidget(QWidget):
                 return True
             finally:
                 del fp
-            return False
         else:
             # Apply chunks to wfile
             repo.thgbackup(repo.wjoin(wfile))
@@ -359,7 +358,6 @@ class ChunksWidget(QWidget):
                 return self.runPatcher(fp, wfile, True)
             finally:
                 wlock.release()
-            return False
 
     def getFileList(self):
         return self.ctx.files()
