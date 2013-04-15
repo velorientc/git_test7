@@ -139,7 +139,8 @@ class HgRepoListModel(QAbstractTableModel):
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
-    def __init__(self, repo, cfgname, branch, revset, rfilter, parent):
+    def __init__(self, repo, cfgname, branch, revset, rfilter, parent,
+            showhidden=False, allparents=False):
         """
         repo is a hg repo instance
         """
@@ -158,6 +159,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.cfgname = cfgname
         self.latesttags = {-1: 'null'}
         self.fullauthorname = False
+        self.showhidden = showhidden
+        self.allparents = allparents
 
         # To be deleted
         self._user_colors = {}
@@ -167,7 +170,9 @@ class HgRepoListModel(QAbstractTableModel):
             self.initBranchColors()
             self.reloadConfig()
             self.updateColumns()
-            self.setBranch(branch)
+            self.setBranch(branch,
+                           allparents=allparents,
+                           showhidden=showhidden)
 
     def initBranchColors(self):
         # Set all the branch colors once on a fixed order,
@@ -186,18 +191,28 @@ class HgRepoListModel(QAbstractTableModel):
         for branch in sorted(self.repo.branchtags().keys()):
             self.namedbranch_color(branch)
 
-    def setBranch(self, branch=None, allparents=False):
+    def setBranch(self, branch=None, allparents=False, showhidden=None):
+        if allparents is None:
+            allparents = self.allparents
+        else:
+            self.allparents = allparents
+        if showhidden is None:
+            showhidden = self.showhidden
+        else:
+            self.showhidden = showhidden
         self.filterbranch = branch  # unicode
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
             grapher = revision_grapher(self.repo,
                                        branch=hglib.fromunicode(branch),
-                                       revset=self.revset)
+                                       revset=self.revset,
+                                       showhidden=showhidden)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:
             grapher = revision_grapher(self.repo,
                                        branch=hglib.fromunicode(branch),
-                                       allparents=allparents)
+                                       allparents=allparents,
+                                       showhidden=showhidden)
             self.graph = Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()

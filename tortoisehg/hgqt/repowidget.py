@@ -165,6 +165,7 @@ class RepoWidget(QWidget):
         self.layout().addWidget(self.filterbar)
 
         self.filterbar.branchChanged.connect(self.setBranch)
+        self.filterbar.showHiddenChanged.connect(self.setShowHidden)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
         self.filterbar.showMessage.connect(self._showMessageOnInfoBar)
@@ -909,7 +910,8 @@ class RepoWidget(QWidget):
         self.revset = [r for r in self.revset if r < len(self.repo)]
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
                                          self.filterbar.branch(), self.revset,
-                                         self.revsetfilter, self)
+                                         self.revsetfilter, self,
+                                         self.filterbar.getShowHidden())
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
@@ -1130,9 +1132,19 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.tabBar().hide()
 
     @pyqtSlot(QString, bool)
-    def setBranch(self, branch, allparents):
-        'Change the branch filter'
-        self.repomodel.setBranch(branch=branch, allparents=allparents)
+    def setBranch(self, branch, allparents=None):
+        return self.setShownRevisions(branch, allparents=allparents)
+
+    @pyqtSlot(bool)
+    def setShowHidden(self, showhidden):
+        return self.setShownRevisions(
+            self.repomodel.branch(), allparents=None, showhidden=showhidden)
+
+    def setShownRevisions(self, branch, allparents=None, showhidden=None):
+        'Change the revisions that must be shown (which branch? show hidden?)'
+        self.repomodel.setBranch(branch=branch,
+                                 allparents=allparents,
+                                 showhidden=showhidden)
         self.titleChanged.emit(self.title())
         if self.revset:
             self.repoview.resetBrowseHistory(self.revset, self.rev)
