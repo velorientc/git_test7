@@ -327,7 +327,7 @@ class ModelTest(QtCore.QObject):
         #       qDebug << self.model.index(i, 0).data().toString()
         #   qDebug() << c['next'] << self.model.data(model.index(end+1, 0, c['parent']))
 
-        assert(c['next'] == self.model.data(model.index(end+1, 0, c['parent'])))
+        assert(c['next'] == self.model.data(self.model.index(end+1, 0, c['parent'])))
 
     def rowsAboutToBeRemoved(self, parent, start, end):
         """
