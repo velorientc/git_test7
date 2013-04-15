@@ -647,12 +647,6 @@ class RepoRegistryView(QDockWidget):
                             % root, parent=self)
                 return
 
-            qtlib.WarningMsgBox(
-                _('Failed to add repository'),
-                _('"%s" is not a valid repository inside "%s"') % \
-                (path, root), parent=self)
-            return
-
     def startSettings(self):
         root = self.selitem.internalPointer().rootpath()
         sd = settings.SettingsDialog(configrepo=True, focus='web.name',
