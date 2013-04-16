@@ -11,6 +11,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import error, revset as hgrevset
+from mercurial import repoview
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -430,3 +431,8 @@ class RepoFilterBar(QToolBar):
     @pyqtSlot()
     def refresh(self):
         self._updateBranchFilter()
+        self._updateShowHiddenBtnState()
+
+    def _updateShowHiddenBtnState(self):
+        hashidden = bool(repoview.filterrevs(self._repo, 'visible'))
+        self.showHiddenBtn.setEnabled(hashidden)
