@@ -105,6 +105,14 @@ class HgFileListModel(QAbstractTableModel):
             return self.index(row, 0)
         return QModelIndex()
 
+    def setFilter(self, match):
+        'simple match in filename filter'
+        self.layoutAboutToBeChanged.emit()
+        self._files = [r for r in self._unfilteredfiles
+            if unicode(match) in r['path']]
+        self.layoutChanged.emit()
+        self.reset()
+
     def _buildDesc(self, parent):
         files = []
         ctxfiles = self._ctx.files()
@@ -159,6 +167,10 @@ class HgFileListModel(QAbstractTableModel):
                 self._files += [x for x in _files if x['path'] not in _paths]
         except EnvironmentError, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
+        # Make a "copy" of self._files that can be used as the data source
+        # when filtering. Note that there is no need for this to be an actual
+        # copy, because self._files will be recreated on setFilter()
+        self._unfilteredfiles = self._files
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
     def data(self, index, role):

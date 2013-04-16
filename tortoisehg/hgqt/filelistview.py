@@ -46,6 +46,7 @@ class HgFileListView(QTableView):
             self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
     def setModel(self, model):
         QTableView.setModel(self, model)
@@ -104,6 +105,9 @@ class HgFileListView(QTableView):
             col_width = max(col_width, 50)
             self.setColumnWidth(0, col_width)
         QTableView.resizeEvent(self, event)
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
 
     #
     ## Mouse drag

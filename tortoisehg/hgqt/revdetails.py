@@ -207,6 +207,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.actionShowAllMerge.setEnabled(False)
         self.filelisttbar.addAction(self.actionShowAllMerge)
 
+        le = QLineEdit()
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
+            le.setPlaceholderText(_('### filter text ###'))
+        self.filefilter = le
+        self.filelisttbar.addWidget(self.filefilter)
+        self.filefilter.textEdited.connect(self.setFilter)
+
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
         self.actionNextLine.triggered.connect(self.fileview.nextLine)
@@ -245,6 +252,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
         self.fileview.setContext(ctx)
         self.filelist.setContext(ctx)
+        self.setFilter(self.filefilter.text())
 
     @pyqtSlot()
     def _updatedeschtmlizer(self):
@@ -297,6 +305,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._fileactions.setPaths_(self.filelist.getSelectedFiles(),
                                     self.filelist.currentFile(),
                                     itemissubrepo)
+
+    @pyqtSlot(QString)
+    def setFilter(self, match):
+        model = self.filelist.model()
+        if model is not None:
+            model.setFilter(match)
+            self.filelist.enablefilterpalette(bool(match))
 
     def saveSettings(self, s):
         wb = "RevDetailsWidget/"
