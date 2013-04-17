@@ -124,6 +124,12 @@
             <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
               <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                     Source='..\contrib\kdiff3x64.exe'/>
+              <Shortcut Id='kdiff3StartMenu' Directory='ProgramMenuDir'
+                    Name='KDiff3'
+                    Advertise='yes'
+                    Icon='kdiff3.exe'
+              />
+              <Icon Id='kdiff3.exe' SourceFile='..\contrib\kdiff3x64.exe'/>
             </Component>
             <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
               <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
@@ -139,6 +145,12 @@
             <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
               <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                     Source='..\contrib\kdiff3.exe'/>
+              <Shortcut Id='kdiff3StartMenu' Directory='ProgramMenuDir'
+                    Name='KDiff3'
+                    Advertise='yes'
+                    Icon='kdiff3.exe'
+              />
+              <Icon Id='kdiff3.exe' SourceFile='..\contrib\kdiff3.exe'/>
             </Component>
             <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
               <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
