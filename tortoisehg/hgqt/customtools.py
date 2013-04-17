@@ -391,7 +391,81 @@ class ToolListBox(QListWidget):
             icon = validtools.get(toolname, {}).get('icon', None)
             self.addOrInsertItem(toolname, icon=icon)
 
-class CustomToolConfigDialog(QDialog):
+
+class CustomConfigDialog(QDialog):
+    '''Custom Config Dialog base class'''
+
+    def __init__(self, parent=None, dialogname='', **kwargs):
+        QDialog.__init__(self, parent, **kwargs)
+        self.dialogname = dialogname
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        self.hbox = QHBoxLayout()
+        self.formvbox = QFormLayout()
+
+        self.hbox.addLayout(self.formvbox)
+        vbox = QVBoxLayout()
+        self.okbutton = QPushButton(_('OK'))
+        self.okbutton.clicked.connect(self.okClicked)
+        vbox.addWidget(self.okbutton)
+        self.cancelbutton = QPushButton(_('Cancel'))
+        self.cancelbutton.clicked.connect(self.reject)
+        vbox.addWidget(self.cancelbutton)
+        vbox.addStretch()
+        self.hbox.addLayout(vbox)
+        self.setLayout(self.hbox)
+        self.setMaximumHeight(self.sizeHint().height())
+        self._readsettings()
+
+    def value(self):
+        return None
+
+    def _genCombo(self, items, selecteditem=None):
+        index = 0
+        if selecteditem:
+            try:
+                index = items.index(selecteditem)
+            except ValueError:
+                pass
+        combo = QComboBox()
+        combo.addItems(items)
+        if index:
+            combo.setCurrentIndex(index)
+        return combo
+
+    def _addConfigItem(self, parent, label, configwidget, tooltip=None):
+        if tooltip:
+            configwidget.setToolTip(tooltip)
+        parent.addRow(label, configwidget)
+        return configwidget
+
+    def okClicked(self):
+        errormsg = self.validateForm()
+        if errormsg:
+            qtlib.WarningMsgBox(_('Missing information'), errormsg)
+            return
+        return self.accept()
+
+    def validateForm(self):
+        return '' # No error
+
+    def _readsettings(self):
+        s = QSettings()
+        if self.dialogname:
+            self.restoreGeometry(s.value(self.dialogname + '/geom').toByteArray())
+        return s
+
+    def _writesettings(self):
+        s = QSettings()
+        if self.dialogname:
+            s.setValue(self.dialogname + '/geom', self.saveGeometry())
+
+    def done(self, r):
+        self._writesettings()
+        super(CustomConfigDialog, self).done(r)
+
+
+class CustomToolConfigDialog(CustomConfigDialog):
     'Dialog for editing the a custom tool configuration'
 
     _enablemappings = [(_('All items'), 'istrue'),
@@ -406,14 +480,12 @@ class CustomToolConfigDialog(QDialog):
     _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
-        QDialog.__init__(self, parent)
+        super(CustomToolConfigDialog, self).__init__(parent,
+            dialogname='customtools',
+            windowTitle=_('Configure Custom Tool'),
+            windowIcon=qtlib.geticon(self._defaulticonname))
 
-        self.setWindowIcon(qtlib.geticon(self._defaulticonname))
-        self.setWindowTitle(_('Configure Custom Tool'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        self.hbox = QHBoxLayout()
-        vbox = QFormLayout()
+        vbox = self.formvbox
 
         command = toolconfig.get('command', '')
         workingdir = toolconfig.get('workingdir', '')
@@ -492,20 +564,6 @@ class CustomToolConfigDialog(QDialog):
             combo, _('When enabled, automatically show the Output Log when the '
             'command is run.\nDefault: False.'))
 
-        self.hbox.addLayout(vbox)
-        vbox = QVBoxLayout()
-        self.okbutton = QPushButton(_('OK'))
-        self.okbutton.clicked.connect(self.okClicked)
-        vbox.addWidget(self.okbutton)
-        self.cancelbutton = QPushButton(_('Cancel'))
-        self.cancelbutton.clicked.connect(self.reject)
-        vbox.addWidget(self.cancelbutton)
-        vbox.addStretch()
-        self.hbox.addLayout(vbox)
-        self.setLayout(self.hbox)
-        self.setMaximumHeight(self.sizeHint().height())
-        self._readsettings()
-
     def value(self):
         toolname = str(self.name.text()).strip()
         toolconfig = {
@@ -521,34 +579,8 @@ class CustomToolConfigDialog(QDialog):
             toolconfig['icon'] = ''
         return toolname, toolconfig
 
-    def _genCombo(self, items, selecteditem=None):
-        index = 0
-        if selecteditem:
-            try:
-                index = items.index(selecteditem)
-            except ValueError:
-                pass
-        combo = QComboBox()
-        combo.addItems(items)
-        if index:
-            combo.setCurrentIndex(index)
-        return combo
-
-    def _addConfigItem(self, parent, label, configwidget, tooltip=None):
-        if tooltip:
-            configwidget.setToolTip(tooltip)
-        parent.addRow(label, configwidget)
-        return configwidget
-
     def _enable2label(self, value):
         return dict((v, l) for l, v in self._enablemappings).get(value)
-
-    def okClicked(self):
-        errormsg = self.validateForm()
-        if errormsg:
-            qtlib.WarningMsgBox(_('Missing information'), errormsg)
-            return
-        return self.accept()
 
     def validateForm(self):
         name, config = self.value()
@@ -559,15 +591,3 @@ class CustomToolConfigDialog(QDialog):
         if not config['command']:
             return _('You must set a command to run.')
         return '' # No error
-
-    def _readsettings(self):
-        s = QSettings()
-        self.restoreGeometry(s.value('customtools/geom').toByteArray())
-
-    def _writesettings(self):
-        s = QSettings()
-        s.setValue('customtools/geom', self.saveGeometry())
-
-    def done(self, r):
-        self._writesettings()
-        super(CustomToolConfigDialog, self).done(r)
