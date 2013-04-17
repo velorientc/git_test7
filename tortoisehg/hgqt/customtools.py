@@ -16,6 +16,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import re
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
@@ -589,5 +591,64 @@ class CustomToolConfigDialog(CustomConfigDialog):
         if name.find(' ') >= 0:
             return _('The tool name cannot have any spaces in it.')
         if not config['command']:
+            return _('You must set a command to run.')
+        return '' # No error
+
+
+class HookConfigDialog(CustomConfigDialog):
+    '''Dialog for editing the a hook configuration'''
+
+    _hooktypes = (
+        'changegroup',
+        'commit',
+        'incoming',
+        'outgoing',
+        'prechangegroup',
+        'precommit',
+        'prelistkeys',
+        'preoutgoing',
+        'prepushkey',
+        'pretag',
+        'pretxnchangegroup',
+        'pretxncommit',
+        'preupdate',
+        'listkeys',
+        'pushkey',
+        'tag',
+        'update',
+    )
+    _rehookname = re.compile('^[^=\s]*$')
+
+    def __init__(self, parent=None, hooktype=None, command='', hookname=''):
+        super(HookConfigDialog, self).__init__(parent,
+            dialogname='hookconfigdialog',
+            windowTitle=_('Configure Hook'),
+            windowIcon=qtlib.geticon('tools-hooks'))
+
+        vbox = self.formvbox
+        combo = self._genCombo(self._hooktypes, hooktype)
+        self.hooktype = self._addConfigItem(vbox, _('Hook type'),
+            combo, _('Select the when you command will be run'))
+        self.name = self._addConfigItem(vbox, _('Tool name'),
+            QLineEdit(hookname), _('The hook name. It cannot contain spaces.'))
+        self.command = self._addConfigItem(vbox, _('Command'),
+            QLineEdit(command), _('The command that will be executed.\n'
+                 'To execute a python function prepend the command with '
+                 '"python:".\n'))
+
+    def value(self):
+        hooktype = str(self.hooktype.currentText())
+        hookname = str(self.name.text()).strip()
+        command = str(self.command.text()).strip()
+        return hooktype, command, hookname
+
+    def validateForm(self):
+        hooktype, command, hookname = self.value()
+        if hooktype not in self._hooktypes:
+            return _('You must set a valid hook type.')
+        if self._rehookname.match(hookname) is None:
+            return _('The hook name cannot contain any spaces, '
+                     'tabs or \'=\' characters.')
+        if not command:
             return _('You must set a command to run.')
         return '' # No error
