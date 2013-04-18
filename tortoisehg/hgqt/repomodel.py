@@ -190,16 +190,13 @@ class HgRepoListModel(QAbstractTableModel):
         for branch in sorted(self.repo.branchtags().keys()):
             self.namedbranch_color(branch)
 
-    def setBranch(self, branch=None, allparents=False, showhidden=None):
-        if allparents is None:
-            allparents = self.allparents
-        else:
-            self.allparents = allparents
-        if showhidden is None:
-            showhidden = self.showhidden
-        else:
-            self.showhidden = showhidden
+    def setBranch(self, branch, allparents=False):
         self.filterbranch = branch
+        self.allparents = allparents
+        self._initGraph()
+
+    def setShowHidden(self, visible):
+        self.showhidden = visible
         self._initGraph()
 
     def _initGraph(self):

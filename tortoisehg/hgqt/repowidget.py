@@ -1136,20 +1136,14 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.tabBar().hide()
 
     @pyqtSlot(QString, bool)
-    def setBranch(self, branch, allparents=None):
-        self.setShownRevisions(branch, allparents=allparents)
+    def setBranch(self, branch, allparents):
+        self.repomodel.setBranch(branch, allparents=allparents)
         self.titleChanged.emit(self.title())
+        self._resetBrowseHistoryOnFilterChange()
 
     @pyqtSlot(bool)
     def setShowHidden(self, showhidden):
-        self.setShownRevisions(
-            self.repomodel.branch(), allparents=None, showhidden=showhidden)
-
-    def setShownRevisions(self, branch, allparents=None, showhidden=None):
-        'Change the revisions that must be shown (which branch? show hidden?)'
-        self.repomodel.setBranch(branch=branch,
-                                 allparents=allparents,
-                                 showhidden=showhidden)
+        self.repomodel.setShowHidden(showhidden)
         self._resetBrowseHistoryOnFilterChange()
 
     ##
