@@ -598,6 +598,10 @@ class RepoWidget(QWidget):
         if self.revset:
             self.repomodel.filterbyrevset = checked
             self.reload()
+        self._resetBrowseHistoryOnFilterChange()
+
+    def _resetBrowseHistoryOnFilterChange(self):
+        if self.revset:
             self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     def setOutgoingNodes(self, nodes):
@@ -1146,8 +1150,7 @@ class RepoWidget(QWidget):
         self.repomodel.setBranch(branch=branch,
                                  allparents=allparents,
                                  showhidden=showhidden)
-        if self.revset:
-            self.repoview.resetBrowseHistory(self.revset, self.rev)
+        self._resetBrowseHistoryOnFilterChange()
 
     ##
     ## Workbench methods
