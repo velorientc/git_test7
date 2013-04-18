@@ -1134,6 +1134,7 @@ class RepoWidget(QWidget):
     @pyqtSlot(QString, bool)
     def setBranch(self, branch, allparents=None):
         self.setShownRevisions(branch, allparents=allparents)
+        self.titleChanged.emit(self.title())
 
     @pyqtSlot(bool)
     def setShowHidden(self, showhidden):
@@ -1145,7 +1146,6 @@ class RepoWidget(QWidget):
         self.repomodel.setBranch(branch=branch,
                                  allparents=allparents,
                                  showhidden=showhidden)
-        self.titleChanged.emit(self.title())
         if self.revset:
             self.repoview.resetBrowseHistory(self.revset, self.rev)
 
