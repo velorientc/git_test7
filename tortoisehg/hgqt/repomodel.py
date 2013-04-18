@@ -60,6 +60,7 @@ COLUMNHEADERS = (
     )
 
 UNAPPLIED_PATCH_COLOR = '#999999'
+HIDDENREV_COLOR = '#666666'
 
 def get_color(n, ignore=()):
     """
@@ -568,6 +569,8 @@ class HgRepoListModel(QAbstractTableModel):
         elif role == Qt.ForegroundRole:
             if ctx.thgmqunappliedpatch():
                 return QColor(UNAPPLIED_PATCH_COLOR)
+            if ctx.hidden():
+                return QColor(HIDDENREV_COLOR)
             if column == 'Author':
                 if self.authorcolor:
                     return QVariant(QColor(self.user_color(ctx.user())))
@@ -746,6 +749,8 @@ class HgRepoListModel(QAbstractTableModel):
             # qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
             msg = qtlib.markup(msg)
             return hglib.tounicode(text + ' ') + msg
+        if ctx.hidden():
+            return qtlib.markup(msg, fg=HIDDENREV_COLOR)
 
         parts = []
         if ctx.thgbranchhead():
