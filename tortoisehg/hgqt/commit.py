@@ -289,12 +289,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 return False
             ctx = r.changectx('.')
             canamendctx = (ctx.phase() != phases.public) \
+                and len(r.changectx(None).parents()) < 2 \
                 and not ctx.children()
             # hg < 2.6
             if hgversion.hgversion < '2.6':
                 canamendctx = canamendctx \
-                    and len(ctx.parents()) < 2 \
-                    and len(r.changectx(None).parents()) < 2
+                    and len(ctx.parents()) < 2
             return canamendctx
 
         acts = [
