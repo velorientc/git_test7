@@ -159,6 +159,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.cfgname = cfgname
         self.latesttags = {-1: 'null'}
         self.fullauthorname = False
+        self.filterbranch = branch  # unicode
         self.showhidden = showhidden
         self.allparents = allparents
 
@@ -170,9 +171,7 @@ class HgRepoListModel(QAbstractTableModel):
             self.initBranchColors()
             self.reloadConfig()
             self.updateColumns()
-            self.setBranch(branch,
-                           allparents=allparents,
-                           showhidden=showhidden)
+            self._initGraph()
 
     def initBranchColors(self):
         # Set all the branch colors once on a fixed order,
@@ -200,7 +199,7 @@ class HgRepoListModel(QAbstractTableModel):
             showhidden = self.showhidden
         else:
             self.showhidden = showhidden
-        self.filterbranch = branch  # unicode
+        self.filterbranch = branch
         self._initGraph()
 
     def _initGraph(self):
