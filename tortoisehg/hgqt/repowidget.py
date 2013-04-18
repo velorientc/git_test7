@@ -1133,11 +1133,11 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QString, bool)
     def setBranch(self, branch, allparents=None):
-        return self.setShownRevisions(branch, allparents=allparents)
+        self.setShownRevisions(branch, allparents=allparents)
 
     @pyqtSlot(bool)
     def setShowHidden(self, showhidden):
-        return self.setShownRevisions(
+        self.setShownRevisions(
             self.repomodel.branch(), allparents=None, showhidden=showhidden)
 
     def setShownRevisions(self, branch, allparents=None, showhidden=None):
