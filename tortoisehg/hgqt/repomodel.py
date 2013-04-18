@@ -201,6 +201,12 @@ class HgRepoListModel(QAbstractTableModel):
         else:
             self.showhidden = showhidden
         self.filterbranch = branch  # unicode
+        self._initGraph()
+
+    def _initGraph(self):
+        branch = self.filterbranch
+        allparents = self.allparents
+        showhidden = self.showhidden
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
             grapher = revision_grapher(self.repo,
