@@ -190,6 +190,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.urlentry.textChanged.connect(self.urlChanged)
         tbar.addWidget(self.urlentry)
 
+        # even though currentRowChanged fires pathSelected, clicked signal is
+        # also connected to it. otherwise urlentry won't be updated when the
+        # selection moves between hgrctv and reltv.
+
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         self.hgrctv = PathsTree(self, True)
@@ -319,6 +323,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths.items(), self)
         self.hgrctv.setModel(tm)
+        sm = self.hgrctv.selectionModel()
+        sm.currentRowChanged.connect(self.pathSelected)
 
         # Refresh post-pull
         self.cachedpp = self.repo.postpull
@@ -363,6 +369,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
+        sm = self.reltv.selectionModel()
+        sm.currentRowChanged.connect(self.pathSelected)
 
     def currentUrl(self):
         return unicode(self.urlentry.text())
