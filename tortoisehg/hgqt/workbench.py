@@ -385,14 +385,20 @@ class Workbench(QMainWindow):
         for a in aliases[:]:
             if a + '-push' in aliases:
                 # add foo,foo-push entry to top of menu
-                aliases.insert(0, u'\u2193 %s | %s-push \u2191' % (a,a))
+                aliases.insert(0, (a, a + '-push'))
                 # move foo,foo-push individual entries to bottom
                 aliases.remove(a)
                 aliases.remove(a + '-push')
                 aliases.append(a)
                 aliases.append(a + '-push')
+
         self.urlCombo.clear()
-        self.urlCombo.addItems(aliases)
+        for a in aliases:
+            # text, (pull-alias, push-alias)
+            if isinstance(a, tuple):
+                self.urlCombo.addItem(u'\u2193 %s | %s \u2191' % a, a)
+            else:
+                self.urlCombo.addItem(a, (a, a))
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
