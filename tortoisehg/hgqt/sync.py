@@ -251,10 +251,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.reload()
         if 'default' in self.paths:
             self.curalias = 'default'
-            self.setUrl(self.paths['default'])
+            self.setEditUrl(self.paths['default'])
         else:
             self.curalias = None
-            self.setUrl('')
+            self.setEditUrl('')
 
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
@@ -397,9 +397,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         alias = aliasindex.data(Qt.DisplayRole).toString()
         self.curalias = hglib.fromunicode(alias)
         path = index.model().realUrl(index)
-        self.setUrl(path)
+        self.setEditUrl(path)
 
-    def setUrl(self, newurl):
+    def setEditUrl(self, newurl):
         'User has selected a new URL: newurl is expected in local encoding'
         self.urlentry.setText(newurl)
         self.refreshUrl()
@@ -432,7 +432,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         if lurl.startswith('file:///'):
             lurl = lurl[8:]
-        self.setUrl(lurl)
+        self.setEditUrl(lurl)
 
     def canExit(self):
         return not self.cmd.core.running()
@@ -494,7 +494,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
-            self.setUrl(hglib.fromunicode(dlg.urlentry.text()))
+            self.setEditUrl(hglib.fromunicode(dlg.urlentry.text()))
             self.reload()
 
     def removeurl(self):
@@ -626,7 +626,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                               'this host and inside this URL.  Remove '
                               'authentication info from this URL?'),
                             parent=self):
-                            self.setUrl(cleanurl)
+                            self.setEditUrl(cleanurl)
                             self.saveclicked()
 
         safeurl = util.hidepassword(lurl)
@@ -675,11 +675,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         save = self.currentUrl()
         orev = self.opts.get('rev')
-        self.setUrl(bundle)
+        self.setEditUrl(bundle)
         if rev is not None:
             self.opts['rev'] = str(rev)
         self.pullclicked(bsource)
-        self.setUrl(save)
+        self.setEditUrl(save)
         self.opts['rev'] = orev
 
     ##
