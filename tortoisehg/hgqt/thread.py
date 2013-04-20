@@ -323,6 +323,11 @@ class CmdThread(QThread):
         except error.LockUnavailable, inst:
             ui.warn(local._("abort: could not lock %s: %s\n") %
                 (inst.desc or inst.filename, inst.strerror))
+        except error.CommandError, inst:
+            if inst.args[0]:
+                ui.warn(local._("hg %s: %s\n") % (inst.args[0], inst.args[1]))
+            else:
+                ui.warn(local._("hg: %s\n") % inst.args[1])
         except error.RepoError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
         except error.ResponseError, inst:
