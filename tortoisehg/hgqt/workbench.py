@@ -400,6 +400,14 @@ class Workbench(QMainWindow):
             else:
                 self.urlCombo.addItem(a, (a, a))
 
+    def _syncUrlFor(self, op):
+        """Current URL alias for the given sync operation"""
+        urlindex = self.urlCombo.currentIndex()
+        if urlindex < 0:
+            return
+        opindex = {'incoming': 0, 'pull': 0, 'outgoing': 1, 'push': 1}[op]
+        return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
+
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
             selectedlocation='workbench.custom-toolbar')
@@ -881,6 +889,7 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             op = str(action.data().toString())
+            w.setSyncUrl(self._syncUrlFor(op) or '')
             getattr(w, op)()
 
     def serve(self):

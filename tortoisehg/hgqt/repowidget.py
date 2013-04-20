@@ -1208,6 +1208,11 @@ class RepoWidget(QWidget):
         self.repoview.saveSettings(s)
         return True
 
+    def setSyncUrl(self, url):
+        """Change the current peer-repo url of the sync widget; url may be
+        a symbolic name defined in [paths] section"""
+        self.syncDemand.get().setUrl(url)
+
     def incoming(self):
         self.syncDemand.get().incoming()
 
