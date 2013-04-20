@@ -340,6 +340,8 @@ class CmdThread(QThread):
                 ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
         except error.RevlogError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
+        except error.UnknownCommand, inst:
+            ui.warn(local._("hg: unknown command '%s'\n") % inst.args[0])
         except socket.error, inst:
             ui.warn(local._("abort: %s!\n") % str(inst))
         except IOError, inst:
