@@ -357,20 +357,21 @@ class Workbench(QMainWindow):
         menu.addAction(self.customtbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
-        newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
+        newaction(_('Incoming'), data='incoming', icon='hg-incoming',
                   tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
+        newaction(_('Pull'), data='pull', icon='hg-pull',
                   tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
+        newaction(_('Outgoing'), data='outgoing', icon='hg-outgoing',
                   tooltip=_('Detect outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Push'), self._repofwd('push'), icon='hg-push',
+        newaction(_('Push'), data='push', icon='hg-push',
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.synctbar.addWidget(self.urlCombo)
+        self.synctbar.actionTriggered.connect(self._runSyncAction)
 
         self.updateMenu()
 
@@ -868,6 +869,13 @@ class Workbench(QMainWindow):
                 getattr(w, name)(*params, **namedparams)
 
         return forwarder
+
+    @pyqtSlot(QAction)
+    def _runSyncAction(self, action):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            op = str(action.data().toString())
+            getattr(w, op)()
 
     def serve(self):
         w = self.repoTabsWidget.currentWidget()
