@@ -184,6 +184,8 @@ class RebaseDialog(QDialog):
 
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
+        # TODO since hg 2.6, rebase will end with ret=1 in case of "unresolved
+        # conflicts", so we can fine-tune checkResolve() later.
         if self.checkResolve() is False:
             msg = _('Rebase is complete')
             if self.aborted:
