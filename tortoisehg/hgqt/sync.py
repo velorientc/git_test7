@@ -404,6 +404,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.urlentry.setText(newurl)
         self.refreshUrl()
 
+    def setUrl(self, newurl):
+        'Set the current URL to the given alias or URL [unicode]'
+        model = self.hgrctv.model()
+        for col in (0, 1):  # search known (alias, url)
+            ixs = model.match(model.index(0, col), Qt.DisplayRole, newurl, 1,
+                              Qt.MatchFixedString | Qt.MatchCaseSensitive)
+            if ixs:
+                self.hgrctv.setCurrentIndex(ixs[0])
+                self.pathSelected(ixs[0])  # in case of row not changed
+                return
+
+        self.setEditUrl(newurl)
+
     def dragEnterEvent(self, event):
         data = event.mimeData()
         if data.hasUrls() or data.hasText():
@@ -1576,4 +1589,7 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return SyncWidget(repo, None, **opts)
+    w = SyncWidget(repo, None, **opts)
+    if pats:
+        w.setUrl(hglib.tounicode(pats[0]))
+    return w
