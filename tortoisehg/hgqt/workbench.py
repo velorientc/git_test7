@@ -363,14 +363,14 @@ class Workbench(QMainWindow):
         newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
                   tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
-        self.urlCombo = QComboBox(self)
-        self.synctbar.addWidget(self.urlCombo)
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
                   tooltip=_('Detect outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Push'), self._repofwd('push'), icon='hg-push',
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
+        self.urlCombo = QComboBox(self)
+        self.synctbar.addWidget(self.urlCombo)
 
         self.updateMenu()
 
