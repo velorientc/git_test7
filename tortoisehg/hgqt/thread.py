@@ -328,6 +328,9 @@ class CmdThread(QThread):
                 ui.warn(local._("hg %s: %s\n") % (inst.args[0], inst.args[1]))
             else:
                 ui.warn(local._("hg: %s\n") % inst.args[1])
+        except error.OutOfBandError, inst:
+            ui.warn(local._("abort: remote error:\n"))
+            ui.warn(''.join(inst.args))
         except error.RepoError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
         except error.ResponseError, inst:
