@@ -249,11 +249,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.cmd = cmd
 
         self.reload()
+        self.curalias = None
         if 'default' in self.paths:
-            self.curalias = 'default'
-            self.setEditUrl(hglib.tounicode(self.paths['default']))
+            self.setUrl('default')
         else:
-            self.curalias = None
             self.setEditUrl('')
 
     def canswitch(self):
@@ -443,7 +442,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         if url.startswith('file:///'):
             url = url[8:]
-        self.setEditUrl(url)
+        self.setUrl(url)
 
     def canExit(self):
         return not self.cmd.core.running()
