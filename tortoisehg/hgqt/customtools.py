@@ -283,6 +283,225 @@ class ToolsFrame(QFrame):
             w.refresh()
 
 
+class HooksFrame(QFrame):
+    def __init__(self, ini, parent=None, **opts):
+        super(HooksFrame, self).__init__(parent, **opts)
+        self.ini = ini
+        # The frame is created empty, and will be populated on 'refresh',
+        # which usually happens when the frames is activated
+        self.setValue({})
+
+        topbox = QHBoxLayout()
+        self.setLayout(topbox)
+        self.hooktable = QTableWidget(0, 3, parent)
+        self.hooktable.setHorizontalHeaderLabels((_('Type'), _('Name'), _('Command')))
+        self.hooktable.sortByColumn(0, Qt.AscendingOrder)
+        self.hooktable.setSelectionBehavior(self.hooktable.SelectRows)
+        self.hooktable.setSelectionMode(self.hooktable.SingleSelection)
+        self.hooktable.cellDoubleClicked.connect(self.editHook)
+        topbox.addWidget(self.hooktable)
+        buttonbox = QVBoxLayout()
+        self.btnnew = QPushButton(_('New hook'))
+        buttonbox.addWidget(self.btnnew)
+        self.btnnew.clicked.connect(self.newHook)
+        self.btnedit = QPushButton(_('Edit hook'))
+        buttonbox.addWidget(self.btnedit)
+        self.btnedit.clicked.connect(self.editCurrentHook)
+        self.btndelete = QPushButton(_('Delete hook'))
+        self.btndelete.clicked.connect(self.deleteCurrentHook)
+        buttonbox.addWidget(self.btndelete)
+        buttonbox.addStretch()
+        topbox.addLayout(buttonbox)
+
+    def newHook(self):
+        td = HookConfigDialog(self)
+        res = td.exec_()
+        if res:
+            hooktype, command, hookname = td.value()
+            # Does the new hook already exist?
+            hooks = self.value()
+            if hooktype in hooks:
+                existingcommand = hooks[hooktype].get(hookname, None)
+                if existingcommand is not None:
+                    if existingcommand == command:
+                        # The command already exists "as is"!
+                        return
+                    if not qtlib.QuestionMsgBox(
+                            _('Replace existing hook?'),
+                            _('There is an existing %s.%s hook.\n\n'
+                            'Do you want to replace it?')
+                            % (hooktype, hookname),
+                            parent=self):
+                        return
+                    # Delete existing matching hooks in reverse order
+                    # (otherwise the row numbers will be wrong after the first
+                    # deletion)
+                    for r in reversed(self.findHooks(
+                            hooktype=hooktype, hookname=hookname)):
+                        self.deleteHook(r)
+            self.hooktable.setSortingEnabled(False)
+            row = self.hooktable.rowCount()
+            self.hooktable.insertRow(row)
+            for c, text in enumerate((hooktype, hookname, command)):
+                self.hooktable.setItem(row, c, QTableWidgetItem(text))
+            # Make the hook column not editable (a dialog is used to edit it)
+            itemhook = self.hooktable.item(row, 0)
+            itemhook.setFlags(itemhook.flags() & ~Qt.ItemIsEditable)
+            self.hooktable.setSortingEnabled(True)
+            self.hooktable.resizeColumnsToContents()
+            self.updatebuttons()
+
+    def editHook(self, r, c=0):
+        if r < 0:
+            r = 0
+        numrows = self.hooktable.rowCount()
+        if not numrows or r >= numrows:
+            return False
+        if c > 0:
+            # Only show the edit dialog when clicking
+            # on the "Hook Type" (i.e. the 1st) column
+            return False
+        hooktype = self.hooktable.item(r, 0).text()
+        hookname = self.hooktable.item(r, 1).text()
+        command = self.hooktable.item(r, 2).text()
+        td = HookConfigDialog(self, hooktype=hooktype,
+                              command=command, hookname=hookname)
+        res = td.exec_()
+        if res:
+            hooktype, command, hookname = td.value()
+            # Update the table
+            # Note that we must disable the ordering while the table
+            # is updated to avoid updating the wrong cell!
+            self.hooktable.setSortingEnabled(False)
+            self.hooktable.item(r, 0).setText(hooktype)
+            self.hooktable.item(r, 1).setText(hookname)
+            self.hooktable.item(r, 2).setText(command)
+            self.hooktable.setSortingEnabled(True)
+            self.hooktable.clearSelection()
+            self.hooktable.setState(self.hooktable.NoState)
+            self.hooktable.resizeColumnsToContents()
+        return bool(res)
+
+    def editCurrentHook(self):
+        self.editHook(self.hooktable.currentRow())
+
+    def deleteHook(self, row=None):
+        if row is None:
+            row = self.hooktable.currentRow()
+            if row < 0:
+                row = self.hooktable.rowCount() - 1
+        self.hooktable.removeRow(row)
+        self.hooktable.resizeColumnsToContents()
+        self.updatebuttons()
+
+    def deleteCurrentHook(self):
+        self.deleteHook()
+
+    def findHooks(self, hooktype=None, hookname=None, command=None):
+        matchingrows = []
+        for r in range(self.hooktable.rowCount()):
+            currhooktype = hglib.fromunicode(self.hooktable.item(r, 0).text())
+            currhookname = hglib.fromunicode(self.hooktable.item(r, 1).text())
+            currcommand = hglib.fromunicode(self.hooktable.item(r, 2).text())
+            matchinghooktype = hooktype is None or hooktype == currhooktype
+            matchinghookname = hookname is None or hookname == currhookname
+            matchingcommand = command is None or command == currcommand
+            if matchinghooktype and matchinghookname and matchingcommand:
+                matchingrows.append(r)
+        return matchingrows
+
+    def updatebuttons(self):
+        tablehasitems = self.hooktable.rowCount() > 0
+        self.btnedit.setEnabled(tablehasitems)
+        self.btndelete.setEnabled(tablehasitems)
+
+    def applyChanges(self, ini):
+        # widget.value() returns the _NEW_ values
+        # widget.curvalue returns the _ORIGINAL_ values (yes, this is a bit
+        # misleading! "cur" means "current" as in currently valid)
+        emitChanged = False
+        if not self.isDirty():
+            return emitChanged
+        emitChanged = True
+
+        # 1. Delete the previous hook configurations
+        section = 'hooks'
+        hooks = self.curvalue
+        for hooktype in hooks:
+            for keyname in hooks[hooktype]:
+                try:
+                    keyname = '%s.%s' % (hooktype, keyname)
+                    del ini[section][keyname]
+                except KeyError:
+                    pass
+        # 2. Save the new configurations
+        hooks = self.value()
+        for hooktype in hooks:
+            for field in sorted(hooks[hooktype]):
+                if field:
+                    keyname = '%s.%s' % (hooktype, field)
+                else:
+                    keyname = hooktype
+                value = hooks[hooktype][field]
+                if value:
+                    ini.set(section, keyname, value)
+        return emitChanged
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = dict(curvalue)
+
+    def value(self):
+        hooks = {}
+        for r in range(self.hooktable.rowCount()):
+            hooktype = hglib.fromunicode(self.hooktable.item(r, 0).text())
+            hookname = hglib.fromunicode(self.hooktable.item(r, 1).text())
+            command = hglib.fromunicode(self.hooktable.item(r, 2).text())
+            if hooktype not in hooks:
+                hooks[hooktype] = {}
+            hooks[hooktype][hookname] = command
+        return hooks
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+    def gethooks(self):
+        hooks = {}
+        for key, value in self.ini.items('hooks'):
+            keyparts = key.split('.', 1)
+            hooktype = keyparts[0]
+            if len(keyparts) == 1:
+                name = ''
+            else:
+                name = keyparts[1]
+            if hooktype not in hooks:
+                hooks[hooktype] = {}
+            hooks[hooktype][name] = value
+        return hooks
+
+    def refresh(self):
+        hooks = self.gethooks()
+        self.setValue(hooks)
+        self.hooktable.setSortingEnabled(False)
+        self.hooktable.setRowCount(0)
+        for hooktype in sorted(hooks):
+            for name in sorted(hooks[hooktype]):
+                itemhook = QTableWidgetItem(hglib.tounicode(hooktype))
+                # Make the hook column not editable
+                # (a dialog is used to edit it)
+                itemhook.setFlags(itemhook.flags() & ~Qt.ItemIsEditable)
+                itemname = QTableWidgetItem(hglib.tounicode(name))
+                itemtool = QTableWidgetItem(
+                    hglib.tounicode(hooks[hooktype][name]))
+                self.hooktable.insertRow(self.hooktable.rowCount())
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 0, itemhook)
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 1, itemname)
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 2, itemtool)
+        self.hooktable.setSortingEnabled(True)
+        self.hooktable.resizeColumnsToContents()
+        self.updatebuttons()
+
+
 class ToolListBox(QListWidget):
     SEPARATOR = '------'
     def __init__(self, ini, parent=None, location=None, minimumwidth=None,
