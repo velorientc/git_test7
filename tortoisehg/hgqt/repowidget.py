@@ -1352,13 +1352,17 @@ class RepoWidget(QWidget):
             return act
         menu = QMenu(self)
         if mode == 'outgoing':
+            pushtypeicon = {'all': None, 'branch': None, 'revision': None}
+            defaultpush = self.repo.ui.config(
+                'tortoisehg', 'defaultpush', 'all')
+            pushtypeicon[defaultpush] = 'hg-push'
             submenu = menu.addMenu(_('Pus&h'))
-            entry(submenu, None, isrev, _('Push to &Here'), '',
-                  self.pushToRevision)
-            entry(submenu, None, isrev, _('Push Selected &Branch'), '',
-                  self.pushBranch)
-            entry(submenu, None, isrev, _('Push &All'), 'hg-push',
-                  self.pushAll)
+            entry(submenu, None, isrev, _('Push to &Here'),
+                  pushtypeicon['revision'], self.pushToRevision)
+            entry(submenu, None, isrev, _('Push Selected &Branch'),
+                  pushtypeicon['branch'], self.pushBranch)
+            entry(submenu, None, isrev, _('Push &All'),
+                  pushtypeicon['all'], self.pushAll)
             entry(menu)
         entry(menu, None, isrev, _('&Update...'), 'hg-update',
               self.updateToRevision)
