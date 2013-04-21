@@ -265,7 +265,7 @@ class Workbench(QMainWindow):
 
         newseparator(menu='view')
 
-        newaction(_("&Refresh"), self._repofwd('reload'), icon='view-refresh',
+        newaction(_("&Refresh"), self.refresh, icon='view-refresh',
                   shortcut='Refresh', enabled='repoopen',
                   menu='view', toolbar='edit',
                   tooltip=_('Refresh current repository'))
@@ -883,6 +883,15 @@ class Workbench(QMainWindow):
                 getattr(w, name)(*params, **namedparams)
 
         return forwarder
+
+    # no @pyqtSlot(); as of PyQt 4.9.3, it makes self.sender() wrong through
+    # the following path: reload -> titleChanged -> _updateRepoTabTitle,
+    # if _updateRepoTabTitle is not decorated as @pyqtSlot.
+    def refresh(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            getattr(w, 'reload')()
+            self._setupUrlCombo(w.repo)
 
     @pyqtSlot(QAction)
     def _runSyncAction(self, action):
