@@ -534,6 +534,7 @@ class _QtRunner(QObject):
             self._mainapp.setOrganizationName('TortoiseHg')
             self._mainapp.setOrganizationDomain('tortoisehg.org')
             self._mainapp.setApplicationVersion(thgversion.version())
+            self._fixlibrarypaths()
             self._installtranslator()
             qtlib.setup_font_substitutions()
             qtlib.fix_application_font()
@@ -572,6 +573,12 @@ class _QtRunner(QObject):
             return self._mainapp.exec_()
         finally:
             self._mainapp = None
+
+    def _fixlibrarypaths(self):
+        # make sure to use the bundled Qt plugins to avoid ABI incompatibility
+        # http://qt-project.org/doc/qt-4.8/deployment-windows.html#qt-plugins
+        if os.name == 'nt' and getattr(sys, 'frozen', False):
+            self._mainapp.setLibraryPaths([self._mainapp.applicationDirPath()])
 
     def _installtranslator(self):
         if not i18n.language:
