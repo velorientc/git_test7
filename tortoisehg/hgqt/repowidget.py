@@ -1220,7 +1220,7 @@ class RepoWidget(QWidget):
         self.syncDemand.get().pull()
     def outgoing(self):
         self.syncDemand.get().outgoing()
-    def push(self, confirm=True, **kwargs):
+    def push(self, confirm=None, **kwargs):
         """Call sync push.
 
         If confirm is False, the user will not be prompted for

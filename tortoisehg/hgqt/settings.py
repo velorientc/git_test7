@@ -691,6 +691,11 @@ INFO = (
         '<li><b>revision</b>: Push the changes in the current branch '
         '<i><u>up to</u> the current revision</i>.</ul><p>'
         'Default: all')),
+    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+          'before pushing changesets. '
+          'If False, push will be performed without any confirmation dialog. '
+          'Default: True')),
     _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks', (genDefaultCombo,
         ['auto', 'prompt', 'never']),
         _('Select when TortoiseHg will show a prompt to activate a bookmark '

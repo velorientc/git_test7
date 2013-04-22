@@ -109,7 +109,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
              'hg-outgoing', self.outclicked)
         self.pushAction = \
         newaction(_('Push outgoing changes to selected URL'),
-             'hg-push', lambda: self.pushclicked(True))
+             'hg-push', lambda: self.pushclicked(None))
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
@@ -860,6 +860,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None, pushall=False):
+        if confirm is None:
+            confirm = self.repo.ui.configbool('tortoisehg', 'confirmpush', True)
         if rev == '':
             rev = None
         if branch == '':
