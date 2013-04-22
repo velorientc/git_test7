@@ -223,6 +223,9 @@ class HgRepoListModel(QAbstractTableModel):
         self.showMessage.emit('')
         QTimer.singleShot(0, self, SIGNAL('filled()'))
 
+    def setRevset(self, revset):
+        self.revset = revset
+
     def reloadConfig(self):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
