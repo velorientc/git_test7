@@ -62,6 +62,8 @@ COLUMNHEADERS = (
 UNAPPLIED_PATCH_COLOR = '#999999'
 HIDDENREV_COLOR = '#666666'
 
+GraphRole = Qt.UserRole + 0
+
 def get_color(n, ignore=()):
     """
     Return a color at index 'n' rotating in the available
@@ -389,7 +391,6 @@ class HgRepoListModel(QAbstractTableModel):
 
     def _drawgraphctx(self, painter, pix, ctx, gnode):
         revset = self.revset
-        rev = gnode.rev
         h = pix.height()
         dot_y = h / 2
 
@@ -521,7 +522,7 @@ class HgRepoListModel(QAbstractTableModel):
     def _roleoffsets(self):
         return {Qt.DisplayRole : 0,
                 Qt.ForegroundRole : len(self._columns),
-                Qt.DecorationRole : len(self._columns) * 2}
+                GraphRole : len(self._columns) * 2}
 
     def data(self, index, role):
         if not index.isValid():
@@ -553,10 +554,10 @@ class HgRepoListModel(QAbstractTableModel):
             self._cache.extend([None,] * (graphlen-cachelen))
         data = self._cache[row]
         if data is None:
-            data = [None,] * (self._roleoffsets[Qt.DecorationRole]+1)
+            data = [None,] * (self._roleoffsets[GraphRole]+1)
         column = self._columns[index.column()]
         offset = self._roleoffsets[role]
-        if role == Qt.DecorationRole:
+        if role == GraphRole:
             if column != 'Graph':
                 return nullvariant
             if data[offset] is None:
