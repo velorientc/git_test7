@@ -370,6 +370,7 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
+        self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.synctbar.addWidget(self.urlCombo)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
