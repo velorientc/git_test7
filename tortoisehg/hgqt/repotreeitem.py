@@ -185,7 +185,7 @@ class RepoItem(RepoTreeItem):
             if not self._valid:
                 ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
             return ico
-        elif role == Qt.DisplayRole:
+        elif role in (Qt.DisplayRole, Qt.EditRole):
             return [self.shortname, self.shortpath][column]()
 
     def getCommonPath(self):
