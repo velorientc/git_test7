@@ -440,7 +440,7 @@ class CustomToolConfigDialog(QDialog):
             ' revision.'))
         self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
             QLineEdit(workingdir),
-            _('The directory where the command will be be executed.\n'
+            _('The directory where the command will be executed.\n'
             'If this is not set, the root of the current repository '
             'will be used instead.\n'
             'You can use the same {VARIABLES} as on the "Command" setting.\n'))
