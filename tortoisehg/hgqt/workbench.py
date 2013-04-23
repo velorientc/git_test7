@@ -155,12 +155,12 @@ class Workbench(QMainWindow):
         self.addToolBar(self.edittbar)
         self.docktbar = QToolBar(_("&Dock Toolbar"), objectName='docktbar')
         self.addToolBar(self.docktbar)
-        self.synctbar = QToolBar(_('S&ync Toolbar'), objectName='synctbar')
-        self.addToolBar(self.synctbar)
         self.tasktbar = QToolBar(_('&Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
         self.customtbar = QToolBar(_('&Custom Toolbar'), objectName='custombar')
         self.addToolBar(self.customtbar)
+        self.synctbar = QToolBar(_('S&ync Toolbar'), objectName='synctbar')
+        self.addToolBar(self.synctbar)
 
         # availability map of actions; applied by updateMenu()
         self._actionavails = {'repoopen': []}
