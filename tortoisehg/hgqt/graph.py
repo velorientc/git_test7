@@ -211,6 +211,7 @@ def filelog_grapher(repo, path):
     heads.remove(rev)
 
     revs = []
+    children = [()]
     rev_color = {}
     nextcolor = 0
     _paths = {}
@@ -220,9 +221,11 @@ def filelog_grapher(repo, path):
         if rev not in revs:
             revs.append(rev)
             rev_color[rev] = nextcolor ; nextcolor += 1
+            children.append(())
         curcolor = rev_color[rev]
         index = revs.index(rev)
         next_revs = revs[:]
+        next_children = children[:]
 
         # Add parents to next_revs
         fctx = repo.filectx(_paths.get(rev, path), changeid=rev)
@@ -230,30 +233,34 @@ def filelog_grapher(repo, path):
             _paths[pfctx.rev()] = pfctx.path()
         parents = [pfctx.rev() for pfctx in fctx.parents()]# if f.path() == path]
         parents_to_add = []
+        children_to_add = []
         for parent in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
+                children_to_add.append((rev,))
                 if len(parents) > 1:
                     rev_color[parent] = nextcolor ; nextcolor += 1
                 else:
                     rev_color[parent] = curcolor
         parents_to_add.sort()
         next_revs[index:index + 1] = parents_to_add
+        next_children[index:index + 1] = children_to_add
 
         lines = []
         for i, nrev in enumerate(revs):
             if nrev in next_revs:
                 color = rev_color[nrev]
-                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT, (), nrev) )
+                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT, children[i], nrev) )
             elif nrev == rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT, (), parent) )
+                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT, (rev,), parent) )
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
                         extra=[_paths.get(fctx.rev(), path)])
         revs = next_revs
+        children = next_children
 
         if revs:
             rev = max(revs)
