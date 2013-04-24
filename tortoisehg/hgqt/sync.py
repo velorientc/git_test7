@@ -920,7 +920,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             elif defaultpush == 'revision':
                 rev = '.'
             else:
-                self.showMessage.emit(_('Invalid default push revision: %s.'
+                self.showMessage.emit(_('Invalid default push revision: %s. '
                                         'Please check your Mercurial configuration '
                                         '(tortoisehg.defaultpush)') % defaultpush)
                 self.pushCompleted.emit()
