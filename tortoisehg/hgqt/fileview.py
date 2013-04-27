@@ -235,7 +235,7 @@ class HgFileView(QFrame):
         tb.addAction(self.actionFind)
         tb.addAction(self.actionShelf)
 
-        self.timer = QTimer()
+        self.timer = QTimer(self)
         self.timer.setSingleShot(False)
         self.timer.timeout.connect(self.timerBuildDiffMarkers)
 
@@ -705,6 +705,7 @@ class HgFileView(QFrame):
     #
     # file mode diff markers
     #
+    @pyqtSlot()
     def timerBuildDiffMarkers(self):
         'show modified and added lines in the self.blk margin'
         # The way the diff markers are generated differs between the DiffMode
