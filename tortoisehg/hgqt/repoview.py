@@ -149,7 +149,7 @@ class HgRepoView(QTableView):
             else:
                 self.setItemDelegateForColumn(c, self.standardDelegate)
 
-    def resizeColumns(self, *args):
+    def resizeColumns(self):
         if not self.model():
             return
         hh = self.horizontalHeader()
