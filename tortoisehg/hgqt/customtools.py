@@ -67,8 +67,7 @@ class ToolsFrame(QFrame):
 
         vbox.addWidget(QLabel(_('Tools shown on selected location')))
         for location, locationdesc in hglib.tortoisehgtoollocations:
-            self.locationcombo.addItem(locationdesc.decode('utf-8'),
-                                       userData=location)
+            self.locationcombo.addItem(locationdesc.decode('utf-8'), location)
             toollist = ToolListBox(self.ini, location=location,
                 minimumwidth=100, parent=self)
             toollist.doubleClicked.connect(self.editToolFromName)
