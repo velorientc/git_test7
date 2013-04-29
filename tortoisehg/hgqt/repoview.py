@@ -48,6 +48,7 @@ class HgRepoView(QTableView):
         vh.setDefaultSectionSize(20)
 
         header = self.horizontalHeader()
+        header.setDefaultAlignment(Qt.AlignLeft)
         header.setHighlightSections(False)
         header.setContextMenuPolicy(Qt.CustomContextMenu)
         header.customContextMenuRequested.connect(self.headerMenuRequest)

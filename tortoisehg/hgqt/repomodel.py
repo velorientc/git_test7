@@ -640,8 +640,6 @@ class HgRepoListModel(QAbstractTableModel):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
                 return QVariant(self._allcolnames[self._columns[section]])
-            if role == Qt.TextAlignmentRole:
-                return QVariant(Qt.AlignLeft)
         return nullvariant
 
     def rowFromRev(self, rev):
