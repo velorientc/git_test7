@@ -48,7 +48,8 @@ class HgRepoView(QTableView):
         vh.setDefaultSectionSize(20)
 
         header = self.horizontalHeader()
-        header.setDefaultAlignment(Qt.AlignLeft)
+        # AlignBottom because RepoWidget steals top of header space for InfoBar
+        header.setDefaultAlignment(Qt.AlignLeft | Qt.AlignBottom)
         header.setHighlightSections(False)
         header.setContextMenuPolicy(Qt.CustomContextMenu)
         header.customContextMenuRequested.connect(self.headerMenuRequest)

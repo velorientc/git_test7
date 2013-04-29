@@ -362,11 +362,16 @@ class RepoWidget(QWidget):
         top = self.repoview.mapTo(self, QPoint(0, 0)).y()
         w.setGeometry(0, top, self.width(), w.heightForWidth(self.width()))
 
-        # give margin to make first row visible, except for auto-hide infobar
+        # give margin to make header or first row accessible. without header,
+        # column width cannot be changed while confirmation is presented.
         if w.infobartype > qtlib.InfoBar.INFO:
             h = self.repoview.horizontalHeader()
             y = h.mapTo(self.repoview, QPoint(0, 0)).y()
-            h.setMinimumSize(0, max(w.height() - y, 0))
+            if w.infobartype >= qtlib.InfoBar.CONFIRM:
+                xh = h.sizeHint().height()
+            else:
+                xh = 0
+            h.setMinimumSize(0, max(w.height() - y, 0) + xh)
             h.geometriesChanged.emit()
 
     @pyqtSlot(unicode, unicode)
