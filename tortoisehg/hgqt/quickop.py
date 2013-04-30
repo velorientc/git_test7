@@ -255,21 +255,25 @@ class QuickOpDialog(QDialog):
             self.files = lfiles
             self.cmd.run(cmdline)
 
-instance = None
-class HeadlessQuickop(QWidget):
+class HeadlessQuickop(QObject):
     def __init__(self, repo, cmdline):
-        QWidget.__init__(self)
+        QObject.__init__(self)
         self.files = cmdline[1:]
         os.chdir(repo.root)
-        self.cmd = cmdui.Runner(True, self)
+        self.cmd = cmdui.Runner(True, None)  # parent must be QWidget or None
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.run(cmdline)
-        self.hide()
 
     def commandFinished(self, ret):
         if ret == 0:
             shlib.shell_notify(self.files)
             sys.exit(0)
+
+    # dummy methods to act as QWidget (see run.qtrun)
+    def show(self):
+        pass
+    def raise_(self):
+        pass
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
@@ -284,8 +288,6 @@ def run(ui, *pats, **opts):
     imm = repo.ui.config('tortoisehg', 'immediate', '')
     if command in imm.lower():
         cmdline = [command] + pats
-        global instance
-        instance = HeadlessQuickop(repo, cmdline)
-        return None
+        return HeadlessQuickop(repo, cmdline)
     else:
         return QuickOpDialog(repo, command, pats, None)
