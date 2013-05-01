@@ -401,6 +401,12 @@ class Workbench(QMainWindow):
             else:
                 self.urlCombo.addItem(a, (a, a))
 
+    #@pyqtSlot()
+    def _setupUrlComboIfCurrent(self):
+        w = self.repoTabsWidget.currentWidget()
+        if self.sender() is w:
+            self._setupUrlCombo(w.repo)
+
     def _syncUrlFor(self, op):
         """Current URL alias for the given sync operation"""
         urlindex = self.urlCombo.currentIndex()
@@ -828,6 +834,7 @@ class Workbench(QMainWindow):
         tw.setTabToolTip(index, hglib.tounicode(repo.root))
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(self._updateRepoTabTitle)
+        rw.repoConfigChanged.connect(self._setupUrlComboIfCurrent)
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
         self.reporegistry.addRepo(hglib.tounicode(repo.root))
