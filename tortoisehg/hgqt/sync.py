@@ -498,7 +498,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        qtlib.openshell(u.folder, 'repo ' + u.folder)
+        qtlib.openshell(u.path, 'repo ' + u.path)
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
