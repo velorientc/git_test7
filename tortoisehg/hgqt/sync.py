@@ -486,7 +486,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def exploreurl(self):
         url = unicode(self.menuurl)
         u = parseurl(url)
-        if u.scheme == 'local':
+        if not u.scheme or u.scheme == 'file':
             qtlib.openlocalurl(u.path)
         else:
             QDesktopServices.openUrl(QUrl(url))
@@ -494,7 +494,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def terminalurl(self):
         url = unicode(self.menuurl)
         u = parseurl(url)
-        if u.scheme != 'local':
+        if u.scheme and u.scheme != 'file':
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
