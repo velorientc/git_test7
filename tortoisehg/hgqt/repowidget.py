@@ -39,7 +39,6 @@ from PyQt4.QtGui import *
 class RepoWidget(QWidget):
 
     showMessageSignal = pyqtSignal(QString)
-    closeSelfSignal = pyqtSignal(QWidget)
     toolbarVisibilityChanged = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
@@ -51,8 +50,11 @@ class RepoWidget(QWidget):
     # The following signals should be exchanged directly between workbench and
     # thgrepo. But it isn't possible because workbench cannot filter out known
     # repo from the result of thgrepo.repository().
+    closeSelfSignal = pyqtSignal(QWidget)
     repoChanged = pyqtSignal(QString)
     repoConfigChanged = pyqtSignal(QString)
+    shortNameChanged = pyqtSignal(QString, QString)
+    baseNodeChanged = pyqtSignal(QString, object)
 
     revisionSelected = pyqtSignal(object)
 
@@ -60,9 +62,6 @@ class RepoWidget(QWidget):
     """Emitted when changed the expected title for the RepoWidget tab"""
 
     showIcon = pyqtSignal(QIcon)
-
-    shortNameChanged = pyqtSignal(QString, QString)
-    baseNodeChanged = pyqtSignal(QString, object)
 
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
