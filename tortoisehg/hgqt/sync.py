@@ -484,7 +484,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.cmenu.exec_(point)
 
     def exploreurl(self):
-        url = hglib.fromunicode(self.menuurl)
+        url = unicode(self.menuurl)
         u = parseurl(url)
         if u.scheme == 'local':
             qtlib.openlocalurl(u.path)
@@ -492,7 +492,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             QDesktopServices.openUrl(QUrl(url))
 
     def terminalurl(self):
-        url = hglib.fromunicode(self.menuurl)
+        url = unicode(self.menuurl)
         u = parseurl(url)
         if u.scheme != 'local':
             qtlib.InfoMsgBox(_('Repository not local'),
