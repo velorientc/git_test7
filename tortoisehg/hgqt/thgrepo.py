@@ -13,6 +13,7 @@ import sys
 import shutil
 import tempfile
 import re
+import time
 
 from PyQt4.QtCore import *
 
@@ -86,6 +87,7 @@ class ThgRepoWrapper(QObject):
         repo.workingDirectoryChanged = self.workingDirectoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
+        self._uimtime = time.time()
 
         monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
         if isinstance(repo, bundlerepo.bundlerepository):
@@ -255,10 +257,11 @@ class ThgRepoWrapper(QObject):
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
-            oldmtime, files = self.repo.uifiles()
-            mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
-            if max(mtime) > oldmtime:
+            files = self.repo.uifiles()[1]
+            mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
+            if mtime > self._uimtime:
                 dbgoutput('config change detected')
+                self._uimtime = mtime
                 self.repo.invalidateui()
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
@@ -458,6 +461,7 @@ def _extendrepo(repo):
                 heads.extend(nodes)
             return heads
 
+        # TODO: remove _uimtime which is superseded by ThgRepoWrapper._uimtime
         def uifiles(self):
             'Returns latest mtime and complete list of config files'
             return self._uimtime, self._uifiles
