@@ -51,7 +51,6 @@ class HgFileListView(QTableView):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
-        self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 
     def setRepo(self, repo):
         self.repo = repo
