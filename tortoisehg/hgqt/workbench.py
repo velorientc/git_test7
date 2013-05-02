@@ -469,10 +469,7 @@ class Workbench(QMainWindow):
             else:
                 action.triggered.connect(slot)
         if icon:
-            if toolbar:
-                action.setIcon(qtlib.geticon(icon))
-            else:
-                action.setIcon(qtlib.getmenuicon(icon))
+            action.setIcon(qtlib.geticon(icon))
         if shortcut:
             keyseq = qtlib.keysequence(shortcut)
             if isinstance(keyseq, QKeySequence.StandardKey):
@@ -526,7 +523,7 @@ class Workbench(QMainWindow):
         for name, desc, icon, tip, cb in self._action_defs():
             act = self._actions[name]
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if tip:
                 act.setStatusTip(tip)
             if cb:

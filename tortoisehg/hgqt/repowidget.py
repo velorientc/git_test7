@@ -1361,7 +1361,7 @@ class RepoWidget(QWidget):
             if cb:
                 act.triggered.connect(cb)
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
@@ -1607,7 +1607,7 @@ class RepoWidget(QWidget):
                 continue
             a = QAction(name, self)
             if icon:
-                a.setIcon(qtlib.getmenuicon(icon))
+                a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
 
@@ -1662,7 +1662,7 @@ class RepoWidget(QWidget):
             act = QAction(name, self)
             act.triggered.connect(cb)
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             acts.append(act)
             menu.addAction(act)
         self.unappcmenu = menu
@@ -1689,7 +1689,7 @@ class RepoWidget(QWidget):
                 continue
             a = QAction(name, self)
             if icon:
-                a.setIcon(qtlib.getmenuicon(icon))
+                a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
 
@@ -1708,7 +1708,7 @@ class RepoWidget(QWidget):
             a = QAction(name, self)
             a.triggered.connect(cb)
             if icon:
-                a.setIcon(qtlib.getmenuicon(icon))
+                a.setIcon(qtlib.geticon(icon))
             menu.addAction(a)
         self.bundlemenu = menu
     def generateOutgoingMenu(self):

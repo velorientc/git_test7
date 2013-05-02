@@ -89,7 +89,7 @@ class FilectxActions(QObject):
             ]:
             act = QAction(desc, self)
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if key:
                 act.setShortcut(key)
             if tip:

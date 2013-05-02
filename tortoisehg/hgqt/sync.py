@@ -470,7 +470,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     continue
                 act = QAction(text, self)
                 if icon:
-                    act.setIcon(qtlib.getmenuicon(icon))
+                    act.setIcon(qtlib.geticon(icon))
                 act.triggered.connect(cb)
                 acts.append(act)
                 menu.addAction(act)

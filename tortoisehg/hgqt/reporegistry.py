@@ -464,7 +464,7 @@ class RepoRegistryView(QDockWidget):
         for name, desc, icon, tip, cb in self._action_defs():
             act = self._actions[name]
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if tip:
                 act.setStatusTip(tip)
             if cb:

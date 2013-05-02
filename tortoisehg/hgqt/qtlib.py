@@ -537,8 +537,6 @@ def geticon(name):
                             or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
 
-getmenuicon = geticon
-
 
 def getoverlaidicon(base, overlay):
     """Generate an overlaid icon"""

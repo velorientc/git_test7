@@ -31,7 +31,7 @@ class WctxActions(QObject):
             action._filetypes = types
             action._runfunc = func
             if icon:
-                action.setIcon(qtlib.getmenuicon(icon))
+                action.setIcon(qtlib.geticon(icon))
             if keys:
                 action.setShortcut(QKeySequence(keys))
             action.triggered.connect(self.runAction)
@@ -116,7 +116,7 @@ class WctxActions(QObject):
             action._filetypes = types
             action._runfunc = func
             if icon:
-                action.setIcon(qtlib.getmenuicon(icon))
+                action.setIcon(qtlib.geticon(icon))
             if func is not None:
                 action.triggered.connect(self.runAction)
             return action
