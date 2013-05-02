@@ -36,7 +36,7 @@ else:
     def dbgoutput(*args):
         pass
 
-def repository(_ui=None, path='', create=False, bundle=None):
+def repository(_ui=None, path='', bundle=None):
     '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
     is obtained using mercurial.hg.repository()'''
@@ -47,11 +47,11 @@ def repository(_ui=None, path='', create=False, bundle=None):
         repo.__class__ = _extendrepo(repo)
         repo._pyqtobj = ThgRepoWrapper(repo)
         return repo
-    if create or path not in _repocache:
+    if path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
         try:
-            repo = hg.repository(_ui, path, create)
+            repo = hg.repository(_ui, path)
             # get unfiltered repo in version safe manner
             repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
