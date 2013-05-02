@@ -45,7 +45,7 @@ def repository(_ui=None, path='', bundle=None):
             _ui = uimod.ui()
         repo = bundlerepo.bundlerepository(_ui, path, bundle)
         repo.__class__ = _extendrepo(repo)
-        repo._pyqtobj = ThgRepoWrapper(repo)
+        repo._pyqtobj = RepoAgent(repo)
         return repo
     if path not in _repocache:
         if _ui is None:
@@ -55,7 +55,7 @@ def repository(_ui=None, path='', bundle=None):
             # get unfiltered repo in version safe manner
             repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
-            repo._pyqtobj = ThgRepoWrapper(repo)
+            repo._pyqtobj = RepoAgent(repo)
             _repocache[path] = repo
             return repo
         except EnvironmentError:
@@ -265,7 +265,8 @@ class RepoWatcher(QObject):
             pass
 
 
-class ThgRepoWrapper(QObject):
+class RepoAgent(QObject):
+    """Proxy access to repository and keep its states up-to-date"""
 
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
