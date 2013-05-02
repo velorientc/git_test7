@@ -92,11 +92,11 @@ class RepoWatcher(QObject):
         elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
             dbgoutput('not watching F/S events for network drive')
         else:
-            self.watcher = QFileSystemWatcher(self)
-            self.watcher.addPath(hglib.tounicode(repo.path))
-            self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
-            self.watcher.directoryChanged.connect(self._pollChanges)
-            self.watcher.fileChanged.connect(self._pollChanges)
+            self._fswatcher = QFileSystemWatcher(self)
+            self._fswatcher.addPath(hglib.tounicode(repo.path))
+            self._fswatcher.addPath(hglib.tounicode(repo.path + '/store'))
+            self._fswatcher.directoryChanged.connect(self._pollChanges)
+            self._fswatcher.fileChanged.connect(self._pollChanges)
             self.addMissingPaths()
 
     @pyqtSlot()
@@ -109,27 +109,27 @@ class RepoWatcher(QObject):
     def addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
         existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
-        files = [unicode(f) for f in self.watcher.files()]
+        files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
-                self.watcher.addPath(hglib.tounicode(f))
+                self._fswatcher.addPath(hglib.tounicode(f))
         for f in self.repo.uifiles():
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
-                self.watcher.addPath(hglib.tounicode(f))
+                self._fswatcher.addPath(hglib.tounicode(f))
 
     def pollStatus(self):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
             # disable watcher by removing all watched paths
-            dirs = self.watcher.directories()
+            dirs = self._fswatcher.directories()
             if dirs:
-                self.watcher.removePaths(dirs)
-            files = self.watcher.files()
+                self._fswatcher.removePaths(dirs)
+            files = self._fswatcher.files()
             if files:
-                self.watcher.removePaths(files)
+                self._fswatcher.removePaths(files)
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
             return
