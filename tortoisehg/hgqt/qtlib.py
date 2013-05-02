@@ -537,12 +537,7 @@ def geticon(name):
                             or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
 
-if sys.platform == 'darwin':
-    # On Mac OS X, we do not want icons on menus
-    def getmenuicon(name):
-        return QIcon()
-else:
-    getmenuicon = geticon
+getmenuicon = geticon
 
 
 def getoverlaidicon(base, overlay):

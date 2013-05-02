@@ -91,6 +91,8 @@ class Workbench(QMainWindow):
             self.dockMenu.addAction(_('&Open Repository...'),
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
+            # On Mac OS X, we do not want icons on menus
+            qt_mac_set_menubar_icons(False)
 
         # Create the actions that will be displayed on the context menu
         self.createActions()
