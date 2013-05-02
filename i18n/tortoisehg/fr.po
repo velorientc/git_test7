@@ -6770,9 +6770,9 @@ msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
 "always"
 msgstr ""
-"Spécifier les système de fichiers dans lesquels TortoiseHg surveille les "
-"modifications : always (tous), localonly (local uniquement à l'exclusion des "
-"disques sur le réseau). Par défaut : always"
+"Spécifier les systèmes de fichiers dans lesquels TortoiseHg surveille les "
+"modifications : always (toujours), localonly (local uniquement à l'exclusion "
+"des disques sur le réseau). Par défaut : always"
 
 #: tortoisehg/hgqt/settings.py:593
 msgid "Max Diff Size"
