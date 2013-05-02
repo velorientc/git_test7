@@ -69,7 +69,8 @@ def repository(_ui=None, path='', bundle=None):
 class _LockStillHeld(Exception):
     'Raised to abort status check due to lock existence'
 
-class ThgRepoWrapper(QObject):
+class RepoWatcher(QObject):
+    """Notify changes of repository by optionally monitoring filesystem"""
 
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
@@ -77,15 +78,9 @@ class ThgRepoWrapper(QObject):
     workingDirectoryChanged = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
-    def __init__(self, repo):
-        QObject.__init__(self)
+    def __init__(self, repo, parent=None):
+        super(RepoWatcher, self).__init__(parent)
         self.repo = repo
-        self.busycount = 0
-        repo.configChanged = self.configChanged
-        repo.repositoryChanged = self.repositoryChanged
-        repo.repositoryDestroyed = self.repositoryDestroyed
-        repo.workingDirectoryChanged = self.workingDirectoryChanged
-        repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
         self._uimtime = time.time()
 
@@ -268,6 +263,38 @@ class ThgRepoWrapper(QObject):
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
             pass
+
+
+class ThgRepoWrapper(QObject):
+
+    configChanged = pyqtSignal()
+    repositoryChanged = pyqtSignal()
+    repositoryDestroyed = pyqtSignal()
+    workingDirectoryChanged = pyqtSignal()
+    workingBranchChanged = pyqtSignal()
+
+    def __init__(self, repo):
+        QObject.__init__(self)
+        self.busycount = 0
+        repo.configChanged = self.configChanged
+        repo.repositoryChanged = self.repositoryChanged
+        repo.repositoryDestroyed = self.repositoryDestroyed
+        repo.workingDirectoryChanged = self.workingDirectoryChanged
+        repo.workingBranchChanged = self.workingBranchChanged
+
+        # TODO: make RepoWatcher not depends on repo internals too much;
+        # i.e. move repo.invalidate(), etc. to this class.
+        self._watcher = watcher = RepoWatcher(repo, self)
+        watcher.configChanged.connect(self.configChanged)
+        watcher.repositoryChanged.connect(self.repositoryChanged)
+        watcher.repositoryDestroyed.connect(self.repositoryDestroyed)
+        watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
+        watcher.workingBranchChanged.connect(self.workingBranchChanged)
+
+    def pollStatus(self):
+        """Force checking changes to emit corresponding signals"""
+        self._watcher.pollStatus()
+
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
