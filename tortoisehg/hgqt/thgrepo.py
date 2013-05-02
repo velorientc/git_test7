@@ -82,6 +82,7 @@ class RepoWatcher(QObject):
     def __init__(self, repo, parent=None):
         super(RepoWatcher, self).__init__(parent)
         self.repo = repo
+        self._fswatcher = None
         self.recordState()
         self._uimtime = time.time()
 
@@ -93,12 +94,28 @@ class RepoWatcher(QObject):
         elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
             dbgoutput('not watching F/S events for network drive')
         else:
+            self.startMonitoring()
+
+    def startMonitoring(self):
+        """Start filesystem monitoring to notify changes automatically"""
+        if not self._fswatcher:
             self._fswatcher = QFileSystemWatcher(self)
-            self._fswatcher.addPath(hglib.tounicode(repo.path))
-            self._fswatcher.addPath(hglib.tounicode(repo.path + '/store'))
             self._fswatcher.directoryChanged.connect(self._pollChanges)
             self._fswatcher.fileChanged.connect(self._pollChanges)
-            self.addMissingPaths()
+        self._fswatcher.addPath(hglib.tounicode(self.repo.path))
+        self._fswatcher.addPath(hglib.tounicode(self.repo.path + '/store'))
+        self.addMissingPaths()
+
+    def stopMonitoring(self):
+        """Stop filesystem monitoring by removing all watched paths"""
+        if not self._fswatcher:
+            return
+        dirs = self._fswatcher.directories()
+        if dirs:
+            self._fswatcher.removePaths(dirs)
+        files = self._fswatcher.files()
+        if files:
+            self._fswatcher.removePaths(files)
 
     @pyqtSlot()
     def _pollChanges(self):
@@ -124,13 +141,7 @@ class RepoWatcher(QObject):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
-            # disable watcher by removing all watched paths
-            dirs = self._fswatcher.directories()
-            if dirs:
-                self._fswatcher.removePaths(dirs)
-            files = self._fswatcher.files()
-            if files:
-                self._fswatcher.removePaths(files)
+            self.stopMonitoring()
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
             return

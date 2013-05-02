@@ -109,8 +109,7 @@ class HgEnvPlugin(plugins.Plugin):
             # https://bitbucket.org/tortoisehg/thg/issue/1783/
             from tortoisehg.hgqt import thgrepo
             for e in thgrepo._repocache.itervalues():
-                w = e._pyqtobj._watcher._fswatcher
-                w.removePaths(w.directories())
-                w.removePaths(w.files())
+                w = e._pyqtobj._watcher
+                w.stopMonitoring()
 
             shutil.rmtree(self.tmpdir)
