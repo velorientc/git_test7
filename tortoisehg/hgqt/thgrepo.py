@@ -45,8 +45,8 @@ def repository(_ui=None, path='', bundle=None):
             _ui = uimod.ui()
         repo = bundlerepo.bundlerepository(_ui, path, bundle)
         repo.__class__ = _extendrepo(repo)
-        repo._pyqtobj = RepoAgent(repo)
-        return repo
+        agent = RepoAgent(repo)
+        return agent.rawRepo()
     if path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
@@ -55,9 +55,9 @@ def repository(_ui=None, path='', bundle=None):
             # get unfiltered repo in version safe manner
             repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
-            repo._pyqtobj = RepoAgent(repo)
-            _repocache[path] = repo
-            return repo
+            agent = RepoAgent(repo)
+            _repocache[path] = agent.rawRepo()
+            return agent.rawRepo()
         except EnvironmentError:
             raise error.RepoError('Cannot open repository at %s' % path)
     if not os.path.exists(os.path.join(path, '.hg/')):
@@ -276,7 +276,11 @@ class RepoAgent(QObject):
 
     def __init__(self, repo):
         QObject.__init__(self)
+        self._repo = repo
         self.busycount = 0
+        # TODO: remove repo-to-agent references later; all widgets should own
+        # RepoAgent instead of thgrepository.
+        repo._pyqtobj = self
         repo.configChanged = self.configChanged
         repo.repositoryChanged = self.repositoryChanged
         repo.repositoryDestroyed = self.repositoryDestroyed
@@ -291,6 +295,9 @@ class RepoAgent(QObject):
         watcher.repositoryDestroyed.connect(self.repositoryDestroyed)
         watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
         watcher.workingBranchChanged.connect(self.workingBranchChanged)
+
+    def rawRepo(self):
+        return self._repo
 
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
