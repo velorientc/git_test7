@@ -13,7 +13,7 @@ from PyQt4.QtGui import QApplication
 
 from mercurial import error
 
-from tortoisehg.hgqt.i18n import agettext as _  # TODO: use unicode version
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import bugreport, qtlib
@@ -35,8 +35,7 @@ def earlyExceptionMsgBox(e):
                   '<a href="#edit:%(arg1)s">edit</a> your config')
     if not QApplication.instance():
         main = QApplication(sys.argv)
-    dlg = ExceptionMsgBox(hglib.tounicode(str(e)),
-                          hglib.tounicode(errstring), opts, parent=None)
+    dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts, parent=None)
     dlg.exec_()
 
 def earlyBugReport(e):
@@ -174,12 +173,11 @@ class QtRunner(QObject):
                 errstr = u''.join([errstr, u'<br><b>', _('hint:'),
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
-            dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                  hglib.tounicode(errstr), opts,
+            dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)), errstr, opts,
                                   parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(hglib.tounicode(_('Keyboard interrupt')),
-                    hglib.tounicode(_('Close this application?'))):
+            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
+                                    _('Close this application?')):
                 QApplication.quit()
             else:
                 self.errors = []
@@ -223,7 +221,7 @@ class QtRunner(QObject):
                     from tortoisehg.hgqt import thgrepo
                     thgrepo.repository(ui, opts['repository'])
                 except error.RepoError, e:
-                    qtlib.WarningMsgBox(hglib.tounicode(_('Repository Error')),
+                    qtlib.WarningMsgBox(_('Repository Error'),
                                         hglib.tounicode(str(e)))
                     return
             dlg = dlgfunc(ui, *args, **opts)
