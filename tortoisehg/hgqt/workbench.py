@@ -10,7 +10,7 @@ Main Qt4 application for TortoiseHg
 
 import os
 import sys
-from mercurial import ui, util
+from mercurial import util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
@@ -38,13 +38,13 @@ class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
 
-    def __init__(self):
+    def __init__(self, ui):
         QMainWindow.__init__(self)
         self.progressDialog = QProgressDialog(
             'TortoiseHg - Initializing Workbench', QString(), 0, 100)
         self.progressDialog.setAutoClose(False)
 
-        self.ui = ui.ui()
+        self.ui = ui
 
         self.setupUi()
         self.setWindowTitle(_('TortoiseHg Workbench'))
