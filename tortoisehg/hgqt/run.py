@@ -609,6 +609,23 @@ class _QtRunner(QObject):
 
 qtrun = _QtRunner()
 
+# common command options
+
+globalopts = [
+    ('R', 'repository', '',
+     _('repository root directory or symbolic path name')),
+    ('v', 'verbose', None, _('enable additional output')),
+    ('q', 'quiet', None, _('suppress output')),
+    ('h', 'help', None, _('display help and exit')),
+    ('', 'debugger', None, _('start debugger')),
+    ('', 'profile', None, _('print command execution profile')),
+    ('', 'nofork', None, _('do not fork GUI process')),
+    ('', 'fork', None, _('always fork GUI process')),
+    ('', 'listfile', '', _('read file list from file')),
+    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
+    ('', 'newworkbench', None, _('open a new workbench window')),
+]
+
 # commands start here, listed alphabetically
 
 def about(ui, *pats, **opts):
@@ -1056,21 +1073,6 @@ def version(ui, **opts):
                (thgversion.version(), hglib.hgversion))
     if not ui.quiet:
         ui.write(shortlicense)
-
-globalopts = [
-    ('R', 'repository', '',
-     _('repository root directory or symbolic path name')),
-    ('v', 'verbose', None, _('enable additional output')),
-    ('q', 'quiet', None, _('suppress output')),
-    ('h', 'help', None, _('display help and exit')),
-    ('', 'debugger', None, _('start debugger')),
-    ('', 'profile', None, _('print command execution profile')),
-    ('', 'nofork', None, _('do not fork GUI process')),
-    ('', 'fork', None, _('always fork GUI process')),
-    ('', 'listfile', '', _('read file list from file')),
-    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
-    ('', 'newworkbench', None, _('open a new workbench window')),
-]
 
 table = {
     "about": (about, [], _('thg about')),
