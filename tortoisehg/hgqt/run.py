@@ -1074,6 +1074,9 @@ def revert(ui, *pats, **opts):
     from tortoisehg.hgqt.quickop import run
     return qtrun(run, ui, *pats, **opts)
 
+@command('rupdate',
+    [('r', 'rev', '', _('revision to update'))],
+    _('thg rupdate [[-r] REV]'))
 def rupdate(ui, *pats, **opts):
     """update a remote repository"""
     from tortoisehg.hgqt.rupdate import run
