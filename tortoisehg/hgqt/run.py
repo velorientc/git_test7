@@ -968,7 +968,7 @@ def hgignore(ui, *pats, **opts):
 @command('import',
     [('', 'mq', False, _('import to the patch queue (MQ)'))],
     _('thg import [OPTION] [SOURCE]...'))
-def thgimport(ui, *pats, **opts):
+def import_(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
     return qtrun(run, ui, *pats, **opts)
