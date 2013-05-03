@@ -35,7 +35,7 @@ def earlyExceptionMsgBox(e):
                   '<a href="#edit:%(arg1)s">edit</a> your config')
     if not QApplication.instance():
         main = QApplication(sys.argv)
-    dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts, parent=None)
+    dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts)
     dlg.exec_()
 
 def earlyBugReport(e):
