@@ -41,7 +41,7 @@ try:
 except ImportError:
     thginithook = None
 
-nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
+nonrepo_commands = '''userconfig shellconfig clone init
 about help version thgstatus serve rejects log'''
 
 def dispatch(args):
@@ -711,27 +711,6 @@ def commit(ui, *pats, **opts):
 def debugbugreport(ui, *pats, **opts):
     """open bugreport dialog by exception"""
     raise Exception(' '.join(pats))
-
-def debugcomplete(ui, cmd='', **opts):
-    """output list of possible commands"""
-    if opts.get('options'):
-        options = []
-        otables = [globalopts]
-        if cmd:
-            aliases, entry = cmdutil.findcmd(cmd, table, False)
-            otables.append(entry[1])
-        for t in otables:
-            for o in t:
-                if o[0]:
-                    options.append('-%s' % o[0])
-                options.append('--%s' % o[1])
-        ui.write("%s\n" % "\n".join(options))
-        return
-
-    cmdlist = cmdutil.findpossible(cmd, table)
-    if ui.verbose:
-        cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
-    ui.write("%s\n" % "\n".join(sorted(cmdlist)))
 
 @command('drag_copy', [], _('thg drag_copy SOURCE... DEST'))
 def drag_copy(ui, *pats, **opts):
