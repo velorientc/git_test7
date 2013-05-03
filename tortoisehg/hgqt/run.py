@@ -990,6 +990,9 @@ def mq(ui, *pats, **opts):
     from tortoisehg.hgqt.mq import run
     return qtrun(run, ui, *pats, **opts)
 
+@command('postreview',
+    [('r', 'rev', [], _('a revision to post'))],
+    _('thg postreview [-r] REV...'))
 def postreview(ui, *pats, **opts):
     """post changesets to reviewboard"""
     from tortoisehg.hgqt.postreview import run
