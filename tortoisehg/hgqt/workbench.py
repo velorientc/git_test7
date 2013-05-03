@@ -38,7 +38,6 @@ class ThgTabBar(QTabBar):
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
-    activeRepoChanged = pyqtSignal(QString)
 
     def __init__(self, createserver=False):
         QMainWindow.__init__(self)
@@ -58,7 +57,6 @@ class Workbench(QMainWindow):
         rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
-        self.activeRepoChanged.connect(rr.setActiveTabRepo)
 
         self.mqpatches = p = mq.MQPatchesWidget(self)
         p.setObjectName('MQPatchesWidget')
@@ -786,11 +784,11 @@ class Workbench(QMainWindow):
             self.updateMenu()
             if w.repo:
                 root = w.repo.root
-                self.activeRepoChanged.emit(hglib.tounicode(root))
+                self.reporegistry.setActiveTabRepo(hglib.tounicode(root))
                 self._setupCustomTools(w.repo.ui)
                 self._setupUrlCombo(w.repo)
         else:
-            self.activeRepoChanged.emit("")
+            self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
