@@ -25,7 +25,6 @@ except ImportError:
 
 def earlyExceptionMsgBox(e):
     """Show message for recoverable error before the QApplication is started"""
-    from tortoisehg.hgqt.bugreport import ExceptionMsgBox
     opts = {}
     opts['cmd'] = ' '.join(sys.argv[1:])
     opts['values'] = e
@@ -35,7 +34,7 @@ def earlyExceptionMsgBox(e):
                   '<a href="#edit:%(arg1)s">edit</a> your config')
     if not QApplication.instance():
         main = QApplication(sys.argv)
-    dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts)
+    dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts)
     dlg.exec_()
 
 def earlyBugReport(e):
@@ -159,7 +158,6 @@ class QtRunner(QObject):
             self.errors = []
 
     def _showexceptiondialog(self):
-        from tortoisehg.hgqt.bugreport import BugReport, ExceptionMsgBox
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
@@ -173,8 +171,9 @@ class QtRunner(QObject):
                 errstr = u''.join([errstr, u'<br><b>', _('hint:'),
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
-            dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)), errstr, opts,
-                                  parent=self._mainapp.activeWindow())
+            dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
+                                            errstr, opts,
+                                            parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
             if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
                                     _('Close this application?')):
@@ -183,7 +182,7 @@ class QtRunner(QObject):
                 self.errors = []
                 return
         else:
-            dlg = BugReport(opts, parent=self._mainapp.activeWindow())
+            dlg = bugreport.BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
 
     def _printexception(self):
