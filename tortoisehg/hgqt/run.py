@@ -295,10 +295,8 @@ def runcommand(ui, args):
             print 'abort: %s is not a repository' % path
             return 1
         os.chdir(path)
-    if options['fork']:
-        cmdoptions['fork'] = True
-    if options['nofork'] or options['profile']:
-        cmdoptions['nofork'] = True
+    if options['profile']:
+        options['nofork'] = True
     path = paths.find_root(os.getcwd())
     if path:
         cmdoptions['repository'] = path
@@ -327,6 +325,7 @@ def runcommand(ui, args):
     if cmd in console_commands.split():
         d = lambda: checkedfunc(ui, *args, **cmdoptions)
     else:
+        portable_fork(ui, options)
         d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
 
@@ -525,8 +524,6 @@ class _QtRunner(QObject):
             traceback.print_exception(*args)
 
     def __call__(self, dlgfunc, ui, *args, **opts):
-        portable_fork(ui, opts)
-
         if self._mainapp:
             self._opendialog(dlgfunc, ui, *args, **opts)
             return
