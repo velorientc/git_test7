@@ -261,15 +261,16 @@ def runcommand(ui, args):
                 path, bundle = s
             cmdoptions['bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
-        if not os.path.exists(path) or not os.path.isdir(path+'/.hg'):
-            print 'abort: %s is not a repository' % path
-            return 1
-        os.chdir(path)
+        # TODO: replace by abspath() if chdir() isn't necessary
+        try:
+            os.chdir(path)
+            path = os.getcwd()
+        except OSError:
+            pass
     if options['profile']:
         options['nofork'] = True
-    path = paths.find_root(os.getcwd())
+    path = paths.find_root(path)
     if path:
-        cmdoptions['repository'] = path
         try:
             lui = ui.copy()
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
@@ -286,9 +287,9 @@ def runcommand(ui, args):
     if options['quiet']:
         ui.quiet = True
 
-    if cmd not in nonrepo_commands.split() and not path:
-        raise error.RepoError(_("There is no Mercurial repository here"
-                                " (.hg not found)"))
+    # repository existence will be tested in qtrun()
+    if cmd not in nonrepo_commands.split():
+        cmdoptions['repository'] = path or options['repository'] or '.'
 
     cmdoptions['mainapp'] = True
     checkedfunc = util.checksignature(func)
