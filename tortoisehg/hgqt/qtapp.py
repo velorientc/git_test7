@@ -16,7 +16,7 @@ from mercurial import error
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import bugreport, qtlib
+from tortoisehg.hgqt import bugreport, qtlib, thgrepo
 
 try:
     from thginithook import thginithook
@@ -216,7 +216,6 @@ class QtRunner(QObject):
                 # Ensure we can open the repository before opening any
                 # dialog windows.  Since thgrepo instances are cached, this
                 # is not wasted.
-                from tortoisehg.hgqt import thgrepo
                 thgrepo.repository(ui, opts['repository'])
             except error.RepoError, e:
                 qtlib.WarningMsgBox(_('Repository Error'),
