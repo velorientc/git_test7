@@ -41,7 +41,7 @@ try:
 except ImportError:
     thginithook = None
 
-nonrepo_commands = '''userconfig shellconfig clone init
+nonrepo_commands = '''userconfig shellconfig clone init debugbugreport
 about help version thgstatus serve rejects log'''
 
 def dispatch(args):
