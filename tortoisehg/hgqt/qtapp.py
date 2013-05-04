@@ -212,11 +212,10 @@ class QtRunner(QObject):
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
         try:
+            args = list(args)
             if 'repository' in opts:
-                # Ensure we can open the repository before opening any
-                # dialog windows.  Since thgrepo instances are cached, this
-                # is not wasted.
-                thgrepo.repository(ui, opts['repository'])
+                repo = thgrepo.repository(ui, opts['repository'])
+                args.insert(0, repo)
             dlg = dlgfunc(ui, *args, **opts)
         except error.RepoError, inst:
             qtlib.WarningMsgBox(_('Repository Error'),
