@@ -222,6 +222,11 @@ class QtRunner(QObject):
             qtlib.WarningMsgBox(_('Repository Error'),
                                 hglib.tounicode(str(inst)))
             return -1
+        except error.Abort, inst:
+            qtlib.WarningMsgBox(_('Abort'),
+                                hglib.tounicode(str(inst)),
+                                hglib.tounicode(inst.hint or ''))
+            return -1
 
         if dlg:
             dlg.show()
