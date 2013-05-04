@@ -530,25 +530,8 @@ class RepoWidget(QWidget):
 
     def onPullCompleted(self):
         if self.bundle:
-            # create a new bundlerepo instance; revision numbers may change
-            brepo = thgrepo.repository(self.repo.ui, self.repo.root,
-                                       bundle=self.bundle)
-            repo = thgrepo.repository(self.repo.ui, self.repo.root)
-            if len(repo) == len(brepo):
-                # all bundle revisions pulled
-                self.clearBundle()
-                self.reload(invalidate=False)
-            else:
-                # refresh revset with remaining revisions
-                self.revset = range(len(repo), len(brepo))
-                self.repo = brepo
-                self.repoview.setRepo(brepo)
-                self.revDetailsWidget.setRepo(brepo)
-                self.manifestDemand.forward('setRepo', brepo)
-                self.reload(invalidate=False)
-                self.repomodel.revset = self.revset
-                self.repoview.resetBrowseHistory(self.revset)
-                self._reload_rev = self.revset[0]
+            self.clearBundle()
+            self.reload(invalidate=False)
 
     def acceptBundle(self):
         if self.bundle:
