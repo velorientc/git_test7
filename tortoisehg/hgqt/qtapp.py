@@ -197,44 +197,37 @@ class QtRunner(QObject):
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
         self._mainapp = QApplication(sys.argv)
-        try:
-            self._gc = GarbageCollector(self, self.debug)
-            # default org is used by QSettings
-            self._mainapp.setApplicationName('TortoiseHgQt')
-            self._mainapp.setOrganizationName('TortoiseHg')
-            self._mainapp.setOrganizationDomain('tortoisehg.org')
-            self._mainapp.setApplicationVersion(thgversion.version())
-            self._fixlibrarypaths()
-            self._installtranslator()
-            qtlib.setup_font_substitutions()
-            qtlib.fix_application_font()
-            qtlib.configstyles(ui)
-            qtlib.initfontcache(ui)
-            self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
+        self._gc = GarbageCollector(self, self.debug)
+        # default org is used by QSettings
+        self._mainapp.setApplicationName('TortoiseHgQt')
+        self._mainapp.setOrganizationName('TortoiseHg')
+        self._mainapp.setOrganizationDomain('tortoisehg.org')
+        self._mainapp.setApplicationVersion(thgversion.version())
+        self._fixlibrarypaths()
+        self._installtranslator()
+        qtlib.setup_font_substitutions()
+        qtlib.fix_application_font()
+        qtlib.configstyles(ui)
+        qtlib.initfontcache(ui)
+        self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
-            if 'repository' in opts:
-                try:
-                    # Ensure we can open the repository before opening any
-                    # dialog windows.  Since thgrepo instances are cached, this
-                    # is not wasted.
-                    from tortoisehg.hgqt import thgrepo
-                    thgrepo.repository(ui, opts['repository'])
-                except error.RepoError, e:
-                    qtlib.WarningMsgBox(_('Repository Error'),
-                                        hglib.tounicode(str(e)))
-                    return
-            dlg = dlgfunc(ui, *args, **opts)
-            if dlg:
-                dlg.show()
-                dlg.raise_()
-            else:
-                return -1
-        except:
-            # Exception before starting eventloop needs to be postponed;
-            # otherwise it will be ignored silently.
-            def reraise():
-                raise
-            QTimer.singleShot(0, reraise)
+        if 'repository' in opts:
+            try:
+                # Ensure we can open the repository before opening any
+                # dialog windows.  Since thgrepo instances are cached, this
+                # is not wasted.
+                from tortoisehg.hgqt import thgrepo
+                thgrepo.repository(ui, opts['repository'])
+            except error.RepoError, e:
+                qtlib.WarningMsgBox(_('Repository Error'),
+                                    hglib.tounicode(str(e)))
+                return
+        dlg = dlgfunc(ui, *args, **opts)
+        if dlg:
+            dlg.show()
+            dlg.raise_()
+        else:
+            return -1
 
         if thginithook is not None:
             thginithook()
