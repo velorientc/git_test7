@@ -385,7 +385,7 @@ def about(ui, *pats, **opts):
 def add(ui, repo, *pats, **opts):
     """add files"""
     from tortoisehg.hgqt.quickop import run
-    return run(ui, *pats, **opts)
+    return run(ui, repo, *pats, **opts)
 
 @command('^annotate|blame',
     [('r', 'rev', '', _('revision to annotate')),
@@ -498,7 +498,7 @@ def email(ui, repo, *pats, **opts):
 def forget(ui, repo, *pats, **opts):
     """forget selected files"""
     from tortoisehg.hgqt.quickop import run
-    return run(ui, *pats, **opts)
+    return run(ui, repo, *pats, **opts)
 
 @command('graft',
     [('r', 'rev', [], _('revisions to graft'))],
@@ -800,7 +800,7 @@ def rejects(ui, *pats, **opts):
 def remove(ui, repo, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
-    return run(ui, *pats, **opts)
+    return run(ui, repo, *pats, **opts)
 
 @command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
 def rename(ui, repo, *pats, **opts):
@@ -834,7 +834,7 @@ def revdetails(ui, repo, *pats, **opts):
 def revert(ui, repo, *pats, **opts):
     """revert selected files"""
     from tortoisehg.hgqt.quickop import run
-    return run(ui, *pats, **opts)
+    return run(ui, repo, *pats, **opts)
 
 @command('rupdate',
     [('r', 'rev', '', _('revision to update'))],
