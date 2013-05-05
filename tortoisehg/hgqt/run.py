@@ -417,8 +417,9 @@ def annotate(ui, repo, *pats, **opts):
     _('thg archive'))
 def archive(ui, repo, *pats, **opts):
     """archive dialog"""
-    from tortoisehg.hgqt.archive import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import archive as archivemod
+    rev = opts.get('rev')
+    return archivemod.ArchiveDialog(repo.ui, repo, rev)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),
