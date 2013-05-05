@@ -378,8 +378,8 @@ globalopts = [
 @command('about', [], _('thg about'))
 def about(ui, *pats, **opts):
     """about dialog"""
-    from tortoisehg.hgqt.about import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import about as aboutmod
+    return aboutmod.AboutDialog()
 
 @command('add', [], _('thg add [FILE]...'))
 def add(ui, repo, *pats, **opts):
