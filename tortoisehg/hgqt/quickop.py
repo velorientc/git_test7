@@ -282,7 +282,7 @@ def run(ui, repo, *pats, **opts):
 
     command = opts['alias']
     imm = repo.ui.config('tortoisehg', 'immediate', '')
-    if command in imm.lower():
+    if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
         return HeadlessQuickop(repo, cmdline)
     else:

@@ -477,14 +477,14 @@ def debugbugreport(ui, *pats, **opts):
 @command('drag_copy', [], _('thg drag_copy SOURCE... DEST'))
 def drag_copy(ui, repo, *pats, **opts):
     """Copy the selected files to the desired directory"""
-    from tortoisehg.hgqt.dnd import run_copy
-    return run_copy(ui, *pats, **opts)
+    opts.update(alias='copy', headless=True)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('drag_move', [], _('thg drag_move SOURCE... DEST'))
 def drag_move(ui, repo, *pats, **opts):
     """Move the selected files to the desired directory"""
-    from tortoisehg.hgqt.dnd import run_move
-    return run_move(ui, *pats, **opts)
+    opts.update(alias='move', headless=True)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('^email',
     [('r', 'rev', [], _('a revision to send'))],
