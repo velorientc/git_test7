@@ -163,10 +163,3 @@ class BisectDialog(QDialog):
         if event.key() == Qt.Key_Escape:
             self.reject()
         super(BisectDialog, self).keyPressEvent(event)
-
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return BisectDialog(repo, opts)

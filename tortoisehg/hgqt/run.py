@@ -440,8 +440,8 @@ def backout(ui, repo, *pats, **opts):
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, repo, *pats, **opts):
     """bisect dialog"""
-    from tortoisehg.hgqt.bisect import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import bisect as bisectmod
+    return bisectmod.BisectDialog(repo, opts)
 
 @command('^clone',
     [('U', 'noupdate', None, _('the clone will include an empty working copy '
