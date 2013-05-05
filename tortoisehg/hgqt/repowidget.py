@@ -906,7 +906,8 @@ class RepoWidget(QWidget):
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
                                          self.filterbar.branch(), self.revset,
                                          self.revsetfilter, self,
-                                         self.filterbar.getShowHidden())
+                                         self.filterbar.getShowHidden(),
+                                         self.filterbar.branchAncestorsIncluded())
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
