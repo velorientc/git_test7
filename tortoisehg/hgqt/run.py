@@ -62,7 +62,8 @@ def dispatch(args):
         opts['nofork'] = True
         errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                       '<a href="#edit:%(arg1)s">edit</a> your config')
-        main = QApplication(sys.argv)
+        if not QApplication.instance():
+            main = QApplication(sys.argv)
         dlg = ExceptionMsgBox(hglib.tounicode(str(e)),
                               hglib.tounicode(errstring), opts, parent=None)
         dlg.exec_()
@@ -75,7 +76,8 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = traceback.format_exc()
-        main = QApplication(sys.argv)
+        if not QApplication.instance():
+            main = QApplication(sys.argv)
         dlg = bugreport.BugReport(opts)
         dlg.exec_()
         return -1
@@ -1180,6 +1182,14 @@ table = {
           ('', 'remove', None, _('remove a tag')),
           ('m', 'message', '', _('use <text> as commit message')),],
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
+    "thgstatus": (thgstatus,
+        [('',  'delay', None, _('wait until the second ticks over')),
+         ('n', 'notify', [], _('notify the shell for paths given')),
+         ('',  'remove', None, _('remove the status cache')),
+         ('s', 'show', None, _('show the contents of the '
+                               'status cache (no update)')),
+         ('',  'all', None, _('udpate all repos in current dir')) ],
+        _('thg thgstatus [OPTION]')),
     "shelve|unshelve": (shelve, [], _('thg shelve')),
     "rejects": (rejects, [], _('thg rejects [FILE]')),
     "debugbugreport": (debugbugreport, [], _('thg debugbugreport [TEXT]')),
