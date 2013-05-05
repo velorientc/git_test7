@@ -455,8 +455,8 @@ def bisect(ui, repo, *pats, **opts):
     _('thg clone [OPTION]... SOURCE [DEST]'))
 def clone(ui, *pats, **opts):
     """clone tool"""
-    from tortoisehg.hgqt.clone import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import clone as clonemod
+    return clonemod.CloneDialog(pats, opts)
 
 @command('^commit|ci',
     [('u', 'user', '', _('record user as committer')),

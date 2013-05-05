@@ -532,6 +532,3 @@ class CloneDialog(QDialog):
             self.cmd.cancel()
             return
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    return CloneDialog(pats, opts)
