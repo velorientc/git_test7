@@ -499,7 +499,7 @@ class RepoWidget(QWidget):
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
         self.reload(invalidate=False)
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
@@ -519,7 +519,7 @@ class RepoWidget(QWidget):
         self.filterbar.setEnableFilter(True)
         self.filterbar.setQuery('')
         self.revset = []
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
         self.bundle = None
         self.bundlesource = None
         self.titleChanged.emit(self.title())
@@ -565,7 +565,7 @@ class RepoWidget(QWidget):
             self.reload()
             return True
         else:
-            self.repomodel.revset = []
+            self.repomodel.setRevset([])
             self.refresh()
         return False
 
@@ -576,7 +576,7 @@ class RepoWidget(QWidget):
         if self.revsetfilter:
             self.reload()
         else:
-            self.repomodel.revset = self.revset
+            self.repomodel.setRevset(self.revset)
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
