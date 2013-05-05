@@ -726,6 +726,9 @@ def recursiveMergeStatus(repo):
 def relatedRepositories(repoid):
     'Yields root paths for local related repositories'
     from tortoisehg.hgqt import reporegistry, repotreemodel
+    if repoid == node.nullid:  # empty repositories shouldn't be related
+        return
+
     f = QFile(reporegistry.settingsfilename())
     f.open(QIODevice.ReadOnly)
     try:
