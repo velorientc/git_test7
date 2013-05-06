@@ -528,8 +528,8 @@ def grep(ui, repo, *pats, **opts):
 @command('^guess', [], _('thg guess'))
 def guess(ui, repo, *pats, **opts):
     """guess previous renames or copies"""
-    from tortoisehg.hgqt.guess import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import guess as guessmod
+    return guessmod.DetectRenameDialog(repo, None, *pats)
 
 ### help management, adapted from mercurial.commands.help_()
 @command('help', [], _('thg help [COMMAND]'))
