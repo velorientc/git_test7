@@ -41,6 +41,7 @@ try:
 except ImportError:
     thginithook = None
 
+console_commands = 'help thgstatus version'
 nonrepo_commands = '''userconfig shellconfig clone init debugbugreport
 about help version thgstatus serve rejects log'''
 
@@ -322,7 +323,11 @@ def runcommand(ui, args):
                                 " (.hg not found)"))
 
     cmdoptions['mainapp'] = True
-    d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
+    checkedfunc = util.checksignature(func)
+    if cmd in console_commands.split():
+        d = lambda: checkedfunc(ui, *args, **cmdoptions)
+    else:
+        d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
 
 def _runcommand(ui, options, cmd, cmdfunc):
@@ -635,13 +640,13 @@ globalopts = [
 def about(ui, *pats, **opts):
     """about dialog"""
     from tortoisehg.hgqt.about import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('add', [], _('thg add [FILE]...'))
 def add(ui, *pats, **opts):
     """add files"""
     from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^annotate|blame',
     [('r', 'rev', '', _('revision to annotate')),
@@ -675,7 +680,7 @@ def annotate(ui, *pats, **opts):
         if opts.get('pattern'):
             dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
         return dlg
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('archive',
     [('r', 'rev', '', _('revision to archive'))],
@@ -683,7 +688,7 @@ def annotate(ui, *pats, **opts):
 def archive(ui, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt.archive import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),
@@ -693,13 +698,13 @@ def archive(ui, *pats, **opts):
 def backout(ui, *pats, **opts):
     """backout tool"""
     from tortoisehg.hgqt.backout import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt.bisect import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^clone',
     [('U', 'noupdate', None, _('the clone will include an empty working copy '
@@ -714,7 +719,7 @@ def bisect(ui, *pats, **opts):
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt.clone import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^commit|ci',
     [('u', 'user', '', _('record user as committer')),
@@ -723,7 +728,7 @@ def clone(ui, *pats, **opts):
 def commit(ui, *pats, **opts):
     """commit tool"""
     from tortoisehg.hgqt.commit import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):
@@ -734,13 +739,13 @@ def debugbugreport(ui, *pats, **opts):
 def drag_copy(ui, *pats, **opts):
     """Copy the selected files to the desired directory"""
     from tortoisehg.hgqt.dnd import run_copy
-    return qtrun(run_copy, ui, *pats, **opts)
+    return run_copy(ui, *pats, **opts)
 
 @command('drag_move', [], _('thg drag_move SOURCE... DEST'))
 def drag_move(ui, *pats, **opts):
     """Move the selected files to the desired directory"""
     from tortoisehg.hgqt.dnd import run_move
-    return qtrun(run_move, ui, *pats, **opts)
+    return run_move(ui, *pats, **opts)
 
 @command('^email',
     [('r', 'rev', [], _('a revision to send'))],
@@ -748,13 +753,13 @@ def drag_move(ui, *pats, **opts):
 def email(ui, *pats, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt.hgemail import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('forget', [], _('thg forget [FILE]...'))
 def forget(ui, *pats, **opts):
     """forget selected files"""
     from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('graft',
     [('r', 'rev', [], _('revisions to graft'))],
@@ -762,7 +767,7 @@ def forget(ui, *pats, **opts):
 def graft(ui, *revs, **opts):
     """graft dialog"""
     from tortoisehg.hgqt.graft import run
-    return qtrun(run, ui, *revs, **opts)
+    return run(ui, *revs, **opts)
 
 @command('^grep|search',
     [('i', 'ignorecase', False, _('ignore case during search'))],
@@ -770,13 +775,13 @@ def graft(ui, *revs, **opts):
 def grep(ui, *pats, **opts):
     """grep/search dialog"""
     from tortoisehg.hgqt.grep import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^guess', [], _('thg guess'))
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt.guess import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
 @command('help', [], _('thg help [COMMAND]'))
@@ -960,7 +965,7 @@ def help_(ui, name=None, with_version=False, **opts):
 def hgignore(ui, *pats, **opts):
     """ignore filter editor"""
     from tortoisehg.hgqt.hgignore import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('import',
     [('', 'mq', False, _('import to the patch queue (MQ)'))],
@@ -968,13 +973,13 @@ def hgignore(ui, *pats, **opts):
 def import_(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^init', [], _('thg init [DEST]'))
 def init(ui, *pats, **opts):
     """init dialog"""
     from tortoisehg.hgqt.hginit import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^log|history|explorer|workbench',
     [('l', 'limit', '', _('(DEPRECATED)'))],
@@ -982,7 +987,7 @@ def init(ui, *pats, **opts):
 def log(ui, *pats, **opts):
     """workbench application"""
     from tortoisehg.hgqt.workbench import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('manifest',
     [('r', 'rev', '', _('revision to display')),
@@ -992,7 +997,7 @@ def log(ui, *pats, **opts):
 def manifest(ui, *pats, **opts):
     """display the current or given revision of the project manifest"""
     from tortoisehg.hgqt.manifestdialog import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^merge',
     [('r', 'rev', '', _('revision to merge'))],
@@ -1000,13 +1005,13 @@ def manifest(ui, *pats, **opts):
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('mq', [], _('thg mq'))
 def mq(ui, *pats, **opts):
     """Mercurial Queue tool"""
     from tortoisehg.hgqt.mq import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('postreview',
     [('r', 'rev', [], _('a revision to post'))],
@@ -1014,25 +1019,25 @@ def mq(ui, *pats, **opts):
 def postreview(ui, *pats, **opts):
     """post changesets to reviewboard"""
     from tortoisehg.hgqt.postreview import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^purge', [], _('thg purge'))
 def purge(ui, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt.purge import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, *pats, **opts):
     """manage multiple MQ patch queues"""
     from tortoisehg.hgqt.qqueue import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^qreorder', [], _('thg qreorder'))
 def qreorder(ui, *pats, **opts):
     """Reorder unapplied MQ patches"""
     from tortoisehg.hgqt.qreorder import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^rebase',
     [('', 'keep', False, _('keep original changesets')),
@@ -1044,25 +1049,25 @@ def qreorder(ui, *pats, **opts):
 def rebase(ui, *pats, **opts):
     """rebase dialog"""
     from tortoisehg.hgqt.rebase import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):
     """Manually resolve rejected patch chunks"""
     from tortoisehg.hgqt.rejects import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('remove|rm', [], _('thg remove [FILE]...'))
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
 def rename(ui, *pats, **opts):
     """rename dialog"""
     from tortoisehg.hgqt.rename import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],
@@ -1070,13 +1075,13 @@ def rename(ui, *pats, **opts):
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from tortoisehg.hgqt.settings import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('resolve', [], _('thg resolve'))
 def resolve(ui, *pats, **opts):
     """resolve dialog"""
     from tortoisehg.hgqt.resolve import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^revdetails',
     [('r', 'rev', '', _('the revision to show'))],
@@ -1084,13 +1089,13 @@ def resolve(ui, *pats, **opts):
 def revdetails(ui, *pats, **opts):
     """revision details tool"""
     from tortoisehg.hgqt.revdetails import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('revert', [], _('thg revert [FILE]...'))
 def revert(ui, *pats, **opts):
     """revert selected files"""
     from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('rupdate',
     [('r', 'rev', '', _('revision to update'))],
@@ -1098,7 +1103,7 @@ def revert(ui, *pats, **opts):
 def rupdate(ui, *pats, **opts):
     """update a remote repository"""
     from tortoisehg.hgqt.rupdate import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^serve',
     [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
@@ -1108,7 +1113,7 @@ def rupdate(ui, *pats, **opts):
 def serve(ui, *pats, **opts):
     """start stand-alone webserver"""
     from tortoisehg.hgqt.serve import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 if os.name == 'nt':
     # TODO: extra detection to determine if shell extension is installed
@@ -1116,13 +1121,13 @@ if os.name == 'nt':
     def shellconfig(ui, *pats, **opts):
         """explorer extension configuration editor"""
         from tortoisehg.hgqt.shellconf import run
-        return qtrun(run, ui, *pats, **opts)
+        return run(ui, *pats, **opts)
 
 @command('shelve|unshelve', [], _('thg shelve'))
 def shelve(ui, *pats, **opts):
     """Move changes between working directory and patches"""
     from tortoisehg.hgqt.shelve import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^status|st',
     [('c', 'clean', False, _('show files without changes')),
@@ -1131,7 +1136,7 @@ def shelve(ui, *pats, **opts):
 def status(ui, *pats, **opts):
     """browse working copy status"""
     from tortoisehg.hgqt.status import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
@@ -1141,13 +1146,13 @@ def status(ui, *pats, **opts):
 def strip(ui, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt.thgstrip import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, *pats, **opts):
     """Synchronize with other repositories"""
     from tortoisehg.hgqt.sync import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^tag',
     [('f', 'force', None, _('replace existing tag')),
@@ -1159,7 +1164,7 @@ def sync(ui, *pats, **opts):
 def tag(ui, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt.tag import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('thgstatus',
     [('',  'delay', None, _('wait until the second ticks over')),
@@ -1181,7 +1186,7 @@ def thgstatus(ui, *pats, **opts):
 def update(ui, *pats, **opts):
     """update/checkout tool"""
     from tortoisehg.hgqt.update import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^userconfig',
     [('', 'focus', '', _('field to give initial focus'))],
@@ -1189,7 +1194,7 @@ def update(ui, *pats, **opts):
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from tortoisehg.hgqt.settings import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^vdiff',
     [('c', 'change', '', _('changeset to view in diff tool')),
@@ -1199,7 +1204,7 @@ def userconfig(ui, *pats, **opts):
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from tortoisehg.hgqt.visdiff import run
-    return qtrun(run, ui, *pats, **opts)
+    return run(ui, *pats, **opts)
 
 @command('^version',
     [('v', 'verbose', None, _('print license'))],

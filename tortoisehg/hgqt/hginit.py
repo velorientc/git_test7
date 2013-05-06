@@ -205,7 +205,7 @@ class InitDialog(QDialog):
         if self.run_wb_chk.isChecked():
             from tortoisehg.hgqt import run
             try:
-                run.log(ui.ui(), root=dest)
+                run.qtrun(run.log, ui.ui(), root=dest)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Init'),
                   _('<p>Repository successfully created at</p><p>%s</p>') % dest,
