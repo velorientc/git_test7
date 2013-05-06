@@ -521,8 +521,9 @@ def graft(ui, repo, *revs, **opts):
     _('thg grep'))
 def grep(ui, repo, *pats, **opts):
     """grep/search dialog"""
-    from tortoisehg.hgqt.grep import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import grep as grepmod
+    upats = [hglib.tounicode(p) for p in pats]
+    return grepmod.SearchDialog(upats, repo, **opts)
 
 @command('^guess', [], _('thg guess'))
 def guess(ui, repo, *pats, **opts):

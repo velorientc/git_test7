@@ -813,8 +813,3 @@ class SearchDialog(QDialog):
     @pyqtSlot()
     def runSearch(self):
         self._searchwidget.runSearch()
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    upats = [hglib.tounicode(p) for p in pats]
-    return SearchDialog(upats, repo, **opts)
