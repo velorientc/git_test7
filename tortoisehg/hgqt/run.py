@@ -712,8 +712,10 @@ def help_(ui, name=None, with_version=False, **opts):
 @command('^hgignore|ignore|filter', [], _('thg hgignore [FILE]'))
 def hgignore(ui, repo, *pats, **opts):
     """ignore filter editor"""
-    from tortoisehg.hgqt.hgignore import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import hgignore as hgignoremod
+    if pats and pats[0].endswith('.hgignore'):
+        pats = []
+    return hgignoremod.HgignoreDialog(repo, None, *pats)
 
 @command('import',
     [('', 'mq', False, _('import to the patch queue (MQ)'))],
