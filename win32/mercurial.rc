@@ -42,11 +42,6 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;git = false
 ;nodates = false
 
-; Enable mercurial_keyring by default on Windows.  It stores passwords
-; for https:// and SMTP using the WIN32 crypto APIs.
-[extensions]
-mercurial_keyring = 
-
 ;
 ; Keyword extension example configuration.  To use, one must
 ; enable the keyword extension, then uncomment and modify these
