@@ -699,10 +699,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     ## Sync dialog buttons
     ##
 
+    def linkifyWithTarget(self, url):
+        link = linkify(url)
+        if self.embedded and self.targetcheckbox.isChecked():
+            idx = self.targetcombo.currentIndex()
+            if idx != -1 and idx < len(self.targetargs):
+                link += (u" (%s)" % self.targetcombo.currentText())
+        return link
+
     def inclicked(self):
         self.syncStarted.emit()
         url = self.currentUrl()
-        link = linkify(url)
+        link = self.linkifyWithTarget(url)
         self.showMessage.emit(_('Getting incoming changesets from %s...') % link)
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
@@ -737,7 +745,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def pullclicked(self, url=None):
         self.syncStarted.emit()
-        link = linkify(url or self.currentUrl())
+        link = self.linkifyWithTarget(url or self.currentUrl())
 
         def finished(ret, output):
             if ret == 0:
@@ -781,7 +789,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def outclicked(self):
         self.syncStarted.emit()
 
-        link = linkify(self.currentUrl())
+        link = self.linkifyWithTarget(self.currentUrl())
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
         if self.embedded and not self.opts.get('subrepos'):
             def verifyhash(hash):
@@ -873,7 +881,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
 
         lurl = hglib.fromunicode(self.currentUrl())
-        link = linkify(self.currentUrl())
+        link = self.linkifyWithTarget(self.currentUrl())
         if (not hg.islocal(lurl) and confirm and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
