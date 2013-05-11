@@ -379,7 +379,7 @@ class Workbench(QMainWindow):
         self.updateMenu()
 
     def _setupUrlCombo(self, repo):
-        'repository has been switched, fill urlCombo with URLs'
+        """repository has been switched, fill urlCombo with URLs"""
         aliases = [hglib.tounicode(alias)
                    for alias, path in repo.ui.configitems('paths')]
         if 'default' in aliases:
