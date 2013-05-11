@@ -14,7 +14,7 @@ from mercurial import ui, util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq
+from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq, serve
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -918,12 +918,14 @@ class Workbench(QMainWindow):
             getattr(w, op)()
 
     def serve(self):
-        from tortoisehg.hgqt import run
+        self._dialogs.open(Workbench._createServeDialog)
+
+    def _createServeDialog(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            run.serve(w.repo.ui, root=w.repo.root)
+            return serve.run(w.repo.ui, root=w.repo.root)
         else:
-            run.serve(self.ui)
+            return serve.run(self.ui)
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
