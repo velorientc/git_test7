@@ -687,7 +687,7 @@ class CustomConfigDialog(QDialog):
 
 
 class CustomToolConfigDialog(CustomConfigDialog):
-    'Dialog for editing the a custom tool configuration'
+    '''Dialog for editing custom tool configurations'''
 
     _enablemappings = [(_('All items'), 'istrue'),
                        (_('Working directory'), 'iswd'),
