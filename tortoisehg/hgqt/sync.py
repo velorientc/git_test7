@@ -1470,7 +1470,7 @@ class PathsModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
-        for alias, path in pathlist:
+        for alias, path in sorted(pathlist):
             safepath = util.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
