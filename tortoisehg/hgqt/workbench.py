@@ -382,18 +382,31 @@ class Workbench(QMainWindow):
         """repository has been switched, fill urlCombo with URLs"""
         aliases = [hglib.tounicode(alias)
                    for alias, path in repo.ui.configitems('paths')]
+
+        # 1. Sort the list if aliases
+        aliases.sort()
+        # 2. Place the default alias at the top of the list
         if 'default' in aliases:
             aliases.remove('default')
             aliases.insert(0, 'default')
+        # 3. Make a list of paths that have a 'push path'
+        # note that the default path will be first (if it has a push path),
+        # followed by the other paths that have a push path, alphabetically
+        haspushaliases = [alias for alias in aliases
+                         if alias + '-push' in aliases]
+        # 4. Place the "-push" paths next to their "pull paths"
+        regularaliases = []
         for a in aliases[:]:
-            if a + '-push' in aliases:
-                # add foo,foo-push entry to top of menu
-                aliases.insert(0, (a, a + '-push'))
-                # move foo,foo-push individual entries to bottom
-                aliases.remove(a)
-                aliases.remove(a + '-push')
-                aliases.append(a)
-                aliases.append(a + '-push')
+            if a.endswith('-push'):
+                if a[:-len('-push')] in haspushaliases:
+                    continue
+            regularaliases.append(a)
+            if a in haspushaliases:
+                regularaliases.append(a + '-push')
+        # 5. Create the list of 'combined aliases'
+        combinedaliases = [(a, a + '-push') for a in haspushaliases]
+        # 6. Put the combined aliases first, followed by the regular aliases
+        aliases = combinedaliases + regularaliases
 
         self.urlCombo.clear()
         for a in aliases:
