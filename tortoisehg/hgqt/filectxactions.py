@@ -48,7 +48,9 @@ class FilectxActions(QObject):
         self._itemissubrepo = False
         self._itemisdir = False
 
-        self._nav_dialogs = {}
+        self._nav_dialogs = qtlib.DialogKeeper(FilectxActions._createnavdialog,
+                                               FilectxActions._gennavdialogkey,
+                                               self)
         self._contextmenus = {}
 
         self._actions = {}
@@ -257,17 +259,8 @@ class FilectxActions(QObject):
     def _navigate(self, dlgclass):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
-            fullpath = repo.wjoin(filename)
-            if (dlgclass, fullpath) not in self._nav_dialogs:
-                dlg = self._createnavdialog(dlgclass, repo, filename)
-                self._nav_dialogs[dlgclass, fullpath] = dlg
-                assert dlg.repo.wjoin(dlg.filename) == fullpath
-                dlg.finished.connect(self._forgetnavdialog)
-            dlg = self._nav_dialogs[dlgclass, fullpath]
+            dlg = self._nav_dialogs.open(dlgclass, repo, filename)
             dlg.goto(rev)
-            dlg.show()
-            dlg.raise_()
-            dlg.activateWindow()
 
     def _createnavdialog(self, dlgclass, repo, filename):
         # dirty hack to pass workbench only if available
@@ -282,12 +275,8 @@ class FilectxActions(QObject):
         dlg.setWindowIcon(qtlib.geticon('hg-log'))
         return dlg
 
-    #@pyqtSlot()
-    def _forgetnavdialog(self):
-        dlg = self.sender()
-        dlg.finished.disconnect(self._forgetnavdialog)
-        fullpath = dlg.repo.wjoin(dlg.filename)
-        del self._nav_dialogs[dlg.__class__, fullpath]
+    def _gennavdialogkey(self, dlgclass, repo, filename):
+        return dlgclass, repo.wjoin(filename)
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths
