@@ -31,11 +31,12 @@ class CloneDialog(QDialog):
         self.ret = None
 
         dest = src = cwd = os.getcwd()
-        if len(args) > 1:
-            src = args[0]
-            dest = args[1]
-        elif len(args):
-            src = args[0]
+        if args:
+            if len(args) > 1:
+                src = args[0]
+                dest = args[1]
+            else:
+                src = args[0]
         udest = hglib.tounicode(dest)
         usrc = hglib.tounicode(src)
         ucwd = hglib.tounicode(cwd)
