@@ -2191,8 +2191,7 @@ class RepoWidget(QWidget):
             else:
                 thgp = self.repo.changectx(self.repo.changectx(self.rev).node())
             patchname = thgp.thgmqpatchname()
-        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-        self.mqDemand.forward('qgotoRevision', patchname)
+        self.mqDemand.get().qgotoRevision(patchname)
 
     def qrename(self):
         sel = self.menuselection[0]
