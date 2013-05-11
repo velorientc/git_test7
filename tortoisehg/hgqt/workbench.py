@@ -281,8 +281,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
-                  menu='repository')
+        newaction(_("Start &Web Server"), self.serve, menu='repository')
         newseparator(menu='repository')
         newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
@@ -907,10 +906,12 @@ class Workbench(QMainWindow):
             getattr(w, op)()
 
     def serve(self):
+        from tortoisehg.hgqt import run
         w = self.repoTabsWidget.currentWidget()
         if w:
-            from tortoisehg.hgqt import run
             run.serve(w.repo.ui, root=w.repo.root)
+        else:
+            run.serve(self.ui)
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
