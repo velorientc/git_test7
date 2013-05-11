@@ -259,24 +259,28 @@ class FilectxActions(QObject):
         if filename and len(repo.file(filename)) > 0:
             fullpath = repo.wjoin(filename)
             if (dlgclass, fullpath) not in self._nav_dialogs:
-                # dirty hack to pass workbench only if available
-                from tortoisehg.hgqt import workbench  # avoid cyclic dep
-                repoviewer = None
-                if self.parent() and isinstance(self.parent().window(),
-                                                workbench.Workbench):
-                    repoviewer = self.parent().window()
-                dlg = dlgclass(repo, filename, repoviewer=repoviewer)
+                dlg = self._createnavdialog(dlgclass, repo, filename)
                 self._nav_dialogs[dlgclass, fullpath] = dlg
                 assert dlg.repo.wjoin(dlg.filename) == fullpath
                 dlg.finished.connect(self._forgetnavdialog)
-                ufname = hglib.tounicode(filename)
-                dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-                dlg.setWindowIcon(qtlib.geticon('hg-log'))
             dlg = self._nav_dialogs[dlgclass, fullpath]
             dlg.goto(rev)
             dlg.show()
             dlg.raise_()
             dlg.activateWindow()
+
+    def _createnavdialog(self, dlgclass, repo, filename):
+        # dirty hack to pass workbench only if available
+        from tortoisehg.hgqt import workbench  # avoid cyclic dep
+        repoviewer = None
+        if self.parent() and isinstance(self.parent().window(),
+                                        workbench.Workbench):
+            repoviewer = self.parent().window()
+        dlg = dlgclass(repo, filename, repoviewer=repoviewer)
+        ufname = hglib.tounicode(filename)
+        dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
+        dlg.setWindowIcon(qtlib.geticon('hg-log'))
+        return dlg
 
     #@pyqtSlot()
     def _forgetnavdialog(self):
