@@ -1391,7 +1391,7 @@ class RepoWidget(QWidget):
         entry(submenu, None, isrev, _('E&xport Patch...'), 'hg-export',
               self.exportRevisions)
         entry(submenu, None, isrev, _('&Email Patch...'), 'mail-forward',
-              self.emailRevision)
+              self.emailSelectedRevisions)
         entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
         entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
@@ -1932,7 +1932,8 @@ class RepoWidget(QWidget):
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
-    def emailRevision(self):
+    @pyqtSlot()
+    def emailSelectedRevisions(self):
         run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
                   repo=self.repo)
 
