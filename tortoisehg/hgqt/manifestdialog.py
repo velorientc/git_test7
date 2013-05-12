@@ -69,6 +69,9 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/geom', self.saveGeometry())
         self._manifest_widget.saveSettings(s, 'manifest')
 
+    def setRev(self, rev):
+        self._manifest_widget.setRev(rev)
+
     def setSource(self, path, rev, line=None):
         self._manifest_widget.setSource(path, rev, line)
 

@@ -1874,11 +1874,14 @@ class RepoWidget(QWidget):
             branch=self.repo[self.rev].branch())
 
     def manifestRevision(self):
-        # TODO: it may be better to reuse open ManifestDialog per RepoWidget
-        self._dialogs.open(RepoWidget._createManifestDialog, self.rev)
+        if QApplication.keyboardModifiers() & Qt.ShiftModifier:
+            self._dialogs.openNew(RepoWidget._createManifestDialog)
+        else:
+            dlg = self._dialogs.open(RepoWidget._createManifestDialog)
+            dlg.setRev(self.rev)
 
-    def _createManifestDialog(self, rev):
-        return ManifestDialog(self.repo, rev)
+    def _createManifestDialog(self):
+        return ManifestDialog(self.repo, self.rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
