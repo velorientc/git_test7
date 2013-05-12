@@ -1190,17 +1190,20 @@ class DialogKeeper(QObject):
 
     def open(self, *args, **kwargs):
         """Create new dialog or reactivate existing dialog"""
-        dlg = self._preparedlg(*args, **kwargs)
+        dlg = self._preparedlg(self._genkey(self.parent(), *args, **kwargs),
+                               args, kwargs)
         dlg.show()
         dlg.raise_()
         dlg.activateWindow()
         return dlg
 
-    def _preparedlg(self, *args, **kwargs):
-        key = self._genkey(self.parent(), *args, **kwargs)
+    def _preparedlg(self, key, args, kwargs):
         if key in self._keytodlg:
             return self._keytodlg[key]
+        else:
+            return self._populatedlg(key, args, kwargs)
 
+    def _populatedlg(self, key, args, kwargs):
         dlg = self._createdlg(self.parent(), *args, **kwargs)
         self._keytodlg[key] = dlg
         self._dlgtokey[dlg] = key
