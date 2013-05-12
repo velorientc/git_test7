@@ -1527,11 +1527,11 @@ class RepoWidget(QWidget):
             if dlg:
                 dlg.exec_()
         def emailPair():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         def emailDagRange():
             l = dagrange()
             if l:
-                run.email(self.repo.ui, rev=l, repo=self.repo)
+                self._emailRevisions(l)
         def bundleDagRange():
             l = dagrange()
             if l:
@@ -1655,7 +1655,7 @@ class RepoWidget(QWidget):
         def exportSel():
             self.exportRevisions(self.menuselection)
         def emailSel():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Export Selected...'), exportSel, 'hg-export'),
@@ -1934,8 +1934,10 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def emailSelectedRevisions(self):
-        run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
-                  repo=self.repo)
+        self._emailRevisions(self.repoview.selectedRevisions())
+
+    def _emailRevisions(self, revs):
+        run.email(self.repo.ui, rev=revs, repo=self.repo)
 
     def archiveRevision(self):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
