@@ -1890,9 +1890,10 @@ class RepoWidget(QWidget):
             QMessageBox.warning(self, _('Unable to merge'),
                 _('You cannot merge a revision with itself'))
             return
-        dlg = merge.MergeDialog(self.rev, self.repo, self)
-        dlg.exec_()
-        dlg.deleteLater()
+        self._dialogs.open(RepoWidget._createMergeDialog, self.rev)
+
+    def _createMergeDialog(self, rev):
+        return merge.MergeDialog(rev, self.repo, self)
 
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
