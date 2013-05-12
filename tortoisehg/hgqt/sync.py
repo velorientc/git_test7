@@ -262,7 +262,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.targetcombo.clear()
         #The parallel targetargs record is the argument list to pass to hg
         self.targetargs = []
-        selIndex = 0;
+        selIndex = 0
         self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
         self.targetargs.append(['--rev', str(ctx.rev())])
 
