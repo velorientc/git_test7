@@ -362,6 +362,8 @@ class RepoFilterBar(QToolBar):
         self.setBranch(branch)
         self._branchCombo.blockSignals(False)
 
+        self._allparAction.setChecked(s.value('branch_allparents').toBool())
+
     def _saveBranchFilterSettings(self, s):
         branch = self.branch()
         if branch == hglib.tounicode(self._repo.dirstate.branch()):
@@ -369,6 +371,8 @@ class RepoFilterBar(QToolBar):
             # clones which are updated to particular branches.
             branch = '.'
         s.setValue('branch', branch)
+
+        s.setValue('branch_allparents', self.branchAncestorsIncluded())
 
     def _updateBranchFilter(self):
         """Update the list of branches"""
@@ -420,13 +424,16 @@ class RepoFilterBar(QToolBar):
         else:
             return unicode(self._branchCombo.currentText())
 
+    def branchAncestorsIncluded(self):
+        return self._allparAction.isChecked()
+
     def getShowHidden(self):
         return self.showHiddenBtn.isChecked()
 
     @pyqtSlot()
     def _emitBranchChanged(self):
         self.branchChanged.emit(self.branch(),
-                                self._allparAction.isChecked())
+                                self.branchAncestorsIncluded())
 
     @pyqtSlot()
     def refresh(self):
