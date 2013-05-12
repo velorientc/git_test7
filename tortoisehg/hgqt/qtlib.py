@@ -1174,6 +1174,24 @@ class DialogKeeper(QObject):
     >>> dlg1 is dlg3
     False
 
+    creates new dialog of the same type:
+
+    >>> dlg4 = dialogs.openNew(QDialog)
+    >>> dlg3 is dlg4
+    False
+    >>> dialogs.count()
+    2
+
+    and the last dialog is preferred:
+
+    >>> dialogs.open(QDialog) is dlg4
+    True
+    >>> dlg4.reject()
+    >>> dialogs.count()
+    1
+    >>> dialogs.open(QDialog) is dlg3
+    True
+
     The following example is not recommended because it creates reference
     cycles and makes hard to garbage-collect::
 
@@ -1185,8 +1203,8 @@ class DialogKeeper(QObject):
         super(DialogKeeper, self).__init__(parent)
         self._createdlg = createdlg
         self._genkey = genkey or DialogKeeper._defaultgenkey
-        self._keytodlg = {}
-        self._dlgtokey = {}
+        self._keytodlgs = {}  # key: [dlg, ...]
+        self._dlgtokey = {}   # dlg: key
 
     def open(self, *args, **kwargs):
         """Create new dialog or reactivate existing dialog"""
@@ -1197,15 +1215,27 @@ class DialogKeeper(QObject):
         dlg.activateWindow()
         return dlg
 
+    def openNew(self, *args, **kwargs):
+        """Create new dialog even if there exists the specified one"""
+        dlg = self._populatedlg(self._genkey(self.parent(), *args, **kwargs),
+                                args, kwargs)
+        dlg.show()
+        dlg.raise_()
+        dlg.activateWindow()
+        return dlg
+
     def _preparedlg(self, key, args, kwargs):
-        if key in self._keytodlg:
-            return self._keytodlg[key]
+        if key in self._keytodlgs:
+            assert len(self._keytodlgs[key]) > 0
+            return self._keytodlgs[key][-1]  # prefer latest
         else:
             return self._populatedlg(key, args, kwargs)
 
     def _populatedlg(self, key, args, kwargs):
         dlg = self._createdlg(self.parent(), *args, **kwargs)
-        self._keytodlg[key] = dlg
+        if key not in self._keytodlgs:
+            self._keytodlgs[key] = []
+        self._keytodlgs[key].append(dlg)
         self._dlgtokey[dlg] = key
         dlg.finished.connect(self._forgetdlg)
         return dlg
@@ -1217,11 +1247,14 @@ class DialogKeeper(QObject):
         if dlg.parent() is self.parent():
             dlg.setParent(None)  # assist gc
         key = self._dlgtokey.pop(dlg)
-        del self._keytodlg[key]
+        self._keytodlgs[key].remove(dlg)
+        if not self._keytodlgs[key]:
+            del self._keytodlgs[key]
 
     def count(self):
-        assert len(self._keytodlg) == len(self._dlgtokey)
-        return len(self._keytodlg)
+        assert len(self._dlgtokey) == sum(len(dlgs) for dlgs
+                                          in self._keytodlgs.itervalues())
+        return len(self._dlgtokey)
 
     @staticmethod
     def _defaultgenkey(_parent, *args, **_kwargs):
