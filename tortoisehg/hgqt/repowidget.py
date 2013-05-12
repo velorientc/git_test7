@@ -819,10 +819,12 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def shelve(self, arg=None):
+        self._dialogs.open(RepoWidget._createShelveDialog)
+
+    def _createShelveDialog(self):
         dlg = shelve.ShelveDialog(self.repo, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.exec_()
-        self._refreshCommitTabIfNeeded()
+        dlg.finished.connect(self._refreshCommitTabIfNeeded)
+        return dlg
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
