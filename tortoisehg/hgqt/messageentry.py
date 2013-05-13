@@ -173,7 +173,7 @@ class MessageEntry(qscilib.Scintilla):
                 break
             e += 1
 
-        if b == e:
+        if b == e == 0:
             return line + 1
 
         group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
