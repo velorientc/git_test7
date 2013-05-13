@@ -62,7 +62,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
-        self.targetargs = []
 
         s = QSettings()
         for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug', 'mq'):
@@ -260,24 +259,21 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
-        #The parallel targetargs record is the argument list to pass to hg
-        self.targetargs = []
+        # itemData(role=UserRole) is the argument list to pass to hg
         selIndex = 0
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
-        self.targetargs.append(['--rev', str(ctx.rev())])
+        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
+                                 ('--rev', str(ctx.rev())))
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.addItem(_('bookmark: ') + uname, ('--bookmark', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
 
@@ -600,10 +596,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if 'rev' in details and '--rev' not in cmdline:
             if self.embedded and self.targetcheckbox.isChecked():
                 idx = self.targetcombo.currentIndex()
-                if idx != -1 and idx < len(self.targetargs):
-                    args = self.targetargs[idx]
+                if idx != -1:
+                    args = self.targetcombo.itemData(idx).toPyObject()
                     if args[0][2:] not in details:
-                        args[0] = '--rev'
+                        args = ('--rev',) + args[1:]
                     cmdline += args
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
@@ -703,7 +699,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         link = linkify(url)
         if self.embedded and self.targetcheckbox.isChecked():
             idx = self.targetcombo.currentIndex()
-            if idx != -1 and idx < len(self.targetargs):
+            if idx != -1:
                 link += (u" (%s)" % self.targetcombo.currentText())
         return link
 
