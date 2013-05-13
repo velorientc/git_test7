@@ -226,10 +226,12 @@ class Workbench(QMainWindow):
 
         self.actionGroupTaskView = QActionGroup(self)
         self.actionGroupTaskView.triggered.connect(self.onSwitchRepoTaskTab)
-        def addtaskview(icon, label, name):
+        def addtaskview(icon, label, name, shortcut=None):
             a = newaction(label, icon=None, checkable=True, data=name,
                           enabled='repoopen', menu='view')
             a.setIcon(qtlib.geticon(icon))
+            if shortcut:
+                a.setShortcut(shortcut)
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
             return a
@@ -253,13 +255,14 @@ class Workbench(QMainWindow):
         self.actionSelectTaskMQ = None
         self.actionSelectTaskPbranch = None
 
-        for taskname in tasklist:
+        for i, taskname in enumerate(tasklist):
             taskname = taskname.strip()
             taskinfo = taskdefs.get(taskname, None)
             if taskinfo is None:
                 newseparator(toolbar='task')
                 continue
-            tbar = addtaskview(taskinfo[0], taskinfo[1], taskname)
+            tbar = addtaskview(taskinfo[0], taskinfo[1], taskname,
+                               "Alt+%d" % (i + 1))
             if taskname == 'mq':
                 self.actionSelectTaskMQ = tbar
             elif taskname == 'pbranch':
