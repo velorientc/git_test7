@@ -749,7 +749,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                       % (link, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
-            if self.opts.get('rebase'):
+            if self.opts.get('rebase') or self.opts.get('updateOrRebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
                     dlg = rebase.RebaseDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
@@ -773,6 +773,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
             cmdline += ['--update', '--config', uimerge]
+        elif self.cachedpp == 'updateOrRebase':
+            cmdline += ['--update', '--rebase', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         elif self.opts.get('mq'):
@@ -1028,13 +1030,15 @@ class PostPullDialog(QDialog):
             layout.addWidget(self.fetch)
         else:
             self.fetch = None
-        if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
+        if 'rebase' in repo.extensions() or repo.postpull == 'rebase' or repo.postpull == 'updateOrRebase':
             if 'rebase' in repo.extensions():
                 btntxt = _('Rebase - rebase local commits above pulled changes')
             else:
                 btntxt = _('Rebase - use rebase extension (rebase is not active!)')
             self.rebase = QRadioButton(btntxt)
             layout.addWidget(self.rebase)
+            self.updateOrRebase = QRadioButton(_('UpdateOrRebase - pull, then try to update or rebase'))
+            layout.addWidget(self.updateOrRebase)
 
         self.none.setChecked(True)
         if repo.postpull == 'update':
@@ -1043,6 +1047,8 @@ class PostPullDialog(QDialog):
             self.fetch.setChecked(True)
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
+        elif repo.postpull == 'updateOrRebase':
+            self.updateOrRebase.setChecked(True)
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
@@ -1076,8 +1082,10 @@ class PostPullDialog(QDialog):
             return 'update'
         elif (self.fetch and self.fetch.isChecked()):
             return 'fetch'
-        else:
+        elif (self.rebase and self.rebase.isChecked()):
             return 'rebase'
+        else:
+            return 'updateOrRebase'
 
     def accept(self):
         path = self.repo.join('hgrc')

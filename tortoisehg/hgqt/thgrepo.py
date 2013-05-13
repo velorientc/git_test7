@@ -361,7 +361,7 @@ def _extendrepo(repo):
         @propertycache
         def postpull(self):
             pp = self.ui.config('tortoisehg', 'postpull')
-            if pp in ('rebase', 'update', 'fetch'):
+            if pp in ('rebase', 'update', 'fetch', 'updateOrRebase'):
                 return pp
             return 'none'
 
