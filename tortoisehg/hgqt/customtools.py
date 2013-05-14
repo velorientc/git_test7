@@ -871,3 +871,40 @@ class HookConfigDialog(CustomConfigDialog):
         if not command:
             return _('You must set a command to run.')
         return '' # No error
+
+
+def addCustomToolsSubmenu(menu,
+        ui, location, make, slot, label=_('Custom Tools')):
+    '''
+    Add a custom tools submenu to an existing menus
+
+    This can be used, for example, to add the custom tools submenu to the
+    different file context menus
+    '''
+    tools, toollist = hglib.tortoisehgtools(ui,
+        selectedlocation=location)
+    if not tools:
+        return
+    submenu = menu.addMenu(label)
+    submenu.triggered.connect(slot)
+    emptysubmenu = True
+    for name in toollist:
+        if name == '|':
+            submenu.addSeparator()
+            continue
+        info = tools.get(name, None)
+        if info is None:
+            continue
+        command = info.get('command', None)
+        if not command:
+            continue
+        label = info.get('label', name)
+        icon = info.get('icon', CustomToolConfigDialog._defaulticonname)
+        status = info.get('status', 'MAR!C?S')
+        a = make(label, None, frozenset(status),
+            icon=icon, inmenu=submenu)
+        if a is not None:
+            a.setData(name)
+            emptysubmenu = False
+    if emptysubmenu:
+        menu.removeAction(submenu.menuAction())

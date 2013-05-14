@@ -8,7 +8,7 @@
 import os
 
 from mercurial import util, error, merge, commands, extensions
-from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
+from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt, customtools
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -107,7 +107,7 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types, icon=None, inmenu=None):
+        def make(text, func, types=None, icon=None, inmenu=None):
             if not types & alltypes:
                 return
             if inmenu is None:
@@ -129,37 +129,11 @@ class WctxActions(QObject):
             make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
             make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
 
-        def _setupCustomSubmenu(menu):
-            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
-                selectedlocation='workbench.commit.custom-menu')
-            if not tools:
-                return
-            menu.addSeparator()
-            submenu = menu.addMenu(_('Custom Tools'))
-            submenu.triggered.connect(self._runCustomCommandByMenu)
-            emptysubmenu = True
-            for name in toollist:
-                if name == '|':
-                    submenu.addSeparator()
-                    continue
-                info = tools.get(name, None)
-                if info is None:
-                    continue
-                command = info.get('command', None)
-                if not command:
-                    continue
-                label = info.get('label', name)
-                icon = info.get('icon', 'tools-spanner-hammer')
-                status = info.get('status', 'MAR!C?S')
-                a = make(label, None, frozenset(status),
-                    icon=icon, inmenu=submenu)
-                if a is not None:
-                    a.setData(name)
-                    emptysubmenu = False
-            if emptysubmenu:
-                menu.removeAction(submenu.menuAction())
-
-        _setupCustomSubmenu(menu)
+        menu.addSeparator()
+        customtools.addCustomToolsSubmenu(menu, repo.ui,
+            location='workbench.commit.custom-menu',
+            make=make,
+            slot=self._runCustomCommandByMenu)
 
         # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
