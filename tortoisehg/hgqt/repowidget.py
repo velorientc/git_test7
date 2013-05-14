@@ -19,16 +19,16 @@ from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
-from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
+from tortoisehg.hgqt import archive, thgimport, thgstrip, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
-from tortoisehg.hgqt import matching, graft
+from tortoisehg.hgqt import matching, graft, hgemail, postreview
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestWidget
+from tortoisehg.hgqt.manifestdialog import ManifestDialog, ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
@@ -128,6 +128,9 @@ class RepoWidget(QWidget):
         self.runner.commandStarted.connect(self.beginSuppressPrompt)
         self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.onCommandFinished)
+
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
 
         # Select the widget chosen by the user
         defaultWidget = \
@@ -499,7 +502,7 @@ class RepoWidget(QWidget):
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
         self.reload(invalidate=False)
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
@@ -519,7 +522,7 @@ class RepoWidget(QWidget):
         self.filterbar.setEnableFilter(True)
         self.filterbar.setQuery('')
         self.revset = []
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
         self.bundle = None
         self.bundlesource = None
         self.titleChanged.emit(self.title())
@@ -565,7 +568,7 @@ class RepoWidget(QWidget):
             self.reload()
             return True
         else:
-            self.repomodel.revset = []
+            self.repomodel.setRevset([])
             self.refresh()
         return False
 
@@ -576,7 +579,7 @@ class RepoWidget(QWidget):
         if self.revsetfilter:
             self.reload()
         else:
-            self.repomodel.revset = self.revset
+            self.repomodel.setRevset(self.revset)
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
@@ -1397,7 +1400,7 @@ class RepoWidget(QWidget):
         entry(submenu, None, isrev, _('E&xport Patch...'), 'hg-export',
               self.exportRevisions)
         entry(submenu, None, isrev, _('&Email Patch...'), 'mail-forward',
-              self.emailRevision)
+              self.emailSelectedRevisions)
         entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
         entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
@@ -1533,11 +1536,11 @@ class RepoWidget(QWidget):
             if dlg:
                 dlg.exec_()
         def emailPair():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         def emailDagRange():
             l = dagrange()
             if l:
-                run.email(self.repo.ui, rev=l, repo=self.repo)
+                self._emailRevisions(l)
         def bundleDagRange():
             l = dagrange()
             if l:
@@ -1661,7 +1664,7 @@ class RepoWidget(QWidget):
         def exportSel():
             self.exportRevisions(self.menuselection)
         def emailSel():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Export Selected...'), exportSel, 'hg-export'),
@@ -1871,7 +1874,11 @@ class RepoWidget(QWidget):
             branch=self.repo[self.rev].branch())
 
     def manifestRevision(self):
-        run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
+        # TODO: it may be better to reuse open ManifestDialog per RepoWidget
+        self._dialogs.open(RepoWidget._createManifestDialog, self.rev)
+
+    def _createManifestDialog(self, rev):
+        return ManifestDialog(self.repo, rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
@@ -1926,8 +1933,11 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def sendToReviewBoard(self):
-        run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
-          repo=self.repo)
+        self._dialogs.open(RepoWidget._createPostReviewDialog,
+                           tuple(self.repoview.selectedRevisions()))
+
+    def _createPostReviewDialog(self, revs):
+        return postreview.PostReviewDialog(self.repo.ui, self.repo, revs)
 
     def rupdate(self):
         import rupdate
@@ -1938,9 +1948,15 @@ class RepoWidget(QWidget):
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
-    def emailRevision(self):
-        run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
-                  repo=self.repo)
+    @pyqtSlot()
+    def emailSelectedRevisions(self):
+        self._emailRevisions(self.repoview.selectedRevisions())
+
+    def _emailRevisions(self, revs):
+        self._dialogs.open(RepoWidget._createEmailDialog, tuple(revs))
+
+    def _createEmailDialog(self, revs):
+        return hgemail.EmailDialog(self.repo, revs)
 
     def archiveRevision(self):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
