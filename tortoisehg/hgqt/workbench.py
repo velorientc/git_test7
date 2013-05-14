@@ -241,8 +241,8 @@ class Workbench(QMainWindow):
         tasklist = self.ui.configlist(
             'tortoisehg', 'workbench.task-toolbar', [])
         if tasklist == []:
-            tasklist = ['log', 'commit', 'mq', 'sync', 'manifest',
-                'grep', 'pbranch']
+            tasklist = ['log', 'commit', 'mq', 'manifest',
+                'grep', 'pbranch', '|', 'sync']
 
         self.actionSelectTaskMQ = None
         self.actionSelectTaskPbranch = None
