@@ -51,7 +51,7 @@ class StatusWidget(QWidget):
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, pats, opts, parent=None, checkable=True,
-                 defcheck='MAR!S'):
+                 defcheck='commit'):
         QWidget.__init__(self, parent)
 
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
@@ -191,6 +191,20 @@ class StatusWidget(QWidget):
 
         self.split = split
         self.diffvbox = vbox
+
+    @property
+    def defcheck(self):
+        if self._defcheck is None:
+            return 'MAR!S'
+        return self._defcheck
+
+    @defcheck.setter
+    def defcheck(self, newdefcheck):
+        if newdefcheck.lower() == 'amend':
+            newdefcheck = 'MAS'
+        elif newdefcheck.lower() in ('commit', 'qnew', 'qrefresh'):
+            newdefcheck = 'MAR!S'
+        self._defcheck = newdefcheck
 
     def checkAllNone(self):
         if self.manualCheckAllUpdate:

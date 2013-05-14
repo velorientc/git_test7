@@ -413,6 +413,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         else:
             if self.lastAction in ('qref', 'amend'):
                 self.setMessage(self.lastCommitMsg)
+        if curraction == 'amend':
+            self.stwidget.defcheck = 'amend'
+        else:
+            self.stwidget.defcheck = 'commit'
         self.stwidget.fileview.enableChangeSelection(allowcs)
         if not allowcs:
             self.stwidget.partials = {}
