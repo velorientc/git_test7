@@ -354,8 +354,8 @@ class Workbench(QMainWindow):
         menu = QMenu(_('&Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
         menu.addAction(self.docktbar.toggleViewAction())
-        menu.addAction(self.synctbar.toggleViewAction())
         menu.addAction(self.tasktbar.toggleViewAction())
+        menu.addAction(self.synctbar.toggleViewAction())
         menu.addAction(self.customtbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
