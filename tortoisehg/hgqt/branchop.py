@@ -103,7 +103,8 @@ class BranchOpDialog(QDialog):
             QString - open new named branch
         '''
         if self.branchCombo.isEnabled():
-            self.branchop = self.branchCombo.currentText()
+            # branch name cannot start/end with whitespace (see dirstate._branch)
+            self.branchop = self.branchCombo.currentText().trimmed()
         elif self.closebranch.isChecked():
             self.branchop = False
         else:
