@@ -38,7 +38,6 @@ class ThgTabBar(QTabBar):
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
-    activeRepoChanged = pyqtSignal(QString)
 
     def __init__(self, createserver=False):
         QMainWindow.__init__(self)
@@ -58,7 +57,6 @@ class Workbench(QMainWindow):
         rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
-        self.activeRepoChanged.connect(rr.setActiveTabRepo)
 
         self.mqpatches = p = mq.MQPatchesWidget(self)
         p.setObjectName('MQPatchesWidget')
@@ -283,8 +281,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
-                  menu='repository')
+        newaction(_("Start &Web Server"), self.serve, menu='repository')
         newseparator(menu='repository')
         newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
@@ -799,11 +796,11 @@ class Workbench(QMainWindow):
             self.updateMenu()
             if w.repo:
                 root = w.repo.root
-                self.activeRepoChanged.emit(hglib.tounicode(root))
+                self.reporegistry.setActiveTabRepo(hglib.tounicode(root))
                 self._setupCustomTools(w.repo.ui)
                 self._setupUrlCombo(w.repo)
         else:
-            self.activeRepoChanged.emit("")
+            self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
@@ -922,10 +919,12 @@ class Workbench(QMainWindow):
             getattr(w, op)()
 
     def serve(self):
+        from tortoisehg.hgqt import run
         w = self.repoTabsWidget.currentWidget()
         if w:
-            from tortoisehg.hgqt import run
             run.serve(w.repo.ui, root=w.repo.root)
+        else:
+            run.serve(self.ui)
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
