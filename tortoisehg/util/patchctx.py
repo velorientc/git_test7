@@ -87,8 +87,14 @@ class patchctx(object):
     def substate(self):
         return {}  # unapplied patch won't include .hgsubstate
 
+    # unlike changectx, `k in pctx` and `iter(pctx)` just iterates files
+    # included in the patch file, because it does not know the full manifest.
+
     def __contains__(self, key):
         return key in self._files
+
+    def __iter__(self):
+        return iter(sorted(self._files))
 
     def __str__(self):      return node.short(self.node())
     def node(self):         return self._node
