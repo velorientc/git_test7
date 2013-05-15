@@ -698,9 +698,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def linkifyWithTarget(self, url):
         link = linkify(url)
         if self.embedded and self.targetcheckbox.isChecked():
-            idx = self.targetcombo.currentIndex()
-            if idx != -1:
-                link += (u" (%s)" % self.targetcombo.currentText())
+            link += u" (%s)" % self.targetcombo.currentText()
         return link
 
     def inclicked(self):
