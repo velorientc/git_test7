@@ -26,6 +26,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     grepRequested = pyqtSignal(unicode, dict)
     revisionSelected = pyqtSignal(int)
     updateToRevision = pyqtSignal(int)
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, rev=None):
         QWidget.__init__(self, parent)
@@ -234,6 +235,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._fileactions = filectxactions.FilectxActions(self.repo, self,
                                                           rev=self.ctx.rev())
         self._fileactions.linkActivated.connect(self.linkActivated)
+        self._fileactions.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
         self.addActions(self._fileactions.actions())
 
     def onRevisionSelected(self, rev):

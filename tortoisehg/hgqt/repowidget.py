@@ -213,6 +213,8 @@ class RepoWidget(QWidget):
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
         w.updateToRevision.connect(lambda rev: self.updateToRevision())
+        w.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         self.namedTabs['log'] = idx
         tt.setTabToolTip(idx, _("Revision details", "tab tooltip"))
@@ -440,6 +442,8 @@ class RepoWidget(QWidget):
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         w.revsetFilterRequested.connect(self.setFilter)
+        w.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         return w
 
     def createSyncWidget(self):

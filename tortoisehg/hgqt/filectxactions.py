@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 
 from mercurial import util
 
-from tortoisehg.hgqt import qtlib, revert, thgrepo, visdiff
+from tortoisehg.hgqt import qtlib, revert, thgrepo, visdiff, customtools
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
@@ -35,6 +35,7 @@ class FilectxActions(QObject):
     filterRequested = pyqtSignal(QString)
     """Ask the repowidget to change its revset filter"""
 
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent=None, rev=None):
         super(FilectxActions, self).__init__(parent)
@@ -168,8 +169,33 @@ class FilectxActions(QObject):
                 contextmenu.addAction(self._actions[act])
             else:
                 contextmenu.addSeparator()
+        self._setupCustomSubmenu(contextmenu)
         self._contextmenus[key] = contextmenu
         return contextmenu
+
+    def _setupCustomSubmenu(self, menu):
+        def make(text, func, types=None, icon=None, inmenu=None):
+            action = inmenu.addAction(text)
+            if icon:
+                action.setIcon(qtlib.geticon(icon))
+            return action
+
+        menu.addSeparator()
+        customtools.addCustomToolsSubmenu(menu, self.repo.ui,
+            location='workbench.filelist.custom-menu',
+            make=make,
+            slot=self._runCustomCommandByMenu)
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        files = [file for file in self._selectedfiles
+                    if os.path.exists(self.repo.wjoin(file))]
+        if not files:
+            qtlib.WarningMsgBox(_('File(s) not found'),
+                _('The selected files do not exist in the working directory'))
+            return
+        self.runCustomCommandRequested.emit(
+            str(action.data().toString()), files)
 
     def navigate(self):
         self._navigate(FileLogDialog)

@@ -118,6 +118,9 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     revsetFilterRequested = pyqtSignal(QString)
     """Ask the repowidget to change its revset filter"""
 
+    runCustomCommandRequested = pyqtSignal(str, list)
+    """Emitted when selects a custom tool on the context menu"""
+
     def canswitch(self):
         return False
 
@@ -207,6 +210,8 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                                                           rev=self._rev)
         self._fileactions.linkActivated.connect(self.linkActivated)
         self._fileactions.filterRequested.connect(self.revsetFilterRequested)
+        self._fileactions.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
         self.addActions(self._fileactions.actions())
 
     def showEvent(self, event):
