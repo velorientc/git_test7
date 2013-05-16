@@ -422,7 +422,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.committb.setText(curraction._text)
         self.lastAction = curraction._name
 
-    def getBranchCommandLine(self, branchName, repo):
+    def getBranchCommandLine(self):
         '''
         Create the command line to change or create the selected branch unless
         it is the selected branch
@@ -434,6 +434,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         the selected action
         '''
         # This function is used both by commit() and mqPerformAction()
+        repo = self.repo
         commandlines = []
         newbranch = False
         branch = hglib.fromunicode(self.branchop)
@@ -478,8 +479,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # Check if we need to change branch first
         wholecmdlines = []  # [[cmd1, ...], [cmd2, ...], ...]
         if self.branchop:
-            cmdlines, newbranch = self.getBranchCommandLine(self.branchop,
-                                                            self.repo)
+            cmdlines, newbranch = self.getBranchCommandLine()
             if cmdlines is None:
                 return
             wholecmdlines.extend(cmdlines)
@@ -832,8 +832,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         elif self.branchop == False:
             brcmd = ['--close-branch']
         else:
-            commandlines, newbranch = self.getBranchCommandLine(self.branchop,
-                                                                self.repo)
+            commandlines, newbranch = self.getBranchCommandLine()
             if commandlines is None:
                 return
         partials = []
