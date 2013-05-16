@@ -540,6 +540,12 @@ class RepoWidget(QWidget):
 
     def pullBundleToRev(self):
         if self.bundle:
+            # manually remove infobar to work around unwanted rejectBundle
+            # during pull operation (issue #2596)
+            if self._activeInfoBar:
+                self._activeInfoBar.hide()
+                self._freeInfoBar()
+
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.syncDemand.pullBundle(self.bundle, self.rev,
                                        self.bundlesource)
