@@ -117,7 +117,7 @@ class ThgRepoWrapper(QObject):
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
-        for f in self.repo.uifiles()[1]:
+        for f in self.repo.uifiles():
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
                 self.watcher.addPath(hglib.tounicode(f))
@@ -257,7 +257,7 @@ class ThgRepoWrapper(QObject):
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
-            files = self.repo.uifiles()[1]
+            files = self.repo.uifiles()
             mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
             if mtime > self._uimtime:
                 dbgoutput('config change detected')
@@ -267,7 +267,7 @@ class ThgRepoWrapper(QObject):
         except (EnvironmentError, ValueError):
             pass
 
-_uiprops = '''_uifiles _uimtime postpull tabwidth maxdiff
+_uiprops = '''_uifiles postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
@@ -348,17 +348,6 @@ def _extendrepo(repo):
             return files
 
         @propertycache
-        def _uimtime(self):
-            mtimes = [0] # zero will be taken if no config files
-            for f in self._uifiles:
-                try:
-                    if os.path.exists(f):
-                        mtimes.append(os.path.getmtime(f))
-                except EnvironmentError:
-                    pass
-            return max(mtimes)
-
-        @propertycache
         def _exts(self):
             lclexts = []
             allexts = [n for n,m in extensions.extensions()]
@@ -372,7 +361,7 @@ def _extendrepo(repo):
         @propertycache
         def postpull(self):
             pp = self.ui.config('tortoisehg', 'postpull')
-            if pp in ('rebase', 'update', 'fetch'):
+            if pp in ('rebase', 'update', 'fetch', 'updateOrRebase'):
                 return pp
             return 'none'
 
@@ -461,10 +450,9 @@ def _extendrepo(repo):
                 heads.extend(nodes)
             return heads
 
-        # TODO: remove _uimtime which is superseded by ThgRepoWrapper._uimtime
         def uifiles(self):
-            'Returns latest mtime and complete list of config files'
-            return self._uimtime, self._uifiles
+            'Returns complete list of config files'
+            return self._uifiles
 
         def extensions(self):
             'Returns list of extensions enabled in this repository'

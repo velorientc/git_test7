@@ -62,7 +62,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
-        self.targetargs = []
 
         s = QSettings()
         for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug', 'mq'):
@@ -260,24 +259,21 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
-        #The parallel targetargs record is the argument list to pass to hg
-        self.targetargs = []
+        # itemData(role=UserRole) is the argument list to pass to hg
         selIndex = 0
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
-        self.targetargs.append(['--rev', str(ctx.rev())])
+        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
+                                 ('--rev', str(ctx.rev())))
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.addItem(_('bookmark: ') + uname, ('--bookmark', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
 
@@ -600,10 +596,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if 'rev' in details and '--rev' not in cmdline:
             if self.embedded and self.targetcheckbox.isChecked():
                 idx = self.targetcombo.currentIndex()
-                if idx != -1 and idx < len(self.targetargs):
-                    args = self.targetargs[idx]
+                if idx != -1:
+                    args = self.targetcombo.itemData(idx).toPyObject()
                     if args[0][2:] not in details:
-                        args[0] = '--rev'
+                        args = ('--rev',) + args[1:]
                     cmdline += args
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
@@ -702,9 +698,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def linkifyWithTarget(self, url):
         link = linkify(url)
         if self.embedded and self.targetcheckbox.isChecked():
-            idx = self.targetcombo.currentIndex()
-            if idx != -1 and idx < len(self.targetargs):
-                link += (u" (%s)" % self.targetcombo.currentText())
+            link += u" (%s)" % self.targetcombo.currentText()
         return link
 
     def inclicked(self):
@@ -755,7 +749,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                       % (link, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
-            if self.opts.get('rebase'):
+            if self.opts.get('rebase') or self.opts.get('updateOrRebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
                     dlg = rebase.RebaseDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
@@ -779,6 +773,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
             cmdline += ['--update', '--config', uimerge]
+        elif self.cachedpp == 'updateOrRebase':
+            cmdline += ['--update', '--rebase', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         elif self.opts.get('mq'):
@@ -1034,13 +1030,15 @@ class PostPullDialog(QDialog):
             layout.addWidget(self.fetch)
         else:
             self.fetch = None
-        if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
+        if 'rebase' in repo.extensions() or repo.postpull == 'rebase' or repo.postpull == 'updateOrRebase':
             if 'rebase' in repo.extensions():
                 btntxt = _('Rebase - rebase local commits above pulled changes')
             else:
                 btntxt = _('Rebase - use rebase extension (rebase is not active!)')
             self.rebase = QRadioButton(btntxt)
             layout.addWidget(self.rebase)
+            self.updateOrRebase = QRadioButton(_('UpdateOrRebase - pull, then try to update or rebase'))
+            layout.addWidget(self.updateOrRebase)
 
         self.none.setChecked(True)
         if repo.postpull == 'update':
@@ -1049,6 +1047,8 @@ class PostPullDialog(QDialog):
             self.fetch.setChecked(True)
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
+        elif repo.postpull == 'updateOrRebase':
+            self.updateOrRebase.setChecked(True)
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
@@ -1082,8 +1082,10 @@ class PostPullDialog(QDialog):
             return 'update'
         elif (self.fetch and self.fetch.isChecked()):
             return 'fetch'
-        else:
+        elif (self.rebase and self.rebase.isChecked()):
             return 'rebase'
+        else:
+            return 'updateOrRebase'
 
     def accept(self):
         path = self.repo.join('hgrc')

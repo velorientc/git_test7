@@ -678,10 +678,11 @@ INFO = (
           'standard tags inserted by the Mercurial Queues Extension. '
           'Default: None (leave blank)')),
     _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
-        ['none', 'update', 'fetch', 'rebase']),
+        ['none', 'update', 'fetch', 'rebase', 'updateOrRebase']),
         _('Operation which is performed directly after a successful pull. '
           'update equates to pull --update, fetch equates to the fetch '
-          'extension, rebase equates to pull --rebase.  Default: none')),
+          'extension, rebase equates to pull --rebase, '
+          'updateOrRebase equates to pull -u --rebase.  Default: none')),
     _fi(_('Default Push'), 'tortoisehg.defaultpush', (genDefaultCombo,
         ['all', 'branch', 'revision']),
         _('Select the revisions that will be pushed by default, '
