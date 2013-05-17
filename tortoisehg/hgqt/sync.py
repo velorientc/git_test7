@@ -1032,12 +1032,14 @@ class PostPullDialog(QDialog):
             self.fetch = None
         if 'rebase' in repo.extensions() or repo.postpull == 'rebase' or repo.postpull == 'updateOrRebase':
             if 'rebase' in repo.extensions():
-                btntxt = _('Rebase - rebase local commits above pulled changes')
+                rebasetxt = _('Rebase - rebase local commits above pulled changes')
+                updateorrebasetxt = _('UpdateOrRebase - pull, then try to update or rebase')
             else:
-                btntxt = _('Rebase - use rebase extension (rebase is not active!)')
-            self.rebase = QRadioButton(btntxt)
+                rebasetxt = _('Rebase - use rebase extension (rebase is not active!)')
+                updateorrebasetxt = _('UpdateOrRebase - use rebase extension (rebase is not active!)')
+            self.rebase = QRadioButton(rebasetxt)
             layout.addWidget(self.rebase)
-            self.updateOrRebase = QRadioButton(_('UpdateOrRebase - pull, then try to update or rebase'))
+            self.updateOrRebase = QRadioButton(updateorrebasetxt)
             layout.addWidget(self.updateOrRebase)
 
         self.none.setChecked(True)
