@@ -369,7 +369,9 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.synctbar.addWidget(self.urlCombo)
+        self.urlComboAction = self.synctbar.addWidget(self.urlCombo)
+        # hide it because workbench could be started without open repo
+        self.urlComboAction.setVisible(False)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
         self.updateMenu()
@@ -378,6 +380,11 @@ class Workbench(QMainWindow):
         """repository has been switched, fill urlCombo with URLs"""
         aliases = [hglib.tounicode(alias)
                    for alias, path in repo.ui.configitems('paths')]
+
+        if len(aliases) <= 1:
+            self.urlComboAction.setVisible(False)
+        else:
+            self.urlComboAction.setVisible(True)
 
         # 1. Sort the list if aliases
         aliases.sort()
