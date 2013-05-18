@@ -1047,7 +1047,7 @@ class StatusDialog(QDialog):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         toplayout = QVBoxLayout()
-        toplayout.setContentsMargins(10, 10, 10, 0);
+        toplayout.setContentsMargins(10, 10, 10, 0)
         self.stwidget = StatusWidget(repo, pats, opts, self, checkable=False)
         toplayout.addWidget(self.stwidget, 1)
         layout.addLayout(toplayout)
