@@ -1030,7 +1030,8 @@ class PostPullDialog(QDialog):
             layout.addWidget(self.fetch)
         else:
             self.fetch = None
-        if 'rebase' in repo.extensions() or repo.postpull == 'rebase' or repo.postpull == 'updateorrebase':
+        if ('rebase' in repo.extensions()
+            or repo.postpull in ('rebase', 'updateorrebase')):
             if 'rebase' in repo.extensions():
                 rebasetxt = _('Rebase - rebase local commits above pulled changes')
                 updateorrebasetxt = _('UpdateOrRebase - pull, then try to update or rebase')
