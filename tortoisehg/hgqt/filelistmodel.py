@@ -101,8 +101,11 @@ class HgFileListModel(QAbstractTableModel):
 
     def indexFromFile(self, filename):
         if filename in self._filesdict:
-            row = self._files.index(self._filesdict[filename])
-            return self.index(row, 0)
+            try:
+                row = self._files.index(self._filesdict[filename])
+                return self.index(row, 0)
+            except ValueError:
+                pass
         return QModelIndex()
 
     def setFilter(self, match):
