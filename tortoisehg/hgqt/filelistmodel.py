@@ -111,10 +111,13 @@ class HgFileListModel(QAbstractTableModel):
     def setFilter(self, match):
         'simple match in filename filter'
         self.layoutAboutToBeChanged.emit()
+        oldindexes = [(self.indexFromFile(r['path']), r['path'])
+                      for r in self._files]
         self._files = [r for r in self._unfilteredfiles
             if unicode(match) in r['path']]
+        for oi, filename in oldindexes:
+            self.changePersistentIndex(oi, self.indexFromFile(filename))
         self.layoutChanged.emit()
-        self.reset()
 
     def _buildDesc(self, parent):
         files = []
