@@ -114,7 +114,7 @@ class HgFileListModel(QAbstractTableModel):
         oldindexes = [(self.indexFromFile(r['path']), r['path'])
                       for r in self._files]
         self._files = [r for r in self._unfilteredfiles
-            if unicode(match) in r['path']]
+            if hglib.fromunicode(match) in r['path']]
         for oi, filename in oldindexes:
             self.changePersistentIndex(oi, self.indexFromFile(filename))
         self.layoutChanged.emit()
