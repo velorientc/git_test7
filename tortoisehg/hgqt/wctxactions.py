@@ -57,7 +57,6 @@ class WctxActions(QObject):
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
         make(_('File &History'), log, frozenset('MARC!'), 'hg-log')
-        make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
@@ -317,13 +316,6 @@ def log(parent, ui, repo, files):
     from tortoisehg.hgqt.run import qtrun
     opts = {'root': repo.root}
     qtrun(run, repo.ui, *files, **opts)
-    return False
-
-def annotate(parent, ui, repo, files):
-    from tortoisehg.hgqt.manifestdialog import run
-    from tortoisehg.hgqt.run import qtrun
-    opts = {'repo': repo, 'canonpath' : files[0], 'rev' : repo['.'].rev()}
-    qtrun(run, repo.ui, **opts)
     return False
 
 def forget(parent, ui, repo, files):
