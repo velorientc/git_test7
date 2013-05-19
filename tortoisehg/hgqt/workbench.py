@@ -97,18 +97,14 @@ class Workbench(QMainWindow):
         self.lastClosedRepoRootList = []
         self.progressDialog.close()
         self.progressDialog = None
-        self._dialogs = []
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth: dlgmeth(self), parent=self)
 
         self.server = None
         if createserver:
             # Enable the Workbench Server that is used to maintain a single
             # workbench instance
             self.createWorkbenchServer()
-
-    def _forgetdialog(self, dlg):
-        """forget the dialog to be garbage collectable"""
-        assert dlg in self._dialogs
-        self._dialogs.remove(dlg)
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -961,19 +957,19 @@ class Workbench(QMainWindow):
 
     def cloneRepository(self):
         """ Run clone dialog """
-        from tortoisehg.hgqt.clone import CloneDialog
+        # it might be better to reuse existing CloneDialog
+        dlg = self._dialogs.openNew(Workbench._createCloneDialog)
         repoWidget = self.repoTabsWidget.currentWidget()
         if repoWidget:
-            root = repoWidget.repo.root
-            args = [root, root + '-clone']
-        else:
-            args = []
-        dlg = CloneDialog(args, parent=self)
-        dlg.finished.connect(dlg.deleteLater)
+            uroot = hglib.tounicode(repoWidget.repo.root)
+            dlg.setSource(uroot)
+            dlg.setDestination(uroot + '-clone')
+
+    def _createCloneDialog(self):
+        from tortoisehg.hgqt.clone import CloneDialog
+        dlg = CloneDialog(parent=self)
         dlg.clonedRepository.connect(self.showRepo)
-        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
-        dlg.show()
-        self._dialogs.append(dlg)
+        return dlg
 
     def openRepository(self):
         """ Open repo from File menu """
