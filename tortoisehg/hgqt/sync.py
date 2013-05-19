@@ -367,10 +367,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         sm = self.reltv.selectionModel()
         sm.currentRowChanged.connect(self.pathSelected)
 
-        # restore the current alias and its url
-        if self.curalias in self.paths:
-            self.setUrl(hglib.tounicode(self.curalias))
-
     def currentUrl(self):
         return unicode(self.urlentry.text())
 
@@ -504,6 +500,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
+            self.setEditUrl(dlg.urlentry.text())
             self.reload()
 
     def removeurl(self):
