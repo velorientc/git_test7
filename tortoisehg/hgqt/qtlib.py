@@ -1197,6 +1197,33 @@ class DialogKeeper(QObject):
 
         self._dialogs = DialogKeeper(self._createDialog)
         self._dialogs = DialogKeeper(lambda *args: Foo(self))
+
+    When to delete reference:
+
+    If a dialog is not referenced, and if accept(), reject() and done() are
+    not overridden, it could be garbage-collected during finished signal and
+    lead to hard crash::
+
+        #0  isSignalConnected (signal_index=..., this=0x0)
+        #1  QMetaObject::activate (...)
+        #2  ... in sipQDialog::done (this=0x1d655b0, ...)
+        #3  ... in sipQDialog::reject (this=0x1d655b0)
+        #4  ... in QDialog::closeEvent (this=this@entry=0x1d655b0, ...)
+
+    To avoid crash, a finished dialog is referenced explicitly by DialogKeeper
+    until next event processing.
+
+    >>> dialogs = DialogKeeper(QDialog)
+    >>> dlgref = weakref.ref(dialogs.open())
+    >>> dialogs.count()
+    1
+    >>> esckeyev = QKeyEvent(QEvent.KeyPress, Qt.Key_Escape, Qt.NoModifier)
+    >>> QApplication.postEvent(dlgref(), esckeyev)  # close without incref
+    >>> QApplication.processEvents()  # should not crash
+    >>> dialogs.count()
+    0
+    >>> dlgref() is None  # nobody should have reference
+    True
     """
 
     def __init__(self, createdlg, genkey=None, parent=None):
@@ -1205,6 +1232,10 @@ class DialogKeeper(QObject):
         self._genkey = genkey or DialogKeeper._defaultgenkey
         self._keytodlgs = {}  # key: [dlg, ...]
         self._dlgtokey = {}   # dlg: key
+
+        self._garbagedlgs = []
+        self._emptygarbagelater = QTimer(self, interval=0, singleShot=True)
+        self._emptygarbagelater.timeout.connect(self._emptygarbage)
 
     def open(self, *args, **kwargs):
         """Create new dialog or reactivate existing dialog"""
@@ -1250,6 +1281,14 @@ class DialogKeeper(QObject):
         self._keytodlgs[key].remove(dlg)
         if not self._keytodlgs[key]:
             del self._keytodlgs[key]
+
+        # avoid deletion inside finished signal
+        self._garbagedlgs.append(dlg)
+        self._emptygarbagelater.start()
+
+    @pyqtSlot()
+    def _emptygarbage(self):
+        del self._garbagedlgs[:]
 
     def count(self):
         assert len(self._dlgtokey) == sum(len(dlgs) for dlgs
