@@ -716,6 +716,14 @@ INFO = (
           '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
           '</ul><p>'
           'Default: prompt')),
+    _fi(_('Target combo'), 'tortoisehg.workbench.target-combo',
+        (genDefaultCombo, ['auto', 'always']),
+        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
+          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
+          'target configured.'
+          '<li><b>always</b>: Always show the combo.'
+          '</ul><p>'
+          'Default: auto'), restartneeded=True),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
  (
