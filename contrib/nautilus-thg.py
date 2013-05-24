@@ -230,10 +230,10 @@ class HgExtensionDefault(GObject.GObject):
     def _get_file_status(self, localpath, repo=None):
         cachestate = cachethg.get_state(localpath, repo)
         cache2state = {cachethg.UNCHANGED:   ('default',   'clean'),
-                       cachethg.ADDED:       ('new',       'added'),
+                       cachethg.ADDED:       ('list-add',  'added'),
                        cachethg.MODIFIED:    ('important', 'modified'),
-                       cachethg.UNKNOWN:     (None,        'unrevisioned'),
-                       cachethg.IGNORED:     ('noread',    'ignored'),
+                       cachethg.UNKNOWN:     ('dialog-question', 'unrevisioned'),
+                       cachethg.IGNORED:     ('unreadable', 'ignored'),
                        cachethg.NOT_IN_REPO: (None,        'unrevisioned'),
                        cachethg.ROOT:        ('generic',   'root'),
                        cachethg.UNRESOLVED:  ('danger',    'unresolved')}
