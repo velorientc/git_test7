@@ -62,6 +62,15 @@ class BookmarkDialog(QDialog):
         self.newNameEdit.textEdited.connect(self.bookmarkTextChanged)
         form.addRow(_('New Name:'), self.newNameEdit)
 
+        ### Activate checkbox
+        self.activateCheckBox = QCheckBox()
+        if self.node == self.repo['.'].node():
+            self.activateCheckBox.setChecked(True)
+        else:
+            self.activateCheckBox.setChecked(False)
+            self.activateCheckBox.setEnabled(False)
+        form.addRow(_('Activate:'), self.activateCheckBox)
+
         ## bottom buttons
         BB = QDialogButtonBox
         bbox = QDialogButtonBox()
@@ -164,8 +173,10 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
 
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--rev', str(self.rev), bookmarklocal]
+        cmdline = ['bookmarks', '--repository', self.repo.root]
+        if not self.activateCheckBox.isChecked():
+            cmdline.extend(['--rev', str(self.rev)])
+        cmdline.append(bookmarklocal)
         self.cmd.run(cmdline)
         self.finishfunc = finished
 
@@ -180,8 +191,10 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been moved") % bookmark, True)
 
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--rev', str(self.rev), '--force', bookmarklocal]
+        cmdline = ['bookmarks', '--repository', self.repo.root]
+        if not self.activateCheckBox.isChecked():
+            cmdline.extend(['--rev', str(self.rev)])
+        cmdline.extend(['--force', bookmarklocal])
         self.cmd.run(cmdline)
         self.finishfunc = finished
 
