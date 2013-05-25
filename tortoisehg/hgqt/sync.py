@@ -658,8 +658,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(QString, QString)
     def outputHook(self, msg, label):
+        label = unicode(label)
         if '\'hg push --new-branch\'' in msg:
+            # not report as error because it will be handled internally in the
+            # same session (see pushclicked.finished)
             self.needNewBranch = True
+            label = ' '.join(l for l in label.split() if l != 'ui.error')
         self.output.emit(msg, label)
 
     ##
