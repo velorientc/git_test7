@@ -92,7 +92,7 @@ class RepoWidget(QWidget):
         # - "current":    Select the current (i.e. working dir parent) revision
         # - "tip":        Select tip of the repository
         # - "workingdir": Select the working directory pseudo-revision
-        initialRevision= \
+        initialRevision = \
             self.repo.ui.config('tortoisehg', 'initialrevision', 'current').lower()
 
         initialRevisionDict = {
@@ -890,7 +890,7 @@ class RepoWidget(QWidget):
                     _('Your current working revision (%d) will be removed '
                       'by this rollback, leaving uncommitted changes.\n '
                       'Continue?' % rev)):
-                    return
+                return
         cmdline = ['rollback', '--repository', self.repo.root, '--verbose']
         self.runCommand(cmdline)
 
