@@ -111,7 +111,8 @@ class ManifestModel(QAbstractItemModel):
                 else:
                     ic = self._icons.get(ext, None)
                     if not ic:
-                        ic = self._fileiconprovider.icon(QFileInfo(self._wjoin(e.path)))
+                        ic = self._fileiconprovider.icon(
+                            QFileInfo(self._wjoin(e.path)))
                         if not ic.availableSizes():
                             ic = self._fileicon
                         self._icons[ext] = ic
@@ -310,7 +311,7 @@ class ManifestModel(QAbstractItemModel):
 
                 origpath = path
                 path = self._repo.removeStandin(path)
-                
+
                 e = treeroot
                 for p in hglib.tounicode(path).split('/'):
                     if not p in e:
