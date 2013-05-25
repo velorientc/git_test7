@@ -847,7 +847,7 @@ class HookConfigDialog(CustomConfigDialog):
         vbox = self.formvbox
         combo = self._genCombo(self._hooktypes, hooktype)
         self.hooktype = self._addConfigItem(vbox, _('Hook type'),
-            combo, _('Select the when you command will be run'))
+            combo, _('Select when your command will be run'))
         self.name = self._addConfigItem(vbox, _('Tool name'),
             QLineEdit(hookname), _('The hook name. It cannot contain spaces.'))
         self.command = self._addConfigItem(vbox, _('Command'),

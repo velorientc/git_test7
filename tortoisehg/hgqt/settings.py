@@ -410,8 +410,7 @@ class PathBrowser(QWidget):
         self.setLayout(layout)
 
     def browse(self):
-        dir = QFileDialog.getExistingDirectory(self, directory=self.lineEdit.text(),
-                                               options=QFileDialog.ShowDirsOnly)
+        dir = QFileDialog.getExistingDirectory(self, '', self.lineEdit.text())
         if dir:
             self.lineEdit.setText(dir)
 
