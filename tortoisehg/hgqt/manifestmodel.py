@@ -457,7 +457,7 @@ class _Entry(object):
         for e in self._child.itervalues():
             e.sort(reverse=reverse)
         self._nameindex.sort(
-            key=lambda s: '%s%s' % (self[s] and 'D' or 'F', os.path.normcase(s)),
+            key=lambda s: (not self[s], os.path.normcase(s)),
             reverse=reverse)
 
 class ManifestCompleter(QCompleter):
