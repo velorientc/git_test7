@@ -578,9 +578,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             b.setEnabled(True)
         self.stopAction.setEnabled(False)
         if self.finishfunc:
+            # allow GC to clean temp finishfunc. here we need to nullify it
+            # before calling, because it may be reassigned in finishfunc().
+            f = self.finishfunc
+            self.finishfunc = None
             output = self.cmd.core.rawoutput()
-            self.finishfunc(ret, output)
-            self.finishfunc = None # allow GC to clean temp functions
+            f(ret, output)
 
     def run(self, cmdline, details):
         if self.cmd.core.running():
@@ -909,6 +912,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     if r:
                         cmdline = self.lastcmdline
                         cmdline.extend(['--new-branch'])
+                        self.finishfunc = finished  # should be called again
                         self.run(cmdline, validopts)
                         return
             self.pushCompleted.emit()
