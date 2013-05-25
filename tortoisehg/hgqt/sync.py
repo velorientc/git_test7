@@ -238,7 +238,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.commandFinished.connect(self.endSuppressPrompt)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
-        cmd.output.connect(self.output)
         cmd.output.connect(self.outputHook)
         cmd.progress.connect(self.progress)
         if not self.embedded:
@@ -657,9 +656,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in lurl)
 
+    @pyqtSlot(QString, QString)
     def outputHook(self, msg, label):
         if '\'hg push --new-branch\'' in msg:
             self.needNewBranch = True
+        self.output.emit(msg, label)
 
     ##
     ## Workbench toolbar buttons
