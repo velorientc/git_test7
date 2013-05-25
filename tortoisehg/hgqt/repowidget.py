@@ -609,9 +609,14 @@ class RepoWidget(QWidget):
         numnodes = len(nodes)
         numoutgoing = numnodes
 
-        # Read the tortoisehg.defaultpush setting to determine what to push
-        # by default, and set the button label and action accordingly
-        defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
+        if self.syncDemand.get().isTargetSelected():
+            # Outgoing preview is already filtered by target selection
+            defaultpush = None
+        else:
+            # Read the tortoisehg.defaultpush setting to determine what to push
+            # by default, and set the button label and action accordingly
+            defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush',
+                                              'all')
         rev = None
         branch = None
         pushall = False

@@ -297,6 +297,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
+    def isTargetSelected(self):
+        return self.targetcheckbox.isChecked()
+
     def editOptions(self):
         dlg = OptionsDialog(self.opts, self)
         dlg.setWindowFlags(Qt.Sheet)
