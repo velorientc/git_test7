@@ -383,10 +383,8 @@ class Workbench(QMainWindow):
 
         combo_setting = self.ui.config('tortoisehg', 'workbench.target-combo',
                                        'auto')
-        if len(aliases) <= 1 and combo_setting == 'auto':
-            self.urlComboAction.setVisible(False)
-        else:
-            self.urlComboAction.setVisible(True)
+        self.urlComboAction.setVisible(len(aliases) > 1
+                                       or combo_setting == 'always')
 
         # 1. Sort the list if aliases
         aliases.sort()
