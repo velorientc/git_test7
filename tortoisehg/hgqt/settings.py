@@ -723,7 +723,7 @@ INFO = (
           'target configured.'
           '<li><b>always</b>: Always show the combo.'
           '</ul><p>'
-          'Default: auto'), restartneeded=True),
+          'Default: auto')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
  (

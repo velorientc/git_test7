@@ -381,7 +381,7 @@ class Workbench(QMainWindow):
         aliases = [hglib.tounicode(alias)
                    for alias, path in repo.ui.configitems('paths')]
 
-        combo_setting = self.ui.config('tortoisehg', 'workbench.target-combo',
+        combo_setting = repo.ui.config('tortoisehg', 'workbench.target-combo',
                                        'auto')
         self.urlComboAction.setVisible(len(aliases) > 1
                                        or combo_setting == 'always')
