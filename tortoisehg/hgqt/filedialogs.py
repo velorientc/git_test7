@@ -402,6 +402,18 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             self._show_rev = rev
 
+    def showLine(self, line):
+        self.textView.showLine(line - 1)  # fileview should do -1 instead?
+
+    def setFileViewMode(self, mode):
+        self.textView.setMode(mode)
+
+    def setSearchPattern(self, text):
+        self.textView.searchbar.setPattern(text)
+
+    def setSearchCaseInsensitive(self, ignorecase):
+        self.textView.searchbar.setCaseInsensitive(ignorecase)
+
     def reload(self):
         self.repoview.saveSettings()
         super(FileLogDialog, self).reload()
