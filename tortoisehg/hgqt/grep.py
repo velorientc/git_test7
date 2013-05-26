@@ -649,9 +649,7 @@ class MatchTree(QTableView):
         self.selectedRows = saved
 
     def onAnnotateFile(self):
-        from tortoisehg.hgqt.manifestdialog import run
-        from tortoisehg.hgqt.run import qtrun
-        repo, ui, pattern, icase = self.repo, self.repo.ui, self.pattern, self.icase
+        repo = self.repo
         seen = set()
         for rev, upath, line in self.selectedRows:
             path = hglib.fromunicode(upath)
@@ -666,19 +664,21 @@ class MatchTree(QTableView):
                 if root and abs.startswith(root):
                     path = abs[len(root)+1:]
                     srepo = thgrepo.repository(None, root)
-                    if rev is None:
-                        rev = srepo['.'].rev()
-                    opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
-                            'line': line, 'pattern': pattern, 'ignorecase': icase}
-                    qtrun(run, ui, **opts)
+                    self._openAnnotateDialog(srepo, rev, path, line)
                 else:
                     continue
             else:
-                if rev is None:
-                    rev = repo['.'].rev()
-                opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
-                        'line': line, 'pattern': pattern, 'ignorecase': icase}
-                qtrun(run, ui, **opts)
+                self._openAnnotateDialog(repo, rev, path, line)
+
+    def _openAnnotateDialog(self, repo, rev, path, line):
+        from tortoisehg.hgqt.manifestdialog import run
+        from tortoisehg.hgqt.run import qtrun
+        ui, pattern, icase = self.repo.ui, self.pattern, self.icase
+        if rev is None:
+            rev = repo['.'].rev()
+        opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
+                'line': line, 'pattern': pattern, 'ignorecase': icase}
+        qtrun(run, ui, **opts)
 
     def onViewChangeset(self):
         for rev, path, line in self.selectedRows:
