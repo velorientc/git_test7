@@ -183,7 +183,7 @@ class HgFileView(QFrame):
         self.modeToggleGroup.addAction(self.actionDiffMode)
         self.modeToggleGroup.addAction(self.actionFileMode)
         self.modeToggleGroup.addAction(self.actionAnnMode)
-        self.modeToggleGroup.triggered.connect(self.setMode)
+        self.modeToggleGroup.triggered.connect(self._setModeByAction)
 
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QAction(qtlib.geticon('go-down'),
@@ -194,7 +194,7 @@ class HgFileView(QFrame):
                                       _('Previous diff (alt+up)'), self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
-        self.setMode(self.actionDiffMode)
+        self._setModeByAction(self.actionDiffMode)
 
         self.actionFirstParent = QAction('1', self)
         self.actionFirstParent.setCheckable(True)
@@ -323,7 +323,7 @@ class HgFileView(QFrame):
         return True
 
     @pyqtSlot(QAction)
-    def setMode(self, action):
+    def _setModeByAction(self, action):
         'One of the mode toolbar buttons has been toggled'
         mode = action._mode
         self._lostMode = mode
