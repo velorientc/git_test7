@@ -83,6 +83,9 @@ class ManifestDialog(QMainWindow):
         """Set if search is case insensitive"""
         self._manifest_widget._fileview.searchbar.setCaseInsensitive(ignorecase)
 
+    def setFileViewMode(self, mode):
+        self._manifest_widget.setFileViewMode(mode)
+
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
@@ -395,6 +398,9 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def _updatecontent(self):
         self.displayFile()
 
+    def setFileViewMode(self, mode):
+        self._fileview.setMode(mode)
+
     @pyqtSlot()
     def _emitPathChanged(self):
         self.pathChanged.emit(self.path)
@@ -435,8 +441,7 @@ def run(ui, *pats, **opts):
             dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
-            if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
-                dlg._manifest_widget._fileview.actionAnnMode.trigger()
+            dlg.setFileViewMode(fileview.AnnMode)
             if 'ignorecase' in opts:
                 dlg.setSearchCaseInsensitive(opts['ignorecase'])
         except IndexError:
