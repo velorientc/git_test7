@@ -664,9 +664,9 @@ class MatchTree(QTableView):
                 root = paths.find_root(abs)
                 if root and abs.startswith(root):
                     path = abs[len(root)+1:]
-                    if rev is None:
-                        rev = repo['.'].rev()
                     srepo = thgrepo.repository(None, root)
+                    if rev is None:
+                        rev = srepo['.'].rev()
                     opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
                             'line': line, 'pattern': pattern, 'ignorecase': icase}
                     qtrun(run, ui, **opts)
