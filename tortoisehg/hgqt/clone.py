@@ -81,11 +81,13 @@ class CloneDialog(QDialog):
         self.shist = s.value('clone/source').toStringList()
         for path in self.shist:
             if path: self.src_combo.addItem(path)
+        self.src_combo.setCurrentIndex(-1)
         self.src_combo.setEditText(usrc)
 
         self.dhist = s.value('clone/dest').toStringList()
         for path in self.dhist:
             if path: self.dest_combo.addItem(path)
+        self.dest_combo.setCurrentIndex(-1)
         self.dest_combo.setEditText(udest)
 
         ### options
