@@ -1286,11 +1286,7 @@ def run(ui, *pats, **opts):
         if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
             from tortoisehg.hgqt.filedialogs import FileLogDialog
             fname = pats[0]
-            ufname = hglib.tounicode(fname)
-            dlg = FileLogDialog(repo, fname, None)
-            dlg.setWindowTitle(_('Hg file log viewer [%s] - %s') % (
-                repo.displayname, ufname))
-            return dlg
+            return FileLogDialog(repo, fname)
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)

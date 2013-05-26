@@ -47,6 +47,10 @@ class _AbstractFileDialog(QMainWindow):
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
+        self.setWindowTitle(_('Hg file log viewer [%s] - %s')
+                            % (repo.displayname, hglib.tounicode(filename)))
+        self.setWindowIcon(qtlib.geticon('hg-log'))
+
         self.createActions()
         self.setupToolbars()
 

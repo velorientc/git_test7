@@ -269,11 +269,7 @@ class FilectxActions(QObject):
         if self.parent() and isinstance(self.parent().window(),
                                         workbench.Workbench):
             repoviewer = self.parent().window()
-        dlg = dlgclass(repo, filename, repoviewer=repoviewer)
-        ufname = hglib.tounicode(filename)
-        dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-        dlg.setWindowIcon(qtlib.geticon('hg-log'))
-        return dlg
+        return dlgclass(repo, filename, repoviewer=repoviewer)
 
     def _gennavdialogkey(self, dlgclass, repo, filename):
         return dlgclass, repo.wjoin(filename)
