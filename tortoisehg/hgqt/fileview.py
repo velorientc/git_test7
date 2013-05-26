@@ -335,6 +335,21 @@ class HgFileView(QFrame):
             self.sci.setAnnotationEnabled(mode == AnnMode)
             self.displayFile(self._filename, self._status)
 
+    def setMode(self, mode):
+        """Switch view to DiffMode/FileMode/AnnMode if available for the current
+        content; otherwise it will be switched later"""
+        actionmap = dict((a._mode, a) for a in self.modeToggleGroup.actions())
+        try:
+            action = actionmap[mode]
+        except KeyError:
+            raise ValueError('invalid mode: %r' % mode)
+
+        if action.isEnabled():
+            if not action.isChecked():
+                action.trigger()  # implies _setModeByAction()
+        else:
+            self._lostMode = mode
+
     @pyqtSlot(QAction)
     def setParent(self, action):
         if action.text() == '1':
