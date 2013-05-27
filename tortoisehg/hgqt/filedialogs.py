@@ -198,6 +198,8 @@ class FileLogDialog(_AbstractFileDialog):
         if self._show_rev is not None:
             index = self.filerevmodel.indexFromRev(self._show_rev)
             self._show_rev = None
+        elif self.repoview.currentIndex().isValid():
+            return  # already set by goto()
         else:
             index = self.filerevmodel.index(0,0)
         if index is not None:
@@ -598,6 +600,8 @@ class FileDiffDialog(_AbstractFileDialog):
         if self._show_rev is not None:
             self.goto(self._show_rev)
             self._show_rev = None
+        elif self.tableView_revisions_left.currentIndex().isValid():
+            return  # already set by goto()
         elif len(self.filerevmodel.graph):
             self.goto(self.filerevmodel.graph[0].rev)
 
