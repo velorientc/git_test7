@@ -15,6 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig, hgversion
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
+from tortoisehg.hgqt import thgrepo
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n, partialcommit
 
@@ -425,7 +426,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.committb.setText(curraction._text)
         self.lastAction = curraction._name
 
-    def getBranchCommandLine(self, branchName, repo):
+    def getBranchCommandLine(self):
         '''
         Create the command line to change or create the selected branch unless
         it is the selected branch
@@ -437,6 +438,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         the selected action
         '''
         # This function is used both by commit() and mqPerformAction()
+        repo = self.repo
         commandlines = []
         newbranch = False
         branch = hglib.fromunicode(self.branchop)
@@ -481,8 +483,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # Check if we need to change branch first
         wholecmdlines = []  # [[cmd1, ...], [cmd2, ...], ...]
         if self.branchop:
-            cmdlines, newbranch = self.getBranchCommandLine(self.branchop,
-                                                            self.repo)
+            cmdlines, newbranch = self.getBranchCommandLine()
             if cmdlines is None:
                 return
             wholecmdlines.extend(cmdlines)
@@ -835,8 +836,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         elif self.branchop == False:
             brcmd = ['--close-branch']
         else:
-            commandlines, newbranch = self.getBranchCommandLine(self.branchop,
-                                                                self.repo)
+            commandlines, newbranch = self.getBranchCommandLine()
             if commandlines is None:
                 return
         partials = []
@@ -1352,6 +1352,9 @@ class CommitDialog(QDialog):
         toplayout.addWidget(self.bb)
         layout.addWidget(self.statusbar)
 
+        self._subdialogs = qtlib.DialogKeeper(CommitDialog._createSubDialog,
+                                              parent=self)
+
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadSettings(s, 'committool')
@@ -1366,10 +1369,13 @@ class CommitDialog(QDialog):
         qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
 
     def linkActivated(self, link):
-        link = hglib.fromunicode(link)
+        link = unicode(link)
         if link.startswith('repo:'):
-            from tortoisehg.hgqt.run import qtrun
-            qtrun(run, ui.ui(), root=link[len('repo:'):])
+            self._subdialogs.open(link[len('repo:'):])
+
+    def _createSubDialog(self, uroot):
+        repo = thgrepo.repository(None, hglib.fromunicode(uroot))
+        return CommitDialog(repo, [], {}, parent=self)
 
     @pyqtSlot()
     def updateUndo(self):
@@ -1416,7 +1422,6 @@ class CommitDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     root = opts.get('root', paths.find_root())
     repo = thgrepo.repository(ui, path=root)
     pats = hglib.canonpaths(pats)

@@ -14,7 +14,7 @@ from mercurial import ui, util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq
+from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq, serve
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -38,7 +38,6 @@ class ThgTabBar(QTabBar):
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
-    activeRepoChanged = pyqtSignal(QString)
 
     def __init__(self, createserver=False):
         QMainWindow.__init__(self)
@@ -58,7 +57,6 @@ class Workbench(QMainWindow):
         rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
-        self.activeRepoChanged.connect(rr.setActiveTabRepo)
 
         self.mqpatches = p = mq.MQPatchesWidget(self)
         p.setObjectName('MQPatchesWidget')
@@ -99,18 +97,14 @@ class Workbench(QMainWindow):
         self.lastClosedRepoRootList = []
         self.progressDialog.close()
         self.progressDialog = None
-        self._dialogs = []
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth: dlgmeth(self), parent=self)
 
         self.server = None
         if createserver:
             # Enable the Workbench Server that is used to maintain a single
             # workbench instance
             self.createWorkbenchServer()
-
-    def _forgetdialog(self, dlg):
-        """forget the dialog to be garbage collectable"""
-        assert dlg in self._dialogs
-        self._dialogs.remove(dlg)
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -286,8 +280,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
-                  menu='repository')
+        newaction(_("Start &Web Server"), self.serve, menu='repository')
         newseparator(menu='repository')
         newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
@@ -376,7 +369,9 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.synctbar.addWidget(self.urlCombo)
+        self.urlComboAction = self.synctbar.addWidget(self.urlCombo)
+        # hide it because workbench could be started without open repo
+        self.urlComboAction.setVisible(False)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
         self.updateMenu()
@@ -385,6 +380,11 @@ class Workbench(QMainWindow):
         """repository has been switched, fill urlCombo with URLs"""
         aliases = [hglib.tounicode(alias)
                    for alias, path in repo.ui.configitems('paths')]
+
+        combo_setting = repo.ui.config('tortoisehg', 'workbench.target-combo',
+                                       'auto')
+        self.urlComboAction.setVisible(len(aliases) > 1
+                                       or combo_setting == 'always')
 
         # 1. Sort the list if aliases
         aliases.sort()
@@ -406,18 +406,14 @@ class Workbench(QMainWindow):
             regularaliases.append(a)
             if a in haspushaliases:
                 regularaliases.append(a + '-push')
-        # 5. Create the list of 'combined aliases'
-        combinedaliases = [(a, a + '-push') for a in haspushaliases]
-        # 6. Put the combined aliases first, followed by the regular aliases
-        aliases = combinedaliases + regularaliases
 
         self.urlCombo.clear()
-        for a in aliases:
-            # text, (pull-alias, push-alias)
-            if isinstance(a, tuple):
-                self.urlCombo.addItem(u'\u2193 %s | %s \u2191' % a, a)
-            else:
-                self.urlCombo.addItem(a, (a, a))
+        # text, (pull-alias, push-alias)
+        for a in haspushaliases:
+            self.urlCombo.addItem(u'\u2193 %s | %s-push \u2191' % (a, a),
+                                  (a, a + '-push'))
+        for a in regularaliases:
+            self.urlCombo.addItem(a, (a, a))
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
@@ -802,11 +798,11 @@ class Workbench(QMainWindow):
             self.updateMenu()
             if w.repo:
                 root = w.repo.root
-                self.activeRepoChanged.emit(hglib.tounicode(root))
+                self.reporegistry.setActiveTabRepo(hglib.tounicode(root))
                 self._setupCustomTools(w.repo.ui)
                 self._setupUrlCombo(w.repo)
         else:
-            self.activeRepoChanged.emit("")
+            self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
         self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
@@ -925,10 +921,14 @@ class Workbench(QMainWindow):
             getattr(w, op)()
 
     def serve(self):
+        self._dialogs.open(Workbench._createServeDialog)
+
+    def _createServeDialog(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            from tortoisehg.hgqt import run
-            run.serve(w.repo.ui, root=w.repo.root)
+            return serve.run(w.repo.ui, root=w.repo.root)
+        else:
+            return serve.run(self.ui)
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
@@ -962,19 +962,19 @@ class Workbench(QMainWindow):
 
     def cloneRepository(self):
         """ Run clone dialog """
-        from tortoisehg.hgqt.clone import CloneDialog
+        # it might be better to reuse existing CloneDialog
+        dlg = self._dialogs.openNew(Workbench._createCloneDialog)
         repoWidget = self.repoTabsWidget.currentWidget()
         if repoWidget:
-            root = repoWidget.repo.root
-            args = [root, root + '-clone']
-        else:
-            args = []
-        dlg = CloneDialog(args, parent=self)
-        dlg.finished.connect(dlg.deleteLater)
+            uroot = hglib.tounicode(repoWidget.repo.root)
+            dlg.setSource(uroot)
+            dlg.setDestination(uroot + '-clone')
+
+    def _createCloneDialog(self):
+        from tortoisehg.hgqt.clone import CloneDialog
+        dlg = CloneDialog(parent=self)
         dlg.clonedRepository.connect(self.showRepo)
-        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
-        dlg.show()
-        self._dialogs.append(dlg)
+        return dlg
 
     def openRepository(self):
         """ Open repo from File menu """
@@ -1286,11 +1286,7 @@ def run(ui, *pats, **opts):
         if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
             from tortoisehg.hgqt.filedialogs import FileLogDialog
             fname = pats[0]
-            ufname = hglib.tounicode(fname)
-            dlg = FileLogDialog(repo, fname, None)
-            dlg.setWindowTitle(_('Hg file log viewer [%s] - %s') % (
-                repo.displayname, ufname))
-            return dlg
+            return FileLogDialog(repo, fname)
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)

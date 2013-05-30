@@ -1144,6 +1144,161 @@ class WidgetGroups(object):
     def set_enable(self, *args, **kargs):
         self.set_prop('setEnabled', *args, **kargs)
 
+class DialogKeeper(QObject):
+    """Manage non-blocking dialogs identified by creation parameters
+
+    Example "open single dialog per type":
+
+    >>> mainwin = QWidget()
+    >>> dialogs = DialogKeeper(lambda self, cls: cls(self), parent=mainwin)
+    >>> dlg1 = dialogs.open(QDialog)
+    >>> dlg1.parent() is mainwin
+    True
+    >>> dlg2 = dialogs.open(QDialog)
+    >>> dlg1 is dlg2
+    True
+    >>> dialogs.count()
+    1
+
+    closed dialog will be disowned:
+
+    >>> dlg1.reject()
+    >>> dlg1.parent() is None
+    True
+    >>> dialogs.count()
+    0
+
+    and recreates as necessary:
+
+    >>> dlg3 = dialogs.open(QDialog)
+    >>> dlg1 is dlg3
+    False
+
+    creates new dialog of the same type:
+
+    >>> dlg4 = dialogs.openNew(QDialog)
+    >>> dlg3 is dlg4
+    False
+    >>> dialogs.count()
+    2
+
+    and the last dialog is preferred:
+
+    >>> dialogs.open(QDialog) is dlg4
+    True
+    >>> dlg4.reject()
+    >>> dialogs.count()
+    1
+    >>> dialogs.open(QDialog) is dlg3
+    True
+
+    The following example is not recommended because it creates reference
+    cycles and makes hard to garbage-collect::
+
+        self._dialogs = DialogKeeper(self._createDialog)
+        self._dialogs = DialogKeeper(lambda *args: Foo(self))
+
+    When to delete reference:
+
+    If a dialog is not referenced, and if accept(), reject() and done() are
+    not overridden, it could be garbage-collected during finished signal and
+    lead to hard crash::
+
+        #0  isSignalConnected (signal_index=..., this=0x0)
+        #1  QMetaObject::activate (...)
+        #2  ... in sipQDialog::done (this=0x1d655b0, ...)
+        #3  ... in sipQDialog::reject (this=0x1d655b0)
+        #4  ... in QDialog::closeEvent (this=this@entry=0x1d655b0, ...)
+
+    To avoid crash, a finished dialog is referenced explicitly by DialogKeeper
+    until next event processing.
+
+    >>> dialogs = DialogKeeper(QDialog)
+    >>> dlgref = weakref.ref(dialogs.open())
+    >>> dialogs.count()
+    1
+    >>> esckeyev = QKeyEvent(QEvent.KeyPress, Qt.Key_Escape, Qt.NoModifier)
+    >>> QApplication.postEvent(dlgref(), esckeyev)  # close without incref
+    >>> QApplication.processEvents()  # should not crash
+    >>> dialogs.count()
+    0
+    >>> dlgref() is None  # nobody should have reference
+    True
+    """
+
+    def __init__(self, createdlg, genkey=None, parent=None):
+        super(DialogKeeper, self).__init__(parent)
+        self._createdlg = createdlg
+        self._genkey = genkey or DialogKeeper._defaultgenkey
+        self._keytodlgs = {}  # key: [dlg, ...]
+        self._dlgtokey = {}   # dlg: key
+
+        self._garbagedlgs = []
+        self._emptygarbagelater = QTimer(self, interval=0, singleShot=True)
+        self._emptygarbagelater.timeout.connect(self._emptygarbage)
+
+    def open(self, *args, **kwargs):
+        """Create new dialog or reactivate existing dialog"""
+        dlg = self._preparedlg(self._genkey(self.parent(), *args, **kwargs),
+                               args, kwargs)
+        dlg.show()
+        dlg.raise_()
+        dlg.activateWindow()
+        return dlg
+
+    def openNew(self, *args, **kwargs):
+        """Create new dialog even if there exists the specified one"""
+        dlg = self._populatedlg(self._genkey(self.parent(), *args, **kwargs),
+                                args, kwargs)
+        dlg.show()
+        dlg.raise_()
+        dlg.activateWindow()
+        return dlg
+
+    def _preparedlg(self, key, args, kwargs):
+        if key in self._keytodlgs:
+            assert len(self._keytodlgs[key]) > 0
+            return self._keytodlgs[key][-1]  # prefer latest
+        else:
+            return self._populatedlg(key, args, kwargs)
+
+    def _populatedlg(self, key, args, kwargs):
+        dlg = self._createdlg(self.parent(), *args, **kwargs)
+        if key not in self._keytodlgs:
+            self._keytodlgs[key] = []
+        self._keytodlgs[key].append(dlg)
+        self._dlgtokey[dlg] = key
+        dlg.finished.connect(self._forgetdlg)
+        return dlg
+
+    #@pyqtSlot()
+    def _forgetdlg(self):
+        dlg = self.sender()
+        dlg.finished.disconnect(self._forgetdlg)
+        if dlg.parent() is self.parent():
+            dlg.setParent(None)  # assist gc
+        key = self._dlgtokey.pop(dlg)
+        self._keytodlgs[key].remove(dlg)
+        if not self._keytodlgs[key]:
+            del self._keytodlgs[key]
+
+        # avoid deletion inside finished signal
+        self._garbagedlgs.append(dlg)
+        self._emptygarbagelater.start()
+
+    @pyqtSlot()
+    def _emptygarbage(self):
+        del self._garbagedlgs[:]
+
+    def count(self):
+        assert len(self._dlgtokey) == sum(len(dlgs) for dlgs
+                                          in self._keytodlgs.itervalues())
+        return len(self._dlgtokey)
+
+    @staticmethod
+    def _defaultgenkey(_parent, *args, **_kwargs):
+        return args
+
 class TaskWidget(object):
     def canswitch(self):
         """Return True if the widget allows to switch away from it"""
