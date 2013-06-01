@@ -650,13 +650,31 @@ def add(ui, *pats, **opts):
     _('thg annotate'))
 def annotate(ui, *pats, **opts):
     """annotate dialog"""
-    from tortoisehg.hgqt.manifestdialog import run
+    from tortoisehg.hgqt import filedialogs, fileview, thgrepo
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
         if pats:
             pats = pats[0:]
         else:
             return
+
+    # TODO: nested run() will be merged into annotate() later
+    def run(ui, *pats, **opts):
+        repo = thgrepo.repository(ui, opts.get('root') or paths.find_root())
+        rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+        filename = hglib.canonpaths(pats)[0]
+        dlg = filedialogs.FileLogDialog(repo, filename)
+        dlg.setFileViewMode(fileview.AnnMode)
+        dlg.goto(rev)
+        if opts.get('line'):
+            try:
+                lineno = int(opts['line'])
+            except ValueError:
+                raise util.Abort(_('invalid line number: %s') % opts['line'])
+            dlg.showLine(lineno)
+        if opts.get('pattern'):
+            dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+        return dlg
     return qtrun(run, ui, *pats, **opts)
 
 @command('archive',
