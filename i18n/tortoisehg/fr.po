@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-05-27 20:01-0300\n"
-"PO-Revision-Date: 2013-05-23 07:45+0000\n"
+"PO-Revision-Date: 2013-05-30 20:09+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-05-28 05:28+0000\n"
-"X-Generator: Launchpad (build 16640)\n"
+"X-Launchpad-Export-Date: 2013-05-31 05:49+0000\n"
+"X-Generator: Launchpad (build 16660)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -552,7 +552,7 @@ msgstr "Nouveau nom :"
 
 #: tortoisehg/hgqt/bookmark.py:72
 msgid "Activate:"
-msgstr ""
+msgstr "Activer :"
 
 #: tortoisehg/hgqt/bookmark.py:77 tortoisehg/hgqt/commit.py:874
 #: tortoisehg/hgqt/tag.py:99 tortoisehg/hgqt/wctxactions.py:57

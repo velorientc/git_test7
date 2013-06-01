@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-05-27 20:01-0300\n"
-"PO-Revision-Date: 2013-05-20 14:45+0000\n"
+"PO-Revision-Date: 2013-05-28 14:04+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-05-28 05:32+0000\n"
+"X-Launchpad-Export-Date: 2013-05-29 05:56+0000\n"
 "X-Generator: Launchpad (build 16640)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -549,7 +549,7 @@ msgstr "Novo Nome:"
 
 #: tortoisehg/hgqt/bookmark.py:72
 msgid "Activate:"
-msgstr ""
+msgstr "Ativar:"
 
 #: tortoisehg/hgqt/bookmark.py:77 tortoisehg/hgqt/commit.py:874
 #: tortoisehg/hgqt/tag.py:99 tortoisehg/hgqt/wctxactions.py:57
