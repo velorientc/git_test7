@@ -52,6 +52,9 @@ class QRenameDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
+        self.le.setFocus()
+        self.le.selectAll()
+
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
@@ -85,7 +88,7 @@ def checkPatchname(reporoot, activequeue, newpatchname, parent):
             try:
                 os.rename(patchfile, patchfile + '.OLD')
             except (OSError, IOError), inst:
-                qtlib.ErrorMsgBox(self.errTitle,
+                qtlib.ErrorMsgBox(_('Rename Error'),
                         _('Could not rename existing patchfile'),
                         hglib.tounicode(str(inst)))
                 return False
@@ -95,7 +98,7 @@ def checkPatchname(reporoot, activequeue, newpatchname, parent):
             try:
                 os.remove(patchfile)
             except (OSError, IOError), inst:
-                qtlib.ErrorMsgBox(self.errTitle,
+                qtlib.ErrorMsgBox(_('Rename Error'),
                         _('Could not delete existing patchfile'),
                         hglib.tounicode(str(inst)))
                 return False

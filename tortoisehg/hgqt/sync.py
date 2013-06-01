@@ -552,6 +552,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.reload()
 
     def secureclicked(self):
+        if not parseurl(self.currentUrl()).host:
+            qtlib.WarningMsgBox(_('No host specified'),
+                                _('Please set a valid URL to continue.'),
+                                parent=self)
+            return
         dlg = SecureDialog(self.repo, self.currentUrl(), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -1247,6 +1252,7 @@ class SecureDialog(QDialog):
             le.setText(pretty)
 
         u = parseurl(urlu)
+        assert u.host
         uhost = hglib.tounicode(u.host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
