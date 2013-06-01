@@ -54,6 +54,9 @@ class QRenameDialog(QDialog):
 
         self.focus = self.le
 
+        self.le.setFocus()
+        self.le.selectAll()
+
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
