@@ -90,7 +90,7 @@ def checkPatchname(reporoot, activequeue, newpatchname, parent):
             try:
                 os.rename(patchfile, patchfile + '.OLD')
             except (OSError, IOError), inst:
-                qtlib.ErrorMsgBox(self.errTitle,
+                qtlib.ErrorMsgBox(_('Rename Error'),
                         _('Could not rename existing patchfile'),
                         hglib.tounicode(str(inst)))
                 return False
@@ -100,7 +100,7 @@ def checkPatchname(reporoot, activequeue, newpatchname, parent):
             try:
                 os.remove(patchfile)
             except (OSError, IOError), inst:
-                qtlib.ErrorMsgBox(self.errTitle,
+                qtlib.ErrorMsgBox(_('Rename Error'),
                         _('Could not delete existing patchfile'),
                         hglib.tounicode(str(inst)))
                 return False
