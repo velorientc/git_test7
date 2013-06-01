@@ -52,8 +52,6 @@ class QRenameDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
-        self.focus = self.le
-
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
