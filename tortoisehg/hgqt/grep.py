@@ -31,7 +31,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         QWidget.__init__(self, parent)
 
         self.thread = None
-        self.setWindowIcon(qtlib.geticon('view-filter'))
 
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
@@ -272,9 +271,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         repoid = str(self.repo[0])
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
-
-    def closeEvent(self, event):
-        self.saveSettings(QSettings())
 
     def searchActivated(self):
         'User pressed [Return] in QLineEdit'
@@ -795,11 +791,32 @@ class MatchModel(QAbstractTableModel):
         assert index.isValid()
         return self.rows[index.row()]
 
+class SearchDialog(QDialog):
+    def __init__(self, upats, repo, parent=None, **opts):
+        super(SearchDialog, self).__init__(parent)
+        self.setWindowFlags(Qt.Window)
+        self.setWindowIcon(qtlib.geticon('view-filter'))
+        self.setLayout(QVBoxLayout(self))
+        self._searchwidget = SearchWidget(upats, repo, parent=self, **opts)
+        self.layout().addWidget(self._searchwidget)
+
+    def closeEvent(self, event):
+        if not self._searchwidget.canExit():
+            self._searchwidget.stopClicked()
+            event.ignore()
+            return
+
+        self._searchwidget.saveSettings(QSettings())
+        super(SearchDialog, self).closeEvent(event)
+
+    def setSearch(self, upattern, **opts):
+        self._searchwidget.setSearch(upattern, **opts)
+
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     upats = [hglib.tounicode(p) for p in pats]
     search = opts.pop('search', False)
-    dlg = SearchWidget(upats, repo, **opts)
+    dlg = SearchDialog(upats, repo, **opts)
     if search:
         dlg.searchActivated()
     return dlg
