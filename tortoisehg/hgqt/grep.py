@@ -564,6 +564,10 @@ class MatchTree(QTableView):
         vh.setDefaultSectionSize(20)
         self.horizontalHeader().setStretchLastSection(True)
 
+        self._filedialogs = qtlib.DialogKeeper(MatchTree._createFileDialog,
+                                               MatchTree._genFileDialogKey,
+                                               self)
+
         self.actions = {}
         self.contextmenu = QMenu(self)
         for key, name, func, shortcut in (
@@ -672,24 +676,15 @@ class MatchTree(QTableView):
                 self._openAnnotateDialog(repo, rev, path, line)
 
     def _openAnnotateDialog(self, repo, rev, path, line):
-        from tortoisehg.hgqt.run import qtrun
-
-        # TODO: use DialogKeeper
-        def run(ui, *pats, **opts):
-            dlg = self._createFileDialog(opts['repo'], opts['canonpath'])
-            dlg.setFileViewMode(fileview.AnnMode)
-            dlg.goto(opts['rev'])
-            dlg.showLine(line)
-            dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
-            dlg.setSearchCaseInsensitive(opts['ignorecase'])
-            return dlg
-
-        ui, pattern, icase = self.repo.ui, self.pattern, self.icase
         if rev is None:
             rev = repo['.'].rev()
-        opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
-                'line': line, 'pattern': pattern, 'ignorecase': icase}
-        qtrun(run, ui, **opts)
+
+        dlg = self._filedialogs.open(repo, path)
+        dlg.setFileViewMode(fileview.AnnMode)
+        dlg.goto(rev)
+        dlg.showLine(line)
+        dlg.setSearchPattern(hglib.tounicode(self.pattern))
+        dlg.setSearchCaseInsensitive(self.icase)
 
     def _createFileDialog(self, repo, path):
         # dirty hack to pass workbench only if available
@@ -698,6 +693,9 @@ class MatchTree(QTableView):
         if isinstance(self.window(), workbench.Workbench):
             repoviewer = self.window()
         return filedialogs.FileLogDialog(repo, path, repoviewer=repoviewer)
+
+    def _genFileDialogKey(self, repo, path):
+        return repo.wjoin(path)
 
     def onViewChangeset(self):
         for rev, path, line in self.selectedRows:
