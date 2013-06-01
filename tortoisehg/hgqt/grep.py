@@ -11,6 +11,7 @@ import re
 from mercurial import ui, hg, error, commands, match, util, subrepo
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui, settings
+from tortoisehg.hgqt import filedialogs, fileview
 from tortoisehg.util import paths, hglib, thread2
 from tortoisehg.hgqt.i18n import _
 
@@ -671,14 +672,32 @@ class MatchTree(QTableView):
                 self._openAnnotateDialog(repo, rev, path, line)
 
     def _openAnnotateDialog(self, repo, rev, path, line):
-        from tortoisehg.hgqt.manifestdialog import run
         from tortoisehg.hgqt.run import qtrun
+
+        # TODO: use DialogKeeper
+        def run(ui, *pats, **opts):
+            dlg = self._createFileDialog(opts['repo'], opts['canonpath'])
+            dlg.setFileViewMode(fileview.AnnMode)
+            dlg.goto(opts['rev'])
+            dlg.showLine(line)
+            dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+            dlg.setSearchCaseInsensitive(opts['ignorecase'])
+            return dlg
+
         ui, pattern, icase = self.repo.ui, self.pattern, self.icase
         if rev is None:
             rev = repo['.'].rev()
         opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
                 'line': line, 'pattern': pattern, 'ignorecase': icase}
         qtrun(run, ui, **opts)
+
+    def _createFileDialog(self, repo, path):
+        # dirty hack to pass workbench only if available
+        from tortoisehg.hgqt import workbench  # avoid cyclic dep
+        repoviewer = None
+        if isinstance(self.window(), workbench.Workbench):
+            repoviewer = self.window()
+        return filedialogs.FileLogDialog(repo, path, repoviewer=repoviewer)
 
     def onViewChangeset(self):
         for rev, path, line in self.selectedRows:
