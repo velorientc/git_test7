@@ -46,6 +46,9 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
         self._manifest_widget.linkActivated.connect(self._linkHandler)
 
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth: dlgmeth(self), parent=self)
+
         self._readsettings()
         self._updatewindowtitle()
 
@@ -88,9 +91,13 @@ class ManifestDialog(QMainWindow):
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
+        dlg = self._dialogs.open(ManifestDialog._createSearchDialog)
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
-        from tortoisehg.hgqt import run
-        run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
+        dlg.setSearch(pattern, **opts)
+
+    def _createSearchDialog(self):
+        from tortoisehg.hgqt import grep
+        return grep.SearchDialog([], self._repo)
 
     @pyqtSlot(QString)
     def _linkHandler(self, link):
