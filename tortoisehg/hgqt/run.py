@@ -738,8 +738,8 @@ def init(ui, *pats, **opts):
     _('thg log [OPTIONS] [FILE]'))
 def log(ui, *pats, **opts):
     """workbench application"""
-    from tortoisehg.hgqt.workbench import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import workbench
+    return workbench.run(ui, *pats, **opts)
 
 @command('manifest',
     [('r', 'rev', '', _('revision to display')),
@@ -910,8 +910,8 @@ def rupdate(ui, repo, *pats, **opts):
     _('thg serve [--web-conf FILE]'))
 def serve(ui, *pats, **opts):
     """start stand-alone webserver"""
-    from tortoisehg.hgqt.serve import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import serve as servemod
+    return servemod.run(ui, *pats, **opts)
 
 if os.name == 'nt':
     # TODO: extra detection to determine if shell extension is installed
@@ -974,8 +974,8 @@ def tag(ui, repo, *pats, **opts):
     _('thg thgstatus [OPTION]'))
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
-    from tortoisehg.util.thgstatus import run
-    run(ui, *pats, **opts)
+    from tortoisehg.util import thgstatus as thgstatusmod
+    thgstatusmod.run(ui, *pats, **opts)
 
 @command('^update|checkout|co',
     [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
