@@ -880,8 +880,10 @@ def resolve(ui, repo, *pats, **opts):
     _('thg revdetails [-r REV]'))
 def revdetails(ui, repo, *pats, **opts):
     """revision details tool"""
-    from tortoisehg.hgqt.revdetails import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import revdetails as revdetailsmod
+    os.chdir(repo.root)
+    rev = opts.get('rev', '.')
+    return revdetailsmod.RevDetailsDialog(repo, rev=rev)
 
 @command('revert', [], _('thg revert [FILE]...'))
 def revert(ui, repo, *pats, **opts):

@@ -414,12 +414,3 @@ class RevDetailsDialog(QDialog):
         s = QSettings()
         s.setValue('revdetails/geom', self.saveGeometry())
         super(RevDetailsDialog, self).done(ret)
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    rev = opts.get('rev', '.')
-    return RevDetailsDialog(repo, rev=rev)
