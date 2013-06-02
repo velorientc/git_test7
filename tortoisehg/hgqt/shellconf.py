@@ -296,9 +296,3 @@ class ShellConfigWindow(QDialog):
 
 def run(ui, *pats, **opts):
     return ShellConfigWindow()
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    form = ShellConfigWindow()
-    form.show()
-    app.exec_()
