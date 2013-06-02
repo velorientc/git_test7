@@ -866,8 +866,8 @@ def rename(ui, repo, *pats, **opts):
     _('thg repoconfig'))
 def repoconfig(ui, repo, *pats, **opts):
     """repository configuration editor"""
-    from tortoisehg.hgqt.settings import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import settings
+    return settings.SettingsDialog(True, focus=opts.get('focus'))
 
 @command('resolve', [], _('thg resolve'))
 def resolve(ui, repo, *pats, **opts):
@@ -984,8 +984,8 @@ def update(ui, repo, *pats, **opts):
     _('thg userconfig'))
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
-    from tortoisehg.hgqt.settings import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import settings
+    return settings.SettingsDialog(False, focus=opts.get('focus'))
 
 @command('^vdiff',
     [('c', 'change', '', _('changeset to view in diff tool')),

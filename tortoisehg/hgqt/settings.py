@@ -1699,7 +1699,3 @@ class SettingsForm(QWidget):
     def applyChangesForHooks(self):
         if self.hooksFrame.applyChanges(self.ini):
             self.restartRequested.emit(_('Hooks'))
-
-def run(ui, *pats, **opts):
-    return SettingsDialog(opts.get('alias') == 'repoconfig',
-                          focus=opts.get('focus'))
