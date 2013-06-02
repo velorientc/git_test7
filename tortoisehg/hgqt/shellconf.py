@@ -293,6 +293,3 @@ class ShellConfigWindow(QDialog):
             if list != itemlist:
                 list.setCurrentItem(None)
         self.update_states()
-
-def run(ui, *pats, **opts):
-    return ShellConfigWindow()

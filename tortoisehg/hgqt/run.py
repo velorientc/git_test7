@@ -918,8 +918,8 @@ if os.name == 'nt':
     @command('shellconfig', [], _('thg shellconfig'))
     def shellconfig(ui, *pats, **opts):
         """explorer extension configuration editor"""
-        from tortoisehg.hgqt.shellconf import run
-        return run(ui, *pats, **opts)
+        from tortoisehg.hgqt import shellconf
+        return shellconf.ShellConfigWindow()
 
 @command('shelve|unshelve', [], _('thg shelve'))
 def shelve(ui, repo, *pats, **opts):
