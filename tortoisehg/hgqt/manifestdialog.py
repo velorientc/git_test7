@@ -452,7 +452,6 @@ def run(ui, *pats, **opts):
             dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
-            dlg.setFileViewMode(fileview.AnnMode)
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
