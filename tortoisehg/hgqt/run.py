@@ -509,8 +509,12 @@ def forget(ui, repo, *pats, **opts):
     _('thg graft [-r] REV...'))
 def graft(ui, repo, *revs, **opts):
     """graft dialog"""
-    from tortoisehg.hgqt.graft import run
-    return run(ui, *revs, **opts)
+    from tortoisehg.hgqt import graft as graftmod
+    revs = list(revs)
+    revs.extend(opts['rev'])
+    if not os.path.exists(repo.join('graftstate')) and not revs:
+        raise util.Abort(_('You must provide revisions to graft'))
+    return graftmod.GraftDialog(repo, None, source=revs)
 
 @command('^grep|search',
     [('i', 'ignorecase', False, _('ignore case during search'))],
