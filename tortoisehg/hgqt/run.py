@@ -394,28 +394,23 @@ def add(ui, repo, *pats, **opts):
     _('thg annotate'))
 def annotate(ui, repo, *pats, **opts):
     """annotate dialog"""
-    from tortoisehg.hgqt import filedialogs, fileview, thgrepo
+    from tortoisehg.hgqt import filedialogs, fileview
     if len(pats) != 1:
         raise util.Abort(_('annotate requires a single filename'))
-
-    # TODO: nested run() will be merged into annotate() later
-    def run(ui, *pats, **opts):
-        repo = thgrepo.repository(ui, opts.get('root') or paths.find_root())
-        rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-        filename = hglib.canonpaths(pats)[0]
-        dlg = filedialogs.FileLogDialog(repo, filename)
-        dlg.setFileViewMode(fileview.AnnMode)
-        dlg.goto(rev)
-        if opts.get('line'):
-            try:
-                lineno = int(opts['line'])
-            except ValueError:
-                raise util.Abort(_('invalid line number: %s') % opts['line'])
-            dlg.showLine(lineno)
-        if opts.get('pattern'):
-            dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
-        return dlg
-    return run(ui, *pats, **opts)
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    filename = hglib.canonpaths(pats)[0]
+    dlg = filedialogs.FileLogDialog(repo, filename)
+    dlg.setFileViewMode(fileview.AnnMode)
+    dlg.goto(rev)
+    if opts.get('line'):
+        try:
+            lineno = int(opts['line'])
+        except ValueError:
+            raise util.Abort(_('invalid line number: %s') % opts['line'])
+        dlg.showLine(lineno)
+    if opts.get('pattern'):
+        dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+    return dlg
 
 @command('archive',
     [('r', 'rev', '', _('revision to archive'))],
