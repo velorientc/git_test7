@@ -841,8 +841,13 @@ def rebase(ui, repo, *pats, **opts):
 @command('rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):
     """Manually resolve rejected patch chunks"""
-    from tortoisehg.hgqt.rejects import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import rejects as rejectsmod
+    if len(pats) != 1:
+        raise util.Abort(_('You must provide the path to a file'))
+    path = pats[0]
+    if path.endswith('.rej'):
+        path = path[:-4]
+    return rejectsmod.RejectsDialog(path, None)
 
 @command('remove|rm', [], _('thg remove [FILE]...'))
 def remove(ui, repo, *pats, **opts):
