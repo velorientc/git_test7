@@ -277,9 +277,6 @@ class HeadlessQuickop(QObject):
 
 def run(ui, repo, *pats, **opts):
     pats = hglib.canonpaths(pats)
-    if opts.get('canonpats'):
-        pats = list(pats) + opts['canonpats']
-
     command = opts['alias']
     imm = repo.ui.config('tortoisehg', 'immediate', '')
     if opts.get('headless') or command in imm.lower():

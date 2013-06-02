@@ -1027,8 +1027,6 @@ def vdiff(ui, repo, *pats, **opts):
     if opts.get('bundle'):
         repo = thgrepo.repository(ui, opts.get('bundle'))
     pats = hglib.canonpaths(pats)
-    if opts.get('canonpats'):
-        pats = list(pats) + opts['canonpats']
     return visdiff.visualdiff(ui, repo, pats, opts)
 
 @command('^version',
