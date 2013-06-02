@@ -220,6 +220,3 @@ class InitDialog(QDialog):
 
     def reject(self):
         super(InitDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    return InitDialog(pats, opts)

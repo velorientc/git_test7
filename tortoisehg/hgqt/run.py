@@ -730,8 +730,8 @@ def import_(ui, repo, *pats, **opts):
 @command('^init', [], _('thg init [DEST]'))
 def init(ui, *pats, **opts):
     """init dialog"""
-    from tortoisehg.hgqt.hginit import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import hginit
+    return hginit.InitDialog(pats, opts)
 
 @command('^log|history|explorer|workbench',
     [('l', 'limit', '', _('(DEPRECATED)'))],
