@@ -872,8 +872,8 @@ def repoconfig(ui, repo, *pats, **opts):
 @command('resolve', [], _('thg resolve'))
 def resolve(ui, repo, *pats, **opts):
     """resolve dialog"""
-    from tortoisehg.hgqt.resolve import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import resolve as resolvemod
+    return resolvemod.ResolveDialog(repo)
 
 @command('^revdetails',
     [('r', 'rev', '', _('the revision to show'))],
