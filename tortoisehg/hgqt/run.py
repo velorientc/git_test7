@@ -23,7 +23,7 @@ from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import qtapp, qtlib
+from tortoisehg.hgqt import qtapp, qtlib, thgrepo
 from tortoisehg.hgqt import quickop
 
 try:
@@ -1023,8 +1023,13 @@ def userconfig(ui, *pats, **opts):
     _('launch visual diff tool'))
 def vdiff(ui, repo, *pats, **opts):
     """launch configured visual diff tool"""
-    from tortoisehg.hgqt.visdiff import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import visdiff
+    if opts.get('bundle'):
+        repo = thgrepo.repository(ui, opts.get('bundle'))
+    pats = hglib.canonpaths(pats)
+    if opts.get('canonpats'):
+        pats = list(pats) + opts['canonpats']
+    return visdiff.visualdiff(ui, repo, pats, opts)
 
 @command('^version',
     [('v', 'verbose', None, _('print license'))],
