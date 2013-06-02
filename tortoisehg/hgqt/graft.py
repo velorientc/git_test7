@@ -302,10 +302,7 @@ def run(ui, *revs, **opts):
     revs = list(revs)
     revs.extend(opts['rev'])
 
-    if os.path.exists(repo.join('graftstate')):
-        qtlib.InfoMsgBox(_('Graft already in progress'),
-                          _('Resuming graft already in progress'))
-    elif not revs:
+    if not os.path.exists(repo.join('graftstate')) and not revs:
         qtlib.ErrorMsgBox(_('Abort'),
                           _('You must provide revisions to graft'))
         import sys; sys.exit()
