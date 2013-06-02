@@ -56,7 +56,7 @@ class WctxActions(QObject):
         make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
-        make(_('File &History'), log, frozenset('MARC!'), 'hg-log')
+        make(_('File &History'), WctxActions.log, frozenset('MARC!'), 'hg-log')
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
@@ -214,6 +214,14 @@ class WctxActions(QObject):
             os.chdir(cwd)
         return notify
 
+    @staticmethod  # TODO
+    def log(parent, ui, repo, files):
+        from tortoisehg.hgqt.workbench import run
+        from tortoisehg.hgqt.run import qtrun
+        opts = {'root': repo.root}
+        qtrun(run, repo.ui, *files, **opts)
+        return False
+
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
     repo[None].forget([deleted]) # !->R
@@ -313,13 +321,6 @@ def revert(parent, ui, repo, files):
                 return False
         commands.revert(ui, repo, *files, **revertopts)
         return True
-
-def log(parent, ui, repo, files):
-    from tortoisehg.hgqt.workbench import run
-    from tortoisehg.hgqt.run import qtrun
-    opts = {'root': repo.root}
-    qtrun(run, repo.ui, *files, **opts)
-    return False
 
 def forget(parent, ui, repo, files):
     commands.forget(ui, repo, *files)
