@@ -857,8 +857,9 @@ def remove(ui, repo, *pats, **opts):
 @command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
 def rename(ui, repo, *pats, **opts):
     """rename dialog"""
-    from tortoisehg.hgqt.rename import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import rename as renamemod
+    iscopy = (opts.get('alias') == 'copy')
+    return renamemod.RenameDialog(ui, pats, iscopy=iscopy)
 
 @command('^repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],

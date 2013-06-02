@@ -329,7 +329,3 @@ class RenameDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('rename/geom', self.saveGeometry())
-
-def run(ui, *pats, **opts):
-    iscopy = (opts.get('alias') == 'copy')
-    return RenameDialog(ui, pats, iscopy=iscopy)
