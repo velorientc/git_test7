@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, util, error, context, merge, scmutil
 
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview, thgrepo
 
@@ -1100,9 +1100,3 @@ class StatusDialog(QDialog):
             return
         self.saveSettings()
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    return StatusDialog(repo, pats, opts)

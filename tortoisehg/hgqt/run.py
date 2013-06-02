@@ -933,8 +933,10 @@ def shelve(ui, repo, *pats, **opts):
     _('thg status [OPTIONS] [FILE]'))
 def status(ui, repo, *pats, **opts):
     """browse working copy status"""
-    from tortoisehg.hgqt.status import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import status as statusmod
+    pats = hglib.canonpaths(pats)
+    os.chdir(repo.root)
+    return statusmod.StatusDialog(repo, pats, opts)
 
 @command('^strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
