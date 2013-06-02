@@ -26,7 +26,7 @@ class WctxActions(QObject):
         self.repo = repo
         allactions = []
 
-        def make(text, func, types, icon=None, keys=None):
+        def make(text, func, types, icon=None, keys=None, slot=self.runAction):
             action = QAction(text, parent)
             action._filetypes = types
             action._runfunc = func
@@ -34,7 +34,7 @@ class WctxActions(QObject):
                 action.setIcon(qtlib.geticon(icon))
             if keys:
                 action.setShortcut(QKeySequence(keys))
-            action.triggered.connect(self.runAction)
+            action.triggered.connect(slot)
             parent.addAction(action)
             allactions.append(action)
 
@@ -56,7 +56,8 @@ class WctxActions(QObject):
         make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
-        make(_('File &History'), WctxActions.log, frozenset('MARC!'), 'hg-log')
+        make(_('File &History'), None, frozenset('MARC!'), 'hg-log',
+             slot=self.log)
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
@@ -214,13 +215,14 @@ class WctxActions(QObject):
             os.chdir(cwd)
         return notify
 
-    @staticmethod  # TODO
-    def log(parent, ui, repo, files):
+    #@pyqtSlot()
+    def log(self):
         from tortoisehg.hgqt.workbench import run
         from tortoisehg.hgqt.run import qtrun
+        repo = self.repo
+        files = self._filesForAction(self.sender())
         opts = {'root': repo.root}
         qtrun(run, repo.ui, *files, **opts)
-        return False
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
