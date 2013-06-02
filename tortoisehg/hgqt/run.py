@@ -806,8 +806,10 @@ def purge(ui, repo, *pats, **opts):
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, repo, *pats, **opts):
     """manage multiple MQ patch queues"""
-    from tortoisehg.hgqt.qqueue import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import qqueue as qqueuemod
+    if not hasattr(repo, 'mq'):
+        raise util.Abort(_('Please enable the MQ extension first.'))
+    return qqueuemod.QQueueDialog(repo)
 
 @command('^qreorder', [], _('thg qreorder'))
 def qreorder(ui, repo, *pats, **opts):
