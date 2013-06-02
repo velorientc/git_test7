@@ -9,11 +9,11 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
+from mercurial import hg, error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, ngettext
-from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, cslist, qtlib
 
 class StripDialog(QDialog):
     """Dialog to strip changesets"""
@@ -21,21 +21,11 @@ class StripDialog(QDialog):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo=None, rev=None, parent=None, opts={}):
+    def __init__(self, repo, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
         self.setWindowIcon(qtlib.geticon('menudelete'))
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'not repository'
+        self.repo = repo
 
         # base layout box
         box = QVBoxLayout()

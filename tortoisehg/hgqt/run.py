@@ -951,7 +951,7 @@ def strip(ui, repo, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return thgstrip.StripDialog(rev=rev, opts=opts)
+    return thgstrip.StripDialog(repo, rev=rev, opts=opts)
 
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repo, *pats, **opts):
