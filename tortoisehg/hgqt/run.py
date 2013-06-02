@@ -793,6 +793,8 @@ def postreview(ui, repo, *pats, **opts):
     revs = opts.get('rev') or None
     if not revs and len(pats):
         revs = pats[0]
+    if not revs:
+        raise util.Abort(_('no revisions specified'))
     return postreviewmod.PostReviewDialog(repo.ui, repo, revs)
 
 @command('^purge', [], _('thg purge'))
