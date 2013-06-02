@@ -748,8 +748,22 @@ def log(ui, *pats, **opts):
     _('thg manifest [-r REV] [FILE]'))
 def manifest(ui, repo, *pats, **opts):
     """display the current or given revision of the project manifest"""
-    from tortoisehg.hgqt.manifestdialog import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import manifestdialog
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    dlg = manifestdialog.ManifestDialog(repo, rev)
+    if pats:
+        path = hglib.canonpaths(pats)[0]
+        if opts.get('line'):
+            try:
+                lineno = int(opts['line'])
+            except ValueError:
+                raise util.Abort(_('invalid line number: %s') % opts['line'])
+        else:
+            lineno = None
+        dlg.setSource(hglib.tounicode(path), rev, lineno)
+    if opts.get('pattern'):
+        dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+    return dlg
 
 @command('^merge',
     [('r', 'rev', '', _('revision to merge'))],

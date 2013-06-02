@@ -11,12 +11,10 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error
-
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, fileview, status, thgrepo, filectxactions
+from tortoisehg.hgqt import qtlib, fileview, status, filectxactions
 from tortoisehg.hgqt import revpanel
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -422,42 +420,6 @@ def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
-
-def run(ui, *pats, **opts):
-    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    try:
-        # ManifestWidget expects integer revision
-        rev = repo[opts.get('rev')].rev()
-    except error.RepoLookupError, e:
-        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
-                          hglib.tounicode(e.message))
-        return
-    try:
-        line = opts.get('line') and int(opts['line']) or None
-    except ValueError:
-        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
-                          _('The specified line number "%s" is invalid.')
-                          % hglib.tounicode(opts.get('line')))
-        return
-
-    dlg = ManifestDialog(repo, rev)
-
-    # set initial state after dialog visible
-    def init():
-        try:
-            if pats:
-                path = hglib.canonpaths(pats)[0]
-            else:
-                return
-            dlg.setSource(hglib.tounicode(path), rev, line)
-            if opts.get('pattern'):
-                dlg.setSearchPattern(opts['pattern'])
-        except IndexError:
-            pass
-        dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
-    QTimer.singleShot(0, init)
-
-    return dlg
 
 # In order to let the user seamlessly switch between the filterbox and the treeview
 # we subclas the QLineEdit and QTreeView widgets. We add some keypress related signals
