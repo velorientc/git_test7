@@ -396,11 +396,7 @@ def annotate(ui, repo, *pats, **opts):
     """annotate dialog"""
     from tortoisehg.hgqt import filedialogs, fileview, thgrepo
     if len(pats) != 1:
-        ui.warn(_('annotate requires a single filename\n'))
-        if pats:
-            pats = pats[0:]
-        else:
-            return
+        raise util.Abort(_('annotate requires a single filename'))
 
     # TODO: nested run() will be merged into annotate() later
     def run(ui, *pats, **opts):
