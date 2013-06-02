@@ -389,7 +389,7 @@ def delete(parent, ui, repo, files):
 def copy(parent, ui, repo, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(ui, files, parent, iscopy=True)
+    dlg = RenameDialog(repo, files, parent, iscopy=True)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
@@ -397,7 +397,7 @@ def copy(parent, ui, repo, files):
 def rename(parent, ui, repo, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(ui, files, parent)
+    dlg = RenameDialog(repo, files, parent)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True

@@ -859,7 +859,7 @@ def rename(ui, repo, *pats, **opts):
     """rename dialog"""
     from tortoisehg.hgqt import rename as renamemod
     iscopy = (opts.get('alias') == 'copy')
-    return renamemod.RenameDialog(ui, pats, iscopy=iscopy)
+    return renamemod.RenameDialog(repo, pats, iscopy=iscopy)
 
 @command('^repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],
