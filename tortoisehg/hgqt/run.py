@@ -956,8 +956,11 @@ def strip(ui, repo, *pats, **opts):
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repo, *pats, **opts):
     """Synchronize with other repositories"""
-    from tortoisehg.hgqt.sync import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import sync as syncmod
+    w = syncmod.SyncWidget(repo, None, **opts)
+    if pats:
+        w.setUrl(hglib.tounicode(pats[0]))
+    return w
 
 @command('^tag',
     [('f', 'force', None, _('replace existing tag')),

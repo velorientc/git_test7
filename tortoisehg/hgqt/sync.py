@@ -1624,11 +1624,3 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
-
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    w = SyncWidget(repo, None, **opts)
-    if pats:
-        w.setUrl(hglib.tounicode(pats[0]))
-    return w
