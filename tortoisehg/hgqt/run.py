@@ -800,8 +800,8 @@ def postreview(ui, repo, *pats, **opts):
 @command('^purge', [], _('thg purge'))
 def purge(ui, repo, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
-    from tortoisehg.hgqt.purge import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import purge as purgemod
+    return purgemod.PurgeDialog(repo, None)
 
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, repo, *pats, **opts):
