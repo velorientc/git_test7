@@ -814,8 +814,10 @@ def qqueue(ui, repo, *pats, **opts):
 @command('^qreorder', [], _('thg qreorder'))
 def qreorder(ui, repo, *pats, **opts):
     """Reorder unapplied MQ patches"""
-    from tortoisehg.hgqt.qreorder import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import qreorder as qreordermod
+    if not hasattr(repo, 'mq'):
+        raise util.Abort(_('Please enable the MQ extension first.'))
+    return qreordermod.QReorderDialog(repo)
 
 @command('^rebase',
     [('', 'keep', False, _('keep original changesets')),
