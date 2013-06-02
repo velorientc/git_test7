@@ -828,8 +828,15 @@ def qreorder(ui, repo, *pats, **opts):
     _('thg rebase -s REV -d REV [--keep]'))
 def rebase(ui, repo, *pats, **opts):
     """rebase dialog"""
-    from tortoisehg.hgqt.rebase import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import rebase as rebasemod
+    if os.path.exists(repo.join('rebasestate')):
+        # TODO: move info dialog into RebaseDialog if possible
+        qtlib.InfoMsgBox(hglib.tounicode(_('Rebase already in progress')),
+                         hglib.tounicode(_('Resuming rebase already in '
+                                           'progress')))
+    elif not opts['source'] or not opts['dest']:
+        raise util.Abort(_('You must provide source and dest arguments'))
+    return rebasemod.RebaseDialog(repo, None, **opts)
 
 @command('rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):
