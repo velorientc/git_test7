@@ -971,8 +971,15 @@ def sync(ui, repo, *pats, **opts):
     _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]'))
 def tag(ui, repo, *pats, **opts):
     """tag tool"""
-    from tortoisehg.hgqt.tag import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import tag as tagmod
+    kargs = {}
+    tag = len(pats) > 0 and pats[0] or None
+    if tag:
+        kargs['tag'] = tag
+    rev = opts.get('rev')
+    if rev:
+        kargs['rev'] = rev
+    return tagmod.TagDialog(repo, opts=opts, **kargs)
 
 @command('thgstatus',
     [('',  'delay', None, _('wait until the second ticks over')),
