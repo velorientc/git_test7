@@ -464,8 +464,10 @@ def clone(ui, *pats, **opts):
     _('thg commit [OPTIONS] [FILE]...'))
 def commit(ui, repo, *pats, **opts):
     """commit tool"""
-    from tortoisehg.hgqt.commit import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import commit as commitmod
+    pats = hglib.canonpaths(pats)
+    os.chdir(repo.root)
+    return commitmod.CommitDialog(repo, pats, opts)
 
 @command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):

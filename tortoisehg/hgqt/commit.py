@@ -1419,11 +1419,3 @@ class CommitDialog(QDialog):
     def reject(self):
         if self.promptExit():
             QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    root = opts.get('root', paths.find_root())
-    repo = thgrepo.repository(ui, path=root)
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    return CommitDialog(repo, pats, opts)
