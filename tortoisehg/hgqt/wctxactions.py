@@ -161,9 +161,12 @@ class WctxActions(QObject):
             menu.addMenu(rmenu)
         return menu
 
+    def _filesForAction(self, action):
+        return [wfile for t, wfile in self.selrows if t & action._filetypes]
+
     @pyqtSlot(QAction)
     def _runCustomCommandByMenu(self, action):
-        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        files = self._filesForAction(action)
         self.runCustomCommandRequested.emit(
             str(action.data().toString()), files)
 
@@ -172,7 +175,7 @@ class WctxActions(QObject):
 
         repo, action, parent = self.repo, self.sender(), self.parent()
         func = action._runfunc
-        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        files = self._filesForAction(action)
 
         hu = htmlui.htmlui()
         name = hglib.tounicode(func.__name__.title())
