@@ -9,6 +9,7 @@ import os
 
 from mercurial import util, error, merge, commands, extensions
 from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt, customtools
+from tortoisehg.hgqt import filedialogs
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -24,6 +25,8 @@ class WctxActions(QObject):
 
         self.menu = QMenu(parent)
         self.repo = repo
+        self._filedialogs = qtlib.DialogKeeper(WctxActions._createFileDialog,
+                                               parent=self)
         allactions = []
 
         def make(text, func, types, icon=None, keys=None, slot=self.runAction):
@@ -217,12 +220,17 @@ class WctxActions(QObject):
 
     #@pyqtSlot()
     def log(self):
-        from tortoisehg.hgqt.workbench import run
-        from tortoisehg.hgqt.run import qtrun
-        repo = self.repo
-        files = self._filesForAction(self.sender())
-        opts = {'root': repo.root}
-        qtrun(run, repo.ui, *files, **opts)
+        for path in self._filesForAction(self.sender()):
+            self._filedialogs.open(path)
+
+    def _createFileDialog(self, path):
+        # dirty hack to pass workbench only if available
+        from tortoisehg.hgqt import workbench  # avoid cyclic dep
+        repoviewer = None
+        if self.parent() and isinstance(self.parent().window(),
+                                        workbench.Workbench):
+            repoviewer = self.parent().window()
+        return filedialogs.FileLogDialog(self.repo, path, repoviewer=repoviewer)
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
