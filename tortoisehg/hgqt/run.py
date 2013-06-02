@@ -722,8 +722,10 @@ def hgignore(ui, repo, *pats, **opts):
     _('thg import [OPTION] [SOURCE]...'))
 def import_(ui, repo, *pats, **opts):
     """import an ordered set of patches"""
-    from tortoisehg.hgqt.thgimport import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import thgimport
+    dlg = thgimport.ImportDialog(repo, None, **opts)
+    dlg.setfilepaths(pats)
+    return dlg
 
 @command('^init', [], _('thg init [DEST]'))
 def init(ui, *pats, **opts):
