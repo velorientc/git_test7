@@ -17,6 +17,7 @@ from mercurial import hg, ui, util, scmutil, httpconnection
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
+from tortoisehg.hgqt import hgemail
 
 def parseurl(url):
     assert type(url) == unicode
@@ -245,6 +246,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
+
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
 
         self.curalias = None
         self.reload()
@@ -962,16 +966,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
-                nodes = [n for n in data.splitlines() if len(n) == 40]
+                nodes = tuple(n for n in data.splitlines() if len(n) == 40)
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
                 try:
-                    outgoingrevs = [cmdline[cmdline.index('--rev') + 1]]
+                    outgoingrevs = (cmdline[cmdline.index('--rev') + 1],)
                 except ValueError:
                     outgoingrevs = None
-                from tortoisehg.hgqt import run as _run
-                _run.email(ui.ui(), repo=self.repo, rev=nodes,
-                           outgoing=True, outgoingrevs=outgoingrevs)
+                self._dialogs.open(SyncWidget._createEmailDialog, nodes,
+                                   outgoingrevs)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
             else:
@@ -980,6 +983,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                     '--template', '{node}\n']
         self.run(cmdline, ('force', 'branch', 'rev'))
+
+    def _createEmailDialog(self, revs, outgoingrevs):
+        return hgemail.EmailDialog(self.repo, revs, outgoing=True,
+                                   outgoingrevs=outgoingrevs)
 
     def unbundle(self):
         caption = _("Select bundle file")

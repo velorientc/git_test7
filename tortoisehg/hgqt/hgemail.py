@@ -495,8 +495,7 @@ def run(ui, *revs, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
 
     try:
-        return EmailDialog(repo, revs, outgoing=opts.get('outgoing', False),
-                           outgoingrevs=opts.get('outgoingrevs', None))
+        return EmailDialog(repo, revs)
     except error.RepoLookupError, e:
         qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
                           hglib.tounicode(e.message))
