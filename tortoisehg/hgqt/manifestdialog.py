@@ -447,16 +447,12 @@ def run(ui, *pats, **opts):
         try:
             if pats:
                 path = hglib.canonpaths(pats)[0]
-            elif 'canonpath' in opts:
-                path = opts['canonpath']
             else:
                 return
             dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
             dlg.setFileViewMode(fileview.AnnMode)
-            if 'ignorecase' in opts:
-                dlg.setSearchCaseInsensitive(opts['ignorecase'])
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
