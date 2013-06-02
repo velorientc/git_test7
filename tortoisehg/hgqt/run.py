@@ -895,8 +895,13 @@ def revert(ui, repo, *pats, **opts):
     _('thg rupdate [[-r] REV]'))
 def rupdate(ui, repo, *pats, **opts):
     """update a remote repository"""
-    from tortoisehg.hgqt.rupdate import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import rupdate as rupdatemod
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    return rupdatemod.rUpdateDialog(repo, rev, None, opts)
 
 @command('^serve',
     [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
