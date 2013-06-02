@@ -924,8 +924,8 @@ if os.name == 'nt':
 @command('shelve|unshelve', [], _('thg shelve'))
 def shelve(ui, repo, *pats, **opts):
     """Move changes between working directory and patches"""
-    from tortoisehg.hgqt.shelve import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import shelve as shelvemod
+    return shelvemod.ShelveDialog(repo)
 
 @command('^status|st',
     [('c', 'clean', False, _('show files without changes')),
