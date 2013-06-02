@@ -262,11 +262,3 @@ class StripDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    rev = None
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    return StripDialog(rev=rev, opts=opts)
