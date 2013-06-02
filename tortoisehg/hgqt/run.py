@@ -1000,8 +1000,13 @@ def thgstatus(ui, *pats, **opts):
     _('thg update [-C] [[-r] REV]'))
 def update(ui, repo, *pats, **opts):
     """update/checkout tool"""
-    from tortoisehg.hgqt.update import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import update as updatemod
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    return updatemod.UpdateDialog(repo, rev, None, opts)
 
 @command('^userconfig',
     [('', 'focus', '', _('field to give initial focus'))],
