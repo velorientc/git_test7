@@ -973,10 +973,3 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
-
-
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return MQWidget(repo, None, **opts)

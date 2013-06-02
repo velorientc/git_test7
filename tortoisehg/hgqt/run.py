@@ -781,8 +781,8 @@ def merge(ui, repo, *pats, **opts):
 @command('mq', [], _('thg mq'))
 def mq(ui, repo, *pats, **opts):
     """Mercurial Queue tool"""
-    from tortoisehg.hgqt.mq import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import mq as mqmod
+    return mqmod.MQWidget(repo, None, **opts)
 
 @command('postreview',
     [('r', 'rev', [], _('a revision to post'))],
