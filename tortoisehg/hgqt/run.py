@@ -789,8 +789,11 @@ def mq(ui, repo, *pats, **opts):
     _('thg postreview [-r] REV...'))
 def postreview(ui, repo, *pats, **opts):
     """post changesets to reviewboard"""
-    from tortoisehg.hgqt.postreview import run
-    return run(ui, *pats, **opts)
+    from tortoisehg.hgqt import postreview as postreviewmod
+    revs = opts.get('rev') or None
+    if not revs and len(pats):
+        revs = pats[0]
+    return postreviewmod.PostReviewDialog(repo.ui, repo, revs)
 
 @command('^purge', [], _('thg purge'))
 def purge(ui, repo, *pats, **opts):
