@@ -24,6 +24,7 @@ from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtapp, qtlib
+from tortoisehg.hgqt import quickop
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
@@ -384,8 +385,7 @@ def about(ui, *pats, **opts):
 @command('add', [], _('thg add [FILE]...'))
 def add(ui, repo, *pats, **opts):
     """add files"""
-    from tortoisehg.hgqt.quickop import run
-    return run(ui, repo, *pats, **opts)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('^annotate|blame',
     [('r', 'rev', '', _('revision to annotate')),
@@ -497,8 +497,7 @@ def email(ui, repo, *pats, **opts):
 @command('forget', [], _('thg forget [FILE]...'))
 def forget(ui, repo, *pats, **opts):
     """forget selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return run(ui, repo, *pats, **opts)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('graft',
     [('r', 'rev', [], _('revisions to graft'))],
@@ -799,8 +798,7 @@ def rejects(ui, *pats, **opts):
 @command('remove|rm', [], _('thg remove [FILE]...'))
 def remove(ui, repo, *pats, **opts):
     """remove selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return run(ui, repo, *pats, **opts)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
 def rename(ui, repo, *pats, **opts):
@@ -833,8 +831,7 @@ def revdetails(ui, repo, *pats, **opts):
 @command('revert', [], _('thg revert [FILE]...'))
 def revert(ui, repo, *pats, **opts):
     """revert selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return run(ui, repo, *pats, **opts)
+    return quickop.run(ui, repo, *pats, **opts)
 
 @command('rupdate',
     [('r', 'rev', '', _('revision to update'))],
