@@ -1395,8 +1395,6 @@ class SettingsForm(QWidget):
             if meta['name'] == focuspage:
                 self._activepagename = meta['name']
                 self.pageList.setCurrentRow(i)
-                QTimer.singleShot(0, lambda:
-                    self.activatePage(i))
                 return True
         return False
 
