@@ -1436,8 +1436,6 @@ class SettingsForm(QWidget):
             if meta['name'] == focuspage:
                 self._activepagename = meta['name']
                 self.pageList.setCurrentRow(i)
-                QTimer.singleShot(0, lambda:
-                    self.activatePage(i))
                 return True
         return False
 
@@ -1680,7 +1678,15 @@ class SettingsForm(QWidget):
         allexts = hglib.allextensions()
         for chk in self.pages['extensions'][2]:
             name = chk.opts['label']
-            chk.setEnabled(changable(name, chk.opts['cpath']))
+            if not changable(name, chk.opts['cpath']):
+                chk.setEnabled(False)
+                cpath = chk.opts['cpath']
+                sect, key = cpath.split('.', 1)
+                if ui.ui().config(sect, key, None) is not None:
+                    chk.setValue(True)
+                    chk.curvalue = True
+            else:
+                chk.setEnabled(True)
             invalmsg = invalidexts.get(name)
             if invalmsg:
                 invalmsg = invalmsg.decode('utf-8')
