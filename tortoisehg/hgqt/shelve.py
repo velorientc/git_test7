@@ -60,6 +60,7 @@ class ShelveDialog(QDialog):
         ahbox.setContentsMargins(2, 2, 2, 2)
         avbox.addLayout(ahbox)
         self.comboa = QComboBox(self)
+        self.comboa.setMinimumContentsLength(10)  # allow to cut long content
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
         self.clearShelfButtonA = QPushButton(_('Clear'))
         self.clearShelfButtonA.setToolTip(_('Clear the current shelf file'))
@@ -89,6 +90,7 @@ class ShelveDialog(QDialog):
         bhbox.setContentsMargins(2, 2, 2, 2)
         bvbox.addLayout(bhbox)
         self.combob = QComboBox(self)
+        self.combob.setMinimumContentsLength(10)  # allow to cut long content
         self.combob.currentIndexChanged.connect(self.comboBChanged)
         self.clearShelfButtonB = QPushButton(_('Clear'))
         self.clearShelfButtonB.setToolTip(_('Clear the current shelf file'))
