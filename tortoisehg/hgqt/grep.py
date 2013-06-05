@@ -156,6 +156,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchbutton, self.cancelbutton = bt, cbt
         self.regexple.setFocus()
 
+        assert not opts.get('search'), 'cannot start search in constructor'
         if 'rev' in opts or 'all' in opts:
             self.setSearch(upats[0], **opts)
         elif len(upats) >= 1:
@@ -780,4 +781,8 @@ class MatchModel(QAbstractTableModel):
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     upats = [hglib.tounicode(p) for p in pats]
-    return SearchWidget(upats, repo, **opts)
+    search = opts.pop('search', False)
+    dlg = SearchWidget(upats, repo, **opts)
+    if search:
+        dlg.searchActivated()
+    return dlg
