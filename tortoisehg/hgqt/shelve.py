@@ -8,7 +8,7 @@
 import os
 import time
 
-from mercurial import commands, error
+from mercurial import commands, error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
@@ -257,11 +257,16 @@ class ShelveDialog(QDialog):
             if not ok:
                 return
             shelve = hglib.fromunicode(name)
-            invalids = (':', '#', '/', '\\', '<', '>', '|')
+            invalids = (':', '#', '/', '\\')
             bads = [c for c in shelve if c in invalids]
             if bads:
                 qtlib.ErrorMsgBox(_('Bad filename'),
-                                  _('A shelf name cannot contain :#/\\<>|'))
+                                  _('A shelf name cannot contain %s')
+                                  % ''.join(bads))
+                return
+            badmsg = util.checkosfilename(shelve)
+            if badmsg:
+                qtlib.ErrorMsgBox(_('Bad filename'), hglib.tounicode(badmsg))
                 return
         try:
             fn = os.path.join('shelves', shelve)
