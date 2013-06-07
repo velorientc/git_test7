@@ -94,6 +94,7 @@ class ManifestDialog(QMainWindow):
         dlg = self._dialogs.open(ManifestDialog._createSearchDialog)
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
         dlg.setSearch(pattern, **opts)
+        dlg.runSearch()
 
     def _createSearchDialog(self):
         from tortoisehg.hgqt import grep

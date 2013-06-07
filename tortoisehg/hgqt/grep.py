@@ -156,7 +156,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchbutton, self.cancelbutton = bt, cbt
         self.regexple.setFocus()
 
-        assert not opts.get('search'), 'cannot start search in constructor'
         if 'rev' in opts or 'all' in opts:
             self.setSearch(upats[0], **opts)
         elif len(upats) >= 1:
@@ -244,8 +243,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         elif opts.get('rev'):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
-        if opts.get('search'):
-            self.runSearch()
 
     def stopClicked(self):
         if self.thread and self.thread.isRunning():

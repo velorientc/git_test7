@@ -920,6 +920,7 @@ class RepoWidget(QWidget):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
         self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
         self.grepDemand.setSearch(pattern, **opts)
+        self.grepDemand.runSearch()
 
     def setupModels(self):
         # Filter revision set in case revisions were removed
