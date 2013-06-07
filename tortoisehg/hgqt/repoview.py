@@ -18,7 +18,7 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import htmldelegate, qtlib
+from tortoisehg.hgqt import htmldelegate, qtlib, repomodel
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from PyQt4.QtCore import *
@@ -59,6 +59,7 @@ class HgRepoView(QTableView):
 
         self.standardDelegate = self.itemDelegate()
         self.htmlDelegate = htmldelegate.HTMLDelegate(self)
+        self.graphDelegate = GraphDelegate(self)
 
         self.setAcceptDrops(True)
         if PYQT_VERSION >= 0x40700:
@@ -143,10 +144,12 @@ class HgRepoView(QTableView):
         for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in ['Description', 'Changes']:
                 self.setItemDelegateForColumn(c, self.htmlDelegate)
+            elif model._columns[c] == 'Graph':
+                self.setItemDelegateForColumn(c, self.graphDelegate)
             else:
                 self.setItemDelegateForColumn(c, self.standardDelegate)
 
-    def resizeColumns(self, *args):
+    def resizeColumns(self):
         if not self.model():
             return
         hh = self.horizontalHeader()
@@ -383,3 +386,21 @@ class HgRepoViewStyle(QStyle):
     def standardIconImplementation(self, *args):
         return self._style.standardIconImplementation(*args)
 
+class GraphDelegate(QStyledItemDelegate):
+
+    def paint(self, painter, option, index):
+        QStyledItemDelegate.paint(self, painter, option, index)
+        graph = index.data(repomodel.GraphRole)
+        if graph:
+            # not grayed-out even if revisions are inactive
+            pix = QPixmap(graph)
+            dest = option.rect
+            src = QRect(0, 0, dest.width(), dest.height())
+            painter.drawPixmap(dest, pix, src)
+
+    def sizeHint(self, option, index):
+        graph = index.data(repomodel.GraphRole)
+        if graph:
+            return QPixmap(graph).size()
+        else:
+            return QSize(0, 0)
