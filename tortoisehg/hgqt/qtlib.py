@@ -26,7 +26,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
-    sys.stderr.write('TortoiseHg requires Qt 4.6 and PyQt 4.6\n')
+    sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
                      (QT_VERSION_STR, PYQT_VERSION_STR))
     sys.exit()
