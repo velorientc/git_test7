@@ -107,10 +107,10 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         revision.toggled.connect(revisiontoggled)
         history.toggled.connect(singlematch.setDisabled)
         revle.setEnabled(False)
-        revle.returnPressed.connect(self.searchActivated)
-        excle.returnPressed.connect(self.searchActivated)
-        incle.returnPressed.connect(self.searchActivated)
-        bt.clicked.connect(self.searchActivated)
+        revle.returnPressed.connect(self.runSearch)
+        excle.returnPressed.connect(self.runSearch)
+        incle.returnPressed.connect(self.runSearch)
+        bt.clicked.connect(self.runSearch)
 
         def updateRecurse(checked):
             try:
@@ -146,7 +146,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
-        le.returnPressed.connect(self.searchActivated)
+        le.returnPressed.connect(self.runSearch)
 
         self.repo = repo
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
@@ -245,7 +245,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
         if opts.get('search'):
-            self.searchActivated()
+            self.runSearch()
 
     def stopClicked(self):
         if self.thread and self.thread.isRunning():
@@ -272,8 +272,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
 
-    def searchActivated(self):
-        'User pressed [Return] in QLineEdit'
+    @pyqtSlot()
+    def runSearch(self):
+        """Run search for the current pattern in background thread"""
         if self.thread and self.thread.isRunning():
             return
 
@@ -811,6 +812,10 @@ class SearchDialog(QDialog):
 
     def setSearch(self, upattern, **opts):
         self._searchwidget.setSearch(upattern, **opts)
+
+    @pyqtSlot()
+    def runSearch(self):
+        self._searchwidget.runSearch()
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
