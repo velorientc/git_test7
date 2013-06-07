@@ -815,8 +815,4 @@ class SearchDialog(QDialog):
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
     upats = [hglib.tounicode(p) for p in pats]
-    search = opts.pop('search', False)
-    dlg = SearchDialog(upats, repo, **opts)
-    if search:
-        dlg.searchActivated()
-    return dlg
+    return SearchDialog(upats, repo, **opts)
