@@ -1428,6 +1428,7 @@ class PathsTree(QTreeView):
 
     def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)
+        self.setDragDropMode(QTreeView.DragOnly)
         self.setSelectionMode(QTreeView.SingleSelection)
         self.editable = editable
 
@@ -1452,38 +1453,6 @@ class PathsTree(QTreeView):
                     parent=self)
             if r:
                 self.removeAlias.emit(alias)
-
-    def selectedUrls(self):
-        for index in self.selectedRows():
-            yield index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
-
-    def dragObject(self):
-        urls = []
-        for url in self.selectedUrls():
-            u = QUrl()
-            u.setPath(url)
-            urls.append(u)
-        if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return super(PathsTree, self).mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTreeView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return super(PathsTree, self).mouseMoveEvent(event)
-        self.dragObject()
-        return super(PathsTree, self).mouseMoveEvent(event)
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
@@ -1521,6 +1490,20 @@ class PathsModel(QAbstractTableModel):
             return QVariant()
         else:
             return QVariant(self.headers[col])
+
+    def mimeData(self, indexes):
+        urls = []
+        for i in indexes:
+            u = QUrl()
+            u.setPath(self.rows[i.row()][1])
+            urls.append(u)
+
+        m = QMimeData()
+        m.setUrls(urls)
+        return m
+
+    def mimeTypes(self):
+        return ['text/uri-list']
 
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
