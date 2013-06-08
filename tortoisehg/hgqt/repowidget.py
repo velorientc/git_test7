@@ -2207,7 +2207,7 @@ class RepoWidget(QWidget):
         def qpopAll(repo):
             self.mqDemand.get().popAll()
 
-        ctx = self.repo.changectx(self.rev)
+        ctx = self.repo.changectx(rev)
         if 'qparent'in ctx.tags():
             return qpopAll(self.repo)
         try:
@@ -2221,12 +2221,12 @@ class RepoWidget(QWidget):
             return qpopAll(self.repo)
 
         if not applied:
-            patchname = self.repo.changectx(self.rev).thgmqpatchname()
+            patchname = self.repo.changectx(rev).thgmqpatchname()
         else:
             if unapplySelected:
-                thgp = self.repo.changectx(self.repo.changectx(self.rev).p1().node())
+                thgp = self.repo.changectx(self.repo.changectx(rev).p1().node())
             else:
-                thgp = self.repo.changectx(self.repo.changectx(self.rev).node())
+                thgp = self.repo.changectx(self.repo.changectx(rev).node())
             patchname = thgp.thgmqpatchname()
         self.mqDemand.get().qgotoRevision(patchname)
 
