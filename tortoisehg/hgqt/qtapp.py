@@ -211,22 +211,7 @@ class QtRunner(QObject):
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
-        try:
-            args = list(args)
-            if 'repository' in opts:
-                repo = thgrepo.repository(ui, opts['repository'])
-                args.insert(0, repo)
-            dlg = dlgfunc(ui, *args, **opts)
-        except error.RepoError, inst:
-            qtlib.WarningMsgBox(_('Repository Error'),
-                                hglib.tounicode(str(inst)))
-            return -1
-        except error.Abort, inst:
-            qtlib.WarningMsgBox(_('Abort'),
-                                hglib.tounicode(str(inst)),
-                                hglib.tounicode(inst.hint or ''))
-            return -1
-
+        dlg = self._createdialog(dlgfunc, ui, args, opts)
         if dlg:
             dlg.show()
             dlg.raise_()
@@ -253,6 +238,21 @@ class QtRunner(QObject):
         t = QTranslator(self._mainapp)
         t.load('qt_' + i18n.language, qtlib.gettranslationpath())
         self._mainapp.installTranslator(t)
+
+    def _createdialog(self, dlgfunc, ui, args, opts):
+        try:
+            args = list(args)
+            if 'repository' in opts:
+                repo = thgrepo.repository(ui, opts['repository'])
+                args.insert(0, repo)
+            return dlgfunc(ui, *args, **opts)
+        except error.RepoError, inst:
+            qtlib.WarningMsgBox(_('Repository Error'),
+                                hglib.tounicode(str(inst)))
+        except error.Abort, inst:
+            qtlib.WarningMsgBox(_('Abort'),
+                                hglib.tounicode(str(inst)),
+                                hglib.tounicode(inst.hint or ''))
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
         dlg = dlgfunc(ui, *args, **opts)
