@@ -2207,16 +2207,8 @@ class RepoWidget(QWidget):
         ctx = self.repo.changectx(rev)
         if 'qparent'in ctx.tags():
             return qpopAll(self.repo)
-        try:
-            applied = ctx.thgmqappliedpatch()
-        except:
-            applied = True
 
-        if not applied:
-            patchname = self.repo.changectx(rev).thgmqpatchname()
-        else:
-            thgp = self.repo.changectx(self.repo.changectx(rev).node())
-            patchname = thgp.thgmqpatchname()
+        patchname = ctx.thgmqpatchname()
         self.mqDemand.get().qgotoRevision(patchname)
 
     def qrename(self):
