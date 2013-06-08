@@ -2192,10 +2192,12 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(cmdline)
 
+    @pyqtSlot()
     def qgotoParentRevision(self):
         """Apply an unapplied patch, or qgoto the parent of an applied patch"""
         self.qgotoRevision(self.repo[self.rev].p1().rev())
 
+    @pyqtSlot()
     def qgotoSelectedRevision(self):
         self.qgotoRevision(self.rev)
 
