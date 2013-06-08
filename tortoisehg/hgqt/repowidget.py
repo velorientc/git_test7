@@ -2194,16 +2194,13 @@ class RepoWidget(QWidget):
 
     def qgotoParentRevision(self):
         """Apply an unapplied patch, or qgoto the parent of an applied patch"""
-        self.qgotoRevision(self.rev, unapplySelected=True)
+        self.qgotoRevision(self.repo[self.rev].p1().rev())
 
     def qgotoSelectedRevision(self):
-        self.qgotoRevision(self.rev, unapplySelected=False)
+        self.qgotoRevision(self.rev)
 
-    def qgotoRevision(self, rev, unapplySelected=True):
+    def qgotoRevision(self, rev):
         """Make REV the top applied patch"""
-        # If unapplySelected is true and rev is an applied patch
-        # it will be unapplied (qgoto its parent)
-        # Otherwise, qgoto the selected revision
         def qpopAll(repo):
             self.mqDemand.get().popAll()
 
@@ -2212,21 +2209,13 @@ class RepoWidget(QWidget):
             return qpopAll(self.repo)
         try:
             applied = ctx.thgmqappliedpatch()
-            mqpatch = True
         except:
             applied = True
-            mqpatch = False
-
-        if unapplySelected and mqpatch and applied and 'qparent' in ctx.p1().tags():
-            return qpopAll(self.repo)
 
         if not applied:
             patchname = self.repo.changectx(rev).thgmqpatchname()
         else:
-            if unapplySelected:
-                thgp = self.repo.changectx(self.repo.changectx(rev).p1().node())
-            else:
-                thgp = self.repo.changectx(self.repo.changectx(rev).node())
+            thgp = self.repo.changectx(self.repo.changectx(rev).node())
             patchname = thgp.thgmqpatchname()
         self.mqDemand.get().qgotoRevision(patchname)
 
