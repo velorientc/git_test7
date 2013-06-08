@@ -405,9 +405,3 @@ class RevsetThread(QThread):
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
 
         os.chdir(cwd)
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return RevisionSetQuery(repo)
