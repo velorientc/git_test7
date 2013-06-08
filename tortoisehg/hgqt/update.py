@@ -9,7 +9,7 @@
 
 from mercurial import error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
 
@@ -430,12 +430,3 @@ class UpdateDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    rev = None
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    return UpdateDialog(repo, rev, None, opts)

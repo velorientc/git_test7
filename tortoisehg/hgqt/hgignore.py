@@ -314,11 +314,3 @@ class HgignoreDialog(QDialog):
         s = QSettings()
         s.setValue('hgignore/geom', self.saveGeometry())
         QDialog.reject(self)
-
-def run(_ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(_ui, path=paths.find_root())
-    if pats and pats[0].endswith('.hgignore'):
-        pats = []
-    return HgignoreDialog(repo, None, *pats)
