@@ -2201,15 +2201,12 @@ class RepoWidget(QWidget):
 
     def qgotoRevision(self, rev):
         """Make REV the top applied patch"""
-        def qpopAll(repo):
-            self.mqDemand.get().popAll()
-
+        mqw = self.mqDemand.get()
         ctx = self.repo.changectx(rev)
         if 'qparent'in ctx.tags():
-            return qpopAll(self.repo)
-
-        patchname = ctx.thgmqpatchname()
-        self.mqDemand.get().qgotoRevision(patchname)
+            mqw.popAll()
+        else:
+            mqw.qgotoRevision(ctx.thgmqpatchname())
 
     def qrename(self):
         sel = self.menuselection[0]
