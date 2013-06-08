@@ -255,7 +255,7 @@ class QtRunner(QObject):
                                 hglib.tounicode(inst.hint or ''))
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
-        dlg = dlgfunc(ui, *args, **opts)
+        dlg = self._createdialog(dlgfunc, ui, args, opts)
         if not dlg:
             return
 
