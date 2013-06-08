@@ -191,7 +191,7 @@ class QtRunner(QObject):
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
-            self._opendialog(dlgfunc, ui, *args, **opts)
+            self._opendialog(dlgfunc, ui, args, opts)
             return
 
         QSettings.setDefaultFormat(QSettings.IniFormat)
@@ -254,7 +254,7 @@ class QtRunner(QObject):
                                 hglib.tounicode(str(inst)),
                                 hglib.tounicode(inst.hint or ''))
 
-    def _opendialog(self, dlgfunc, ui, *args, **opts):
+    def _opendialog(self, dlgfunc, ui, args, opts):
         dlg = self._createdialog(dlgfunc, ui, args, opts)
         if not dlg:
             return
