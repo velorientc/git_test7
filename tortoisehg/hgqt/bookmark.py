@@ -118,7 +118,7 @@ class BookmarkDialog(QDialog):
         """ update display on dialog with recent repo data """
         # add bookmarks to drop-down list
         marks = self.repo._bookmarks.keys()[:]
-        marks.sort(reverse=True)
+        marks.sort()
         cur = self.bookmarkCombo.currentText()
         self.bookmarkCombo.clear()
         for bookmark in marks:
