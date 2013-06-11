@@ -1169,6 +1169,16 @@ class SaveDialog(QDialog):
         else:
             self.clearcb = None
 
+        s = QSettings()
+        self.updatesubpaths = QCheckBox(_('Update subrepo paths'))
+        self.updatesubpaths.setChecked(
+            s.value('sync/updatesubpaths', True).toBool())
+        self.updatesubpaths.setToolTip(
+            _('Update or create a path alias called \'%s\' on all subrepos, '
+              'using this URL as the base URL, '
+              'appending the local relative subrepo path to it') % alias)
+        self.layout().addRow(self.updatesubpaths)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1179,8 +1189,8 @@ class SaveDialog(QDialog):
 
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
-    def accept(self):
-        fn = self.repo.join('hgrc')
+    def savePath(self, repo, alias, path, confirm=True):
+        fn = repo.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
@@ -1188,14 +1198,7 @@ class SaveDialog(QDialog):
             return
         if fn is None:
             return
-        alias = hglib.fromunicode(self.aliasentry.text())
-        if self.edit:
-            path = hglib.fromunicode(self.urlentry.text())
-        elif self.clearcb and self.clearcb.isChecked():
-            path = self.cleanurl
-        else:
-            path = self.origurl
-        if (not self.edit or path != self.origurl) and alias in cfg['paths']:
+        if confirm and (not self.edit or path != self.origurl) and alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                 _('%s already exists, replace URL?') % hglib.tounicode(alias),
                 parent=self):
@@ -1203,13 +1206,52 @@ class SaveDialog(QDialog):
         cfg.set('paths', alias, path)
         if self.edit and alias != self.origalias:
             cfg.remove('paths', self.origalias)
-        self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
+        if self.updatesubpaths.isChecked():
+            ctx = repo['.']
+            for subname in ctx.substate:
+                if ctx.substate[subname][2] != 'hg':
+                    continue
+                if not os.path.exists(repo.wjoin(subname)):
+                    continue
+                defaultsubpath = ctx.substate[subname][0]
+                pathurl = util.url(path)
+                if pathurl.scheme:
+                    subpath = str(pathurl).rstrip('/') + '/' + subname
+                else:
+                    subpath = os.path.normpath(os.path.join(path, subname))
+                if defaultsubpath != subname:
+                    if not qtlib.QuestionMsgBox(
+                            _('Confirm URL replace'),
+                            _('Subrepo \'%s\' has a non trivial '
+                              'default sync URL:<p>%s<p>'
+                              'Replace it with the following URL?:'
+                              '<p>%s')
+                                % (hglib.tounicode(subname),
+                                    hglib.tounicode(defaultsubpath),
+                                    hglib.tounicode(subpath)),
+                            parent=self):
+                        continue
+                subrepo = hg.repository(repo.ui, path=repo.wjoin(subname))
+                self.savePath(subrepo, alias, subpath, confirm=False)
+
+    def accept(self):
+        alias = hglib.fromunicode(self.aliasentry.text())
+        if self.edit:
+            path = hglib.fromunicode(self.urlentry.text())
+        elif self.clearcb and self.clearcb.isChecked():
+            path = self.cleanurl
+        else:
+            path = self.origurl
+        self.repo.incrementBusyCount()
+        self.savePath(self.repo, alias, path)
         self.repo.decrementBusyCount()
+        s = QSettings()
+        s.setValue('sync/updatesubpaths', self.updatesubpaths.isChecked())
         super(SaveDialog, self).accept()
 
     def reject(self):
