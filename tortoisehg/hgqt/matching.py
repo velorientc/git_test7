@@ -18,7 +18,7 @@ class MatchDialog(QDialog):
 
     revmatch = pyqtSignal(QString)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repo, rev=None, parent=None):
         super(MatchDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
