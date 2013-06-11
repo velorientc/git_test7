@@ -143,8 +143,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                                     lineWrapMode=QTextEdit.NoWrap,
                                     openLinks=False)
         self.message.minimumSizeHint = lambda: QSize(0, 25)
-        self.message.anchorClicked.connect(
-            lambda url: self.linkActivated.emit(url.toString()))
+        self.message.anchorClicked.connect(self._forwardAnchorClicked)
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
@@ -198,7 +197,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def createActions(self):
         self.actionUpdate = a = self.filelisttbar.addAction(
             qtlib.geticon('hg-update'), _('Update to this revision'))
-        a.triggered.connect(lambda: self.updateToRevision.emit(self.ctx.rev()))
+        a.triggered.connect(self._emitUpdateToRevision)
         self.filelisttbar.addSeparator()
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -271,6 +270,14 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                 and rev not in self.repo.thgmqunappliedpatches)):
             rev = 'tip'
         self.onRevisionSelected(rev)
+
+    @pyqtSlot(QUrl)
+    def _forwardAnchorClicked(self, url):
+        self.linkActivated.emit(url.toString())
+
+    @pyqtSlot()
+    def _emitUpdateToRevision(self):
+        self.updateToRevision.emit(self.ctx.rev())
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
