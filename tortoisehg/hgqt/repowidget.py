@@ -215,7 +215,7 @@ class RepoWidget(QWidget):
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
-        w.updateToRevision.connect(lambda rev: self.updateToRevision())
+        w.updateToRevision.connect(self.updateToRevision)
         w.runCustomCommandRequested.connect(
             self.handleRunCustomCommandRequest)
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
@@ -1848,6 +1848,7 @@ class RepoWidget(QWidget):
             dlg.exec_()
             dlg.deleteLater()
 
+    @pyqtSlot()
     def updateToRevision(self):
         ctx = self.repo[self.rev]
         bookmarks = ctx.bookmarks()
