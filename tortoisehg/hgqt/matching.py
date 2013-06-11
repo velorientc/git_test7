@@ -24,7 +24,6 @@ class MatchDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self.revsetexpression = ''
-        self._finished = False
         self.repo = repo
 
         # base layout box

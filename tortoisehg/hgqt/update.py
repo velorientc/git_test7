@@ -27,7 +27,6 @@ class UpdateDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
-        self._finished = False
         self.repo = repo
 
         # base layout box
