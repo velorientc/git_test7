@@ -174,6 +174,3 @@ class AboutDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('about/geom', self.saveGeometry())
-
-def run(ui, *pats, **opts):
-    return AboutDialog()

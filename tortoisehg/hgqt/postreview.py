@@ -16,10 +16,10 @@
 # GNU General Public License version 2, incorporated herein by reference.
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import error, extensions, scmutil
-from tortoisehg.util import hglib, paths
+from mercurial import extensions, scmutil
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.postreview_ui import Ui_PostReviewDialog
 from tortoisehg.hgqt.hgemail import _ChangesetsModel
 
@@ -388,15 +388,3 @@ class PostReviewDialog(QDialog):
             # accidentally.
             self.repo.invalidateui()  # force reloading config immediately
             self.readSettings()
-
-def run(ui, *pats, **opts):
-    revs = opts.get('rev') or None
-    if not revs and len(pats):
-        revs = pats[0]
-    repo = opts.get('repo') or thgrepo.repository(ui, path=paths.find_root())
-
-    try:
-        return PostReviewDialog(repo.ui, repo, revs)
-    except error.RepoLookupError, e:
-        qtlib.ErrorMsgBox(_('Failed to open Review Board dialog'),
-                          hglib.tounicode(e.message))

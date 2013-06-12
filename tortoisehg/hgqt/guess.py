@@ -441,9 +441,3 @@ class RenameSearchThread(QThread):
                 return
             old, new, sim = o.path(), n.path(), s
             self.match.emit([old, new, sim])
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(None, path=paths.find_root())
-    return DetectRenameDialog(repo, None, *pats)

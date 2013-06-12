@@ -344,16 +344,3 @@ class TagDialog(QDialog):
         # prevent signals from reaching deleted objects
         self.repo.repositoryChanged.disconnect(self.refresh)
         super(TagDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    kargs = {}
-    tag = len(pats) > 0 and pats[0] or None
-    if tag:
-        kargs['tag'] = tag
-    rev = opts.get('rev')
-    if rev:
-        kargs['rev'] = rev
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return TagDialog(repo, opts=opts, **kargs)

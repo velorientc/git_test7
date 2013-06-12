@@ -275,14 +275,3 @@ class RejectBrowser(qscilib.Scintilla):
         for i in removed:
             self.markerAdd(i, self.removedMark)
             self.markerAdd(i, self.removedColor)
-
-def run(ui, *pats, **opts):
-    if len(pats) != 1:
-        qtlib.ErrorMsgBox(_('Filename required'),
-                          _('You must provide the path to a file'))
-        import sys; sys.exit()
-    path = pats[0]
-    if path.endswith('.rej'):
-        path = path[:-4]
-    dlg = RejectsDialog(path, None)
-    return dlg

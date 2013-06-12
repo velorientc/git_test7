@@ -7,9 +7,9 @@
 
 from mercurial import error, revset
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
+from tortoisehg.hgqt import csinfo, qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -18,13 +18,12 @@ class MatchDialog(QDialog):
 
     revmatch = pyqtSignal(QString)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repo, rev=None, parent=None):
         super(MatchDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
         self.revsetexpression = ''
-        self._finished = False
         self.repo = repo
 
         # base layout box

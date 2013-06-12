@@ -17,6 +17,7 @@ from mercurial import hg, ui, util, scmutil, httpconnection
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
+from tortoisehg.hgqt import hgemail
 
 def parseurl(url):
     assert type(url) == unicode
@@ -62,7 +63,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
-        self.targetargs = []
 
         s = QSettings()
         for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug', 'mq'):
@@ -247,6 +247,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.setVisible(False)
         self.cmd = cmd
 
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
+
         self.curalias = None
         self.reload()
         if 'default' in self.paths:
@@ -259,24 +262,21 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
-        #The parallel targetargs record is the argument list to pass to hg
-        self.targetargs = []
+        # itemData(role=UserRole) is the argument list to pass to hg
         selIndex = 0
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
-        self.targetargs.append(['--rev', str(ctx.rev())])
+        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
+                                 ('--rev', str(ctx.rev())))
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.addItem(_('bookmark: ') + uname, ('--bookmark', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
 
@@ -607,10 +607,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if 'rev' in details and '--rev' not in cmdline:
             if self.embedded and self.targetcheckbox.isChecked():
                 idx = self.targetcombo.currentIndex()
-                if idx != -1 and idx < len(self.targetargs):
-                    args = self.targetargs[idx]
+                if idx != -1:
+                    args = self.targetcombo.itemData(idx).toPyObject()
                     if args[0][2:] not in details:
-                        args[0] = '--rev'
+                        args = ('--rev',) + args[1:]
                     cmdline += args
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
@@ -659,7 +659,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot(QString, QString)
     def outputHook(self, msg, label):
         label = unicode(label)
-        if '\'hg push --new-branch\'' in msg:
+        if "'hg push --new-branch'" in msg and 'ui.error' in label.split():
             # not report as error because it will be handled internally in the
             # same session (see pushclicked.finished)
             self.needNewBranch = True
@@ -715,9 +715,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def linkifyWithTarget(self, url):
         link = linkify(url)
         if self.embedded and self.targetcheckbox.isChecked():
-            idx = self.targetcombo.currentIndex()
-            if idx != -1 and idx < len(self.targetargs):
-                link += (u" (%s)" % self.targetcombo.currentText())
+            link += u" (%s)" % self.targetcombo.currentText()
         return link
 
     def inclicked(self):
@@ -768,7 +766,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                       % (link, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
-            if self.opts.get('rebase'):
+            if self.opts.get('rebase') or self.opts.get('updateorrebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
                     dlg = rebase.RebaseDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
@@ -792,6 +790,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
             cmdline += ['--update', '--config', uimerge]
+        elif self.cachedpp == 'updateorrebase':
+            cmdline += ['--update', '--rebase', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         elif self.opts.get('mq'):
@@ -966,16 +966,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
-                nodes = [n for n in data.splitlines() if len(n) == 40]
+                nodes = tuple(n for n in data.splitlines() if len(n) == 40)
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
                 try:
-                    outgoingrevs = [cmdline[cmdline.index('--rev') + 1]]
+                    outgoingrevs = (cmdline[cmdline.index('--rev') + 1],)
                 except ValueError:
                     outgoingrevs = None
-                from tortoisehg.hgqt import run as _run
-                _run.email(ui.ui(), repo=self.repo, rev=nodes,
-                           outgoing=True, outgoingrevs=outgoingrevs)
+                self._dialogs.open(SyncWidget._createEmailDialog, nodes,
+                                   outgoingrevs)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
             else:
@@ -984,6 +983,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                     '--template', '{node}\n']
         self.run(cmdline, ('force', 'branch', 'rev'))
+
+    def _createEmailDialog(self, revs, outgoingrevs):
+        return hgemail.EmailDialog(self.repo, revs, outgoing=True,
+                                   outgoingrevs=outgoingrevs)
 
     def unbundle(self):
         caption = _("Select bundle file")
@@ -1048,13 +1051,18 @@ class PostPullDialog(QDialog):
             layout.addWidget(self.fetch)
         else:
             self.fetch = None
-        if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
+        if ('rebase' in repo.extensions()
+            or repo.postpull in ('rebase', 'updateorrebase')):
             if 'rebase' in repo.extensions():
-                btntxt = _('Rebase - rebase local commits above pulled changes')
+                rebasetxt = _('Rebase - rebase local commits above pulled changes')
+                updateorrebasetxt = _('UpdateOrRebase - pull, then try to update or rebase')
             else:
-                btntxt = _('Rebase - use rebase extension (rebase is not active!)')
-            self.rebase = QRadioButton(btntxt)
+                rebasetxt = _('Rebase - use rebase extension (rebase is not active!)')
+                updateorrebasetxt = _('UpdateOrRebase - use rebase extension (rebase is not active!)')
+            self.rebase = QRadioButton(rebasetxt)
             layout.addWidget(self.rebase)
+            self.updateOrRebase = QRadioButton(updateorrebasetxt)
+            layout.addWidget(self.updateOrRebase)
 
         self.none.setChecked(True)
         if repo.postpull == 'update':
@@ -1063,6 +1071,8 @@ class PostPullDialog(QDialog):
             self.fetch.setChecked(True)
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
+        elif repo.postpull == 'updateorrebase':
+            self.updateOrRebase.setChecked(True)
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
@@ -1096,8 +1106,10 @@ class PostPullDialog(QDialog):
             return 'update'
         elif (self.fetch and self.fetch.isChecked()):
             return 'fetch'
-        else:
+        elif (self.rebase and self.rebase.isChecked()):
             return 'rebase'
+        else:
+            return 'updateorrebase'
 
     def accept(self):
         path = self.repo.join('hgrc')
@@ -1595,11 +1607,3 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
-
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    w = SyncWidget(repo, None, **opts)
-    if pats:
-        w.setUrl(hglib.tounicode(pats[0]))
-    return w
