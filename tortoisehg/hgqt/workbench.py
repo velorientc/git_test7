@@ -383,8 +383,9 @@ class Workbench(QMainWindow):
 
     def _setupUrlCombo(self, repo):
         """repository has been switched, fill urlCombo with URLs"""
-        aliases = [hglib.tounicode(alias)
-                   for alias, path in repo.ui.configitems('paths')]
+        pathdict = dict((hglib.tounicode(alias), hglib.tounicode(path))
+                         for alias, path in repo.ui.configitems('paths'))
+        aliases = pathdict.keys()
 
         # 1. Sort the list if aliases
         aliases.sort()
@@ -412,12 +413,19 @@ class Workbench(QMainWindow):
         aliases = combinedaliases + regularaliases
 
         self.urlCombo.clear()
-        for a in aliases:
+        for n, a in enumerate(aliases):
             # text, (pull-alias, push-alias)
             if isinstance(a, tuple):
-                self.urlCombo.addItem(u'\u2193 %s | %s \u2191' % a, a)
+                itemtext = u'\u2193 %s | %s \u2191' % a
+                itemdata = a
+                tooltip = _('pull: %s\npush: %s') % tuple(pathdict[alias]
+                    for alias in itemdata)
             else:
-                self.urlCombo.addItem(a, (a, a))
+                itemtext = a
+                itemdata = (a, a)
+                tooltip = pathdict[a]
+            self.urlCombo.addItem(itemtext, itemdata)
+            self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
