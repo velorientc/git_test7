@@ -114,6 +114,7 @@ class BookmarkDialog(QDialog):
         self.bookmarkCombo.setFocus()
         self.bookmarkTextChanged()
 
+    @pyqtSlot()
     def refresh(self):
         """ update display on dialog with recent repo data """
         # add bookmarks to drop-down list
@@ -236,8 +237,3 @@ class BookmarkDialog(QDialog):
                    '--rename', namelocal, newnamelocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
-
-    def reject(self):
-        # prevent signals from reaching deleted objects
-        self.repo.repositoryChanged.disconnect(self.refresh)
-        super(BookmarkDialog, self).reject()
