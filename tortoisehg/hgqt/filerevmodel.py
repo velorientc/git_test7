@@ -82,6 +82,10 @@ class FileRevModel(HgRepoListModel):
 
         This does not follow renames.
         """
+        # as of Mercurial 2.6, workingfilectx.linkrev() does not work, and
+        # this model has no virtual working-dir revision.
+        if rev is None:
+            rev = '.'
         try:
             fctx = self.repo[rev][self.filename]
         except error.LookupError:
