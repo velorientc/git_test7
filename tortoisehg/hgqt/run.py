@@ -443,6 +443,20 @@ def bisect(ui, repo, *pats, **opts):
     from tortoisehg.hgqt import bisect as bisectmod
     return bisectmod.BisectDialog(repo, opts)
 
+@command('bookmarks|bookmark',
+    [('r', 'rev', '', _('revision'))],
+    _('thg bookmarks [-r REV] [NAME]'))
+def bookmark(ui, repo, *names, **opts):
+    """add or remove a movable marker"""
+    from tortoisehg.hgqt import bookmark as bookmarkmod
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    if len(names) > 1:
+        raise util.Abort(_('only one new bookmark name allowed'))
+    dlg = bookmarkmod.BookmarkDialog(repo, rev)
+    if names:
+        dlg.setBookmarkName(hglib.tounicode(names[0]))
+    return dlg
+
 @command('^clone',
     [('U', 'noupdate', None, _('the clone will include an empty working copy '
                                '(only a repository)')),

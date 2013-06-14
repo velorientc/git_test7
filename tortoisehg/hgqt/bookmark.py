@@ -17,7 +17,7 @@ class BookmarkDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent):
+    def __init__(self, repo, rev, parent=None):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
@@ -140,6 +140,9 @@ class BookmarkDialog(QDialog):
             self.moveBtn.setEnabled(False)
             self.renameBtn.setEnabled(False)
             self.newNameEdit.setEnabled(False)
+
+    def setBookmarkName(self, name):
+        self.bookmarkCombo.setEditText(name)
 
     def set_status(self, text, icon=None):
         self.status.setShown(True)
