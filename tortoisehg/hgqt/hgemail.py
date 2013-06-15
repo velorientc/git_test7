@@ -205,7 +205,8 @@ class EmailDialog(QDialog):
         opts['intro'] = self._qui.writeintro_check.isChecked()
         if opts['intro']:
             opts['subject'] = headertext(self._qui.subject_edit.currentText())
-            opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
+            opts['desc'] = writetempfile(
+                hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
         # Include the repo in the command so it can be found when thg is not
@@ -220,7 +221,8 @@ class EmailDialog(QDialog):
             if not getattr(self._qui, e).currentText():
                 return False
 
-        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.currentText():
+        if (self._qui.writeintro_check.isChecked()
+            and not self._qui.subject_edit.currentText()):
             return False
 
         if not self._revs:
@@ -316,7 +318,7 @@ class EmailDialog(QDialog):
             lex.setFont(fh.font())
             w.setLexer(lex)
             # TODO: better way to setup diff lexer
-          
+
         initqsci(self._qui.preview_edit)
 
         self._qui.main_tabs.currentChanged.connect(self._refreshpreviewtab)
