@@ -1301,13 +1301,12 @@ def connectToExistingWorkbench(root=None):
 
 def run(ui, *pats, **opts):
     root = opts.get('root') or paths.find_root()
-    if root and pats:
+    if root and len(pats) == 1 and os.path.isfile(pats[0]):
         repo = thgrepo.repository(ui, root)
         pats = hglib.canonpaths(pats)
-        if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
-            from tortoisehg.hgqt.filedialogs import FileLogDialog
-            fname = pats[0]
-            return FileLogDialog(repo, fname)
+        from tortoisehg.hgqt.filedialogs import FileLogDialog
+        fname = pats[0]
+        return FileLogDialog(repo, fname)
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)
@@ -1342,8 +1341,8 @@ def run(ui, *pats, **opts):
 
         if pats:
             q = []
-            for pat in pats:
-                f = repo.wjoin(pat)
+            for f in pats:
+                pat = hglib.canonpaths([f])[0]
                 if os.path.isdir(f):
                     q.append('file("%s/**")' % pat)
                 elif os.path.isfile(f):
