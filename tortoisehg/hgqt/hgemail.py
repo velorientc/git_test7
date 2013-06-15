@@ -12,7 +12,7 @@ from StringIO import StringIO
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import error, extensions, util, scmutil
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
