@@ -413,7 +413,8 @@ class RevDetailsDialog(QDialog):
         else:
             hash = self.revdetails.ctx.hex()[:12]
             revstr = '@%s: %s' % (str(revnum), hash)
-        self.setWindowTitle(_('%s - Revision Details (%s)') % (self.revdetails.repo.displayname, revstr))
+        self.setWindowTitle(_('%s - Revision Details (%s)')
+                            % (self.revdetails.repo.displayname, revstr))
         self.revdetails.reload()
 
     def done(self, ret):
