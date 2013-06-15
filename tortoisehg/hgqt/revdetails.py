@@ -88,7 +88,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelisttbar = QToolBar(_('File List Toolbar'))
         self.filelisttbar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView(self.repo, self, True)
-        self.filelist.linkActivated.connect(self.linkActivated)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
         self.filelist.doubleClicked.connect(self.onDoubleClick)
