@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import gc, os, sys, traceback, zlib
+import gc, os, sys, traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication
@@ -27,7 +27,7 @@ except ImportError:
 # It doesn't check the hierarchy of exception classes for simplicity.
 _recoverableexc = {
     error.RepoLookupError: _('Try refreshing your repository.'),
-    zlib.error:            _('Try refreshing your repository.'),
+    error.RevlogError:     _('Try refreshing your repository.'),
     error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                         '<a href="#edit:%(arg1)s">edit</a> your config'),
     error.ConfigError: _('Configuration Error: "%(arg0)s",<br>Please '
