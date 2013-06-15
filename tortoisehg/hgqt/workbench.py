@@ -39,7 +39,7 @@ class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
 
-    def __init__(self, createserver=False):
+    def __init__(self):
         QMainWindow.__init__(self)
         self.progressDialog = QProgressDialog(
             'TortoiseHg - Initializing Workbench', QString(), 0, 100)
@@ -101,10 +101,6 @@ class Workbench(QMainWindow):
             lambda self, dlgmeth: dlgmeth(self), parent=self)
 
         self.server = None
-        if createserver:
-            # Enable the Workbench Server that is used to maintain a single
-            # workbench instance
-            self.createWorkbenchServer()
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -1324,7 +1320,9 @@ def run(ui, *pats, **opts):
         # is not one already
         mustcreateserver = not serverexists
 
-    w = Workbench(createserver=mustcreateserver)
+    w = Workbench()
+    if mustcreateserver:
+        w.createWorkbenchServer()
     if root:
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
