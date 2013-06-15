@@ -411,6 +411,11 @@ class Workbench(QMainWindow):
         combinedaliases = [(a, a + '-push') for a in haspushaliases]
         # 6. Put the combined aliases first, followed by the regular aliases
         aliases = combinedaliases + regularaliases
+        # 7. Ensure the first path is a default path (either a
+        # combined "default | default-push" path or a regular default path)
+        if not 'default-push' in aliases and 'default' in aliases:
+            aliases.remove('default')
+            aliases.insert(0, 'default')
 
         self.urlCombo.clear()
         for n, a in enumerate(aliases):
