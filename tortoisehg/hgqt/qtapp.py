@@ -23,6 +23,19 @@ try:
 except ImportError:
     thginithook = None
 
+# {exception class: message}
+# It doesn't check the hierarchy of exception classes for simplicity.
+_recoverableexc = {
+    error.RepoLookupError: _('Try refreshing your repository.'),
+    zlib.error:            _('Try refreshing your repository.'),
+    error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
+                        '<a href="#edit:%(arg1)s">edit</a> your config'),
+    error.ConfigError: _('Configuration Error: "%(arg0)s",<br>Please '
+                         '<a href="#fix:%(arg0)s">fix</a> your config'),
+    error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
+    error.LockUnavailable: _('Repository is locked'),
+    }
+
 def earlyExceptionMsgBox(e):
     """Show message for recoverable error before the QApplication is started"""
     opts = {}
@@ -101,19 +114,6 @@ class QtRunner(QObject):
 
     _exceptionOccured = pyqtSignal(object, object, object)
 
-    # {exception class: message}
-    # It doesn't check the hierarchy of exception classes for simplicity.
-    _recoverableexc = {
-        error.RepoLookupError: _('Try refreshing your repository.'),
-        zlib.error:            _('Try refreshing your repository.'),
-        error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
-                            '<a href="#edit:%(arg1)s">edit</a> your config'),
-        error.ConfigError: _('Configuration Error: "%(arg0)s",<br>Please '
-                             '<a href="#fix:%(arg0)s">fix</a> your config'),
-        error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
-        error.LockUnavailable: _('Repository is locked'),
-        }
-
     def __init__(self):
         super(QtRunner, self).__init__()
         gc.disable()
@@ -164,9 +164,9 @@ class QtRunner(QObject):
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
         if (len(set(e[0] for e in self.errors)) == 1
-            and etype in self._recoverableexc):
+            and etype in _recoverableexc):
             opts['values'] = evalue
-            errstr = self._recoverableexc[etype]
+            errstr = _recoverableexc[etype]
             if etype is error.Abort and evalue.hint:
                 errstr = u''.join([errstr, u'<br><b>', _('hint:'),
                                    u'</b> %(arg1)s'])
