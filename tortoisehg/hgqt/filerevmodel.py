@@ -14,6 +14,8 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from mercurial import error
+
 from tortoisehg.hgqt.repomodel import HgRepoListModel, COLUMNHEADERS
 from tortoisehg.hgqt.graph import Graph, filelog_grapher
 from tortoisehg.hgqt.i18n import _
@@ -74,3 +76,18 @@ class FileRevModel(HgRepoListModel):
         else:
             self.graph = None
             self.heads = []
+
+    def indexLinkedFromRev(self, rev):
+        """Index for the last changed revision before the specified revision
+
+        This does not follow renames.
+        """
+        # as of Mercurial 2.6, workingfilectx.linkrev() does not work, and
+        # this model has no virtual working-dir revision.
+        if rev is None:
+            rev = '.'
+        try:
+            fctx = self.repo[rev][self.filename]
+        except error.LookupError:
+            return None
+        return self.indexFromRev(fctx.linkrev())

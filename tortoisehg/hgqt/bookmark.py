@@ -5,25 +5,19 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error
-
-from tortoisehg.util import hglib, i18n
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui
-
-keep = i18n.keepgettext()
 
 class BookmarkDialog(QDialog):
     showMessage = pyqtSignal(QString)
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent):
+    def __init__(self, repo, rev, parent=None):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
@@ -114,6 +108,7 @@ class BookmarkDialog(QDialog):
         self.bookmarkCombo.setFocus()
         self.bookmarkTextChanged()
 
+    @pyqtSlot()
     def refresh(self):
         """ update display on dialog with recent repo data """
         # add bookmarks to drop-down list
@@ -145,6 +140,9 @@ class BookmarkDialog(QDialog):
             self.moveBtn.setEnabled(False)
             self.renameBtn.setEnabled(False)
             self.newNameEdit.setEnabled(False)
+
+    def setBookmarkName(self, name):
+        self.bookmarkCombo.setEditText(name)
 
     def set_status(self, text, icon=None):
         self.status.setShown(True)
@@ -236,8 +234,3 @@ class BookmarkDialog(QDialog):
                    '--rename', namelocal, newnamelocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
-
-    def reject(self):
-        # prevent signals from reaching deleted objects
-        self.repo.repositoryChanged.disconnect(self.refresh)
-        super(BookmarkDialog, self).reject()

@@ -537,8 +537,6 @@ class ConsoleWidget(QWidget):
         self.closeRequested.emit()
 
 class LogDockWidget(QDockWidget):
-    visibilityChanged = pyqtSignal(bool)
-
     def __init__(self, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
@@ -554,9 +552,6 @@ class LogDockWidget(QDockWidget):
         self.setWidget(self.logte)
         for name in ('setRepository', 'progressReceived'):
             setattr(self, name, getattr(self.logte, name))
-
-        self.visibilityChanged.connect(
-            lambda visible: visible and self.logte.setFocus())
 
     @pyqtSlot()
     def clear(self):
@@ -576,12 +571,10 @@ class LogDockWidget(QDockWidget):
         self.logte.openPrompt()
 
     def showEvent(self, event):
-        self.visibilityChanged.emit(True)
+        super(LogDockWidget, self).showEvent(event)
+        self.logte.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)
         if visible:
             self.raise_()
-
-    def hideEvent(self, event):
-        self.visibilityChanged.emit(False)

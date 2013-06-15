@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import error, extensions, util, scmutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
@@ -483,20 +483,3 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         first = self.createIndex(0, 0)
         last = self.createIndex(len(self._revs) - 1, 0)
         self.dataChanged.emit(first, last)
-
-def run(ui, *revs, **opts):
-    # TODO: same options as patchbomb
-    if opts.get('rev'):
-        if revs:
-            raise util.Abort(_('use only one form to specify the revision'))
-        revs = opts.get('rev')
-
-    # TODO: repo should be a required argument?
-    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-
-    try:
-        return EmailDialog(repo, revs, outgoing=opts.get('outgoing', False),
-                           outgoingrevs=opts.get('outgoingrevs', None))
-    except error.RepoLookupError, e:
-        qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
-                          hglib.tounicode(e.message))
