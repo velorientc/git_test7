@@ -376,6 +376,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.urlCombo.currentIndexChanged.connect(self._updateUrlComboToolTip)
         self.synctbar.addWidget(self.urlCombo)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
@@ -417,6 +418,7 @@ class Workbench(QMainWindow):
             aliases.remove('default')
             aliases.insert(0, 'default')
 
+        self.urlCombo.blockSignals(True)
         self.urlCombo.clear()
         for n, a in enumerate(aliases):
             # text, (pull-alias, push-alias)
@@ -431,6 +433,8 @@ class Workbench(QMainWindow):
                 tooltip = pathdict[a]
             self.urlCombo.addItem(itemtext, itemdata)
             self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
+        self.urlCombo.blockSignals(False)
+        self._updateUrlComboToolTip(self.urlCombo.currentIndex())
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
@@ -445,6 +449,14 @@ class Workbench(QMainWindow):
             return
         opindex = {'incoming': 0, 'pull': 0, 'outgoing': 1, 'push': 1}[op]
         return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
+
+    def _updateUrlComboToolTip(self, index):
+        if not self.urlCombo.count():
+            tooltip = _('There are no configured sync paths.\n'
+                        'Open the Synchronize tab to configure them.')
+        else:
+            tooltip = self.urlCombo.itemData(index, Qt.ToolTipRole).toString()
+        self.urlCombo.setToolTip(tooltip)
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
