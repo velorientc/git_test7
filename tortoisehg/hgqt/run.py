@@ -376,6 +376,13 @@ globalopts = [
     ('', 'newworkbench', None, _('open a new workbench window')),
 ]
 
+# common command functions
+
+def _filelog(ui, repo, *pats, **opts):
+    from tortoisehg.hgqt import filedialogs
+    filename = hglib.canonpaths(pats)[0]
+    return filedialogs.FileLogDialog(repo, filename)
+
 # commands start here, listed alphabetically
 
 @command('about', [], _('thg about'))
@@ -755,6 +762,12 @@ def init(ui, *pats, **opts):
 def log(ui, *pats, **opts):
     """workbench application"""
     from tortoisehg.hgqt import workbench
+
+    root = opts.get('root') or paths.find_root()
+    if root and len(pats) == 1 and os.path.isfile(pats[0]):
+        repo = thgrepo.repository(ui, root)
+        return _filelog(ui, repo, *pats, **opts)
+
     return workbench.run(ui, *pats, **opts)
 
 @command('manifest',
