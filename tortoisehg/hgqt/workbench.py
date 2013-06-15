@@ -21,7 +21,6 @@ from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.docklog import LogDockWidget
 from tortoisehg.hgqt.settings import SettingsDialog
-from tortoisehg.hgqt.run import portable_start_fork
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -961,6 +960,7 @@ class Workbench(QMainWindow):
             w.repoview.goto(rev)
 
     def newWorkbench(self):
+        from tortoisehg.hgqt.run import portable_start_fork
         portable_start_fork(['--new'])
 
     def newRepository(self):
