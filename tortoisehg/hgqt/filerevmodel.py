@@ -33,7 +33,6 @@ class FileRevModel(HgRepoListModel):
     Model used to manage the list of revisions of a file, in file
     viewer of in diff-file viewer dialogs.
     """
-    filled = pyqtSignal()
 
     _allcolumns = tuple(h[0] for h in FILE_COLUMNHEADERS)
     _allcolnames = dict(FILE_COLUMNHEADERS)
