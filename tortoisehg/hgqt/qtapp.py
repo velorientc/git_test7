@@ -43,8 +43,7 @@ def earlyExceptionMsgBox(e):
     opts['values'] = e
     opts['error'] = traceback.format_exc()
     opts['nofork'] = True
-    errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
-                  '<a href="#edit:%(arg1)s">edit</a> your config')
+    errstring = _recoverableexc[e.__class__]
     if not QApplication.instance():
         main = QApplication(sys.argv)
     dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts)
