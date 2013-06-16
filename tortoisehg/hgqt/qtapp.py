@@ -70,9 +70,9 @@ class GarbageCollector(QObject):
 
     INTERVAL = 5000
 
-    def __init__(self, parent, debug=False):
+    def __init__(self, ui, parent):
         QObject.__init__(self, parent)
-        self.debug = debug
+        self._ui = ui
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.check)
@@ -86,22 +86,20 @@ class GarbageCollector(QObject):
         l0, l1, l2 = gc.get_count()
         if l0 > self.threshold[0]:
             num = gc.collect(0)
-            if self.debug:
-                print 'GarbageCollector.check:', l0, l1, l2
-                print 'collected gen 0, found', num, 'unreachable'
+            self._ui.debug('GarbageCollector.check: %d %d %d\n' % (l0, l1, l2))
+            self._ui.debug('collected gen 0, found %d unreachable\n' % num)
             if l1 > self.threshold[1]:
                 num = gc.collect(1)
-                if self.debug:
-                    print 'collected gen 1, found', num, 'unreachable'
+                self._ui.debug('collected gen 1, found %d unreachable\n' % num)
                 if l2 > self.threshold[2]:
                     num = gc.collect(2)
-                    if self.debug:
-                        print 'collected gen 2, found', num, 'unreachable'
+                    self._ui.debug('collected gen 2, found %d unreachable\n'
+                                   % num)
 
     def debug_cycles(self):
         gc.collect()
         for obj in gc.garbage:
-            print (obj, repr(obj), type(obj))
+            self._ui.debug('%s, %r, %s\n' % (obj, obj, type(obj)))
 
 class QtRunner(QObject):
     """Run Qt app and hold its windows
@@ -116,7 +114,6 @@ class QtRunner(QObject):
     def __init__(self):
         super(QtRunner, self).__init__()
         gc.disable()
-        self.debug = 'THGDEBUG' in os.environ
         self._mainapp = None
         self._dialogs = []
         self.errors = []
@@ -196,7 +193,7 @@ class QtRunner(QObject):
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
         self._mainapp = QApplication(sys.argv)
-        self._gc = GarbageCollector(self, self.debug)
+        self._gc = GarbageCollector(ui, self)
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
         self._mainapp.setOrganizationName('TortoiseHg')
