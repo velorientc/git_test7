@@ -281,3 +281,18 @@ class QtRunner(QObject):
         assert not self._workbench
         self._workbench = workbench.Workbench()
         return self._workbench
+
+    def showRepoInWorkbench(self, uroot, rev=-1):
+        """Show the specified repository in Workbench"""
+        assert self._mainapp
+        if not self._workbench:
+            self._opendialog(lambda ui: self.createWorkbench(), [], {})
+            assert self._workbench
+
+        wb = self._workbench
+        wb.show()
+        wb.activateWindow()
+        wb.raise_()
+        wb.showRepo(uroot)
+        if rev != -1:
+            wb.goto(hglib.fromunicode(uroot), rev)
