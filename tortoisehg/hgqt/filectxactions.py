@@ -289,13 +289,7 @@ class FilectxActions(QObject):
             dlg.goto(rev)
 
     def _createnavdialog(self, dlgclass, repo, filename):
-        # dirty hack to pass workbench only if available
-        from tortoisehg.hgqt import workbench  # avoid cyclic dep
-        repoviewer = None
-        if self.parent() and isinstance(self.parent().window(),
-                                        workbench.Workbench):
-            repoviewer = self.parent().window()
-        return dlgclass(repo, filename, repoviewer=repoviewer)
+        return dlgclass(repo, filename)
 
     def _gennavdialogkey(self, dlgclass, repo, filename):
         return dlgclass, repo.wjoin(filename)

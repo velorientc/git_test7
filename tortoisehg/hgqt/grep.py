@@ -681,12 +681,7 @@ class MatchTree(QTableView):
         dlg.setSearchCaseInsensitive(self.icase)
 
     def _createFileDialog(self, repo, path):
-        # dirty hack to pass workbench only if available
-        from tortoisehg.hgqt import workbench  # avoid cyclic dep
-        repoviewer = None
-        if isinstance(self.window(), workbench.Workbench):
-            repoviewer = self.window()
-        return filedialogs.FileLogDialog(repo, path, repoviewer=repoviewer)
+        return filedialogs.FileLogDialog(repo, path)
 
     def _genFileDialogKey(self, repo, path):
         return repo.wjoin(path)

@@ -36,12 +36,11 @@ otherside = {'left': 'right', 'right': 'left'}
 class _AbstractFileDialog(QMainWindow):
     finished = pyqtSignal(int)
 
-    def __init__(self, repo, filename, repoviewer=None):
+    def __init__(self, repo, filename):
         QMainWindow.__init__(self)
         self.repo = repo
 
         self.setupUi(self)
-        self.setRepoViewer(repoviewer)
         self._show_rev = None
 
         assert not isinstance(filename, (unicode, QString))
@@ -61,15 +60,6 @@ class _AbstractFileDialog(QMainWindow):
         super(_AbstractFileDialog, self).closeEvent(event)
         self.finished.emit(0)  # mimic QDialog exit
 
-    def setRepoViewer(self, repoviewer=None):
-        self.repoviewer = repoviewer
-        if repoviewer:
-            repoviewer.finished.connect(self._clearRepoViewer)
-
-    @pyqtSlot()
-    def _clearRepoViewer(self):
-        self.setRepoViewer(None)
-
     def reload(self):
         'Reload toolbar action handler'
         self.repo.thginvalidate()
@@ -79,22 +69,16 @@ class _AbstractFileDialog(QMainWindow):
         """
         Callback called when a revision is double-clicked in the revisions table
         """
-        if self.repoviewer is None:
-            # prevent recursive import
-            from workbench import Workbench
-            self.repoviewer = Workbench()
-        self.repoviewer.show()
-        self.repoviewer.activateWindow()
-        self.repoviewer.raise_()
-        self.repoviewer.showRepo(hglib.tounicode(self.repo.root))
-        self.repoviewer.goto(self.repo.root, rev)
+        # TODO: implement by using signal-slot if possible
+        from tortoisehg.hgqt import run
+        run.qtrun.showRepoInWorkbench(hglib.tounicode(self.repo.root), rev)
 
 class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    def __init__(self, repo, filename, repoviewer=None):
-        super(FileLogDialog, self).__init__(repo, filename, repoviewer)
+    def __init__(self, repo, filename):
+        super(FileLogDialog, self).__init__(repo, filename)
         self._readSettings()
         self.menu = None
         self.dualmenu = None
@@ -422,8 +406,8 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    def __init__(self, repo, filename, repoviewer=None):
-        super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
+    def __init__(self, repo, filename):
+        super(FileDiffDialog, self).__init__(repo, filename)
         self._readSettings()
         self.menu = None
 

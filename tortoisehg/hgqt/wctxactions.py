@@ -224,13 +224,7 @@ class WctxActions(QObject):
             self._filedialogs.open(path)
 
     def _createFileDialog(self, path):
-        # dirty hack to pass workbench only if available
-        from tortoisehg.hgqt import workbench  # avoid cyclic dep
-        repoviewer = None
-        if self.parent() and isinstance(self.parent().window(),
-                                        workbench.Workbench):
-            repoviewer = self.parent().window()
-        return filedialogs.FileLogDialog(self.repo, path, repoviewer=repoviewer)
+        return filedialogs.FileLogDialog(self.repo, path)
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
