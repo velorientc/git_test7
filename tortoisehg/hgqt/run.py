@@ -767,7 +767,32 @@ def log(ui, *pats, **opts):
         repo = thgrepo.repository(ui, root)
         return _filelog(ui, repo, *pats, **opts)
 
-    return workbench.run(ui, *pats, **opts)
+    # Before starting the workbench, we must check if we must try to reuse an
+    # existing workbench window (we don't by default)
+    # Note that if the "single workbench mode" is enabled, and there is no
+    # existing workbench window, we must tell the Workbench object to create
+    # the workbench server
+    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
+    mustcreateserver = False
+    if singleworkbenchmode:
+        newworkbench = opts.get('newworkbench')
+        if root and not newworkbench:
+            if workbench.connectToExistingWorkbench(root):
+                # The were able to connect to an existing workbench server, and
+                # it confirmed that it has opened the selected repo for us
+                sys.exit(0)
+            # there is no pre-existing workbench server
+            serverexists = False
+        else:
+            serverexists = workbench.connectToExistingWorkbench('[echo]')
+        # When in " single workbench mode", we must create a server if there
+        # is not one already
+        mustcreateserver = not serverexists
+
+    w = workbench.run(ui, *pats, **opts)
+    if mustcreateserver:
+        w.createWorkbenchServer()
+    return w
 
 @command('manifest',
     [('r', 'rev', '', _('revision to display')),

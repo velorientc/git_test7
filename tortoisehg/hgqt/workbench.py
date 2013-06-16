@@ -1298,31 +1298,7 @@ def connectToExistingWorkbench(root=None):
 def run(ui, *pats, **opts):
     root = opts.get('root') or paths.find_root()
 
-    # Before starting the workbench, we must check if we must try to reuse an
-    # existing workbench window (we don't by default)
-    # Note that if the "single workbench mode" is enabled, and there is no
-    # existing workbench window, we must tell the Workbench object to create
-    # the workbench server
-    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
-    mustcreateserver = False
-    if singleworkbenchmode:
-        newworkbench = opts.get('newworkbench')
-        if root and not newworkbench:
-            if connectToExistingWorkbench(root):
-                # The were able to connect to an existing workbench server, and
-                # it confirmed that it has opened the selected repo for us
-                sys.exit(0)
-            # there is no pre-existing workbench server
-            serverexists = False
-        else:
-            serverexists = connectToExistingWorkbench('[echo]')
-        # When in " single workbench mode", we must create a server if there
-        # is not one already
-        mustcreateserver = not serverexists
-
     w = Workbench()
-    if mustcreateserver:
-        w.createWorkbenchServer()
     if root:
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
