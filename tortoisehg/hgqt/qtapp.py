@@ -113,6 +113,7 @@ class QtRunner(QObject):
 
     def __init__(self):
         super(QtRunner, self).__init__()
+        self._ui = None
         self._mainapp = None
         self._workbench = None
         self._dialogs = []
@@ -187,11 +188,12 @@ class QtRunner(QObject):
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
-            self._opendialog(dlgfunc, ui, args, opts)
+            self._opendialog(dlgfunc, args, opts)
             return
 
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
+        self._ui = ui
         self._mainapp = QApplication(sys.argv)
         self._gc = GarbageCollector(ui, self)
         # default org is used by QSettings
@@ -207,7 +209,7 @@ class QtRunner(QObject):
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
-        dlg = self._createdialog(dlgfunc, ui, args, opts)
+        dlg = self._createdialog(dlgfunc, args, opts)
         if dlg:
             dlg.show()
             dlg.raise_()
@@ -222,7 +224,7 @@ class QtRunner(QObject):
         finally:
             if self._workbench is dlg:
                 self._workbench = None
-            self._mainapp = None
+            self._mainapp = self._ui = None
 
     def _fixlibrarypaths(self):
         # make sure to use the bundled Qt plugins to avoid ABI incompatibility
@@ -237,13 +239,14 @@ class QtRunner(QObject):
         t.load('qt_' + i18n.language, qtlib.gettranslationpath())
         self._mainapp.installTranslator(t)
 
-    def _createdialog(self, dlgfunc, ui, args, opts):
+    def _createdialog(self, dlgfunc, args, opts):
+        assert self._ui
         try:
             args = list(args)
             if 'repository' in opts:
-                repo = thgrepo.repository(ui, opts['repository'])
+                repo = thgrepo.repository(self._ui, opts['repository'])
                 args.insert(0, repo)
-            return dlgfunc(ui, *args, **opts)
+            return dlgfunc(self._ui, *args, **opts)
         except error.RepoError, inst:
             qtlib.WarningMsgBox(_('Repository Error'),
                                 hglib.tounicode(str(inst)))
@@ -252,8 +255,8 @@ class QtRunner(QObject):
                                 hglib.tounicode(str(inst)),
                                 hglib.tounicode(inst.hint or ''))
 
-    def _opendialog(self, dlgfunc, ui, args, opts):
-        dlg = self._createdialog(dlgfunc, ui, args, opts)
+    def _opendialog(self, dlgfunc, args, opts):
+        dlg = self._createdialog(dlgfunc, args, opts)
         if not dlg:
             return
 
