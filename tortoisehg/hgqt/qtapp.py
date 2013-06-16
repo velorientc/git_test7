@@ -113,7 +113,6 @@ class QtRunner(QObject):
 
     def __init__(self):
         super(QtRunner, self).__init__()
-        gc.disable()
         self._mainapp = None
         self._dialogs = []
         self.errors = []
