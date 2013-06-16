@@ -43,6 +43,8 @@ def dispatch(args):
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
+        if 'THGDEBUG' in os.environ:
+            u.setconfig('ui', 'debug', 'on')
         return _runcatch(u, args)
     except error.ParseError, e:
         qtapp.earlyExceptionMsgBox(e)
