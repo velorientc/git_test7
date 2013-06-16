@@ -380,6 +380,8 @@ globalopts = [
 
 def _filelog(ui, repo, *pats, **opts):
     from tortoisehg.hgqt import filedialogs
+    if len(pats) != 1:
+        raise util.Abort(_('requires a single filename'))
     filename = hglib.canonpaths(pats)[0]
     return filedialogs.FileLogDialog(repo, filename)
 
@@ -403,12 +405,9 @@ def add(ui, repo, *pats, **opts):
     _('thg annotate'))
 def annotate(ui, repo, *pats, **opts):
     """annotate dialog"""
-    from tortoisehg.hgqt import filedialogs, fileview
-    if len(pats) != 1:
-        raise util.Abort(_('annotate requires a single filename'))
+    from tortoisehg.hgqt import fileview
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-    filename = hglib.canonpaths(pats)[0]
-    dlg = filedialogs.FileLogDialog(repo, filename)
+    dlg = _filelog(ui, repo, *pats, **opts)
     dlg.setFileViewMode(fileview.AnnMode)
     dlg.goto(rev)
     if opts.get('line'):
