@@ -406,14 +406,18 @@ class Workbench(QMainWindow):
             regularaliases.append(a)
             if a in haspushaliases:
                 regularaliases.append(a + '-push')
+        # 5. Create the list of 'combined aliases'
+        combinedaliases = [(a, a + '-push') for a in haspushaliases]
+        # 6. Put the combined aliases first, followed by the regular aliases
+        aliases = combinedaliases + regularaliases
 
         self.urlCombo.clear()
-        # text, (pull-alias, push-alias)
-        for a in haspushaliases:
-            self.urlCombo.addItem(u'\u2193 %s | %s-push \u2191' % (a, a),
-                                  (a, a + '-push'))
-        for a in regularaliases:
-            self.urlCombo.addItem(a, (a, a))
+        for a in aliases:
+            # text, (pull-alias, push-alias)
+            if isinstance(a, tuple):
+                self.urlCombo.addItem(u'\u2193 %s | %s \u2191' % a, a)
+            else:
+                self.urlCombo.addItem(a, (a, a))
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
