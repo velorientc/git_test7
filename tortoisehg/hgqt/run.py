@@ -385,6 +385,33 @@ def _filelog(ui, repo, *pats, **opts):
     filename = hglib.canonpaths(pats)[0]
     return filedialogs.FileLogDialog(repo, filename)
 
+def _workbench(ui, *pats, **opts):
+    from tortoisehg.hgqt import workbench
+
+    root = opts.get('root') or paths.find_root()
+
+    w = workbench.Workbench()
+    if root:
+        root = hglib.tounicode(root)
+        bundle = opts.get('bundle')
+        if bundle:
+            w._openRepo(root, False, bundle=bundle)
+        else:
+            w.showRepo(root)
+
+        if pats:
+            q = []
+            for f in pats:
+                pat = hglib.canonpaths([f])[0]
+                if os.path.isdir(f):
+                    q.append('file("%s/**")' % pat)
+                elif os.path.isfile(f):
+                    q.append('file("%s")' % pat)
+            w.setRevsetFilter(root, ' or '.join(q))
+    if w.repoTabsWidget.count() <= 0:
+        w.reporegistry.setVisible(True)
+    return w
+
 # commands start here, listed alphabetically
 
 @command('about', [], _('thg about'))
@@ -789,7 +816,7 @@ def log(ui, *pats, **opts):
         # is not one already
         mustcreateserver = not serverexists
 
-    w = workbench.run(ui, *pats, **opts)
+    w = _workbench(ui, *pats, **opts)
     if mustcreateserver:
         w.createWorkbenchServer()
     return w
