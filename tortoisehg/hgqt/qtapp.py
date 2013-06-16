@@ -16,7 +16,7 @@ from mercurial import error
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import bugreport, qtlib, thgrepo
+from tortoisehg.hgqt import bugreport, qtlib, thgrepo, workbench
 
 try:
     from thginithook import thginithook
@@ -114,6 +114,7 @@ class QtRunner(QObject):
     def __init__(self):
         super(QtRunner, self).__init__()
         self._mainapp = None
+        self._workbench = None
         self._dialogs = []
         self.errors = []
         sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
@@ -219,6 +220,8 @@ class QtRunner(QObject):
         try:
             return self._mainapp.exec_()
         finally:
+            if self._workbench is dlg:
+                self._workbench = None
             self._mainapp = None
 
     def _fixlibrarypaths(self):
@@ -266,3 +269,12 @@ class QtRunner(QObject):
         """forget the dialog to be garbage collectable"""
         assert dlg in self._dialogs
         self._dialogs.remove(dlg)
+        if self._workbench is dlg:
+            self._workbench = None
+
+    def createWorkbench(self):
+        """Create Workbench window and keep single reference"""
+        assert self._mainapp
+        assert not self._workbench
+        self._workbench = workbench.Workbench()
+        return self._workbench

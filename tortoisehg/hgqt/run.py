@@ -386,11 +386,11 @@ def _filelog(ui, repo, *pats, **opts):
     return filedialogs.FileLogDialog(repo, filename)
 
 def _workbench(ui, *pats, **opts):
-    from tortoisehg.hgqt import workbench
-
     root = opts.get('root') or paths.find_root()
 
-    w = workbench.Workbench()
+    # TODO: unclear that _workbench() is called inside qtrun(). maybe this
+    # function should receive factory object instead of using global qtrun.
+    w = qtrun.createWorkbench()
     if root:
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
