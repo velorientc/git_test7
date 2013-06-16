@@ -345,7 +345,6 @@ class RevDetailsDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-log'))
-        self.repoviewer = None
 
         layout = QVBoxLayout()
         layout.setMargin(0)
@@ -395,15 +394,9 @@ class RevDetailsDialog(QDialog):
             except ValueError:
                 linkpath = linktarget
                 rev = None
-            if self.repoviewer is None:
-                # prevent recursive import
-                from workbench import Workbench
-                self.repoviewer = Workbench()
-            self.repoviewer.show()
-            self.repoviewer.activateWindow()
-            self.repoviewer.raise_()
-            self.repoviewer.showRepo(hglib.tounicode(linkpath))
-            self.repoviewer.goto(linkpath, rev)
+            # TODO: implement by using signal-slot if possible
+            from tortoisehg.hgqt import run
+            run.qtrun.showRepoInWorkbench(hglib.tounicode(linkpath), rev)
 
     @pyqtSlot()
     def refresh(self):
