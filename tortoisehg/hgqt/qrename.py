@@ -52,8 +52,6 @@ class QRenameDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
-        self.focus = self.le
-
         self.le.setFocus()
         self.le.selectAll()
 

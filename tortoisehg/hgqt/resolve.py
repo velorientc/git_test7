@@ -543,8 +543,3 @@ class ToolsCombo(QComboBox):
                 return hglib.fromunicode(text)
         else:
             return None
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return ResolveDialog(repo, None)

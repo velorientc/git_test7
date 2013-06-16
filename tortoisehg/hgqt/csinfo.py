@@ -387,8 +387,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if self.revlabel is None:
             self.revlabel = QLabel()
-            self.revlabel.linkActivated.connect(
-                 lambda s: self.linkActivated.emit(s))
+            self.revlabel.linkActivated.connect(self.linkActivated)
             self.layout().addWidget(self.revlabel, 0, Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
