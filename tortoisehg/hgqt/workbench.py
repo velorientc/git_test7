@@ -24,7 +24,6 @@ from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.QtNetwork import QLocalServer, QLocalSocket
 
 class ThgTabBar(QTabBar):
     def mouseReleaseEvent(self, event):
@@ -98,8 +97,6 @@ class Workbench(QMainWindow):
         self.progressDialog = None
         self._dialogs = qtlib.DialogKeeper(
             lambda self, dlgmeth: dlgmeth(self), parent=self)
-
-        self.server = None
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -1177,8 +1174,6 @@ class Workbench(QMainWindow):
         else:
             self.storeSettings()
             self.reporegistry.close()
-            if self.server:
-                self.server.close()
             # mimic QDialog exit
             self.finished.emit(0)
 
@@ -1214,74 +1209,3 @@ class Workbench(QMainWindow):
         sd = SettingsDialog(configrepo=False,
                             parent=self, root=twrepo)
         sd.exec_()
-
-    def createWorkbenchServer(self):
-        self.server = QLocalServer()
-        self.server.newConnection.connect(self.newConnection)
-        self.server.listen(qApp.applicationName() + '-' + util.getuser())
-
-    def newConnection(self):
-        socket = self.server.nextPendingConnection()
-        if socket:
-            socket.waitForReadyRead(10000)
-            root = str(socket.readAll())
-            if root and root != '[echo]':
-                self.openRepo(hglib.tounicode(root), reuse=True)
-
-                # Bring the workbench window to the front
-                # This assumes that the client process has
-                # called allowSetForegroundWindow(-1) right before
-                # sending the request
-                self.setWindowState(self.windowState() & ~Qt.WindowMinimized
-                                    | Qt.WindowActive)
-                self.show()
-                self.raise_()
-                self.activateWindow()
-                # Revoke the blanket permission to set the foreground window
-                allowSetForegroundWindow(os.getpid())
-
-            socket.write(QByteArray(root))
-            socket.flush()
-
-def allowSetForegroundWindow(processid=-1):
-    """Allow a given process to set the foreground window"""
-    # processid = -1 means ASFW_ANY (i.e. allow any process)
-    if os.name == 'nt':
-        # on windows we must explicitly allow bringing the main window to
-        # the foreground. To do so we must use ctypes
-        try:
-            from ctypes import windll
-            windll.user32.AllowSetForegroundWindow(processid)
-        except ImportError:
-            pass
-
-def connectToExistingWorkbench(root=None):
-    """
-    Connect and send data to an existing workbench server
-
-    For the connection to be successful, the server must loopback the data
-    that we send to it.
-
-    Normally the data that is sent will be a repository root path, but we can
-    also send "echo" to check that the connection works (i.e. that there is a
-    server)
-    """
-    if root:
-        data = root
-    else:
-        data = '[echo]'
-    socket = QLocalSocket()
-    socket.connectToServer(qApp.applicationName() + '-' + util.getuser(),
-        QIODevice.ReadWrite)
-    if socket.waitForConnected(10000):
-        # Momentarily let any process set the foreground window
-        # The server process with revoke this permission as soon as it gets
-        # the request
-        allowSetForegroundWindow()
-        socket.write(QByteArray(data))
-        socket.flush()
-        socket.waitForReadyRead(10000)
-        reply = socket.readAll()
-        if data == reply:
-            return True
-    return False

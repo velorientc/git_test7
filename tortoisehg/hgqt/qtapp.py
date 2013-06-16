@@ -10,8 +10,9 @@ import gc, os, sys, traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication
+from PyQt4.QtNetwork import QLocalServer, QLocalSocket
 
-from mercurial import error
+from mercurial import error, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, i18n
@@ -101,6 +102,51 @@ class GarbageCollector(QObject):
         for obj in gc.garbage:
             self._ui.debug('%s, %r, %s\n' % (obj, obj, type(obj)))
 
+
+def allowSetForegroundWindow(processid=-1):
+    """Allow a given process to set the foreground window"""
+    # processid = -1 means ASFW_ANY (i.e. allow any process)
+    if os.name == 'nt':
+        # on windows we must explicitly allow bringing the main window to
+        # the foreground. To do so we must use ctypes
+        try:
+            from ctypes import windll
+            windll.user32.AllowSetForegroundWindow(processid)
+        except ImportError:
+            pass
+
+def connectToExistingWorkbench(root=None):
+    """
+    Connect and send data to an existing workbench server
+
+    For the connection to be successful, the server must loopback the data
+    that we send to it.
+
+    Normally the data that is sent will be a repository root path, but we can
+    also send "echo" to check that the connection works (i.e. that there is a
+    server)
+    """
+    if root:
+        data = root
+    else:
+        data = '[echo]'
+    socket = QLocalSocket()
+    socket.connectToServer(QApplication.applicationName() + '-' + util.getuser(),
+        QIODevice.ReadWrite)
+    if socket.waitForConnected(10000):
+        # Momentarily let any process set the foreground window
+        # The server process with revoke this permission as soon as it gets
+        # the request
+        allowSetForegroundWindow()
+        socket.write(QByteArray(data))
+        socket.flush()
+        socket.waitForReadyRead(10000)
+        reply = socket.readAll()
+        if data == reply:
+            return True
+    return False
+
+
 class QtRunner(QObject):
     """Run Qt app and hold its windows
 
@@ -115,6 +161,7 @@ class QtRunner(QObject):
         super(QtRunner, self).__init__()
         self._ui = None
         self._mainapp = None
+        self._server = None
         self._workbench = None
         self._dialogs = []
         self.errors = []
@@ -224,6 +271,8 @@ class QtRunner(QObject):
         finally:
             if self._workbench is dlg:
                 self._workbench = None
+            if self._server:
+                self._server.close()
             self._mainapp = self._ui = None
 
     def _fixlibrarypaths(self):
@@ -296,3 +345,35 @@ class QtRunner(QObject):
         wb.showRepo(uroot)
         if rev != -1:
             wb.goto(hglib.fromunicode(uroot), rev)
+
+    def createWorkbenchServer(self):
+        assert self._mainapp
+        assert not self._server
+        self._server = QLocalServer(self)
+        self._server.newConnection.connect(self._handleNewConnection)
+        self._server.listen(self._mainapp.applicationName() + '-' + util.getuser())
+
+    @pyqtSlot()
+    def _handleNewConnection(self):
+        socket = self._server.nextPendingConnection()
+        if socket:
+            socket.waitForReadyRead(10000)
+            root = str(socket.readAll())
+            if root and root != '[echo]':
+                self.showRepoInWorkbench(hglib.tounicode(root))
+
+                # Bring the workbench window to the front
+                # This assumes that the client process has
+                # called allowSetForegroundWindow(-1) right before
+                # sending the request
+                wb = self._workbench
+                wb.setWindowState(wb.windowState() & ~Qt.WindowMinimized
+                                  | Qt.WindowActive)
+                wb.show()
+                wb.raise_()
+                wb.activateWindow()
+                # Revoke the blanket permission to set the foreground window
+                allowSetForegroundWindow(os.getpid())
+
+            socket.write(QByteArray(root))
+            socket.flush()

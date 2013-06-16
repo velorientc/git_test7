@@ -787,8 +787,6 @@ def init(ui, *pats, **opts):
     _('thg log [OPTIONS] [FILE]'))
 def log(ui, *pats, **opts):
     """workbench application"""
-    from tortoisehg.hgqt import workbench
-
     root = opts.get('root') or paths.find_root()
     if root and len(pats) == 1 and os.path.isfile(pats[0]):
         repo = thgrepo.repository(ui, root)
@@ -804,21 +802,21 @@ def log(ui, *pats, **opts):
     if singleworkbenchmode:
         newworkbench = opts.get('newworkbench')
         if root and not newworkbench:
-            if workbench.connectToExistingWorkbench(root):
+            if qtapp.connectToExistingWorkbench(root):
                 # The were able to connect to an existing workbench server, and
                 # it confirmed that it has opened the selected repo for us
                 sys.exit(0)
             # there is no pre-existing workbench server
             serverexists = False
         else:
-            serverexists = workbench.connectToExistingWorkbench('[echo]')
+            serverexists = qtapp.connectToExistingWorkbench('[echo]')
         # When in " single workbench mode", we must create a server if there
         # is not one already
         mustcreateserver = not serverexists
 
     w = _workbench(ui, *pats, **opts)
     if mustcreateserver:
-        w.createWorkbenchServer()
+        qtrun.createWorkbenchServer()
     return w
 
 @command('manifest',
