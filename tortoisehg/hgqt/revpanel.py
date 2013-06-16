@@ -137,7 +137,7 @@ def RevPanelWidget(repo):
     '''creates a rev panel widget and returns it'''
     custom = csinfo.custom(data=data_func, label=label_func,
                            markup=markup_func)
-    style = csinfo.panelstyle(contents=('cset', 'branch', 'close', 'user',
+    style = csinfo.panelstyle(contents=('cset', 'branch', 'obsolete', 'close', 'user',
                    'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                    'p4', 'svn', 'converted'), selectable=True,
                    expandable=True)
