@@ -611,6 +611,7 @@ class Workbench(QMainWindow):
         if actionlist:
             contextmenu.exec_(self.repoTabsWidget.mapToGlobal(point))
 
+    @pyqtSlot()
     def closeLastClickedTab(self):
         if self.repoTabsWidget.lastClickedTab > -1:
             self.repoTabCloseRequested(self.repoTabsWidget.lastClickedTab)
@@ -628,6 +629,7 @@ class Workbench(QMainWindow):
             self.lastClosedRepoRootList = closedRepoRootList
 
 
+    @pyqtSlot()
     def closeNotLastClickedTabs(self):
         self._closeOtherTabs(self.repoTabsWidget.lastClickedTab)
 
@@ -797,6 +799,7 @@ class Workbench(QMainWindow):
             self.updateMenu()
             self.lastClosedRepoRootList = [reporoot]
 
+    @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         if 0 <= index < tw.count():
@@ -811,6 +814,7 @@ class Workbench(QMainWindow):
                 self.updateMenu()
                 self.lastClosedRepoRootList = [reporoot]
 
+    @pyqtSlot()
     def reopenLastClosedTabs(self):
         for n, reporoot in enumerate(self.lastClosedRepoRootList):
             self.progress(_('Reopening tabs'), n,
