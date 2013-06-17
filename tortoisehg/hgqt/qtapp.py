@@ -89,8 +89,8 @@ class ExceptionCatcher(QObject):
 
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
-        elist = traceback.format_exception(etype, evalue, tracebackobj)
         if 'THGDEBUG' in os.environ:
+            elist = traceback.format_exception(etype, evalue, tracebackobj)
             sys.stderr.write(''.join(elist))
         self._exceptionOccured.emit(etype, evalue, tracebackobj)
         # not thread-safe to touch self.errors here
