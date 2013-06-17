@@ -790,10 +790,7 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             w = self.repoTabsWidget.widget(index)
-            try:
-                reporoot = w.repo.root
-            except:
-                reporoot = ''
+            reporoot = w.repo.root
             self.repoTabsWidget.removeTab(index)
             widget.deleteLater()
             self.updateMenu()
@@ -804,10 +801,7 @@ class Workbench(QMainWindow):
         tw = self.repoTabsWidget
         if 0 <= index < tw.count():
             w = tw.widget(index)
-            try:
-                reporoot = w.repo.root
-            except:
-                reporoot = ''
+            reporoot = w.repo.root
             if w and w.closeRepoWidget():
                 tw.removeTab(index)
                 w.deleteLater()
