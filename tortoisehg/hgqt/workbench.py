@@ -802,7 +802,7 @@ class Workbench(QMainWindow):
         if 0 <= index < tw.count():
             w = tw.widget(index)
             reporoot = w.repo.root
-            if w and w.closeRepoWidget():
+            if w.closeRepoWidget():
                 tw.removeTab(index)
                 w.deleteLater()
                 self.updateMenu()
