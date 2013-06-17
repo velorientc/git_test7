@@ -259,7 +259,7 @@ class PurgeThread(QThread):
         self.progress.emit(*data)
         self.showMessage.emit(_('Deleted %d files') % len(files))
 
-        if opts['delfolders']:
+        if opts['delfolders'] and directories:
             for i, f in enumerate(sorted(directories, reverse=True)):
                 if not os.listdir(repo.wjoin(f)):
                     data = ('rmdir', i, f, '', len(directories))
