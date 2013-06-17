@@ -165,7 +165,6 @@ class QtRunner(QObject):
         self._workbench = None
         self._dialogs = []
         self.errors = []
-        sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
 
         # can be emitted by another thread; postpones it until next
         # eventloop of main (GUI) thread.
@@ -242,6 +241,7 @@ class QtRunner(QObject):
 
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
+        sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
         self._gc = GarbageCollector(ui, self)
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
