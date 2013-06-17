@@ -450,6 +450,7 @@ class Workbench(QMainWindow):
         opindex = {'incoming': 0, 'pull': 0, 'outgoing': 1, 'push': 1}[op]
         return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
 
+    @pyqtSlot(int)
     def _updateUrlComboToolTip(self, index):
         if not self.urlCombo.count():
             tooltip = _('There are no configured sync paths.\n'
