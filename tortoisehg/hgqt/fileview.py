@@ -183,7 +183,7 @@ class HgFileView(QFrame):
         self.modeToggleGroup.addAction(self.actionDiffMode)
         self.modeToggleGroup.addAction(self.actionFileMode)
         self.modeToggleGroup.addAction(self.actionAnnMode)
-        self.modeToggleGroup.triggered.connect(self.setMode)
+        self.modeToggleGroup.triggered.connect(self._setModeByAction)
 
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QAction(qtlib.geticon('go-down'),
@@ -194,7 +194,7 @@ class HgFileView(QFrame):
                                       _('Previous diff (alt+up)'), self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
-        self.setMode(self.actionDiffMode)
+        self._setModeByAction(self.actionDiffMode)
 
         self.actionFirstParent = QAction('1', self)
         self.actionFirstParent.setCheckable(True)
@@ -323,7 +323,7 @@ class HgFileView(QFrame):
         return True
 
     @pyqtSlot(QAction)
-    def setMode(self, action):
+    def _setModeByAction(self, action):
         'One of the mode toolbar buttons has been toggled'
         mode = action._mode
         self._lostMode = mode
@@ -334,6 +334,21 @@ class HgFileView(QFrame):
             self.blk.setVisible(mode != DiffMode)
             self.sci.setAnnotationEnabled(mode == AnnMode)
             self.displayFile(self._filename, self._status)
+
+    def setMode(self, mode):
+        """Switch view to DiffMode/FileMode/AnnMode if available for the current
+        content; otherwise it will be switched later"""
+        actionmap = dict((a._mode, a) for a in self.modeToggleGroup.actions())
+        try:
+            action = actionmap[mode]
+        except KeyError:
+            raise ValueError('invalid mode: %r' % mode)
+
+        if action.isEnabled():
+            if not action.isChecked():
+                action.trigger()  # implies _setModeByAction()
+        else:
+            self._lostMode = mode
 
     @pyqtSlot(QAction)
     def setParent(self, action):
@@ -836,7 +851,6 @@ class HgFileView(QFrame):
 
         selection = self.sci.selectedText()
         def sreq(**opts):
-            opts['search'] = True
             return lambda: self.grepRequested.emit(selection, opts)
         def sann():
             self.searchbar.search(selection)
@@ -876,7 +890,6 @@ class HgFileView(QFrame):
         fctx, line = self.sci._links[line]
         if selection:
             def sreq(**opts):
-                opts['search'] = True
                 return lambda: self.grepRequested.emit(selection, opts)
             def sann():
                 self.searchbar.search(selection)

@@ -270,9 +270,3 @@ class PurgeThread(QThread):
             self.showMessage.emit(_('Deleted %d files and %d folders') % (
                                   len(files), len(directories)))
         return failures
-
-def run(ui, *pats, **opts):
-    from tortoisehg.hgqt import thgrepo
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return PurgeDialog(repo, None)

@@ -332,9 +332,3 @@ class ImportDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ImportDialog(repo, None, **opts)
-    dlg.setfilepaths(pats)
-    return dlg

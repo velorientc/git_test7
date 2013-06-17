@@ -11,12 +11,10 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error
-
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, fileview, status, thgrepo, filectxactions
+from tortoisehg.hgqt import qtlib, fileview, status, filectxactions
 from tortoisehg.hgqt import revpanel
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -46,6 +44,9 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
         self._manifest_widget.linkActivated.connect(self._linkHandler)
 
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth: dlgmeth(self), parent=self)
+
         self._readsettings()
         self._updatewindowtitle()
 
@@ -69,6 +70,9 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/geom', self.saveGeometry())
         self._manifest_widget.saveSettings(s, 'manifest')
 
+    def setRev(self, rev):
+        self._manifest_widget.setRev(rev)
+
     def setSource(self, path, rev, line=None):
         self._manifest_widget.setSource(path, rev, line)
 
@@ -80,11 +84,19 @@ class ManifestDialog(QMainWindow):
         """Set if search is case insensitive"""
         self._manifest_widget._fileview.searchbar.setCaseInsensitive(ignorecase)
 
+    def setFileViewMode(self, mode):
+        self._manifest_widget.setFileViewMode(mode)
+
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
+        dlg = self._dialogs.open(ManifestDialog._createSearchDialog)
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
-        from tortoisehg.hgqt import run
-        run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
+        dlg.setSearch(pattern, **opts)
+        dlg.runSearch()
+
+    def _createSearchDialog(self):
+        from tortoisehg.hgqt import grep
+        return grep.SearchDialog([], self._repo)
 
     @pyqtSlot(QString)
     def _linkHandler(self, link):
@@ -397,6 +409,9 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def _updatecontent(self):
         self.displayFile()
 
+    def setFileViewMode(self, mode):
+        self._fileview.setMode(mode)
+
     @pyqtSlot()
     def _emitPathChanged(self):
         self.pathChanged.emit(self.path)
@@ -405,48 +420,6 @@ def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
-
-def run(ui, *pats, **opts):
-    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    try:
-        # ManifestWidget expects integer revision
-        rev = repo[opts.get('rev')].rev()
-    except error.RepoLookupError, e:
-        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
-                          hglib.tounicode(e.message))
-        return
-    try:
-        line = opts.get('line') and int(opts['line']) or None
-    except ValueError:
-        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
-                          _('The specified line number "%s" is invalid.')
-                          % hglib.tounicode(opts.get('line')))
-        return
-
-    dlg = ManifestDialog(repo, rev)
-
-    # set initial state after dialog visible
-    def init():
-        try:
-            if pats:
-                path = hglib.canonpaths(pats)[0]
-            elif 'canonpath' in opts:
-                path = opts['canonpath']
-            else:
-                return
-            dlg.setSource(hglib.tounicode(path), rev, line)
-            if opts.get('pattern'):
-                dlg.setSearchPattern(opts['pattern'])
-            if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
-                dlg._manifest_widget._fileview.actionAnnMode.trigger()
-            if 'ignorecase' in opts:
-                dlg.setSearchCaseInsensitive(opts['ignorecase'])
-        except IndexError:
-            pass
-        dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
-    QTimer.singleShot(0, init)
-
-    return dlg
 
 # In order to let the user seamlessly switch between the filterbox and the treeview
 # we subclas the QLineEdit and QTreeView widgets. We add some keypress related signals

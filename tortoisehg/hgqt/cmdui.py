@@ -228,7 +228,10 @@ class Core(QObject):
             if self.extproc:
                 return self.extproc.state() != QProcess.NotRunning
             elif self.thread:
-                return self.thread.isRunning()
+                # keep "running" until just before emitting commandFinished.
+                # thread.isRunning() is cleared earlier than onThreadFinished,
+                # because inter-thread signal is queued.
+                return True
         except AttributeError:
             pass
         return False

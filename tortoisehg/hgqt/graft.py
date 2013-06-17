@@ -310,19 +310,3 @@ class GraftDialog(QDialog):
                                         labels=labels, parent=self):
                 return
         super(GraftDialog, self).reject()
-
-def run(ui, *revs, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-
-    revs = list(revs)
-    revs.extend(opts['rev'])
-
-    if os.path.exists(repo.join('graftstate')):
-        qtlib.InfoMsgBox(_('Graft already in progress'),
-                          _('Resuming graft already in progress'))
-    elif not revs:
-        qtlib.ErrorMsgBox(_('Abort'),
-                          _('You must provide revisions to graft'))
-        import sys; sys.exit()
-    return GraftDialog(repo, None, source=revs)

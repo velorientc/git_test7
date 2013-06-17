@@ -8,7 +8,7 @@
 import sys, os, httplib, socket, tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import extensions, hgweb, util, error, subrepo
+from mercurial import extensions, hgweb, util, error
 from mercurial.hgweb import server  # workaround for demandimport
 from tortoisehg.util import paths, wconfig, hglib
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo
@@ -266,18 +266,6 @@ def run(ui, *pats, **opts):
         dlg.start()
     return dlg
 
-def recursiveRepoSearch(repo):
-    yield repo.root
-    try:
-        wctx = repo[None]
-        for s in wctx.substate:
-            sub = wctx.sub(s)
-            if isinstance(sub, subrepo.hgsubrepo):
-                for root in recursiveRepoSearch(sub._repo):
-                    yield root
-    except (EnvironmentError, error.Abort, error.RepoError):
-        pass
-
 def _asconfigliststr(value):
     r"""
     >>> _asconfigliststr('foo')
@@ -305,19 +293,17 @@ def _newwebconf(repopath, webconfpath):
     elif repopath:  # imitate webconf for single repo
         c = wconfig.config()
         try:
+            # TODO: not nice to instantiate repo just for repo.shortname
             repo = thgrepo.repository(None, repopath)
-            roots = [root for root in recursiveRepoSearch(repo)]
-            if len(roots) == 1:
+            if not os.path.exists(os.path.join(repopath, '.hgsub')):
                 # no _asconfigliststr(repopath) for now, because ServeDialog
                 # cannot parse it as a list in single-repo mode.
                 c.set('paths', '/', repopath)
             else:
                 # since hg 8cbb59124e67, path entry is parsed as a list
                 base = hglib.fromunicode(repo.shortname)
-                c.set('paths', base, _asconfigliststr(repopath))
-                for root in roots[1:]:
-                    c.set('paths', base + root[len(repopath):],
-                          _asconfigliststr(root))
+                c.set('paths', base,
+                      _asconfigliststr(os.path.join(repopath, '**')))
         except (EnvironmentError, error.Abort, error.RepoError):
             c.set('paths', '/', repopath)
         return c

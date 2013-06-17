@@ -397,8 +397,3 @@ class ArchiveDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('archive/geom', self.saveGeometry())
-
-def run(ui, *revs, **opts):
-    rev = opts.get('rev')
-    repo = thgrepo.repository(ui, paths.find_root())
-    return ArchiveDialog(repo.ui, repo, rev)
