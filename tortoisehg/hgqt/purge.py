@@ -31,7 +31,7 @@ class PurgeDialog(QDialog):
         layout.setMargin(0)
         layout.setSpacing(0)
         self.setLayout(layout)
-        
+
         toplayout = QVBoxLayout()
         toplayout.setMargin(10)
         toplayout.setSpacing(5)
