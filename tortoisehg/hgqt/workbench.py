@@ -786,15 +786,8 @@ class Workbench(QMainWindow):
         self.actionForward.setEnabled(rw.canGoForward())
 
     def repoTabCloseSelf(self, widget):
-        self.repoTabsWidget.setCurrentWidget(widget)
-        index = self.repoTabsWidget.currentIndex()
-        if widget.closeRepoWidget():
-            w = self.repoTabsWidget.widget(index)
-            reporoot = w.repo.root
-            self.repoTabsWidget.removeTab(index)
-            widget.deleteLater()
-            self.updateMenu()
-            self.lastClosedRepoRootList = [reporoot]
+        index = self.repoTabsWidget.indexOf(widget)
+        self.repoTabCloseRequested(index)
 
     @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
