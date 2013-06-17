@@ -76,6 +76,17 @@ class ExceptionCatcher(QObject):
         self._exceptionOccured.connect(self.putexception,
                                        Qt.QueuedConnection)
 
+        self._ui.debug('setting up excepthook\n')
+        self._origexcepthook = sys.excepthook
+        sys.excepthook = self.ehook
+
+    def release(self):
+        if not self._origexcepthook:
+            return
+        self._ui.debug('restoring excepthook\n')
+        sys.excepthook = self._origexcepthook
+        self._origexcepthook = None
+
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
         elist = traceback.format_exception(etype, evalue, tracebackobj)
@@ -252,7 +263,6 @@ class QtRunner(QObject):
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
         self._exccatcher = ExceptionCatcher(ui, self._mainapp, self)
-        sys.excepthook = lambda t, v, o: self._exccatcher.ehook(t, v, o)
         self._gc = GarbageCollector(ui, self)
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
@@ -284,6 +294,7 @@ class QtRunner(QObject):
                 self._workbench = None
             if self._server:
                 self._server.close()
+            self._exccatcher.release()
             self._mainapp = self._ui = None
 
     def _fixlibrarypaths(self):
