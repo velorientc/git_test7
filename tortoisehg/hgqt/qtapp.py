@@ -60,6 +60,84 @@ def earlyBugReport(e):
     dlg = bugreport.BugReport(opts)
     dlg.exec_()
 
+class ExceptionCatcher(QObject):
+    """Catch unhandled exception raised inside Qt event loop"""
+
+    _exceptionOccured = pyqtSignal(object, object, object)
+
+    def __init__(self, ui, mainapp, parent=None):
+        super(ExceptionCatcher, self).__init__(parent)
+        self._ui = ui
+        self._mainapp = mainapp
+        self.errors = []
+
+        # can be emitted by another thread; postpones it until next
+        # eventloop of main (GUI) thread.
+        self._exceptionOccured.connect(self.putexception,
+                                       Qt.QueuedConnection)
+
+    def ehook(self, etype, evalue, tracebackobj):
+        'Will be called by any thread, on any unhandled exception'
+        elist = traceback.format_exception(etype, evalue, tracebackobj)
+        if 'THGDEBUG' in os.environ:
+            sys.stderr.write(''.join(elist))
+        self._exceptionOccured.emit(etype, evalue, tracebackobj)
+        # not thread-safe to touch self.errors here
+
+    @pyqtSlot(object, object, object)
+    def putexception(self, etype, evalue, tracebackobj):
+        'Enque exception info and display it later; run in main thread'
+        if not self.errors:
+            QTimer.singleShot(10, self.excepthandler)
+        self.errors.append((etype, evalue, tracebackobj))
+
+    @pyqtSlot()
+    def excepthandler(self):
+        'Display exception info; run in main (GUI) thread'
+        try:
+            try:
+                self._showexceptiondialog()
+            except:
+                # make sure to quit mainloop first, so that it never leave
+                # zombie process.
+                self._mainapp.exit(1)
+                self._printexception()
+        finally:
+            self.errors = []
+
+    def _showexceptiondialog(self):
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = ''.join(''.join(traceback.format_exception(*args))
+                                for args in self.errors)
+        etype, evalue = self.errors[0][:2]
+        if (len(set(e[0] for e in self.errors)) == 1
+            and etype in _recoverableexc):
+            opts['values'] = evalue
+            errstr = _recoverableexc[etype]
+            if etype is error.Abort and evalue.hint:
+                errstr = u''.join([errstr, u'<br><b>', _('hint:'),
+                                   u'</b> %(arg1)s'])
+                opts['values'] = [str(evalue), evalue.hint]
+            dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
+                                            errstr, opts,
+                                            parent=self._mainapp.activeWindow())
+        elif etype is KeyboardInterrupt:
+            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
+                                    _('Close this application?')):
+                QApplication.quit()
+            else:
+                self.errors = []
+                return
+        else:
+            dlg = bugreport.BugReport(opts, parent=self._mainapp.activeWindow())
+        dlg.exec_()
+
+    def _printexception(self):
+        for args in self.errors:
+            traceback.print_exception(*args)
+
+
 class GarbageCollector(QObject):
     '''
     Disable automatic garbage collection and instead collect manually
@@ -146,83 +224,6 @@ def connectToExistingWorkbench(root=None):
             return True
     return False
 
-
-class ExceptionCatcher(QObject):
-    """Catch unhandled exception raised inside Qt event loop"""
-
-    _exceptionOccured = pyqtSignal(object, object, object)
-
-    def __init__(self, ui, mainapp, parent=None):
-        super(ExceptionCatcher, self).__init__(parent)
-        self._ui = ui
-        self._mainapp = mainapp
-        self.errors = []
-
-        # can be emitted by another thread; postpones it until next
-        # eventloop of main (GUI) thread.
-        self._exceptionOccured.connect(self.putexception,
-                                       Qt.QueuedConnection)
-
-    def ehook(self, etype, evalue, tracebackobj):
-        'Will be called by any thread, on any unhandled exception'
-        elist = traceback.format_exception(etype, evalue, tracebackobj)
-        if 'THGDEBUG' in os.environ:
-            sys.stderr.write(''.join(elist))
-        self._exceptionOccured.emit(etype, evalue, tracebackobj)
-        # not thread-safe to touch self.errors here
-
-    @pyqtSlot(object, object, object)
-    def putexception(self, etype, evalue, tracebackobj):
-        'Enque exception info and display it later; run in main thread'
-        if not self.errors:
-            QTimer.singleShot(10, self.excepthandler)
-        self.errors.append((etype, evalue, tracebackobj))
-
-    @pyqtSlot()
-    def excepthandler(self):
-        'Display exception info; run in main (GUI) thread'
-        try:
-            try:
-                self._showexceptiondialog()
-            except:
-                # make sure to quit mainloop first, so that it never leave
-                # zombie process.
-                self._mainapp.exit(1)
-                self._printexception()
-        finally:
-            self.errors = []
-
-    def _showexceptiondialog(self):
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = ''.join(''.join(traceback.format_exception(*args))
-                                for args in self.errors)
-        etype, evalue = self.errors[0][:2]
-        if (len(set(e[0] for e in self.errors)) == 1
-            and etype in _recoverableexc):
-            opts['values'] = evalue
-            errstr = _recoverableexc[etype]
-            if etype is error.Abort and evalue.hint:
-                errstr = u''.join([errstr, u'<br><b>', _('hint:'),
-                                   u'</b> %(arg1)s'])
-                opts['values'] = [str(evalue), evalue.hint]
-            dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                            errstr, opts,
-                                            parent=self._mainapp.activeWindow())
-        elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
-                                    _('Close this application?')):
-                QApplication.quit()
-            else:
-                self.errors = []
-                return
-        else:
-            dlg = bugreport.BugReport(opts, parent=self._mainapp.activeWindow())
-        dlg.exec_()
-
-    def _printexception(self):
-        for args in self.errors:
-            traceback.print_exception(*args)
 
 class QtRunner(QObject):
     """Run Qt app and hold its windows
