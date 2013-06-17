@@ -147,23 +147,15 @@ def connectToExistingWorkbench(root=None):
     return False
 
 
-class QtRunner(QObject):
-    """Run Qt app and hold its windows
-
-    NOTE: This object will be instantiated before QApplication, it means
-    there's a limitation on Qt's event handling. See
-    http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
-    """
+class ExceptionCatcher(QObject):
+    """Catch unhandled exception raised inside Qt event loop"""
 
     _exceptionOccured = pyqtSignal(object, object, object)
 
-    def __init__(self):
-        super(QtRunner, self).__init__()
-        self._ui = None
-        self._mainapp = None
-        self._server = None
-        self._workbench = None
-        self._dialogs = []
+    def __init__(self, ui, mainapp, parent=None):
+        super(ExceptionCatcher, self).__init__(parent)
+        self._ui = ui
+        self._mainapp = mainapp
         self.errors = []
 
         # can be emitted by another thread; postpones it until next
@@ -232,6 +224,23 @@ class QtRunner(QObject):
         for args in self.errors:
             traceback.print_exception(*args)
 
+class QtRunner(QObject):
+    """Run Qt app and hold its windows
+
+    NOTE: This object will be instantiated before QApplication, it means
+    there's a limitation on Qt's event handling. See
+    http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
+    """
+
+    def __init__(self):
+        super(QtRunner, self).__init__()
+        self._ui = None
+        self._mainapp = None
+        self._exccatcher = None
+        self._server = None
+        self._workbench = None
+        self._dialogs = []
+
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
             self._opendialog(dlgfunc, args, opts)
@@ -241,7 +250,8 @@ class QtRunner(QObject):
 
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
-        sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
+        self._exccatcher = ExceptionCatcher(ui, self._mainapp, self)
+        sys.excepthook = lambda t, v, o: self._exccatcher.ehook(t, v, o)
         self._gc = GarbageCollector(ui, self)
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
