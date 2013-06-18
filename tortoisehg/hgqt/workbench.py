@@ -638,6 +638,21 @@ class Workbench(QMainWindow):
         """ Open repo by openRepoSignal from reporegistry [unicode] """
         self._openRepo(root, reuse)
 
+    def _openRepo(self, root, reuse, bundle=None):
+        root = hglib.fromunicode(root)
+        if root and not root.startswith('ssh://'):
+            if reuse:
+                for rw in self._findrepowidget(root):
+                    self.repoTabsWidget.setCurrentWidget(rw)
+                    return
+            try:
+                repo = thgrepo.repository(path=root)
+                return self.addRepoTab(repo, bundle)
+            except RepoError, e:
+                qtlib.WarningMsgBox(_('Failed to open repository'),
+                                    hglib.tounicode(str(e)), parent=self)
+        return None
+
     @pyqtSlot(QString)
     def closeRepo(self, root):
         """ Close tab if the repo is removed from reporegistry [unicode] """
@@ -1005,21 +1020,6 @@ class Workbench(QMainWindow):
         path = FD.getExistingDirectory(self, caption, cwd,
                                        FD.ShowDirsOnly | FD.ReadOnly)
         self._openRepo(path, False)
-
-    def _openRepo(self, root, reuse, bundle=None):
-        root = hglib.fromunicode(root)
-        if root and not root.startswith('ssh://'):
-            if reuse:
-                for rw in self._findrepowidget(root):
-                    self.repoTabsWidget.setCurrentWidget(rw)
-                    return
-            try:
-                repo = thgrepo.repository(path=root)
-                return self.addRepoTab(repo, bundle)
-            except RepoError, e:
-                qtlib.WarningMsgBox(_('Failed to open repository'),
-                                    hglib.tounicode(str(e)), parent=self)
-        return None
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
