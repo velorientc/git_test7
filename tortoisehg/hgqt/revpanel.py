@@ -9,7 +9,7 @@
 
 from mercurial import error
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, obsoleteutil
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import csinfo, qtlib
 
@@ -26,6 +26,10 @@ def label_func(widget, item, ctx):
         return _('Child:')
     elif item == 'patch':
         return _('Patch:')
+    elif item == 'precursors':
+        return _('Precursors:')
+    elif item == 'successors':
+        return _('Successors:')
     raise csinfo.UnknownItem(item)
 
 def revid_markup(revid, **kargs):
@@ -42,6 +46,10 @@ def data_func(widget, item, ctx):
             return ctx
         desc = ctx.description()
         return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
+    def format_ctxlist(ctxlist):
+        if not ctxlist:
+            return None
+        return [revline_data(ctx)[:3] for ctx in ctxlist]
     if item == 'cset':
         return revline_data(ctx)
     elif item == 'branch':
@@ -91,6 +99,13 @@ def data_func(widget, item, ctx):
         if ctx.rev() is None:
             ctx = ctx.p1()
         return ctx.extra().get('close') is not None
+    elif item == 'precursors':
+        ctxlist = obsoleteutil.first_known_precursors(ctx)
+        return format_ctxlist(ctxlist)
+    elif item == 'successors':
+        ctxlist = obsoleteutil.first_known_successors(ctx)
+        return format_ctxlist(ctxlist)
+
     raise csinfo.UnknownItem(item)
 
 def markup_func(widget, item, value):
@@ -123,7 +138,7 @@ def markup_func(widget, item, value):
         if isinstance(value, basestring):
             return revid_markup(value)
         return revline_markup(link=link, *value)
-    elif item in ('parents', 'children'):
+    elif item in ('parents', 'children', 'precursors', 'successors'):
         csets = []
         for cset in value:
             if isinstance(cset, basestring):
@@ -139,6 +154,7 @@ def RevPanelWidget(repo):
                            markup=markup_func)
     style = csinfo.panelstyle(contents=('cset', 'branch', 'obsolete', 'close', 'user',
                    'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
+                   'precursors', 'successors',
                    'p4', 'svn', 'converted'), selectable=True,
                    expandable=True)
     return csinfo.create(repo, style=style, custom=custom)
