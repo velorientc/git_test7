@@ -23,6 +23,7 @@ from tortoisehg.hgqt import archive, thgimport, thgstrip, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
 from tortoisehg.hgqt import matching, graft, hgemail, postreview
+from tortoisehg.hgqt import sign
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -1405,6 +1406,9 @@ class RepoWidget(QWidget):
               self.tagToRevision)
         entry(menu, None, fixed, _('Boo&kmark...'), 'hg-bookmarks',
               self.bookmarkRevision)
+        if 'gpg' in exs:
+            entry(menu, None, fixed, _('Sig&n...'), 'hg-sign',
+                  self.signRevision)
         entry(menu)
         entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
               self.backoutToRevision)
@@ -1924,6 +1928,14 @@ class RepoWidget(QWidget):
 
     def bookmarkRevision(self):
         dlg = bookmark.BookmarkDialog(self.repo, self.rev, self)
+        dlg.showMessage.connect(self.showMessage)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+
+    def signRevision(self):
+        dlg = sign.SignDialog(self.repo, self.rev, self)
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
