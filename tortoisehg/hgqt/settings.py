@@ -587,7 +587,7 @@ INFO = (
     _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolRBGroup,
         _('Always show repo tabs, even for a single repo. Default: False')),
     _fi(_('Monitor Repo Changes'), 'tortoisehg.monitorrepo',
-        (genDefaultCombo, ['always', 'localonly']),
+        (genDefaultCombo, ['always', 'localonly', 'never']),
         _('Specify the target filesystem where TortoiseHg monitors changes. '
           'Default: always')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,

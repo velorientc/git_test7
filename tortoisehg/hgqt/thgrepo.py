@@ -90,7 +90,9 @@ class ThgRepoWrapper(QObject):
         self._uimtime = time.time()
 
         monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
-        if isinstance(repo, bundlerepo.bundlerepository):
+        if monitorrepo == 'never':
+            dbgoutput('watching of F/S events is disabled by configuration')
+        elif isinstance(repo, bundlerepo.bundlerepository):
             dbgoutput('not watching F/S events for bundle repository')
         elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
             dbgoutput('not watching F/S events for network drive')
