@@ -49,7 +49,9 @@ class FilectxActions(QObject):
         self._itemissubrepo = False
         self._itemisdir = False
 
-        self._nav_dialogs = {}
+        self._nav_dialogs = qtlib.DialogKeeper(FilectxActions._createnavdialog,
+                                               FilectxActions._gennavdialogkey,
+                                               self)
         self._contextmenus = {}
 
         self._actions = {}
@@ -283,33 +285,14 @@ class FilectxActions(QObject):
     def _navigate(self, dlgclass):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
-            fullpath = repo.wjoin(filename)
-            if (dlgclass, fullpath) not in self._nav_dialogs:
-                # dirty hack to pass workbench only if available
-                from tortoisehg.hgqt import workbench  # avoid cyclic dep
-                repoviewer = None
-                if self.parent() and isinstance(self.parent().window(),
-                                                workbench.Workbench):
-                    repoviewer = self.parent().window()
-                dlg = dlgclass(repo, filename, repoviewer=repoviewer)
-                self._nav_dialogs[dlgclass, fullpath] = dlg
-                assert dlg.repo.wjoin(dlg.filename) == fullpath
-                dlg.finished.connect(self._forgetnavdialog)
-                ufname = hglib.tounicode(filename)
-                dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-                dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = self._nav_dialogs[dlgclass, fullpath]
+            dlg = self._nav_dialogs.open(dlgclass, repo, filename)
             dlg.goto(rev)
-            dlg.show()
-            dlg.raise_()
-            dlg.activateWindow()
 
-    #@pyqtSlot()
-    def _forgetnavdialog(self):
-        dlg = self.sender()
-        dlg.finished.disconnect(self._forgetnavdialog)
-        fullpath = dlg.repo.wjoin(dlg.filename)
-        del self._nav_dialogs[dlg.__class__, fullpath]
+    def _createnavdialog(self, dlgclass, repo, filename):
+        return dlgclass(repo, filename)
+
+    def _gennavdialogkey(self, dlgclass, repo, filename):
+        return dlgclass, repo.wjoin(filename)
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths

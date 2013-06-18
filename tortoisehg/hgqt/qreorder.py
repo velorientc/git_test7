@@ -9,8 +9,8 @@ import os
 
 from hgext import mq
 
-from tortoisehg.hgqt import qtlib, thgrepo, qrename
-from tortoisehg.util import hglib, paths
+from tortoisehg.hgqt import qtlib, qrename
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -219,11 +219,3 @@ def writeSeries(repo, applied, unapplied):
             fp.close()
     finally:
         repo.decrementBusyCount()
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(None, paths.find_root())
-    if hasattr(repo, 'mq'):
-        return QReorderDialog(repo)
-    else:
-        qtlib.ErrorMsgBox(_('TortoiseHg Error'),
-            _('Please enable the MQ extension first.'))

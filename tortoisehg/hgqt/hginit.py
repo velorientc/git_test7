@@ -203,14 +203,9 @@ class InitDialog(QDialog):
                     pass
 
         if self.run_wb_chk.isChecked():
+            # TODO: implement by using signal-slot if possible
             from tortoisehg.hgqt import run
-            try:
-                run.log(ui.ui(), root=dest)
-            except Exception, e:
-                qtlib.WarningMsgBox(_('Init'),
-                  _('<p>Repository successfully created at</p><p>%s</p>') % dest,
-                  _('<p>But could not run Workbench for it.</p><p>%s</p>')
-                    % hglib.tounicode(str(e)))
+            run.qtrun.showRepoInWorkbench(udest)
         else:
             if not self.parent():
                 qtlib.InfoMsgBox(_('Init'),
@@ -220,6 +215,3 @@ class InitDialog(QDialog):
 
     def reject(self):
         super(InitDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    return InitDialog(pats, opts)

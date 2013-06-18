@@ -36,16 +36,19 @@ otherside = {'left': 'right', 'right': 'left'}
 class _AbstractFileDialog(QMainWindow):
     finished = pyqtSignal(int)
 
-    def __init__(self, repo, filename, repoviewer=None):
+    def __init__(self, repo, filename):
         QMainWindow.__init__(self)
         self.repo = repo
 
         self.setupUi(self)
-        self.setRepoViewer(repoviewer)
         self._show_rev = None
 
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
+
+        self.setWindowTitle(_('Hg file log viewer [%s] - %s')
+                            % (repo.displayname, hglib.tounicode(filename)))
+        self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.createActions()
         self.setupToolbars()
@@ -57,15 +60,6 @@ class _AbstractFileDialog(QMainWindow):
         super(_AbstractFileDialog, self).closeEvent(event)
         self.finished.emit(0)  # mimic QDialog exit
 
-    def setRepoViewer(self, repoviewer=None):
-        self.repoviewer = repoviewer
-        if repoviewer:
-            repoviewer.finished.connect(self._clearRepoViewer)
-
-    @pyqtSlot()
-    def _clearRepoViewer(self):
-        self.setRepoViewer(None)
-
     def reload(self):
         'Reload toolbar action handler'
         self.repo.thginvalidate()
@@ -75,22 +69,16 @@ class _AbstractFileDialog(QMainWindow):
         """
         Callback called when a revision is double-clicked in the revisions table
         """
-        if self.repoviewer is None:
-            # prevent recursive import
-            from workbench import Workbench
-            self.repoviewer = Workbench()
-        self.repoviewer.show()
-        self.repoviewer.activateWindow()
-        self.repoviewer.raise_()
-        self.repoviewer.showRepo(hglib.tounicode(self.repo.root))
-        self.repoviewer.goto(self.repo.root, rev)
+        # TODO: implement by using signal-slot if possible
+        from tortoisehg.hgqt import run
+        run.qtrun.showRepoInWorkbench(hglib.tounicode(self.repo.root), rev)
 
 class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    def __init__(self, repo, filename, repoviewer=None):
-        super(FileLogDialog, self).__init__(repo, filename, repoviewer)
+    def __init__(self, repo, filename):
+        super(FileLogDialog, self).__init__(repo, filename)
         self._readSettings()
         self.menu = None
         self.dualmenu = None
@@ -196,7 +184,7 @@ class FileLogDialog(_AbstractFileDialog):
     def modelFilled(self):
         self.repoview.resizeColumns()
         if self._show_rev is not None:
-            index = self.filerevmodel.indexFromRev(self._show_rev)
+            index = self.filerevmodel.indexLinkedFromRev(self._show_rev)
             self._show_rev = None
         elif self.repoview.currentIndex().isValid():
             return  # already set by goto()
@@ -392,11 +380,23 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.showMessage.emit(msg)
 
     def goto(self, rev):
-        index = self.filerevmodel.indexFromRev(rev)
+        index = self.filerevmodel.indexLinkedFromRev(rev)
         if index is not None:
             self.repoview.setCurrentIndex(index)
         else:
             self._show_rev = rev
+
+    def showLine(self, line):
+        self.textView.showLine(line - 1)  # fileview should do -1 instead?
+
+    def setFileViewMode(self, mode):
+        self.textView.setMode(mode)
+
+    def setSearchPattern(self, text):
+        self.textView.searchbar.setPattern(text)
+
+    def setSearchCaseInsensitive(self, ignorecase):
+        self.textView.searchbar.setCaseInsensitive(ignorecase)
 
     def reload(self):
         self.repoview.saveSettings()
@@ -406,8 +406,8 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    def __init__(self, repo, filename, repoviewer=None):
-        super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
+    def __init__(self, repo, filename):
+        super(FileDiffDialog, self).__init__(repo, filename)
         self._readSettings()
         self.menu = None
 
@@ -619,7 +619,7 @@ class FileDiffDialog(_AbstractFileDialog):
         self.update_diff(keeppos=otherside[side])
 
     def goto(self, rev):
-        index = self.filerevmodel.indexFromRev(rev)
+        index = self.filerevmodel.indexLinkedFromRev(rev)
         if index is not None:
             if index.row() == 0:
                 index = self.filerevmodel.index(1, 0)

@@ -14,7 +14,7 @@ from PyQt4.Qsci import QsciScintilla
 from mercurial import commands, util
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, run
+from tortoisehg.hgqt import cmdui
 from tortoisehg.util import hglib
 
 class _LogWidgetForConsole(cmdui.LogWidget):
@@ -305,6 +305,7 @@ class ConsoleWidget(QWidget):
             self._logwidget.flash()
 
     def _commandComplete(self, cmdtype, cmdline):
+        from tortoisehg.hgqt import run
         matches = []
         cmd = cmdline.split()
         if cmdtype == 'hg':
@@ -511,6 +512,7 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_thg(self, args):
+        from tortoisehg.hgqt import run
         self.closePrompt()
         try:
             if self._repo:
@@ -537,8 +539,6 @@ class ConsoleWidget(QWidget):
         self.closeRequested.emit()
 
 class LogDockWidget(QDockWidget):
-    visibilityChanged = pyqtSignal(bool)
-
     def __init__(self, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
@@ -554,9 +554,6 @@ class LogDockWidget(QDockWidget):
         self.setWidget(self.logte)
         for name in ('setRepository', 'progressReceived'):
             setattr(self, name, getattr(self.logte, name))
-
-        self.visibilityChanged.connect(
-            lambda visible: visible and self.logte.setFocus())
 
     @pyqtSlot()
     def clear(self):
@@ -576,12 +573,10 @@ class LogDockWidget(QDockWidget):
         self.logte.openPrompt()
 
     def showEvent(self, event):
-        self.visibilityChanged.emit(True)
+        super(LogDockWidget, self).showEvent(event)
+        self.logte.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)
         if visible:
             self.raise_()
-
-    def hideEvent(self, event):
-        self.visibilityChanged.emit(False)

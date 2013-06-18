@@ -18,9 +18,9 @@
 
 from mercurial import error, node
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import thgrepo, hgrcutil
+from tortoisehg.hgqt import hgrcutil
 from tortoisehg.hgqt.update import UpdateDialog
 
 from PyQt4.QtCore import *
@@ -154,12 +154,3 @@ class rUpdateDialog(UpdateDialog):
     def command_started(self):
         super(rUpdateDialog, self).command_started()
         self.update_btn.setHidden(False)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    rev = None
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    return rUpdateDialog(repo, rev, None, opts)
