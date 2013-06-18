@@ -395,7 +395,7 @@ def _workbench(ui, *pats, **opts):
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
         if bundle:
-            w._openRepo(root, False, bundle=hglib.tounicode(bundle))
+            w.openRepo(root, False, bundle=hglib.tounicode(bundle))
         else:
             w.showRepo(root)
 

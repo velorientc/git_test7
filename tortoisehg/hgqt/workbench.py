@@ -634,11 +634,8 @@ class Workbench(QMainWindow):
             rw.switchToNamedTaskTab(str(action.data().toString()))
 
     @pyqtSlot(QString, bool)
-    def openRepo(self, root, reuse):
-        """ Open repo by openRepoSignal from reporegistry [unicode] """
-        self._openRepo(root, reuse)
-
-    def _openRepo(self, root, reuse, bundle=None):
+    def openRepo(self, root, reuse, bundle=None):
+        """Open tab of the specified repo [unicode]"""
         root = hglib.fromunicode(root)
         if root and not root.startswith('ssh://'):
             if reuse:
@@ -688,7 +685,7 @@ class Workbench(QMainWindow):
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
                 self.repoTabsWidget.setCurrentIndex(i)
                 return w
-        return self._openRepo(root, False)
+        return self.openRepo(root, False)
 
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
@@ -989,7 +986,7 @@ class Workbench(QMainWindow):
         dlg.finished.connect(dlg.deleteLater)
         if dlg.exec_():
             path = dlg.getPath()
-            self._openRepo(hglib.tounicode(path), False)
+            self.openRepo(hglib.tounicode(path), False)
 
     def cloneRepository(self):
         """ Run clone dialog """
@@ -1019,7 +1016,7 @@ class Workbench(QMainWindow):
         FD = QFileDialog
         path = FD.getExistingDirectory(self, caption, cwd,
                                        FD.ShowDirsOnly | FD.ReadOnly)
-        self._openRepo(path, False)
+        self.openRepo(path, False)
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
@@ -1159,7 +1156,7 @@ class Workbench(QMainWindow):
                           _('Reopening repository %s') % upath, '',
                           len(openrepos))
             QCoreApplication.processEvents()
-            self._openRepo(upath, False)
+            self.openRepo(upath, False)
             QCoreApplication.processEvents()
         self.progress(_('Reopening tabs'), None, '', '', None)
 
@@ -1168,7 +1165,7 @@ class Workbench(QMainWindow):
         # this will have no effect
         lastactiverepo = s.value(wb + 'lastactiverepo').toString()
         if lastactiverepo:
-            self._openRepo(lastactiverepo, True)
+            self.openRepo(lastactiverepo, True)
 
         # Clear the lastactiverepo and the openrepos list once the workbench state
         # has been reload, so that opening additional workbench windows does not
@@ -1235,7 +1232,7 @@ class Workbench(QMainWindow):
             socket.waitForReadyRead(10000)
             root = str(socket.readAll())
             if root and root != '[echo]':
-                self._openRepo(hglib.tounicode(root), reuse=True)
+                self.openRepo(hglib.tounicode(root), reuse=True)
 
                 # Bring the workbench window to the front
                 # This assumes that the client process has
