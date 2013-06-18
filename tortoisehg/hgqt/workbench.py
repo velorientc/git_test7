@@ -1345,7 +1345,8 @@ def run(ui, *pats, **opts):
         root = hglib.tounicode(root)
         bundle = opts.get('bundle')
         if bundle:
-            w._openRepo(root, False, bundle=bundle)
+            w._openRepo(hglib.fromunicode(root), False,
+                        bundle=hglib.tounicode(bundle))
         else:
             w.showRepo(root)
 
