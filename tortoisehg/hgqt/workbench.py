@@ -679,13 +679,7 @@ class Workbench(QMainWindow):
     @pyqtSlot(QString)
     def showRepo(self, root):
         """Activate the repo tab or open it if not available [unicode]"""
-        root = unicode(root)
-        for i in xrange(self.repoTabsWidget.count()):
-            w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
-                self.repoTabsWidget.setCurrentIndex(i)
-                return
-        self.openRepo(root, False)
+        self.openRepo(root, True)
 
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
