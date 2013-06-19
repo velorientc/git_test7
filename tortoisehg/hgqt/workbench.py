@@ -662,7 +662,7 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
-        uri = path.split('?')
+        uri = unicode(path).split('?', 1)
         path = uri[0]
         rev = None
         if len(uri) > 1:
