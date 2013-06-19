@@ -124,7 +124,7 @@ class SignDialog(QDialog):
 
     def commandFinished(self, ret):
         if ret == 0:
-            self.finishfunc()
+            self.set_status(_("Signature has been added"))
 
     @pyqtSlot()
     def updateStates(self):
@@ -134,9 +134,6 @@ class SignDialog(QDialog):
         self.customTextLineEdit.setEnabled(not nocommit and custom)
 
     def onSign(self):
-        def finished():
-            self.set_status(_("Signature has been added"))
-
         if self.cmd.core.running():
             self.set_status(_('Repository command still running'), False)
             return
@@ -174,7 +171,6 @@ class SignDialog(QDialog):
                 cmd.append('--message=%s' % msg)
 
         cmd.append(str(self.rev))
-        self.finishfunc = finished
         self.cmd.run(cmd)
 
     def customMessageToggle(self, checked):
