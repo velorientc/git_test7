@@ -1406,9 +1406,8 @@ class RepoWidget(QWidget):
               self.tagToRevision)
         entry(menu, None, fixed, _('Boo&kmark...'), 'hg-bookmarks',
               self.bookmarkRevision)
-        if 'gpg' in exs:
-            entry(menu, None, fixed, _('Sig&n...'), 'hg-sign',
-                  self.signRevision)
+        entry(menu, 'gpg', fixed, _('Sig&n...'), 'hg-sign',
+              self.signRevision)
         entry(menu)
         entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
               self.backoutToRevision)
