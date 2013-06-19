@@ -644,11 +644,10 @@ class Workbench(QMainWindow):
                     return
             try:
                 repo = thgrepo.repository(path=root)
-                return self.addRepoTab(repo, bundle)
+                self.addRepoTab(repo, bundle)
             except RepoError, e:
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                                     hglib.tounicode(str(e)), parent=self)
-        return None
 
     @pyqtSlot(QString)
     def closeRepo(self, root):
@@ -667,8 +666,9 @@ class Workbench(QMainWindow):
         rev = None
         if len(uri) > 1:
             rev = hglib.fromunicode(uri[1])
-        rw = self.showRepo(path)
-        if rw:
+        self.showRepo(path)
+        rw = self.repoTabsWidget.currentWidget()
+        if rw and hglib.tounicode(rw.repo.root) == os.path.normpath(path):
             if rev:
                 rw.goto(rev)
             else:
@@ -684,8 +684,8 @@ class Workbench(QMainWindow):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == os.path.normpath(root):
                 self.repoTabsWidget.setCurrentIndex(i)
-                return w
-        return self.openRepo(root, False)
+                return
+        self.openRepo(root, False)
 
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
