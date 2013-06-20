@@ -424,12 +424,11 @@ class Workbench(QMainWindow):
             # text, (pull-alias, push-alias)
             if isinstance(a, tuple):
                 itemtext = u'\u2193 %s | %s \u2191' % a
-                itemdata = a
-                tooltip = _('pull: %s\npush: %s') % tuple(pathdict[alias]
-                    for alias in itemdata)
+                itemdata = tuple(pathdict[alias] for alias in a)
+                tooltip = _('pull: %s\npush: %s') % itemdata
             else:
                 itemtext = a
-                itemdata = (a, a)
+                itemdata = (pathdict[a], pathdict[a])
                 tooltip = pathdict[a]
             self.urlCombo.addItem(itemtext, itemdata)
             self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
@@ -443,7 +442,7 @@ class Workbench(QMainWindow):
             self._setupUrlCombo(w.repo)
 
     def _syncUrlFor(self, op):
-        """Current URL alias for the given sync operation"""
+        """Current URL for the given sync operation"""
         urlindex = self.urlCombo.currentIndex()
         if urlindex < 0:
             return
