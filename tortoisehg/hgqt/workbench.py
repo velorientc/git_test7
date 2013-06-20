@@ -376,7 +376,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.urlCombo.currentIndexChanged.connect(self._updateUrlComboToolTip)
+        self.urlCombo.currentIndexChanged.connect(self._updateSyncUrlToolTip)
         self.synctbar.addWidget(self.urlCombo)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
@@ -433,7 +433,7 @@ class Workbench(QMainWindow):
             self.urlCombo.addItem(itemtext, itemdata)
             self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
         self.urlCombo.blockSignals(False)
-        self._updateUrlComboToolTip(self.urlCombo.currentIndex())
+        self._updateSyncUrlToolTip(self.urlCombo.currentIndex())
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
@@ -450,7 +450,7 @@ class Workbench(QMainWindow):
         return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
 
     @pyqtSlot(int)
-    def _updateUrlComboToolTip(self, index):
+    def _updateSyncUrlToolTip(self, index):
         if not self.urlCombo.count():
             tooltip = _('There are no configured sync paths.\n'
                         'Open the Synchronize tab to configure them.')
