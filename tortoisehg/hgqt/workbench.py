@@ -363,16 +363,12 @@ class Workbench(QMainWindow):
         self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), data='incoming', icon='hg-incoming',
-                  tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), data='pull', icon='hg-pull',
-                  tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), data='outgoing', icon='hg-outgoing',
-                  tooltip=_('Detect outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Push'), data='push', icon='hg-push',
-                  tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -451,12 +447,38 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(int)
     def _updateSyncUrlToolTip(self, index):
+        self._updateUrlComboToolTip(index)
+        self._updateSyncActionToolTip(index)
+
+    def _updateUrlComboToolTip(self, index):
         if not self.urlCombo.count():
             tooltip = _('There are no configured sync paths.\n'
                         'Open the Synchronize tab to configure them.')
         else:
             tooltip = self.urlCombo.itemData(index, Qt.ToolTipRole).toString()
         self.urlCombo.setToolTip(tooltip)
+
+    def _updateSyncActionToolTip(self, index):
+        if index < 0:
+            tooltips = {
+                'incoming': _('Check for incoming changes'),
+                'pull':     _('Pull incoming changes'),
+                'outgoing': _('Detect outgoing changes'),
+                'push':     _('Push outgoing changes'),
+                }
+        else:
+            pullurl, pushurl = self.urlCombo.itemData(index).toPyObject()
+            tooltips = {
+                'incoming': _('Check for incoming changes from\n%s') % pullurl,
+                'pull':     _('Pull incoming changes from\n%s') % pullurl,
+                'outgoing': _('Detect outgoing changes to\n%s') % pushurl,
+                'push':     _('Push outgoing changes to\n%s') % pushurl,
+                }
+
+        for a in self.synctbar.actions():
+            op = str(a.data().toString())
+            if op in tooltips:
+                a.setToolTip(tooltips[op])
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
