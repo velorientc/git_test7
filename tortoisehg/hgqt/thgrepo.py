@@ -109,12 +109,20 @@ class RepoWatcher(QObject):
         if files:
             self._fswatcher.removePaths(files)
 
+    def isMonitoring(self):
+        """True if filesystem monitor is running"""
+        if not self._fswatcher:
+            return False
+        return not self._fswatcher.signalsBlocked()
+
     @pyqtSlot()
     def _pollChanges(self):
         '''Catch writes or deletions of files, or writes to .hg/ folder,
         most importantly lock files'''
         self.pollStatus()
-        self.addMissingPaths()
+        # filesystem monitor may be stopped inside pollStatus()
+        if self.isMonitoring():
+            self.addMissingPaths()
 
     def addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
