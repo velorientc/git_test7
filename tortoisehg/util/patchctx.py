@@ -112,6 +112,13 @@ class patchctx(object):
     def extra(self):        return {}
     def p1(self):           return None
     def p2(self):           return None
+    def obsolete(self):     return False
+    def extinct(self):      return False
+    def unstable(self):     return False
+    def bumped(self):       return False
+    def divergent(self):    return False
+    def troubled(self):     return False
+    def troubles(self):     return []
 
     def flags(self, wfile):
         if wfile == self._parseErrorFileName:
