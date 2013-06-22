@@ -1188,7 +1188,8 @@ class SaveDialog(QDialog):
         self.updatesubpaths.setToolTip(
             _('Update or create a path alias called \'%s\' on all subrepos, '
               'using this URL as the base URL, '
-              'appending the local relative subrepo path to it') % alias)
+              'appending the local relative subrepo path to it')
+            % hglib.tounicode(alias))
         self.layout().addRow(self.updatesubpaths)
 
         BB = QDialogButtonBox

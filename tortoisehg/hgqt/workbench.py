@@ -347,20 +347,16 @@ class Workbench(QMainWindow):
         self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), data='incoming', icon='hg-incoming',
-                  tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), data='pull', icon='hg-pull',
-                  tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), data='outgoing', icon='hg-outgoing',
-                  tooltip=_('Detect outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Push'), data='push', icon='hg-push',
-                  tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.urlCombo.currentIndexChanged.connect(self._updateUrlComboToolTip)
+        self.urlCombo.currentIndexChanged.connect(self._updateSyncUrlToolTip)
         self.urlComboAction = self.synctbar.addWidget(self.urlCombo)
         # hide it because workbench could be started without open repo
         self.urlComboAction.setVisible(False)
@@ -415,17 +411,16 @@ class Workbench(QMainWindow):
             # text, (pull-alias, push-alias)
             if isinstance(a, tuple):
                 itemtext = u'\u2193 %s | %s \u2191' % a
-                itemdata = a
-                tooltip = _('pull: %s\npush: %s') % tuple(pathdict[alias]
-                    for alias in itemdata)
+                itemdata = tuple(pathdict[alias] for alias in a)
+                tooltip = _('pull: %s\npush: %s') % itemdata
             else:
                 itemtext = a
-                itemdata = (a, a)
+                itemdata = (pathdict[a], pathdict[a])
                 tooltip = pathdict[a]
             self.urlCombo.addItem(itemtext, itemdata)
             self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
         self.urlCombo.blockSignals(False)
-        self._updateUrlComboToolTip(self.urlCombo.currentIndex())
+        self._updateSyncUrlToolTip(self.urlCombo.currentIndex())
 
     #@pyqtSlot()
     def _setupUrlComboIfCurrent(self):
@@ -434,7 +429,7 @@ class Workbench(QMainWindow):
             self._setupUrlCombo(w.repo)
 
     def _syncUrlFor(self, op):
-        """Current URL alias for the given sync operation"""
+        """Current URL for the given sync operation"""
         urlindex = self.urlCombo.currentIndex()
         if urlindex < 0:
             return
@@ -442,6 +437,10 @@ class Workbench(QMainWindow):
         return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
 
     @pyqtSlot(int)
+    def _updateSyncUrlToolTip(self, index):
+        self._updateUrlComboToolTip(index)
+        self._updateSyncActionToolTip(index)
+
     def _updateUrlComboToolTip(self, index):
         if not self.urlCombo.count():
             tooltip = _('There are no configured sync paths.\n'
@@ -449,6 +448,28 @@ class Workbench(QMainWindow):
         else:
             tooltip = self.urlCombo.itemData(index, Qt.ToolTipRole).toString()
         self.urlCombo.setToolTip(tooltip)
+
+    def _updateSyncActionToolTip(self, index):
+        if index < 0:
+            tooltips = {
+                'incoming': _('Check for incoming changes'),
+                'pull':     _('Pull incoming changes'),
+                'outgoing': _('Detect outgoing changes'),
+                'push':     _('Push outgoing changes'),
+                }
+        else:
+            pullurl, pushurl = self.urlCombo.itemData(index).toPyObject()
+            tooltips = {
+                'incoming': _('Check for incoming changes from\n%s') % pullurl,
+                'pull':     _('Pull incoming changes from\n%s') % pullurl,
+                'outgoing': _('Detect outgoing changes to\n%s') % pushurl,
+                'push':     _('Push outgoing changes to\n%s') % pushurl,
+                }
+
+        for a in self.synctbar.actions():
+            op = str(a.data().toString())
+            if op in tooltips:
+                a.setToolTip(tooltips[op])
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,

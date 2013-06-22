@@ -280,8 +280,10 @@ class ChunksWidget(QWidget):
             else:
                 wlock = repo.wlock()
                 try:
-                    repo.wopener(self.currentFile, 'wb').write(
-                        self.diffbrowse.origcontents)
+                    # atomictemp can preserve file permission
+                    wf = repo.wopener(self.currentFile, 'wb', atomictemp=True)
+                    wf.write(self.diffbrowse.origcontents)
+                    wf.close()
                     fp = cStringIO.StringIO()
                     chunks[0].write(fp)
                     for c in kchunks:
