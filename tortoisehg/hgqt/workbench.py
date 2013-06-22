@@ -647,13 +647,9 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(QString)
     def closeRepo(self, root):
-        """ Close tab if the repo is removed from reporegistry [unicode] """
-        root = os.path.normpath(hglib.fromunicode(root))
-        for i in xrange(self.repoTabsWidget.count()):
-            w = self.repoTabsWidget.widget(i)
-            if w.repo.root == root:
-                self.repoTabCloseRequested(i)
-                return
+        """Close tabs of the specified repo [unicode]"""
+        for rw in list(self._findRepoWidget(unicode(root))):
+            self.repoTabCloseRequested(self.repoTabsWidget.indexOf(rw))
 
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
