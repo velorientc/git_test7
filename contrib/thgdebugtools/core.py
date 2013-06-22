@@ -74,10 +74,11 @@ class DebugMenuActions(dbgutil.BaseMenuActions):
 def extsetup(ui):
     class dbgqtrun(run.qtrun.__class__):
         def _createdialog(self, dlgfunc, args, opts):
-            dlg = super(dbgqtrun, self)._createdialog(dlgfunc, args, opts)
+            dlg, reporoot = super(dbgqtrun, self)._createdialog(dlgfunc, args,
+                                                                opts)
             if isinstance(dlg, QMainWindow):
                 m = dlg.menuBar().addMenu('&Debug')
                 DebugMenuActions(m, parent=dlg)
-            return dlg
+            return dlg, reporoot
 
     run.qtrun.__class__ = dbgqtrun

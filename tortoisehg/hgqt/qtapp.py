@@ -251,7 +251,7 @@ class QtRunner(QObject):
         self._exccatcher = None
         self._server = None
         self._workbench = None
-        self._dialogs = []
+        self._dialogs = {}  # dlg: reporoot
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
@@ -277,7 +277,7 @@ class QtRunner(QObject):
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
-        dlg = self._createdialog(dlgfunc, args, opts)
+        dlg, reporoot = self._createdialog(dlgfunc, args, opts)
         if dlg:
             dlg.show()
             dlg.raise_()
@@ -312,12 +312,14 @@ class QtRunner(QObject):
 
     def _createdialog(self, dlgfunc, args, opts):
         assert self._ui
+        reporoot = None
         try:
             args = list(args)
             if 'repository' in opts:
                 repo = thgrepo.repository(self._ui, opts['repository'])
+                reporoot = hglib.tounicode(repo.root)
                 args.insert(0, repo)
-            return dlgfunc(self._ui, *args, **opts)
+            return dlgfunc(self._ui, *args, **opts), reporoot
         except error.RepoError, inst:
             qtlib.WarningMsgBox(_('Repository Error'),
                                 hglib.tounicode(str(inst)))
@@ -325,13 +327,14 @@ class QtRunner(QObject):
             qtlib.WarningMsgBox(_('Abort'),
                                 hglib.tounicode(str(inst)),
                                 hglib.tounicode(inst.hint or ''))
+        return None, None
 
     def _opendialog(self, dlgfunc, args, opts):
-        dlg = self._createdialog(dlgfunc, args, opts)
+        dlg, reporoot = self._createdialog(dlgfunc, args, opts)
         if not dlg:
             return
 
-        self._dialogs.append(dlg)  # avoid garbage collection
+        self._dialogs[dlg] = reporoot  # avoid garbage collection
         if hasattr(dlg, 'finished') and hasattr(dlg.finished, 'connect'):
             dlg.finished.connect(dlg.deleteLater)
         # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
@@ -342,7 +345,7 @@ class QtRunner(QObject):
     def _forgetdialog(self, dlg):
         """forget the dialog to be garbage collectable"""
         assert dlg in self._dialogs
-        self._dialogs.remove(dlg)
+        del self._dialogs[dlg]
         if self._workbench is dlg:
             self._workbench = None
 
