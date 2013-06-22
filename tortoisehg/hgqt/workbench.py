@@ -10,7 +10,6 @@ Main Qt4 application for TortoiseHg
 
 import os
 import sys
-from mercurial import util
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
@@ -633,14 +632,14 @@ class Workbench(QMainWindow):
     @pyqtSlot(QString, bool)
     def openRepo(self, root, reuse, bundle=None):
         """Open tab of the specified repo [unicode]"""
-        root = hglib.fromunicode(root)
+        root = unicode(root)
         if root and not root.startswith('ssh://'):
             if reuse:
                 for rw in self._findRepoWidget(root):
                     self.repoTabsWidget.setCurrentWidget(rw)
                     return
             try:
-                repo = thgrepo.repository(path=root)
+                repo = thgrepo.repository(path=hglib.fromunicode(root))
                 self.addRepoTab(repo, bundle)
             except RepoError, e:
                 qtlib.WarningMsgBox(_('Failed to open repository'),
@@ -1015,11 +1014,12 @@ class Workbench(QMainWindow):
     def _findRepoWidget(self, root):
         """Iterates RepoWidget for the specified root"""
         def normpathandcase(path):
-            return os.path.normcase(util.normpath(path))
+            return os.path.normcase(os.path.normpath(path))
+        normroot = normpathandcase(root)
         tw = self.repoTabsWidget
         for idx in range(tw.count()):
             rw = tw.widget(idx)
-            if normpathandcase(rw.repo.root) == normpathandcase(root):
+            if normpathandcase(hglib.tounicode(rw.repo.root)) == normroot:
                 yield rw
 
     def onAbout(self, *args):
@@ -1168,7 +1168,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'lastactiverepo', '')
 
     def goto(self, root, rev):
-        for rw in self._findRepoWidget(root):
+        for rw in self._findRepoWidget(hglib.tounicode(root)):
             rw.goto(rev)
 
     def closeEvent(self, event):
