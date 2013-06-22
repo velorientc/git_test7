@@ -837,8 +837,7 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
-        rw.progress.connect(lambda tp, p, i, u, tl:
-            self.statusbar.progress(tp, p, i, u, tl, repo.root))
+        rw.progress.connect(self._showRepoWidgetProgress)
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.beginSuppressPrompt.connect(self.log.beginSuppressPrompt)
@@ -871,7 +870,11 @@ class Workbench(QMainWindow):
         self.updateMenu()
         return rw
 
-
+    #@pyqtSlot(QString, object, QString, QString, object)
+    def _showRepoWidgetProgress(self, topic, pos, item, unit, total):
+        rw = self.sender()
+        assert isinstance(rw, RepoWidget)
+        self.statusbar.progress(topic, pos, item, unit, total, rw.repo.root)
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)
