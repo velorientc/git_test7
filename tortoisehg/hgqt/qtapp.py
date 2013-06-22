@@ -250,6 +250,7 @@ class QtRunner(QObject):
         self._mainapp = None
         self._exccatcher = None
         self._server = None
+        self._repomanager = None
         self._workbench = None
         self._dialogs = {}  # dlg: reporoot
 
@@ -277,6 +278,8 @@ class QtRunner(QObject):
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
+        self._repomanager = thgrepo.RepoManager(ui, self)
+
         dlg, reporoot = self._createdialog(dlgfunc, args, opts)
         if dlg:
             dlg.show()
@@ -292,6 +295,8 @@ class QtRunner(QObject):
         finally:
             if self._workbench is dlg:
                 self._workbench = None
+            if reporoot:
+                self._repomanager.releaseRepoAgent(reporoot)
             if self._server:
                 self._server.close()
             self._exccatcher.release()
@@ -311,13 +316,15 @@ class QtRunner(QObject):
         self._mainapp.installTranslator(t)
 
     def _createdialog(self, dlgfunc, args, opts):
-        assert self._ui
+        assert self._ui and self._repomanager
         reporoot = None
         try:
             args = list(args)
             if 'repository' in opts:
-                repo = thgrepo.repository(self._ui, opts['repository'])
-                reporoot = hglib.tounicode(repo.root)
+                repoagent = self._repomanager.openRepoAgent(
+                    hglib.tounicode(opts['repository']))
+                reporoot = repoagent.rootPath()
+                repo = repoagent.rawRepo()  # TODO: pass repoagent to dlgfunc
                 args.insert(0, repo)
             return dlgfunc(self._ui, *args, **opts), reporoot
         except error.RepoError, inst:
@@ -327,6 +334,8 @@ class QtRunner(QObject):
             qtlib.WarningMsgBox(_('Abort'),
                                 hglib.tounicode(str(inst)),
                                 hglib.tounicode(inst.hint or ''))
+        if reporoot:
+            self._repomanager.releaseRepoAgent(reporoot)
         return None, None
 
     def _opendialog(self, dlgfunc, args, opts):
@@ -345,7 +354,9 @@ class QtRunner(QObject):
     def _forgetdialog(self, dlg):
         """forget the dialog to be garbage collectable"""
         assert dlg in self._dialogs
-        del self._dialogs[dlg]
+        reporoot = self._dialogs.pop(dlg)
+        if reporoot:
+            self._repomanager.releaseRepoAgent(reporoot)
         if self._workbench is dlg:
             self._workbench = None
 
