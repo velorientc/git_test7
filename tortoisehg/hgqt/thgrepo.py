@@ -95,11 +95,13 @@ class RepoWatcher(QObject):
         self._fswatcher.addPath(hglib.tounicode(self.repo.path))
         self._fswatcher.addPath(hglib.tounicode(self.repo.path + '/store'))
         self.addMissingPaths()
+        self._fswatcher.blockSignals(False)
 
     def stopMonitoring(self):
         """Stop filesystem monitoring by removing all watched paths"""
         if not self._fswatcher:
             return
+        self._fswatcher.blockSignals(True)  # ignore pending events
         dirs = self._fswatcher.directories()
         if dirs:
             self._fswatcher.removePaths(dirs)
