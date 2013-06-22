@@ -636,7 +636,7 @@ class Workbench(QMainWindow):
         root = hglib.fromunicode(root)
         if root and not root.startswith('ssh://'):
             if reuse:
-                for rw in self._findrepowidget(root):
+                for rw in self._findRepoWidget(root):
                     self.repoTabsWidget.setCurrentWidget(rw)
                     return
             try:
@@ -1012,7 +1012,7 @@ class Workbench(QMainWindow):
                                        FD.ShowDirsOnly | FD.ReadOnly)
         self.openRepo(path, False)
 
-    def _findrepowidget(self, root):
+    def _findRepoWidget(self, root):
         """Iterates RepoWidget for the specified root"""
         def normpathandcase(path):
             return os.path.normcase(util.normpath(path))
@@ -1168,7 +1168,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'lastactiverepo', '')
 
     def goto(self, root, rev):
-        for rw in self._findrepowidget(root):
+        for rw in self._findRepoWidget(root):
             rw.goto(rev)
 
     def closeEvent(self, event):
