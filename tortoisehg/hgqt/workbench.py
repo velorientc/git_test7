@@ -54,6 +54,7 @@ class Workbench(QMainWindow):
         rr.openRepo.connect(self.openRepo)
         rr.removeRepo.connect(self.closeRepo)
         rr.progressReceived.connect(self.progress)
+        self._repomanager.repositoryChanged.connect(rr.scanRepo)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
@@ -863,7 +864,6 @@ class Workbench(QMainWindow):
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
         rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
         rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
-        rw.repoChanged.connect(self.reporegistry.scanRepo)
 
         tw = self.repoTabsWidget
         # We can open new tabs next to the current one or next to the last tab
