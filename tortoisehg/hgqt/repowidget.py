@@ -1837,7 +1837,6 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def visualDiffToLocal(self):
         if self.rev is None:
@@ -1846,7 +1845,6 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     @pyqtSlot()
     def updateToRevision(self):

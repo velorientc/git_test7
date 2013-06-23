@@ -249,14 +249,12 @@ class FileLogDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffToLocal(self):
         opts = dict(rev=['rev(%d)' % self.selection[0]])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffRevs(self):
         revs = self.selection
@@ -267,7 +265,6 @@ class FileLogDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffFile(self):
         rev = self.selection[0]
@@ -276,7 +273,6 @@ class FileLogDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffFileToLocal(self):
         rev = self.selection[0]
@@ -285,7 +281,6 @@ class FileLogDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffFileRevs(self):
         revs = self.selection
@@ -297,7 +292,6 @@ class FileLogDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onEditLocal(self):
         filenames = [self.filename]
@@ -821,14 +815,12 @@ class FileDiffDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffToLocal(self):
         opts = dict(rev=['rev(%d)' % self.selection[0]])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffFile(self):
         rev = self.selection[0]
@@ -837,7 +829,6 @@ class FileDiffDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onVisualDiffFileToLocal(self):
         rev = self.selection[0]
@@ -846,7 +837,6 @@ class FileDiffDialog(_AbstractFileDialog):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def onEditLocal(self):
         filenames = [self.filename]
