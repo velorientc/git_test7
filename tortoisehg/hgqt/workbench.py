@@ -810,7 +810,7 @@ class Workbench(QMainWindow):
         if widget.closeRepoWidget():
             w = self.repoTabsWidget.widget(index)
             try:
-                reporoot = w.repo.root
+                reporoot = hglib.tounicode(w.repo.root)
             except:
                 reporoot = ''
             self.repoTabsWidget.removeTab(index)
@@ -823,7 +823,7 @@ class Workbench(QMainWindow):
         if 0 <= index < tw.count():
             w = tw.widget(index)
             try:
-                reporoot = w.repo.root
+                reporoot = hglib.tounicode(w.repo.root)
             except:
                 reporoot = ''
             if w and w.closeRepoWidget():
