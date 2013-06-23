@@ -56,12 +56,14 @@ class RepoWidget(QWidget):
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
-    def __init__(self, repo, parent=None, bundle=None):
+    def __init__(self, repoagent, parent=None, bundle=None):
         QWidget.__init__(self, parent, acceptDrops=True)
 
-        self.repo = repo
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.configChanged.connect(self.configChanged)
+        self._repoagent = repoagent
+        # TODO: use _repoagent where appropriate
+        self.repo = repo = repoagent.rawRepo()
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
         self.revsetfilter = False
         self.bundle = None  # bundle file name [local encoding]
         self.bundlesource = None  # source URL of incoming bundle [unicode]

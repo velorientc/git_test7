@@ -878,8 +878,7 @@ class Workbench(QMainWindow):
 
     def addRepoTab(self, repoagent, bundle):
         '''opens the given repo in a new tab'''
-        repo = repoagent.rawRepo()  # TODO: pass repoagent to RepoWidget
-        rw = RepoWidget(repo, self, bundle=bundle)
+        rw = RepoWidget(repoagent, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.progress.connect(self._showRepoWidgetProgress)
         rw.output.connect(self._appendRepoWidgetOutput)
