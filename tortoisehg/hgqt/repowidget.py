@@ -261,7 +261,7 @@ class RepoWidget(QWidget):
                 self.repotabs_splitter.setSizes([1, 1])
 
     def repoRootPath(self):
-        return hglib.tounicode(self.repo.root)
+        return self._repoagent.rootPath()
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
