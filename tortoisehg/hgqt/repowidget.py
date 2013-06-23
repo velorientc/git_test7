@@ -1867,7 +1867,6 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def matchRevision(self):
@@ -1974,7 +1973,6 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     @pyqtSlot()
