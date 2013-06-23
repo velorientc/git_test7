@@ -743,8 +743,7 @@ class RepoRegistryView(QDockWidget):
             it.setShortName(uname)
             self.tview.model().layoutChanged.emit()
 
-    @pyqtSlot(QString, object)
-    def baseNodeChanged(self, uroot, basenode):
+    def setBaseNode(self, uroot, basenode):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setBaseNode(basenode)

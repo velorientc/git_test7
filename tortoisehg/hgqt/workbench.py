@@ -46,6 +46,7 @@ class Workbench(QMainWindow):
         self._repomanager = repomanager
         self._repomanager.configChanged.connect(self._setupUrlComboIfCurrent)
         self._repomanager.configChanged.connect(self._updateRepoShortName)
+        self._repomanager.repositoryChanged.connect(self._updateRepoBaseNode)
         self._repomanager.repositoryDestroyed.connect(self.closeRepo)
         self._repomanager.repositoryOpened.connect(self._updateRepoRegItem)
 
@@ -808,11 +809,17 @@ class Workbench(QMainWindow):
     @pyqtSlot(unicode)
     def _updateRepoRegItem(self, root):
         self._updateRepoShortName(root)
+        self._updateRepoBaseNode(root)
 
     @pyqtSlot(unicode)
     def _updateRepoShortName(self, root):
         repo = self._repomanager.repoAgent(root).rawRepo()
         self.reporegistry.setShortName(root, repo.shortname)
+
+    @pyqtSlot(unicode)
+    def _updateRepoBaseNode(self, root):
+        repo = self._repomanager.repoAgent(root).rawRepo()
+        self.reporegistry.setBaseNode(root, repo[0].node())
 
     @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
@@ -874,7 +881,6 @@ class Workbench(QMainWindow):
         rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
-        rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
 
         tw = self.repoTabsWidget
         # We can open new tabs next to the current one or next to the last tab

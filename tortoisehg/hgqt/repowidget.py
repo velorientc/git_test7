@@ -48,11 +48,6 @@ class RepoWidget(QWidget):
     beginSuppressPrompt = pyqtSignal()
     endSuppressPrompt = pyqtSignal()
 
-    # The following signals should be exchanged directly between workbench and
-    # thgrepo. But it isn't possible because workbench cannot filter out known
-    # repo from the result of thgrepo.repository().
-    baseNodeChanged = pyqtSignal(QString, object)
-
     revisionSelected = pyqtSignal(object)
 
     titleChanged = pyqtSignal(unicode)
@@ -77,7 +72,6 @@ class RepoWidget(QWidget):
         self.busyIcons = []
         self.namedTabs = {}
         self.repolen = len(repo)
-        self.basenode = None
         self.destroyed.connect(self.repo.thginvalidate)
 
         # Determine the "initial revision" that must be shown when
@@ -948,10 +942,6 @@ class RepoWidget(QWidget):
         'initial batch of revisions loaded'
         self.repoview.goto(self._reload_rev) # emits revisionSelected
         self.repoview.resizeColumns()
-        if len(self.repo) and self.repo[0].node() != self.basenode:
-            self.basenode = self.repo[0].node()
-            self.baseNodeChanged.emit(hglib.tounicode(self.repo.root),
-                                      self.basenode)
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
