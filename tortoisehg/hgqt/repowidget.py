@@ -909,7 +909,6 @@ class RepoWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         dlg.showMessage.connect(self.showMessage)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     ## End workbench event forwards
@@ -1932,7 +1931,6 @@ class RepoWidget(QWidget):
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def graftRevisions(self):
@@ -2220,7 +2218,6 @@ class RepoWidget(QWidget):
         if not isinstance(sel, str):
             sel = self.repo.changectx(sel).thgmqpatchname()
         dlg = qrename.QRenameDialog(self.repo, sel, self)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()
