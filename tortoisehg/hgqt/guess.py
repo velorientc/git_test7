@@ -69,6 +69,7 @@ class DetectRenameDialog(QDialog):
 
         self.unrevlist = QListWidget()
         self.unrevlist.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.unrevlist.doubleClicked.connect(self.onUnrevDoubleClicked)
         utvbox.addWidget(self.unrevlist)
 
         simhbox = QHBoxLayout()
@@ -274,6 +275,10 @@ class DetectRenameDialog(QDialog):
             for t, l in patch.difflabel(difftext.splitlines, True):
                 hu.write(t, label=l)
         self.difftb.setHtml(hu.getdata()[0])
+
+    def onUnrevDoubleClicked(self, index):
+        file = hglib.fromunicode(self.unrevlist.model().data(index).toString())
+        qtlib.editfiles(self.repo, [file])
 
     def accept(self):
         s = QSettings()
