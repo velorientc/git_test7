@@ -1633,7 +1633,6 @@ class RepoWidget(QWidget):
         def qdeleteact():
             """Delete unapplied patch(es)"""
             dlg = qdelete.QDeleteDialog(self.repo, self.menuselection, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()

@@ -272,7 +272,6 @@ class MQPatchesWidget(QDockWidget):
         from tortoisehg.hgqt import qdelete
         patch = self.queueListWidget.currentItem()._thgpatch
         dlg = qdelete.QDeleteDialog(self.repo, [patch], self)
-        dlg.finished.connect(dlg.deleteLater)
         if dlg.exec_() == QDialog.Accepted:
             self.reload()
 

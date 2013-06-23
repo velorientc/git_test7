@@ -49,13 +49,15 @@ class QDeleteDialog(QDialog):
         self.bbox = bbox
 
     def accept(self):
-        def finished(ret):
-            self.repo.decrementBusyCount()
-            self.reject()
         cmdline = ['qdelete', '--repository', self.repo.root]
         if self.keepchk.isChecked():
             cmdline += ['--keep']
         cmdline += self.patches
         self.repo.incrementBusyCount()
-        self.cmd.commandFinished.connect(finished)
+        self.cmd.commandFinished.connect(self._finishOff)
         self.cmd.run(cmdline)
+
+    @pyqtSlot()
+    def _finishOff(self):
+        self.repo.decrementBusyCount()
+        self.reject()
