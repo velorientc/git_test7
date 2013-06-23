@@ -51,7 +51,6 @@ class RepoWidget(QWidget):
     # The following signals should be exchanged directly between workbench and
     # thgrepo. But it isn't possible because workbench cannot filter out known
     # repo from the result of thgrepo.repository().
-    shortNameChanged = pyqtSignal(QString, QString)
     baseNodeChanged = pyqtSignal(QString, object)
 
     revisionSelected = pyqtSignal(object)
@@ -78,7 +77,6 @@ class RepoWidget(QWidget):
         self.busyIcons = []
         self.namedTabs = {}
         self.repolen = len(repo)
-        self.shortname = None
         self.basenode = None
         self.destroyed.connect(self.repo.thginvalidate)
 
@@ -950,10 +948,6 @@ class RepoWidget(QWidget):
         'initial batch of revisions loaded'
         self.repoview.goto(self._reload_rev) # emits revisionSelected
         self.repoview.resizeColumns()
-        if self.repo.shortname != self.shortname:
-            self.shortname = self.repo.shortname
-            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
-                                       self.shortname)
         if len(self.repo) and self.repo[0].node() != self.basenode:
             self.basenode = self.repo[0].node()
             self.baseNodeChanged.emit(hglib.tounicode(self.repo.root),
@@ -1129,10 +1123,6 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.reload()
         self.titleChanged.emit(self.title())
         self.updateTaskTabs()
-        if self.repo.shortname != self.shortname:
-            self.shortname = self.repo.shortname
-            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
-                                       self.shortname)
 
     def updateTaskTabs(self):
         val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()

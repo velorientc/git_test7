@@ -45,7 +45,9 @@ class Workbench(QMainWindow):
         self.ui = ui
         self._repomanager = repomanager
         self._repomanager.configChanged.connect(self._setupUrlComboIfCurrent)
+        self._repomanager.configChanged.connect(self._updateRepoShortName)
         self._repomanager.repositoryDestroyed.connect(self.closeRepo)
+        self._repomanager.repositoryOpened.connect(self._updateRepoRegItem)
 
         self.setupUi()
         self.setWindowTitle(_('TortoiseHg Workbench'))
@@ -802,6 +804,16 @@ class Workbench(QMainWindow):
         self.actionBack.setEnabled(rw.canGoBack())
         self.actionForward.setEnabled(rw.canGoForward())
 
+    # might be better to move them to RepoRegistry
+    @pyqtSlot(unicode)
+    def _updateRepoRegItem(self, root):
+        self._updateRepoShortName(root)
+
+    @pyqtSlot(unicode)
+    def _updateRepoShortName(self, root):
+        repo = self._repomanager.repoAgent(root).rawRepo()
+        self.reporegistry.setShortName(root, repo.shortname)
+
     @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
@@ -862,7 +874,6 @@ class Workbench(QMainWindow):
         rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
-        rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
         rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
 
         tw = self.repoTabsWidget

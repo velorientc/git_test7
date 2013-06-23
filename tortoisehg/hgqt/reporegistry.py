@@ -737,8 +737,7 @@ class RepoRegistryView(QDockWidget):
                 return 0
         self.tview.model().sortchilds(ip.childs, keyfunc)
 
-    @pyqtSlot(QString, QString)
-    def shortNameChanged(self, uroot, uname):
+    def setShortName(self, uroot, uname):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setShortName(uname)
