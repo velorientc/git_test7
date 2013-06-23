@@ -684,7 +684,7 @@ class Workbench(QMainWindow):
             rev = hglib.fromunicode(uri[1])
         self.showRepo(path)
         rw = self.repoTabsWidget.currentWidget()
-        if rw and hglib.tounicode(rw.repo.root) == os.path.normpath(path):
+        if rw and rw.repoRootPath() == os.path.normpath(path):
             if rev:
                 rw.goto(rev)
             else:
@@ -701,7 +701,7 @@ class Workbench(QMainWindow):
     def setRevsetFilter(self, path, filter):
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == path:
+            if w.repoRootPath() == path:
                 w.setFilter(filter)
                 return
 
@@ -806,7 +806,7 @@ class Workbench(QMainWindow):
         tw = self.repoTabsWidget
         if 0 <= index < tw.count():
             w = tw.widget(index)
-            reporoot = hglib.tounicode(w.repo.root)
+            reporoot = w.repoRootPath()
             if w.closeRepoWidget():
                 tw.removeTab(index)
                 w.deleteLater()
@@ -831,8 +831,7 @@ class Workbench(QMainWindow):
             self.updateHistoryActions()
             self.updateMenu()
             if w.repo:
-                root = w.repo.root
-                self.reporegistry.setActiveTabRepo(hglib.tounicode(root))
+                self.reporegistry.setActiveTabRepo(w.repoRootPath())
                 self._setupCustomTools(w.repo.ui)
                 self._setupUrlCombo(w.repo)
         else:
@@ -1003,7 +1002,7 @@ class Workbench(QMainWindow):
         dlg = self._dialogs.openNew(Workbench._createCloneDialog)
         repoWidget = self.repoTabsWidget.currentWidget()
         if repoWidget:
-            uroot = hglib.tounicode(repoWidget.repo.root)
+            uroot = repoWidget.repoRootPath()
             dlg.setSource(uroot)
             dlg.setDestination(uroot + '-clone')
 
@@ -1035,7 +1034,7 @@ class Workbench(QMainWindow):
         tw = self.repoTabsWidget
         for idx in range(tw.count()):
             rw = tw.widget(idx)
-            if normpathandcase(hglib.tounicode(rw.repo.root)) == normroot:
+            if normpathandcase(rw.repoRootPath()) == normroot:
                 yield rw
 
     def onAbout(self, *args):
@@ -1136,10 +1135,10 @@ class Workbench(QMainWindow):
             tw = self.repoTabsWidget
             for idx in range(tw.count()):
                 rw = tw.widget(idx)
-                repostosave.append(hglib.tounicode(rw.repo.root))
+                repostosave.append(rw.repoRootPath())
             cw = tw.currentWidget()
             if cw is not None:
-                lastactiverepo = hglib.tounicode(cw.repo.root)
+                lastactiverepo = cw.repoRootPath()
         s.setValue(wb + 'lastactiverepo', lastactiverepo)
         s.setValue(wb + 'openrepos', (',').join(repostosave))
 

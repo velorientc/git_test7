@@ -271,6 +271,9 @@ class RepoWidget(QWidget):
             if self.repotabs_splitter.sizes()[1] == 0:
                 self.repotabs_splitter.setSizes([1, 1])
 
+    def repoRootPath(self):
+        return hglib.tounicode(self.repo.root)
+
     def title(self):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
