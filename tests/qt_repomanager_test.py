@@ -7,6 +7,7 @@ def mockrepo(ui, path):
     m.unfiltered = lambda: m
     return m
 
+LOCAL_SIGNALS = ['repositoryOpened', 'repositoryClosed']
 MAPPED_SIGNALS = ['configChanged', 'repositoryChanged', 'repositoryDestroyed']
 
 class RepoManagerMockedTest(unittest.TestCase):
@@ -17,7 +18,7 @@ class RepoManagerMockedTest(unittest.TestCase):
         self.watcherpatcher.start()
         self.repoman = thgrepo.RepoManager(ui.ui())
 
-        for signame in MAPPED_SIGNALS:
+        for signame in LOCAL_SIGNALS + MAPPED_SIGNALS:
             slot = mock.Mock()
             setattr(self, signame, slot)
             getattr(self.repoman, signame).connect(slot)
@@ -54,3 +55,23 @@ class RepoManagerMockedTest(unittest.TestCase):
         for signame in MAPPED_SIGNALS:
             getattr(a, signame).emit()
             self.assertFalse(getattr(self, signame).called)
+
+    def test_opened_signal(self):
+        self.repoman.repositoryOpened.connect(
+            lambda: self.assertTrue(self.repoman.repoAgent('/a')))
+        self.repoman.openRepoAgent('/a')
+        self.repositoryOpened.assert_called_once_with('/a')
+        self.repositoryOpened.reset_mock()
+        # emitted only if repository is actually instantiated (i.e. not cached)
+        self.repoman.openRepoAgent('/a')
+        self.assertFalse(self.repositoryOpened.called)
+
+    def test_closed_signal(self):
+        self.repoman.repositoryClosed.connect(
+            lambda: self.assertFalse(self.repoman.repoAgent('/a')))
+        self.repoman.openRepoAgent('/a')
+        self.repoman.openRepoAgent('/a')
+        self.repoman.releaseRepoAgent('/a')
+        self.assertFalse(self.repositoryClosed.called)
+        self.repoman.releaseRepoAgent('/a')
+        self.repositoryClosed.assert_called_once_with('/a')

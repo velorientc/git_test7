@@ -365,6 +365,9 @@ def _normreporoot(path):
 class RepoManager(QObject):
     """Cache open RepoAgent instances and bundle their signals"""
 
+    repositoryOpened = pyqtSignal(unicode)
+    repositoryClosed = pyqtSignal(unicode)
+
     configChanged = pyqtSignal(unicode)
     repositoryChanged = pyqtSignal(unicode)
     repositoryDestroyed = pyqtSignal(unicode)
@@ -393,6 +396,7 @@ class RepoManager(QObject):
 
         assert agent.rootPath() == path
         self._openagents[path] = (agent, 1)
+        self.repositoryOpened.emit(path)
         return agent
 
     def releaseRepoAgent(self, path):
@@ -409,6 +413,7 @@ class RepoManager(QObject):
         for sig, slot in self._mappedSignals(agent):
             sig.disconnect(slot)
         agent.setParent(None)
+        self.repositoryClosed.emit(path)
 
     def repoAgent(self, path):
         """Peek open RepoAgent for the specified path without refcount change;
