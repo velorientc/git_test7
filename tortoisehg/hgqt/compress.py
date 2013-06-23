@@ -8,11 +8,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import os
+from mercurial import revset
 
-from mercurial import revset, merge as mergemod
-
-from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdui, commit, thgrepo
 
