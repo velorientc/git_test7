@@ -659,15 +659,3 @@ class CheckThread(QThread):
 
     def cancel(self):
         self.canceled = True
-
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    else:
-        rev = 'tip'
-    return BackoutDialog(rev, repo, None)

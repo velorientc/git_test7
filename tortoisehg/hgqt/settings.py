@@ -104,7 +104,8 @@ class SettingsCombo(QComboBox):
         utext = self.currentText()
         if utext == _unspecstr:
             return None
-        if 'nohist' in self.opts or utext in self.defaults + self.previous or not utext:
+        if ('nohist' in self.opts or utext in self.defaults + self.previous
+            or not utext):
             return hglib.fromunicode(utext)
         self.previous.insert(0, utext)
         self.previous = self.previous[:10]
@@ -547,11 +548,11 @@ INFO = (
     _fi(_('Three-way Merge Tool'), 'ui.merge',
         (genDeferredCombo, findMergeTools),
         _('Graphical merge program for resolving merge conflicts.  If left '
-        'unspecified, Mercurial will use the first applicable tool it finds '
-        'on your system or use its internal merge tool that leaves conflict '
-        'markers in place.  Choose internal:merge to force conflict markers, '
-        'internal:prompt to always select local or other, or internal:dump '
-        'to leave files in the working directory for manual merging')),
+          'unspecified, Mercurial will use the first applicable tool it finds '
+          'on your system or use its internal merge tool that leaves conflict '
+          'markers in place.  Choose internal:merge to force conflict markers, '
+          'internal:prompt to always select local or other, or internal:dump '
+          'to leave files in the working directory for manual merging')),
     _fi(_('Visual Diff Tool'), 'tortoisehg.vdiff',
         (genDeferredCombo, findDiffTools),
         _('Specify visual diff tool, as described in the [merge-tools] '
@@ -610,27 +611,30 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
-    _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single', genBoolRBGroup,
+    _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single',
+        genBoolRBGroup,
         _('Select whether you want to have a single workbench window. '
-        'If you disable this setting you will get a new workbench window everytime that you use the "Hg Workbench" '
-        'command on the explorer context menu. Default: True'),
+          'If you disable this setting you will get a new workbench window '
+          'everytime that you use the "Hg Workbench" command on the explorer '
+          'context menu. Default: True'),
         restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
         ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
         _('Select the initial widget that will be shown when opening a '
-        'repository. '
-        'Default: revdetails')),
-    _fi(_('Initial revision'), 'tortoisehg.initialrevision', (genDefaultCombo,
-        ['current', 'tip', 'workingdir']),
+          'repository. '
+          'Default: revdetails')),
+    _fi(_('Initial revision'), 'tortoisehg.initialrevision',
+        (genDefaultCombo, ['current', 'tip', 'workingdir']),
         _('Select the initial revision that will be selected when opening a '
-        'repository.  You can select the "current" (i.e. the working directory '
-        'parent), the current "tip" or the working directory ("workingdir"). '
-        'Default: current')),
+          'repository.  You can select the "current" (i.e. the working '
+          'directory parent), the current "tip" or the working directory '
+          '("workingdir"). '
+          'Default: current')),
     _fi(_('Open new tabs next\nto the current tab'),
         'tortoisehg.opentabsaftercurrent', genBoolRBGroup,
         _('Should new tabs be open next to the current tab? '
-        'If False new tabs will be open after the last tab. '
-        'Default: True')),
+          'If False new tabs will be open after the last tab. '
+          'Default: True')),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '
@@ -640,12 +644,13 @@ INFO = (
         _('Show full authorname in Logview. If not enabled, '
           'only a short part, usually name without email is shown. '
           'Default: False')),
-    _fi(_('Task Tabs'), 'tortoisehg.tasktabs', (genDefaultCombo,
-         ['east', 'west', 'off']),
+    _fi(_('Task Tabs'), 'tortoisehg.tasktabs',
+        (genDefaultCombo, ['east', 'west', 'off']),
         _('Show tabs along the side of the bottom half of each repo '
           'widget allowing one to switch task tabs without using the toolbar. '
           'Default: off')),
-    _fi(_('Task Toolbar Order'), 'tortoisehg.workbench.task-toolbar', genEditCombo,
+    _fi(_('Task Toolbar Order'), 'tortoisehg.workbench.task-toolbar',
+        genEditCombo,
         _('Specify which task buttons you want to show on the task toolbar '
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
@@ -677,100 +682,113 @@ INFO = (
           'standard tags inserted by the Mercurial Queues Extension. '
           'Default: None (leave blank)')),
     _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
-        ['none', 'update', 'fetch', 'rebase']),
+        ['none', 'update', 'fetch', 'rebase', 'updateorrebase']),
         _('Operation which is performed directly after a successful pull. '
           'update equates to pull --update, fetch equates to the fetch '
-          'extension, rebase equates to pull --rebase.  Default: none')),
-    _fi(_('Default Push'), 'tortoisehg.defaultpush', (genDefaultCombo,
-        ['all', 'branch', 'revision']),
+          'extension, rebase equates to pull --rebase, '
+          'updateorrebase equates to pull -u --rebase.  Default: none')),
+    _fi(_('Default Push'), 'tortoisehg.defaultpush',
+        (genDefaultCombo, ['all', 'branch', 'revision']),
         _('Select the revisions that will be pushed by default, '
-        'whenever you click the Push button.'
-        '<ul><li><b>all</b>: The default. Push all changes in <i>all branches</i>.'
-        '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
-        '<li><b>revision</b>: Push the changes in the current branch '
-        '<i><u>up to</u> the current revision</i>.</ul><p>'
-        'Default: all')),
+          'whenever you click the Push button.'
+          '<ul><li><b>all</b>: The default. Push all changes in '
+          '<i>all branches</i>.'
+          '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
+          '<li><b>revision</b>: Push the changes in the current branch '
+          '<i><u>up to</u> the current revision</i>.</ul><p>'
+          'Default: all')),
     _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
           'before pushing changesets. '
           'If False, push will be performed without any confirmation dialog. '
           'Default: True')),
-    _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks', (genDefaultCombo,
-        ['auto', 'prompt', 'never']),
+    _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks',
+        (genDefaultCombo, ['auto', 'prompt', 'never']),
         _('Select when TortoiseHg will show a prompt to activate a bookmark '
-        'when updating to a revision that has one or more bookmarks.'
-        '<ul><li><b>auto</b>: Try to automatically activate bookmarks. When '
-        'updating to a revision that has a single bookmark it will be activated '
-        'automatically. Show a prompt if there is more than one bookmark on the '
-        'revision that is being updated to.'
-        '<li><b>prompt</b>: The default. Show a prompt when updating to a '
-        'revision that has one or more bookmarks.'
-        '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
-        '</ul><p>'
-        'Default: prompt')),
+          'when updating to a revision that has one or more bookmarks.'
+          '<ul><li><b>auto</b>: Try to automatically activate bookmarks. When '
+          'updating to a revision that has a single bookmark it will be '
+          'activated automatically. Show a prompt if there is more than one '
+          'bookmark on the revision that is being updated to.'
+          '<li><b>prompt</b>: The default. Show a prompt when updating to a '
+          'revision that has one or more bookmarks.'
+          '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
+          '</ul><p>'
+          'Default: prompt')),
+    _fi(_('Target combo'), 'tortoisehg.workbench.target-combo',
+        (genDefaultCombo, ['auto', 'always']),
+        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
+          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
+          'target configured.'
+          '<li><b>always</b>: Always show the combo.'
+          '</ul><p>'
+          'Default: auto')),
     )),
-({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
+({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
+ (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is:<br>'
           'Full Name &lt;email@example.com&gt;')),
     _fi(_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
-       _('Suggested length of commit message lines. A red vertical '
-         'line will mark this length.  CTRL-E will reflow the current '
-         'paragraph to the specified line length. Default: 80')),
+        _('Suggested length of commit message lines. A red vertical '
+          'line will mark this length.  CTRL-E will reflow the current '
+          'paragraph to the specified line length. Default: 80')),
     _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolRBGroup,
         _('Close the commit tool after every successful '
           'commit.  Default: False')),
-    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', (genEditCombo,
-         ['default-push', 'default']),
+    _fi(_('Push After Commit'), 'tortoisehg.cipushafter',
+        (genEditCombo, ['default-push', 'default']),
         _('Attempt to push to specified URL or alias after each successful '
           'commit.  Default: No push')),
     _fi(_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
-       _('Comma separated list of files that are automatically included '
-         'in every commit.  Intended for use only as a repository setting. '
-         'Default: None (leave blank)')),
+        _('Comma separated list of files that are automatically included '
+          'in every commit.  Intended for use only as a repository setting. '
+          'Default: None (leave blank)')),
     _fi(_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
-       _('Comma separated list of files that are automatically unchecked '
-         'when the status, and commit dialogs are opened. '
-         'Default: None (leave blank)')),
+        _('Comma separated list of files that are automatically unchecked '
+          'when the status, and commit dialogs are opened. '
+          'Default: None (leave blank)')),
     _fi(_('English Messages'), 'tortoisehg.engmsg', genBoolRBGroup,
-       _('Generate English commit messages even if LANGUAGE or LANG '
-         'environment variables are set to a non-English language. '
-         'This setting is used by the Merge, Tag and Backout dialogs. '
-         'Default: False')),
-    _fi(_('New Commit Phase'), 'phases.new-commit', (genDefaultCombo,
-        phases.phasenames),
+        _('Generate English commit messages even if LANGUAGE or LANG '
+          'environment variables are set to a non-English language. '
+          'This setting is used by the Merge, Tag and Backout dialogs. '
+          'Default: False')),
+    _fi(_('New Commit Phase'), 'phases.new-commit',
+        (genDefaultCombo, phases.phasenames),
         _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
-       _('Make MQ patches secret (instead of draft). '
-         'Default: False')),
+        _('Make MQ patches secret (instead of draft). '
+          'Default: False')),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
-        (genDefaultCombo,
-        ['auto', 'always', 'alwayslocal']),
+        (genDefaultCombo, ['auto', 'always', 'alwayslocal']),
         _('Select when the working directory status list will be refreshed:<br>'
-        '- <b>auto</b>: [<i>default</i>] let TortoiseHg decide when to refresh the working '
-        'directory status list.<br>'
-        'TortoiseHg will refresh the status list whenever it performs an action '
-        'that may potentially modify the working directory. <i>This may miss '
-        'any changes that happen outside of TortoiseHg\'s control;</i><br>'
-        '- <b>always</b>: in addition to the automatic updates above, also '
-        'refresh the status list whenever the user clicks on the "working dir '
-        'revision" or on the "Commit icon" on the workbench task bar;<br>'
-        '- <b>alwayslocal</b>: same as "<b>always</b>" but restricts forced '
-        'refreshes to <i>local repos</i>.<br>'
-        'Default: auto')),
-    _fi(_('Confirm adding unknown files'), 'tortoisehg.confirmaddfiles', genBoolRBGroup,
+          '- <b>auto</b>: [<i>default</i>] let TortoiseHg decide when to '
+          'refresh the working directory status list.<br>'
+          'TortoiseHg will refresh the status list whenever it performs an '
+          'action that may potentially modify the working directory. '
+          "<i>This may miss any changes that happen outside of TortoiseHg's "
+          'control;</i><br>'
+          '- <b>always</b>: in addition to the automatic updates above, also '
+          'refresh the status list whenever the user clicks on the "working '
+          'dir revision" or on the "Commit icon" on the workbench task bar;<br>'
+          '- <b>alwayslocal</b>: same as "<b>always</b>" but restricts forced '
+          'refreshes to <i>local repos</i>.<br>'
+          'Default: auto')),
+    _fi(_('Confirm adding unknown files'), 'tortoisehg.confirmaddfiles',
+        genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
-        'before adding new files in a commit. '
-        'If True, a confirmation dialog will be showed. '
-        'If False, selected new files will be included in the '
-        'commit with no confirmation dialog.  Default: True')),
-    _fi(_('Confirm deleting files'), 'tortoisehg.confirmdeletefiles', genBoolRBGroup,
+          'before adding new files in a commit. '
+          'If True, a confirmation dialog will be showed. '
+          'If False, selected new files will be included in the '
+          'commit with no confirmation dialog.  Default: True')),
+    _fi(_('Confirm deleting files'), 'tortoisehg.confirmdeletefiles',
+        genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
-        'before removing files in a commit. '
-        'If True, a confirmation dialog will be showed. '
-        'If False, selected deleted files will be included in the '
-        'commit with no confirmation dialog.  Default: True')),
+          'before removing files in a commit. '
+          'If True, a confirmation dialog will be showed. '
+          'If False, selected deleted files will be included in the '
+          'commit with no confirmation dialog.  Default: True')),
     )),
 
 ({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
@@ -878,8 +896,8 @@ INFO = (
 
 ({'name': 'diff', 'label': _('Diff and Annotate'),
   'icon': QStyle.SP_FileDialogContentsView}, (
-    _fi(_('Patch EOL'), 'patch.eol', (genDefaultCombo,
-        ['auto', 'strict', 'crlf', 'lf']),
+    _fi(_('Patch EOL'), 'patch.eol',
+        (genDefaultCombo, ['auto', 'strict', 'crlf', 'lf']),
         _('Normalize file line endings during and after patch to lf or '
           'crlf.  Strict does no normalization.  Auto does per-file '
           'detection, and is the recommended setting. '
@@ -887,15 +905,16 @@ INFO = (
     _fi(_('Git Format'), 'diff.git', genBoolRBGroup,
         _('Use git extended diff header format. '
           'Default: False')),
-    _fi(_('MQ Git Format'), 'mq.git', (genDefaultCombo,
-        ['auto', 'keep', 'yes', 'no']),
-     _("When set to 'auto', mq will automatically use git patches when required"
-       " to avoid losing changes to file modes, copy records or binary files."
-       " If set to 'keep', mq will obey the [diff] section configuration while"
-       " preserving existing git patches upon qrefresh. If set to 'yes' or"
-       " 'no', mq will override the [diff] section and always generate git or"
-       " regular patches, possibly losing data in the second case."
-       " Default: auto")),
+    _fi(_('MQ Git Format'), 'mq.git',
+        (genDefaultCombo, ['auto', 'keep', 'yes', 'no']),
+        _("When set to 'auto', mq will automatically use git patches when "
+          "required  to avoid losing changes to file modes, copy records or "
+          "binary files. If set to 'keep', mq will obey the [diff] section "
+          "configuration while preserving existing git patches upon qrefresh. "
+          "If set to 'yes' or 'no', mq will override the [diff] section and "
+          "always generate git or regular patches, possibly losing data in the "
+          "second case. "
+          "Default: auto")),
     _fi(_('No Dates'), 'diff.nodates', genBoolRBGroup,
         _('Do not include modification dates in diff headers. '
           'Default: False')),
@@ -929,16 +948,16 @@ INFO = (
        globalonly=True),
     _fi(_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
         _('Font used to display text differences. Default: monospace 10'),
-       globalonly=True),
+        globalonly=True),
     _fi(_('List Font'), 'tortoisehg.fontlist', genFontEdit,
         _('Font used to display file lists. Default: sans 9'),
-       globalonly=True),
+        globalonly=True),
     _fi(_('ChangeLog Font'), 'tortoisehg.fontlog', genFontEdit,
         _('Font used to display changelog data. Default: monospace 10'),
-       globalonly=True),
+        globalonly=True),
     _fi(_('Output Font'), 'tortoisehg.fontoutputlog', genFontEdit,
         _('Font used to display output messages. Default: sans 8'),
-       globalonly=True),
+        globalonly=True),
     )),
 
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': 'hg-extensions'}, (
@@ -963,23 +982,28 @@ INFO = (
           'instead.')),
     _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
         _('Show tags at start of commit message.')),
-    _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory', genBoolRBGroup,
-        _('When committing, require that a reference to an issue be specified.  '
-          'If enabled, the regex configured in \'Issue Regex\' must find a match '
-          'in the commit message.')),
+    _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory',
+        genBoolRBGroup,
+        _('When committing, require that a reference to an issue be specified. '
+          'If enabled, the regex configured in \'Issue Regex\' must find a '
+          'match in the commit message.')),
     _fi(_('Issue Tracker Plugin'), 'tortoisehg.issue.bugtraqplugin',
         (genDeferredCombo, findIssueTrackerPlugins),
         _('Configures a COM IBugTraqProvider or IBugTrackProvider2 issue '
           'tracking plugin.'), visible=issuePluginVisible),
-    _fi(_('Configure Issue Tracker'), 'tortoisehg.issue.bugtraqparameters', genBugTraqEdit,
+    _fi(_('Configure Issue Tracker'), 'tortoisehg.issue.bugtraqparameters',
+        genBugTraqEdit,
         _('Configure the selected COM Bug Tracker plugin.'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
-    _fi(_('Issue Tracker Trigger'), 'tortoisehg.issue.bugtraqtrigger', (genDefaultCombo,
-        ['never', 'commit']),
-        _('Determines when the issue tracker state will be updated by TortoiseHg. Valid settings values are:'
-        '<ul><li><b>never</b>: Do not update the Issue Tracker state automatically.'
-        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ul><p>'
-        'Default: never'),
+    _fi(_('Issue Tracker Trigger'), 'tortoisehg.issue.bugtraqtrigger',
+        (genDefaultCombo, ['never', 'commit']),
+        _('Determines when the issue tracker state will be updated by '
+          'TortoiseHg. Valid settings values are:'
+          '<ul><li><b>never</b>: Do not update the Issue Tracker state '
+          'automatically.'
+          '<li><b>commit</b>: Update the Issue Tracker state after a '
+          'successful commit.</ul><p>'
+          'Default: never'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
 
@@ -992,66 +1016,80 @@ INFO = (
     _fi(_('Password'), 'reviewboard.password', genPasswordEntry,
         _('Password to authenticate with review board')),
     _fi(_('Server Repository ID'), 'reviewboard.repoid', genEditCombo,
-        _('The default repository id for this repo on the review board server')),
+        _('The default repository id for this repo on the review board '
+          'server')),
     _fi(_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
         _('A comma separated list of target groups')),
     _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma separated list of target people')),
     )),
 
-({'name': 'kbfiles', 'label': _('Kiln Bfiles'), 'icon': 'kiln', 'extension': 'kbfiles'}, (
+({'name': 'kbfiles', 'label': _('Kiln Bfiles'), 'icon': 'kiln',
+  'extension': 'kbfiles'}, (
     _fi(_('Patterns'), 'kilnbfiles.patterns', genEditCombo,
-        _('Files with names meeting the specified patterns will be automatically '
-          'added as bfiles')),
+        _('Files with names meeting the specified patterns will be '
+          'automatically added as bfiles')),
     _fi(_('Size'), 'kilnbfiles.size', genEditCombo,
-        _('Files of at least the specified size (in megabytes) will be added as bfiles')),
+        _('Files of at least the specified size (in megabytes) will be added '
+          'as bfiles')),
     _fi(_('System Cache'), 'kilnbfiles.systemcache', genPathBrowser,
-        _('Path to the directory where a system-wide cache of bfiles will be stored')),
+        _('Path to the directory where a system-wide cache of bfiles will be '
+          'stored')),
     )),
 
-({'name': 'largefiles', 'label': _('Largefiles'), 'icon': 'kiln', 'extension': 'largefiles'}, (
+({'name': 'largefiles', 'label': _('Largefiles'), 'icon': 'kiln',
+  'extension': 'largefiles'}, (
     _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
-        _('Files with names meeting the specified patterns will be automatically '
-          'added as largefiles')),
+        _('Files with names meeting the specified patterns will be '
+          'automatically added as largefiles')),
     _fi(_('Minimum Size'), 'largefiles.minsize', genEditCombo,
-        _('Files of at least the specified size (in megabytes) will be added as largefiles')),
+        _('Files of at least the specified size (in megabytes) will be added '
+          'as largefiles')),
     _fi(_('User Cache'), 'largefiles.usercache', genPathBrowser,
-        _('Path to the directory where a user\'s cache of largefiles will be stored')),
+        _('Path to the directory where a user\'s cache of largefiles will be '
+          'stored')),
     )),
 
-({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
-    _fi(_('Require confirmation'), 'projrc.confirm', (genDefaultCombo, ['always', 'first', 'never']),
-        _('When to ask the user to confirm the update of the local "projrc" configuration file '
-        'when the remote projrc file changes. Possible values are:'
-        '<ul><li><b>always</b>: [<i>default</i>] '
-        'Always show a confirmation prompt before updating the local .hg/projrc file.'
-        '<li><b>first</b>: Show a confirmation dialog when the repository is cloned '
-        'or when a remote projrc file is found for the first time.'
-        '<li><b>never</b>: Update the local .hg/projrc file automatically, '
-        'without requiring any user confirmation.</ul>')),
+({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc',
+  'extension': 'projrc'}, (
+    _fi(_('Require confirmation'), 'projrc.confirm',
+        (genDefaultCombo, ['always', 'first', 'never']),
+        _('When to ask the user to confirm the update of the local "projrc" '
+          'configuration file when the remote projrc file changes. Possible '
+          'values are:'
+          '<ul><li><b>always</b>: [<i>default</i>] '
+          'Always show a confirmation prompt before updating the local '
+          '.hg/projrc file.'
+          '<li><b>first</b>: Show a confirmation dialog when the repository is '
+          'cloned or when a remote projrc file is found for the first time.'
+          '<li><b>never</b>: Update the local .hg/projrc file automatically, '
+          'without requiring any user confirmation.</ul>')),
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
-        _('List of Servers from which "projrc" configuration files must be pulled. '
-        'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
-        'Default is pull from NO servers.')),
+        _('List of Servers from which "projrc" configuration files must be '
+          'pulled. Set it to "*" to pull from all servers. Set it to "default" '
+          'to pull from the default sync path.'
+          'Default is pull from NO servers.')),
     _fi(_('Include'), 'projrc.include', genEditCombo,
-        _('List of settings that will be pulled from the project configuration file. Default is include NO settings.')),
+        _('List of settings that will be pulled from the project configuration '
+          'file. Default is include NO settings.')),
     _fi(_('Exclude'), 'projrc.exclude', genEditCombo,
-        _('List of settings that will NOT be pulled from the project configuration file. '
-        'Default is exclude none of the included settings.')),
-    _fi(_('Update on incoming'), 'projrc.updateonincoming', (genDefaultCombo, ['never', 'prompt', 'auto']),
+        _('List of settings that will NOT be pulled from the project '
+          'configuration file. '
+          'Default is exclude none of the included settings.')),
+    _fi(_('Update on incoming'), 'projrc.updateonincoming',
+        (genDefaultCombo, ['never', 'prompt', 'auto']),
         _('Let the user update the projrc on incoming:'
-        '<ul><li><b>never</b>: [<i>default</i>] '
-        'Show whether the remote projrc file has changed, '
-        'but do not update (nor ask to update) the local projrc file.'
-        '<li><b>prompt</b>: Look for changes to the projrc file. '
-        'If there are changes _always_ show a confirmation prompt, '
-        'asking the user if it wants to update its local projrc file.'
-        '<li><b>auto</b>: Look for changes to the projrc file. '
-        'Use the value of the "projrc.confirm" configuration key to '
-        'determine whether to show a confirmation dialog or not '
-        'before updating the local projrc file.</ul><p>'
-        'Default: never')),
-
+          '<ul><li><b>never</b>: [<i>default</i>] '
+          'Show whether the remote projrc file has changed, '
+          'but do not update (nor ask to update) the local projrc file.'
+          '<li><b>prompt</b>: Look for changes to the projrc file. '
+          'If there are changes _always_ show a confirmation prompt, '
+          'asking the user if it wants to update its local projrc file.'
+          '<li><b>auto</b>: Look for changes to the projrc file. '
+          'Use the value of the "projrc.confirm" configuration key to '
+          'determine whether to show a confirmation dialog or not '
+          'before updating the local projrc file.</ul><p>'
+          'Default: never')),
     )),
 )
 
@@ -1063,8 +1101,8 @@ class SettingsDialog(QDialog):
     def __init__(self, configrepo=False, focus=None, parent=None, root=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint |
-            Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint
+                            | Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         if not hasattr(wconfig.config(), 'write'):
@@ -1119,9 +1157,11 @@ class SettingsDialog(QDialog):
             if 'projrc' in repo.extensions():
                 projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
                 if os.path.exists(projrcpath):
-                    rtab = SettingsForm(rcpath=projrcpath, focus=focus, readonly=True)
+                    rtab = SettingsForm(rcpath=projrcpath, focus=focus,
+                                        readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
-                                         _('%s project settings (.hg/projrc)') % os.path.basename(repo.displayname))
+                                         _('%s project settings (.hg/projrc)')
+                                         % os.path.basename(repo.displayname))
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
@@ -1211,7 +1251,8 @@ class SettingsForm(QWidget):
     def __init__(self, rcpath, focus=None, parent=None, readonly=False):
         super(SettingsForm, self).__init__(parent)
 
-        # If forcereadonly is false, the settings form will be readonly if the corresponding ini file is readonly
+        # If forcereadonly is false, the settings form will be readonly
+        # if the corresponding ini file is readonly
         self.forcereadonly = readonly
 
         if isinstance(rcpath, (list, tuple)):
@@ -1652,7 +1693,3 @@ class SettingsForm(QWidget):
     def applyChangesForHooks(self):
         if self.hooksFrame.applyChanges(self.ini):
             self.restartRequested.emit(_('Hooks'))
-
-def run(ui, *pats, **opts):
-    return SettingsDialog(opts.get('alias') == 'repoconfig',
-                          focus=opts.get('focus'))

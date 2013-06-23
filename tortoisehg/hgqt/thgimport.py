@@ -124,9 +124,9 @@ class ImportDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.src_combo.editTextChanged.connect(lambda *a: self.preview())
+        self.src_combo.editTextChanged.connect(self.preview)
         self.src_combo.lineEdit().returnPressed.connect(self.thgimport)
-        self.p0chk.toggled.connect(lambda *a: self.preview())
+        self.p0chk.toggled.connect(self.preview)
 
         # dialog setting
         self.setLayout(box)
@@ -332,9 +332,3 @@ class ImportDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ImportDialog(repo, None, **opts)
-    dlg.setfilepaths(pats)
-    return dlg

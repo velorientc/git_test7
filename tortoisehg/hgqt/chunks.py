@@ -124,7 +124,6 @@ class ChunksWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, filenames, opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def revertfile(self):
         filenames = self.getSelectedFiles()

@@ -6,7 +6,6 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import sys
 import subprocess
 import stat
 import shutil
@@ -17,8 +16,8 @@ import re
 from mercurial import hg, util, error, match, scmutil, copies
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.util import hglib
+from tortoisehg.hgqt import qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -607,21 +606,3 @@ class FileSelectionDialog(QDialog):
                        phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        parent2=dir1b, plabel2=rev1b, clabel=dir2, child=rev2)
         launchtool(self.diffpath, self.mergeopts, replace, False)
-
-
-def run(ui, *pats, **opts):
-    try:
-        path = opts.get('bundle') or paths.find_root()
-        repo = thgrepo.repository(ui, path=path)
-    except error.RepoError:
-        ui.warn(_('No repository found here') + '\n')
-        return None
-
-    pats = hglib.canonpaths(pats)
-    if opts.get('canonpats'):
-        pats = list(pats) + opts['canonpats']
-
-    dlg = visualdiff(ui, repo, pats, opts)
-    if not dlg:
-        sys.exit()
-    return dlg
