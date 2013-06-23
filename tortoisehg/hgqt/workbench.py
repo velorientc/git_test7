@@ -44,6 +44,7 @@ class Workbench(QMainWindow):
 
         self.ui = ui
         self._repomanager = repomanager
+        self._repomanager.configChanged.connect(self._setupUrlComboIfCurrent)
         self._repomanager.repositoryDestroyed.connect(self.closeRepo)
 
         self.setupUi()
@@ -425,10 +426,10 @@ class Workbench(QMainWindow):
         self.urlCombo.blockSignals(False)
         self._updateSyncUrlToolTip(self.urlCombo.currentIndex())
 
-    #@pyqtSlot()
-    def _setupUrlComboIfCurrent(self):
+    @pyqtSlot(unicode)
+    def _setupUrlComboIfCurrent(self, root):
         w = self.repoTabsWidget.currentWidget()
-        if self.sender() is w:
+        if w.repoRootPath() == root:
             self._setupUrlCombo(w.repo)
 
     def _syncUrlFor(self, op):
@@ -876,7 +877,6 @@ class Workbench(QMainWindow):
         tw.setTabToolTip(index, repoagent.rootPath())
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(self._updateRepoTabTitle)
-        rw.repoConfigChanged.connect(self._setupUrlComboIfCurrent)
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
         self.reporegistry.addRepo(repoagent.rootPath())

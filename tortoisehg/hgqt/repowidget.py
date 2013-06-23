@@ -51,7 +51,6 @@ class RepoWidget(QWidget):
     # The following signals should be exchanged directly between workbench and
     # thgrepo. But it isn't possible because workbench cannot filter out known
     # repo from the result of thgrepo.repository().
-    repoConfigChanged = pyqtSignal(QString)
     shortNameChanged = pyqtSignal(QString, QString)
     baseNodeChanged = pyqtSignal(QString, object)
 
@@ -1134,8 +1133,6 @@ class RepoWidget(QWidget):
             self.shortname = self.repo.shortname
             self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
                                        self.shortname)
-
-        self.repoConfigChanged.emit(hglib.tounicode(self.repo.root))
 
     def updateTaskTabs(self):
         val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()
