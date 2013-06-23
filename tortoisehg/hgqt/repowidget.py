@@ -726,9 +726,6 @@ class RepoWidget(QWidget):
         pbw.makeLogVisible.connect(self.makeLogVisible)
         return pbw
 
-    def reponame(self):
-        return self.repo.shortname
-
     @property
     def rev(self):
         """Returns the current active revision"""
