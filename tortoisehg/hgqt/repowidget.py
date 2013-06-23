@@ -1589,7 +1589,6 @@ class RepoWidget(QWidget):
                            _('Selected changeset pair not related'))
                 return
             dlg = compress.CompressDialog(self.repo, revs, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
         menu = QMenu(self)
