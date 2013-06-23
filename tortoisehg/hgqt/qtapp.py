@@ -362,9 +362,9 @@ class QtRunner(QObject):
 
     def createWorkbench(self):
         """Create Workbench window and keep single reference"""
-        assert self._ui and self._mainapp
+        assert self._ui and self._mainapp and self._repomanager
         assert not self._workbench
-        self._workbench = workbench.Workbench(self._ui)
+        self._workbench = workbench.Workbench(self._ui, self._repomanager)
         return self._workbench
 
     def showRepoInWorkbench(self, uroot, rev=-1):

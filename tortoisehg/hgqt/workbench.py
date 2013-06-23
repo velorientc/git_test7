@@ -13,7 +13,7 @@ import sys
 from mercurial.error import RepoError
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import thgrepo, cmdui, qtlib, mq, serve
+from tortoisehg.hgqt import cmdui, qtlib, mq, serve
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -36,13 +36,14 @@ class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
 
-    def __init__(self, ui):
+    def __init__(self, ui, repomanager):
         QMainWindow.__init__(self)
         self.progressDialog = QProgressDialog(
             'TortoiseHg - Initializing Workbench', QString(), 0, 100)
         self.progressDialog.setAutoClose(False)
 
         self.ui = ui
+        self._repomanager = repomanager
 
         self.setupUi()
         self.setWindowTitle(_('TortoiseHg Workbench'))
@@ -660,8 +661,8 @@ class Workbench(QMainWindow):
                     self.repoTabsWidget.setCurrentWidget(rw)
                     return
             try:
-                repo = thgrepo.repository(path=hglib.fromunicode(root))
-                self.addRepoTab(repo, bundle)
+                repoagent = self._repomanager.openRepoAgent(root)
+                self.addRepoTab(repoagent, bundle)
             except RepoError, e:
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                                     hglib.tounicode(str(e)), parent=self)
@@ -811,6 +812,7 @@ class Workbench(QMainWindow):
             if w.closeRepoWidget():
                 tw.removeTab(index)
                 w.deleteLater()
+                self._repomanager.releaseRepoAgent(reporoot)
                 self.updateMenu()
                 self.lastClosedRepoRootList = [reporoot]
 
@@ -848,8 +850,9 @@ class Workbench(QMainWindow):
         if index == self.repoTabsWidget.currentIndex():
             self._updateWindowTitle()
 
-    def addRepoTab(self, repo, bundle):
+    def addRepoTab(self, repoagent, bundle):
         '''opens the given repo in a new tab'''
+        repo = repoagent.rawRepo()  # TODO: pass repoagent to RepoWidget
         rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
@@ -875,13 +878,13 @@ class Workbench(QMainWindow):
                 tw.currentIndex()+1, rw, rw.title())
         else:
             index = self.repoTabsWidget.addTab(rw, rw.title())
-        tw.setTabToolTip(index, hglib.tounicode(repo.root))
+        tw.setTabToolTip(index, repoagent.rootPath())
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(self._updateRepoTabTitle)
         rw.repoConfigChanged.connect(self._setupUrlComboIfCurrent)
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
-        self.reporegistry.addRepo(hglib.tounicode(repo.root))
+        self.reporegistry.addRepo(repoagent.rootPath())
 
         self.updateMenu()
         return rw
