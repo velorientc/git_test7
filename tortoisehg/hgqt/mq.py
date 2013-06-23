@@ -844,7 +844,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             super(MQWidget, self).dropEvent(event)
             return
         dlg = thgimport.ImportDialog(self.repo, self, mq=True)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.setfilepaths(patches)
         dlg.exec_()
 

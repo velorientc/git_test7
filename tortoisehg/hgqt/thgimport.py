@@ -124,9 +124,9 @@ class ImportDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.src_combo.editTextChanged.connect(lambda *a: self.preview())
+        self.src_combo.editTextChanged.connect(self.preview)
         self.src_combo.lineEdit().returnPressed.connect(self.thgimport)
-        self.p0chk.toggled.connect(lambda *a: self.preview())
+        self.p0chk.toggled.connect(self.preview)
 
         # dialog setting
         self.setLayout(box)
