@@ -80,7 +80,8 @@ class LuaLexerSelector(_ScriptLexerSelector):
     regex = None
 
 class CppLexerSelector(_FilenameLexerSelector):
-    extensions = ('.c', '.cpp', '.cxx', '.cl', '.cu', '.h', '.hpp', '.hxx')
+    extensions = ('.c', '.cpp', '.cc', '.cxx', '.cl', '.cu',
+                  '.h', '.hpp', '.hh', '.hxx')
     _lexer = Qsci.QsciLexerCPP
 
 class DLexerSelector(_FilenameLexerSelector):
