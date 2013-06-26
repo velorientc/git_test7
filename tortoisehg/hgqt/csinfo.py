@@ -136,10 +136,11 @@ class SummaryInfo(object):
             elif item == 'desc':
                 return hglib.tounicode(ctx.description().replace('\0', ''))
             elif item == 'summary':
-                value = ctx.description().replace('\0', '').split('\n')[0]
-                if len(value) == 0:
+                summary = hglib.longsummary(
+                    ctx.description().replace('\0', ''))
+                if len(summary) == 0:
                     return None
-                return hglib.tounicode(value)[:80]
+                return summary
             elif item == 'user':
                 user = hglib.user(ctx)
                 if user:
