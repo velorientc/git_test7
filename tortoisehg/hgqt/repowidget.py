@@ -255,9 +255,6 @@ class RepoWidget(QWidget):
         else:
             self.pbranchTabIndex = -1
 
-        self.taskTabsWidget.currentChanged.connect(
-            self._refreshCommitTabIfNeeded)
-
     @pyqtSlot(QString)
     def switchToNamedTaskTab(self, tabname):
         tabname = str(tabname)
@@ -427,8 +424,17 @@ class RepoWidget(QWidget):
         cw.grepRequested.connect(self.grep)
         cw.runCustomCommandRequested.connect(
             self.handleRunCustomCommandRequest)
-        QTimer.singleShot(0, cw.reload)
+        QTimer.singleShot(0, self._initCommitWidgetLate)
         return cw
+
+    @pyqtSlot()
+    def _initCommitWidgetLate(self):
+        cw = self.commitDemand.get()
+        cw.reload()
+        # auto-refresh should be enabled after initial reload(); otherwise
+        # refreshWctx() can be doubled
+        self.taskTabsWidget.currentChanged.connect(
+            self._refreshCommitTabIfNeeded)
 
     def createManifestWidget(self):
         if isinstance(self.rev, basestring):
