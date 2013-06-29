@@ -156,11 +156,10 @@ class CmdThread(QThread):
     #          others - return code of command
     commandFinished = pyqtSignal(int)
 
-    def __init__(self, cmdline, display, parent=None):
+    def __init__(self, cmdline, parent=None):
         super(CmdThread, self).__init__(parent)
 
         self.cmdline = cmdline
-        self.display = display
         self.ret = -1
         self.abortbyuser = False
         self.responseq = Queue.Queue()
@@ -262,12 +261,6 @@ class CmdThread(QThread):
                 Qt.QueuedConnection)
         ui.sig.interactSignal.connect(self.interact_handler,
                 Qt.QueuedConnection)
-
-        if self.display:
-            cmd = '%% hg %s\n' % self.display
-        else:
-            cmd = '%% hg %s\n' % ' '.join(self.cmdline)
-        ui.write(cmd, label='control')
 
         try:
             # save thread id in order to terminate by KeyboardInterrupt

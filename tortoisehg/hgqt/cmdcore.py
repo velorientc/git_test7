@@ -35,10 +35,9 @@ class CmdProc(QObject):
     # progress is not supported but needed to be a worker class
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, cmdline, display, parent=None):
+    def __init__(self, cmdline, parent=None):
         super(CmdProc, self).__init__(parent)
         self.cmdline = cmdline
-        self.display = display
         self.abortbyuser = False
         self.rawoutput = QStringList()
 
@@ -50,11 +49,6 @@ class CmdProc(QObject):
         proc.error.connect(self._handleerror)
 
     def start(self):
-        if self.display:
-            cmd = '%% hg %s\n' % self.display
-        else:
-            cmd = '%% hg %s\n' % ' '.join(self.cmdline)
-        self.outputReceived.emit(cmd, 'control')
         self._proc.start(_findhgexe(), self.cmdline, QIODevice.ReadOnly)
 
     def abort(self):
@@ -195,11 +189,12 @@ class Core(QObject):
 
         cmdline = self.queue.pop(0)
 
-        display = self.display or _prettifycmdline(cmdline)
+        if not self.display:
+            self.display = _prettifycmdline(cmdline)
         if self.useproc:
-            self._worker = CmdProc(cmdline, display, self)
+            self._worker = CmdProc(cmdline, self)
         else:
-            self._worker = thread.CmdThread(cmdline, display, self.parent())
+            self._worker = thread.CmdThread(cmdline, self.parent())
         self._worker.started.connect(self.onCommandStarted)
         self._worker.commandFinished.connect(self.onCommandFinished)
 
@@ -223,6 +218,8 @@ class Core(QObject):
             self.stbar.showMessage(_('Running...'))
 
         self.commandStarted.emit()
+        cmd = '%% hg %s\n' % self.display
+        self.output.emit(hglib.tounicode(cmd), 'control')
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
