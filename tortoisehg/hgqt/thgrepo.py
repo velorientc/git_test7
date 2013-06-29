@@ -288,7 +288,7 @@ class RepoAgent(QObject):
     def __init__(self, repo):
         QObject.__init__(self)
         self._repo = repo
-        self.busycount = 0
+        self._busycount = 0
         # TODO: remove repo-to-agent references later; all widgets should own
         # RepoAgent instead of thgrepository.
         repo._pyqtobj = self
@@ -335,6 +335,19 @@ class RepoAgent(QObject):
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
         self._watcher.pollStatus()
+
+    def _incrementBusyCount(self):
+        self._busycount += 1
+
+    def _decrementBusyCount(self):
+        self._busycount -= 1
+        if self._busycount == 0:
+            self.pollStatus()
+        else:
+            # A lot of logic will depend on invalidation happening within
+            # the context of this call. Signals will not be emitted till later,
+            # but we at least invalidate cached data in the repository
+            self._repo.thginvalidate()
 
 
 def _normreporoot(path):
@@ -667,21 +680,14 @@ def _extendrepo(repo):
                 if a in self.__dict__:
                     delattr(self, a)
 
+        # TODO: replace manual busycount handling by RepoAgent's
         def incrementBusyCount(self):
             'A GUI widget is starting a transaction'
-            self._pyqtobj.busycount += 1
+            self._pyqtobj._incrementBusyCount()
 
         def decrementBusyCount(self):
             'A GUI widget has finished a transaction'
-            self._pyqtobj.busycount -= 1
-            if self._pyqtobj.busycount == 0:
-                self._pyqtobj.pollStatus()
-            else:
-                # A lot of logic will depend on invalidation happening
-                # within the context of this call.  Signals will not be
-                # emitted till later, but we at least invalidate cached
-                # data in the repository
-                self.thginvalidate()
+            self._pyqtobj._decrementBusyCount()
 
         def thgbackup(self, path):
             'Make a backup of the given file in the repository "trashcan"'
