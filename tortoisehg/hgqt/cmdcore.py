@@ -7,7 +7,7 @@
 
 import os, sys, time
 
-from PyQt4.QtCore import QIODevice, QObject, QProcess, QString
+from PyQt4.QtCore import QIODevice, QObject, QProcess, QString, QStringList
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 
 from tortoisehg.util import hglib, paths
@@ -33,12 +33,12 @@ class CmdProc(QObject):
     commandFinished = pyqtSignal(int)
     outputReceived = pyqtSignal(QString, QString)
 
-    def __init__(self, cmdline, display, rawoutlines, parent=None):
+    def __init__(self, cmdline, display, parent=None):
         super(CmdProc, self).__init__(parent)
         self.cmdline = cmdline
         self.display = display
-        self.rawoutlines = rawoutlines
         self.abortbyuser = False
+        self.rawoutput = QStringList()
 
         self._proc = proc = QProcess(self)
         proc.started.connect(self.started)
@@ -48,7 +48,6 @@ class CmdProc(QObject):
         proc.error.connect(self._handleerror)
 
     def start(self):
-        del self.rawoutlines[:]
         if self.display:
             cmd = '%% hg %s\n' % self.display
         else:
@@ -86,7 +85,7 @@ class CmdProc(QObject):
 
     def _stdout(self):
         data = self._proc.readAllStandardOutput().data()
-        self.rawoutlines.append(data)
+        self.rawoutput.append(hglib.tounicode(data))
         self.outputReceived.emit(hglib.tounicode(data), '')
 
     def _stderr(self):
@@ -210,7 +209,7 @@ class Core(QObject):
         cmdline = self.queue.pop(0)
 
         display = self.display or _prettifycmdline(cmdline)
-        self.extproc = CmdProc(cmdline, display, self.rawoutlines, self)
+        self.extproc = CmdProc(cmdline, display, self)
         self.extproc.started.connect(self.onCommandStarted)
         self.extproc.commandFinished.connect(self.onProcFinished)
         self.extproc.outputReceived.connect(self.output)
@@ -286,6 +285,8 @@ class Core(QObject):
             return # run next command
         else:
             del self.queue[:]
+            text = self.thread.rawoutput.join('')
             self.extproc = None
+            self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)
