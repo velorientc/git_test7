@@ -31,7 +31,7 @@ class CmdProc(QObject):
 
     started = pyqtSignal()
     commandFinished = pyqtSignal(int)
-    output = pyqtSignal(QString, QString)
+    outputReceived = pyqtSignal(QString, QString)
 
     def __init__(self, queue, rawoutlines, parent=None):
         super(CmdProc, self).__init__(parent)
@@ -52,7 +52,7 @@ class CmdProc(QObject):
             cmd = '%% hg %s\n' % display
         else:
             cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
-        self.output.emit(cmd, 'control')
+        self.outputReceived.emit(cmd, 'control')
         self._proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
 
     def abort(self):
@@ -71,7 +71,7 @@ class CmdProc(QObject):
         else:
             msg = _('[command completed successfully %s]')
         msg = msg % time.asctime() + '\n'
-        self.output.emit(msg, 'control')
+        self.outputReceived.emit(msg, 'control')
         if ret == 0 and self.queue:
             self.start(self.queue.pop(0), '')
         else:
@@ -81,21 +81,21 @@ class CmdProc(QObject):
 
     def _handleerror(self, error):
         if error == QProcess.FailedToStart:
-            self.output.emit(_('failed to start command\n'),
-                             'ui.error')
+            self.outputReceived.emit(_('failed to start command\n'),
+                                     'ui.error')
             self._finished(-1)
         elif error != QProcess.Crashed:
-            self.output.emit(_('error while running command\n'),
-                             'ui.error')
+            self.outputReceived.emit(_('error while running command\n'),
+                                     'ui.error')
 
     def _stdout(self):
         data = self._proc.readAllStandardOutput().data()
         self.rawoutlines.append(data)
-        self.output.emit(hglib.tounicode(data), '')
+        self.outputReceived.emit(hglib.tounicode(data), '')
 
     def _stderr(self):
         data = self._proc.readAllStandardError().data()
-        self.output.emit(hglib.tounicode(data), 'ui.error')
+        self.outputReceived.emit(hglib.tounicode(data), 'ui.error')
 
 
 def _quotecmdarg(arg):
@@ -211,7 +211,7 @@ class Core(QObject):
         self.extproc = CmdProc(self.queue, self.rawoutlines, self)
         self.extproc.started.connect(self.onCommandStarted)
         self.extproc.commandFinished.connect(self.commandFinished)
-        self.extproc.output.connect(self.output)
+        self.extproc.outputReceived.connect(self.output)
         self.extproc.start(self.queue.pop(0), self.display)
 
     def runNext(self):
