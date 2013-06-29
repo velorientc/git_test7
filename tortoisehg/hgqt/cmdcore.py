@@ -14,6 +14,70 @@ from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import thread
 
+# TODO: provide CmdThread-compatible interface
+def _runproc(self):
+    'Run mercurial command in separate process'
+
+    exepath = None
+    if hasattr(sys, 'frozen'):
+        progdir = paths.get_prog_root()
+        exe = os.path.join(progdir, 'hg.exe')
+        if os.path.exists(exe):
+            exepath = exe
+    if not exepath:
+        exepath = paths.find_in_path('hg')
+
+    def start(cmdline, display):
+        self.rawoutlines = []
+        if display:
+            cmd = '%% hg %s\n' % display
+        else:
+            cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
+        self.output.emit(cmd, 'control')
+        proc.start(exepath, cmdline, QIODevice.ReadOnly)
+
+    @pyqtSlot(int)
+    def finished(ret):
+        if ret:
+            msg = _('[command returned code %d %%s]') % int(ret)
+        else:
+            msg = _('[command completed successfully %s]')
+        msg = msg % time.asctime() + '\n'
+        self.output.emit(msg, 'control')
+        if ret == 0 and self.queue:
+            start(self.queue.pop(0), '')
+        else:
+            self.queue = []
+            self.extproc = None
+            self.commandFinished.emit(ret)
+
+    def handleerror(error):
+        if error == QProcess.FailedToStart:
+            self.output.emit(_('failed to start command\n'),
+                             'ui.error')
+            finished(-1)
+        elif error != QProcess.Crashed:
+            self.output.emit(_('error while running command\n'),
+                             'ui.error')
+
+    def stdout():
+        data = proc.readAllStandardOutput().data()
+        self.rawoutlines.append(data)
+        self.output.emit(hglib.tounicode(data), '')
+
+    def stderr():
+        data = proc.readAllStandardError().data()
+        self.output.emit(hglib.tounicode(data), 'ui.error')
+
+    self.extproc = proc = QProcess(self)
+    proc.started.connect(self.onCommandStarted)
+    proc.finished.connect(finished)
+    proc.readyReadStandardOutput.connect(stdout)
+    proc.readyReadStandardError.connect(stderr)
+    proc.error.connect(handleerror)
+    start(self.queue.pop(0), self.display)
+
+
 def _quotecmdarg(arg):
     # only for display; no use to construct command string for os.system()
     if not arg or ' ' in arg or '\\' in arg or '"' in arg:
@@ -124,67 +188,7 @@ class Core(QObject):
     ### Private Method ###
 
     def runproc(self):
-        'Run mercurial command in separate process'
-
-        exepath = None
-        if hasattr(sys, 'frozen'):
-            progdir = paths.get_prog_root()
-            exe = os.path.join(progdir, 'hg.exe')
-            if os.path.exists(exe):
-                exepath = exe
-        if not exepath:
-            exepath = paths.find_in_path('hg')
-
-        def start(cmdline, display):
-            self.rawoutlines = []
-            if display:
-                cmd = '%% hg %s\n' % display
-            else:
-                cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
-            self.output.emit(cmd, 'control')
-            proc.start(exepath, cmdline, QIODevice.ReadOnly)
-
-        @pyqtSlot(int)
-        def finished(ret):
-            if ret:
-                msg = _('[command returned code %d %%s]') % int(ret)
-            else:
-                msg = _('[command completed successfully %s]')
-            msg = msg % time.asctime() + '\n'
-            self.output.emit(msg, 'control')
-            if ret == 0 and self.queue:
-                start(self.queue.pop(0), '')
-            else:
-                self.queue = []
-                self.extproc = None
-                self.commandFinished.emit(ret)
-
-        def handleerror(error):
-            if error == QProcess.FailedToStart:
-                self.output.emit(_('failed to start command\n'),
-                                 'ui.error')
-                finished(-1)
-            elif error != QProcess.Crashed:
-                self.output.emit(_('error while running command\n'),
-                                 'ui.error')
-
-        def stdout():
-            data = proc.readAllStandardOutput().data()
-            self.rawoutlines.append(data)
-            self.output.emit(hglib.tounicode(data), '')
-
-        def stderr():
-            data = proc.readAllStandardError().data()
-            self.output.emit(hglib.tounicode(data), 'ui.error')
-
-        self.extproc = proc = QProcess(self)
-        proc.started.connect(self.onCommandStarted)
-        proc.finished.connect(finished)
-        proc.readyReadStandardOutput.connect(stdout)
-        proc.readyReadStandardError.connect(stderr)
-        proc.error.connect(handleerror)
-        start(self.queue.pop(0), self.display)
-
+        _runproc(self)
 
     def runNext(self):
         if not self.queue:
