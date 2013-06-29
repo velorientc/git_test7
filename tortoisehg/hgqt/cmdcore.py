@@ -76,7 +76,6 @@ class CmdProc(QObject):
             self.start(self.queue.pop(0), '')
         else:
             del self.queue[:]
-            # TODO: self.extproc = None
             self.commandFinished.emit(ret)
 
     def _handleerror(self, error):
@@ -210,7 +209,7 @@ class Core(QObject):
     def runproc(self):
         self.extproc = CmdProc(self.queue, self.rawoutlines, self)
         self.extproc.started.connect(self.onCommandStarted)
-        self.extproc.commandFinished.connect(self.commandFinished)
+        self.extproc.commandFinished.connect(self.onProcFinished)
         self.extproc.outputReceived.connect(self.output)
         self.extproc.start(self.queue.pop(0), self.display)
 
@@ -273,4 +272,9 @@ class Core(QObject):
             self.thread = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
+        self.commandFinished.emit(ret)
+
+    @pyqtSlot(int)
+    def onProcFinished(self, ret):
+        self.extproc = None
         self.commandFinished.emit(ret)
