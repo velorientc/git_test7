@@ -37,6 +37,7 @@ class CmdProc(QObject):
         super(CmdProc, self).__init__(parent)
         self.queue = queue
         self.rawoutlines = rawoutlines
+        self.abortbyuser = False
 
         self._proc = proc = QProcess(self)
         proc.started.connect(self.started)
@@ -53,6 +54,12 @@ class CmdProc(QObject):
             cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
         self.output.emit(cmd, 'control')
         self._proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
+
+    def abort(self):
+        if not self.isRunning():
+            return
+        self._proc.close()
+        self.abortbyuser = True
 
     def isRunning(self):
         return self._proc.state() != QProcess.NotRunning
@@ -172,7 +179,7 @@ class Core(QObject):
         if self.running():
             try:
                 if self.extproc:
-                    self.extproc._proc.close()
+                    self.extproc.abort()
                 elif self.thread:
                     self.thread.abort()
             except AttributeError:
