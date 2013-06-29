@@ -33,9 +33,10 @@ class CmdProc(QObject):
     commandFinished = pyqtSignal(int)
     outputReceived = pyqtSignal(QString, QString)
 
-    def __init__(self, cmdline, rawoutlines, parent=None):
+    def __init__(self, cmdline, display, rawoutlines, parent=None):
         super(CmdProc, self).__init__(parent)
         self.cmdline = cmdline
+        self.display = display
         self.rawoutlines = rawoutlines
         self.abortbyuser = False
 
@@ -46,12 +47,12 @@ class CmdProc(QObject):
         proc.readyReadStandardError.connect(self._stderr)
         proc.error.connect(self._handleerror)
 
-    def start(self, display):
+    def start(self):
         del self.rawoutlines[:]
-        if display:
-            cmd = '%% hg %s\n' % display
+        if self.display:
+            cmd = '%% hg %s\n' % self.display
         else:
-            cmd = '%% hg %s\n' % _prettifycmdline(self.cmdline)
+            cmd = '%% hg %s\n' % ' '.join(self.cmdline)
         self.outputReceived.emit(cmd, 'control')
         self._proc.start(_findhgexe(), self.cmdline, QIODevice.ReadOnly)
 
@@ -208,12 +209,13 @@ class Core(QObject):
 
         cmdline = self.queue.pop(0)
 
-        self.extproc = CmdProc(cmdline, self.rawoutlines, self)
+        display = self.display or _prettifycmdline(cmdline)
+        self.extproc = CmdProc(cmdline, display, self.rawoutlines, self)
         self.extproc.started.connect(self.onCommandStarted)
         self.extproc.commandFinished.connect(self.onProcFinished)
         self.extproc.outputReceived.connect(self.output)
 
-        self.extproc.start(self.display)
+        self.extproc.start()
         return True
 
     def runNext(self):
