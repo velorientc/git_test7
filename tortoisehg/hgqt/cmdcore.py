@@ -29,6 +29,15 @@ def _findhgexe():
 def _runproc(self):
     'Run mercurial command in separate process'
 
+    def init():
+        proc = QProcess(self)
+        proc.started.connect(self.onCommandStarted)
+        proc.finished.connect(finished)
+        proc.readyReadStandardOutput.connect(stdout)
+        proc.readyReadStandardError.connect(stderr)
+        proc.error.connect(handleerror)
+        return proc
+
     def start(cmdline, display):
         self.rawoutlines = []
         if display:
@@ -71,12 +80,7 @@ def _runproc(self):
         data = proc.readAllStandardError().data()
         self.output.emit(hglib.tounicode(data), 'ui.error')
 
-    self.extproc = proc = QProcess(self)
-    proc.started.connect(self.onCommandStarted)
-    proc.finished.connect(finished)
-    proc.readyReadStandardOutput.connect(stdout)
-    proc.readyReadStandardError.connect(stderr)
-    proc.error.connect(handleerror)
+    self.extproc = proc = init()
     start(self.queue.pop(0), self.display)
 
 
