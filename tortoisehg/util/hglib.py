@@ -710,6 +710,23 @@ def get_revision_desc(fctx, curpath=None):
     summary = l and l[0] or ''
     return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
+def longsummary(description, limit=None):
+    summary = tounicode(description)
+    lines = summary.splitlines()
+    if limit:
+        if lines:
+            summary = lines.pop(0)
+            while len(summary) < limit and lines:
+                summary += u'  ' + lines.pop(0)
+            summary = summary[0:limit]
+        else:
+            summary = ''
+    else:
+        summary = lines and lines[0] or ''
+        if summary and len(lines) > 1:
+            summary += u' \u2026' # ellipsis ...
+    return summary
+
 def validate_synch_path(path, repo):
     '''
     Validate the path that must be used to sync operations (pull,

@@ -156,25 +156,11 @@ class patchctx(object):
     def removeStandin(self, path):  return path
 
     def longsummary(self):
-        summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
             limit = 80
-            lines = summary.splitlines()
-            if lines:
-                summary = lines.pop(0)
-                while len(summary) < limit and lines:
-                    summary += u'  ' + lines.pop(0)
-                summary = summary[0:limit]
-            else:
-                summary = ''
         else:
-            lines = summary.splitlines()
-            summary = lines and lines[0] or ''
-
-            if summary and len(lines) > 1:
-                summary += u' \u2026' # ellipsis ...
-
-        return summary
+            limit = None
+        return hglib.longsummary(self.description(), limit)
 
     def changesToParent(self, whichparent):
         'called by filelistmodel to get list of files'
