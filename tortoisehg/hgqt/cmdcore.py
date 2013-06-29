@@ -54,6 +54,9 @@ class CmdProc(QObject):
         self.output.emit(cmd, 'control')
         self._proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
 
+    def isRunning(self):
+        return self._proc.state() != QProcess.NotRunning
+
     @pyqtSlot(int)
     def _finished(self, ret):
         if ret:
@@ -182,7 +185,7 @@ class Core(QObject):
     def running(self):
         try:
             if self.extproc:
-                return self.extproc._proc.state() != QProcess.NotRunning
+                return self.extproc.isRunning()
             elif self.thread:
                 # keep "running" until just before emitting commandFinished.
                 # thread.isRunning() is cleared earlier than onThreadFinished,
