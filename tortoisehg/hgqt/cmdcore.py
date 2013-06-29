@@ -33,9 +33,9 @@ class CmdProc(QObject):
     commandFinished = pyqtSignal(int)
     outputReceived = pyqtSignal(QString, QString)
 
-    def __init__(self, queue, rawoutlines, parent=None):
+    def __init__(self, cmdline, rawoutlines, parent=None):
         super(CmdProc, self).__init__(parent)
-        self.queue = queue
+        self.cmdline = cmdline
         self.rawoutlines = rawoutlines
         self.abortbyuser = False
 
@@ -46,14 +46,14 @@ class CmdProc(QObject):
         proc.readyReadStandardError.connect(self._stderr)
         proc.error.connect(self._handleerror)
 
-    def start(self, cmdline, display):
+    def start(self, display):
         del self.rawoutlines[:]
         if display:
             cmd = '%% hg %s\n' % display
         else:
-            cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
+            cmd = '%% hg %s\n' % _prettifycmdline(self.cmdline)
         self.outputReceived.emit(cmd, 'control')
-        self._proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
+        self._proc.start(_findhgexe(), self.cmdline, QIODevice.ReadOnly)
 
     def abort(self):
         if not self.isRunning():
@@ -72,11 +72,7 @@ class CmdProc(QObject):
             msg = _('[command completed successfully %s]')
         msg = msg % time.asctime() + '\n'
         self.outputReceived.emit(msg, 'control')
-        if ret == 0 and self.queue:
-            self.start(self.queue.pop(0), '')
-        else:
-            del self.queue[:]
-            self.commandFinished.emit(ret)
+        self.commandFinished.emit(ret)
 
     def _handleerror(self, error):
         if error == QProcess.FailedToStart:
@@ -207,11 +203,18 @@ class Core(QObject):
     ### Private Method ###
 
     def runproc(self):
-        self.extproc = CmdProc(self.queue, self.rawoutlines, self)
+        if not self.queue:
+            return False
+
+        cmdline = self.queue.pop(0)
+
+        self.extproc = CmdProc(cmdline, self.rawoutlines, self)
         self.extproc.started.connect(self.onCommandStarted)
         self.extproc.commandFinished.connect(self.onProcFinished)
         self.extproc.outputReceived.connect(self.output)
-        self.extproc.start(self.queue.pop(0), self.display)
+
+        self.extproc.start(self.display)
+        return True
 
     def runNext(self):
         if not self.queue:
@@ -276,5 +279,11 @@ class Core(QObject):
 
     @pyqtSlot(int)
     def onProcFinished(self, ret):
-        self.extproc = None
+        self.display = None
+        if ret == 0 and self.runproc():
+            return # run next command
+        else:
+            del self.queue[:]
+            self.extproc = None
+
         self.commandFinished.emit(ret)
