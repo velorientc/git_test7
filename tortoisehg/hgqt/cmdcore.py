@@ -14,10 +14,7 @@ from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import thread
 
-# TODO: provide CmdThread-compatible interface
-def _runproc(self):
-    'Run mercurial command in separate process'
-
+def _findhgexe():
     exepath = None
     if hasattr(sys, 'frozen'):
         progdir = paths.get_prog_root()
@@ -26,6 +23,11 @@ def _runproc(self):
             exepath = exe
     if not exepath:
         exepath = paths.find_in_path('hg')
+    return exepath
+
+# TODO: provide CmdThread-compatible interface
+def _runproc(self):
+    'Run mercurial command in separate process'
 
     def start(cmdline, display):
         self.rawoutlines = []
@@ -34,7 +36,7 @@ def _runproc(self):
         else:
             cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
         self.output.emit(cmd, 'control')
-        proc.start(exepath, cmdline, QIODevice.ReadOnly)
+        proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
 
     @pyqtSlot(int)
     def finished(ret):
