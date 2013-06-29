@@ -25,13 +25,15 @@ def _findhgexe():
         exepath = paths.find_in_path('hg')
     return exepath
 
-# TODO: provide CmdThread-compatible interface
 class CmdProc(QObject):
     'Run mercurial command in separate process'
 
     started = pyqtSignal()
     commandFinished = pyqtSignal(int)
     outputReceived = pyqtSignal(QString, QString)
+
+    # progress is not supported but needed to be a worker class
+    progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, cmdline, display, parent=None):
         super(CmdProc, self).__init__(parent)
@@ -163,9 +165,7 @@ class Core(QObject):
         self.queue.append(cmdline)
         if len(cmdlines):
             self.queue.extend(cmdlines)
-        if self.useproc:
-            self.runproc()
-        elif not self.running():
+        if not self.running():
             self.runNext()
 
     def cancel(self):
@@ -189,21 +189,6 @@ class Core(QObject):
 
     ### Private Method ###
 
-    def runproc(self):
-        if not self.queue:
-            return False
-
-        cmdline = self.queue.pop(0)
-
-        display = self.display or _prettifycmdline(cmdline)
-        self._worker = CmdProc(cmdline, display, self)
-        self._worker.started.connect(self.onCommandStarted)
-        self._worker.commandFinished.connect(self.onProcFinished)
-        self._worker.outputReceived.connect(self.output)
-
-        self._worker.start()
-        return True
-
     def runNext(self):
         if not self.queue:
             return False
@@ -211,7 +196,10 @@ class Core(QObject):
         cmdline = self.queue.pop(0)
 
         display = self.display or _prettifycmdline(cmdline)
-        self._worker = thread.CmdThread(cmdline, display, self.parent())
+        if self.useproc:
+            self._worker = CmdProc(cmdline, display, self)
+        else:
+            self._worker = thread.CmdThread(cmdline, display, self.parent())
         self._worker.started.connect(self.onCommandStarted)
         self._worker.commandFinished.connect(self.onCommandFinished)
 
@@ -259,19 +247,6 @@ class Core(QObject):
             return # run next command
         else:
             self.queue = []
-            text = self._worker.rawoutput.join('')
-            self._worker = None
-            self.rawoutlines = [hglib.fromunicode(text, 'replace')]
-
-        self.commandFinished.emit(ret)
-
-    @pyqtSlot(int)
-    def onProcFinished(self, ret):
-        self.display = None
-        if ret == 0 and self.runproc():
-            return # run next command
-        else:
-            del self.queue[:]
             text = self._worker.rawoutput.join('')
             self._worker = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
