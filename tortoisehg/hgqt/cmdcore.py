@@ -26,29 +26,36 @@ def _findhgexe():
     return exepath
 
 # TODO: provide CmdThread-compatible interface
-def _runproc(self):
+class CmdProc(QObject):
     'Run mercurial command in separate process'
 
-    def init():
-        proc = QProcess(self)
-        proc.started.connect(self.onCommandStarted)
-        proc.finished.connect(finished)
-        proc.readyReadStandardOutput.connect(stdout)
-        proc.readyReadStandardError.connect(stderr)
-        proc.error.connect(handleerror)
-        return proc
+    started = pyqtSignal()
+    commandFinished = pyqtSignal(int)
+    output = pyqtSignal(QString, QString)
 
-    def start(cmdline, display):
-        self.rawoutlines = []
+    def __init__(self, queue, rawoutlines, parent=None):
+        super(CmdProc, self).__init__(parent)
+        self.queue = queue
+        self.rawoutlines = rawoutlines
+
+        self._proc = proc = QProcess(self)
+        proc.started.connect(self.started)
+        proc.finished.connect(self._finished)
+        proc.readyReadStandardOutput.connect(self._stdout)
+        proc.readyReadStandardError.connect(self._stderr)
+        proc.error.connect(self._handleerror)
+
+    def start(self, cmdline, display):
+        del self.rawoutlines[:]
         if display:
             cmd = '%% hg %s\n' % display
         else:
             cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
         self.output.emit(cmd, 'control')
-        proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
+        self._proc.start(_findhgexe(), cmdline, QIODevice.ReadOnly)
 
     @pyqtSlot(int)
-    def finished(ret):
+    def _finished(self, ret):
         if ret:
             msg = _('[command returned code %d %%s]') % int(ret)
         else:
@@ -56,32 +63,29 @@ def _runproc(self):
         msg = msg % time.asctime() + '\n'
         self.output.emit(msg, 'control')
         if ret == 0 and self.queue:
-            start(self.queue.pop(0), '')
+            self.start(self.queue.pop(0), '')
         else:
-            self.queue = []
-            self.extproc = None
+            del self.queue[:]
+            # TODO: self.extproc = None
             self.commandFinished.emit(ret)
 
-    def handleerror(error):
+    def _handleerror(self, error):
         if error == QProcess.FailedToStart:
             self.output.emit(_('failed to start command\n'),
                              'ui.error')
-            finished(-1)
+            self._finished(-1)
         elif error != QProcess.Crashed:
             self.output.emit(_('error while running command\n'),
                              'ui.error')
 
-    def stdout():
-        data = proc.readAllStandardOutput().data()
+    def _stdout(self):
+        data = self._proc.readAllStandardOutput().data()
         self.rawoutlines.append(data)
         self.output.emit(hglib.tounicode(data), '')
 
-    def stderr():
-        data = proc.readAllStandardError().data()
+    def _stderr(self):
+        data = self._proc.readAllStandardError().data()
         self.output.emit(hglib.tounicode(data), 'ui.error')
-
-    self.extproc = proc = init()
-    start(self.queue.pop(0), self.display)
 
 
 def _quotecmdarg(arg):
@@ -165,7 +169,7 @@ class Core(QObject):
         if self.running():
             try:
                 if self.extproc:
-                    self.extproc.close()
+                    self.extproc._proc.close()
                 elif self.thread:
                     self.thread.abort()
             except AttributeError:
@@ -178,7 +182,7 @@ class Core(QObject):
     def running(self):
         try:
             if self.extproc:
-                return self.extproc.state() != QProcess.NotRunning
+                return self.extproc._proc.state() != QProcess.NotRunning
             elif self.thread:
                 # keep "running" until just before emitting commandFinished.
                 # thread.isRunning() is cleared earlier than onThreadFinished,
@@ -194,7 +198,11 @@ class Core(QObject):
     ### Private Method ###
 
     def runproc(self):
-        _runproc(self)
+        self.extproc = CmdProc(self.queue, self.rawoutlines, self)
+        self.extproc.started.connect(self.onCommandStarted)
+        self.extproc.commandFinished.connect(self.commandFinished)
+        self.extproc.output.connect(self.output)
+        self.extproc.start(self.queue.pop(0), self.display)
 
     def runNext(self):
         if not self.queue:
