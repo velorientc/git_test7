@@ -318,6 +318,8 @@ class RepoAgent(QObject):
             dbgoutput('not watching F/S events for bundle repository')
         elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
             dbgoutput('not watching F/S events for network drive')
+        elif self._busycount > 0:
+            dbgoutput('not watching F/S events while busy')
         else:
             self._watcher.startMonitoring()
 
@@ -337,12 +339,15 @@ class RepoAgent(QObject):
         self._watcher.pollStatus()
 
     def _incrementBusyCount(self):
+        if self._busycount == 0:
+            self.stopMonitoring()
         self._busycount += 1
 
     def _decrementBusyCount(self):
         self._busycount -= 1
         if self._busycount == 0:
             self.pollStatus()
+            self.startMonitoringIfEnabled()
         else:
             # A lot of logic will depend on invalidation happening within
             # the context of this call. Signals will not be emitted till later,
