@@ -141,8 +141,7 @@ class Core(QObject):
     def __init__(self, logWindow, parent):
         super(Core, self).__init__(parent)
 
-        self.thread = None
-        self.extproc = None
+        self._worker = None
         self.stbar = None
         self.queue = []
         self.rawoutlines = []
@@ -172,30 +171,18 @@ class Core(QObject):
     def cancel(self):
         '''Cancel running Mercurial command'''
         if self.running():
-            try:
-                if self.extproc:
-                    self.extproc.abort()
-                elif self.thread:
-                    self.thread.abort()
-            except AttributeError:
-                pass
+            if self._worker:
+                self._worker.abort()
             self.commandCanceling.emit()
 
     def setStbar(self, stbar):
         self.stbar = stbar
 
     def running(self):
-        try:
-            if self.extproc:
-                return self.extproc.isRunning()
-            elif self.thread:
-                # keep "running" until just before emitting commandFinished.
-                # thread.isRunning() is cleared earlier than onThreadFinished,
-                # because inter-thread signal is queued.
-                return True
-        except AttributeError:
-            pass
-        return False
+        # keep "running" until just before emitting commandFinished. if worker
+        # is QThread, isRunning() is cleared earlier than onCommandFinished,
+        # because inter-thread signal is queued.
+        return bool(self._worker)
 
     def rawoutput(self):
         return ''.join(self.rawoutlines)
@@ -209,12 +196,12 @@ class Core(QObject):
         cmdline = self.queue.pop(0)
 
         display = self.display or _prettifycmdline(cmdline)
-        self.extproc = CmdProc(cmdline, display, self)
-        self.extproc.started.connect(self.onCommandStarted)
-        self.extproc.commandFinished.connect(self.onProcFinished)
-        self.extproc.outputReceived.connect(self.output)
+        self._worker = CmdProc(cmdline, display, self)
+        self._worker.started.connect(self.onCommandStarted)
+        self._worker.commandFinished.connect(self.onProcFinished)
+        self._worker.outputReceived.connect(self.output)
 
-        self.extproc.start()
+        self._worker.start()
         return True
 
     def runNext(self):
@@ -224,16 +211,16 @@ class Core(QObject):
         cmdline = self.queue.pop(0)
 
         display = self.display or _prettifycmdline(cmdline)
-        self.thread = thread.CmdThread(cmdline, display, self.parent())
-        self.thread.started.connect(self.onCommandStarted)
-        self.thread.commandFinished.connect(self.onThreadFinished)
+        self._worker = thread.CmdThread(cmdline, display, self.parent())
+        self._worker.started.connect(self.onCommandStarted)
+        self._worker.commandFinished.connect(self.onCommandFinished)
 
-        self.thread.outputReceived.connect(self.output)
-        self.thread.progressReceived.connect(self.progress)
+        self._worker.outputReceived.connect(self.output)
+        self._worker.progressReceived.connect(self.progress)
         if self.stbar:
-            self.thread.progressReceived.connect(self.stbar.progress)
+            self._worker.progressReceived.connect(self.stbar.progress)
 
-        self.thread.start()
+        self._worker.start()
         return True
 
     def clearOutput(self):
@@ -250,12 +237,12 @@ class Core(QObject):
         self.commandStarted.emit()
 
     @pyqtSlot(int)
-    def onThreadFinished(self, ret):
+    def onCommandFinished(self, ret):
         if self.stbar:
             error = False
             if ret is None:
                 self.stbar.clear()
-                if self.thread.abortbyuser:
+                if self._worker.abortbyuser:
                     status = _('Terminated by user')
                 else:
                     status = _('Terminated')
@@ -267,13 +254,13 @@ class Core(QObject):
             self.stbar.showMessage(status, error)
 
         self.display = None
-        self.thread.setParent(None)  # assist gc
+        self._worker.setParent(None)  # assist gc
         if ret == 0 and self.runNext():
             return # run next command
         else:
             self.queue = []
-            text = self.thread.rawoutput.join('')
-            self.thread = None
+            text = self._worker.rawoutput.join('')
+            self._worker = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)
@@ -285,8 +272,8 @@ class Core(QObject):
             return # run next command
         else:
             del self.queue[:]
-            text = self.thread.rawoutput.join('')
-            self.extproc = None
+            text = self._worker.rawoutput.join('')
+            self._worker = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)
