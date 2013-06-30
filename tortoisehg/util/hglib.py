@@ -713,18 +713,24 @@ def get_revision_desc(fctx, curpath=None):
 def longsummary(description, limit=None):
     summary = tounicode(description)
     lines = summary.splitlines()
+    if not lines:
+        return ''
+    summary = lines[0].strip()
+    add_ellipsis = False
     if limit:
-        if lines:
-            summary = lines.pop(0)
-            while len(summary) < limit and lines:
-                summary += u'  ' + lines.pop(0)
+        for raw_line in lines[1:]:
+            if len(summary) >= limit:
+                break
+            line = raw_line.strip()
+            if line:
+                summary += u'  ' + line
+        if len(summary) > limit:
+            add_ellipsis = True
             summary = summary[0:limit]
-        else:
-            summary = ''
-    else:
-        summary = lines and lines[0] or ''
-        if summary and len(lines) > 1:
-            summary += u' \u2026' # ellipsis ...
+    elif len(lines) > 1:
+        add_ellipsis = True
+    if add_ellipsis:
+        summary += u' \u2026' # ellipsis ...
     return summary
 
 def validate_synch_path(path, repo):
