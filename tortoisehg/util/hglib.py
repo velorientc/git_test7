@@ -721,7 +721,7 @@ def longsummary(description, limit=None):
         for raw_line in lines[1:]:
             if len(summary) >= limit:
                 break
-            line = raw_line.strip()
+            line = raw_line.strip().replace('\t', ' ')
             if line:
                 summary += u'  ' + line
         if len(summary) > limit:
