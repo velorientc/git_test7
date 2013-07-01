@@ -10,7 +10,7 @@ import os
 from mercurial import ui, util, error, extensions, scmutil, phases
 
 from tortoisehg.util import hglib, paths, wconfig, i18n, editor
-from tortoisehg.util import terminal
+from tortoisehg.util import terminal, gpg
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
@@ -510,6 +510,9 @@ def findEditors():
 
 def findTerminals():
     return terminal.findterminals(ui.ui())
+
+def findGpg():
+    return gpg.findgpg(ui.ui())
 
 def genCheckBox(opts):
     opts['nohist'] = True
@@ -1090,6 +1093,14 @@ INFO = (
           'determine whether to show a confirmation dialog or not '
           'before updating the local projrc file.</ul><p>'
           'Default: never')),
+    )),
+
+({'name': 'gnupg', 'label': _('GnuPG'), 'icon': 'gnupg',
+  'extension': 'gpg'}, (
+    _fi(_('Command'), 'gpg.cmd', (genEditableDeferredCombo, findGpg),
+        _('Specify the path to GPG. Default: None (leave blank)')),
+    _fi(_('Key ID'), 'gpg.key', genEditCombo,
+        _('GPG key ID associated with user. Default: None (leave blank)')),
     )),
 )
 
