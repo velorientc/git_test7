@@ -131,7 +131,6 @@ class RepoWatcher(QObject):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
-            self.stopMonitoring()
             if self.repo.root in _repocache:
                 del _repocache[self.repo.root]
             return
@@ -297,7 +296,6 @@ class RepoAgent(QObject):
         watcher.repositoryDestroyed.connect(self.repositoryDestroyed)
         watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
         watcher.workingBranchChanged.connect(self.workingBranchChanged)
-        self.startMonitoringIfEnabled()
 
     def startMonitoringIfEnabled(self):
         """Start filesystem monitoring on repository open by RepoManager or
@@ -312,6 +310,11 @@ class RepoAgent(QObject):
             dbgoutput('not watching F/S events for network drive')
         else:
             self._watcher.startMonitoring()
+
+    def stopMonitoring(self):
+        """Stop filesystem monitoring on repository closed by RepoManager or
+        command about to run"""
+        self._watcher.stopMonitoring()
 
     def rawRepo(self):
         return self._repo
@@ -358,6 +361,7 @@ class RepoManager(QObject):
         agent.setParent(self)
         for sig, slot in self._mappedSignals(agent):
             sig.connect(slot)
+        agent.startMonitoringIfEnabled()
 
         assert agent.rootPath() == path
         self._openagents[path] = (agent, 1)
@@ -373,7 +377,7 @@ class RepoManager(QObject):
 
         self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
         agent, _refcount = self._openagents.pop(path)
-        # TODO: stop filesystem monitoring
+        agent.stopMonitoring()
         for sig, slot in self._mappedSignals(agent):
             sig.disconnect(slot)
         agent.setParent(None)
@@ -404,7 +408,7 @@ class RepoManager(QObject):
     #@pyqtSlot()
     def _mapRepositoryDestroyed(self):
         agent = self.sender()
-        # TODO: stop filesystem monitoring
+        agent.stopMonitoring()  # avoid further changed/destroyed signals
         self.repositoryDestroyed.emit(agent.rootPath())
 
 
