@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-06-26 10:52-0300\n"
-"PO-Revision-Date: 2013-06-07 21:26+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"PO-Revision-Date: 2013-06-30 18:49+0000\n"
+"Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-06-27 05:39+0000\n"
-"X-Generator: Launchpad (build 16681)\n"
+"X-Launchpad-Export-Date: 2013-07-01 05:17+0000\n"
+"X-Generator: Launchpad (build 16692)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
@@ -3857,12 +3857,12 @@ msgstr "Patch-Warteschlange '%s' umbennen in"
 
 #: tortoisehg/hgqt/qqueue.py:285
 msgid "Confirm patch queue delete"
-msgstr "Entfernen der Patch-Warteschlange bestätigen"
+msgstr "Löschen der Patch-Warteschlange bestätigen"
 
 #: tortoisehg/hgqt/qqueue.py:286
 #, python-format
 msgid "Do you really want to delete patch queue '%s' ?"
-msgstr "Wollen Sie die Patch-Warteschlange '%s' wirklich entfernen?"
+msgstr "Wollen Sie die Patch-Warteschlange '%s' wirklich löschen?"
 
 #: tortoisehg/hgqt/qqueue.py:298
 msgid "Confirm patch queue purge"
@@ -10136,7 +10136,7 @@ msgstr "Archivregistrierung &anzeigen"
 
 #: tortoisehg/hgqt/workbench.py:202
 msgid "Show &Patch Queue"
-msgstr "%Patchwarteschlange anzeigen"
+msgstr "&Patch-Warteschlange anzeigen"
 
 #: tortoisehg/hgqt/workbench.py:208
 msgid "Show Output &Log"
