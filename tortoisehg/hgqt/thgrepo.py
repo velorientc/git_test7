@@ -86,16 +86,6 @@ class RepoWatcher(QObject):
         self.recordState()
         self._uimtime = time.time()
 
-        monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
-        if monitorrepo == 'never':
-            dbgoutput('watching of F/S events is disabled by configuration')
-        elif isinstance(repo, bundlerepo.bundlerepository):
-            dbgoutput('not watching F/S events for bundle repository')
-        elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
-            dbgoutput('not watching F/S events for network drive')
-        else:
-            self.startMonitoring()
-
     def startMonitoring(self):
         """Start filesystem monitoring to notify changes automatically"""
         if not self._fswatcher:
@@ -307,6 +297,21 @@ class RepoAgent(QObject):
         watcher.repositoryDestroyed.connect(self.repositoryDestroyed)
         watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
         watcher.workingBranchChanged.connect(self.workingBranchChanged)
+        self.startMonitoringIfEnabled()
+
+    def startMonitoringIfEnabled(self):
+        """Start filesystem monitoring on repository open by RepoManager or
+        running command finished"""
+        repo = self._repo
+        monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
+        if monitorrepo == 'never':
+            dbgoutput('watching of F/S events is disabled by configuration')
+        elif isinstance(repo, bundlerepo.bundlerepository):
+            dbgoutput('not watching F/S events for bundle repository')
+        elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
+            dbgoutput('not watching F/S events for network drive')
+        else:
+            self._watcher.startMonitoring()
 
     def rawRepo(self):
         return self._repo
