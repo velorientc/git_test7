@@ -36,6 +36,7 @@ else:
     def dbgoutput(*args):
         pass
 
+# thgrepo.repository() will be deprecated
 def repository(_ui=None, path='', bundle=None):
     '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
@@ -299,9 +300,96 @@ class RepoAgent(QObject):
     def rawRepo(self):
         return self._repo
 
+    def rootPath(self):
+        return hglib.tounicode(self._repo.root)
+
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
         self._watcher.pollStatus()
+
+
+def _normreporoot(path):
+    """Normalize repo root path in the same manner as localrepository"""
+    # see localrepo.localrepository and scmutil.vfs
+    lpath = hglib.fromunicode(path)
+    lpath = os.path.realpath(util.expandpath(lpath))
+    return hglib.tounicode(lpath)
+
+class RepoManager(QObject):
+    """Cache open RepoAgent instances and bundle their signals"""
+
+    configChanged = pyqtSignal(unicode)
+    repositoryChanged = pyqtSignal(unicode)
+    repositoryDestroyed = pyqtSignal(unicode)
+
+    def __init__(self, ui, parent=None):
+        super(RepoManager, self).__init__(parent)
+        self._ui = ui
+        self._openagents = {}  # path: (agent, refcount)
+
+    def openRepoAgent(self, path):
+        """Return RepoAgent for the specified path and increment refcount"""
+        path = _normreporoot(path)
+        if path in self._openagents:
+            agent, refcount = self._openagents[path]
+            self._openagents[path] = (agent, refcount + 1)
+            return agent
+
+        # TODO: move repository creation from thgrepo.repository()
+        self._ui.debug('opening repo: %s\n' % hglib.fromunicode(path))
+        agent = repository(self._ui, hglib.fromunicode(path))._pyqtobj
+        assert agent.parent() is None
+        agent.setParent(self)
+        for sig, slot in self._mappedSignals(agent):
+            sig.connect(slot)
+
+        assert agent.rootPath() == path
+        self._openagents[path] = (agent, 1)
+        return agent
+
+    def releaseRepoAgent(self, path):
+        """Decrement refcount of RepoAgent and close it if possible"""
+        path = _normreporoot(path)
+        agent, refcount = self._openagents[path]
+        if refcount > 1:
+            self._openagents[path] = (agent, refcount - 1)
+            return
+
+        self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
+        agent, _refcount = self._openagents.pop(path)
+        # TODO: stop filesystem monitoring
+        for sig, slot in self._mappedSignals(agent):
+            sig.disconnect(slot)
+        agent.setParent(None)
+
+    def repoAgent(self, path):
+        """Peek open RepoAgent for the specified path without refcount change;
+        None for unknown path"""
+        path = _normreporoot(path)
+        return self._openagents.get(path, (None, 0))[0]
+
+    def _mappedSignals(self, agent):
+        return [
+            (agent.configChanged,           self._mapConfigChanged),
+            (agent.repositoryChanged,       self._mapRepositoryChanged),
+            (agent.repositoryDestroyed,     self._mapRepositoryDestroyed),
+            ]
+
+    #@pyqtSlot()
+    def _mapConfigChanged(self):
+        agent = self.sender()
+        self.configChanged.emit(agent.rootPath())
+
+    #@pyqtSlot()
+    def _mapRepositoryChanged(self):
+        agent = self.sender()
+        self.repositoryChanged.emit(agent.rootPath())
+
+    #@pyqtSlot()
+    def _mapRepositoryDestroyed(self):
+        agent = self.sender()
+        # TODO: stop filesystem monitoring
+        self.repositoryDestroyed.emit(agent.rootPath())
 
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
