@@ -538,6 +538,10 @@ class ConsoleWidget(QWidget):
         self.closeRequested.emit()
 
 class LogDockWidget(QDockWidget):
+
+    progressReceived = pyqtSignal(QString, object, QString, QString,
+                                  object, object)
+
     def __init__(self, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
@@ -550,9 +554,11 @@ class LogDockWidget(QDockWidget):
 
         self.logte = ConsoleWidget(self)
         self.logte.closeRequested.connect(self.close)
+        self.logte.progressReceived.connect(self.progressReceived)
         self.setWidget(self.logte)
-        for name in ('setRepository', 'progressReceived'):
-            setattr(self, name, getattr(self.logte, name))
+
+    def setRepository(self, repo):
+        self.logte.setRepository(repo)
 
     @pyqtSlot()
     def clear(self):
