@@ -6,10 +6,11 @@
 # GNU General Public License version 2 or any later version.
 import os
 
-def findgpg(ui):
-    path = []
-    if os.name == 'nt':
-        import _winreg
+if os.name == 'nt':
+    import _winreg
+
+    def findgpg(ui):
+        path = []
         for key in (r"Software\GNU\GnuPG", r"Software\Wow6432Node\GNU\GnuPG"):
             try:
                 hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key)
@@ -23,4 +24,8 @@ def findgpg(ui):
             except EnvironmentError:
                 pass
 
-    return path
+        return path
+
+else:
+    def findgpg(ui):
+        return []
