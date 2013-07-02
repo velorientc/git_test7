@@ -441,7 +441,6 @@ class ConsoleWidget(QWidget):
             if not self.suppressPrompt:
                 self.openPrompt()
 
-    @pyqtSlot(object)
     def setRepository(self, repo):
         """Change the current working repository"""
         self._repo = repo
