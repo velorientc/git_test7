@@ -9,21 +9,18 @@ import os
 def findgpg(ui):
     path = []
     if os.name == 'nt':
-        try:
-            import _winreg
-            for key in (r"Software\GNU\GnuPG", r"Software\Wow6432Node\GNU\GnuPG"):
-                try:
-                    hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key)
-                    pfx = _winreg.QueryValueEx(hkey, 'Install Directory')[0]
-                    for dirPath, dirNames, fileNames in os.walk(pfx):
-                        for f in fileNames:
-                            if f == 'gpg.exe':
-                                path.append(os.path.join(dirPath, f))
-                except WindowsError:
-                    pass
-                except EnvironmentError:
-                    pass
-        except ImportError:
-            pass
+        import _winreg
+        for key in (r"Software\GNU\GnuPG", r"Software\Wow6432Node\GNU\GnuPG"):
+            try:
+                hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key)
+                pfx = _winreg.QueryValueEx(hkey, 'Install Directory')[0]
+                for dirPath, dirNames, fileNames in os.walk(pfx):
+                    for f in fileNames:
+                        if f == 'gpg.exe':
+                            path.append(os.path.join(dirPath, f))
+            except WindowsError:
+                pass
+            except EnvironmentError:
+                pass
 
     return path
