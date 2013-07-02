@@ -557,6 +557,9 @@ class LogDockWidget(QDockWidget):
         self.logte.progressReceived.connect(self.progressReceived)
         self.setWidget(self.logte)
 
+        # move focus only when console is activated by keyboard/mouse operation
+        self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
+
     def setRepository(self, repo):
         self.logte.setRepository(repo)
 
@@ -577,9 +580,10 @@ class LogDockWidget(QDockWidget):
         self.logte.suppressPrompt = False
         self.logte.openPrompt()
 
-    def showEvent(self, event):
-        super(LogDockWidget, self).showEvent(event)
-        self.logte.setFocus()
+    @pyqtSlot(bool)
+    def _setFocusOnToggleView(self, visible):
+        if visible:
+            self.logte.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)
