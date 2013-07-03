@@ -1098,7 +1098,7 @@ INFO = (
 ({'name': 'gnupg', 'label': _('GnuPG'), 'icon': 'gnupg',
   'extension': 'gpg'}, (
     _fi(_('Command'), 'gpg.cmd', (genEditableDeferredCombo, findGpg),
-        _('Specify the path to GPG. Default: None (leave blank)')),
+        _('Specify the path to GPG. Default: gpg')),
     _fi(_('Key ID'), 'gpg.key', genEditCombo,
         _('GPG key ID associated with user. Default: None (leave blank)')),
     )),
