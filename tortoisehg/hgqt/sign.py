@@ -65,7 +65,8 @@ class SignDialog(QDialog):
         self.localCheckBox.toggled.connect(self.updateStates)
         optbox.addWidget(self.localCheckBox)
 
-        self.replaceCheckBox = QCheckBox(_('Replace existing signature (-f/--force)'))
+        self.replaceCheckBox = QCheckBox(_('Sign even if the sigfile is '
+                                           'modified (-f/--force)'))
         self.replaceCheckBox.toggled.connect(self.updateStates)
         optbox.addWidget(self.replaceCheckBox)
 
