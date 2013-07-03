@@ -446,6 +446,10 @@ class ConsoleWidget(QWidget):
         self._repo = repo
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
 
+    def repoRootPath(self):
+        if self._repo:
+            return hglib.tounicode(self._repo.root)
+
     @property
     def cwd(self):
         """Return the current working directory"""
@@ -561,13 +565,30 @@ class LogDockWidget(QDockWidget):
         self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
 
     def setRepository(self, repo):
-        self.logte.setRepository(repo)
+        w = self._findConsoleFor(repo)
+        if not w:
+            w = self._createConsole()
+            w.setRepository(repo)
+        self._consoles.setCurrentWidget(w)
+
+    def _findConsoleFor(self, repo):
+        if repo:
+            root = hglib.tounicode(repo.root)
+        else:
+            root = None
+        for i in xrange(self._consoles.count()):
+            w = self._consoles.widget(i)
+            if w.repoRootPath() == root:
+                return w
 
     def _createConsole(self):
         w = ConsoleWidget(self)
         w.closeRequested.connect(self.close)
         w.progressReceived.connect(self.progressReceived)
         self._consoles.addWidget(w)
+        return w
+
+    # TODO: delete unused console on repositoryClosed
 
     # TODO: stub property should be removed later
     @property

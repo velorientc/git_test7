@@ -873,6 +873,7 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.progress.connect(self._showRepoWidgetProgress)
+        # TODO: send output to corresponding console instead of current one
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.beginSuppressPrompt.connect(self.log.beginSuppressPrompt)
