@@ -551,6 +551,7 @@ class LogDockWidget(QDockWidget):
         self.setWindowTitle(_('Output Log'))
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
+        self.dockLocationChanged.connect(self._updateTitleBarStyle)
 
         self.logte = ConsoleWidget(self)
         self.logte.closeRequested.connect(self.close)
@@ -589,3 +590,12 @@ class LogDockWidget(QDockWidget):
         super(LogDockWidget, self).setVisible(visible)
         if visible:
             self.raise_()
+
+    @pyqtSlot(Qt.DockWidgetArea)
+    def _updateTitleBarStyle(self, area):
+        f = self.features()
+        if area & (Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea):
+            f |= QDockWidget.DockWidgetVerticalTitleBar  # saves vertical space
+        else:
+            f &= ~QDockWidget.DockWidgetVerticalTitleBar
+        self.setFeatures(f)
