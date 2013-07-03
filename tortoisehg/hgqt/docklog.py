@@ -553,16 +553,26 @@ class LogDockWidget(QDockWidget):
         #self.setWindowFlags(Qt.Drawer)
         self.dockLocationChanged.connect(self._updateTitleBarStyle)
 
-        self.logte = ConsoleWidget(self)
-        self.logte.closeRequested.connect(self.close)
-        self.logte.progressReceived.connect(self.progressReceived)
-        self.setWidget(self.logte)
+        self._consoles = QStackedWidget(self)
+        self.setWidget(self._consoles)
+        self._createConsole()
 
         # move focus only when console is activated by keyboard/mouse operation
         self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
 
     def setRepository(self, repo):
         self.logte.setRepository(repo)
+
+    def _createConsole(self):
+        w = ConsoleWidget(self)
+        w.closeRequested.connect(self.close)
+        w.progressReceived.connect(self.progressReceived)
+        self._consoles.addWidget(w)
+
+    # TODO: stub property should be removed later
+    @property
+    def logte(self):
+        return self._consoles.currentWidget()
 
     @pyqtSlot()
     def clear(self):
