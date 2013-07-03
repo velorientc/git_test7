@@ -4,6 +4,7 @@
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -16,9 +17,9 @@ class SignDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent = None):
+    def __init__(self, repo, rev, parent=None):
         super(SignDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & \
+        self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
         self.rev = rev
