@@ -845,7 +845,8 @@ class Workbench(QMainWindow):
         self.lastClosedRepoRootList = []
         self.progress(_('Reopening tabs'), None, '', '', None)
 
-    def repoTabChanged(self, index=0):
+    @pyqtSlot()
+    def repoTabChanged(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
             self.updateHistoryActions()
