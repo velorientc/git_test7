@@ -277,6 +277,8 @@ class RepoAgent(QObject):
     repositoryDestroyed = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
+    busyChanged = pyqtSignal(bool)
+
     def __init__(self, repo):
         QObject.__init__(self)
         self._repo = repo
@@ -306,7 +308,7 @@ class RepoAgent(QObject):
             dbgoutput('not watching F/S events for bundle repository')
         elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
             dbgoutput('not watching F/S events for network drive')
-        elif self._busycount > 0:
+        elif self.isBusy():
             dbgoutput('not watching F/S events while busy')
         else:
             self._watcher.startMonitoring()
@@ -348,16 +350,21 @@ class RepoAgent(QObject):
         self._repo.thginvalidate()
         self.workingBranchChanged.emit()
 
+    def isBusy(self):
+        return self._busycount > 0
+
     def _incrementBusyCount(self):
         self._busycount += 1
         if self._busycount == 1:
             self.stopMonitoring()
+            self.busyChanged.emit(self.isBusy())
 
     def _decrementBusyCount(self):
         self._busycount -= 1
         if self._busycount == 0:
             self.pollStatus()
             self.startMonitoringIfEnabled()
+            self.busyChanged.emit(self.isBusy())
         else:
             # A lot of logic will depend on invalidation happening within
             # the context of this call. Signals will not be emitted till later,
