@@ -558,6 +558,8 @@ class LogDockWidget(QDockWidget):
         self.dockLocationChanged.connect(self._updateTitleBarStyle)
 
         self._repomanager = repomanager
+        self._repomanager.repositoryOpened.connect(self._createConsoleFor)
+        self._repomanager.repositoryClosed.connect(self._destroyConsoleFor)
 
         self._consoles = QStackedWidget(self)
         self.setWidget(self._consoles)
@@ -568,8 +570,7 @@ class LogDockWidget(QDockWidget):
 
     def setRepository(self, root):
         w = self._findConsoleFor(root)
-        if not w:
-            w = self._createConsoleFor(root)
+        assert w
         self._consoles.setCurrentWidget(w)
 
     def _findConsoleFor(self, root):
@@ -585,15 +586,21 @@ class LogDockWidget(QDockWidget):
         self._consoles.addWidget(w)
         return w
 
+    @pyqtSlot(unicode)
     def _createConsoleFor(self, root):
+        root = unicode(root)
         w = self._createConsole()
-        assert root
         repoagent = self._repomanager.repoAgent(root)
         assert repoagent
         w.setRepository(repoagent.rawRepo())
-        return w
 
-    # TODO: delete unused console on repositoryClosed
+    @pyqtSlot(unicode)
+    def _destroyConsoleFor(self, root):
+        root = unicode(root)
+        w = self._findConsoleFor(root)
+        assert w
+        self._consoles.removeWidget(w)
+        w.setParent(None)
 
     # TODO: stub property should be removed later
     @property
