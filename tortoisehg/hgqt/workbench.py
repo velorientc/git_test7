@@ -850,10 +850,9 @@ class Workbench(QMainWindow):
         if w:
             self.updateHistoryActions()
             self.updateMenu()
-            if w.repo:
-                self.reporegistry.setActiveTabRepo(w.repoRootPath())
-                self._setupCustomTools(w.repo.ui)
-                self._setupUrlCombo(w.repo)
+            self.reporegistry.setActiveTabRepo(w.repoRootPath())
+            self._setupCustomTools(w.repo.ui)
+            self._setupUrlCombo(w.repo)
         else:
             self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
