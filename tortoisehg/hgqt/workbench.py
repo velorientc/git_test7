@@ -68,7 +68,7 @@ class Workbench(QMainWindow):
         p.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, p)
 
-        self.log = LogDockWidget(self)
+        self.log = LogDockWidget(repomanager, self)
         self.log.setObjectName('Log')
         self.log.progressReceived.connect(self.statusbar.progress)
         self.log.hide()
@@ -851,13 +851,14 @@ class Workbench(QMainWindow):
         if w:
             self.updateHistoryActions()
             self.updateMenu()
+            self.log.setRepository(w.repoRootPath())
             self.reporegistry.setActiveTabRepo(w.repoRootPath())
             self._setupCustomTools(w.repo.ui)
             self._setupUrlCombo(w.repo)
         else:
+            self.log.setRepository(None)
             self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
-        self.log.setRepository(repo)
         self.mqpatches.setrepo(repo)
 
     #@pyqtSlot(unicode)

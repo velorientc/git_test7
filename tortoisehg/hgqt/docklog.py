@@ -546,7 +546,7 @@ class LogDockWidget(QDockWidget):
     progressReceived = pyqtSignal(QString, object, QString, QString,
                                   object, object)
 
-    def __init__(self, parent=None):
+    def __init__(self, repomanager, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -557,6 +557,8 @@ class LogDockWidget(QDockWidget):
         #self.setWindowFlags(Qt.Drawer)
         self.dockLocationChanged.connect(self._updateTitleBarStyle)
 
+        self._repomanager = repomanager
+
         self._consoles = QStackedWidget(self)
         self.setWidget(self._consoles)
         self._createConsole()
@@ -564,18 +566,13 @@ class LogDockWidget(QDockWidget):
         # move focus only when console is activated by keyboard/mouse operation
         self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
 
-    def setRepository(self, repo):
-        w = self._findConsoleFor(repo)
+    def setRepository(self, root):
+        w = self._findConsoleFor(root)
         if not w:
-            w = self._createConsole()
-            w.setRepository(repo)
+            w = self._createConsoleFor(root)
         self._consoles.setCurrentWidget(w)
 
-    def _findConsoleFor(self, repo):
-        if repo:
-            root = hglib.tounicode(repo.root)
-        else:
-            root = None
+    def _findConsoleFor(self, root):
         for i in xrange(self._consoles.count()):
             w = self._consoles.widget(i)
             if w.repoRootPath() == root:
@@ -586,6 +583,14 @@ class LogDockWidget(QDockWidget):
         w.closeRequested.connect(self.close)
         w.progressReceived.connect(self.progressReceived)
         self._consoles.addWidget(w)
+        return w
+
+    def _createConsoleFor(self, root):
+        w = self._createConsole()
+        assert root
+        repoagent = self._repomanager.repoAgent(root)
+        assert repoagent
+        w.setRepository(repoagent.rawRepo())
         return w
 
     # TODO: delete unused console on repositoryClosed
