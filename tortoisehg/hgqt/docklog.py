@@ -570,7 +570,6 @@ class LogDockWidget(QDockWidget):
 
     def setRepository(self, root):
         w = self._findConsoleFor(root)
-        assert w
         self._consoles.setCurrentWidget(w)
 
     def _findConsoleFor(self, root):
@@ -578,6 +577,7 @@ class LogDockWidget(QDockWidget):
             w = self._consoles.widget(i)
             if w.repoRootPath() == root:
                 return w
+        raise ValueError('no console found for %r' % root)
 
     def _createConsole(self):
         w = ConsoleWidget(self)
@@ -598,7 +598,6 @@ class LogDockWidget(QDockWidget):
     def _destroyConsoleFor(self, root):
         root = unicode(root)
         w = self._findConsoleFor(root)
-        assert w
         self._consoles.removeWidget(w)
         w.setParent(None)
 
