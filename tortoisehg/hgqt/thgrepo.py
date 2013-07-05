@@ -93,7 +93,7 @@ class RepoWatcher(QObject):
             self._fswatcher.directoryChanged.connect(self._pollChanges)
             self._fswatcher.fileChanged.connect(self._pollChanges)
         self._fswatcher.addPath(hglib.tounicode(self.repo.path))
-        self._fswatcher.addPath(hglib.tounicode(self.repo.path + '/store'))
+        self._fswatcher.addPath(hglib.tounicode(self.repo.spath))
         self.addMissingPaths()
         self._fswatcher.blockSignals(False)
 
