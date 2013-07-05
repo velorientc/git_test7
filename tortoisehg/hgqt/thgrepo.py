@@ -141,8 +141,6 @@ class RepoWatcher(QObject):
         if not os.path.exists(self.repo.path):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
-            if self.repo.root in _repocache:
-                del _repocache[self.repo.root]
             return
         if self.locked():
             dbgoutput('locked, aborting')
@@ -303,7 +301,7 @@ class RepoAgent(QObject):
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self.configChanged)
         watcher.repositoryChanged.connect(self.repositoryChanged)
-        watcher.repositoryDestroyed.connect(self.repositoryDestroyed)
+        watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
         watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
         watcher.workingBranchChanged.connect(self.workingBranchChanged)
 
@@ -337,6 +335,13 @@ class RepoAgent(QObject):
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
         self._watcher.pollStatus()
+
+    @pyqtSlot()
+    def _onRepositoryDestroyed(self):
+        if self._repo.root in _repocache:
+            del _repocache[self._repo.root]
+        self.stopMonitoring()  # avoid further changed/destroyed signals
+        self.repositoryDestroyed.emit()
 
     def _incrementBusyCount(self):
         if self._busycount == 0:
@@ -441,7 +446,6 @@ class RepoManager(QObject):
     #@pyqtSlot()
     def _mapRepositoryDestroyed(self):
         agent = self.sender()
-        agent.stopMonitoring()  # avoid further changed/destroyed signals
         self.repositoryDestroyed.emit(agent.rootPath())
 
 
