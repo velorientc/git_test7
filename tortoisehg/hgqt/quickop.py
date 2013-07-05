@@ -275,18 +275,11 @@ class HeadlessQuickop(QObject):
     def raise_(self):
         pass
 
-def run(ui, *pats, **opts):
+def run(ui, repo, *pats, **opts):
     pats = hglib.canonpaths(pats)
-    if opts.get('canonpats'):
-        pats = list(pats) + opts['canonpats']
-
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-
     command = opts['alias']
     imm = repo.ui.config('tortoisehg', 'immediate', '')
-    if command in imm.lower():
+    if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
         return HeadlessQuickop(repo, cmdline)
     else:

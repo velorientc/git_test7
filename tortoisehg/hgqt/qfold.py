@@ -106,7 +106,6 @@ class QFoldDialog(QDialog):
 
         self.msgte.setText(self.composeMsg(self.patches))
         self.msgte.refresh(self.repo)
-        self.focus = self.msgte
 
     def showSummary(self, item):
         patchname = hglib.fromunicode(item.text())

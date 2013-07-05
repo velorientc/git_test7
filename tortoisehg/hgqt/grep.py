@@ -11,6 +11,7 @@ import re
 from mercurial import ui, hg, error, commands, match, util, subrepo
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui, settings
+from tortoisehg.hgqt import filedialogs, fileview
 from tortoisehg.util import paths, hglib, thread2
 from tortoisehg.hgqt.i18n import _
 
@@ -30,7 +31,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         QWidget.__init__(self, parent)
 
         self.thread = None
-        self.setWindowIcon(qtlib.geticon('view-filter'))
 
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
@@ -107,10 +107,10 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         revision.toggled.connect(revisiontoggled)
         history.toggled.connect(singlematch.setDisabled)
         revle.setEnabled(False)
-        revle.returnPressed.connect(self.searchActivated)
-        excle.returnPressed.connect(self.searchActivated)
-        incle.returnPressed.connect(self.searchActivated)
-        bt.clicked.connect(self.searchActivated)
+        revle.returnPressed.connect(self.runSearch)
+        excle.returnPressed.connect(self.runSearch)
+        incle.returnPressed.connect(self.runSearch)
+        bt.clicked.connect(self.runSearch)
 
         def updateRecurse(checked):
             try:
@@ -146,7 +146,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
-        le.returnPressed.connect(self.searchActivated)
+        le.returnPressed.connect(self.runSearch)
 
         self.repo = repo
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
@@ -156,7 +156,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchbutton, self.cancelbutton = bt, cbt
         self.regexple.setFocus()
 
-        assert not opts.get('search'), 'cannot start search in constructor'
         if 'rev' in opts or 'all' in opts:
             self.setSearch(upats[0], **opts)
         elif len(upats) >= 1:
@@ -244,8 +243,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         elif opts.get('rev'):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
-        if opts.get('search'):
-            self.searchActivated()
 
     def stopClicked(self):
         if self.thread and self.thread.isRunning():
@@ -272,11 +269,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
 
-    def closeEvent(self, event):
-        self.saveSettings(QSettings())
-
-    def searchActivated(self):
-        'User pressed [Return] in QLineEdit'
+    @pyqtSlot()
+    def runSearch(self):
+        """Run search for the current pattern in background thread"""
         if self.thread and self.thread.isRunning():
             return
 
@@ -563,6 +558,10 @@ class MatchTree(QTableView):
         vh.setDefaultSectionSize(20)
         self.horizontalHeader().setStretchLastSection(True)
 
+        self._filedialogs = qtlib.DialogKeeper(MatchTree._createFileDialog,
+                                               MatchTree._genFileDialogKey,
+                                               self)
+
         self.actions = {}
         self.contextmenu = QMenu(self)
         for key, name, func, shortcut in (
@@ -649,9 +648,7 @@ class MatchTree(QTableView):
         self.selectedRows = saved
 
     def onAnnotateFile(self):
-        from tortoisehg.hgqt.manifestdialog import run
-        from tortoisehg.hgqt.run import qtrun
-        repo, ui, pattern, icase = self.repo, self.repo.ui, self.pattern, self.icase
+        repo = self.repo
         seen = set()
         for rev, upath, line in self.selectedRows:
             path = hglib.fromunicode(upath)
@@ -666,19 +663,28 @@ class MatchTree(QTableView):
                 if root and abs.startswith(root):
                     path = abs[len(root)+1:]
                     srepo = thgrepo.repository(None, root)
-                    if rev is None:
-                        rev = srepo['.'].rev()
-                    opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
-                            'line': line, 'pattern': pattern, 'ignorecase': icase}
-                    qtrun(run, ui, **opts)
+                    self._openAnnotateDialog(srepo, rev, path, line)
                 else:
                     continue
             else:
-                if rev is None:
-                    rev = repo['.'].rev()
-                opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
-                        'line': line, 'pattern': pattern, 'ignorecase': icase}
-                qtrun(run, ui, **opts)
+                self._openAnnotateDialog(repo, rev, path, line)
+
+    def _openAnnotateDialog(self, repo, rev, path, line):
+        if rev is None:
+            rev = repo['.'].rev()
+
+        dlg = self._filedialogs.open(repo, path)
+        dlg.setFileViewMode(fileview.AnnMode)
+        dlg.goto(rev)
+        dlg.showLine(line)
+        dlg.setSearchPattern(hglib.tounicode(self.pattern))
+        dlg.setSearchCaseInsensitive(self.icase)
+
+    def _createFileDialog(self, repo, path):
+        return filedialogs.FileLogDialog(repo, path)
+
+    def _genFileDialogKey(self, repo, path):
+        return repo.wjoin(path)
 
     def onViewChangeset(self):
         for rev, path, line in self.selectedRows:
@@ -778,11 +784,27 @@ class MatchModel(QAbstractTableModel):
         assert index.isValid()
         return self.rows[index.row()]
 
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    upats = [hglib.tounicode(p) for p in pats]
-    search = opts.pop('search', False)
-    dlg = SearchWidget(upats, repo, **opts)
-    if search:
-        dlg.searchActivated()
-    return dlg
+class SearchDialog(QDialog):
+    def __init__(self, upats, repo, parent=None, **opts):
+        super(SearchDialog, self).__init__(parent)
+        self.setWindowFlags(Qt.Window)
+        self.setWindowIcon(qtlib.geticon('view-filter'))
+        self.setLayout(QVBoxLayout(self))
+        self._searchwidget = SearchWidget(upats, repo, parent=self, **opts)
+        self.layout().addWidget(self._searchwidget)
+
+    def closeEvent(self, event):
+        if not self._searchwidget.canExit():
+            self._searchwidget.stopClicked()
+            event.ignore()
+            return
+
+        self._searchwidget.saveSettings(QSettings())
+        super(SearchDialog, self).closeEvent(event)
+
+    def setSearch(self, upattern, **opts):
+        self._searchwidget.setSearch(upattern, **opts)
+
+    @pyqtSlot()
+    def runSearch(self):
+        self._searchwidget.runSearch()

@@ -272,7 +272,6 @@ class MQPatchesWidget(QDockWidget):
         from tortoisehg.hgqt import qdelete
         patch = self.queueListWidget.currentItem()._thgpatch
         dlg = qdelete.QDeleteDialog(self.repo, [patch], self)
-        dlg.finished.connect(dlg.deleteLater)
         if dlg.exec_() == QDialog.Accepted:
             self.reload()
 
@@ -844,7 +843,6 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             super(MQWidget, self).dropEvent(event)
             return
         dlg = thgimport.ImportDialog(self.repo, self, mq=True)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.setfilepaths(patches)
         dlg.exec_()
 
@@ -981,10 +979,3 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
-
-
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return MQWidget(repo, None, **opts)

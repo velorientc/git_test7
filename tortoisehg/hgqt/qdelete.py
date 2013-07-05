@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -51,13 +49,15 @@ class QDeleteDialog(QDialog):
         self.bbox = bbox
 
     def accept(self):
-        def finished(ret):
-            self.repo.decrementBusyCount()
-            self.reject()
         cmdline = ['qdelete', '--repository', self.repo.root]
         if self.keepchk.isChecked():
             cmdline += ['--keep']
         cmdline += self.patches
         self.repo.incrementBusyCount()
-        self.cmd.commandFinished.connect(finished)
+        self.cmd.commandFinished.connect(self._finishOff)
         self.cmd.run(cmdline)
+
+    @pyqtSlot()
+    def _finishOff(self):
+        self.repo.decrementBusyCount()
+        self.reject()

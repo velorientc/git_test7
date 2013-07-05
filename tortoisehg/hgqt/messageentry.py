@@ -83,7 +83,7 @@ class MessageEntry(qscilib.Scintilla):
 
         def paste():
             files = self.getChecked()
-            self.insert(', '.join(files))
+            self.insert('\n'.join(files))
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
