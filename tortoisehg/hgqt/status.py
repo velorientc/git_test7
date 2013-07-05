@@ -192,19 +192,19 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
 
-    @property
-    def defcheck(self):
+    def __get_defcheck(self):
         if self._defcheck is None:
             return 'MAR!S'
         return self._defcheck
 
-    @defcheck.setter
-    def defcheck(self, newdefcheck):
+    def __set_defcheck(self, newdefcheck):
         if newdefcheck.lower() == 'amend':
             newdefcheck = 'MAS'
         elif newdefcheck.lower() in ('commit', 'qnew', 'qrefresh'):
             newdefcheck = 'MAR!S'
         self._defcheck = newdefcheck
+
+    defcheck = property(__get_defcheck, __set_defcheck)
 
     def checkAllNone(self):
         if self.manualCheckAllUpdate:
