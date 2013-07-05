@@ -207,7 +207,6 @@ class RepoWatcher(QObject):
             if self.locked():
                 raise _LockStillHeld
             self.recordState()
-            self.repo.thginvalidate()
             self.repositoryChanged.emit()
 
     def _checkdirstate(self):
@@ -229,7 +228,6 @@ class RepoWatcher(QObject):
             if self.locked():
                 raise _LockStillHeld
             self.recordState()
-            self.repo.thginvalidate()
             self.repositoryChanged.emit()
             return True
         return False
@@ -255,7 +253,6 @@ class RepoWatcher(QObject):
             if self.locked():
                 raise _LockStillHeld
             self._rawbranch = newbranch
-            self.repo.thginvalidate()
             self.workingBranchChanged.emit()
             return True
         return False
@@ -268,7 +265,6 @@ class RepoWatcher(QObject):
             if mtime > self._uimtime:
                 dbgoutput('config change detected')
                 self._uimtime = mtime
-                self.repo.invalidateui()
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
             pass
@@ -296,14 +292,12 @@ class RepoAgent(QObject):
         repo.workingDirectoryChanged = self.workingDirectoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
 
-        # TODO: make RepoWatcher not depends on repo internals too much;
-        # i.e. move repo.invalidate(), etc. to this class.
         self._watcher = watcher = RepoWatcher(repo, self)
-        watcher.configChanged.connect(self.configChanged)
-        watcher.repositoryChanged.connect(self.repositoryChanged)
+        watcher.configChanged.connect(self._onConfigChanged)
+        watcher.repositoryChanged.connect(self._onRepositoryChanged)
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
         watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
-        watcher.workingBranchChanged.connect(self.workingBranchChanged)
+        watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
 
     def startMonitoringIfEnabled(self):
         """Start filesystem monitoring on repository open by RepoManager or
@@ -337,11 +331,26 @@ class RepoAgent(QObject):
         self._watcher.pollStatus()
 
     @pyqtSlot()
+    def _onConfigChanged(self):
+        self._repo.invalidateui()
+        self.configChanged.emit()
+
+    @pyqtSlot()
+    def _onRepositoryChanged(self):
+        self._repo.thginvalidate()
+        self.repositoryChanged.emit()
+
+    @pyqtSlot()
     def _onRepositoryDestroyed(self):
         if self._repo.root in _repocache:
             del _repocache[self._repo.root]
         self.stopMonitoring()  # avoid further changed/destroyed signals
         self.repositoryDestroyed.emit()
+
+    @pyqtSlot()
+    def _onWorkingBranchChanged(self):
+        self._repo.thginvalidate()
+        self.workingBranchChanged.emit()
 
     def _incrementBusyCount(self):
         if self._busycount == 0:
