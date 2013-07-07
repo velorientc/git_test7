@@ -140,6 +140,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self.repo, self, checkable)
+        self.actions.refreshNeeded.connect(self.refreshWctx)
         self.actions.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
         tv = WctxFileTree(self.repo, checkable=checkable)
@@ -284,8 +285,7 @@ class StatusWidget(QWidget):
     @pyqtSlot(QPoint, object)
     def onMenuRequest(self, point, selected):
         menu = self.actions.makeMenu(selected)
-        if menu.exec_(point):
-            self.refreshWctx()
+        menu.exec_(point)
 
     def setPatchContext(self, pctx):
         if pctx != self.pctx:

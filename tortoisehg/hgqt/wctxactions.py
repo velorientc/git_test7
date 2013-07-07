@@ -17,6 +17,8 @@ from PyQt4.QtGui import *
 
 class WctxActions(QObject):
     'container class for working context actions'
+
+    refreshNeeded = pyqtSignal()
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, checkable=True):
@@ -210,7 +212,9 @@ class WctxActions(QObject):
                 QMessageBox.critical(parent, name + _(' Aborted'), err)
         finally:
             os.chdir(cwd)
-        return notify
+
+        if notify:
+            self.refreshNeeded.emit()
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
