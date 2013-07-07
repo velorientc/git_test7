@@ -95,7 +95,7 @@ def revision_grapher(repo, **opts):
             return [x.rev() for x in ctx.parents() if x]
     else:
         def getparents(ctx):
-            return [x.rev() for x in ctx.parents() \
+            return [x.rev() for x in ctx.parents()
                     if x and x.branch() == branch]
 
     while curr_rev is None or curr_rev >= stop_rev:
@@ -137,7 +137,8 @@ def revision_grapher(repo, **opts):
         next_children = children[:]
 
         # Add parents to next_revs.
-        parents = [(p,LINE_TYPE_PARENT) for p in getparents(ctx) if not hidden(p)]
+        parents = [(p, LINE_TYPE_PARENT) for p in getparents(ctx)
+                   if not hidden(p)]
         if 'source' in ctx.extra():
             src_rev_str = ctx.extra()['source']
             if src_rev_str in repo:
@@ -180,11 +181,13 @@ def revision_grapher(repo, **opts):
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, links[i], children[i], rev) )
+                lines.append((i, next_revs.index(rev), color, links[i],
+                              children[i], rev))
             elif rev == curr_rev:
                 for parent, link_type in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, link_type, (curr_rev,), parent) )
+                    lines.append((i, next_revs.index(parent), color, link_type,
+                                  (curr_rev,), parent))
 
         yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
@@ -231,7 +234,8 @@ def filelog_grapher(repo, path):
         fctx = repo.filectx(_paths.get(rev, path), changeid=rev)
         for pfctx in fctx.parents():
             _paths[pfctx.rev()] = pfctx.path()
-        parents = [pfctx.rev() for pfctx in fctx.parents()]# if f.path() == path]
+        parents = [pfctx.rev() for pfctx in fctx.parents()]
+                   # if f.path() == path]
         parents_to_add = []
         children_to_add = []
         for parent in parents:
@@ -250,11 +254,13 @@ def filelog_grapher(repo, path):
         for i, nrev in enumerate(revs):
             if nrev in next_revs:
                 color = rev_color[nrev]
-                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT, children[i], nrev) )
+                lines.append((i, next_revs.index(nrev), color, LINE_TYPE_PARENT,
+                              children[i], nrev))
             elif nrev == rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT, (rev,), parent) )
+                    lines.append((i, next_revs.index(parent), color,
+                                  LINE_TYPE_PARENT, (rev,), parent))
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
