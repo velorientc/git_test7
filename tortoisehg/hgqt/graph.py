@@ -28,7 +28,7 @@ import time
 import os
 import itertools
 
-from mercurial import repoview, util, error
+from mercurial import repoview
 
 LINE_TYPE_PARENT = 0
 LINE_TYPE_GRAFT = 1
