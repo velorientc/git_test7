@@ -76,7 +76,6 @@ class RepoWatcher(QObject):
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
     repositoryDestroyed = pyqtSignal()
-    workingDirectoryChanged = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
     def __init__(self, repo, parent=None):
@@ -276,7 +275,6 @@ class RepoAgent(QObject):
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
     repositoryDestroyed = pyqtSignal()
-    workingDirectoryChanged = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
     def __init__(self, repo):
@@ -289,14 +287,12 @@ class RepoAgent(QObject):
         repo.configChanged = self.configChanged
         repo.repositoryChanged = self.repositoryChanged
         repo.repositoryDestroyed = self.repositoryDestroyed
-        repo.workingDirectoryChanged = self.workingDirectoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
 
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self._onConfigChanged)
         watcher.repositoryChanged.connect(self._onRepositoryChanged)
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
-        watcher.workingDirectoryChanged.connect(self.workingDirectoryChanged)
         watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
 
     def startMonitoringIfEnabled(self):
