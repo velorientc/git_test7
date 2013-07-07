@@ -96,7 +96,7 @@ def revision_grapher(repo, **opts):
             return [x for x in ctx.parents()
                     if x and x.branch() == branch]
 
-    rev_color = RevColorPalette(getparents, stop_rev)
+    rev_color = RevColorPalette(getparents)
 
     while curr_rev is None or curr_rev >= stop_rev:
         if hidden(curr_rev):
@@ -271,34 +271,53 @@ def mq_patch_grapher(repo):
 class RevColorPalette(object):
     """Assign node and line colors for each revision"""
 
-    def __init__(self, getparents, stoprev):
+    def __init__(self, getparents):
         self._getparents = getparents
-        self._stoprev = stoprev
+        self._pendingheads = []
         self._knowncolors = {}
         self._nextcolor = 0
 
     def addheadctx(self, ctx):
-        self._knowncolors[ctx.rev()] = curcolor = self._nextcolor
-        self._nextcolor += 1
+        color = self.assigncolor(ctx.rev())
         p_ctxs = self._getparents(ctx)
+        self._pendingheads.append((p_ctxs, color))
+
+    def _fillpendingheads(self, stoprev):
+        if stoprev is None:
+            return  # avoid filling everything (int_rev < None is False)
+
+        nextpendingheads = []
+        for p_ctxs, color in self._pendingheads:
+            pending = self._fillancestors(p_ctxs, color, stoprev)
+            if pending:
+                nextpendingheads.append((pending, color))
+        self._pendingheads = nextpendingheads
+
+    def _fillancestors(self, p_ctxs, curcolor, stoprev):
         while p_ctxs:
             ctx0 = p_ctxs[0]
             rev0 = ctx0.rev()
-            if rev0 < self._stoprev or rev0 in self._knowncolors:
-                break
+            if rev0 < stoprev:
+                return p_ctxs
+            if rev0 in self._knowncolors:
+                return
             self._knowncolors[rev0] = curcolor
             p_ctxs = self._getparents(ctx0)
 
     def assigncolor(self, rev, color=None):
+        self._fillpendingheads(rev)
         if color is None:
             color = self._nextcolor
             self._nextcolor += 1
         self._knowncolors[rev] = color
+        return color
 
     def __getitem__(self, rev):
+        self._fillpendingheads(rev)
         return self._knowncolors[rev]
 
     def __contains__(self, rev):
+        self._fillpendingheads(rev)
         return rev in self._knowncolors
 
 class GraphNode(object):
