@@ -87,8 +87,6 @@ def revision_grapher(repo, **opts):
     revs = []
     children = [()]
     links = [] # smallest link type that applies
-    rev_color = {}
-    nextcolor = 0
 
     if opts.get('allparents') or not branch:
         def getparents(ctx):
@@ -97,6 +95,8 @@ def revision_grapher(repo, **opts):
         def getparents(ctx):
             return [x for x in ctx.parents()
                     if x and x.branch() == branch]
+
+    rev_color = RevColorPalette(getparents, stop_rev)
 
     while curr_rev is None or curr_rev >= stop_rev:
         if hidden(curr_rev):
@@ -120,17 +120,8 @@ def revision_grapher(repo, **opts):
                 continue
             revs.append(curr_rev)
             links.append(LINE_TYPE_PARENT)
-            rev_color[curr_rev] = curcolor = nextcolor
             children.append(())
-            nextcolor += 1
-            p_ctxs = getparents(ctx)
-            while p_ctxs:
-                ctx0 = p_ctxs[0]
-                rev0 = ctx0.rev()
-                if rev0 < stop_rev or rev0 in rev_color:
-                    break
-                rev_color[rev0] = curcolor
-                p_ctxs = getparents(ctx0)
+            rev_color.addheadctx(ctx)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
@@ -159,12 +150,8 @@ def revision_grapher(repo, **opts):
                 links_to_add.append(link_type)
                 children_to_add.append((curr_rev,))
                 if parent not in rev_color:
-                    if preferred_color:
-                        rev_color[parent] = preferred_color
-                        preferred_color = None
-                    else:
-                        rev_color[parent] = nextcolor
-                        nextcolor += 1
+                    rev_color.assigncolor(parent, preferred_color)
+                    preferred_color = None
             else:
                 # Merging lines should have the most solid style
                 #  (= lowest style value)
@@ -280,6 +267,39 @@ def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
         yield GraphNode(patchname, 0, "", [], [])
+
+class RevColorPalette(object):
+    """Assign node and line colors for each revision"""
+
+    def __init__(self, getparents, stoprev):
+        self._getparents = getparents
+        self._stoprev = stoprev
+        self._knowncolors = {}
+        self._nextcolor = 0
+
+    def addheadctx(self, ctx):
+        self._knowncolors[ctx.rev()] = curcolor = self._nextcolor
+        self._nextcolor += 1
+        p_ctxs = self._getparents(ctx)
+        while p_ctxs:
+            ctx0 = p_ctxs[0]
+            rev0 = ctx0.rev()
+            if rev0 < self._stoprev or rev0 in self._knowncolors:
+                break
+            self._knowncolors[rev0] = curcolor
+            p_ctxs = self._getparents(ctx0)
+
+    def assigncolor(self, rev, color=None):
+        if color is None:
+            color = self._nextcolor
+            self._nextcolor += 1
+        self._knowncolors[rev] = color
+
+    def __getitem__(self, rev):
+        return self._knowncolors[rev]
+
+    def __contains__(self, rev):
+        return rev in self._knowncolors
 
 class GraphNode(object):
     """
