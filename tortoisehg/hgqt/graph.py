@@ -92,10 +92,10 @@ def revision_grapher(repo, **opts):
 
     if opts.get('allparents') or not branch:
         def getparents(ctx):
-            return [x.rev() for x in ctx.parents() if x]
+            return [x for x in ctx.parents() if x]
     else:
         def getparents(ctx):
-            return [x.rev() for x in ctx.parents()
+            return [x for x in ctx.parents()
                     if x and x.branch() == branch]
 
     while curr_rev is None or curr_rev >= stop_rev:
@@ -123,13 +123,14 @@ def revision_grapher(repo, **opts):
             rev_color[curr_rev] = curcolor = nextcolor
             children.append(())
             nextcolor += 1
-            p_revs = getparents(ctx)
-            while p_revs:
-                rev0 = p_revs[0]
+            p_ctxs = getparents(ctx)
+            while p_ctxs:
+                ctx0 = p_ctxs[0]
+                rev0 = ctx0.rev()
                 if rev0 < stop_rev or rev0 in rev_color:
                     break
                 rev_color[rev0] = curcolor
-                p_revs = getparents(repo[rev0])
+                p_ctxs = getparents(ctx0)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
@@ -137,8 +138,8 @@ def revision_grapher(repo, **opts):
         next_children = children[:]
 
         # Add parents to next_revs.
-        parents = [(p, LINE_TYPE_PARENT) for p in getparents(ctx)
-                   if not hidden(p)]
+        parents = [(p.rev(), LINE_TYPE_PARENT) for p in getparents(ctx)
+                   if not hidden(p.rev())]
         if 'source' in ctx.extra():
             src_rev_str = ctx.extra()['source']
             if src_rev_str in repo:
