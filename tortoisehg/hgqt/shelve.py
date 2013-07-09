@@ -489,12 +489,3 @@ class ShelveDialog(QDialog):
     def reject(self):
         self.storeSettings()
         super(ShelveDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    if 'repo' in opts:
-        repo = opts['repo']
-    else:
-        from tortoisehg.util import paths
-        from tortoisehg.hgqt import thgrepo
-        repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo)

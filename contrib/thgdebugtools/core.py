@@ -10,8 +10,7 @@ import gc
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import extensions
-from tortoisehg.hgqt import run, workbench
+from tortoisehg.hgqt import run
 
 import dbgutil, infobar, widgets
 
@@ -72,11 +71,14 @@ class DebugMenuActions(dbgutil.BaseMenuActions):
                                      % ', '.join(map(str, gc.get_count())))
         self._gcEnabledAction.setChecked(self.isGcEnabled())
 
-def _workbenchrun(orig, ui, *pats, **opts):
-    dlg = orig(ui, *pats, **opts)
-    m = dlg.menuBar().addMenu('&Debug')
-    DebugMenuActions(m, parent=dlg)
-    return dlg
-
 def extsetup(ui):
-    extensions.wrapfunction(workbench, 'run', _workbenchrun)
+    class dbgqtrun(run.qtrun.__class__):
+        def _createdialog(self, dlgfunc, args, opts):
+            dlg, reporoot = super(dbgqtrun, self)._createdialog(dlgfunc, args,
+                                                                opts)
+            if isinstance(dlg, QMainWindow):
+                m = dlg.menuBar().addMenu('&Debug')
+                DebugMenuActions(m, parent=dlg)
+            return dlg, reporoot
+
+    run.qtrun.__class__ = dbgqtrun

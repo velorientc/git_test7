@@ -63,7 +63,7 @@ class BaseMenuActions(QObject):
 
     def _getText(self, title, label, text=None):
         newtext, ok = QInputDialog.getText(self._parentWidget(), title, label,
-                                           text=text or '')
+                                           QLineEdit.Normal, text or '')
         if ok:
             return unicode(newtext)
 

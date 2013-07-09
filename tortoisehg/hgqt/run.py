@@ -16,12 +16,6 @@ import os
 import pdb
 import sys
 import subprocess
-import traceback
-import zlib
-import gc
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 
 import mercurial.ui as uimod
 from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
@@ -29,19 +23,16 @@ from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import bugreport, qtlib
+from tortoisehg.hgqt import qtapp, qtlib, thgrepo
+from tortoisehg.hgqt import quickop
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
 except ImportError:
     config_nofork = None
 
-try:
-    from thginithook import thginithook
-except ImportError:
-    thginithook = None
-
-nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
+console_commands = 'help thgstatus version'
+nonrepo_commands = '''userconfig shellconfig clone init debugbugreport
 about help version thgstatus serve rejects log'''
 
 def dispatch(args):
@@ -52,34 +43,17 @@ def dispatch(args):
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
+        if 'THGDEBUG' in os.environ:
+            u.setconfig('ui', 'debug', 'on')
         return _runcatch(u, args)
     except error.ParseError, e:
-        from tortoisehg.hgqt.bugreport import ExceptionMsgBox
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['values'] = e
-        opts['error'] = traceback.format_exc()
-        opts['nofork'] = True
-        errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
-                      '<a href="#edit:%(arg1)s">edit</a> your config')
-        if not QApplication.instance():
-            main = QApplication(sys.argv)
-        dlg = ExceptionMsgBox(hglib.tounicode(str(e)),
-                              hglib.tounicode(errstring), opts, parent=None)
-        dlg.exec_()
+        qtapp.earlyExceptionMsgBox(e)
     except SystemExit:
         pass
     except Exception, e:
-        # generic errors before the QApplication is started
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = traceback.format_exc()
-        if not QApplication.instance():
-            main = QApplication(sys.argv)
-        dlg = bugreport.BugReport(opts)
-        dlg.exec_()
+        qtapp.earlyBugReport(e)
         return -1
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
@@ -290,17 +264,16 @@ def runcommand(ui, args):
                 path, bundle = s
             cmdoptions['bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
-        if not os.path.exists(path) or not os.path.isdir(path+'/.hg'):
-            print 'abort: %s is not a repository' % path
-            return 1
-        os.chdir(path)
-    if options['fork']:
-        cmdoptions['fork'] = True
-    if options['nofork'] or options['profile']:
-        cmdoptions['nofork'] = True
-    path = paths.find_root(os.getcwd())
+        # TODO: replace by abspath() if chdir() isn't necessary
+        try:
+            os.chdir(path)
+            path = os.getcwd()
+        except OSError:
+            pass
+    if options['profile']:
+        options['nofork'] = True
+    path = paths.find_root(path)
     if path:
-        cmdoptions['repository'] = path
         try:
             lui = ui.copy()
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
@@ -317,12 +290,17 @@ def runcommand(ui, args):
     if options['quiet']:
         ui.quiet = True
 
-    if cmd not in nonrepo_commands.split() and not path:
-        raise error.RepoError(_("There is no Mercurial repository here"
-                                " (.hg not found)"))
+    # repository existence will be tested in qtrun()
+    if cmd not in nonrepo_commands.split():
+        cmdoptions['repository'] = path or options['repository'] or '.'
 
     cmdoptions['mainapp'] = True
-    d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
+    checkedfunc = util.checksignature(func)
+    if cmd in console_commands.split():
+        d = lambda: checkedfunc(ui, *args, **cmdoptions)
+    else:
+        portable_fork(ui, options)
+        d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
 
 def _runcommand(ui, options, cmd, cmdfunc):
@@ -376,480 +354,234 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
-class GarbageCollector(QObject):
-    '''
-    Disable automatic garbage collection and instead collect manually
-    every INTERVAL milliseconds.
+qtrun = qtapp.QtRunner()
 
-    This is done to ensure that garbage collection only happens in the GUI
-    thread, as otherwise Qt can crash.
-    '''
+table = {}
+command = cmdutil.command(table)
 
-    INTERVAL = 5000
+# common command options
 
-    def __init__(self, parent, debug=False):
-        QObject.__init__(self, parent)
-        self.debug = debug
+globalopts = [
+    ('R', 'repository', '',
+     _('repository root directory or symbolic path name')),
+    ('v', 'verbose', None, _('enable additional output')),
+    ('q', 'quiet', None, _('suppress output')),
+    ('h', 'help', None, _('display help and exit')),
+    ('', 'debugger', None, _('start debugger')),
+    ('', 'profile', None, _('print command execution profile')),
+    ('', 'nofork', None, _('do not fork GUI process')),
+    ('', 'fork', None, _('always fork GUI process')),
+    ('', 'listfile', '', _('read file list from file')),
+    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
+    ('', 'newworkbench', None, _('open a new workbench window')),
+]
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.check)
+# common command functions
 
-        self.threshold = gc.get_threshold()
-        gc.disable()
-        self.timer.start(self.INTERVAL)
-        #gc.set_debug(gc.DEBUG_SAVEALL)
+def _filelog(ui, repo, *pats, **opts):
+    from tortoisehg.hgqt import filedialogs
+    if len(pats) != 1:
+        raise util.Abort(_('requires a single filename'))
+    filename = hglib.canonpaths(pats)[0]
+    return filedialogs.FileLogDialog(repo, filename)
 
-    def check(self):
-        l0, l1, l2 = gc.get_count()
-        if l0 > self.threshold[0]:
-            num = gc.collect(0)
-            if self.debug:
-                print 'GarbageCollector.check:', l0, l1, l2
-                print 'collected gen 0, found', num, 'unreachable'
-            if l1 > self.threshold[1]:
-                num = gc.collect(1)
-                if self.debug:
-                    print 'collected gen 1, found', num, 'unreachable'
-                if l2 > self.threshold[2]:
-                    num = gc.collect(2)
-                    if self.debug:
-                        print 'collected gen 2, found', num, 'unreachable'
+def _workbench(ui, *pats, **opts):
+    root = opts.get('root') or paths.find_root()
 
-    def debug_cycles(self):
-        gc.collect()
-        for obj in gc.garbage:
-            print (obj, repr(obj), type(obj))
-
-class _QtRunner(QObject):
-    """Run Qt app and hold its windows
-
-    NOTE: This object will be instantiated before QApplication, it means
-    there's a limitation on Qt's event handling. See
-    http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
-    """
-
-    _exceptionOccured = pyqtSignal(object, object, object)
-
-    # {exception class: message}
-    # It doesn't check the hierarchy of exception classes for simplicity.
-    _recoverableexc = {
-        error.RepoLookupError: _('Try refreshing your repository.'),
-        zlib.error:            _('Try refreshing your repository.'),
-        error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
-                            '<a href="#edit:%(arg1)s">edit</a> your config'),
-        error.ConfigError: _('Configuration Error: "%(arg0)s",<br>Please '
-                             '<a href="#fix:%(arg0)s">fix</a> your config'),
-        error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
-        error.LockUnavailable: _('Repository is locked'),
-        }
-
-    def __init__(self):
-        super(_QtRunner, self).__init__()
-        gc.disable()
-        self.debug = 'THGDEBUG' in os.environ
-        self._mainapp = None
-        self._dialogs = []
-        self.errors = []
-        sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
-
-        # can be emitted by another thread; postpones it until next
-        # eventloop of main (GUI) thread.
-        self._exceptionOccured.connect(self.putexception,
-                                       Qt.QueuedConnection)
-
-    def ehook(self, etype, evalue, tracebackobj):
-        'Will be called by any thread, on any unhandled exception'
-        elist = traceback.format_exception(etype, evalue, tracebackobj)
-        if 'THGDEBUG' in os.environ:
-            sys.stderr.write(''.join(elist))
-        self._exceptionOccured.emit(etype, evalue, tracebackobj)
-        # not thread-safe to touch self.errors here
-
-    @pyqtSlot(object, object, object)
-    def putexception(self, etype, evalue, tracebackobj):
-        'Enque exception info and display it later; run in main thread'
-        if not self.errors:
-            QTimer.singleShot(10, self.excepthandler)
-        self.errors.append((etype, evalue, tracebackobj))
-
-    @pyqtSlot()
-    def excepthandler(self):
-        'Display exception info; run in main (GUI) thread'
-        try:
-            try:
-                self._showexceptiondialog()
-            except:
-                # make sure to quit mainloop first, so that it never leave
-                # zombie process.
-                self._mainapp.exit(1)
-                self._printexception()
-        finally:
-            self.errors = []
-
-    def _showexceptiondialog(self):
-        from tortoisehg.hgqt.bugreport import BugReport, ExceptionMsgBox
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = ''.join(''.join(traceback.format_exception(*args))
-                                for args in self.errors)
-        etype, evalue = self.errors[0][:2]
-        if (len(set(e[0] for e in self.errors)) == 1
-            and etype in self._recoverableexc):
-            opts['values'] = evalue
-            errstr = self._recoverableexc[etype]
-            if etype is error.Abort and evalue.hint:
-                errstr = u''.join([errstr, u'<br><b>', _('hint:'),
-                                   u'</b> %(arg1)s'])
-                opts['values'] = [str(evalue), evalue.hint]
-            dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                  hglib.tounicode(errstr), opts,
-                                  parent=self._mainapp.activeWindow())
-        elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(hglib.tounicode(_('Keyboard interrupt')),
-                    hglib.tounicode(_('Close this application?'))):
-                QApplication.quit()
-            else:
-                self.errors = []
-                return
+    # TODO: unclear that _workbench() is called inside qtrun(). maybe this
+    # function should receive factory object instead of using global qtrun.
+    w = qtrun.createWorkbench()
+    if root:
+        root = hglib.tounicode(root)
+        bundle = opts.get('bundle')
+        if bundle:
+            w.openRepo(root, False, bundle=hglib.tounicode(bundle))
         else:
-            dlg = BugReport(opts, parent=self._mainapp.activeWindow())
-        dlg.exec_()
+            w.showRepo(root)
 
-    def _printexception(self):
-        for args in self.errors:
-            traceback.print_exception(*args)
+        if pats:
+            q = []
+            for f in pats:
+                pat = hglib.canonpaths([f])[0]
+                if os.path.isdir(f):
+                    q.append('file("%s/**")' % pat)
+                elif os.path.isfile(f):
+                    q.append('file("%s")' % pat)
+            w.setRevsetFilter(root, ' or '.join(q))
+    if w.repoTabsWidget.count() <= 0:
+        w.reporegistry.setVisible(True)
+    return w
 
-    def __call__(self, dlgfunc, ui, *args, **opts):
-        portable_fork(ui, opts)
+# commands start here, listed alphabetically
 
-        if self._mainapp:
-            self._opendialog(dlgfunc, ui, *args, **opts)
-            return
+@command('about', [], _('thg about'))
+def about(ui, *pats, **opts):
+    """about dialog"""
+    from tortoisehg.hgqt import about as aboutmod
+    return aboutmod.AboutDialog()
 
-        QSettings.setDefaultFormat(QSettings.IniFormat)
-
-        self._mainapp = QApplication(sys.argv)
-        try:
-            self._gc = GarbageCollector(self, self.debug)
-            # default org is used by QSettings
-            self._mainapp.setApplicationName('TortoiseHgQt')
-            self._mainapp.setOrganizationName('TortoiseHg')
-            self._mainapp.setOrganizationDomain('tortoisehg.org')
-            self._mainapp.setApplicationVersion(thgversion.version())
-            self._fixlibrarypaths()
-            self._installtranslator()
-            qtlib.setup_font_substitutions()
-            qtlib.fix_application_font()
-            qtlib.configstyles(ui)
-            qtlib.initfontcache(ui)
-            self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
-
-            if 'repository' in opts:
-                try:
-                    # Ensure we can open the repository before opening any
-                    # dialog windows.  Since thgrepo instances are cached, this
-                    # is not wasted.
-                    from tortoisehg.hgqt import thgrepo
-                    thgrepo.repository(ui, opts['repository'])
-                except error.RepoError, e:
-                    qtlib.WarningMsgBox(hglib.tounicode(_('Repository Error')),
-                                        hglib.tounicode(str(e)))
-                    return
-            dlg = dlgfunc(ui, *args, **opts)
-            if dlg:
-                dlg.show()
-                dlg.raise_()
-            else:
-                return -1
-        except:
-            # Exception before starting eventloop needs to be postponed;
-            # otherwise it will be ignored silently.
-            def reraise():
-                raise
-            QTimer.singleShot(0, reraise)
-
-        if thginithook is not None:
-            thginithook()
-
-        try:
-            return self._mainapp.exec_()
-        finally:
-            self._mainapp = None
-
-    def _fixlibrarypaths(self):
-        # make sure to use the bundled Qt plugins to avoid ABI incompatibility
-        # http://qt-project.org/doc/qt-4.8/deployment-windows.html#qt-plugins
-        if os.name == 'nt' and getattr(sys, 'frozen', False):
-            self._mainapp.setLibraryPaths([self._mainapp.applicationDirPath()])
-
-    def _installtranslator(self):
-        if not i18n.language:
-            return
-        t = QTranslator(self._mainapp)
-        t.load('qt_' + i18n.language, qtlib.gettranslationpath())
-        self._mainapp.installTranslator(t)
-
-    def _opendialog(self, dlgfunc, ui, *args, **opts):
-        dlg = dlgfunc(ui, *args, **opts)
-        if not dlg:
-            return
-
-        self._dialogs.append(dlg)  # avoid garbage collection
-        if hasattr(dlg, 'finished') and hasattr(dlg.finished, 'connect'):
-            dlg.finished.connect(dlg.deleteLater)
-        # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
-        # So we cannot write `dlg.destroyed.connect(self._forgetdialog)`.
-        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
-        dlg.show()
-
-    def _forgetdialog(self, dlg):
-        """forget the dialog to be garbage collectable"""
-        assert dlg in self._dialogs
-        self._dialogs.remove(dlg)
-
-qtrun = _QtRunner()
-
-def add(ui, *pats, **opts):
+@command('add', [], _('thg add [FILE]...'))
+def add(ui, repo, *pats, **opts):
     """add files"""
-    from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
+    return quickop.run(ui, repo, *pats, **opts)
 
-def backout(ui, *pats, **opts):
+@command('^annotate|blame',
+    [('r', 'rev', '', _('revision to annotate')),
+     ('n', 'line', '', _('open to line')),
+     ('p', 'pattern', '', _('initial search pattern'))],
+    _('thg annotate'))
+def annotate(ui, repo, *pats, **opts):
+    """annotate dialog"""
+    from tortoisehg.hgqt import fileview
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    dlg = _filelog(ui, repo, *pats, **opts)
+    dlg.setFileViewMode(fileview.AnnMode)
+    dlg.goto(rev)
+    if opts.get('line'):
+        try:
+            lineno = int(opts['line'])
+        except ValueError:
+            raise util.Abort(_('invalid line number: %s') % opts['line'])
+        dlg.showLine(lineno)
+    if opts.get('pattern'):
+        dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+    return dlg
+
+@command('archive',
+    [('r', 'rev', '', _('revision to archive'))],
+    _('thg archive'))
+def archive(ui, repo, *pats, **opts):
+    """archive dialog"""
+    from tortoisehg.hgqt import archive as archivemod
+    rev = opts.get('rev')
+    return archivemod.ArchiveDialog(repo.ui, repo, rev)
+
+@command('^backout',
+    [('', 'merge', None, _('merge with old dirstate parent after backout')),
+     ('', 'parent', '', _('parent to choose when backing out merge')),
+     ('r', 'rev', '', _('revision to backout'))],
+    _('thg backout [OPTION]... [[-r] REV]'))
+def backout(ui, repo, *pats, **opts):
     """backout tool"""
-    from tortoisehg.hgqt.backout import run
-    return qtrun(run, ui, *pats, **opts)
+    from tortoisehg.hgqt import backout as backoutmod
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    else:
+        rev = 'tip'
+    return backoutmod.BackoutDialog(rev, repo, None)
 
-def thgstatus(ui, *pats, **opts):
-    """update TortoiseHg status cache"""
-    from tortoisehg.util.thgstatus import run
-    run(ui, *pats, **opts)
+@command('^bisect', [], _('thg bisect'))
+def bisect(ui, repo, *pats, **opts):
+    """bisect dialog"""
+    from tortoisehg.hgqt import bisect as bisectmod
+    return bisectmod.BisectDialog(repo, opts)
 
-def userconfig(ui, *pats, **opts):
-    """user configuration editor"""
-    from tortoisehg.hgqt.settings import run
-    return qtrun(run, ui, *pats, **opts)
+@command('bookmarks|bookmark',
+    [('r', 'rev', '', _('revision'))],
+    _('thg bookmarks [-r REV] [NAME]'))
+def bookmark(ui, repo, *names, **opts):
+    """add or remove a movable marker"""
+    from tortoisehg.hgqt import bookmark as bookmarkmod
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    if len(names) > 1:
+        raise util.Abort(_('only one new bookmark name allowed'))
+    dlg = bookmarkmod.BookmarkDialog(repo, rev)
+    if names:
+        dlg.setBookmarkName(hglib.tounicode(names[0]))
+    return dlg
 
-def repoconfig(ui, *pats, **opts):
-    """repository configuration editor"""
-    from tortoisehg.hgqt.settings import run
-    return qtrun(run, ui, *pats, **opts)
-
+@command('^clone',
+    [('U', 'noupdate', None, _('the clone will include an empty working copy '
+                               '(only a repository)')),
+     ('u', 'updaterev', '', _('revision, tag or branch to check out')),
+     ('r', 'rev', '', _('include the specified changeset')),
+     ('b', 'branch', [], _('clone only the specified branch')),
+     ('', 'pull', None, _('use pull protocol to copy metadata')),
+     ('', 'uncompressed', None, _('use uncompressed transfer '
+                                  '(fast over LAN)'))],
+    _('thg clone [OPTION]... SOURCE [DEST]'))
 def clone(ui, *pats, **opts):
     """clone tool"""
-    from tortoisehg.hgqt.clone import run
-    return qtrun(run, ui, *pats, **opts)
+    from tortoisehg.hgqt import clone as clonemod
+    return clonemod.CloneDialog(pats, opts)
 
-def commit(ui, *pats, **opts):
+@command('^commit|ci',
+    [('u', 'user', '', _('record user as committer')),
+     ('d', 'date', '', _('record datecode as commit date'))],
+    _('thg commit [OPTIONS] [FILE]...'))
+def commit(ui, repo, *pats, **opts):
     """commit tool"""
-    from tortoisehg.hgqt.commit import run
-    return qtrun(run, ui, *pats, **opts)
+    from tortoisehg.hgqt import commit as commitmod
+    pats = hglib.canonpaths(pats)
+    os.chdir(repo.root)
+    return commitmod.CommitDialog(repo, pats, opts)
 
-def email(ui, *pats, **opts):
-    """send changesets by email"""
-    from tortoisehg.hgqt.hgemail import run
-    return qtrun(run, ui, *pats, **opts)
-
-def graft(ui, *revs, **opts):
-    """graft dialog"""
-    from tortoisehg.hgqt.graft import run
-    return qtrun(run, ui, *revs, **opts)
-
-def resolve(ui, *pats, **opts):
-    """resolve dialog"""
-    from tortoisehg.hgqt.resolve import run
-    return qtrun(run, ui, *pats, **opts)
-
-def postreview(ui, *pats, **opts):
-    """post changesets to reviewboard"""
-    from tortoisehg.hgqt.postreview import run
-    return qtrun(run, ui, *pats, **opts)
-
-def rupdate(ui, *pats, **opts):
-    """update a remote repository"""
-    from tortoisehg.hgqt.rupdate import run
-    return qtrun(run, ui, *pats, **opts)
-
-def merge(ui, *pats, **opts):
-    """merge wizard"""
-    from tortoisehg.hgqt.merge import run
-    return qtrun(run, ui, *pats, **opts)
-
-def manifest(ui, *pats, **opts):
-    """display the current or given revision of the project manifest"""
-    from tortoisehg.hgqt.manifestdialog import run
-    return qtrun(run, ui, *pats, **opts)
-
-def guess(ui, *pats, **opts):
-    """guess previous renames or copies"""
-    from tortoisehg.hgqt.guess import run
-    return qtrun(run, ui, *pats, **opts)
-
-def status(ui, *pats, **opts):
-    """browse working copy status"""
-    from tortoisehg.hgqt.status import run
-    return qtrun(run, ui, *pats, **opts)
-
-def shelve(ui, *pats, **opts):
-    """Move changes between working directory and patches"""
-    from tortoisehg.hgqt.shelve import run
-    return qtrun(run, ui, *pats, **opts)
-
-def rejects(ui, *pats, **opts):
-    """Manually resolve rejected patch chunks"""
-    from tortoisehg.hgqt.rejects import run
-    return qtrun(run, ui, *pats, **opts)
-
-def tag(ui, *pats, **opts):
-    """tag tool"""
-    from tortoisehg.hgqt.tag import run
-    return qtrun(run, ui, *pats, **opts)
-
-def mq(ui, *pats, **opts):
-    """Mercurial Queue tool"""
-    from tortoisehg.hgqt.mq import run
-    return qtrun(run, ui, *pats, **opts)
-
+@command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):
     """open bugreport dialog by exception"""
     raise Exception(' '.join(pats))
 
-def purge(ui, *pats, **opts):
-    """purge unknown and/or ignore files from repository"""
-    from tortoisehg.hgqt.purge import run
-    return qtrun(run, ui, *pats, **opts)
-
-def qreorder(ui, *pats, **opts):
-    """Reorder unapplied MQ patches"""
-    from tortoisehg.hgqt.qreorder import run
-    return qtrun(run, ui, *pats, **opts)
-
-def qqueue(ui, *pats, **opts):
-    """manage multiple MQ patch queues"""
-    from tortoisehg.hgqt.qqueue import run
-    return qtrun(run, ui, *pats, **opts)
-
-def remove(ui, *pats, **opts):
-    """remove selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
-
-def revert(ui, *pats, **opts):
-    """revert selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
-
-def forget(ui, *pats, **opts):
-    """forget selected files"""
-    from tortoisehg.hgqt.quickop import run
-    return qtrun(run, ui, *pats, **opts)
-
-def hgignore(ui, *pats, **opts):
-    """ignore filter editor"""
-    from tortoisehg.hgqt.hgignore import run
-    return qtrun(run, ui, *pats, **opts)
-
-def serve(ui, *pats, **opts):
-    """start stand-alone webserver"""
-    from tortoisehg.hgqt.serve import run
-    return qtrun(run, ui, *pats, **opts)
-
-def sync(ui, *pats, **opts):
-    """Synchronize with other repositories"""
-    from tortoisehg.hgqt.sync import run
-    return qtrun(run, ui, *pats, **opts)
-
-def shellconfig(ui, *pats, **opts):
-    """explorer extension configuration editor"""
-    from tortoisehg.hgqt.shellconf import run
-    return qtrun(run, ui, *pats, **opts)
-
-def update(ui, *pats, **opts):
-    """update/checkout tool"""
-    from tortoisehg.hgqt.update import run
-    return qtrun(run, ui, *pats, **opts)
-
-def log(ui, *pats, **opts):
-    """workbench application"""
-    from tortoisehg.hgqt.workbench import run
-    return qtrun(run, ui, *pats, **opts)
-
-def vdiff(ui, *pats, **opts):
-    """launch configured visual diff tool"""
-    from tortoisehg.hgqt.visdiff import run
-    return qtrun(run, ui, *pats, **opts)
-
-def about(ui, *pats, **opts):
-    """about dialog"""
-    from tortoisehg.hgqt.about import run
-    return qtrun(run, ui, *pats, **opts)
-
-def grep(ui, *pats, **opts):
-    """grep/search dialog"""
-    from tortoisehg.hgqt.grep import run
-    return qtrun(run, ui, *pats, **opts)
-
-def archive(ui, *pats, **opts):
-    """archive dialog"""
-    from tortoisehg.hgqt.archive import run
-    return qtrun(run, ui, *pats, **opts)
-
-def bisect(ui, *pats, **opts):
-    """bisect dialog"""
-    from tortoisehg.hgqt.bisect import run
-    return qtrun(run, ui, *pats, **opts)
-
-def annotate(ui, *pats, **opts):
-    """annotate dialog"""
-    from tortoisehg.hgqt.manifestdialog import run
-    if len(pats) != 1:
-        ui.warn(_('annotate requires a single filename\n'))
-        if pats:
-            pats = pats[0:]
-        else:
-            return
-    return qtrun(run, ui, *pats, **opts)
-
-def init(ui, *pats, **opts):
-    """init dialog"""
-    from tortoisehg.hgqt.hginit import run
-    return qtrun(run, ui, *pats, **opts)
-
-def rename(ui, *pats, **opts):
-    """rename dialog"""
-    from tortoisehg.hgqt.rename import run
-    return qtrun(run, ui, *pats, **opts)
-
-def strip(ui, *pats, **opts):
-    """strip dialog"""
-    from tortoisehg.hgqt.thgstrip import run
-    return qtrun(run, ui, *pats, **opts)
-
-def rebase(ui, *pats, **opts):
-    """rebase dialog"""
-    from tortoisehg.hgqt.rebase import run
-    return qtrun(run, ui, *pats, **opts)
-
-def drag_move(ui, *pats, **opts):
-    """Move the selected files to the desired directory"""
-    from tortoisehg.hgqt.dnd import run_move
-    return qtrun(run_move, ui, *pats, **opts)
-
-def drag_copy(ui, *pats, **opts):
+@command('drag_copy', [], _('thg drag_copy SOURCE... DEST'))
+def drag_copy(ui, repo, *pats, **opts):
     """Copy the selected files to the desired directory"""
-    from tortoisehg.hgqt.dnd import run_copy
-    return qtrun(run_copy, ui, *pats, **opts)
+    opts.update(alias='copy', headless=True)
+    return quickop.run(ui, repo, *pats, **opts)
 
-def thgimport(ui, *pats, **opts):
-    """import an ordered set of patches"""
-    from tortoisehg.hgqt.thgimport import run
-    return qtrun(run, ui, *pats, **opts)
+@command('drag_move', [], _('thg drag_move SOURCE... DEST'))
+def drag_move(ui, repo, *pats, **opts):
+    """Move the selected files to the desired directory"""
+    opts.update(alias='move', headless=True)
+    return quickop.run(ui, repo, *pats, **opts)
 
-def revdetails(ui, *pats, **opts):
-    """revision details tool"""
-    from tortoisehg.hgqt.revdetails import run
-    return qtrun(run, ui, *pats, **opts)
+@command('^email',
+    [('r', 'rev', [], _('a revision to send'))],
+    _('thg email [REVS]'))
+def email(ui, repo, *revs, **opts):
+    """send changesets by email"""
+    from tortoisehg.hgqt import hgemail
+    # TODO: same options as patchbomb
+    if opts.get('rev'):
+        if revs:
+            raise util.Abort(_('use only one form to specify the revision'))
+        revs = opts.get('rev')
+    return hgemail.EmailDialog(repo, revs)
+
+@command('forget', [], _('thg forget [FILE]...'))
+def forget(ui, repo, *pats, **opts):
+    """forget selected files"""
+    return quickop.run(ui, repo, *pats, **opts)
+
+@command('graft',
+    [('r', 'rev', [], _('revisions to graft'))],
+    _('thg graft [-r] REV...'))
+def graft(ui, repo, *revs, **opts):
+    """graft dialog"""
+    from tortoisehg.hgqt import graft as graftmod
+    revs = list(revs)
+    revs.extend(opts['rev'])
+    if not os.path.exists(repo.join('graftstate')) and not revs:
+        raise util.Abort(_('You must provide revisions to graft'))
+    return graftmod.GraftDialog(repo, None, source=revs)
+
+@command('^grep|search',
+    [('i', 'ignorecase', False, _('ignore case during search'))],
+    _('thg grep'))
+def grep(ui, repo, *pats, **opts):
+    """grep/search dialog"""
+    from tortoisehg.hgqt import grep as grepmod
+    upats = [hglib.tounicode(p) for p in pats]
+    return grepmod.SearchDialog(upats, repo, **opts)
+
+@command('^guess', [], _('thg guess'))
+def guess(ui, repo, *pats, **opts):
+    """guess previous renames or copies"""
+    from tortoisehg.hgqt import guess as guessmod
+    return guessmod.DetectRenameDialog(repo, None, *pats)
 
 ### help management, adapted from mercurial.commands.help_()
+@command('help', [], _('thg help [COMMAND]'))
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
 
@@ -1026,6 +758,358 @@ def help_(ui, name=None, with_version=False, **opts):
             else:
                 ui.write("%s\n" % first)
 
+@command('^hgignore|ignore|filter', [], _('thg hgignore [FILE]'))
+def hgignore(ui, repo, *pats, **opts):
+    """ignore filter editor"""
+    from tortoisehg.hgqt import hgignore as hgignoremod
+    if pats and pats[0].endswith('.hgignore'):
+        pats = []
+    return hgignoremod.HgignoreDialog(repo, None, *pats)
+
+@command('import',
+    [('', 'mq', False, _('import to the patch queue (MQ)'))],
+    _('thg import [OPTION] [SOURCE]...'))
+def import_(ui, repo, *pats, **opts):
+    """import an ordered set of patches"""
+    from tortoisehg.hgqt import thgimport
+    dlg = thgimport.ImportDialog(repo, None, **opts)
+    dlg.setfilepaths(pats)
+    return dlg
+
+@command('^init', [], _('thg init [DEST]'))
+def init(ui, *pats, **opts):
+    """init dialog"""
+    from tortoisehg.hgqt import hginit
+    return hginit.InitDialog(pats, opts)
+
+@command('^log|history|explorer|workbench',
+    [('l', 'limit', '', _('(DEPRECATED)'))],
+    _('thg log [OPTIONS] [FILE]'))
+def log(ui, *pats, **opts):
+    """workbench application"""
+    root = opts.get('root') or paths.find_root()
+    if root and len(pats) == 1 and os.path.isfile(pats[0]):
+        repo = thgrepo.repository(ui, root)
+        return _filelog(ui, repo, *pats, **opts)
+
+    # Before starting the workbench, we must check if we must try to reuse an
+    # existing workbench window (we don't by default)
+    # Note that if the "single workbench mode" is enabled, and there is no
+    # existing workbench window, we must tell the Workbench object to create
+    # the workbench server
+    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
+    mustcreateserver = False
+    if singleworkbenchmode:
+        newworkbench = opts.get('newworkbench')
+        if root and not newworkbench:
+            if qtapp.connectToExistingWorkbench(root):
+                # The were able to connect to an existing workbench server, and
+                # it confirmed that it has opened the selected repo for us
+                sys.exit(0)
+            # there is no pre-existing workbench server
+            serverexists = False
+        else:
+            serverexists = qtapp.connectToExistingWorkbench('[echo]')
+        # When in " single workbench mode", we must create a server if there
+        # is not one already
+        mustcreateserver = not serverexists
+
+    w = _workbench(ui, *pats, **opts)
+    if mustcreateserver:
+        qtrun.createWorkbenchServer()
+    return w
+
+@command('manifest',
+    [('r', 'rev', '', _('revision to display')),
+     ('n', 'line', '', _('open to line')),
+     ('p', 'pattern', '', _('initial search pattern'))],
+    _('thg manifest [-r REV] [FILE]'))
+def manifest(ui, repo, *pats, **opts):
+    """display the current or given revision of the project manifest"""
+    from tortoisehg.hgqt import manifestdialog
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    dlg = manifestdialog.ManifestDialog(repo, rev)
+    if pats:
+        path = hglib.canonpaths(pats)[0]
+        if opts.get('line'):
+            try:
+                lineno = int(opts['line'])
+            except ValueError:
+                raise util.Abort(_('invalid line number: %s') % opts['line'])
+        else:
+            lineno = None
+        dlg.setSource(hglib.tounicode(path), rev, lineno)
+    if opts.get('pattern'):
+        dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
+    return dlg
+
+@command('^merge',
+    [('r', 'rev', '', _('revision to merge'))],
+    _('thg merge [[-r] REV]'))
+def merge(ui, repo, *pats, **opts):
+    """merge wizard"""
+    from tortoisehg.hgqt import merge as mergemod
+    rev = opts.get('rev') or None
+    if not rev and len(pats):
+        rev = pats[0]
+    if not rev:
+        raise util.Abort(_('Merge revision not specified or not found'))
+    return mergemod.MergeDialog(rev, repo, None)
+
+@command('mq', [], _('thg mq'))
+def mq(ui, repo, *pats, **opts):
+    """Mercurial Queue tool"""
+    from tortoisehg.hgqt import mq as mqmod
+    return mqmod.MQWidget(repo, None, **opts)
+
+@command('postreview',
+    [('r', 'rev', [], _('a revision to post'))],
+    _('thg postreview [-r] REV...'))
+def postreview(ui, repo, *pats, **opts):
+    """post changesets to reviewboard"""
+    from tortoisehg.hgqt import postreview as postreviewmod
+    revs = opts.get('rev') or None
+    if not revs and len(pats):
+        revs = pats[0]
+    if not revs:
+        raise util.Abort(_('no revisions specified'))
+    return postreviewmod.PostReviewDialog(repo.ui, repo, revs)
+
+@command('^purge', [], _('thg purge'))
+def purge(ui, repo, *pats, **opts):
+    """purge unknown and/or ignore files from repository"""
+    from tortoisehg.hgqt import purge as purgemod
+    return purgemod.PurgeDialog(repo, None)
+
+@command('^qqueue', [], _('thg qqueue'))
+def qqueue(ui, repo, *pats, **opts):
+    """manage multiple MQ patch queues"""
+    from tortoisehg.hgqt import qqueue as qqueuemod
+    if not hasattr(repo, 'mq'):
+        raise util.Abort(_('Please enable the MQ extension first.'))
+    return qqueuemod.QQueueDialog(repo)
+
+@command('^qreorder', [], _('thg qreorder'))
+def qreorder(ui, repo, *pats, **opts):
+    """Reorder unapplied MQ patches"""
+    from tortoisehg.hgqt import qreorder as qreordermod
+    if not hasattr(repo, 'mq'):
+        raise util.Abort(_('Please enable the MQ extension first.'))
+    return qreordermod.QReorderDialog(repo)
+
+@command('^rebase',
+    [('', 'keep', False, _('keep original changesets')),
+     ('', 'keepbranches', False, _('keep original branch names')),
+     ('', 'detach', False, _('(DEPRECATED)')),
+     ('s', 'source', '', _('rebase from the specified changeset')),
+     ('d', 'dest', '', _('rebase onto the specified changeset'))],
+    _('thg rebase -s REV -d REV [--keep]'))
+def rebase(ui, repo, *pats, **opts):
+    """rebase dialog"""
+    from tortoisehg.hgqt import rebase as rebasemod
+    if os.path.exists(repo.join('rebasestate')):
+        # TODO: move info dialog into RebaseDialog if possible
+        qtlib.InfoMsgBox(hglib.tounicode(_('Rebase already in progress')),
+                         hglib.tounicode(_('Resuming rebase already in '
+                                           'progress')))
+    elif not opts['source'] or not opts['dest']:
+        raise util.Abort(_('You must provide source and dest arguments'))
+    return rebasemod.RebaseDialog(repo, None, **opts)
+
+@command('rejects', [], _('thg rejects [FILE]'))
+def rejects(ui, *pats, **opts):
+    """Manually resolve rejected patch chunks"""
+    from tortoisehg.hgqt import rejects as rejectsmod
+    if len(pats) != 1:
+        raise util.Abort(_('You must provide the path to a file'))
+    path = pats[0]
+    if path.endswith('.rej'):
+        path = path[:-4]
+    return rejectsmod.RejectsDialog(path, None)
+
+@command('remove|rm', [], _('thg remove [FILE]...'))
+def remove(ui, repo, *pats, **opts):
+    """remove selected files"""
+    return quickop.run(ui, repo, *pats, **opts)
+
+@command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
+def rename(ui, repo, *pats, **opts):
+    """rename dialog"""
+    from tortoisehg.hgqt import rename as renamemod
+    iscopy = (opts.get('alias') == 'copy')
+    return renamemod.RenameDialog(repo, pats, iscopy=iscopy)
+
+@command('^repoconfig',
+    [('', 'focus', '', _('field to give initial focus'))],
+    _('thg repoconfig'))
+def repoconfig(ui, repo, *pats, **opts):
+    """repository configuration editor"""
+    from tortoisehg.hgqt import settings
+    return settings.SettingsDialog(True, focus=opts.get('focus'))
+
+@command('resolve', [], _('thg resolve'))
+def resolve(ui, repo, *pats, **opts):
+    """resolve dialog"""
+    from tortoisehg.hgqt import resolve as resolvemod
+    return resolvemod.ResolveDialog(repo)
+
+@command('^revdetails',
+    [('r', 'rev', '', _('the revision to show'))],
+    _('thg revdetails [-r REV]'))
+def revdetails(ui, repo, *pats, **opts):
+    """revision details tool"""
+    from tortoisehg.hgqt import revdetails as revdetailsmod
+    os.chdir(repo.root)
+    rev = opts.get('rev', '.')
+    return revdetailsmod.RevDetailsDialog(repo, rev=rev)
+
+@command('revert', [], _('thg revert [FILE]...'))
+def revert(ui, repo, *pats, **opts):
+    """revert selected files"""
+    return quickop.run(ui, repo, *pats, **opts)
+
+@command('rupdate',
+    [('r', 'rev', '', _('revision to update'))],
+    _('thg rupdate [[-r] REV]'))
+def rupdate(ui, repo, *pats, **opts):
+    """update a remote repository"""
+    from tortoisehg.hgqt import rupdate as rupdatemod
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    return rupdatemod.rUpdateDialog(repo, rev, None, opts)
+
+@command('^serve',
+    [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
+                            'one repository)')),
+     ('', 'webdir-conf', '', _('name of the hgweb config file (DEPRECATED)'))],
+    _('thg serve [--web-conf FILE]'))
+def serve(ui, *pats, **opts):
+    """start stand-alone webserver"""
+    from tortoisehg.hgqt import serve as servemod
+    return servemod.run(ui, *pats, **opts)
+
+if os.name == 'nt':
+    # TODO: extra detection to determine if shell extension is installed
+    @command('shellconfig', [], _('thg shellconfig'))
+    def shellconfig(ui, *pats, **opts):
+        """explorer extension configuration editor"""
+        from tortoisehg.hgqt import shellconf
+        return shellconf.ShellConfigWindow()
+
+@command('shelve|unshelve', [], _('thg shelve'))
+def shelve(ui, repo, *pats, **opts):
+    """Move changes between working directory and patches"""
+    from tortoisehg.hgqt import shelve as shelvemod
+    return shelvemod.ShelveDialog(repo)
+
+@command('^status|st',
+    [('c', 'clean', False, _('show files without changes')),
+     ('i', 'ignored', False, _('show ignored files'))],
+    _('thg status [OPTIONS] [FILE]'))
+def status(ui, repo, *pats, **opts):
+    """browse working copy status"""
+    from tortoisehg.hgqt import status as statusmod
+    pats = hglib.canonpaths(pats)
+    os.chdir(repo.root)
+    return statusmod.StatusDialog(repo, pats, opts)
+
+@command('^strip',
+    [('f', 'force', None, _('discard uncommitted changes (no backup)')),
+     ('n', 'nobackup', None, _('do not back up stripped revisions')),
+     ('r', 'rev', '', _('revision to strip'))],
+    _('thg strip [-f] [-n] [[-r] REV]'))
+def strip(ui, repo, *pats, **opts):
+    """strip dialog"""
+    from tortoisehg.hgqt import thgstrip
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    return thgstrip.StripDialog(repo, rev=rev, opts=opts)
+
+@command('^sync|synchronize', [], _('thg sync [PEER]'))
+def sync(ui, repo, *pats, **opts):
+    """Synchronize with other repositories"""
+    from tortoisehg.hgqt import sync as syncmod
+    w = syncmod.SyncWidget(repo, None, **opts)
+    if pats:
+        w.setUrl(hglib.tounicode(pats[0]))
+    return w
+
+@command('^tag',
+    [('f', 'force', None, _('replace existing tag')),
+     ('l', 'local', None, _('make the tag local')),
+     ('r', 'rev', '', _('revision to tag')),
+     ('', 'remove', None, _('remove a tag')),
+     ('m', 'message', '', _('use <text> as commit message'))],
+    _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]'))
+def tag(ui, repo, *pats, **opts):
+    """tag tool"""
+    from tortoisehg.hgqt import tag as tagmod
+    kargs = {}
+    tag = len(pats) > 0 and pats[0] or None
+    if tag:
+        kargs['tag'] = tag
+    rev = opts.get('rev')
+    if rev:
+        kargs['rev'] = rev
+    return tagmod.TagDialog(repo, opts=opts, **kargs)
+
+@command('thgstatus',
+    [('',  'delay', None, _('wait until the second ticks over')),
+     ('n', 'notify', [], _('notify the shell for paths given')),
+     ('',  'remove', None, _('remove the status cache')),
+     ('s', 'show', None, _('show the contents of the status cache '
+                           '(no update)')),
+     ('',  'all', None, _('udpate all repos in current dir'))],
+    _('thg thgstatus [OPTION]'))
+def thgstatus(ui, *pats, **opts):
+    """update TortoiseHg status cache"""
+    from tortoisehg.util import thgstatus as thgstatusmod
+    thgstatusmod.run(ui, *pats, **opts)
+
+@command('^update|checkout|co',
+    [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
+     ('r', 'rev', '', _('revision to update')),],
+    _('thg update [-C] [[-r] REV]'))
+def update(ui, repo, *pats, **opts):
+    """update/checkout tool"""
+    from tortoisehg.hgqt import update as updatemod
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    elif len(pats) == 1:
+        rev = pats[0]
+    return updatemod.UpdateDialog(repo, rev, None, opts)
+
+@command('^userconfig',
+    [('', 'focus', '', _('field to give initial focus'))],
+    _('thg userconfig'))
+def userconfig(ui, *pats, **opts):
+    """user configuration editor"""
+    from tortoisehg.hgqt import settings
+    return settings.SettingsDialog(False, focus=opts.get('focus'))
+
+@command('^vdiff',
+    [('c', 'change', '', _('changeset to view in diff tool')),
+     ('r', 'rev', [], _('revisions to view in diff tool')),
+     ('b', 'bundle', '', _('bundle file to preview'))],
+    _('launch visual diff tool'))
+def vdiff(ui, repo, *pats, **opts):
+    """launch configured visual diff tool"""
+    from tortoisehg.hgqt import visdiff
+    if opts.get('bundle'):
+        repo = thgrepo.repository(ui, opts.get('bundle'))
+    pats = hglib.canonpaths(pats)
+    return visdiff.visualdiff(ui, repo, pats, opts)
+
+@command('^version',
+    [('v', 'verbose', None, _('print license'))],
+    _('thg version [OPTION]'))
 def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '
@@ -1033,191 +1117,3 @@ def version(ui, **opts):
                (thgversion.version(), hglib.hgversion))
     if not ui.quiet:
         ui.write(shortlicense)
-
-def debugcomplete(ui, cmd='', **opts):
-    """output list of possible commands"""
-    if opts.get('options'):
-        options = []
-        otables = [globalopts]
-        if cmd:
-            aliases, entry = cmdutil.findcmd(cmd, table, False)
-            otables.append(entry[1])
-        for t in otables:
-            for o in t:
-                if o[0]:
-                    options.append('-%s' % o[0])
-                options.append('--%s' % o[1])
-        ui.write("%s\n" % "\n".join(options))
-        return
-
-    cmdlist = cmdutil.findpossible(cmd, table)
-    if ui.verbose:
-        cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
-    ui.write("%s\n" % "\n".join(sorted(cmdlist)))
-
-globalopts = [
-    ('R', 'repository', '',
-     _('repository root directory or symbolic path name')),
-    ('v', 'verbose', None, _('enable additional output')),
-    ('q', 'quiet', None, _('suppress output')),
-    ('h', 'help', None, _('display help and exit')),
-    ('', 'debugger', None, _('start debugger')),
-    ('', 'profile', None, _('print command execution profile')),
-    ('', 'nofork', None, _('do not fork GUI process')),
-    ('', 'fork', None, _('always fork GUI process')),
-    ('', 'listfile', '', _('read file list from file')),
-    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
-    ('', 'newworkbench', None, _('open a new workbench window')),
-]
-
-table = {
-    "about": (about, [], _('thg about')),
-    "add": (add, [], _('thg add [FILE]...')),
-    "^annotate|blame": (annotate,
-          [('r', 'rev', '', _('revision to annotate')),
-           ('n', 'line', '', _('open to line')),
-           ('p', 'pattern', '', _('initial search pattern'))],
-        _('thg annotate')),
-    "archive": (archive,
-        [('r', 'rev', '', _('revision to archive'))],
-        _('thg archive')),
-    "^backout": (backout,
-        [('', 'merge', None,
-          _('merge with old dirstate parent after backout')),
-         ('', 'parent', '', _('parent to choose when backing out merge')),
-         ('r', 'rev', '', _('revision to backout'))],
-        _('thg backout [OPTION]... [[-r] REV]')),
-    "^bisect": (bisect, [], _('thg bisect')),
-    "^clone":
-        (clone,
-         [('U', 'noupdate', None,
-           _('the clone will include an empty working copy '
-             '(only a repository)')),
-          ('u', 'updaterev', '',
-           _('revision, tag or branch to check out')),
-          ('r', 'rev', '', _('include the specified changeset')),
-          ('b', 'branch', [],
-           _('clone only the specified branch')),
-          ('', 'pull', None, _('use pull protocol to copy metadata')),
-          ('', 'uncompressed', None,
-           _('use uncompressed transfer (fast over LAN)')),],
-         _('thg clone [OPTION]... SOURCE [DEST]')),
-    "^commit|ci": (commit,
-        [('u', 'user', '', _('record user as committer')),
-         ('d', 'date', '', _('record datecode as commit date'))],
-        _('thg commit [OPTIONS] [FILE]...')),
-    "drag_move": (drag_move, [], _('thg drag_move SOURCE... DEST')),
-    "drag_copy": (drag_copy, [], _('thg drag_copy SOURCE... DEST')),
-    "graft": (graft,
-        [('r', 'rev', [], _('revisions to graft'))],
-        _('thg graft [-r] REV...')),
-    "^grep|search": (grep,
-        [('i', 'ignorecase', False, _('ignore case during search')),],
-        _('thg grep')),
-    "^guess": (guess, [], _('thg guess')),
-    "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
-    "import": (thgimport,
-        [('', 'mq', False, _('import to the patch queue (MQ)'))],
-        _('thg import [OPTION] [SOURCE]...')),
-    "^init": (init, [], _('thg init [DEST]')),
-    "^email":
-        (email,
-         [('r', 'rev', [], _('a revision to send')),],
-         _('thg email [REVS]')),
-    "^log|history|explorer|workbench":
-        (log,
-         [('l', 'limit', '', _('(DEPRECATED)'))],
-         _('thg log [OPTIONS] [FILE]')),
-    "^revdetails":
-        (revdetails,
-         [('r', 'rev', '', _('the revision to show'))],
-         _('thg revdetails [-r REV]')),
-    "manifest":
-        (manifest,
-         [('r', 'rev', '', _('revision to display')),
-          ('n', 'line', '', _('open to line')),
-          ('p', 'pattern', '', _('initial search pattern'))],
-         _('thg manifest [-r REV] [FILE]')),
-    "^merge":
-        (merge,
-         [('r', 'rev', '', _('revision to merge'))],
-         _('thg merge [[-r] REV]')),
-    "remove|rm": (remove, [], _('thg remove [FILE]...')),
-    "mq": (mq, [], _('thg mq')),
-    "resolve": (resolve, [], _('thg resolve')),
-    "revert": (revert, [], _('thg revert [FILE]...')),
-    "forget": (forget, [], _('thg forget [FILE]...')),
-    "rename|mv|copy": (rename, [], _('thg rename SOURCE [DEST]...')),
-    "^serve":
-        (serve,
-         [('', 'web-conf', '',
-           _('name of the hgweb config file (serve more than one repository)')),
-          ('', 'webdir-conf', '',
-           _('name of the hgweb config file (DEPRECATED)'))],
-         _('thg serve [--web-conf FILE]')),
-    "^sync|synchronize": (sync, [], _('thg sync [PEER]')),
-    "^status|st": (status,
-         [('c', 'clean', False, _('show files without changes')),
-          ('i', 'ignored', False, _('show ignored files'))],
-        _('thg status [OPTIONS] [FILE]')),
-    "^strip": (strip,
-        [('f', 'force', None, _('discard uncommitted changes (no backup)')),
-         ('n', 'nobackup', None, _('do not back up stripped revisions')),
-         ('r', 'rev', '', _('revision to strip')),],
-        _('thg strip [-f] [-n] [[-r] REV]')),
-    "^rebase": (rebase,
-        [('', 'keep', False, _('keep original changesets')),
-         ('', 'keepbranches', False, _('keep original branch names')),
-         ('', 'detach', False, _('(DEPRECATED)')),
-         ('s', 'source', '',
-          _('rebase from the specified changeset')),
-         ('d', 'dest', '',
-          _('rebase onto the specified changeset'))],
-        _('thg rebase -s REV -d REV [--keep]')),
-    "^tag":
-        (tag,
-         [('f', 'force', None, _('replace existing tag')),
-          ('l', 'local', None, _('make the tag local')),
-          ('r', 'rev', '', _('revision to tag')),
-          ('', 'remove', None, _('remove a tag')),
-          ('m', 'message', '', _('use <text> as commit message')),],
-         _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
-    "thgstatus": (thgstatus,
-        [('',  'delay', None, _('wait until the second ticks over')),
-         ('n', 'notify', [], _('notify the shell for paths given')),
-         ('',  'remove', None, _('remove the status cache')),
-         ('s', 'show', None, _('show the contents of the '
-                               'status cache (no update)')),
-         ('',  'all', None, _('udpate all repos in current dir')) ],
-        _('thg thgstatus [OPTION]')),
-    "shelve|unshelve": (shelve, [], _('thg shelve')),
-    "rejects": (rejects, [], _('thg rejects [FILE]')),
-    "debugbugreport": (debugbugreport, [], _('thg debugbugreport [TEXT]')),
-    "help": (help_, [], _('thg help [COMMAND]')),
-    "^purge": (purge, [], _('thg purge')),
-    "^qreorder": (qreorder, [], _('thg qreorder')),
-    "^qqueue": (qqueue, [], _('thg qqueue')),
-    "^update|checkout|co":
-        (update,
-         [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
-          ('r', 'rev', '', _('revision to update')),],
-         _('thg update [-C] [[-r] REV]')),
-    "^userconfig": (userconfig,
-        [('', 'focus', '', _('field to give initial focus'))],
-        _('thg userconfig')),
-    "^repoconfig": (repoconfig,
-        [('', 'focus', '', _('field to give initial focus'))],
-        _('thg repoconfig')),
-    "^vdiff": (vdiff,
-        [('c', 'change', '', _('changeset to view in diff tool')),
-         ('r', 'rev', [], _('revisions to view in diff tool')),
-         ('b', 'bundle', '', _('bundle file to preview'))],
-            _('launch visual diff tool')),
-    "^version": (version,
-        [('v', 'verbose', None, _('print license'))],
-        _('thg version [OPTION]')),
-}
-
-if os.name == 'nt':
-    # TODO: extra detection to determine if shell extension is installed
-    table['shellconfig'] = (shellconfig, [], _('thg shellconfig'))

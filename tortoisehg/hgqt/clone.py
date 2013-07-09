@@ -230,6 +230,17 @@ class CloneDialog(QDialog):
 
         self.composeCommand()
 
+    def setSource(self, url):
+        assert not self.isRunning()
+        self.src_combo.setEditText(url)
+
+    def setDestination(self, url):
+        assert not self.isRunning()
+        self.dest_combo.setEditText(url)
+
+    def isRunning(self):
+        return self.cmd.core.running()
+
     ### Private Methods ###
 
     def getSrc(self):
@@ -521,6 +532,3 @@ class CloneDialog(QDialog):
             self.cmd.cancel()
             return
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    return CloneDialog(pats, opts)

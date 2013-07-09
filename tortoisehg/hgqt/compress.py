@@ -8,11 +8,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import os
+from mercurial import revset
 
-from mercurial import revset, merge as mergemod
-
-from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdui, commit, thgrepo
 
@@ -94,20 +91,23 @@ class CompressDialog(QDialog):
                         if status == 'u':
                             self.dirty = True
                             break
-        def completed():
-            self.th.wait()
-            if self.th.dirty:
-                self.compressbtn.setEnabled(False)
-                txt = _('Before compress, you must <a href="commit">'
-                        '<b>commit</b></a> or <a href="discard">'
-                        '<b>discard</b></a> changes.')
-            else:
-                self.compressbtn.setEnabled(True)
-                txt = _('You may continue the compress')
-            self.showMessage.emit(txt)
+
         self.th = CheckThread(self)
-        self.th.finished.connect(completed)
+        self.th.finished.connect(self._checkCompleted)
         self.th.start()
+
+    @pyqtSlot()
+    def _checkCompleted(self):
+        self.th.wait()
+        if self.th.dirty:
+            self.compressbtn.setEnabled(False)
+            txt = _('Before compress, you must <a href="commit">'
+                    '<b>commit</b></a> or <a href="discard">'
+                    '<b>discard</b></a> changes.')
+        else:
+            self.compressbtn.setEnabled(True)
+            txt = _('You may continue the compress')
+        self.showMessage.emit(txt)
 
     def compress(self):
         self.cancelbtn.setShown(False)
