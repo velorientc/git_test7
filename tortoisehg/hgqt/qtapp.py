@@ -293,8 +293,6 @@ class QtRunner(QObject):
         try:
             return self._mainapp.exec_()
         finally:
-            if self._workbench is dlg:
-                self._workbench = None
             if reporoot:
                 self._repomanager.releaseRepoAgent(reporoot)
             if self._server:
@@ -357,8 +355,6 @@ class QtRunner(QObject):
         reporoot = self._dialogs.pop(dlg)
         if reporoot:
             self._repomanager.releaseRepoAgent(reporoot)
-        if self._workbench is dlg:
-            self._workbench = None
 
     def createWorkbench(self):
         """Create Workbench window and keep single reference"""
@@ -371,7 +367,7 @@ class QtRunner(QObject):
         """Show the specified repository in Workbench"""
         assert self._mainapp
         if not self._workbench:
-            self._opendialog(lambda ui: self.createWorkbench(), [], {})
+            self.createWorkbench()
             assert self._workbench
 
         wb = self._workbench
