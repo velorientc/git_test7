@@ -54,11 +54,13 @@ class MergeDialog(QWizard):
 
     @pyqtSlot()
     def repositoryChanged(self):
-        self.currentPage().repositoryChanged()
+        if self.currentPage():
+            self.currentPage().repositoryChanged()
 
     @pyqtSlot()
     def configChanged(self):
-        self.currentPage().configChanged()
+        if self.currentPage():
+            self.currentPage().configChanged()
 
     def pageChanged(self, id):
         if id != -1:
