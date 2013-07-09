@@ -530,6 +530,7 @@ class RepoWidget(QWidget):
         self.filterbar.setQuery('')
         self.revset = []
         self.repomodel.revset = self.revset
+        self.repoview.enablefilterpalette(False)
         self.bundle = None
         self.bundlesource = None
         self.titleChanged.emit(self.title())
@@ -1052,6 +1053,7 @@ class RepoWidget(QWidget):
             elif self.revset:
                 self.revset = []
                 self.filterbar.setQuery('')
+                self.repoview.enablefilterpalette(False)
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)
