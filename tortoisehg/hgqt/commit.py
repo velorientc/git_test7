@@ -75,8 +75,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
-    beginSuppressPrompt = pyqtSignal()
-    endSuppressPrompt = pyqtSignal()
 
     def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
         QWidget.__init__(self, parent)
@@ -107,8 +105,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
-        self.runner.commandStarted.connect(self.beginSuppressPrompt)
-        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.commandFinished)
 
         layout = QVBoxLayout()

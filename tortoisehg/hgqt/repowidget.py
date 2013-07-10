@@ -45,8 +45,6 @@ class RepoWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
-    beginSuppressPrompt = pyqtSignal()
-    endSuppressPrompt = pyqtSignal()
 
     revisionSelected = pyqtSignal(object)
 
@@ -114,8 +112,6 @@ class RepoWidget(QWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
-        self.runner.commandStarted.connect(self.beginSuppressPrompt)
-        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.onCommandFinished)
 
         self._dialogs = qtlib.DialogKeeper(
@@ -412,8 +408,6 @@ class RepoWidget(QWidget):
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
-        cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
-        cw.endSuppressPrompt.connect(self.endSuppressPrompt)
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
         cw.grepRequested.connect(self.grep)
@@ -452,8 +446,6 @@ class RepoWidget(QWidget):
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
-        sw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
-        sw.endSuppressPrompt.connect(self.endSuppressPrompt)
         sw.syncStarted.connect(self.clearInfoBar)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
