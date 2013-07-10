@@ -279,7 +279,6 @@ class ConsoleWidget(QWidget):
         self.setFocusProxy(self._logwidget)
         self._repoagent = None
         self.openPrompt()
-        self.suppressPrompt = False
         self._commandHistory = []
         self._commandIdx = 0
 
@@ -438,12 +437,15 @@ class ConsoleWidget(QWidget):
         try:
             self._logwidget.appendLog(msg, label)
         finally:
-            if not self.suppressPrompt:
+            if not self._repoagent or not self._repoagent.isBusy():
                 self.openPrompt()
 
     def setRepoAgent(self, repoagent):
         """Change the current working repository"""
+        if self._repoagent:
+            self._repoagent.busyChanged.disconnect(self._suppressPromptOnBusy)
         self._repoagent = repoagent
+        repoagent.busyChanged.connect(self._suppressPromptOnBusy)
         repo = repoagent.rawRepo()
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
 
@@ -460,6 +462,13 @@ class ConsoleWidget(QWidget):
     def cwd(self):
         """Return the current working directory"""
         return self._repo and self._repo.root or os.getcwd()
+
+    @pyqtSlot(bool)
+    def _suppressPromptOnBusy(self, busy):
+        if busy:
+            self._logwidget.clearPrompt()
+        else:
+            self.openPrompt()
 
     @pyqtSlot(unicode, object, unicode, unicode, object)
     def _emitProgress(self, *args):
@@ -619,15 +628,6 @@ class LogDockWidget(QDockWidget):
     @pyqtSlot(QString, QString)
     def output(self, msg, label):
         self.logte.appendLog(msg, label)
-
-    @pyqtSlot()
-    def beginSuppressPrompt(self):
-        self.logte.suppressPrompt = True
-
-    @pyqtSlot()
-    def endSuppressPrompt(self):
-        self.logte.suppressPrompt = False
-        self.logte.openPrompt()
 
     @pyqtSlot(bool)
     def _setFocusOnToggleView(self, visible):
