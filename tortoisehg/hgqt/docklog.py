@@ -568,7 +568,7 @@ class LogDockWidget(QDockWidget):
         # move focus only when console is activated by keyboard/mouse operation
         self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
 
-    def setRepository(self, root):
+    def setCurrentRepoRoot(self, root):
         w = self._findConsoleFor(root)
         self._consoles.setCurrentWidget(w)
 

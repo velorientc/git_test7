@@ -851,12 +851,12 @@ class Workbench(QMainWindow):
         if w:
             self.updateHistoryActions()
             self.updateMenu()
-            self.log.setRepository(w.repoRootPath())
+            self.log.setCurrentRepoRoot(w.repoRootPath())
             self.reporegistry.setActiveTabRepo(w.repoRootPath())
             self._setupCustomTools(w.repo.ui)
             self._setupUrlCombo(w.repo)
         else:
-            self.log.setRepository(None)
+            self.log.setCurrentRepoRoot(None)
             self.reporegistry.setActiveTabRepo('')
         repo = w and w.repo or None
         self.mqpatches.setrepo(repo)
