@@ -277,7 +277,7 @@ class ConsoleWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self.setFocusProxy(self._logwidget)
-        self.setRepository(None)
+        self._repoagent = None
         self.openPrompt()
         self.suppressPrompt = False
         self._commandHistory = []
@@ -441,14 +441,20 @@ class ConsoleWidget(QWidget):
             if not self.suppressPrompt:
                 self.openPrompt()
 
-    def setRepository(self, repo):
+    def setRepoAgent(self, repoagent):
         """Change the current working repository"""
-        self._repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
 
     def repoRootPath(self):
-        if self._repo:
-            return hglib.tounicode(self._repo.root)
+        if self._repoagent:
+            return self._repoagent.rootPath()
+
+    @property
+    def _repo(self):
+        if self._repoagent:
+            return self._repoagent.rawRepo()
 
     @property
     def cwd(self):
@@ -592,7 +598,7 @@ class LogDockWidget(QDockWidget):
         w = self._createConsole()
         repoagent = self._repomanager.repoAgent(root)
         assert repoagent
-        w.setRepository(repoagent.rawRepo())
+        w.setRepoAgent(repoagent)
 
     @pyqtSlot(unicode)
     def _destroyConsoleFor(self, root):
