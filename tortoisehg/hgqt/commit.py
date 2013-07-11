@@ -11,7 +11,7 @@ import tempfile
 
 from mercurial import ui, util, error, scmutil, phases
 
-from tortoisehg.util import hglib, shlib, wconfig, hgversion
+from tortoisehg.util import hglib, shlib, wconfig
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
@@ -289,14 +289,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if ispatch(r):
                 return False
             ctx = r.changectx('.')
-            canamendctx = (ctx.phase() != phases.public) \
+            return (ctx.phase() != phases.public) \
                 and len(r.changectx(None).parents()) < 2 \
                 and not ctx.children()
-            # hg < 2.6
-            if hgversion.hgversion < '2.6':
-                canamendctx = canamendctx \
-                    and len(ctx.parents()) < 2
-            return canamendctx
 
         acts = [
             ('commit', _('Commit changes'), _('Commit'), notpatch),
