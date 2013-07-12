@@ -9,7 +9,7 @@ import os
 import re
 import tempfile
 
-from mercurial import ui, util, error, scmutil, phases
+from mercurial import util, error, scmutil, phases
 
 from tortoisehg.util import hglib, shlib, wconfig
 
