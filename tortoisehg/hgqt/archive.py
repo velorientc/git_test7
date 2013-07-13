@@ -216,7 +216,7 @@ class ArchiveDialog(QDialog):
             ctx = self.repo[rev]
         except (error.LookupError, error.RepoLookupError):
             return False
-        return '.hgsubstate' in ctx.files() or '.hgsubstate' in ctx.manifest()
+        return '.hgsubstate' in ctx
 
     def get_selected_rev(self):
         rev = self.rev_combo.currentText()
