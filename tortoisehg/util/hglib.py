@@ -126,6 +126,22 @@ def getmaxdiffsize(ui):
     _maxdiff = maxdiff * 1024
     return _maxdiff
 
+def getrevisionlabel(repo, rev):
+    ctx = repo[rev]
+    bookmarks = ctx.bookmarks()
+    if ctx in repo.parents():
+        # keep bookmark unchanged when updating to current rev
+        if repo._bookmarkcurrent in bookmarks:
+            return repo._bookmarkcurrent
+        else:
+            return rev
+    else:
+        # more common switching bookmark, rather than deselecting it
+        if bookmarks:
+            return bookmarks[0]
+        else:
+            return rev
+
 _deadbranch = None
 def getdeadbranch(ui):
     '''return a list of dead branch names in UTF-8'''
