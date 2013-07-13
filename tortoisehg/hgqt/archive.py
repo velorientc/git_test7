@@ -139,7 +139,7 @@ class ArchiveDialog(QDialog):
             if selectindex >= 0:
                 self.rev_combo.setCurrentIndex(selectindex)
             else:
-                self.rev_combo.insertItems(0, [text])
+                self.rev_combo.insertItem(0, text)
                 self.rev_combo.setCurrentIndex(0)
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
         self.subrepos_chk.setChecked(self.get_subrepos_present())
