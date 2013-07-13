@@ -11,11 +11,11 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, error
+from mercurial import error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.util import hglib
+from tortoisehg.hgqt import cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
 
