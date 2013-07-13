@@ -616,14 +616,10 @@ class LogDockWidget(QDockWidget):
         self._consoles.removeWidget(w)
         w.setParent(None)
 
-    # TODO: stub property should be removed later
-    @property
-    def logte(self):
-        return self._consoles.currentWidget()
-
     @pyqtSlot()
     def clear(self):
-        self.logte.clear()
+        w = self._consoles.currentWidget()
+        w.clear()
 
     def appendLog(self, msg, label, reporoot=None):
         w = self._findConsoleFor(reporoot)
@@ -632,7 +628,8 @@ class LogDockWidget(QDockWidget):
     @pyqtSlot(bool)
     def _setFocusOnToggleView(self, visible):
         if visible:
-            self.logte.setFocus()
+            w = self._consoles.currentWidget()
+            w.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)
