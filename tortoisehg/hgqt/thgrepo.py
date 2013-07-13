@@ -349,9 +349,9 @@ class RepoAgent(QObject):
         self.workingBranchChanged.emit()
 
     def _incrementBusyCount(self):
-        if self._busycount == 0:
-            self.stopMonitoring()
         self._busycount += 1
+        if self._busycount == 1:
+            self.stopMonitoring()
 
     def _decrementBusyCount(self):
         self._busycount -= 1
