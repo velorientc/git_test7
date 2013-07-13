@@ -1936,7 +1936,8 @@ class RepoWidget(QWidget):
         return hgemail.EmailDialog(self.repo, revs)
 
     def archiveRevision(self):
-        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
+        rev = hglib.getrevisionlabel(self.repo, self.rev)
+        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
