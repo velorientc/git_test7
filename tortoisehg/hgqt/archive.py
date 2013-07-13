@@ -176,7 +176,7 @@ class ArchiveDialog(QDialog):
         self.rev_combo.setFocus()
         self._readsettings()
 
-    def rev_combo_changed(self, index):
+    def rev_combo_changed(self):
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.update_path()
 
