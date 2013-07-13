@@ -209,7 +209,10 @@ class ArchiveDialog(QDialog):
 
     def get_subrepos_present(self):
         rev = self.get_selected_rev()
-        ctx = self.repo[rev]
+        try:
+            ctx = self.repo[rev]
+        except (error.LookupError, error.RepoLookupError):
+            return False
         return '.hgsubstate' in ctx.files() or '.hgsubstate' in ctx.manifest()
 
     def get_selected_rev(self):
