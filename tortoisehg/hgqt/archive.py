@@ -128,17 +128,20 @@ class ArchiveDialog(QDialog):
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
-            self.rev_combo.addItem(b)
+            self.rev_combo.addItem(hglib.tounicode(b))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
         for t in tags:
-            self.rev_combo.addItem(t)
+            self.rev_combo.addItem(hglib.tounicode(t))
         if self.initrev:
-            text = str(self.initrev)
-            if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
+            text = hglib.tounicode(str(self.initrev))
+            selectindex = self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly))
+            if selectindex >= 0:
+                self.rev_combo.setCurrentIndex(selectindex)
+            else:
                 self.rev_combo.insertItems(0, [text])
+                self.rev_combo.setCurrentIndex(0)
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
-        self.rev_combo.setCurrentIndex(0)
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.dest_edit.setText(hglib.tounicode(self.repo.root))
         self.filesradio.setChecked(True)
@@ -209,7 +212,10 @@ class ArchiveDialog(QDialog):
 
     def get_subrepos_present(self):
         rev = self.get_selected_rev()
-        ctx = self.repo[rev]
+        try:
+            ctx = self.repo[rev]
+        except (error.LookupError, error.RepoLookupError):
+            return False
         return '.hgsubstate' in ctx.files() or '.hgsubstate' in ctx.manifest()
 
     def get_selected_rev(self):
