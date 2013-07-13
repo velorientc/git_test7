@@ -135,7 +135,7 @@ class ArchiveDialog(QDialog):
             self.rev_combo.addItem(hglib.tounicode(t))
         if self.initrev:
             text = hglib.tounicode(str(self.initrev))
-            selectindex = self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly))
+            selectindex = self.rev_combo.findText(text)
             if selectindex >= 0:
                 self.rev_combo.setCurrentIndex(selectindex)
             else:
