@@ -128,13 +128,13 @@ class ArchiveDialog(QDialog):
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
-            self.rev_combo.addItem(b)
+            self.rev_combo.addItem(hglib.tounicode(b))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
         for t in tags:
-            self.rev_combo.addItem(t)
+            self.rev_combo.addItem(hglib.tounicode(t))
         if self.initrev:
-            text = str(self.initrev)
+            text = hglib.tounicode(str(self.initrev))
             if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
                 self.rev_combo.insertItems(0, [text])
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
