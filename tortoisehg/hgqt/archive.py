@@ -149,7 +149,6 @@ class ArchiveDialog(QDialog):
 
         # connecting slots
         self.dest_edit.textEdited.connect(self.dest_edited)
-        self.rev_combo.currentIndexChanged.connect(self.rev_combo_changed)
         self.rev_combo.editTextChanged.connect(self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
