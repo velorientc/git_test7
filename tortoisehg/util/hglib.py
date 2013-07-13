@@ -131,7 +131,9 @@ def getrevisionlabel(repo, rev):
     if rev is None:
         return None  # no symbol for working revision
 
+    # see context.changectx for look-up order of labels
     ctx = repo[rev]
+
     bookmarks = ctx.bookmarks()
     if ctx in repo.parents():
         # keep bookmark unchanged when updating to current rev
@@ -141,6 +143,14 @@ def getrevisionlabel(repo, rev):
         # more common switching bookmark, rather than deselecting it
         if bookmarks:
             return bookmarks[0]
+
+    tags = ctx.tags()
+    if tags:
+        return tags[0]
+
+    branch = ctx.branch()
+    if repo.branchtip(branch) == ctx.node():
+        return branch
 
     return str(rev)
 
