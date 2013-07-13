@@ -874,8 +874,7 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repo, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.progress.connect(self._showRepoWidgetProgress)
-        # TODO: send output to corresponding console instead of current one
-        rw.output.connect(self.log.output)
+        rw.output.connect(self._appendRepoWidgetOutput)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.openLinkedRepo)
@@ -906,6 +905,12 @@ class Workbench(QMainWindow):
         rw = self.sender()
         assert isinstance(rw, RepoWidget)
         self.statusbar.progress(topic, pos, item, unit, total, rw.repo.root)
+
+    #@pyqtSlot(QString, QString)
+    def _appendRepoWidgetOutput(self, msg, label):
+        rw = self.sender()
+        assert isinstance(rw, RepoWidget)
+        self.log.appendLog(msg, label, rw.repoRootPath())
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)

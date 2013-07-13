@@ -625,9 +625,9 @@ class LogDockWidget(QDockWidget):
     def clear(self):
         self.logte.clear()
 
-    @pyqtSlot(QString, QString)
-    def output(self, msg, label):
-        self.logte.appendLog(msg, label)
+    def appendLog(self, msg, label, reporoot=None):
+        w = self._findConsoleFor(reporoot)
+        w.appendLog(msg, label)
 
     @pyqtSlot(bool)
     def _setFocusOnToggleView(self, visible):
