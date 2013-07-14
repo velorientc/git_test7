@@ -480,7 +480,8 @@ tortoisehgtoollocations = (
     ('workbench.custom-toolbar', _('Workbench custom toolbar')),
     ('workbench.revdetails.custom-menu', _('Revision details context menu')),
     ('workbench.commit.custom-menu', _('Commit context menu')),
-    ('workbench.filelist.custom-menu', _('File context menu (on manifest and revision details)')),
+    ('workbench.filelist.custom-menu', _('File context menu (on manifest '
+                                         'and revision details)')),
 )
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
@@ -864,7 +865,7 @@ def netlocsplit(netloc):
 
 def getLineSeparator(line):
     """Get the line separator used on a given line"""
-    # By default assume the default OS line separator 
+    # By default assume the default OS line separator
     linesep = os.linesep
     lineseptypes = ['\r\n', '\n', '\r']
     for sep in lineseptypes:
