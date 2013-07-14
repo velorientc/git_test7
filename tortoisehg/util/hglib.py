@@ -884,8 +884,10 @@ def buildcmdargs(name, *args, **opts):
     ['push', '--branch', 'foo']
     >>> buildcmdargs('graft', r=['0', '1'])
     ['graft', '-r', '0', '-r', '1']
-    >>> buildcmdargs('log', no_merges=True, quiet=False)
+    >>> buildcmdargs('log', no_merges=True, quiet=False, limit=None)
     ['log', '--no-merges']
+    >>> buildcmdargs('commit', user='')
+    ['commit', '--user', '']
 
     positional arguments:
 
@@ -896,6 +898,9 @@ def buildcmdargs(name, *args, **opts):
     """
     fullargs = [name]
     for k, v in opts.iteritems():
+        if v is None:
+            continue
+
         if len(k) == 1:
             aname = '-%s' % k
         else:
