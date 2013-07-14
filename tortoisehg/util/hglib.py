@@ -887,13 +887,13 @@ def buildcmdargs(**opts):
     >>> buildcmdargs(no_merges=True, quiet=False)
     ['--no-merges']
     """
-    args = []
+    fullargs = []
     for k, v in opts.iteritems():
         if isinstance(v, bool):
             if v:
-                args.append('--%s' % k.replace('_', '-'))
+                fullargs.append('--%s' % k.replace('_', '-'))
         else:
             for e in isinstance(v, basestring) and [v] or v:
-                args += ['--%s' % k.replace('_', '-'), e]
+                fullargs += ['--%s' % k.replace('_', '-'), e]
 
-    return args
+    return fullargs
