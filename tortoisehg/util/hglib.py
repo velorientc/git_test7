@@ -878,6 +878,15 @@ def dispatch(ui, args):
     return hgdispatch._dispatch(req)
 
 def buildcmdargs(**opts):
+    """Build list of command-line arguments
+
+    >>> buildcmdargs(branch='foo')
+    ['--branch', 'foo']
+    >>> buildcmdargs(rev=['0', '1'])
+    ['--rev', '0', '--rev', '1']
+    >>> buildcmdargs(no_merges=True, quiet=False)
+    ['--no-merges']
+    """
     args = []
     for k, v in opts.iteritems():
         if isinstance(v, bool):
