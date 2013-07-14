@@ -271,24 +271,12 @@ class EmailDialog(QDialog):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
     def accept(self):
-        # TODO: want to pass patchbombopts directly
-        def cmdargs(opts):
-            args = []
-            for k, v in opts.iteritems():
-                if isinstance(v, bool):
-                    if v:
-                        args.append('--%s' % k.replace('_', '-'))
-                else:
-                    for e in isinstance(v, basestring) and [v] or v:
-                        args += ['--%s' % k.replace('_', '-'), e]
-
-            return args
-
         hglib.loadextension(self._ui, 'patchbomb')
 
         opts = self._patchbombopts()
         try:
-            cmd = cmdui.Dialog(['email'] + cmdargs(opts), parent=self)
+            cmd = cmdui.Dialog(['email'] + hglib.buildcmdargs(**opts),
+                               parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.setShowOutput(False)
             cmd.finished.connect(cmd.deleteLater)

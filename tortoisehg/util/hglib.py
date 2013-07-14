@@ -876,3 +876,15 @@ def getLineSeparator(line):
 def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
     return hgdispatch._dispatch(req)
+
+def buildcmdargs(**opts):
+    args = []
+    for k, v in opts.iteritems():
+        if isinstance(v, bool):
+            if v:
+                args.append('--%s' % k.replace('_', '-'))
+        else:
+            for e in isinstance(v, basestring) and [v] or v:
+                args += ['--%s' % k.replace('_', '-'), e]
+
+    return args
