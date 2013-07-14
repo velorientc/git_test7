@@ -882,8 +882,8 @@ def buildcmdargs(name, *args, **opts):
 
     >>> buildcmdargs('push', branch='foo')
     ['push', '--branch', 'foo']
-    >>> buildcmdargs('graft', rev=['0', '1'])
-    ['graft', '--rev', '0', '--rev', '1']
+    >>> buildcmdargs('graft', r=['0', '1'])
+    ['graft', '-r', '0', '-r', '1']
     >>> buildcmdargs('log', no_merges=True, quiet=False)
     ['log', '--no-merges']
 
@@ -896,7 +896,10 @@ def buildcmdargs(name, *args, **opts):
     """
     fullargs = [name]
     for k, v in opts.iteritems():
-        aname = '--%s' % k.replace('_', '-')
+        if len(k) == 1:
+            aname = '-%s' % k
+        else:
+            aname = '--%s' % k.replace('_', '-')
         if isinstance(v, bool):
             if v:
                 fullargs.append(aname)
