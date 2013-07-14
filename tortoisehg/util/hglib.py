@@ -893,8 +893,12 @@ def buildcmdargs(**opts):
         if isinstance(v, bool):
             if v:
                 fullargs.append(aname)
+        elif isinstance(v, list):
+            for e in v:
+                fullargs.append(aname)
+                fullargs.append(e)
         else:
-            for e in isinstance(v, basestring) and [v] or v:
-                fullargs += [aname, e]
+            fullargs.append(aname)
+            fullargs.append(v)
 
     return fullargs
