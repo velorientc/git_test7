@@ -154,12 +154,12 @@ class QuickOpDialog(QDialog):
             self.reject()
 
     def accept(self):
-        cmdline = [self.command]
-        if hasattr(self, 'chk') and self.chk.isChecked():
+        cmdopts = {}
+        if hasattr(self, 'chk'):
             if self.command == 'revert':
-                cmdline.append('--no-backup')
+                cmdopts['no_backup'] = self.chk.isChecked()
             elif self.command == 'remove':
-                cmdline.append('--force')
+                cmdopts['force'] = self.chk.isChecked()
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
@@ -191,7 +191,7 @@ class QuickOpDialog(QDialog):
                         0, 2, selmodified)
                     ret = prompt.run()
                     if ret == 1:
-                        cmdline.append('--force')
+                        cmdopts['force'] = True
                     elif ret == 2:
                         return
             unknown, ignored = repostate[4:6]
@@ -207,7 +207,7 @@ class QuickOpDialog(QDialog):
                 self.addWithPrompt(files)
                 return
         if files:
-            cmdline.extend(files)
+            cmdline = hglib.buildcmdargs(self.command, *files, **cmdopts)
             self.files = files
             self.cmd.run(cmdline)
         else:
