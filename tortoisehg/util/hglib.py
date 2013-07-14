@@ -877,7 +877,7 @@ def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
     return hgdispatch._dispatch(req)
 
-def buildcmdargs(name, **opts):
+def buildcmdargs(name, *args, **opts):
     """Build list of command-line arguments
 
     >>> buildcmdargs('push', branch='foo')
@@ -886,6 +886,13 @@ def buildcmdargs(name, **opts):
     ['graft', '--rev', '0', '--rev', '1']
     >>> buildcmdargs('log', no_merges=True, quiet=False)
     ['log', '--no-merges']
+
+    positional arguments:
+
+    >>> buildcmdargs('add', 'foo', 'bar')
+    ['add', 'foo', 'bar']
+    >>> buildcmdargs('cat', '-foo', rev='0')
+    ['cat', '--rev', '0', '--', '-foo']
     """
     fullargs = [name]
     for k, v in opts.iteritems():
@@ -900,5 +907,9 @@ def buildcmdargs(name, **opts):
         else:
             fullargs.append(aname)
             fullargs.append(v)
+
+    if util.any(e.startswith('-') for e in args):
+        fullargs.append('--')
+    fullargs.extend(args)
 
     return fullargs
