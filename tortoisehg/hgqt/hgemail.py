@@ -275,8 +275,7 @@ class EmailDialog(QDialog):
 
         opts = self._patchbombopts()
         try:
-            cmd = cmdui.Dialog(['email'] + hglib.buildcmdargs(**opts),
-                               parent=self)
+            cmd = cmdui.Dialog(hglib.buildcmdargs('email', **opts), parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.setShowOutput(False)
             cmd.finished.connect(cmd.deleteLater)

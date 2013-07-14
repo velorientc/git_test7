@@ -877,17 +877,17 @@ def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
     return hgdispatch._dispatch(req)
 
-def buildcmdargs(**opts):
+def buildcmdargs(name, **opts):
     """Build list of command-line arguments
 
-    >>> buildcmdargs(branch='foo')
-    ['--branch', 'foo']
-    >>> buildcmdargs(rev=['0', '1'])
-    ['--rev', '0', '--rev', '1']
-    >>> buildcmdargs(no_merges=True, quiet=False)
-    ['--no-merges']
+    >>> buildcmdargs('push', branch='foo')
+    ['push', '--branch', 'foo']
+    >>> buildcmdargs('graft', rev=['0', '1'])
+    ['graft', '--rev', '0', '--rev', '1']
+    >>> buildcmdargs('log', no_merges=True, quiet=False)
+    ['log', '--no-merges']
     """
-    fullargs = []
+    fullargs = [name]
     for k, v in opts.iteritems():
         aname = '--%s' % k.replace('_', '-')
         if isinstance(v, bool):
