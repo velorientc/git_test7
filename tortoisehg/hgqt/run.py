@@ -454,7 +454,7 @@ def archive(ui, repo, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt import archive as archivemod
     rev = opts.get('rev')
-    return archivemod.ArchiveDialog(repo.ui, repo, rev)
+    return archivemod.ArchiveDialog(repo, rev)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),

@@ -26,7 +26,7 @@ class ArchiveDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, ui, repo, rev=None, parent=None):
+    def __init__(self, repo, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent)
 
         # main layout
@@ -122,7 +122,6 @@ class ArchiveDialog(QDialog):
         self.vbox.addLayout(self.hbox)
 
         # set default values
-        self.ui = ui
         self.repo = repo
         self.initrev = rev
         self.prevtarget = None
