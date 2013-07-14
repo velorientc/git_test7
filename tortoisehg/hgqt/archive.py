@@ -123,7 +123,6 @@ class ArchiveDialog(QDialog):
 
         # set default values
         self.repo = repo
-        self.initrev = rev
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
@@ -132,8 +131,8 @@ class ArchiveDialog(QDialog):
         tags.sort(reverse=True)
         for t in tags:
             self.rev_combo.addItem(hglib.tounicode(t))
-        if self.initrev:
-            text = hglib.tounicode(str(self.initrev))
+        if rev:
+            text = hglib.tounicode(str(rev))
             selectindex = self.rev_combo.findText(text)
             if selectindex >= 0:
                 self.rev_combo.setCurrentIndex(selectindex)
