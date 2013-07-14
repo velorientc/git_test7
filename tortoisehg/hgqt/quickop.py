@@ -134,7 +134,8 @@ class QuickOpDialog(QDialog):
             if self.command == 'revert':
                 self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
             elif self.command == 'remove':
-                self.chk.setChecked(s.value('quickop/forceremove', False).toBool())
+                self.chk.setChecked(
+                    s.value('quickop/forceremove', False).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
@@ -178,13 +179,16 @@ class QuickOpDialog(QDialog):
                     if wfile in modified:
                         selmodified.append(wfile)
                 if selmodified:
-                    prompt = qtlib.CustomPrompt(_('Confirm Remove'),
-                                                _('You have selected one or more files that have been '
-                                                  'modified.  By default, these files will not be '
-                                                  'removed.  What would you like to do?'), self,
-                                                (_('Remove &Unmodified Files'),
-                                                 _('Remove &All Selected Files'), _('Cancel')),
-                                                0, 2, selmodified)
+                    prompt = qtlib.CustomPrompt(
+                        _('Confirm Remove'),
+                        _('You have selected one or more files that have been '
+                          'modified.  By default, these files will not be '
+                          'removed.  What would you like to do?'),
+                        self,
+                        (_('Remove &Unmodified Files'),
+                         _('Remove &All Selected Files'),
+                         _('Cancel')),
+                        0, 2, selmodified)
                     ret = prompt.run()
                     if ret == 1:
                         cmdline.append('--force')
