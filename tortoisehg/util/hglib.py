@@ -889,11 +889,12 @@ def buildcmdargs(**opts):
     """
     fullargs = []
     for k, v in opts.iteritems():
+        aname = '--%s' % k.replace('_', '-')
         if isinstance(v, bool):
             if v:
-                fullargs.append('--%s' % k.replace('_', '-'))
+                fullargs.append(aname)
         else:
             for e in isinstance(v, basestring) and [v] or v:
-                fullargs += ['--%s' % k.replace('_', '-'), e]
+                fullargs += [aname, e]
 
     return fullargs
