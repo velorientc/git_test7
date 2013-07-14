@@ -878,7 +878,7 @@ def dispatch(ui, args):
     return hgdispatch._dispatch(req)
 
 def buildcmdargs(name, *args, **opts):
-    """Build list of command-line arguments
+    r"""Build list of command-line arguments
 
     >>> buildcmdargs('push', branch='foo')
     ['push', '--branch', 'foo']
@@ -895,8 +895,22 @@ def buildcmdargs(name, *args, **opts):
     ['add', 'foo', 'bar']
     >>> buildcmdargs('cat', '-foo', rev='0')
     ['cat', '--rev', '0', '--', '-foo']
+
+    type conversion to string:
+
+    >>> from PyQt4.QtCore import QString
+    >>> buildcmdargs('email', r=[0, 1])
+    ['email', '-r', '0', '-r', '1']
+    >>> buildcmdargs('grep', 'foo', rev=2)
+    ['grep', '--rev', '2', 'foo']
+    >>> buildcmdargs('tag', u'\xc0', message=u'\xc1')
+    ['tag', '--message', u'\xc1', u'\xc0']
+    >>> buildcmdargs(QString('tag'), QString(u'\xc0'), message=QString(u'\xc1'))
+    [u'tag', '--message', u'\xc1', u'\xc0']
     """
-    fullargs = [name]
+    stringfy = '%s'.__mod__  # (unicode, QString) -> unicode, otherwise -> str
+
+    fullargs = [stringfy(name)]
     for k, v in opts.iteritems():
         if v is None:
             continue
@@ -911,11 +925,12 @@ def buildcmdargs(name, *args, **opts):
         elif isinstance(v, list):
             for e in v:
                 fullargs.append(aname)
-                fullargs.append(e)
+                fullargs.append(stringfy(e))
         else:
             fullargs.append(aname)
-            fullargs.append(v)
+            fullargs.append(stringfy(v))
 
+    args = map(stringfy, args)
     if util.any(e.startswith('-') for e in args):
         fullargs.append('--')
     fullargs.extend(args)
