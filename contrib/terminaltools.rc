@@ -45,7 +45,7 @@ gnome-terminal.executable-linux = gnome-terminal
 
 xterm.priority = -10
 xterm.executable-unix = xterm
-xterm.args = -T "%(reponame)s"'
+xterm.args = -T "%(reponame)s"
 
 # OSX specific terminals
 terminal_app.priority = -1
