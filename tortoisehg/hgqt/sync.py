@@ -47,7 +47,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     hideBusyIcon = pyqtSignal(QString)
     switchToRequest = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -56,7 +56,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.finishfunc = None
         self.opts = {}
         self.cmenu = None
@@ -73,7 +73,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if val:
                 self.opts[opt] = val
 
-        self.repo.configChanged.connect(self.reload)
+        self._repoagent.configChanged.connect(self.reload)
 
         if self.embedded:
             layout.setContentsMargins(2, 2, 2, 2)
@@ -252,6 +252,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.setUrl('default')
         else:
             self.setEditUrl('')
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def canswitch(self):
         return not self.targetcheckbox.isChecked()

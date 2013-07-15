@@ -1056,8 +1056,7 @@ def strip(ui, repoagent, *pats, **opts):
 def sync(ui, repoagent, *pats, **opts):
     """Synchronize with other repositories"""
     from tortoisehg.hgqt import sync as syncmod
-    repo = repoagent.rawRepo()
-    w = syncmod.SyncWidget(repo, None, **opts)
+    w = syncmod.SyncWidget(repoagent, None, **opts)
     if pats:
         w.setUrl(hglib.tounicode(pats[0]))
     return w

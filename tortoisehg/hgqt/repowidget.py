@@ -445,7 +445,7 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        sw = SyncWidget(self.repo, self)
+        sw = SyncWidget(self._repoagent, self)
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
