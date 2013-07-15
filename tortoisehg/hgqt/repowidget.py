@@ -1922,7 +1922,7 @@ class RepoWidget(QWidget):
 
     def rupdate(self):
         import rupdate
-        dlg = rupdate.rUpdateDialog(self.repo, self.rev, self)
+        dlg = rupdate.rUpdateDialog(self._repoagent, self.rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
