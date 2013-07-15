@@ -30,20 +30,20 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Known good revision:')))
-        gle = QLineEdit()
+        self._gle = gle = QLineEdit()
         gle.setText(opts.get('good', ''))
         hbox.addWidget(gle, 1)
-        gb = QPushButton(_('Accept'))
+        self._gb = gb = QPushButton(_('Accept'))
         hbox.addWidget(gb)
         box.addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Known bad revision:')))
-        ble = QLineEdit()
+        self._ble = ble = QLineEdit()
         ble.setText(opts.get('bad', ''))
         ble.setEnabled(False)
         hbox.addWidget(ble, 1)
-        bb = QPushButton(_('Accept'))
+        self._bb = bb = QPushButton(_('Accept'))
         bb.setEnabled(False)
         hbox.addWidget(bb)
         box.addLayout(hbox)
@@ -94,15 +94,15 @@ class BisectDialog(QDialog):
         self.cmd.commandFinished.connect(cmdFinished)
 
         def gverify():
-            good = hglib.fromunicode(gle.text().simplified())
+            good = hglib.fromunicode(self._gle.text().simplified())
             try:
-                ctx = repo[good]
+                ctx = self.repo[good]
                 self.goodrev = ctx.rev()
-                gb.setEnabled(False)
-                gle.setEnabled(False)
-                bb.setEnabled(True)
-                ble.setEnabled(True)
-                ble.setFocus()
+                self._gb.setEnabled(False)
+                self._gle.setEnabled(False)
+                self._bb.setEnabled(True)
+                self._ble.setEnabled(True)
+                self._ble.setFocus()
             except error.RepoLookupError, e:
                 self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
             except util.Abort, e:
@@ -113,12 +113,12 @@ class BisectDialog(QDialog):
                     err = hglib.tounicode(str(e))
                 self.cmd.core.stbar.showMessage(err)
         def bverify():
-            bad = hglib.fromunicode(ble.text().simplified())
+            bad = hglib.fromunicode(self._ble.text().simplified())
             try:
-                ctx = repo[bad]
+                ctx = self.repo[bad]
                 self.badrev = ctx.rev()
-                ble.setEnabled(False)
-                bb.setEnabled(False)
+                self._ble.setEnabled(False)
+                self._bb.setEnabled(False)
                 cmds = []
                 cmds.append(self._bisectcmd(reset=True))
                 cmds.append(self._bisectcmd(self.goodrev, good=True))
