@@ -278,6 +278,8 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
+        menuSync = self.menuRepository.addMenu(_('S&ynchronize'))
+        newseparator(menu='repository')
         newaction(_("Start &Web Server"), self.serve, menu='repository')
         newseparator(menu='repository')
         newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
@@ -361,6 +363,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='sync')
         newaction(_('Push'), data='push', icon='hg-push',
                   enabled='repoopen', toolbar='sync')
+        menuSync.addActions(self.synctbar.actions())
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.urlCombo.currentIndexChanged.connect(self._updateSyncUrlToolTip)
