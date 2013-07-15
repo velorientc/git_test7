@@ -899,7 +899,7 @@ def purge(ui, repoagent, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt import purge as purgemod
     repo = repoagent.rawRepo()
-    return purgemod.PurgeDialog(repo, None)
+    return purgemod.PurgeDialog(repo)
 
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, repoagent, *pats, **opts):

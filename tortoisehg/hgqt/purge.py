@@ -23,7 +23,7 @@ class PurgeDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         QDialog.__init__(self, parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
