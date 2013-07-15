@@ -130,6 +130,7 @@ class QReorderDialog(QDialog):
             dlg.makeLogVisible.connect(self.parent().makeLogVisible)
         dlg.exec_()
 
+    @pyqtSlot()
     def refresh(self):
         patchnames = self.repo.mq.series[:]
         applied = [p.name for p in self.repo.mq.applied]
@@ -196,7 +197,6 @@ class QReorderDialog(QDialog):
 
     def closeEvent(self, event):
         self._writesettings()
-        self.repo.repositoryChanged.disconnect(self.refresh)
         super(QReorderDialog, self).closeEvent(event)
 
     def _readsettings(self):
