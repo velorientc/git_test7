@@ -868,6 +868,11 @@ class Workbench(QMainWindow):
         if index == self.repoTabsWidget.currentIndex():
             self._updateWindowTitle()
 
+    #@pyqtSlot(QIcon)
+    def _updateRepoTabIcon(self, icon):
+        index = self.repoTabsWidget.indexOf(self.sender())
+        self.repoTabsWidget.setTabIcon(index, icon)
+
     def addRepoTab(self, repoagent, bundle):
         '''opens the given repo in a new tab'''
         repo = repoagent.rawRepo()  # TODO: pass repoagent to RepoWidget
@@ -893,8 +898,7 @@ class Workbench(QMainWindow):
         tw.setTabToolTip(index, repoagent.rootPath())
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(self._updateRepoTabTitle)
-        rw.showIcon.connect(
-            lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
+        rw.showIcon.connect(self._updateRepoTabIcon)
         self.reporegistry.addRepo(repoagent.rootPath())
 
         self.updateMenu()
