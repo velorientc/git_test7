@@ -317,7 +317,6 @@ class QQueueDialog(QDialog):
 
     def done(self, ret):
         self._writesettings()
-        self.repo.repositoryChanged.disconnect(self.reload)
         super(QQueueDialog, self).done(ret)
 
     def _readsettings(self):
