@@ -466,14 +466,13 @@ def archive(ui, repoagent, *pats, **opts):
 def backout(ui, repoagent, *pats, **opts):
     """backout tool"""
     from tortoisehg.hgqt import backout as backoutmod
-    repo = repoagent.rawRepo()
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
     else:
         rev = 'tip'
-    return backoutmod.BackoutDialog(repo, rev)
+    return backoutmod.BackoutDialog(repoagent, rev)
 
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, repoagent, *pats, **opts):

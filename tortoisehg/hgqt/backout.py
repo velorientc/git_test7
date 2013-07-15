@@ -17,7 +17,7 @@ from PyQt4.QtGui import *
 
 class BackoutDialog(QWizard):
 
-    def __init__(self, repo, rev, parent=None):
+    def __init__(self, repoagent, rev, parent=None):
         super(BackoutDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
@@ -26,22 +26,23 @@ class BackoutDialog(QWizard):
         self.parentbackout = False
         self.backoutmergeparentrev = None
 
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Backout - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-revert'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
         self.setOption(QWizard.NoBackButtonOnLastPage, True)
         self.setOption(QWizard.IndependentPages, True)
 
-        self.addPage(SummaryPage(repo, self))
-        self.addPage(BackoutPage(repo, self))
-        self.addPage(CommitPage(repo, self))
-        self.addPage(ResultPage(repo, self))
+        self.addPage(SummaryPage(repoagent, self))
+        self.addPage(BackoutPage(repoagent, self))
+        self.addPage(CommitPage(repoagent, self))
+        self.addPage(ResultPage(repoagent, self))
         self.currentIdChanged.connect(self.pageChanged)
 
         self.resize(QSize(700, 489).expandedTo(self.minimumSizeHint()))
 
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.configChanged.connect(self.configChanged)
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
 
     @pyqtSlot()
     def repositoryChanged(self):
@@ -61,9 +62,13 @@ class BackoutDialog(QWizard):
 
 
 class BasePage(QWizardPage):
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         super(BasePage, self).__init__(parent)
-        self.repo = repo
+        self._repoagent = repoagent
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def validatePage(self):
         'user pressed NEXT button, can we proceed?'
@@ -90,8 +95,8 @@ class BasePage(QWizardPage):
 
 class SummaryPage(BasePage):
 
-    def __init__(self, repo, parent):
-        super(SummaryPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(SummaryPage, self).__init__(repoagent, parent)
         self.clean = False
         self.th = None
 
@@ -319,8 +324,8 @@ class SummaryPage(BasePage):
 
 
 class BackoutPage(BasePage):
-    def __init__(self, repo, parent):
-        super(BackoutPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(BackoutPage, self).__init__(repoagent, parent)
         self.backoutcomplete = False
 
         self.setTitle(_('Backing out, then merging...'))
@@ -404,14 +409,16 @@ class BackoutPage(BasePage):
 
 class CommitPage(BasePage):
 
-    def __init__(self, repo, parent):
-        super(CommitPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(CommitPage, self).__init__(repoagent, parent)
         self.commitComplete = False
 
         self.setTitle(_('Commit backout and merge results'))
         self.setSubTitle(' ')
         self.setLayout(QVBoxLayout())
         self.setCommitPage(True)
+
+        repo = repoagent.rawRepo()
 
         # csinfo
         def label_func(widget, item, ctx):
@@ -614,8 +621,8 @@ class CommitPage(BasePage):
 
 
 class ResultPage(BasePage):
-    def __init__(self, repo, parent):
-        super(ResultPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(ResultPage, self).__init__(repoagent, parent)
         self.setTitle(_('Finished'))
         self.setSubTitle(' ')
         self.setFinalPage(True)
