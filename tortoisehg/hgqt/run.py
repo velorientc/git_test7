@@ -1045,13 +1045,12 @@ def status(ui, repoagent, *pats, **opts):
 def strip(ui, repoagent, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt import thgstrip
-    repo = repoagent.rawRepo()
     rev = None
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return thgstrip.StripDialog(repo, rev=rev, opts=opts)
+    return thgstrip.StripDialog(repoagent, rev=rev, opts=opts)
 
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repoagent, *pats, **opts):

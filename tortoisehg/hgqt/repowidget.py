@@ -1907,7 +1907,8 @@ class RepoWidget(QWidget):
 
     def stripRevision(self):
         'Strip the selected revision and all descendants'
-        dlg = thgstrip.StripDialog(self.repo, rev=str(self.rev), parent=self)
+        dlg = thgstrip.StripDialog(self._repoagent, rev=str(self.rev),
+                                   parent=self)
         dlg.showBusyIcon.connect(self.onShowBusyIcon)
         dlg.hideBusyIcon.connect(self.onHideBusyIcon)
         dlg.finished.connect(dlg.deleteLater)
