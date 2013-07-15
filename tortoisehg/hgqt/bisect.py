@@ -76,23 +76,7 @@ class BisectDialog(QDialog):
             b.setEnabled(False)
         self.lastrev = None
 
-        def cmdFinished(ret):
-            lbl = self._lbl
-            if ret != 0:
-                lbl.setText(_('Error encountered.'))
-                return
-            self.repo.dirstate.invalidate()
-            ctx = self.repo['.']
-            if ctx.rev() == self.lastrev:
-                lbl.setText(_('Culprit found.'))
-                return
-            self.lastrev = ctx.rev()
-            for b in self.nextbuttons:
-                b.setEnabled(True)
-            lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), ctx.rev(), ctx,
-                        _('Test this revision and report findings. '
-                          '(good/bad/skip)')))
-        self.cmd.commandFinished.connect(cmdFinished)
+        self.cmd.commandFinished.connect(self._cmdFinished)
 
         gb.pressed.connect(self._verifyGood)
         bb.pressed.connect(self._verifyBad)
@@ -111,6 +95,24 @@ class BisectDialog(QDialog):
     def _bisectcmd(self, *args, **opts):
         opts['repository'] = self.repo.root
         return hglib.buildcmdargs('bisect', *args, **opts)
+
+    @pyqtSlot(int)
+    def _cmdFinished(self, ret):
+        lbl = self._lbl
+        if ret != 0:
+            lbl.setText(_('Error encountered.'))
+            return
+        self.repo.dirstate.invalidate()
+        ctx = self.repo['.']
+        if ctx.rev() == self.lastrev:
+            lbl.setText(_('Culprit found.'))
+            return
+        self.lastrev = ctx.rev()
+        for b in self.nextbuttons:
+            b.setEnabled(True)
+        lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), ctx.rev(), ctx,
+                    _('Test this revision and report findings. '
+                      '(good/bad/skip)')))
 
     @pyqtSlot()
     def _verifyGood(self):
