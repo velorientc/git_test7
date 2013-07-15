@@ -64,7 +64,7 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         box.addLayout(hbox)
-        lbl = QLabel()
+        self._lbl = lbl = QLabel()
         hbox.addWidget(lbl)
         hbox.addStretch(1)
         closeb = QPushButton(_('Close'))
@@ -77,11 +77,12 @@ class BisectDialog(QDialog):
         self.lastrev = None
 
         def cmdFinished(ret):
+            lbl = self._lbl
             if ret != 0:
                 lbl.setText(_('Error encountered.'))
                 return
-            repo.dirstate.invalidate()
-            ctx = repo['.']
+            self.repo.dirstate.invalidate()
+            ctx = self.repo['.']
             if ctx.rev() == self.lastrev:
                 lbl.setText(_('Culprit found.'))
                 return
