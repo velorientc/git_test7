@@ -192,9 +192,6 @@ class QReorderDialog(QDialog):
         writeSeries(self.repo, applied, unapplied)
         QDialog.accept(self)
 
-    def reject(self):
-        QDialog.reject(self)
-
     def closeEvent(self, event):
         self._writesettings()
         super(QReorderDialog, self).closeEvent(event)
