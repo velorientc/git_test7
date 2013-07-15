@@ -279,7 +279,8 @@ class HeadlessQuickop(QObject):
     def raise_(self):
         pass
 
-def run(ui, repo, *pats, **opts):
+def run(ui, repoagent, *pats, **opts):
+    repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     command = opts['alias']
     imm = repo.ui.config('tortoisehg', 'immediate', '')

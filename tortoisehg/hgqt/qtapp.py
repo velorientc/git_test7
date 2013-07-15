@@ -322,8 +322,7 @@ class QtRunner(QObject):
                 repoagent = self._repomanager.openRepoAgent(
                     hglib.tounicode(opts['repository']))
                 reporoot = repoagent.rootPath()
-                repo = repoagent.rawRepo()  # TODO: pass repoagent to dlgfunc
-                args.insert(0, repo)
+                args.insert(0, repoagent)
             return dlgfunc(self._ui, *args, **opts), reporoot
         except error.RepoError, inst:
             qtlib.WarningMsgBox(_('Repository Error'),
