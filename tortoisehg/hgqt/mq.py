@@ -455,10 +455,11 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     makeLogVisible = pyqtSignal(bool)
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         QWidget.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.opts = opts
         self.refreshing = False
         self.finishfunc = None
@@ -560,8 +561,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         QShortcut(QKeySequence('Ctrl+Return'), self, self.onQNewOrQRefresh)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
 
-        self.repo.configChanged.connect(self.onConfigChanged)
-        self.repo.repositoryChanged.connect(self.reload)
+        self._repoagent.configChanged.connect(self.onConfigChanged)
+        self._repoagent.repositoryChanged.connect(self.reload)
         self.setAcceptDrops(True)
 
         if parent:
@@ -579,6 +580,10 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def getUserOptions(self, *optionlist):
         return mqutil.getUserOptions(self.opts, *optionlist)

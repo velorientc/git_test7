@@ -706,7 +706,7 @@ class RepoWidget(QWidget):
         return gw
 
     def createMQWidget(self):
-        mqw = mq.MQWidget(self.repo, self)
+        mqw = mq.MQWidget(self._repoagent, self)
         mqw.output.connect(self.output)
         mqw.progress.connect(self.progress)
         mqw.makeLogVisible.connect(self.makeLogVisible)
