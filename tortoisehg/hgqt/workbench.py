@@ -853,14 +853,15 @@ class Workbench(QMainWindow):
             self.updateHistoryActions()
             self.updateMenu()
             self.log.setCurrentRepoRoot(w.repoRootPath())
+            repoagent = self._repomanager.repoAgent(w.repoRootPath())
+            self.mqpatches.setRepoAgent(repoagent)
             self.reporegistry.setActiveTabRepo(w.repoRootPath())
             self._setupCustomTools(w.repo.ui)
             self._setupUrlCombo(w.repo)
         else:
             self.log.setCurrentRepoRoot(None)
+            self.mqpatches.setRepoAgent(None)
             self.reporegistry.setActiveTabRepo('')
-        repo = w and w.repo or None
-        self.mqpatches.setrepo(repo)
 
     #@pyqtSlot(unicode)
     def _updateRepoTabTitle(self, title):

@@ -31,7 +31,7 @@ class MQPatchesWidget(QDockWidget):
 
     def __init__(self, parent, **opts):
         QDockWidget.__init__(self, parent)
-        self.repo = None
+        self._repoagent = None
         self.opts = opts
         self.refreshing = False
         self.finishfunc = None
@@ -133,13 +133,18 @@ class MQPatchesWidget(QDockWidget):
 
         QTimer.singleShot(0, self.reload)
 
-    def setrepo(self, repo):
-        if self.repo:
-            self.repo.repositoryChanged.disconnect(self.reload)
-        self.repo = None
-        if repo and 'mq' in repo.extensions():
-            self.repo = repo
-            self.repo.repositoryChanged.connect(self.reload)
+    @property
+    def repo(self):
+        if self._repoagent:
+            return self._repoagent.rawRepo()
+
+    def setRepoAgent(self, repoagent):
+        if self._repoagent:
+            self._repoagent.repositoryChanged.disconnect(self.reload)
+        self._repoagent = None
+        if repoagent and 'mq' in repoagent.rawRepo().extensions():
+            self._repoagent = repoagent
+            self._repoagent.repositoryChanged.connect(self.reload)
         QTimer.singleShot(0, self.reload)
 
     def getUserOptions(self, *optionlist):
