@@ -893,8 +893,7 @@ def postreview(ui, repoagent, *pats, **opts):
 def purge(ui, repoagent, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt import purge as purgemod
-    repo = repoagent.rawRepo()
-    return purgemod.PurgeDialog(repo)
+    return purgemod.PurgeDialog(repoagent)
 
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, repoagent, *pats, **opts):

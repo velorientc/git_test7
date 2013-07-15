@@ -894,7 +894,7 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def purge(self):
-        dlg = purge.PurgeDialog(self.repo, self)
+        dlg = purge.PurgeDialog(self._repoagent, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         dlg.showMessage.connect(self.showMessage)
