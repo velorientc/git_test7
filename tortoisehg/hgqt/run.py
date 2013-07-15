@@ -490,7 +490,7 @@ def bookmark(ui, repoagent, *names, **opts):
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
     if len(names) > 1:
         raise util.Abort(_('only one new bookmark name allowed'))
-    dlg = bookmarkmod.BookmarkDialog(repo, rev)
+    dlg = bookmarkmod.BookmarkDialog(repoagent, rev)
     if names:
         dlg.setBookmarkName(hglib.tounicode(names[0]))
     return dlg

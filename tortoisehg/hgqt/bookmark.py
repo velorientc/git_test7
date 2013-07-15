@@ -17,11 +17,12 @@ class BookmarkDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent=None):
+    def __init__(self, repoagent, rev, parent=None):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.rev = rev
         self.node = repo[rev].node()
 
@@ -104,9 +105,13 @@ class BookmarkDialog(QDialog):
         # prepare to show
         self.clear_status()
         self.refresh()
-        self.repo.repositoryChanged.connect(self.refresh)
+        self._repoagent.repositoryChanged.connect(self.refresh)
         self.bookmarkCombo.setFocus()
         self.bookmarkTextChanged()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def refresh(self):

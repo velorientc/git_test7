@@ -1874,7 +1874,7 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def bookmarkRevision(self):
-        dlg = bookmark.BookmarkDialog(self.repo, self.rev, self)
+        dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
