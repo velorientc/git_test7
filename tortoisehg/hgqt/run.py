@@ -1071,7 +1071,6 @@ def sync(ui, repoagent, *pats, **opts):
 def tag(ui, repoagent, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt import tag as tagmod
-    repo = repoagent.rawRepo()
     kargs = {}
     tag = len(pats) > 0 and pats[0] or None
     if tag:
@@ -1079,7 +1078,7 @@ def tag(ui, repoagent, *pats, **opts):
     rev = opts.get('rev')
     if rev:
         kargs['rev'] = rev
-    return tagmod.TagDialog(repo, opts=opts, **kargs)
+    return tagmod.TagDialog(repoagent, opts=opts, **kargs)
 
 @command('thgstatus',
     [('',  'delay', None, _('wait until the second ticks over')),

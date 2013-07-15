@@ -20,12 +20,13 @@ class TagDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
+    def __init__(self, repoagent, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Tag - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-tag'))
 
@@ -119,7 +120,7 @@ class TagDialog(QDialog):
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.commandFinished.connect(self.onCommandFinished)
 
-        repo.repositoryChanged.connect(self.refresh)
+        repoagent.repositoryChanged.connect(self.refresh)
         self.customTextLineEdit.setDisabled(True)
         self.replaceCheckBox.setChecked(bool(opts.get('force')))
         self.localCheckBox.setChecked(bool(opts.get('local')))
@@ -131,6 +132,10 @@ class TagDialog(QDialog):
         self.show_options(False)
         self.tagCombo.setFocus()
         self.refresh()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def refresh(self):
