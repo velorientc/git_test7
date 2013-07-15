@@ -139,21 +139,9 @@ class BisectDialog(QDialog):
         gle.returnPressed.connect(gverify)
         ble.returnPressed.connect(bverify)
 
-        def goodrevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(self._bisectcmd('.', good=True))
-        def badrevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(self._bisectcmd('.', bad=True))
-        def skiprevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(self._bisectcmd('.', skip=True))
-        goodrev.clicked.connect(goodrevision)
-        badrev.clicked.connect(badrevision)
-        skiprev.clicked.connect(skiprevision)
+        goodrev.clicked.connect(self._markGoodRevision)
+        badrev.clicked.connect(self._markBadRevision)
+        skiprev.clicked.connect(self._skipRevision)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -163,3 +151,21 @@ class BisectDialog(QDialog):
     def _bisectcmd(self, *args, **opts):
         opts['repository'] = self.repo.root
         return hglib.buildcmdargs('bisect', *args, **opts)
+
+    @pyqtSlot()
+    def _markGoodRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', good=True))
+
+    @pyqtSlot()
+    def _markBadRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', bad=True))
+
+    @pyqtSlot()
+    def _skipRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', skip=True))
