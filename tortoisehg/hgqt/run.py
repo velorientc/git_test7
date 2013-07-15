@@ -888,7 +888,7 @@ def postreview(ui, repoagent, *pats, **opts):
         revs = pats[0]
     if not revs:
         raise util.Abort(_('no revisions specified'))
-    return postreviewmod.PostReviewDialog(repo.ui, repo, revs)
+    return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
 
 @command('^purge', [], _('thg purge'))
 def purge(ui, repoagent, *pats, **opts):

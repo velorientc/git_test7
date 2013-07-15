@@ -1918,7 +1918,7 @@ class RepoWidget(QWidget):
                            tuple(self.repoview.selectedRevisions()))
 
     def _createPostReviewDialog(self, revs):
-        return postreview.PostReviewDialog(self.repo.ui, self.repo, revs)
+        return postreview.PostReviewDialog(self.repo.ui, self._repoagent, revs)
 
     def rupdate(self):
         import rupdate
