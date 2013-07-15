@@ -341,6 +341,4 @@ class TagDialog(QDialog):
             self.set_status(_('Repository command still running'), False)
             return
 
-        # prevent signals from reaching deleted objects
-        self.repo.repositoryChanged.disconnect(self.refresh)
         super(TagDialog, self).reject()
