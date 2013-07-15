@@ -20,7 +20,7 @@ MARGINS = (8, 0, 0, 0)
 
 class MergeDialog(QWizard):
 
-    def __init__(self, otherrev, repo, parent):
+    def __init__(self, repo, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)

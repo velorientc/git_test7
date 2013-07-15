@@ -871,7 +871,7 @@ def merge(ui, repoagent, *pats, **opts):
         rev = pats[0]
     if not rev:
         raise util.Abort(_('Merge revision not specified or not found'))
-    return mergemod.MergeDialog(rev, repo, None)
+    return mergemod.MergeDialog(repo, rev)
 
 @command('mq', [], _('thg mq'))
 def mq(ui, repoagent, *pats, **opts):
