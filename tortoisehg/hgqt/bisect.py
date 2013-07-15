@@ -93,8 +93,6 @@ class BisectDialog(QDialog):
                           '(good/bad/skip)')))
         self.cmd.commandFinished.connect(cmdFinished)
 
-        prefix = ['bisect', '--repository', repo.root]
-
         def gverify():
             good = hglib.fromunicode(gle.text().simplified())
             try:
@@ -122,9 +120,9 @@ class BisectDialog(QDialog):
                 ble.setEnabled(False)
                 bb.setEnabled(False)
                 cmds = []
-                cmds.append(prefix + ['--reset'])
-                cmds.append(prefix + ['--good', str(self.goodrev)])
-                cmds.append(prefix + ['--bad', str(self.badrev)])
+                cmds.append(self._bisectcmd(reset=True))
+                cmds.append(self._bisectcmd(self.goodrev, good=True))
+                cmds.append(self._bisectcmd(self.badrev, bad=True))
                 self.cmd.run(*cmds)
             except error.RepoLookupError, e:
                 self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
@@ -144,15 +142,15 @@ class BisectDialog(QDialog):
         def goodrevision():
             for b in self.nextbuttons:
                 b.setEnabled(False)
-            self.cmd.run(prefix + ['--good', '.'])
+            self.cmd.run(self._bisectcmd('.', good=True))
         def badrevision():
             for b in self.nextbuttons:
                 b.setEnabled(False)
-            self.cmd.run(prefix + ['--bad', '.'])
+            self.cmd.run(self._bisectcmd('.', bad=True))
         def skiprevision():
             for b in self.nextbuttons:
                 b.setEnabled(False)
-            self.cmd.run(prefix + ['--skip', '.'])
+            self.cmd.run(self._bisectcmd('.', skip=True))
         goodrev.clicked.connect(goodrevision)
         badrev.clicked.connect(badrevision)
         skiprev.clicked.connect(skiprevision)
@@ -161,3 +159,7 @@ class BisectDialog(QDialog):
         if event.key() == Qt.Key_Escape:
             self.reject()
         super(BisectDialog, self).keyPressEvent(event)
+
+    def _bisectcmd(self, *args, **opts):
+        opts['repository'] = self.repo.root
+        return hglib.buildcmdargs('bisect', *args, **opts)
