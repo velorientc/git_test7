@@ -841,7 +841,7 @@ def manifest(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import manifestdialog
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-    dlg = manifestdialog.ManifestDialog(repo, rev)
+    dlg = manifestdialog.ManifestDialog(repoagent, rev)
     if pats:
         path = hglib.canonpaths(pats)[0]
         if opts.get('line'):

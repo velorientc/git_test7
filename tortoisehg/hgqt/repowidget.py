@@ -433,7 +433,7 @@ class RepoWidget(QWidget):
             rev = None
         else:
             rev = self.rev
-        w = ManifestWidget(self.repo, rev, self)
+        w = ManifestWidget(self._repoagent, rev, self)
         w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
         w.linkActivated.connect(self._openLink)
@@ -1851,7 +1851,7 @@ class RepoWidget(QWidget):
             dlg.setRev(self.rev)
 
     def _createManifestDialog(self):
-        return ManifestDialog(self.repo, self.rev)
+        return ManifestDialog(self._repoagent, self.rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
