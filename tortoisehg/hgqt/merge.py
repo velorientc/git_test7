@@ -50,7 +50,6 @@ class MergeDialog(QWizard):
 
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.configChanged.connect(self.configChanged)
-        self.repo = repo
 
     @pyqtSlot()
     def repositoryChanged(self):
