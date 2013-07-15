@@ -474,7 +474,7 @@ def backout(ui, repoagent, *pats, **opts):
         rev = pats[0]
     else:
         rev = 'tip'
-    return backoutmod.BackoutDialog(rev, repo, None)
+    return backoutmod.BackoutDialog(repo, rev)
 
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, repoagent, *pats, **opts):

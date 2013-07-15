@@ -1901,7 +1901,7 @@ class RepoWidget(QWidget):
             dlg.exec_()
 
     def backoutToRevision(self):
-        dlg = backout.BackoutDialog(self.rev, self.repo, self)
+        dlg = backout.BackoutDialog(self.repo, self.rev, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 

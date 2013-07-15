@@ -17,7 +17,7 @@ from PyQt4.QtGui import *
 
 class BackoutDialog(QWizard):
 
-    def __init__(self, rev, repo, parent):
+    def __init__(self, repo, rev, parent=None):
         super(BackoutDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
