@@ -716,7 +716,7 @@ class RepoWidget(QWidget):
         return mqw
 
     def createPatchBranchWidget(self):
-        pbw = PatchBranchWidget(self.repo, parent=self)
+        pbw = PatchBranchWidget(self._repoagent, parent=self)
         pbw.output.connect(self.output)
         pbw.progress.connect(self.progress)
         pbw.makeLogVisible.connect(self.makeLogVisible)
