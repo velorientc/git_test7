@@ -27,7 +27,7 @@ class QQueueDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, embedded=False, parent=None):
+    def __init__(self, repoagent, embedded=False, parent=None):
         super(QQueueDialog, self).__init__(parent)
 
         self.setWindowIcon(qtlib.geticon('thg-mq'))
@@ -35,8 +35,8 @@ class QQueueDialog(QDialog):
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
-        repo.repositoryChanged.connect(self.reload)
+        self._repoagent = repoagent
+        repoagent.repositoryChanged.connect(self.reload)
         self.needsRefresh = False
 
         layout = QVBoxLayout()
@@ -51,7 +51,7 @@ class QQueueDialog(QDialog):
         rle = QLineEdit()
         hbr.addWidget(rle)
         rle.setFont(qtlib.getfont('fontlist').font())
-        rle.setText(repo.displayname)
+        rle.setText(self.repo.displayname)
         rle.setReadOnly(True)
         rle.setFocusPolicy(Qt.NoFocus)
 
@@ -140,6 +140,10 @@ class QQueueDialog(QDialog):
         self._readsettings()
         self.reload()
         self.ql.setFocus()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def setButtonState(self, state):
         if state:

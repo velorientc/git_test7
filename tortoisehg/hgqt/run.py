@@ -903,7 +903,7 @@ def qqueue(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     if not hasattr(repo, 'mq'):
         raise util.Abort(_('Please enable the MQ extension first.'))
-    return qqueuemod.QQueueDialog(repo)
+    return qqueuemod.QQueueDialog(repoagent)
 
 @command('^qreorder', [], _('thg qreorder'))
 def qreorder(ui, repoagent, *pats, **opts):

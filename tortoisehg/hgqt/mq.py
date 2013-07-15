@@ -697,7 +697,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot()
     def launchQQueueTool(self):
-        dlg = qqueue.QQueueDialog(self.repo, True, self)
+        dlg = qqueue.QQueueDialog(self._repoagent, True, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
