@@ -234,7 +234,7 @@ class MQPatchesWidget(QDockWidget):
                     break
             return cont
         if checkGuardsOrComments():
-            dlg = qreorder.QReorderDialog(self.repo, self)
+            dlg = qreorder.QReorderDialog(self._repoagent, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 

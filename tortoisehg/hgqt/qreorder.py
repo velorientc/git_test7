@@ -21,16 +21,16 @@ from PyQt4.QtGui import *
 #  Explicit refresh
 
 class QReorderDialog(QDialog):
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
 
         self.setWindowTitle(_('Reorder Unapplied Patches'))
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-qreorder'))
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.cached = None
-        repo.repositoryChanged.connect(self.refresh)
+        repoagent.repositoryChanged.connect(self.refresh)
 
         layout = QVBoxLayout()
         layout.setMargin(4)
@@ -44,7 +44,7 @@ class QReorderDialog(QDialog):
         hb.addWidget(le)
         le.setReadOnly(True)
         le.setFont(qtlib.getfont('fontlist').font())
-        le.setText(repo.displayname)
+        le.setText(self.repo.displayname)
         le.setFocusPolicy(Qt.NoFocus)
         layout.addLayout(hb)
         hl = qtlib.LabeledSeparator('')
@@ -112,6 +112,10 @@ class QReorderDialog(QDialog):
         self.alw.setCurrentRow(0)
         self.ulw.setCurrentRow(0)
         self.ulw.setFocus()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def patchlistMenuRequest(self, point, selection):
         self.menuselection = selection
