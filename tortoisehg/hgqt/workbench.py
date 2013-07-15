@@ -355,13 +355,13 @@ class Workbench(QMainWindow):
         menu.addAction(self.customtbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
-        newaction(_('Incoming'), data='incoming', icon='hg-incoming',
+        newaction(_('&Incoming'), data='incoming', icon='hg-incoming',
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Pull'), data='pull', icon='hg-pull',
+        newaction(_('&Pull'), data='pull', icon='hg-pull',
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Outgoing'), data='outgoing', icon='hg-outgoing',
+        newaction(_('&Outgoing'), data='outgoing', icon='hg-outgoing',
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Push'), data='push', icon='hg-push',
+        newaction(_('P&ush'), data='push', icon='hg-push',
                   enabled='repoopen', toolbar='sync')
         menuSync.addActions(self.synctbar.actions())
         self.urlCombo = QComboBox(self)
