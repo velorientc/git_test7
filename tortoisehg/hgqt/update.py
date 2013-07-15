@@ -22,12 +22,13 @@ class UpdateDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts={}):
         super(UpdateDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
 
         # base layout box
         box = QVBoxLayout()
@@ -189,6 +190,11 @@ class UpdateDialog(QDialog):
         expander.set_expanded(hiddenOptionsChecked)
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def hiddenSettingIsChecked(self):
         if self.merge_chk.isChecked() or self.autoresolve_chk.isChecked() or self.showlog_chk.isChecked():
             return True

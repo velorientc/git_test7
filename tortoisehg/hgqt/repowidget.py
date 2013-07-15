@@ -1817,7 +1817,7 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def updateToRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)
-        dlg = update.UpdateDialog(self.repo, rev, self)
+        dlg = update.UpdateDialog(self._repoagent, rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)

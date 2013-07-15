@@ -569,7 +569,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         branch = self.selected_patch()
         # TODO: Fetch list of heads of branch
         # - use a list of revs if more than one found
-        dlg = update.UpdateDialog(self.repo, branch, self)
+        dlg = update.UpdateDialog(self._repoagent, branch, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)

@@ -29,8 +29,7 @@ from PyQt4.QtGui import *
 class rUpdateDialog(UpdateDialog):
 
     def __init__(self, repoagent, rev=None, parent=None, opts={}):
-        repo = repoagent.rawRepo()  # TODO
-        super(rUpdateDialog, self).__init__(repo, rev, parent, opts)
+        super(rUpdateDialog, self).__init__(repoagent, rev, parent, opts)
 
         # Get configured paths
         self.paths = {}
