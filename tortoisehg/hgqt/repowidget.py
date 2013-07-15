@@ -1863,7 +1863,7 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createMergeDialog, self.rev)
 
     def _createMergeDialog(self, rev):
-        return merge.MergeDialog(self.repo, rev, self)
+        return merge.MergeDialog(self._repoagent, rev, self)
 
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)

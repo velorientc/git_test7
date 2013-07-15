@@ -862,13 +862,12 @@ def manifest(ui, repoagent, *pats, **opts):
 def merge(ui, repoagent, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt import merge as mergemod
-    repo = repoagent.rawRepo()
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]
     if not rev:
         raise util.Abort(_('Merge revision not specified or not found'))
-    return mergemod.MergeDialog(repo, rev)
+    return mergemod.MergeDialog(repoagent, rev)
 
 @command('mq', [], _('thg mq'))
 def mq(ui, repoagent, *pats, **opts):

@@ -20,11 +20,12 @@ MARGINS = (8, 0, 0, 0)
 
 class MergeDialog(QWizard):
 
-    def __init__(self, repo, otherrev, parent=None):
+    def __init__(self, repoagent, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
+        repo = repoagent.rawRepo()
         self.otherrev = str(otherrev)
         self.localrev = str(repo['.'].rev())
 
@@ -35,11 +36,11 @@ class MergeDialog(QWizard):
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
-        summarypage = SummaryPage(repo, self)
+        summarypage = SummaryPage(repoagent, self)
         self.addPage(summarypage)
-        self.addPage(MergePage(repo, self))
-        self.addPage(CommitPage(repo, self))
-        self.addPage(ResultPage(repo, self))
+        self.addPage(MergePage(repoagent, self))
+        self.addPage(CommitPage(repoagent, self))
+        self.addPage(ResultPage(repoagent, self))
         self.currentIdChanged.connect(self.pageChanged)
 
         # move focus to "Next" button so that "Cancel" doesn't eat Enter key
@@ -48,8 +49,8 @@ class MergeDialog(QWizard):
 
         self.resize(QSize(700, 489).expandedTo(self.minimumSizeHint()))
 
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.configChanged.connect(self.configChanged)
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
 
     @pyqtSlot()
     def repositoryChanged(self):
@@ -71,9 +72,13 @@ class MergeDialog(QWizard):
 
 
 class BasePage(QWizardPage):
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         super(BasePage, self).__init__(parent)
-        self.repo = repo
+        self._repoagent = repoagent
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def validatePage(self):
         'user pressed NEXT button, can we proceed?'
@@ -111,8 +116,8 @@ class BasePage(QWizardPage):
 class SummaryPage(BasePage):
     refreshFinished = pyqtSignal()
 
-    def __init__(self, repo, parent):
-        super(SummaryPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(SummaryPage, self).__init__(repoagent, parent)
         self.clean = None
         self.th = None
 
@@ -338,8 +343,8 @@ class SummaryPage(BasePage):
 
 
 class MergePage(BasePage):
-    def __init__(self, repo, parent):
-        super(MergePage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(MergePage, self).__init__(repoagent, parent)
         self.mergecomplete = False
 
         self.setTitle(_('Merging...'))
@@ -438,13 +443,15 @@ class MergePage(BasePage):
 
 class CommitPage(BasePage):
 
-    def __init__(self, repo, parent):
-        super(CommitPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(CommitPage, self).__init__(repoagent, parent)
 
         self.setTitle(_('Commit merge results'))
         self.setSubTitle(' ')
         self.setLayout(QVBoxLayout())
         self.setCommitPage(True)
+
+        repo = repoagent.rawRepo()
 
         # csinfo
         def label_func(widget, item, ctx):
@@ -677,8 +684,8 @@ class CommitPage(BasePage):
             self.refresh()
 
 class ResultPage(BasePage):
-    def __init__(self, repo, parent):
-        super(ResultPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(ResultPage, self).__init__(repoagent, parent)
         self.setTitle(_('Finished'))
         self.setSubTitle(' ')
         self.setFinalPage(True)
