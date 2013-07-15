@@ -93,51 +93,10 @@ class BisectDialog(QDialog):
                           '(good/bad/skip)')))
         self.cmd.commandFinished.connect(cmdFinished)
 
-        def gverify():
-            good = hglib.fromunicode(self._gle.text().simplified())
-            try:
-                ctx = self.repo[good]
-                self.goodrev = ctx.rev()
-                self._gb.setEnabled(False)
-                self._gle.setEnabled(False)
-                self._bb.setEnabled(True)
-                self._ble.setEnabled(True)
-                self._ble.setFocus()
-            except error.RepoLookupError, e:
-                self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
-            except util.Abort, e:
-                if e.hint:
-                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                                hglib.tounicode(e.hint))
-                else:
-                    err = hglib.tounicode(str(e))
-                self.cmd.core.stbar.showMessage(err)
-        def bverify():
-            bad = hglib.fromunicode(self._ble.text().simplified())
-            try:
-                ctx = self.repo[bad]
-                self.badrev = ctx.rev()
-                self._ble.setEnabled(False)
-                self._bb.setEnabled(False)
-                cmds = []
-                cmds.append(self._bisectcmd(reset=True))
-                cmds.append(self._bisectcmd(self.goodrev, good=True))
-                cmds.append(self._bisectcmd(self.badrev, bad=True))
-                self.cmd.run(*cmds)
-            except error.RepoLookupError, e:
-                self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
-            except util.Abort, e:
-                if e.hint:
-                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                                hglib.tounicode(e.hint))
-                else:
-                    err = hglib.tounicode(str(e))
-                self.cmd.core.stbar.showMessage(err)
-
-        gb.pressed.connect(gverify)
-        bb.pressed.connect(bverify)
-        gle.returnPressed.connect(gverify)
-        ble.returnPressed.connect(bverify)
+        gb.pressed.connect(self._verifyGood)
+        bb.pressed.connect(self._verifyBad)
+        gle.returnPressed.connect(self._verifyGood)
+        ble.returnPressed.connect(self._verifyBad)
 
         goodrev.clicked.connect(self._markGoodRevision)
         badrev.clicked.connect(self._markBadRevision)
@@ -151,6 +110,50 @@ class BisectDialog(QDialog):
     def _bisectcmd(self, *args, **opts):
         opts['repository'] = self.repo.root
         return hglib.buildcmdargs('bisect', *args, **opts)
+
+    @pyqtSlot()
+    def _verifyGood(self):
+        good = hglib.fromunicode(self._gle.text().simplified())
+        try:
+            ctx = self.repo[good]
+            self.goodrev = ctx.rev()
+            self._gb.setEnabled(False)
+            self._gle.setEnabled(False)
+            self._bb.setEnabled(True)
+            self._ble.setEnabled(True)
+            self._ble.setFocus()
+        except error.RepoLookupError, e:
+            self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.cmd.core.stbar.showMessage(err)
+
+    @pyqtSlot()
+    def _verifyBad(self):
+        bad = hglib.fromunicode(self._ble.text().simplified())
+        try:
+            ctx = self.repo[bad]
+            self.badrev = ctx.rev()
+            self._ble.setEnabled(False)
+            self._bb.setEnabled(False)
+            cmds = []
+            cmds.append(self._bisectcmd(reset=True))
+            cmds.append(self._bisectcmd(self.goodrev, good=True))
+            cmds.append(self._bisectcmd(self.badrev, bad=True))
+            self.cmd.run(*cmds)
+        except error.RepoLookupError, e:
+            self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.cmd.core.stbar.showMessage(err)
 
     @pyqtSlot()
     def _markGoodRevision(self):
