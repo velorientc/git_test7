@@ -19,12 +19,13 @@ BB = QDialogButtonBox
 class GraftDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(GraftDialog, self).__init__(parent)
         self.setWindowIcon(qtlib.geticon('hg-transplant'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+
+        self._repoagent = repoagent
         self._graftstatefile = self.repo.join('graftstate')
         self.aborted = False
         self.valid = True
@@ -91,7 +92,7 @@ class GraftDialog(QDialog):
         self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
         self.autoresolvechk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+            self.repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
         self.currentuservechk = QCheckBox(_('Use my user name instead of graft '
@@ -135,6 +136,10 @@ class GraftDialog(QDialog):
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Graft - %s') % self.repo.displayname)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def _updateSourceTitle(self, idx):
         numrevs = len(self.sourcelist)

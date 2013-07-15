@@ -569,7 +569,7 @@ def graft(ui, repoagent, *revs, **opts):
     revs.extend(opts['rev'])
     if not os.path.exists(repo.join('graftstate')) and not revs:
         raise util.Abort(_('You must provide revisions to graft'))
-    return graftmod.GraftDialog(repo, None, source=revs)
+    return graftmod.GraftDialog(repoagent, None, source=revs)
 
 @command('^grep|search',
     [('i', 'ignorecase', False, _('ignore case during search'))],

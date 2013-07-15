@@ -1895,7 +1895,7 @@ class RepoWidget(QWidget):
             revlist.append(str(rev))
         if not revlist:
             revlist = [self.rev]
-        dlg = graft.GraftDialog(self.repo, self, source=revlist)
+        dlg = graft.GraftDialog(self._repoagent, self, source=revlist)
         dlg.finished.connect(dlg.deleteLater)
         if dlg.valid:
             dlg.exec_()
