@@ -26,8 +26,9 @@ class ArchiveDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, repo, rev=None, parent=None):
+    def __init__(self, repoagent, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent)
+        self._repoagent = repoagent
 
         # main layout
         self.vbox = QVBoxLayout()
@@ -122,7 +123,6 @@ class ArchiveDialog(QDialog):
         self.vbox.addLayout(self.hbox)
 
         # set default values
-        self.repo = repo
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
@@ -170,6 +170,10 @@ class ArchiveDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.rev_combo.setFocus()
         self._readsettings()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def rev_combo_changed(self):
         self.subrepos_chk.setChecked(self.get_subrepos_present())

@@ -455,9 +455,8 @@ def annotate(ui, repoagent, *pats, **opts):
 def archive(ui, repoagent, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt import archive as archivemod
-    repo = repoagent.rawRepo()
     rev = opts.get('rev')
-    return archivemod.ArchiveDialog(repo, rev)
+    return archivemod.ArchiveDialog(repoagent, rev)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),

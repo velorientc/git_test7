@@ -1940,7 +1940,7 @@ class RepoWidget(QWidget):
 
     def archiveRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)
-        dlg = archive.ArchiveDialog(self.repo, rev, self)
+        dlg = archive.ArchiveDialog(self._repoagent, rev, self)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
