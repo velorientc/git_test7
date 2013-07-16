@@ -125,7 +125,7 @@ class BisectDialog(QDialog):
             self._bb.setEnabled(True)
             self._ble.setEnabled(True)
             self._ble.setFocus()
-        except error.RepoLookupError, e:
+        except (error.LookupError, error.RepoLookupError), e:
             self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
         except util.Abort, e:
             if e.hint:
@@ -148,7 +148,7 @@ class BisectDialog(QDialog):
             cmds.append(self._bisectcmd(self.goodrev, good=True))
             cmds.append(self._bisectcmd(self.badrev, bad=True))
             self.cmd.run(*cmds)
-        except error.RepoLookupError, e:
+        except (error.LookupError, error.RepoLookupError), e:
             self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
         except util.Abort, e:
             if e.hint:
