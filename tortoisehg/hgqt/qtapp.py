@@ -281,16 +281,16 @@ class QtRunner(QObject):
         self._repomanager = thgrepo.RepoManager(ui, self)
 
         dlg, reporoot = self._createdialog(dlgfunc, args, opts)
-        if dlg:
-            dlg.show()
-            dlg.raise_()
-        else:
-            return -1
-
-        if thginithook is not None:
-            thginithook()
-
         try:
+            if dlg:
+                dlg.show()
+                dlg.raise_()
+            else:
+                return -1
+
+            if thginithook is not None:
+                thginithook()
+
             return self._mainapp.exec_()
         finally:
             if reporoot:
