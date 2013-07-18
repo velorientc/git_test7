@@ -438,6 +438,10 @@ class RepoManager(QObject):
         path = _normreporoot(path)
         return self._openagents.get(path, (None, 0))[0]
 
+    def repoRootPaths(self):
+        """Return list of root paths of open repositories"""
+        return self._openagents.keys()
+
     def _mappedSignals(self, agent):
         return [
             (agent.configChanged,           self._mapConfigChanged),
