@@ -579,6 +579,8 @@ class LogDockWidget(QDockWidget):
         self._consoles = QStackedWidget(self)
         self.setWidget(self._consoles)
         self._createConsole()
+        for root in self._repomanager.repoRootPaths():
+            self._createConsoleFor(root)
 
         # move focus only when console is activated by keyboard/mouse operation
         self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
