@@ -987,7 +987,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def unbundle(self):
         caption = _("Select bundle file")
-        _FILE_FILTER = "%s" % _("Bundle files (*.hg)")
+        _FILE_FILTER = ';;'.join([_("Bundle files (*.hg)"),
+                                  _("All files (*)")])
         bundlefile = QFileDialog.getOpenFileName(parent=self, caption=caption,
                                     directory=self.repo.root,
                                     filter=_FILE_FILTER)
