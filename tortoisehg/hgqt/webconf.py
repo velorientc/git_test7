@@ -13,7 +13,8 @@ from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.webconf_ui import Ui_WebconfForm
 
-_FILE_FILTER = _('Config files (*.conf *.config *.ini);;Any files (*)')
+_FILE_FILTER = ';;'.join([_('Config files (*.conf *.config *.ini)'),
+                          _('Any files (*)')])
 
 class WebconfForm(QWidget):
     """Widget to show/edit webconf"""
