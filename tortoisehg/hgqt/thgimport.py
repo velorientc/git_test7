@@ -13,11 +13,9 @@ import tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
-
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo, commit
+from tortoisehg.hgqt import cmdui, cslist, qtlib, commit
 
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
