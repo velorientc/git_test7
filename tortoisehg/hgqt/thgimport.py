@@ -83,12 +83,14 @@ class ImportDialog(QDialog):
         statbox.addWidget(self.status)
         self.targetcombo = QComboBox()
         self.targetcombo.currentIndexChanged.connect(self.updatestatus)
-        self.targetcombo.addItem(_('Repository'))
-        self.targetcombo.addItem(_('Shelf'))
-        self.targetcombo.addItem(_('Working Directory'))
+        self.targetcombo.addItem(_('Repository'), ('import',))
+        self.targetcombo.addItem(_('Shelf'), ('copy',))
+        self.targetcombo.addItem(_('Working Directory'),
+                                 ('import', '--no-commit'))
         cur = self.repo.getcurrentqqueue()
         if cur:
-            self.targetcombo.addItem(hglib.tounicode(cur))
+            self.targetcombo.addItem(hglib.tounicode(cur), ('qimport',))
+        self.targetcombo.currentIndexChanged.connect(self._updatep0chk)
         statbox.addWidget(self.targetcombo)
         grid.addItem(statbox, 3, 1)
 
@@ -141,6 +143,7 @@ class ImportDialog(QDialog):
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
         self.p0chk.setHidden(False)
+        self._updatep0chk()
         self.preview()
 
     ### Private Methods ###
@@ -207,6 +210,17 @@ class ImportDialog(QDialog):
             self.src_combo.setEditText(curtext + os.pathsep + filename)
         else:
             self.src_combo.setEditText(filename)
+
+    def _targetcommand(self):
+        index = self.targetcombo.currentIndex()
+        return self.targetcombo.itemData(index).toPyObject()
+
+    @pyqtSlot()
+    def _updatep0chk(self):
+        cmd = self._targetcommand()[0]
+        self.p0chk.setEnabled(cmd == 'import')
+        if not self.p0chk.isEnabled():
+            self.p0chk.setChecked(False)
 
     def updatestatus(self):
         items = self.cslist.curitems
