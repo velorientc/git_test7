@@ -23,7 +23,8 @@ class StripDialog(QDialog):
 
     def __init__(self, repo, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
         self.setWindowIcon(qtlib.geticon('menudelete'))
         self.repo = repo
 
@@ -73,7 +74,8 @@ class StripDialog(QDialog):
         grid.addWidget(expander, 3, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 3, 1)
 
-        self.discard_chk = QCheckBox(_('Discard local changes, no backup (-f/--force)'))
+        self.discard_chk = QCheckBox(_('Discard local changes, no backup '
+                                       '(-f/--force)'))
         self.nobackup_chk = QCheckBox(_('No backup (-n/--nobackup)'))
         optbox.addWidget(self.discard_chk)
         optbox.addWidget(self.nobackup_chk)
@@ -176,7 +178,8 @@ class StripDialog(QDialog):
         # since strip will always strip all the descendants of a revision.
         # Thus in this case --hidden will just let us choose a hidden revision
         # as the base revision to strip.
-        cmdline = ['strip', '--repository', self.repo.root, '--verbose', '--hidden']
+        cmdline = ['strip', '--repository', self.repo.root, '--verbose',
+                   '--hidden']
         rev = hglib.fromunicode(self.rev_combo.currentText())
         if not rev:
             return
