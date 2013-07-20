@@ -136,11 +136,9 @@ class ImportDialog(QDialog):
 
         # prepare to show
         self.src_combo.lineEdit().selectAll()
-        self.cslist.setHidden(False)
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
-        self.p0chk.setHidden(False)
         self._updatep0chk()
         self.preview()
 
