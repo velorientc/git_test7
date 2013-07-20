@@ -986,10 +986,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def unbundle(self):
         caption = _("Select bundle file")
-        _FILE_FILTER = "%s" % _("Bundle files (*.hg)")
-        bundlefile = QFileDialog.getOpenFileName(parent=self, caption=caption,
-                                    directory=self.repo.root,
-                                    filter=_FILE_FILTER)
+        _FILE_FILTER = ';;'.join([_("Bundle files (*.hg)"),
+                                  _("All files (*)")])
+        bundlefile = QFileDialog.getOpenFileName(
+            self, caption, hglib.tounicode(self.repo.root), _FILE_FILTER)
         if bundlefile:
             # Set the pull source to the selected bundle file
             self.urlentry.setText(bundlefile)
