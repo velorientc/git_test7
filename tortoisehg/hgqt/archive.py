@@ -198,7 +198,8 @@ class ArchiveDialog(QDialog):
         else:
             caption = _('Select Destination File')
             ext = '*' + select['ext']
-            filter = '%s (%s);;All Files (*.*)' % (select['label'], ext)
+            filter = ';;'.join(['%s (%s)' % (select['label'], ext),
+                                _('All Files (*.*)')])
         response = FD.getSaveFileName(self, caption, dest, filter, None,
                                       FD.ReadOnly)
         if response:
