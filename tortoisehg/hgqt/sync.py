@@ -990,7 +990,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         _FILE_FILTER = ';;'.join([_("Bundle files (*.hg)"),
                                   _("All files (*)")])
         bundlefile = QFileDialog.getOpenFileName(parent=self, caption=caption,
-                                    directory=self.repo.root,
+                                    directory=hglib.tounicode(self.repo.root),
                                     filter=_FILE_FILTER)
         if bundlefile:
             # Set the pull source to the selected bundle file
