@@ -71,10 +71,9 @@ class ImportDialog(QDialog):
 
         ### patch list
         self.cslist = cslist.ChangesetList(self.repo)
-        self.cslistrow = cslistrow = 4
-        self.cslistcol = cslistcol = 1
-        grid.addWidget(self.cslist, cslistrow, cslistcol,
-                       Qt.AlignLeft | Qt.AlignTop)
+        cslistrow = 4
+        cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol)
         grid.addWidget(QLabel(_('Preview:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
         statbox = QHBoxLayout()
         self.status = QLabel("")
@@ -165,11 +164,6 @@ class ImportDialog(QDialog):
             self.checkStatus()
         else:
             return super(ImportDialog, self).keyPressEvent(event)
-
-    def resizeEvent(self, event):
-        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
-        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
-        self.cslist.resize(w, h)
 
     def browsefiles(self):
         caption = _("Select patches")

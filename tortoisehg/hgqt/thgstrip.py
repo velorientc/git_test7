@@ -61,10 +61,9 @@ class StripDialog(QDialog):
 
         ### preview box, contained in scroll area, contains preview grid
         self.cslist = cslist.ChangesetList(self.repo)
-        self.cslistrow = cslistrow = 2
-        self.cslistcol = cslistcol = 1
-        grid.addWidget(self.cslist, cslistrow, cslistcol,
-                       Qt.AlignLeft | Qt.AlignTop)
+        cslistrow = 2
+        cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol)
 
         ### options
         optbox = QVBoxLayout()
@@ -129,11 +128,6 @@ class StripDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
-
-    def resizeEvent(self, event):
-        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
-        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
-        self.cslist.resize(w, h)
 
     def get_rev(self):
         """Return the integer revision number of the input or None"""
