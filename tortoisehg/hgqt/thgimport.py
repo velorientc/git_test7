@@ -80,7 +80,6 @@ class ImportDialog(QDialog):
         self.status = QLabel("")
         statbox.addWidget(self.status)
         self.targetcombo = QComboBox()
-        self.targetcombo.currentIndexChanged.connect(self.updatestatus)
         self.targetcombo.addItem(_('Repository'), ('import',))
         self.targetcombo.addItem(_('Shelf'), ('copy',))
         self.targetcombo.addItem(_('Working Directory'),
