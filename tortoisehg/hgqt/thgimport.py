@@ -261,8 +261,8 @@ class ImportDialog(QDialog):
     def thgimport(self):
         if self.cslist.curitems is None:
             return
-        idx = self.targetcombo.currentIndex()
-        if idx == 1:
+        cmdline = list(self._targetcommand())
+        if cmdline == ['copy']:
             # import to shelf
             existing = self.repo.thgshelves()
             if not os.path.exists(self.repo.shelfdir):
@@ -270,8 +270,7 @@ class ImportDialog(QDialog):
             for file in self.cslist.curitems:
                 shutil.copy(file, self.repo.shelfdir)
             return
-        hgcmd = ('import', 'copy', 'import --no-commit', 'qimport')[idx]
-        cmdline = hgcmd.split(' ') + ['--repository', self.repo.root]
+        cmdline.extend(['--repository', self.repo.root])
         if self.p0chk.isChecked():
             cmdline.append('-p0')
         cmdline.extend(['--verbose', '--'])
