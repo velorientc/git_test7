@@ -79,6 +79,8 @@ class Logger():
 
 logger = Logger()
 
+iconcache = {}
+
 def load_icon(name):
     from tortoisehg.util.paths import get_tortoise_icon
     iconPathName = get_tortoise_icon(name)
@@ -90,13 +92,20 @@ def load_icon(name):
         hicon = LoadIcon(0, win32con.IDI_APPLICATION)
     return hicon
 
+def get_icon(name):
+    try:
+        return iconcache[name]
+    except KeyError:
+        iconcache[name] = load_icon(name)
+        return iconcache[name]
+
 def SetIcon(hwnd, name, add=False):
     # Try and find a custom icon
     if '--noicon' in sys.argv:
         return
     print "SetIcon(%s)" % name
 
-    hicon = load_icon(name)
+    hicon = get_icon(name)
 
     flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
     nid = (hwnd, 0, flags, win32con.WM_USER+20, hicon, APP_TITLE)
