@@ -1402,7 +1402,7 @@ class RepoWidget(QWidget):
             entry(submenu, None, isrev, pname).setData(pnum)
         entry(menu)
 
-        entry(menu, None, fixed, _('&Graft to Local...'), 'hg-transplant',
+        entry(menu, None, isrev, _('&Graft to Local...'), 'hg-transplant',
               self.graftRevisions)
 
         if 'mq' in exs or 'rebase' in exs:
@@ -1416,7 +1416,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'mq', applied, _('Re&name Patch...'), None,
                   self.qrename)
             entry(submenu, 'mq')
-            entry(submenu, 'rebase', fixed, _('&Rebase...'), 'hg-rebase',
+            entry(submenu, 'rebase', isrev, _('&Rebase...'), 'hg-rebase',
                   self.rebaseRevision)
             entry(submenu, 'rebase')
             entry(submenu, 'mq', fixed, _('&Strip...'), 'menudelete',
