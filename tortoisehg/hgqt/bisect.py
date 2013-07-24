@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -32,20 +30,20 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Known good revision:')))
-        gle = QLineEdit()
+        self._gle = gle = QLineEdit()
         gle.setText(opts.get('good', ''))
         hbox.addWidget(gle, 1)
-        gb = QPushButton(_('Accept'))
+        self._gb = gb = QPushButton(_('Accept'))
         hbox.addWidget(gb)
         box.addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Known bad revision:')))
-        ble = QLineEdit()
+        self._ble = ble = QLineEdit()
         ble.setText(opts.get('bad', ''))
         ble.setEnabled(False)
         hbox.addWidget(ble, 1)
-        bb = QPushButton(_('Accept'))
+        self._bb = bb = QPushButton(_('Accept'))
         bb.setEnabled(False)
         hbox.addWidget(bb)
         box.addLayout(hbox)
@@ -66,7 +64,7 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         box.addLayout(hbox)
-        lbl = QLabel()
+        self._lbl = lbl = QLabel()
         hbox.addWidget(lbl)
         hbox.addStretch(1)
         closeb = QPushButton(_('Close'))
@@ -78,95 +76,102 @@ class BisectDialog(QDialog):
             b.setEnabled(False)
         self.lastrev = None
 
-        def cmdFinished(ret):
-            if ret != 0:
-                lbl.setText(_('Error encountered.'))
-                return
-            repo.dirstate.invalidate()
-            ctx = repo['.']
-            if ctx.rev() == self.lastrev:
-                lbl.setText(_('Culprit found.'))
-                return
-            self.lastrev = ctx.rev()
-            for b in self.nextbuttons:
-                b.setEnabled(True)
-            lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), ctx.rev(), ctx,
-                        _('Test this revision and report findings. '
-                          '(good/bad/skip)')))
-        self.cmd.commandFinished.connect(cmdFinished)
+        self.cmd.commandFinished.connect(self._cmdFinished)
 
-        prefix = ['bisect', '--repository', repo.root]
+        gb.pressed.connect(self._verifyGood)
+        bb.pressed.connect(self._verifyBad)
+        gle.returnPressed.connect(self._verifyGood)
+        ble.returnPressed.connect(self._verifyBad)
 
-        def gverify():
-            good = hglib.fromunicode(gle.text().simplified())
-            try:
-                ctx = repo[good]
-                self.goodrev = ctx.rev()
-                gb.setEnabled(False)
-                gle.setEnabled(False)
-                bb.setEnabled(True)
-                ble.setEnabled(True)
-                ble.setFocus()
-            except error.RepoLookupError, e:
-                self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
-            except util.Abort, e:
-                if e.hint:
-                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                                hglib.tounicode(e.hint))
-                else:
-                    err = hglib.tounicode(str(e))
-                self.cmd.core.stbar.showMessage(err)
-        def bverify():
-            bad = hglib.fromunicode(ble.text().simplified())
-            try:
-                ctx = repo[bad]
-                self.badrev = ctx.rev()
-                ble.setEnabled(False)
-                bb.setEnabled(False)
-                cmds = []
-                cmds.append(prefix + ['--reset'])
-                cmds.append(prefix + ['--good', str(self.goodrev)])
-                cmds.append(prefix + ['--bad', str(self.badrev)])
-                self.cmd.run(*cmds)
-            except error.RepoLookupError, e:
-                self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
-            except util.Abort, e:
-                if e.hint:
-                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                                hglib.tounicode(e.hint))
-                else:
-                    err = hglib.tounicode(str(e))
-                self.cmd.core.stbar.showMessage(err)
-
-        gb.pressed.connect(gverify)
-        bb.pressed.connect(bverify)
-        gle.returnPressed.connect(gverify)
-        ble.returnPressed.connect(bverify)
-
-        def goodrevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(prefix + ['--good', '.'])
-        def badrevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(prefix + ['--bad', '.'])
-        def skiprevision():
-            for b in self.nextbuttons:
-                b.setEnabled(False)
-            self.cmd.run(prefix + ['--skip', '.'])
-        goodrev.clicked.connect(goodrevision)
-        badrev.clicked.connect(badrevision)
-        skiprev.clicked.connect(skiprevision)
+        goodrev.clicked.connect(self._markGoodRevision)
+        badrev.clicked.connect(self._markBadRevision)
+        skiprev.clicked.connect(self._skipRevision)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.reject()
         super(BisectDialog, self).keyPressEvent(event)
 
+    def _bisectcmd(self, *args, **opts):
+        opts['repository'] = self.repo.root
+        return hglib.buildcmdargs('bisect', *args, **opts)
 
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return BisectDialog(repo, opts)
+    @pyqtSlot(int)
+    def _cmdFinished(self, ret):
+        lbl = self._lbl
+        if ret != 0:
+            lbl.setText(_('Error encountered.'))
+            return
+        self.repo.dirstate.invalidate()
+        ctx = self.repo['.']
+        if ctx.rev() == self.lastrev:
+            lbl.setText(_('Culprit found.'))
+            return
+        self.lastrev = ctx.rev()
+        for b in self.nextbuttons:
+            b.setEnabled(True)
+        lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), ctx.rev(), ctx,
+                    _('Test this revision and report findings. '
+                      '(good/bad/skip)')))
+
+    @pyqtSlot()
+    def _verifyGood(self):
+        good = hglib.fromunicode(self._gle.text().simplified())
+        try:
+            ctx = self.repo[good]
+            self.goodrev = ctx.rev()
+            self._gb.setEnabled(False)
+            self._gle.setEnabled(False)
+            self._bb.setEnabled(True)
+            self._ble.setEnabled(True)
+            self._ble.setFocus()
+        except (error.LookupError, error.RepoLookupError), e:
+            self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.cmd.core.stbar.showMessage(err)
+
+    @pyqtSlot()
+    def _verifyBad(self):
+        bad = hglib.fromunicode(self._ble.text().simplified())
+        try:
+            ctx = self.repo[bad]
+            self.badrev = ctx.rev()
+            self._ble.setEnabled(False)
+            self._bb.setEnabled(False)
+            cmds = []
+            cmds.append(self._bisectcmd(reset=True))
+            cmds.append(self._bisectcmd(self.goodrev, good=True))
+            cmds.append(self._bisectcmd(self.badrev, bad=True))
+            self.cmd.run(*cmds)
+        except (error.LookupError, error.RepoLookupError), e:
+            self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.cmd.core.stbar.showMessage(err)
+
+    @pyqtSlot()
+    def _markGoodRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', good=True))
+
+    @pyqtSlot()
+    def _markBadRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', bad=True))
+
+    @pyqtSlot()
+    def _skipRevision(self):
+        for b in self.nextbuttons:
+            b.setEnabled(False)
+        self.cmd.run(self._bisectcmd('.', skip=True))

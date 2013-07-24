@@ -134,7 +134,8 @@ class QuickOpDialog(QDialog):
             if self.command == 'revert':
                 self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
             elif self.command == 'remove':
-                self.chk.setChecked(s.value('quickop/forceremove', False).toBool())
+                self.chk.setChecked(
+                    s.value('quickop/forceremove', False).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
@@ -153,12 +154,12 @@ class QuickOpDialog(QDialog):
             self.reject()
 
     def accept(self):
-        cmdline = [self.command]
-        if hasattr(self, 'chk') and self.chk.isChecked():
+        cmdopts = {}
+        if hasattr(self, 'chk'):
             if self.command == 'revert':
-                cmdline.append('--no-backup')
+                cmdopts['no_backup'] = self.chk.isChecked()
             elif self.command == 'remove':
-                cmdline.append('--force')
+                cmdopts['force'] = self.chk.isChecked()
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
@@ -178,16 +179,19 @@ class QuickOpDialog(QDialog):
                     if wfile in modified:
                         selmodified.append(wfile)
                 if selmodified:
-                    prompt = qtlib.CustomPrompt(_('Confirm Remove'),
-                                                _('You have selected one or more files that have been '
-                                                  'modified.  By default, these files will not be '
-                                                  'removed.  What would you like to do?'), self,
-                                                (_('Remove &Unmodified Files'),
-                                                 _('Remove &All Selected Files'), _('Cancel')),
-                                                0, 2, selmodified)
+                    prompt = qtlib.CustomPrompt(
+                        _('Confirm Remove'),
+                        _('You have selected one or more files that have been '
+                          'modified.  By default, these files will not be '
+                          'removed.  What would you like to do?'),
+                        self,
+                        (_('Remove &Unmodified Files'),
+                         _('Remove &All Selected Files'),
+                         _('Cancel')),
+                        0, 2, selmodified)
                     ret = prompt.run()
                     if ret == 1:
-                        cmdline.append('--force')
+                        cmdopts['force'] = True
                     elif ret == 2:
                         return
             unknown, ignored = repostate[4:6]
@@ -203,7 +207,7 @@ class QuickOpDialog(QDialog):
                 self.addWithPrompt(files)
                 return
         if files:
-            cmdline.extend(files)
+            cmdline = hglib.buildcmdargs(self.command, *files, **cmdopts)
             self.files = files
             self.cmd.run(cmdline)
         else:
@@ -275,18 +279,12 @@ class HeadlessQuickop(QObject):
     def raise_(self):
         pass
 
-def run(ui, *pats, **opts):
+def run(ui, repoagent, *pats, **opts):
+    repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
-    if opts.get('canonpats'):
-        pats = list(pats) + opts['canonpats']
-
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-
     command = opts['alias']
     imm = repo.ui.config('tortoisehg', 'immediate', '')
-    if command in imm.lower():
+    if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
         return HeadlessQuickop(repo, cmdline)
     else:

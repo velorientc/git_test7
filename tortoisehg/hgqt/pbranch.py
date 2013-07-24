@@ -569,7 +569,6 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def merge_activated(self):

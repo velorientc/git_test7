@@ -12,9 +12,9 @@ from StringIO import StringIO
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import error, extensions, util, scmutil
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
@@ -205,7 +205,8 @@ class EmailDialog(QDialog):
         opts['intro'] = self._qui.writeintro_check.isChecked()
         if opts['intro']:
             opts['subject'] = headertext(self._qui.subject_edit.currentText())
-            opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
+            opts['desc'] = writetempfile(
+                hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
         # Include the repo in the command so it can be found when thg is not
@@ -220,7 +221,8 @@ class EmailDialog(QDialog):
             if not getattr(self._qui, e).currentText():
                 return False
 
-        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.currentText():
+        if (self._qui.writeintro_check.isChecked()
+            and not self._qui.subject_edit.currentText()):
             return False
 
         if not self._revs:
@@ -269,24 +271,11 @@ class EmailDialog(QDialog):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
     def accept(self):
-        # TODO: want to pass patchbombopts directly
-        def cmdargs(opts):
-            args = []
-            for k, v in opts.iteritems():
-                if isinstance(v, bool):
-                    if v:
-                        args.append('--%s' % k.replace('_', '-'))
-                else:
-                    for e in isinstance(v, basestring) and [v] or v:
-                        args += ['--%s' % k.replace('_', '-'), e]
-
-            return args
-
         hglib.loadextension(self._ui, 'patchbomb')
 
         opts = self._patchbombopts()
         try:
-            cmd = cmdui.Dialog(['email'] + cmdargs(opts), parent=self)
+            cmd = cmdui.Dialog(hglib.buildcmdargs('email', **opts), parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.setShowOutput(False)
             cmd.finished.connect(cmd.deleteLater)
@@ -316,7 +305,7 @@ class EmailDialog(QDialog):
             lex.setFont(fh.font())
             w.setLexer(lex)
             # TODO: better way to setup diff lexer
-          
+
         initqsci(self._qui.preview_edit)
 
         self._qui.main_tabs.currentChanged.connect(self._refreshpreviewtab)
@@ -483,20 +472,3 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         first = self.createIndex(0, 0)
         last = self.createIndex(len(self._revs) - 1, 0)
         self.dataChanged.emit(first, last)
-
-def run(ui, *revs, **opts):
-    # TODO: same options as patchbomb
-    if opts.get('rev'):
-        if revs:
-            raise util.Abort(_('use only one form to specify the revision'))
-        revs = opts.get('rev')
-
-    # TODO: repo should be a required argument?
-    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-
-    try:
-        return EmailDialog(repo, revs, outgoing=opts.get('outgoing', False),
-                           outgoingrevs=opts.get('outgoingrevs', None))
-    except error.RepoLookupError, e:
-        qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
-                          hglib.tounicode(e.message))

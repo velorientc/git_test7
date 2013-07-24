@@ -28,7 +28,7 @@ import time
 import os
 import itertools
 
-from mercurial import repoview, util, error
+from mercurial import repoview
 
 LINE_TYPE_PARENT = 0
 LINE_TYPE_GRAFT = 1
@@ -55,8 +55,11 @@ def revision_grapher(repo, **opts):
       - current revision
       - column of the current node in the set of ongoing edges
       - color of the node (?)
-      - lines; a list of (col, next_col, color_no, line_type) defining
-        the edges between the current row and the next row
+      - lines: a list of (col, next_col, color_no, line_type, children, parent)
+          children: tuple of revs which connected to top of this line.
+                    (or current rev if node is on the line.)
+          parent:   rev which connected to bottom of this line.
+        defining the edges between the current row and the next row
       - parent revisions of current revision
     """
 
@@ -82,17 +85,18 @@ def revision_grapher(repo, **opts):
 
     curr_rev = start_rev
     revs = []
+    children = [()]
     links = [] # smallest link type that applies
-    rev_color = {}
-    nextcolor = 0
 
     if opts.get('allparents') or not branch:
         def getparents(ctx):
-            return [x.rev() for x in ctx.parents() if x]
+            return [x for x in ctx.parents() if x]
     else:
         def getparents(ctx):
-            return [x.rev() for x in ctx.parents() \
+            return [x for x in ctx.parents()
                     if x and x.branch() == branch]
+
+    rev_color = RevColorPalette(getparents)
 
     while curr_rev is None or curr_rev >= stop_rev:
         if hidden(curr_rev):
@@ -116,22 +120,17 @@ def revision_grapher(repo, **opts):
                 continue
             revs.append(curr_rev)
             links.append(LINE_TYPE_PARENT)
-            rev_color[curr_rev] = curcolor = nextcolor
-            nextcolor += 1
-            p_revs = getparents(ctx)
-            while p_revs:
-                rev0 = p_revs[0]
-                if rev0 < stop_rev or rev0 in rev_color:
-                    break
-                rev_color[rev0] = curcolor
-                p_revs = getparents(repo[rev0])
+            children.append(())
+            rev_color.addheadctx(ctx)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
         next_links = links[:]
+        next_children = children[:]
 
         # Add parents to next_revs.
-        parents = [(p,LINE_TYPE_PARENT) for p in getparents(ctx) if not hidden(p)]
+        parents = [(p.rev(), LINE_TYPE_PARENT) for p in getparents(ctx)
+                   if not hidden(p.rev())]
         if 'source' in ctx.extra():
             src_rev_str = ctx.extra()['source']
             if src_rev_str in repo:
@@ -140,6 +139,7 @@ def revision_grapher(repo, **opts):
                     parents.append((src_rev, LINE_TYPE_GRAFT))
         parents_to_add = []
         links_to_add = []
+        children_to_add = []
         if len(parents) > 1:
             preferred_color = None
         else:
@@ -148,37 +148,39 @@ def revision_grapher(repo, **opts):
             if parent not in next_revs:
                 parents_to_add.append(parent)
                 links_to_add.append(link_type)
+                children_to_add.append((curr_rev,))
                 if parent not in rev_color:
-                    if preferred_color:
-                        rev_color[parent] = preferred_color
-                        preferred_color = None
-                    else:
-                        rev_color[parent] = nextcolor
-                        nextcolor += 1
+                    rev_color.assigncolor(parent, preferred_color)
+                    preferred_color = None
             else:
                 # Merging lines should have the most solid style
                 #  (= lowest style value)
                 i = next_revs.index(parent)
                 next_links[i] = min(next_links[i], link_type)
+                next_children[i] += (curr_rev,)
             preferred_color = None
 
         # parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
         next_links[rev_index:rev_index + 1] = links_to_add
+        next_children[rev_index:rev_index + 1] = children_to_add
 
         lines = []
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, links[i]) )
+                lines.append((i, next_revs.index(rev), color, links[i],
+                              children[i], rev))
             elif rev == curr_rev:
                 for parent, link_type in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, link_type) )
+                    lines.append((i, next_revs.index(parent), color, link_type,
+                                  (curr_rev,), parent))
 
         yield GraphNode(curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
         links = next_links
+        children = next_children
         if curr_rev is None:
             curr_rev = len(repo)
         else:
@@ -200,6 +202,7 @@ def filelog_grapher(repo, path):
     heads.remove(rev)
 
     revs = []
+    children = [()]
     rev_color = {}
     nextcolor = 0
     _paths = {}
@@ -209,40 +212,49 @@ def filelog_grapher(repo, path):
         if rev not in revs:
             revs.append(rev)
             rev_color[rev] = nextcolor ; nextcolor += 1
+            children.append(())
         curcolor = rev_color[rev]
         index = revs.index(rev)
         next_revs = revs[:]
+        next_children = children[:]
 
         # Add parents to next_revs
         fctx = repo.filectx(_paths.get(rev, path), changeid=rev)
         for pfctx in fctx.parents():
             _paths[pfctx.rev()] = pfctx.path()
-        parents = [pfctx.rev() for pfctx in fctx.parents()]# if f.path() == path]
+        parents = [pfctx.rev() for pfctx in fctx.parents()]
+                   # if f.path() == path]
         parents_to_add = []
+        children_to_add = []
         for parent in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
+                children_to_add.append((rev,))
                 if len(parents) > 1:
                     rev_color[parent] = nextcolor ; nextcolor += 1
                 else:
                     rev_color[parent] = curcolor
         parents_to_add.sort()
         next_revs[index:index + 1] = parents_to_add
+        next_children[index:index + 1] = children_to_add
 
         lines = []
         for i, nrev in enumerate(revs):
             if nrev in next_revs:
                 color = rev_color[nrev]
-                lines.append( (i, next_revs.index(nrev), color, LINE_TYPE_PARENT) )
+                lines.append((i, next_revs.index(nrev), color, LINE_TYPE_PARENT,
+                              children[i], nrev))
             elif nrev == rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, LINE_TYPE_PARENT) )
+                    lines.append((i, next_revs.index(parent), color,
+                                  LINE_TYPE_PARENT, (rev,), parent))
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield GraphNode(fctx.rev(), index, curcolor, lines, pcrevs,
                         extra=[_paths.get(fctx.rev(), path)])
         revs = next_revs
+        children = next_children
 
         if revs:
             rev = max(revs)
@@ -255,6 +267,58 @@ def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
         yield GraphNode(patchname, 0, "", [], [])
+
+class RevColorPalette(object):
+    """Assign node and line colors for each revision"""
+
+    def __init__(self, getparents):
+        self._getparents = getparents
+        self._pendingheads = []
+        self._knowncolors = {}
+        self._nextcolor = 0
+
+    def addheadctx(self, ctx):
+        color = self.assigncolor(ctx.rev())
+        p_ctxs = self._getparents(ctx)
+        self._pendingheads.append((p_ctxs, color))
+
+    def _fillpendingheads(self, stoprev):
+        if stoprev is None:
+            return  # avoid filling everything (int_rev < None is False)
+
+        nextpendingheads = []
+        for p_ctxs, color in self._pendingheads:
+            pending = self._fillancestors(p_ctxs, color, stoprev)
+            if pending:
+                nextpendingheads.append((pending, color))
+        self._pendingheads = nextpendingheads
+
+    def _fillancestors(self, p_ctxs, curcolor, stoprev):
+        while p_ctxs:
+            ctx0 = p_ctxs[0]
+            rev0 = ctx0.rev()
+            if rev0 < stoprev:
+                return p_ctxs
+            if rev0 in self._knowncolors:
+                return
+            self._knowncolors[rev0] = curcolor
+            p_ctxs = self._getparents(ctx0)
+
+    def assigncolor(self, rev, color=None):
+        self._fillpendingheads(rev)
+        if color is None:
+            color = self._nextcolor
+            self._nextcolor += 1
+        self._knowncolors[rev] = color
+        return color
+
+    def __getitem__(self, rev):
+        self._fillpendingheads(rev)
+        return self._knowncolors[rev]
+
+    def __contains__(self, rev):
+        self._fillpendingheads(rev)
+        return rev in self._knowncolors
 
 class GraphNode(object):
     """

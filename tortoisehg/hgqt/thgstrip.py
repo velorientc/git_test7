@@ -9,11 +9,11 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
+from mercurial import error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, ngettext
-from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, cslist, qtlib
 
 class StripDialog(QDialog):
     """Dialog to strip changesets"""
@@ -21,21 +21,12 @@ class StripDialog(QDialog):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo=None, rev=None, parent=None, opts={}):
+    def __init__(self, repo, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
         self.setWindowIcon(qtlib.geticon('menudelete'))
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'not repository'
+        self.repo = repo
 
         # base layout box
         box = QVBoxLayout()
@@ -71,10 +62,9 @@ class StripDialog(QDialog):
 
         ### preview box, contained in scroll area, contains preview grid
         self.cslist = cslist.ChangesetList(self.repo)
-        self.cslistrow = cslistrow = 2
-        self.cslistcol = cslistcol = 1
-        grid.addWidget(self.cslist, cslistrow, cslistcol,
-                       Qt.AlignLeft | Qt.AlignTop)
+        cslistrow = 2
+        cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol)
 
         ### options
         optbox = QVBoxLayout()
@@ -84,7 +74,8 @@ class StripDialog(QDialog):
         grid.addWidget(expander, 3, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 3, 1)
 
-        self.discard_chk = QCheckBox(_('Discard local changes, no backup (-f/--force)'))
+        self.discard_chk = QCheckBox(_('Discard local changes, no backup '
+                                       '(-f/--force)'))
         self.nobackup_chk = QCheckBox(_('No backup (-n/--nobackup)'))
         optbox.addWidget(self.discard_chk)
         optbox.addWidget(self.nobackup_chk)
@@ -140,11 +131,6 @@ class StripDialog(QDialog):
 
     ### Private Methods ###
 
-    def resizeEvent(self, event):
-        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
-        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
-        self.cslist.resize(w, h)
-
     def get_rev(self):
         """Return the integer revision number of the input or None"""
         revstr = hglib.fromunicode(self.rev_combo.currentText())
@@ -192,7 +178,8 @@ class StripDialog(QDialog):
         # since strip will always strip all the descendants of a revision.
         # Thus in this case --hidden will just let us choose a hidden revision
         # as the base revision to strip.
-        cmdline = ['strip', '--repository', self.repo.root, '--verbose', '--hidden']
+        cmdline = ['strip', '--repository', self.repo.root, '--verbose',
+                   '--hidden']
         rev = hglib.fromunicode(self.rev_combo.currentText())
         if not rev:
             return
@@ -262,11 +249,3 @@ class StripDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    rev = None
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    return StripDialog(rev=rev, opts=opts)

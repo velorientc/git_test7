@@ -31,7 +31,7 @@ class PurgeDialog(QDialog):
         layout.setMargin(0)
         layout.setSpacing(0)
         self.setLayout(layout)
-        
+
         toplayout = QVBoxLayout()
         toplayout.setMargin(10)
         toplayout.setSpacing(5)
@@ -259,7 +259,7 @@ class PurgeThread(QThread):
         self.progress.emit(*data)
         self.showMessage.emit(_('Deleted %d files') % len(files))
 
-        if opts['delfolders']:
+        if opts['delfolders'] and directories:
             for i, f in enumerate(sorted(directories, reverse=True)):
                 if not os.listdir(repo.wjoin(f)):
                     data = ('rmdir', i, f, '', len(directories))
@@ -270,9 +270,3 @@ class PurgeThread(QThread):
             self.showMessage.emit(_('Deleted %d files and %d folders') % (
                                   len(files), len(directories)))
         return failures
-
-def run(ui, *pats, **opts):
-    from tortoisehg.hgqt import thgrepo
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return PurgeDialog(repo, None)

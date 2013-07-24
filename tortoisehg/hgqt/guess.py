@@ -69,6 +69,7 @@ class DetectRenameDialog(QDialog):
 
         self.unrevlist = QListWidget()
         self.unrevlist.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.unrevlist.doubleClicked.connect(self.onUnrevDoubleClicked)
         utvbox.addWidget(self.unrevlist)
 
         simhbox = QHBoxLayout()
@@ -275,6 +276,10 @@ class DetectRenameDialog(QDialog):
                 hu.write(t, label=l)
         self.difftb.setHtml(hu.getdata()[0])
 
+    def onUnrevDoubleClicked(self, index):
+        file = hglib.fromunicode(self.unrevlist.model().data(index).toString())
+        qtlib.editfiles(self.repo, [file])
+
     def accept(self):
         s = QSettings()
         s.setValue('guess/geom', self.saveGeometry())
@@ -441,9 +446,3 @@ class RenameSearchThread(QThread):
                 return
             old, new, sim = o.path(), n.path(), s
             self.match.emit([old, new, sim])
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(None, path=paths.find_root())
-    return DetectRenameDialog(repo, None, *pats)

@@ -9,8 +9,8 @@ import os
 
 from hgext import mq
 
-from tortoisehg.hgqt import qtlib, thgrepo, qrename
-from tortoisehg.util import hglib, paths
+from tortoisehg.hgqt import qtlib, qrename
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -130,6 +130,7 @@ class QReorderDialog(QDialog):
             dlg.makeLogVisible.connect(self.parent().makeLogVisible)
         dlg.exec_()
 
+    @pyqtSlot()
     def refresh(self):
         patchnames = self.repo.mq.series[:]
         applied = [p.name for p in self.repo.mq.applied]
@@ -191,12 +192,8 @@ class QReorderDialog(QDialog):
         writeSeries(self.repo, applied, unapplied)
         QDialog.accept(self)
 
-    def reject(self):
-        QDialog.reject(self)
-
     def closeEvent(self, event):
         self._writesettings()
-        self.repo.repositoryChanged.disconnect(self.refresh)
         super(QReorderDialog, self).closeEvent(event)
 
     def _readsettings(self):
@@ -219,11 +216,3 @@ def writeSeries(repo, applied, unapplied):
             fp.close()
     finally:
         repo.decrementBusyCount()
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(None, paths.find_root())
-    if hasattr(repo, 'mq'):
-        return QReorderDialog(repo)
-    else:
-        qtlib.ErrorMsgBox(_('TortoiseHg Error'),
-            _('Please enable the MQ extension first.'))

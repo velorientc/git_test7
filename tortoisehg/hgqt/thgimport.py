@@ -13,11 +13,9 @@ import tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
-
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo, commit
+from tortoisehg.hgqt import cmdui, cslist, qtlib, commit
 
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
@@ -73,16 +71,14 @@ class ImportDialog(QDialog):
 
         ### patch list
         self.cslist = cslist.ChangesetList(self.repo)
-        self.cslistrow = cslistrow = 4
-        self.cslistcol = cslistcol = 1
-        grid.addWidget(self.cslist, cslistrow, cslistcol,
-                       Qt.AlignLeft | Qt.AlignTop)
+        cslistrow = 4
+        cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol)
         grid.addWidget(QLabel(_('Preview:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
         statbox = QHBoxLayout()
         self.status = QLabel("")
         statbox.addWidget(self.status)
         self.targetcombo = QComboBox()
-        self.targetcombo.currentIndexChanged.connect(self.updatestatus)
         self.targetcombo.addItem(_('Repository'), ('import',))
         self.targetcombo.addItem(_('Shelf'), ('copy',))
         self.targetcombo.addItem(_('Working Directory'),
@@ -126,9 +122,9 @@ class ImportDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.src_combo.editTextChanged.connect(lambda *a: self.preview())
+        self.src_combo.editTextChanged.connect(self.preview)
         self.src_combo.lineEdit().returnPressed.connect(self.thgimport)
-        self.p0chk.toggled.connect(lambda *a: self.preview())
+        self.p0chk.toggled.connect(self.preview)
 
         # dialog setting
         self.setLayout(box)
@@ -138,11 +134,9 @@ class ImportDialog(QDialog):
 
         # prepare to show
         self.src_combo.lineEdit().selectAll()
-        self.cslist.setHidden(False)
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
-        self.p0chk.setHidden(False)
         self._updatep0chk()
         self.preview()
 
@@ -170,11 +164,6 @@ class ImportDialog(QDialog):
             self.checkStatus()
         else:
             return super(ImportDialog, self).keyPressEvent(event)
-
-    def resizeEvent(self, event):
-        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
-        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
-        self.cslist.resize(w, h)
 
     def browsefiles(self):
         caption = _("Select patches")
@@ -272,8 +261,8 @@ class ImportDialog(QDialog):
     def thgimport(self):
         if self.cslist.curitems is None:
             return
-        idx = self.targetcombo.currentIndex()
-        if idx == 1:
+        cmdline = list(self._targetcommand())
+        if cmdline == ['copy']:
             # import to shelf
             existing = self.repo.thgshelves()
             if not os.path.exists(self.repo.shelfdir):
@@ -281,8 +270,7 @@ class ImportDialog(QDialog):
             for file in self.cslist.curitems:
                 shutil.copy(file, self.repo.shelfdir)
             return
-        hgcmd = ('import', 'copy', 'import --no-commit', 'qimport')[idx]
-        cmdline = hgcmd.split(' ') + ['--repository', self.repo.root]
+        cmdline.extend(['--repository', self.repo.root])
         if self.p0chk.isChecked():
             cmdline.append('-p0')
         cmdline.extend(['--verbose', '--'])
@@ -346,9 +334,3 @@ class ImportDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ImportDialog(repo, None, **opts)
-    dlg.setfilepaths(pats)
-    return dlg

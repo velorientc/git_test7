@@ -12,8 +12,8 @@ from mercurial import util
 from hgext import mq
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import thgrepo, qtlib, cmdui
-from tortoisehg.util import paths, hglib
+from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -317,7 +317,6 @@ class QQueueDialog(QDialog):
 
     def done(self, ret):
         self._writesettings()
-        self.repo.repositoryChanged.disconnect(self.reload)
         super(QQueueDialog, self).done(ret)
 
     def _readsettings(self):
@@ -327,11 +326,3 @@ class QQueueDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('qqueue/geom', self.saveGeometry())
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(None, paths.find_root())
-    if hasattr(repo, 'mq'):
-        return QQueueDialog(repo)
-    else:
-        qtlib.ErrorMsgBox(_('TortoiseHg Error'),
-            _('Please enable the MQ extension first.'))

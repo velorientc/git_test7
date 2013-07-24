@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, util, error, context, merge, scmutil
 
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview, thgrepo
 
@@ -1047,7 +1047,7 @@ class StatusDialog(QDialog):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         toplayout = QVBoxLayout()
-        toplayout.setContentsMargins(10, 10, 10, 0);
+        toplayout.setContentsMargins(10, 10, 10, 0)
         self.stwidget = StatusWidget(repo, pats, opts, self, checkable=False)
         toplayout.addWidget(self.stwidget, 1)
         layout.addLayout(toplayout)
@@ -1059,6 +1059,9 @@ class StatusDialog(QDialog):
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
         self.stwidget.linkActivated.connect(self.linkActivated)
 
+        self._subdialogs = qtlib.DialogKeeper(StatusDialog._createSubDialog,
+                                              parent=self)
+
         self.setWindowTitle(self.stwidget.getTitle())
         self.setWindowFlags(Qt.Window)
         self.loadSettings()
@@ -1068,11 +1071,13 @@ class StatusDialog(QDialog):
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def linkActivated(self, link):
-        link = hglib.fromunicode(link)
+        link = unicode(link)
         if link.startswith('repo:'):
-            from tortoisehg.hgqt.run import qtrun
-            from tortoisehg.hgqt import commit
-            qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
+            self._subdialogs.open(link[len('repo:'):])
+
+    def _createSubDialog(self, uroot):
+        repo = thgrepo.repository(None, hglib.fromunicode(uroot))
+        return StatusDialog(repo, [], {}, parent=self)
 
     def loadSettings(self):
         s = QSettings()
@@ -1095,9 +1100,3 @@ class StatusDialog(QDialog):
             return
         self.saveSettings()
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    return StatusDialog(repo, pats, opts)

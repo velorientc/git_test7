@@ -258,15 +258,3 @@ class RebaseDialog(QDialog):
                                         labels=labels, parent=self):
                 return
         super(RebaseDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    if os.path.exists(repo.join('rebasestate')):
-        qtlib.InfoMsgBox(_('Rebase already in progress'),
-                          _('Resuming rebase already in progress'))
-    elif not opts['source'] or not opts['dest']:
-        qtlib.ErrorMsgBox(_('Abort'),
-                          _('You must provide source and dest arguments'))
-        import sys; sys.exit()
-    return RebaseDialog(repo, None, **opts)

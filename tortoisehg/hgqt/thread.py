@@ -24,12 +24,6 @@ from tortoisehg.hgqt import qtlib
 
 local = localgettext()
 
-try:
-    _InterventionRequired = error.InterventionRequired
-except AttributeError:  # hg<2.6
-    class _InterventionRequired(Exception):
-        pass
-
 class DataWrapper(object):
     def __init__(self, data):
         self.data = data
@@ -351,7 +345,7 @@ class CmdThread(QThread):
             ui.warn(local._("abort: %s!\n") % inst)
         except error.UnknownCommand, inst:
             ui.warn(local._("hg: unknown command '%s'\n") % inst.args[0])
-        except _InterventionRequired, inst:
+        except error.InterventionRequired, inst:
             ui.warn("%s\n" % inst)
             self.ret = 1
         except socket.error, inst:

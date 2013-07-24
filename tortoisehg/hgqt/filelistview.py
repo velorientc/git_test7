@@ -29,7 +29,6 @@ class HgFileListView(QTableView):
     """
 
     fileSelected = pyqtSignal(QString, QString)
-    linkActivated = pyqtSignal(QString)
     clearDisplay = pyqtSignal()
 
     def __init__(self, repo, parent, multiselectable):

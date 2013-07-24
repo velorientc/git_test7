@@ -126,6 +126,34 @@ def getmaxdiffsize(ui):
     _maxdiff = maxdiff * 1024
     return _maxdiff
 
+def getrevisionlabel(repo, rev):
+    """Return symbolic name for the specified revision or stringfy it"""
+    if rev is None:
+        return None  # no symbol for working revision
+
+    # see context.changectx for look-up order of labels
+    ctx = repo[rev]
+
+    bookmarks = ctx.bookmarks()
+    if ctx in repo.parents():
+        # keep bookmark unchanged when updating to current rev
+        if repo._bookmarkcurrent in bookmarks:
+            return repo._bookmarkcurrent
+    else:
+        # more common switching bookmark, rather than deselecting it
+        if bookmarks:
+            return bookmarks[0]
+
+    tags = ctx.tags()
+    if tags:
+        return tags[0]
+
+    branch = ctx.branch()
+    if repo.branchtip(branch) == ctx.node():
+        return branch
+
+    return str(rev)
+
 _deadbranch = None
 def getdeadbranch(ui):
     '''return a list of dead branch names in UTF-8'''
@@ -452,7 +480,8 @@ tortoisehgtoollocations = (
     ('workbench.custom-toolbar', _('Workbench custom toolbar')),
     ('workbench.revdetails.custom-menu', _('Revision details context menu')),
     ('workbench.commit.custom-menu', _('Commit context menu')),
-    ('workbench.filelist.custom-menu', _('File context menu (on manifest and revision details)')),
+    ('workbench.filelist.custom-menu', _('File context menu (on manifest '
+                                         'and revision details)')),
 )
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
@@ -710,6 +739,29 @@ def get_revision_desc(fctx, curpath=None):
     summary = l and l[0] or ''
     return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
+def longsummary(description, limit=None):
+    summary = tounicode(description)
+    lines = summary.splitlines()
+    if not lines:
+        return ''
+    summary = lines[0].strip()
+    add_ellipsis = False
+    if limit:
+        for raw_line in lines[1:]:
+            if len(summary) >= limit:
+                break
+            line = raw_line.strip().replace('\t', ' ')
+            if line:
+                summary += u'  ' + line
+        if len(summary) > limit:
+            add_ellipsis = True
+            summary = summary[0:limit]
+    elif len(lines) > 1:
+        add_ellipsis = True
+    if add_ellipsis:
+        summary += u' \u2026' # ellipsis ...
+    return summary
+
 def validate_synch_path(path, repo):
     '''
     Validate the path that must be used to sync operations (pull,
@@ -813,7 +865,7 @@ def netlocsplit(netloc):
 
 def getLineSeparator(line):
     """Get the line separator used on a given line"""
-    # By default assume the default OS line separator 
+    # By default assume the default OS line separator
     linesep = os.linesep
     lineseptypes = ['\r\n', '\n', '\r']
     for sep in lineseptypes:
@@ -825,3 +877,63 @@ def getLineSeparator(line):
 def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
     return hgdispatch._dispatch(req)
+
+def buildcmdargs(name, *args, **opts):
+    r"""Build list of command-line arguments
+
+    >>> buildcmdargs('push', branch='foo')
+    ['push', '--branch', 'foo']
+    >>> buildcmdargs('graft', r=['0', '1'])
+    ['graft', '-r', '0', '-r', '1']
+    >>> buildcmdargs('log', no_merges=True, quiet=False, limit=None)
+    ['log', '--no-merges']
+    >>> buildcmdargs('commit', user='')
+    ['commit', '--user', '']
+
+    positional arguments:
+
+    >>> buildcmdargs('add', 'foo', 'bar')
+    ['add', 'foo', 'bar']
+    >>> buildcmdargs('cat', '-foo', rev='0')
+    ['cat', '--rev', '0', '--', '-foo']
+
+    type conversion to string:
+
+    >>> from PyQt4.QtCore import QString
+    >>> buildcmdargs('email', r=[0, 1])
+    ['email', '-r', '0', '-r', '1']
+    >>> buildcmdargs('grep', 'foo', rev=2)
+    ['grep', '--rev', '2', 'foo']
+    >>> buildcmdargs('tag', u'\xc0', message=u'\xc1')
+    ['tag', '--message', u'\xc1', u'\xc0']
+    >>> buildcmdargs(QString('tag'), QString(u'\xc0'), message=QString(u'\xc1'))
+    [u'tag', '--message', u'\xc1', u'\xc0']
+    """
+    stringfy = '%s'.__mod__  # (unicode, QString) -> unicode, otherwise -> str
+
+    fullargs = [stringfy(name)]
+    for k, v in opts.iteritems():
+        if v is None:
+            continue
+
+        if len(k) == 1:
+            aname = '-%s' % k
+        else:
+            aname = '--%s' % k.replace('_', '-')
+        if isinstance(v, bool):
+            if v:
+                fullargs.append(aname)
+        elif isinstance(v, list):
+            for e in v:
+                fullargs.append(aname)
+                fullargs.append(stringfy(e))
+        else:
+            fullargs.append(aname)
+            fullargs.append(stringfy(v))
+
+    args = map(stringfy, args)
+    if util.any(e.startswith('-') for e in args):
+        fullargs.append('--')
+    fullargs.extend(args)
+
+    return fullargs

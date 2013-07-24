@@ -13,7 +13,8 @@ from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.webconf_ui import Ui_WebconfForm
 
-_FILE_FILTER = _('Config files (*.conf *.config *.ini);;Any files (*)')
+_FILE_FILTER = ';;'.join([_('Config files (*.conf *.config *.ini)'),
+                          _('All files (*)')])
 
 class WebconfForm(QWidget):
     """Widget to show/edit webconf"""
@@ -228,9 +229,13 @@ class _PathDialog(QDialog):
         if not path:
             return
 
-        self._localpath_edit.setText(path)
+        path = unicode(path)
+        if os.path.exists(os.path.join(path, '.hgsub')):
+            self._localpath_edit.setText(os.path.join(path, '**'))
+        else:
+            self._localpath_edit.setText(path)
         if not self.path:
-            self._path_edit.setText(os.path.basename(unicode(path)))
+            self._path_edit.setText(os.path.basename(path))
 
     @pyqtSlot()
     def _updateform(self):

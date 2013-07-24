@@ -19,7 +19,8 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'close',
-                 'tags', 'graft', 'transplant', 'p4', 'svn', 'converted')
+                 'tags', 'graft', 'transplant', 'obsolete',
+                 'p4', 'svn', 'converted',)
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -110,6 +111,7 @@ class SummaryInfo(object):
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'rawtags': _('Tags:'), 'graft': _('Graft:'),
               'transplant': _('Transplant:'),
+              'obsolete': _('Obsolete state:'),
               'p4': _('Perforce:'), 'svn': _('Subversion:'),
               'converted': _('Converted From:'), 'shortuser': _('User:')}
 
@@ -134,10 +136,11 @@ class SummaryInfo(object):
             elif item == 'desc':
                 return hglib.tounicode(ctx.description().replace('\0', ''))
             elif item == 'summary':
-                value = ctx.description().replace('\0', '').split('\n')[0]
-                if len(value) == 0:
+                summary = hglib.longsummary(
+                    ctx.description().replace('\0', ''))
+                if len(summary) == 0:
                     return None
-                return hglib.tounicode(value)[:80]
+                return summary
             elif item == 'user':
                 user = hglib.user(ctx)
                 if user:
@@ -194,6 +197,16 @@ class SummaryInfo(object):
                         return binascii.hexlify(ts)
                 except KeyError:
                     pass
+                return None
+            elif item == 'obsolete':
+                obsoletestate = []
+                if ctx.obsolete():
+                    obsoletestate.append('obsolete')
+                if ctx.extinct():
+                    obsoletestate.append('extinct')
+                obsoletestate += ctx.troubles()
+                if obsoletestate:
+                    return obsoletestate
                 return None
             elif item == 'p4':
                 extra = ctx.extra()
@@ -281,6 +294,11 @@ class SummaryInfo(object):
                 return qtlib.markup(value)
             elif item == 'dateage':
                 return qtlib.markup('%s (%s)' % value)
+            elif item == 'obsolete':
+                opts = dict(fg='black', bg='#ff8566')
+                obsoletestates = [qtlib.markup(' %s ' % state, **opts)
+                                  for state in value]
+                return ' '.join(obsoletestates)
             raise UnknownItem(item)
         value = self.get_data(item, *args)
         if value is None:
@@ -387,8 +405,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if self.revlabel is None:
             self.revlabel = QLabel()
-            self.revlabel.linkActivated.connect(
-                 lambda s: self.linkActivated.emit(s))
+            self.revlabel.linkActivated.connect(self.linkActivated)
             self.layout().addWidget(self.revlabel, 0, Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:

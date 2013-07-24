@@ -14,7 +14,7 @@ from PyQt4.Qsci import QsciScintilla
 from mercurial import commands, util
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, run
+from tortoisehg.hgqt import cmdui
 from tortoisehg.util import hglib
 
 class _LogWidgetForConsole(cmdui.LogWidget):
@@ -277,9 +277,8 @@ class ConsoleWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self.setFocusProxy(self._logwidget)
-        self.setRepository(None)
+        self._repoagent = None
         self.openPrompt()
-        self.suppressPrompt = False
         self._commandHistory = []
         self._commandIdx = 0
 
@@ -305,6 +304,7 @@ class ConsoleWidget(QWidget):
             self._logwidget.flash()
 
     def _commandComplete(self, cmdtype, cmdline):
+        from tortoisehg.hgqt import run
         matches = []
         cmd = cmdline.split()
         if cmdtype == 'hg':
@@ -437,19 +437,38 @@ class ConsoleWidget(QWidget):
         try:
             self._logwidget.appendLog(msg, label)
         finally:
-            if not self.suppressPrompt:
+            if not self._repoagent or not self._repoagent.isBusy():
                 self.openPrompt()
 
-    @pyqtSlot(object)
-    def setRepository(self, repo):
+    def setRepoAgent(self, repoagent):
         """Change the current working repository"""
-        self._repo = repo
+        if self._repoagent:
+            self._repoagent.busyChanged.disconnect(self._suppressPromptOnBusy)
+        self._repoagent = repoagent
+        repoagent.busyChanged.connect(self._suppressPromptOnBusy)
+        repo = repoagent.rawRepo()
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
+
+    def repoRootPath(self):
+        if self._repoagent:
+            return self._repoagent.rootPath()
+
+    @property
+    def _repo(self):
+        if self._repoagent:
+            return self._repoagent.rawRepo()
 
     @property
     def cwd(self):
         """Return the current working directory"""
         return self._repo and self._repo.root or os.getcwd()
+
+    @pyqtSlot(bool)
+    def _suppressPromptOnBusy(self, busy):
+        if busy:
+            self._logwidget.clearPrompt()
+        else:
+            self.openPrompt()
 
     @pyqtSlot(unicode, object, unicode, unicode, object)
     def _emitProgress(self, *args):
@@ -511,6 +530,7 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_thg(self, args):
+        from tortoisehg.hgqt import run
         self.closePrompt()
         try:
             if self._repo:
@@ -537,9 +557,11 @@ class ConsoleWidget(QWidget):
         self.closeRequested.emit()
 
 class LogDockWidget(QDockWidget):
-    visibilityChanged = pyqtSignal(bool)
 
-    def __init__(self, parent=None):
+    progressReceived = pyqtSignal(QString, object, QString, QString,
+                                  object, object)
+
+    def __init__(self, repomanager, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -548,40 +570,79 @@ class LogDockWidget(QDockWidget):
         self.setWindowTitle(_('Output Log'))
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
+        self.dockLocationChanged.connect(self._updateTitleBarStyle)
 
-        self.logte = ConsoleWidget(self)
-        self.logte.closeRequested.connect(self.close)
-        self.setWidget(self.logte)
-        for name in ('setRepository', 'progressReceived'):
-            setattr(self, name, getattr(self.logte, name))
+        self._repomanager = repomanager
+        self._repomanager.repositoryOpened.connect(self._createConsoleFor)
+        self._repomanager.repositoryClosed.connect(self._destroyConsoleFor)
 
-        self.visibilityChanged.connect(
-            lambda visible: visible and self.logte.setFocus())
+        self._consoles = QStackedWidget(self)
+        self.setWidget(self._consoles)
+        self._createConsole()
+        for root in self._repomanager.repoRootPaths():
+            self._createConsoleFor(root)
+
+        # move focus only when console is activated by keyboard/mouse operation
+        self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
+
+    def setCurrentRepoRoot(self, root):
+        w = self._findConsoleFor(root)
+        self._consoles.setCurrentWidget(w)
+
+    def _findConsoleFor(self, root):
+        for i in xrange(self._consoles.count()):
+            w = self._consoles.widget(i)
+            if w.repoRootPath() == root:
+                return w
+        raise ValueError('no console found for %r' % root)
+
+    def _createConsole(self):
+        w = ConsoleWidget(self)
+        w.closeRequested.connect(self.close)
+        w.progressReceived.connect(self.progressReceived)
+        self._consoles.addWidget(w)
+        return w
+
+    @pyqtSlot(unicode)
+    def _createConsoleFor(self, root):
+        root = unicode(root)
+        w = self._createConsole()
+        repoagent = self._repomanager.repoAgent(root)
+        assert repoagent
+        w.setRepoAgent(repoagent)
+
+    @pyqtSlot(unicode)
+    def _destroyConsoleFor(self, root):
+        root = unicode(root)
+        w = self._findConsoleFor(root)
+        self._consoles.removeWidget(w)
+        w.setParent(None)
 
     @pyqtSlot()
     def clear(self):
-        self.logte.clear()
+        w = self._consoles.currentWidget()
+        w.clear()
 
-    @pyqtSlot(QString, QString)
-    def output(self, msg, label):
-        self.logte.appendLog(msg, label)
+    def appendLog(self, msg, label, reporoot=None):
+        w = self._findConsoleFor(reporoot)
+        w.appendLog(msg, label)
 
-    @pyqtSlot()
-    def beginSuppressPrompt(self):
-        self.logte.suppressPrompt = True
-
-    @pyqtSlot()
-    def endSuppressPrompt(self):
-        self.logte.suppressPrompt = False
-        self.logte.openPrompt()
-
-    def showEvent(self, event):
-        self.visibilityChanged.emit(True)
+    @pyqtSlot(bool)
+    def _setFocusOnToggleView(self, visible):
+        if visible:
+            w = self._consoles.currentWidget()
+            w.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)
         if visible:
             self.raise_()
 
-    def hideEvent(self, event):
-        self.visibilityChanged.emit(False)
+    @pyqtSlot(Qt.DockWidgetArea)
+    def _updateTitleBarStyle(self, area):
+        f = self.features()
+        if area & (Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea):
+            f |= QDockWidget.DockWidgetVerticalTitleBar  # saves vertical space
+        else:
+            f &= ~QDockWidget.DockWidgetVerticalTitleBar
+        self.setFeatures(f)

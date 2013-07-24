@@ -11,13 +11,11 @@ import os, sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util, error, scmutil
+from mercurial import util, scmutil
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
-from tortoisehg.util import hglib, paths
-
-# TODO: this dialog should take a repo argument, not ui
+from tortoisehg.hgqt import cmdui, qtlib, manifestmodel
+from tortoisehg.util import hglib
 
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
@@ -26,26 +24,20 @@ class RenameDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, ui, pats, parent=None, iscopy=False):
+    def __init__(self, repo, pats, parent=None, iscopy=False):
         super(RenameDialog, self).__init__(parent)
         self.iscopy = iscopy
         # pats: local; src, dest: unicode
-        src, dest = self.init_data(ui, pats)
+        src, dest = self.init_data(repo, pats)
         self.init_view(src, dest)
 
-    def init_data(self, ui, pats):
+    def init_data(self, repo, pats):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
+        self.root = repo.root
+        self.repo = repo
         cwd = os.getcwd()
-        try:
-            self.root = paths.find_root()
-            self.repo = thgrepo.repository(ui, path=self.root)
-        except (error.RepoError):
-            qtlib.ErrorMsgBox(_('Error'),
-                    _('Could not find or initialize the repository '
-                      'from folder<p>%s</p>' % cwd))
-            return ('', '')
         try:
             fname = scmutil.canonpath(self.root, cwd, pats[0])
             target = scmutil.canonpath(self.root, cwd, pats[1])
@@ -329,7 +321,3 @@ class RenameDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('rename/geom', self.saveGeometry())
-
-def run(ui, *pats, **opts):
-    iscopy = (opts.get('alias') == 'copy')
-    return RenameDialog(ui, pats, iscopy=iscopy)
