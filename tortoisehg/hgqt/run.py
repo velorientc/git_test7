@@ -478,8 +478,7 @@ def backout(ui, repoagent, *pats, **opts):
 def bisect(ui, repoagent, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt import bisect as bisectmod
-    repo = repoagent.rawRepo()
-    return bisectmod.BisectDialog(repo, opts)
+    return bisectmod.BisectDialog(repoagent, opts)
 
 @command('bookmarks|bookmark',
     [('r', 'rev', '', _('revision'))],

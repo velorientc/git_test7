@@ -15,13 +15,13 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 
 class BisectDialog(QDialog):
-    def __init__(self, repo, opts, parent=None):
+    def __init__(self, repoagent, opts, parent=None):
         super(BisectDialog, self).__init__(parent)
-        self.setWindowTitle(_('Bisect - %s') % repo.displayname)
+        self.setWindowTitle(_('Bisect - %s') % repoagent.rawRepo().displayname)
         self.setWindowIcon(qtlib.geticon('hg-bisect'))
 
         self.setWindowFlags(Qt.Window)
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -91,6 +91,10 @@ class BisectDialog(QDialog):
         if event.key() == Qt.Key_Escape:
             self.reject()
         super(BisectDialog, self).keyPressEvent(event)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def _bisectcmd(self, *args, **opts):
         opts['repository'] = self.repo.root

@@ -807,7 +807,7 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def bisect(self):
-        dlg = bisect.BisectDialog(self.repo, {}, self)
+        dlg = bisect.BisectDialog(self._repoagent, {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
@@ -1536,13 +1536,13 @@ class RepoWidget(QWidget):
         def bisectNormal():
             revA, revB = self.menuselection
             opts = {'good':str(revA), 'bad':str(revB)}
-            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg = bisect.BisectDialog(self._repoagent, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def bisectReverse():
             revA, revB = self.menuselection
             opts = {'good':str(revB), 'bad':str(revA)}
-            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg = bisect.BisectDialog(self._repoagent, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def compressDlg():
