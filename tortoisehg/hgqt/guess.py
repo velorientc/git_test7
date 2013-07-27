@@ -399,6 +399,7 @@ class RenameSearchThread(QThread):
         self.minpct = minpct
         self.copies = copies
         self.stopped = False
+        self.threadid = None
 
     def run(self):
         def emit(topic, pos, item='', unit='', total=None):
@@ -407,10 +408,14 @@ class RenameSearchThread(QThread):
             unit = hglib.tounicode(unit or '')
             self.progress.emit(topic, pos, item, unit, total)
         self.repo.ui.progress = emit
+        self.threadid = int(self.currentThreadId())
         try:
-            self.search(self.repo)
-        except Exception, e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
+            try:
+                self.search(self.repo)
+            except Exception, e:
+                self.showMessage.emit(hglib.tounicode(str(e)))
+        finally:
+            self.threadid = None
 
     def cancel(self):
         self.stopped = True
