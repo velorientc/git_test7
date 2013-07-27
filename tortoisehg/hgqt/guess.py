@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib
+from tortoisehg.util import hglib, shlib, thread2
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, htmlui, cmdui
@@ -412,13 +412,22 @@ class RenameSearchThread(QThread):
         try:
             try:
                 self.search(self.repo)
+            except KeyboardInterrupt:
+                pass
             except Exception, e:
                 self.showMessage.emit(hglib.tounicode(str(e)))
         finally:
             self.threadid = None
 
     def cancel(self):
+        tid = self.threadid
+        if tid is None:
+            return
         self.stopped = True
+        try:
+            thread2._async_raise(tid, KeyboardInterrupt)
+        except ValueError:
+            pass
 
     def search(self, repo):
         wctx = repo[None]
