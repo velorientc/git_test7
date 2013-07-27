@@ -398,7 +398,6 @@ class RenameSearchThread(QThread):
         self.ufiles = ufiles
         self.minpct = minpct
         self.copies = copies
-        self.stopped = False
         self.threadid = None
 
     def run(self):
@@ -423,7 +422,6 @@ class RenameSearchThread(QThread):
         tid = self.threadid
         if tid is None:
             return
-        self.stopped = True
         try:
             thread2._async_raise(tid, KeyboardInterrupt)
         except ValueError:
@@ -446,8 +444,6 @@ class RenameSearchThread(QThread):
         exacts = []
         gen = similar._findexactmatches(repo, added, removed)
         for o, n in gen:
-            if self.stopped:
-                return
             old, new = o.path(), n.path()
             exacts.append(old)
             self.match.emit([old, new, 1.0])
@@ -456,7 +452,5 @@ class RenameSearchThread(QThread):
         removed = [r for r in removed if r.path() not in exacts]
         gen = similar._findsimilarmatches(repo, added, removed, self.minpct)
         for o, n, s in gen:
-            if self.stopped:
-                return
             old, new, sim = o.path(), n.path(), s
             self.match.emit([old, new, sim])
