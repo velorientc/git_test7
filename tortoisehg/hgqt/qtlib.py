@@ -9,6 +9,7 @@ import os
 import sys
 import atexit
 import shutil
+import shlex
 import stat
 import subprocess
 import tempfile
@@ -238,8 +239,15 @@ def openshell(root, reponame, ui=None):
             if args:
                 shell = shell + ' ' + util.expandpath(args)
             shellcmd = shell % {'root': root, 'reponame': reponame}
+
+            # Unix: QProcess.startDetached(program) cannot parse single-quoted
+            # parameters built using util.shellquote().
+            # Windows: subprocess.Popen(program, shell=True) cannot spawn
+            # cmd.exe in new window, probably because the initial cmd.exe is
+            # invoked with SW_HIDE.
             os.chdir(root)
-            started = QProcess.startDetached(shellcmd)
+            fullargs = shlex.split(shellcmd)
+            started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
         if not started:
