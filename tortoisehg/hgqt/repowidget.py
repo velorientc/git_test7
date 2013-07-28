@@ -220,6 +220,7 @@ class RepoWidget(QWidget):
             tt.setTabToolTip(idx, _("MQ Patch", "tab tooltip"))
             self.namedTabs['mq'] = idx
         else:
+            self.mqDemand = None
             self.mqTabIndex = -1
 
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
@@ -1157,7 +1158,7 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
-        if 'mq' in self.repo.extensions():
+        if self.mqDemand:
             if not self.mqDemand.canExit():
                 self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
                 self.showMessage(_('MQ tab cannot exit'))
