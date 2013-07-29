@@ -214,8 +214,11 @@ class RejectsDialog(QDialog):
 
         if acceptresolution:
             f = QFile(hglib.tounicode(self.path))
-            f.open(QIODevice.WriteOnly)
-            self.editor.write(f)
+            saved = f.open(QIODevice.WriteOnly) and self.editor.write(f)
+            if not saved:
+                qtlib.ErrorMsgBox(_('Unable to save file'),
+                                  f.errorString(), parent=self)
+                return
             self.saveSettings()
             super(RejectsDialog, self).accept()
 
