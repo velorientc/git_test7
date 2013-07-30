@@ -880,7 +880,8 @@ class Workbench(QMainWindow):
         '''opens the given repo in a new tab'''
         rw = RepoWidget(repoagent, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
-        rw.progress.connect(self._showRepoWidgetProgress)
+        rw.progress.connect(lambda tp, p, i, u, tl:
+            self.statusbar.progress(tp, p, i, u, tl, rw.repo.root))
         rw.output.connect(self._appendRepoWidgetOutput)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.revisionSelected.connect(self.updateHistoryActions)
@@ -905,12 +906,6 @@ class Workbench(QMainWindow):
 
         self.updateMenu()
         return rw
-
-    #@pyqtSlot(QString, object, QString, QString, object)
-    def _showRepoWidgetProgress(self, topic, pos, item, unit, total):
-        rw = self.sender()
-        assert isinstance(rw, RepoWidget)
-        self.statusbar.progress(topic, pos, item, unit, total, rw.repo.root)
 
     #@pyqtSlot(QString, QString)
     def _appendRepoWidgetOutput(self, msg, label):
