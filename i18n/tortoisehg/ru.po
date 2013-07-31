@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
 "POT-Creation-Date: 2013-07-24 10:22-0300\n"
-"PO-Revision-Date: 2013-06-23 09:18+0000\n"
+"PO-Revision-Date: 2013-07-28 08:20+0000\n"
 "Last-Translator: Stanislav V. Kroter <krotersv@gmail.com>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-07-25 05:18+0000\n"
+"X-Launchpad-Export-Date: 2013-07-29 05:28+0000\n"
 "X-Generator: Launchpad (build 16700)\n"
 "Language: ru\n"
 
@@ -1376,7 +1376,7 @@ msgstr "Трансплантация:"
 
 #: tortoisehg/hgqt/csinfo.py:114
 msgid "Obsolete state:"
-msgstr ""
+msgstr "Устаревшее состояние:"
 
 #: tortoisehg/hgqt/csinfo.py:115
 msgid "Perforce:"
@@ -1464,19 +1464,19 @@ msgstr "Команда"
 
 #: tortoisehg/hgqt/customtools.py:304
 msgid "New hook"
-msgstr ""
+msgstr "Новая ловушка"
 
 #: tortoisehg/hgqt/customtools.py:307
 msgid "Edit hook"
-msgstr ""
+msgstr "Править ловушку"
 
 #: tortoisehg/hgqt/customtools.py:310
 msgid "Delete hook"
-msgstr ""
+msgstr "Удалить ловушку"
 
 #: tortoisehg/hgqt/customtools.py:330
 msgid "Replace existing hook?"
-msgstr ""
+msgstr "Заменить существующую ловушку?"
 
 #: tortoisehg/hgqt/customtools.py:331
 #, python-format
@@ -1485,6 +1485,9 @@ msgid ""
 "\n"
 "Do you want to replace it?"
 msgstr ""
+"Есть ловушка %s.%s.\n"
+"\n"
+"Вы хотите её заменить?"
 
 #: tortoisehg/hgqt/customtools.py:629
 msgid "OK"
@@ -1512,11 +1515,11 @@ msgstr "Все контексты"
 
 #: tortoisehg/hgqt/customtools.py:696
 msgid "Fixed revisions"
-msgstr ""
+msgstr "Зафиксированные ревизии"
 
 #: tortoisehg/hgqt/customtools.py:697
 msgid "Applied patches"
-msgstr ""
+msgstr "Применённые заплатки"
 
 #: tortoisehg/hgqt/customtools.py:698
 msgid "Applied patches or qparent"
@@ -1615,6 +1618,9 @@ msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
 "Default: False."
 msgstr ""
+"Когда задействовано, то, когда команда запущена, автоматически показывать "
+"журнал вывода.\n"
+"По умолчанию: Ложь."
 
 #: tortoisehg/hgqt/customtools.py:809
 msgid "You must set a tool name."
@@ -1630,11 +1636,11 @@ msgstr "Вы должны установить команду на выполн�
 
 #: tortoisehg/hgqt/customtools.py:844
 msgid "Configure Hook"
-msgstr ""
+msgstr "Настроить ловушку"
 
 #: tortoisehg/hgqt/customtools.py:849
 msgid "Hook type"
-msgstr ""
+msgstr "Тип ловушки"
 
 #: tortoisehg/hgqt/customtools.py:850
 msgid "Select when your command will be run"
@@ -1642,7 +1648,7 @@ msgstr "Выберите когда ваша команда будет запу�
 
 #: tortoisehg/hgqt/customtools.py:852
 msgid "The hook name. It cannot contain spaces."
-msgstr ""
+msgstr "Имя ловушки. Оно не может содержать пробелы."
 
 #: tortoisehg/hgqt/customtools.py:854
 msgid ""
@@ -1654,11 +1660,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/customtools.py:867
 msgid "You must set a valid hook type."
-msgstr ""
+msgstr "Вам следует установить корректный тип ловушки."
 
 #: tortoisehg/hgqt/customtools.py:869
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
-msgstr ""
+msgstr "Имя ловушки не может содержать пробелы, табуляторы или символы '='."
 
 #: tortoisehg/hgqt/customtools.py:877 tortoisehg/hgqt/repowidget.py:1444
 msgid "Custom Tools"
@@ -1987,7 +1993,7 @@ msgstr "(является новым и «грязным» подхранили�
 
 #: tortoisehg/hgqt/filedata.py:338
 msgid "open..."
-msgstr ""
+msgstr "открыть..."
 
 #: tortoisehg/hgqt/filedata.py:347
 #, python-format
@@ -2042,7 +2048,7 @@ msgstr "&Сравнить набор изменений с предком"
 
 #: tortoisehg/hgqt/filedialogs.py:216
 msgid "Diff Changeset to &Local"
-msgstr ""
+msgstr "Сравнить набор изменений с &местным"
 
 #: tortoisehg/hgqt/filedialogs.py:220 tortoisehg/hgqt/filedialogs.py:792
 msgid "Diff &File to Parent"
@@ -2050,7 +2056,7 @@ msgstr "Сравнить &файл с предком"
 
 #: tortoisehg/hgqt/filedialogs.py:223 tortoisehg/hgqt/filedialogs.py:795
 msgid "Diff File to Lo&cal"
-msgstr ""
+msgstr "Сравнить файл с  ме&стным"
 
 #: tortoisehg/hgqt/filedialogs.py:239
 msgid "Show Revision &Details"
@@ -2159,7 +2165,7 @@ msgstr "Перейти  к"
 
 #: tortoisehg/hgqt/fileview.py:920
 msgid "View File at"
-msgstr ""
+msgstr "Посмотреть файл в"
 
 #: tortoisehg/hgqt/fileview.py:921 tortoisehg/hgqt/fileview.py:922
 msgid "&Originating Revision"
@@ -2973,11 +2979,11 @@ msgstr "Ветка"
 
 #: tortoisehg/hgqt/matching.py:101
 msgid "Phase"
-msgstr ""
+msgstr "Фаза"
 
 #: tortoisehg/hgqt/matching.py:134
 msgid "&Match"
-msgstr ""
+msgstr "&Совпадение"
 
 #: tortoisehg/hgqt/matching.py:145
 #, python-format
@@ -2999,7 +3005,7 @@ msgstr "<b>Неизвестная ревизия!</b>"
 
 #: tortoisehg/hgqt/matching.py:222
 msgid "<b>Parse Error!</b>"
-msgstr ""
+msgstr "<b>Синтаксическая ошибка!</b>"
 
 #: tortoisehg/hgqt/merge.py:31
 #, python-format
@@ -3016,6 +3022,10 @@ msgid ""
 "\n"
 "To cancel the merge you can update to one of the merge parent revisions."
 msgstr ""
+"Чтобы завершить слияние, вам следует зафиксировать рабочую директорию.\n"
+"\n"
+"Чтобы отменить слияние, вы можете обновить до одной из сливаемых "
+"родительских ревизий."
 
 #: tortoisehg/hgqt/merge.py:125
 msgid "Prepare to merge"
@@ -3122,15 +3132,15 @@ msgstr "Фиксировать результаты слияния"
 
 #: tortoisehg/hgqt/merge.py:543
 msgid "Commit Options"
-msgstr ""
+msgstr "Настройки фиксации"
 
 #: tortoisehg/hgqt/merge.py:552
 msgid "Commit Now"
-msgstr ""
+msgstr "Зафиксировать сейчас"
 
 #: tortoisehg/hgqt/merge.py:554
 msgid "Commit Later"
-msgstr ""
+msgstr "Зафиксировать позже"
 
 #: tortoisehg/hgqt/merge.py:578
 msgid "Merge"
@@ -3158,7 +3168,7 @@ msgstr "Слить набор изменений"
 
 #: tortoisehg/hgqt/messageentry.py:97
 msgid "Syntax Highlighting"
-msgstr ""
+msgstr "Подсветка синтаксиса"
 
 #: tortoisehg/hgqt/messageentry.py:103
 msgid "Paste &Filenames"
@@ -3809,23 +3819,23 @@ msgstr "Переименовать заплатку"
 
 #: tortoisehg/hgqt/qscilib.py:194
 msgid "&Undo"
-msgstr ""
+msgstr "&Отменить"
 
 #: tortoisehg/hgqt/qscilib.py:197
 msgid "&Redo"
-msgstr ""
+msgstr "&Повторить"
 
 #: tortoisehg/hgqt/qscilib.py:201
 msgid "Cu&t"
-msgstr ""
+msgstr "Вы&резать"
 
 #: tortoisehg/hgqt/qscilib.py:204
 msgid "&Copy"
-msgstr ""
+msgstr "&Копировать"
 
 #: tortoisehg/hgqt/qscilib.py:208
 msgid "&Paste"
-msgstr ""
+msgstr "В&ставить"
 
 #: tortoisehg/hgqt/qscilib.py:210 tortoisehg/hgqt/reporegistry.py:210
 #: tortoisehg/hgqt/wctxactions.py:380
@@ -3843,23 +3853,23 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:220
 msgid "&Word"
-msgstr ""
+msgstr "&Слово"
 
 #: tortoisehg/hgqt/qscilib.py:221
 msgid "&Character"
-msgstr ""
+msgstr "&Символ"
 
 #: tortoisehg/hgqt/qscilib.py:228
 msgid "White&space"
-msgstr ""
+msgstr "Про&бел"
 
 #: tortoisehg/hgqt/qscilib.py:229 tortoisehg/hgqt/qscilib.py:239
 msgid "&Visible"
-msgstr ""
+msgstr "&Видимый"
 
 #: tortoisehg/hgqt/qscilib.py:230 tortoisehg/hgqt/qscilib.py:240
 msgid "&Invisible"
-msgstr ""
+msgstr "&Невидимый"
 
 #: tortoisehg/hgqt/qscilib.py:231
 msgid "&AfterIndent"
@@ -3867,11 +3877,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:238
 msgid "EOL &Visibility"
-msgstr ""
+msgstr "&Видимость конца строчки"
 
 #: tortoisehg/hgqt/qscilib.py:251
 msgid "EOL &Mode"
-msgstr ""
+msgstr "&Режим конца строчки"
 
 #: tortoisehg/hgqt/qscilib.py:252
 msgid "&Windows"
@@ -3879,43 +3889,43 @@ msgstr ""
 
 #: tortoisehg/hgqt/qscilib.py:253
 msgid "&Unix"
-msgstr ""
+msgstr "&Unix"
 
 #: tortoisehg/hgqt/qscilib.py:254
 msgid "&Mac"
-msgstr ""
+msgstr "&Mac"
 
 #: tortoisehg/hgqt/qscilib.py:261
 msgid "&TAB Inserts"
-msgstr ""
+msgstr "Вставки &Табуляторов"
 
 #: tortoisehg/hgqt/qscilib.py:262
 msgid "&Auto"
-msgstr ""
+msgstr "&Автоматически"
 
 #: tortoisehg/hgqt/qscilib.py:263
 msgid "&TAB"
-msgstr ""
+msgstr "&Табулятор"
 
 #: tortoisehg/hgqt/qscilib.py:264
 msgid "&Spaces"
-msgstr ""
+msgstr "&Пробелы"
 
 #: tortoisehg/hgqt/qscilib.py:272
 msgid "&Auto-Complete"
-msgstr ""
+msgstr "&Автозавершение"
 
 #: tortoisehg/hgqt/qscilib.py:273
 msgid "&Enable"
-msgstr ""
+msgstr "&Включить"
 
 #: tortoisehg/hgqt/qscilib.py:274
 msgid "&Disable"
-msgstr ""
+msgstr "&Отключить"
 
 #: tortoisehg/hgqt/qscilib.py:282
 msgid "&Editor Options"
-msgstr ""
+msgstr "&Настройки редактора"
 
 #: tortoisehg/hgqt/qscilib.py:480
 msgid "### regular expression ###"
@@ -4044,7 +4054,7 @@ msgstr "Вы должны представиться Mercurial"
 
 #: tortoisehg/hgqt/qtlib.py:1407
 msgid "Text Translation Failure"
-msgstr ""
+msgstr "Перевод текста не удался"
 
 #: tortoisehg/hgqt/qtlib.py:1408
 msgid "Unable to translate input to local encoding."
@@ -4356,11 +4366,11 @@ msgstr "Включить/выключить фильтрацию исключё�
 
 #: tortoisehg/hgqt/repofilter.py:166
 msgid "Show/Hide hidden changesets"
-msgstr ""
+msgstr "Показать/скрыть скрытые наборы изменений"
 
 #: tortoisehg/hgqt/repofilter.py:253
 msgid "Keyword Search"
-msgstr ""
+msgstr "Поиск по ключевым словам"
 
 #: tortoisehg/hgqt/repofilter.py:254
 msgid "Revision Set"
@@ -4469,6 +4479,7 @@ msgstr "Неподдерживаемый тип хранилища (%s)"
 #: tortoisehg/hgqt/reporegistry.py:177 tortoisehg/hgqt/reporegistry.py:686
 msgid "Cannot open non Mercurial repositories or subrepositories"
 msgstr ""
+"Нельзя открыть хранилища или подхранилища, не принадлежащие Mercurial"
 
 #: tortoisehg/hgqt/reporegistry.py:212
 msgid "Confirm Delete"
@@ -4485,23 +4496,23 @@ msgstr "Реестр хранилищ"
 
 #: tortoisehg/hgqt/reporegistry.py:310
 msgid "Show &Paths"
-msgstr ""
+msgstr "Показать &Пути"
 
 #: tortoisehg/hgqt/reporegistry.py:311
 msgid "Show S&hort Paths"
-msgstr ""
+msgstr "Показать ко&роткие пути"
 
 #: tortoisehg/hgqt/reporegistry.py:312
 msgid "&Scan Repositories at Startup"
-msgstr ""
+msgstr "&Сканировать хранилища при запуске"
 
 #: tortoisehg/hgqt/reporegistry.py:313
 msgid "Scan &Remote Repositories"
-msgstr ""
+msgstr "Сканировать &удалённые хранилища"
 
 #: tortoisehg/hgqt/reporegistry.py:418
 msgid "&Refresh Repository List"
-msgstr ""
+msgstr "Обновить список хранилищ"
 
 #: tortoisehg/hgqt/reporegistry.py:419
 msgid "Refresh the Repository Registry list"
@@ -4509,7 +4520,7 @@ msgstr "Обновить изображение списка в реестре �
 
 #: tortoisehg/hgqt/reporegistry.py:420 tortoisehg/hgqt/wctxactions.py:49
 msgid "&Open"
-msgstr ""
+msgstr "&Открыть"
 
 #: tortoisehg/hgqt/reporegistry.py:421
 msgid "Open the repository in a new tab"
@@ -4517,7 +4528,7 @@ msgstr "Открыть хранилище в новой вкладке"
 
 #: tortoisehg/hgqt/reporegistry.py:422
 msgid "&Open All"
-msgstr ""
+msgstr "&Открыть всё"
 
 #: tortoisehg/hgqt/reporegistry.py:423
 msgid "Open all repositories in new tabs"

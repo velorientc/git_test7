@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-07-24 10:22-0300\n"
-"PO-Revision-Date: 2013-07-24 17:52+0000\n"
+"PO-Revision-Date: 2013-07-26 16:42+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-07-25 05:20+0000\n"
+"X-Launchpad-Export-Date: 2013-07-27 05:04+0000\n"
 "X-Generator: Launchpad (build 16700)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -540,7 +540,7 @@ msgstr "新名稱:"
 
 #: tortoisehg/hgqt/bookmark.py:66
 msgid "Activate:"
-msgstr ""
+msgstr "活動的:"
 
 #: tortoisehg/hgqt/bookmark.py:71 tortoisehg/hgqt/commit.py:865
 #: tortoisehg/hgqt/tag.py:99 tortoisehg/hgqt/wctxactions.py:62
@@ -649,7 +649,7 @@ msgstr "回報 TortoiseHg 的問題"
 
 #: tortoisehg/hgqt/bugreport.py:111
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "建議更新到最新的TortoiseHg"
 
 #: tortoisehg/hgqt/bugreport.py:115
 msgid "Your TortoiseHg is up to date."
@@ -720,7 +720,7 @@ msgstr "沒有可刪除的區塊"
 
 #: tortoisehg/hgqt/chunks.py:237
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "從補丁中完整的移除檔案?"
 
 #: tortoisehg/hgqt/chunks.py:239
 msgid "Revert all file changes?"
@@ -1389,7 +1389,7 @@ msgstr "顯示 %(count)d / %(total)d 項目"
 
 #: tortoisehg/hgqt/customtools.py:46
 msgid "Select a GUI location to edit:"
-msgstr ""
+msgstr "選擇一個GUI工具列來編輯"
 
 #: tortoisehg/hgqt/customtools.py:49
 msgid "Select the toolbar or menu to change"
@@ -1397,7 +1397,7 @@ msgstr "選一個工具列或選單來改變"
 
 #: tortoisehg/hgqt/customtools.py:70
 msgid "Tools shown on selected location"
-msgstr ""
+msgstr "顯示在工具列的項目"
 
 #: tortoisehg/hgqt/customtools.py:80
 msgid "Delete from list"
@@ -1722,7 +1722,7 @@ msgstr ""
 #: tortoisehg/hgqt/filectxactions.py:74 tortoisehg/hgqt/filedialogs.py:232
 #: tortoisehg/hgqt/filedialogs.py:804
 msgid "&Edit Local"
-msgstr "編輯本地(&E)"
+msgstr "(&E)編輯本地"
 
 #: tortoisehg/hgqt/filectxactions.py:76
 msgid "&Open Local"
@@ -1752,7 +1752,7 @@ msgstr "開啟選擇的子儲存庫"
 
 #: tortoisehg/hgqt/filectxactions.py:86
 msgid "E&xplore Folder"
-msgstr "探索資料夾(&x)"
+msgstr "(&x)探索資料夾"
 
 #: tortoisehg/hgqt/filectxactions.py:87
 msgid "Open the selected folder in the system file manager"
@@ -2370,7 +2370,7 @@ msgstr "正在略過 %s,因為不能讀取"
 
 #: tortoisehg/hgqt/grep.py:568
 msgid "Vi&ew File"
-msgstr "(&e檢視檔案"
+msgstr "(&e)檢視檔案"
 
 #: tortoisehg/hgqt/grep.py:569
 msgid "&View Changeset"
@@ -2378,7 +2378,7 @@ msgstr "檢視變更集(&V)"
 
 #: tortoisehg/hgqt/grep.py:571
 msgid "Annotate &File"
-msgstr ""
+msgstr "(&F)加註檔案"
 
 #: tortoisehg/hgqt/grep.py:736
 msgid "File"
@@ -2417,11 +2417,11 @@ msgstr "刷新檔案列表"
 #: tortoisehg/hgqt/guess.py:84
 #, python-format
 msgid "Min Similarity: %d%%"
-msgstr ""
+msgstr "最小相似:%d%%"
 
 #: tortoisehg/hgqt/guess.py:93
 msgid "Only consider deleted files"
-msgstr ""
+msgstr "只考慮刪除過得檔案"
 
 #: tortoisehg/hgqt/guess.py:94
 msgid "Uncheck to consider all revisioned files for copy sources"
@@ -2437,7 +2437,7 @@ msgstr "找尋複製,和/或更名的來源"
 
 #: tortoisehg/hgqt/guess.py:106
 msgid "<b>Candidate Matches</b>"
-msgstr ""
+msgstr "<b>符合的候選人</b>"
 
 #: tortoisehg/hgqt/guess.py:116 tortoisehg/hgqt/guess.py:129
 msgid "Accept All Matches"
@@ -2465,7 +2465,7 @@ msgstr "找不到檔案"
 
 #: tortoisehg/hgqt/guess.py:201
 msgid "There are no files that may have been renamed"
-msgstr ""
+msgstr "沒有可能被更名過的檔案"
 
 #: tortoisehg/hgqt/guess.py:243
 msgid "Multiple sources chosen"
@@ -2484,6 +2484,8 @@ msgid ""
 "%s and %s have identical contents\n"
 "\n"
 msgstr ""
+"%s 和 %s 有相同的內容\n"
+"\n"
 
 #. i18n: percent format
 #: tortoisehg/hgqt/guess.py:307
@@ -2497,11 +2499,11 @@ msgstr "來源"
 
 #: tortoisehg/hgqt/guess.py:313
 msgid "Dest"
-msgstr ""
+msgstr "目的"
 
 #: tortoisehg/hgqt/guess.py:313
 msgid "% Match"
-msgstr ""
+msgstr "%符合"
 
 #: tortoisehg/hgqt/hgemail.py:279
 msgid "Sending Email"
@@ -2652,7 +2654,7 @@ msgstr "設定(&S)"
 
 #: tortoisehg/hgqt/hgemail_ui.py:305
 msgid "Send &Email"
-msgstr "傳送電子郵件(&E)"
+msgstr "(&E)傳送電子郵件"
 
 #: tortoisehg/hgqt/hgignore.py:37
 #, python-format
@@ -3446,7 +3448,7 @@ msgstr "更新預覽"
 
 #: tortoisehg/hgqt/postreview_ui.py:171
 msgid "Create diff with all outgoing changes"
-msgstr ""
+msgstr "用可被推送的變更集建立diff"
 
 #: tortoisehg/hgqt/postreview_ui.py:172
 msgid "Create diff with all changes on this branch"
@@ -4250,11 +4252,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/repofilter.py:334
 msgid "Display graph the named branch only"
-msgstr ""
+msgstr "只顯示命名的分支圖"
 
 #: tortoisehg/hgqt/repofilter.py:338
 msgid "Display only active branches"
-msgstr ""
+msgstr "只顯示活動的分支"
 
 #: tortoisehg/hgqt/repofilter.py:341
 msgid "Display closed branches"
@@ -4262,7 +4264,7 @@ msgstr "顯示已關閉的分支"
 
 #: tortoisehg/hgqt/repofilter.py:344
 msgid "Include all ancestors"
-msgstr ""
+msgstr "包括所有的祖先"
 
 #: tortoisehg/hgqt/repomodel.py:46
 msgctxt "column header"
@@ -4445,7 +4447,7 @@ msgstr "拓製儲存庫"
 #: tortoisehg/hgqt/reporegistry.py:436 tortoisehg/hgqt/sync.py:456
 #: tortoisehg/hgqt/workbench.py:308
 msgid "E&xplore"
-msgstr ""
+msgstr "(&x)探索"
 
 #: tortoisehg/hgqt/reporegistry.py:437
 msgid "Open the repository in a file browser"
@@ -4779,22 +4781,22 @@ msgstr "推送全部"
 
 #: tortoisehg/hgqt/repowidget.py:656
 msgid "no outgoing changesets"
-msgstr ""
+msgstr "沒有可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:659
 #, python-format
 msgid "no outgoing changesets in current branch (%s) / %d in total"
-msgstr ""
+msgstr "在目前分支(%s)/全部(%d)沒有可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:663
 #, python-format
 msgid "no outgoing changesets up to current revision (#%d) / %d in total"
-msgstr ""
+msgstr "在目前修訂版(#%d)/全部(%d)沒有可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:666
 #, python-format
 msgid "no outgoing changesets up to revision #%d / %d in total"
-msgstr ""
+msgstr "在目前修訂版(#%d)/全部(%d)沒有可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:670 tortoisehg/hgqt/repowidget.py:685
 #: tortoisehg/hgqt/sync.py:966
@@ -4810,12 +4812,12 @@ msgstr ""
 #: tortoisehg/hgqt/repowidget.py:676
 #, python-format
 msgid "%d outgoing changesets up to current revision (#%d) / %d in total"
-msgstr ""
+msgstr "在目前修訂版(#%d)/全部(%d)有%d 個可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:679
 #, python-format
 msgid "%d outgoing changesets up to revision #%d / %d in total"
-msgstr ""
+msgstr "在目前修訂版(#%d)/全部(%d)有%d 個可被推送的變更集"
 
 #: tortoisehg/hgqt/repowidget.py:691
 msgid "Nothing to push"
@@ -4973,7 +4975,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1393
 msgid "&Bundle Rev and Descendants..."
-msgstr ""
+msgstr "(&B)綁兜修訂版跟其衍生的..."
 
 #: tortoisehg/hgqt/repowidget.py:1395 tortoisehg/hgqt/wctxactions.py:47
 msgid "&Copy Patch"
@@ -5069,7 +5071,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/repowidget.py:1572
 msgid "Bundle DAG Range..."
-msgstr ""
+msgstr "綁兜DAG範圍..."
 
 #: tortoisehg/hgqt/repowidget.py:1574
 msgid "Bisect - Good, Bad..."
@@ -5222,7 +5224,7 @@ msgstr "你不能合併自己"
 
 #: tortoisehg/hgqt/repowidget.py:1959
 msgid "Write bundle"
-msgstr "寫進綁兜(bundle)"
+msgstr "寫進綁兜"
 
 #: tortoisehg/hgqt/repowidget.py:2028
 msgid "Backwards phase change requested"
@@ -7245,7 +7247,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/settings.py:900
 msgid "Diff and Annotate"
-msgstr ""
+msgstr "比對和加註"
 
 #: tortoisehg/hgqt/settings.py:902
 msgid "Patch EOL"
@@ -7392,11 +7394,11 @@ msgstr "擴充套件"
 
 #: tortoisehg/hgqt/settings.py:969 tortoisehg/hgqt/settings.py:1702
 msgid "Tools"
-msgstr ""
+msgstr "工具"
 
 #: tortoisehg/hgqt/settings.py:972 tortoisehg/hgqt/settings.py:1706
 msgid "Hooks"
-msgstr ""
+msgstr "掛勾"
 
 #: tortoisehg/hgqt/settings.py:975
 msgid "Issue Tracking"
@@ -8159,11 +8161,11 @@ msgstr "從選擇的URL那邊拉收可拉收的變更集"
 
 #: tortoisehg/hgqt/sync.py:106
 msgid "Detect outgoing changes to selected URL"
-msgstr "偵測可被推送的變更集到選擇的URL"
+msgstr ""
 
 #: tortoisehg/hgqt/sync.py:109
 msgid "Push outgoing changes to selected URL"
-msgstr "推送可被推送的變更集到選擇的URL"
+msgstr ""
 
 #: tortoisehg/hgqt/sync.py:111
 msgid "Email outgoing changesets for remote repository"
@@ -8672,7 +8674,7 @@ msgstr "不能儲存認證"
 #: tortoisehg/hgqt/sync.py:1572
 #, python-format
 msgid "%s - sync options"
-msgstr ""
+msgstr "%s - 同步選項"
 
 #: tortoisehg/hgqt/sync.py:1579
 msgid "Allow push of a new branch (--new-branch)"
@@ -9236,7 +9238,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/wctxactions.py:53
 msgid "E&xplore Subrepository"
-msgstr ""
+msgstr "(&x)探索子儲存庫"
 
 #: tortoisehg/hgqt/wctxactions.py:59
 msgid "&View Missing"
@@ -9457,7 +9459,7 @@ msgstr "說明 (&H)"
 
 #: tortoisehg/hgqt/workbench.py:148
 msgid "&Edit Toolbar"
-msgstr ""
+msgstr "(&E)編輯工具列"
 
 #: tortoisehg/hgqt/workbench.py:150
 msgid "&Dock Toolbar"
@@ -9659,47 +9661,47 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:465
 msgid "Check for incoming changes"
-msgstr ""
+msgstr "檢查可拉收的變更集"
 
 #: tortoisehg/hgqt/workbench.py:466
 msgid "Pull incoming changes"
-msgstr ""
+msgstr "拉收可拉收的變更集"
 
 #: tortoisehg/hgqt/workbench.py:467
 msgid "Detect outgoing changes"
-msgstr ""
+msgstr "偵測可被推送的變更集"
 
 #: tortoisehg/hgqt/workbench.py:468
 msgid "Push outgoing changes"
-msgstr ""
+msgstr "推送可被推送的變更集"
 
 #: tortoisehg/hgqt/workbench.py:473
 #, python-format
 msgid ""
 "Check for incoming changes from\n"
 "%s"
-msgstr ""
+msgstr "從 %s 那邊檢查可拉收的變更集"
 
 #: tortoisehg/hgqt/workbench.py:474
 #, python-format
 msgid ""
 "Pull incoming changes from\n"
 "%s"
-msgstr ""
+msgstr "拉收可拉收的變更集到 %s"
 
 #: tortoisehg/hgqt/workbench.py:475
 #, python-format
 msgid ""
 "Detect outgoing changes to\n"
 "%s"
-msgstr ""
+msgstr "偵測可被推送的變更集到 %s"
 
 #: tortoisehg/hgqt/workbench.py:476
 #, python-format
 msgid ""
 "Push outgoing changes to\n"
 "%s"
-msgstr ""
+msgstr "推送可被推送的變更集到 %s"
 
 #: tortoisehg/hgqt/workbench.py:506
 #, python-format
