@@ -250,12 +250,12 @@ class StatusWidget(QWidget):
         for file in dels:
             del self.partials[file]
 
+        wfile = hglib.fromunicode(wfile)
         if changes is None:
             if wfile in self.partials:
                 del self.partials[wfile]
             return
 
-        wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
             # merge selection state from old hunk list to new hunk list
             oldhunks = self.partials[wfile].hunks
