@@ -254,6 +254,7 @@ class StatusWidget(QWidget):
         if changes is None:
             if wfile in self.partials:
                 del self.partials[wfile]
+                self.chunkSelectionChanged()
             return
 
         if wfile in self.partials:
