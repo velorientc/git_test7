@@ -322,7 +322,7 @@ class StatusWidget(QWidget):
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
         self.refthread.finished.connect(self.reloadComplete)
-        self.refthread.showMessage.connect(self.showMessage)
+        self.refthread.showMessage.connect(self.reloadFailed)
         self.refthread.start()
 
     @pyqtSlot()
@@ -341,6 +341,11 @@ class StatusWidget(QWidget):
         match = self.le.text()
         if match:
             self.setFilter(match)
+
+    # better to handle error in reloadComplete in place of separate signal?
+    @pyqtSlot(QString)
+    def reloadFailed(self, msg):
+        qtlib.ErrorMsgBox(_('Failed to refresh'), msg, parent=self)
 
     def isRefreshingWctx(self):
         return bool(self.refthread)
