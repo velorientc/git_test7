@@ -268,7 +268,7 @@ class FontEntry(QWidget):
             return None
 
         f = QFont()
-        f.fromString(self.value())
+        f.fromString(hglib.tounicode(self.value()))
         return f
 
     ## common APIs for all edit widgets
