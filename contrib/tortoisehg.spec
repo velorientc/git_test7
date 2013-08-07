@@ -56,8 +56,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
-install -m 644 -D contrib/_hgtk $RPM_BUILD_ROOT/%{_datadir}/zsh/site-functions/_hgtk
-
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
@@ -81,11 +79,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pixmaps/tortoisehg/
 %{_datadir}/pixmaps/thg_logo.svg
 %{_datadir}/applications/%{name}.desktop
-
-# /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
-# require. We also don't want to create a sub-package just for this dependency.
-# Instead we just claim ownership of the zsh top folder ...
-%{_datadir}/zsh
 
 %config(noreplace) %{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
