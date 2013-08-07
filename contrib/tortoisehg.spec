@@ -1,6 +1,4 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-# Pure python package
-%define debug_package %{nil}
 
 Name:       tortoisehg
 Version:    hg
@@ -14,18 +12,18 @@ Source0:    %{name}-%{version}.tar.gz
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:  noarch
 BuildRequires:  python, python-devel, gettext, python-sphinx
-BuildRequires:  PyQt4-devel
-Requires:   python >= 2.4, python-iniparse, mercurial >= 1.6
-# gconf needs at util/shlib.py for browse_url(url).
+BuildRequires:  PyQt4-devel, desktop-file-utils
+Requires:   python >= 2.4, python-iniparse, mercurial >= 2.6
+# gconf needed at util/shlib.py for browse_url(url).
 Requires:   gnome-python2-gconf
-Requires:   PyQt4 >= 4.6, qscintilla-python
+Requires:   PyQt4 >= 4.6, qscintilla-python, python-pygments
 
 %description
 This package contains the thg command line tool which provides a
 graphical user interface to the Mercurial distributed revision control system.
 
 %package    nautilus
-Summary:    Mercurial GUI plugin to Nautilus file manager
+Summary:    Mercurial GUI plug-in to the Nautilus file manager
 Group:      Development/Tools
 Requires:   %{name} = %{version}-%{release}, nautilus-python
 
@@ -60,7 +58,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
 ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/thg_logo.svg
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop --vendor %{name}
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop
 
 %find_lang %{name}
 
@@ -80,7 +78,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pixmaps/thg_logo.svg
 %{_datadir}/applications/%{name}.desktop
 
-%config(noreplace) %{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
 %files nautilus
 %defattr(-,root,root,-)
