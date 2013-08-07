@@ -11,6 +11,7 @@ import time
 import urllib2, urllib
 import socket
 import errno
+import inspect
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -117,9 +118,18 @@ class QtUi(uimod.ui):
         if not self.interactive(): return default
         return self.sig.prompt(msg, default)
 
-    def promptchoice(self, msg, choices, default=0):
+    def promptchoice(self, prompt, default=0):
+        parts = prompt.split('$$')
+        msg = parts[0].rstrip(' ')
+        choices = [p.strip(' ') for p in parts[1:]]
+        return self._promptchoice(msg, choices, default)
+
+    def _promptchoice(self, msg, choices, default=0):
         if not self.interactive(): return default
         return self.sig.promptchoice(msg, choices, default)
+
+    if len(inspect.getargspec(uimod.ui.promptchoice)[0]) > 3:
+        promptchoice = _promptchoice  # hg<2.7
 
     def getpass(self, prompt=_('password: '), default=None):
         return self.sig.getpass(prompt, default)
