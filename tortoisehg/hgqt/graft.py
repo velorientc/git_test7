@@ -122,6 +122,7 @@ class GraftDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
+        self.th = None
         if self.checkResolve():
             self.abortbtn.setEnabled(True)
         else:
@@ -301,6 +302,8 @@ class GraftDialog(QDialog):
             self.runner.run(cmdline)
 
     def reject(self):
+        if self.th and self.th.isRunning():
+            return
         if os.path.exists(self._graftstatefile):
             main = _('Exiting with an unfinished graft is not recommended.')
             text = _('Consider aborting the graft first.')
