@@ -223,7 +223,7 @@ class PurgeThread(QThread):
 
         self.showMessage.emit('')
         match = scmutil.matchall(repo)
-        match.dir = directories.append
+        match.explicitdir = match.traversedir = directories.append
         repo.bfstatus = True
         repo.lfstatus = True
         status = repo.status(match=match, ignored=opts['ignored'],
@@ -261,7 +261,7 @@ class PurgeThread(QThread):
 
         if opts['delfolders'] and directories:
             for i, f in enumerate(sorted(directories, reverse=True)):
-                if not os.listdir(repo.wjoin(f)):
+                if match(f) and not os.listdir(repo.wjoin(f)):
                     data = ('rmdir', i, f, '', len(directories))
                     self.progress.emit(*data)
                     remove(os.rmdir, f)
