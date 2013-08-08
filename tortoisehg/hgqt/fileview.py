@@ -113,7 +113,8 @@ class HgFileView(QFrame):
 
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
+        keys = set((Qt.Key_Space,))
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self, keys))
         self.sci.setCaretLineVisible(False)
 
         # define markers for colorize zones of diff
@@ -948,6 +949,24 @@ class HgFileView(QFrame):
     def resizeEvent(self, event):
         super(HgFileView, self).resizeEvent(event)
         self.updateScrollBar()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            if self.changeselection:
+                x, y = self.sci.getCursorPosition()
+                chunk = self.chunkContainsLine(x)
+                if self.updateChunk(chunk, not chunk.excluded):
+                    self.chunkSelectionChanged.emit()
+            return
+        return super(HgFileView, self).keyPressEvent(event)
+
+    def chunkContainsLine(self, line):
+        chunks = self.chunkatline
+        if line in chunks:
+            return chunks[line]
+
+        line = max(i for i in chunks.keys() if i < line)
+        return chunks[line]
 
     def updateScrollBar(self):
         sbWidth = self.sci.verticalScrollBar().width()
