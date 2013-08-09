@@ -105,6 +105,11 @@ class _LogWidgetForConsole(cmdui.LogWidget):
                                        1 << self._prompt_marker)
 
     @pyqtSlot()
+    def clearLog(self):
+        self.clear()
+        self.openPrompt()
+
+    @pyqtSlot()
     def closePrompt(self):
         """Disable user input"""
         line = self._findPromptLine()
