@@ -547,18 +547,15 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_clear(self, args):
-        self.clear()
-        self.openPrompt()
+        self._logwidget.clearLog()
 
     @_cmdtable
     def _cmd_cls(self, args):
-        self.clear()
-        self.openPrompt()
+        self._logwidget.clearLog()
 
     @_cmdtable
     def _cmd_exit(self, args):
-        self.clear()
-        self.openPrompt()
+        self._logwidget.clearLog()
         self.closeRequested.emit()
 
 class LogDockWidget(QDockWidget):
