@@ -606,7 +606,7 @@ _fontcache = {}
 def initfontcache(ui):
     for name in _fontdefaults:
         fname = ui.config('tortoisehg', name, _fontdefaults[name])
-        _fontcache[name] = ThgFont(fname)
+        _fontcache[name] = ThgFont(hglib.tounicode(fname))
 
 def getfont(name):
     assert name in _fontdefaults
