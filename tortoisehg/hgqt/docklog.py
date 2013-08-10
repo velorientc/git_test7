@@ -253,16 +253,6 @@ def _searchhistory(items, text, direction, idx):
         idx += direction
     return None, idx
 
-class _ConsoleCmdTable(dict):
-    """Command table for ConsoleWidget"""
-    _cmdfuncprefix = '_cmd_'
-
-    def __call__(self, func):
-        if not func.__name__.startswith(self._cmdfuncprefix):
-            raise ValueError('bad command function name %s' % func.__name__)
-        self[func.__name__[len(self._cmdfuncprefix):]] = func
-        return func
-
 class ConsoleWidget(QWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
@@ -273,8 +263,6 @@ class ConsoleWidget(QWidget):
 
     Args: topic, pos, item, unit, total, reporoot
     """
-
-    _cmdtable = _ConsoleCmdTable()
 
     def __init__(self, parent=None):
         super(ConsoleWidget, self).__init__(parent)
@@ -526,14 +514,12 @@ class ConsoleWidget(QWidget):
         self._extproc.setWorkingDirectory(hglib.tounicode(self.cwd))
         self._extproc.start(cmdline, QIODevice.ReadOnly)
 
-    @_cmdtable
     def _cmd_hg(self, args):
         self.closePrompt()
         if self._repo:
             args = ['--cwd', self._repo.root] + args
         self._cmdcore.run(args)
 
-    @_cmdtable
     def _cmd_thg(self, args):
         from tortoisehg.hgqt import run
         self.closePrompt()
@@ -545,18 +531,20 @@ class ConsoleWidget(QWidget):
         finally:
             self.openPrompt()
 
-    @_cmdtable
     def _cmd_clear(self, args):
         self._logwidget.clearLog()
 
-    @_cmdtable
-    def _cmd_cls(self, args):
-        self._logwidget.clearLog()
-
-    @_cmdtable
     def _cmd_exit(self, args):
         self._logwidget.clearLog()
         self.closeRequested.emit()
+
+    _cmdtable = {
+        'hg':    _cmd_hg,
+        'thg':   _cmd_thg,
+        'clear': _cmd_clear,
+        'cls':   _cmd_clear,
+        'exit':  _cmd_exit,
+        }
 
 class LogDockWidget(QDockWidget):
 
