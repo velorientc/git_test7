@@ -108,6 +108,14 @@ class RepoWatcher(QObject):
         if files:
             self._fswatcher.removePaths(files)
 
+        # QTBUG-32917: On Windows, removePaths() fails to remove ".hg" and
+        # ".hg/store" from the list, but actually they are not watched.
+        # Thus, they cannot be watched again by the same fswatcher instance.
+        if self._fswatcher.directories() or self._fswatcher.files():
+            dbgoutput('failed to remove paths - destroying watcher')
+            self._fswatcher.setParent(None)
+            self._fswatcher = None
+
     def isMonitoring(self):
         """True if filesystem monitor is running"""
         if not self._fswatcher:
