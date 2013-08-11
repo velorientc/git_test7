@@ -233,6 +233,9 @@ def connectToExistingWorkbench(root=None):
         reply = socket.readAll()
         if data == reply:
             return True
+    elif socket.error() == QLocalSocket.ConnectionRefusedError:
+        # last server process was crashed?
+        QLocalServer.removeServer(servername)
     return False
 
 
