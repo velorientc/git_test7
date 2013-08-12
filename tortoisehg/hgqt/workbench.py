@@ -970,6 +970,9 @@ class Workbench(QMainWindow):
             getattr(w, 'reload')()
             self._setupUrlCombo(w.repo)
 
+        if not self.mqpatches.isHidden():
+            self.mqpatches.reload()
+
     @pyqtSlot(QAction)
     def _runSyncAction(self, action):
         w = self.repoTabsWidget.currentWidget()

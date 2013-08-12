@@ -219,9 +219,9 @@ def connectToExistingWorkbench(root=None):
         data = root
     else:
         data = '[echo]'
+    servername = QApplication.applicationName() + '-' + util.getuser()
     socket = QLocalSocket()
-    socket.connectToServer(QApplication.applicationName() + '-' + util.getuser(),
-        QIODevice.ReadWrite)
+    socket.connectToServer(servername, QIODevice.ReadWrite)
     if socket.waitForConnected(10000):
         # Momentarily let any process set the foreground window
         # The server process with revoke this permission as soon as it gets
@@ -233,6 +233,9 @@ def connectToExistingWorkbench(root=None):
         reply = socket.readAll()
         if data == reply:
             return True
+    elif socket.error() == QLocalSocket.ConnectionRefusedError:
+        # last server process was crashed?
+        QLocalServer.removeServer(servername)
     return False
 
 
