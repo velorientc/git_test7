@@ -69,7 +69,7 @@ class WctxActions(QObject):
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
         make(_('De&tect Renames...'), guessRename, frozenset('A?!'),
-             'detect_rename')
+             'detect_rename', slot=self.runDialogAction)
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
         make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
         make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
@@ -370,9 +370,9 @@ def addlf(parent, ui, repo, files):
     commands.add(ui, repo, lfsize='', normal=None, large=True, *files)
     return True
 
-def guessRename(parent, ui, repo, files):
+def guessRename(parent, repoagent, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog
-    dlg = DetectRenameDialog(repo, parent, *files)
+    dlg = DetectRenameDialog(repoagent, parent, *files)
     def matched():
         ret[0] = True
     ret = [False]

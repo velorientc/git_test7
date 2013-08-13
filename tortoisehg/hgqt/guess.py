@@ -25,10 +25,11 @@ class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
     matchAccepted = pyqtSignal()
 
-    def __init__(self, repo, parent, *pats):
+    def __init__(self, repoagent, parent, *pats):
         QDialog.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.pats = pats
         self.thread = None
 
@@ -156,6 +157,10 @@ class DetectRenameDialog(QDialog):
         slider.setValue(s.value('guess/simslider').toInt()[0] or 50)
         self.vsplit, self.hsplit = vsplit, hsplit
         QTimer.singleShot(0, self.refresh)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def refresh(self):
         self.repo.thginvalidate()
