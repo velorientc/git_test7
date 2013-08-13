@@ -271,6 +271,22 @@ class FontEntry(QWidget):
         f.fromString(hglib.tounicode(self.value()))
         return f
 
+    def parseFont(self, font):
+        if not font:
+            return _unspecstr
+
+        s = font.family()
+        s += ", %d" % font.pointSize() + _("pt")
+        if font.bold():
+            s += ", " + _("Bold")
+        if font.italic():
+            s += ", " + _("Italic")
+        if font.strikeOut():
+            s += ", " + _("Strike")
+        if font.underline():
+            s += ", " + _("Underline")
+        return s
+
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
