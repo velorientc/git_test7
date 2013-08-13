@@ -27,7 +27,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     revisionSelected = pyqtSignal(int)
 
-    def __init__(self, repo, upats, parent=None, **opts):
+    def __init__(self, repoagent, upats, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         self.thread = None
@@ -114,7 +114,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
 
         def updateRecurse(checked):
             try:
-                wctx = repo[None]
+                wctx = self.repo[None]
                 if '.hgsubstate' in wctx:
                     recurse.setEnabled(checked)
                 else:
@@ -141,14 +141,15 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         frame.setLayout(grid)
         mainvbox.addWidget(frame)
 
-        tv = MatchTree(repo, self)
+        tv = MatchTree(repoagent, self)
         tv.revisionSelected.connect(self.revisionSelected)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
         le.returnPressed.connect(self.runSearch)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
@@ -189,6 +190,10 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.setLayout(outervbox)
             self.showMessage.connect(self.stbar.showMessage)
             self.progress.connect(self.stbar.progress)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def setCompleters(self):
         comp = QCompleter(self.searchhistory, self)
@@ -538,10 +543,10 @@ class MatchTree(QTableView):
     revisionSelected = pyqtSignal(int)
     contextmenu = None
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         QTableView.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.pattern = None
         self.icase = False
         self.embedded = parent.parent() is not None
@@ -580,6 +585,10 @@ class MatchTree(QTableView):
 
         self.setModel(MatchModel(self))
         self.selectionModel().selectionChanged.connect(self.onSelectionChanged)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def dragObject(self):
         snapshots = {}
@@ -785,12 +794,12 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 class SearchDialog(QDialog):
-    def __init__(self, repo, upats, parent=None, **opts):
+    def __init__(self, repoagent, upats, parent=None, **opts):
         super(SearchDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('view-filter'))
         self.setLayout(QVBoxLayout(self))
-        self._searchwidget = SearchWidget(repo, upats, parent=self, **opts)
+        self._searchwidget = SearchWidget(repoagent, upats, parent=self, **opts)
         self.layout().addWidget(self._searchwidget)
 
     def closeEvent(self, event):
