@@ -120,9 +120,6 @@ class _SciImSupport(object):
                                 QsciScintilla.INDIC_PLAIN)
 
 class Scintilla(QsciScintilla):
-
-    _stdMenu = None
-
     def __init__(self, parent=None):
         super(Scintilla, self).__init__(parent)
         self.autoUseTabs = True
@@ -186,39 +183,36 @@ class Scintilla(QsciScintilla):
 
     def createStandardContextMenu(self):
         """Create standard context menu"""
-        if not self._stdMenu:
-            self._stdMenu = QMenu(self)
-        else:
-            self._stdMenu.clear()
+        menu = QMenu(self)
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('&Undo'), self.undo)
+            a = menu.addAction(_('&Undo'), self.undo)
             a.setShortcuts(QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = self._stdMenu.addAction(_('&Redo'), self.redo)
+            a = menu.addAction(_('&Redo'), self.redo)
             a.setShortcuts(QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
-            self._stdMenu.addSeparator()
-            a = self._stdMenu.addAction(_('Cu&t'), self.cut)
+            menu.addSeparator()
+            a = menu.addAction(_('Cu&t'), self.cut)
             a.setShortcuts(QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = self._stdMenu.addAction(_('&Copy'), self.copy)
+        a = menu.addAction(_('&Copy'), self.copy)
         a.setShortcuts(QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('&Paste'), self.paste)
+            a = menu.addAction(_('&Paste'), self.paste)
             a.setShortcuts(QKeySequence.Paste)
-            a = self._stdMenu.addAction(_('&Delete'), self.removeSelectedText)
+            a = menu.addAction(_('&Delete'), self.removeSelectedText)
             a.setShortcuts(QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
-        self._stdMenu.addSeparator()
-        a = self._stdMenu.addAction(_('Select &All'), self.selectAll)
+        menu.addSeparator()
+        a = menu.addAction(_('Select &All'), self.selectAll)
         a.setShortcuts(QKeySequence.SelectAll)
 
-        self._stdMenu.addSeparator()
-        editoptsmenu = self._stdMenu.addMenu(_('&Editor Options'))
+        menu.addSeparator()
+        editoptsmenu = menu.addMenu(_('&Editor Options'))
         self._buildEditorOptionsMenu(editoptsmenu)
 
-        return self._stdMenu
+        return menu
 
     def _buildEditorOptionsMenu(self, editoptsmenu):
         qsci = QsciScintilla
