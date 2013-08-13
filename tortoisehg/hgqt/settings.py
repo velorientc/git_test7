@@ -224,6 +224,7 @@ class FontEntry(QWidget):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
+        self.font = None
 
         self.label = QLabel()
         self.setButton = QPushButton(_('&Set...'))
@@ -270,6 +271,10 @@ class FontEntry(QWidget):
         f = QFont()
         f.fromString(hglib.tounicode(self.value()))
         return f
+
+    def setCurrentFont(self, font):
+        self.font = font
+        self.label.setText(self.parseFont(self.font))
 
     def parseFont(self, font):
         if not font:
