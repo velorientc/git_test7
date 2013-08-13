@@ -125,7 +125,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def PatchDiffDetails():
             # pdiff view of selected patc
-            self.patchdiff = revdetails.RevDetailsWidget(self.repo, self)
+            self.patchdiff = revdetails.RevDetailsWidget(self._repoagent, self)
             return self.patchdiff
 
         BuildChildWidgets()

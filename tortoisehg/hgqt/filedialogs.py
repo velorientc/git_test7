@@ -341,7 +341,7 @@ class FileLogDialog(_AbstractFileDialog):
         rev = self.selection[0]
         if not self.revdetails:
             from tortoisehg.hgqt.revdetails import RevDetailsDialog
-            self.revdetails = RevDetailsDialog(self.repo, rev=rev)
+            self.revdetails = RevDetailsDialog(self._repoagent, rev=rev)
         else:
             self.revdetails.setRev(rev)
         self.revdetails.show()

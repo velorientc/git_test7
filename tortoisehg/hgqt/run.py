@@ -973,7 +973,7 @@ def revdetails(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     os.chdir(repo.root)
     rev = opts.get('rev', '.')
-    return revdetailsmod.RevDetailsDialog(repo, rev=rev)
+    return revdetailsmod.RevDetailsDialog(repoagent, rev=rev)
 
 @command('revert', [], _('thg revert [FILE]...'))
 def revert(ui, repoagent, *pats, **opts):
