@@ -248,7 +248,7 @@ class FontEntry(QWidget):
 
     def onSetClicked(self, checked):
         def newFont(font):
-            self.setText(font.toString())
+            self.setCurrentFont(font)
             thgf.setFont(font)
         thgf = qtlib.getfont(self.fname)
         origfont = self.currentFont() or thgf.font()
@@ -257,11 +257,11 @@ class FontEntry(QWidget):
         font, isok = dlg.getFont(origfont, self)
         if not isok:
             return
-        self.label.setText(font.toString())
+        self.setCurrentFont(font)
         thgf.setFont(font)
 
     def onClearClicked(self, checked):
-        self.label.setText(_unspecstr)
+        self.setCurrentFont(None)
 
     def currentFont(self):
         """currently selected QFont if specified"""
