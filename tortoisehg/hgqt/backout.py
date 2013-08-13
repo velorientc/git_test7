@@ -292,7 +292,7 @@ class SummaryPage(BasePage):
         repo = self.repo
         if cmd == 'commit':
             from tortoisehg.hgqt import commit
-            dlg = commit.CommitDialog(repo, [], {}, self.wizard())
+            dlg = commit.CommitDialog(self._repoagent, [], {}, self.wizard())
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()

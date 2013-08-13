@@ -138,7 +138,7 @@ class CompressDialog(QDialog):
         descs = [self.repo[c].description() for c in revs]
         self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
-        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.showMessage.emit(_('Compress is complete, old history untouched'))
@@ -148,7 +148,7 @@ class CompressDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
+            dlg = commit.CommitDialog(self._repoagent, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkStatus()

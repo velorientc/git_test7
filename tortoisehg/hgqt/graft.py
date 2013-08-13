@@ -283,7 +283,7 @@ class GraftDialog(QDialog):
             dlg.exec_()
             self.checkResolve()
         elif cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
+            dlg = commit.CommitDialog(self._repoagent, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.destcsinfo.update(self.repo['.'])

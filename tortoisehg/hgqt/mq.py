@@ -686,8 +686,10 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     def qinitOrCommit(self):
         if os.path.isdir(self.repo.mq.join('.hg')):
             from tortoisehg.hgqt import commit
+            # TODO: do not instantiate repo here
             mqrepo = thgrepo.repository(None, self.repo.mq.path)
-            dlg = commit.CommitDialog(mqrepo, [], {}, self)
+            repoagent = mqrepo._pyqtobj
+            dlg = commit.CommitDialog(repoagent, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.reload()

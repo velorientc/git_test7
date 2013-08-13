@@ -520,7 +520,7 @@ def commit(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return commitmod.CommitDialog(repo, pats, opts)
+    return commitmod.CommitDialog(repoagent, pats, opts)
 
 @command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):

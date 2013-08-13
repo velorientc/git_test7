@@ -147,7 +147,7 @@ class ImportDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def commitActivated(self):
-        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.checkStatus()
