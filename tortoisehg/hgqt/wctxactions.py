@@ -181,7 +181,7 @@ class WctxActions(QObject):
             str(action.data().toString()), files)
 
     def runAction(self):
-        'run wrapper for all action methods'
+        'run wrapper for direct action methods'
 
         repo, action, parent = self.repo, self.sender(), self.parent()
         func = action._runfunc
@@ -224,6 +224,20 @@ class WctxActions(QObject):
             os.chdir(cwd)
 
         if notify:
+            self.refreshNeeded.emit()
+
+    #@pyqtSlot()
+    def runDialogAction(self):
+        'run wrapper for modal dialog action methods'
+
+        repo, action, parent = self.repo, self.sender(), self.parent()
+        func = action._runfunc
+        files = self._filesForAction(action)
+
+        notify = func(parent, self._repoagent, files)
+        if notify:
+            wfiles = [repo.wjoin(x) for x in files]
+            shlib.shell_notify(wfiles)
             self.refreshNeeded.emit()
 
     #@pyqtSlot()
