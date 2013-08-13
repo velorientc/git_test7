@@ -253,7 +253,7 @@ class FontEntry(QWidget):
         origfont = self.currentFont() or thgf.font()
         dlg = QFontDialog(self)
         dlg.currentFontChanged.connect(newFont)
-        font, isok = dlg.getFont(origfont, self)
+        font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
         self.label.setText(font.toString())
