@@ -315,7 +315,7 @@ class SummaryPage(BasePage):
             repo.incrementBusyCount()
             self.runner.run(cmdline)
         else:
-            raise 'unknown command: %s' % cmd
+            raise ValueError('unknown command: %s' % cmd)
 
 
 class BackoutPage(BasePage):

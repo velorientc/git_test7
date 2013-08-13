@@ -335,7 +335,7 @@ class SummaryPage(BasePage):
         elif cmd == 'skip':
             self.wizard().next()
         else:
-            raise 'unknown command: %s' % cmd
+            raise ValueError('unknown command: %s' % cmd)
 
 
 class MergePage(BasePage):
