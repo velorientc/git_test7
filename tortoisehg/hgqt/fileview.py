@@ -243,7 +243,8 @@ class HgFileView(QFrame):
     def launchShelve(self):
         from tortoisehg.hgqt import shelve
         # TODO: pass self._filename
-        dlg = shelve.ShelveDialog(self.repo, self)
+        repoagent = self.repo._pyqtobj  # TODO
+        dlg = shelve.ShelveDialog(repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.shelveToolExited.emit()

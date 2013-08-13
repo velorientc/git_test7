@@ -375,7 +375,7 @@ class UpdateDialog(QDialog):
                     cmdline.append('--clean')
                 elif clicked == 'shelve':
                     from tortoisehg.hgqt import shelve
-                    dlg = shelve.ShelveDialog(self.repo, self)
+                    dlg = shelve.ShelveDialog(self._repoagent, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return

@@ -315,7 +315,7 @@ class SummaryPage(BasePage):
             self.refresh()
         elif cmd == 'shelve':
             from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self.wizard())
+            dlg = shelve.ShelveDialog(self._repoagent, self.wizard())
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()

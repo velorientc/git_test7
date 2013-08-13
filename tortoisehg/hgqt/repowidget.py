@@ -827,7 +827,7 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createShelveDialog)
 
     def _createShelveDialog(self):
-        dlg = shelve.ShelveDialog(self.repo, self)
+        dlg = shelve.ShelveDialog(self._repoagent, self)
         dlg.finished.connect(self._refreshCommitTabIfNeeded)
         return dlg
 
