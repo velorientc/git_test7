@@ -26,16 +26,16 @@ class RenameDialog(QDialog):
 
     def __init__(self, repo, pats, parent=None, iscopy=False):
         super(RenameDialog, self).__init__(parent)
+        self.repo = repo
         self.iscopy = iscopy
         # pats: local; src, dest: unicode
-        src, dest = self.init_data(repo, pats)
+        src, dest = self.init_data(pats)
         self.init_view(src, dest)
 
-    def init_data(self, repo, pats):
+    def init_data(self, pats):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
-        self.repo = repo
         root = self.repo.root
         cwd = os.getcwd()
         try:
