@@ -35,15 +35,15 @@ class RenameDialog(QDialog):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
-        self.root = repo.root
         self.repo = repo
+        root = self.repo.root
         cwd = os.getcwd()
         try:
-            fname = scmutil.canonpath(self.root, cwd, pats[0])
-            target = scmutil.canonpath(self.root, cwd, pats[1])
+            fname = scmutil.canonpath(root, cwd, pats[0])
+            target = scmutil.canonpath(root, cwd, pats[1])
         except:
             pass
-        os.chdir(self.root)
+        os.chdir(root)
         fname = hglib.tounicode(util.normpath(fname))
         if target:
             target = hglib.tounicode(util.normpath(target))
@@ -207,7 +207,7 @@ class RenameDialog(QDialog):
         if not fullpath:
             return
         fullpath = util.normpath(unicode(fullpath))
-        pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+        pathprefix = util.normpath(hglib.tounicode(self.repo.root)) + '/'
         if not os.path.normcase(fullpath).startswith(os.path.normcase(pathprefix)):
             return
         return fullpath[len(pathprefix):]
