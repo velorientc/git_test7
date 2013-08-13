@@ -27,7 +27,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     revisionSelected = pyqtSignal(int)
 
-    def __init__(self, upats, repo, parent=None, **opts):
+    def __init__(self, repo, upats, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         self.thread = None
@@ -785,12 +785,12 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 class SearchDialog(QDialog):
-    def __init__(self, upats, repo, parent=None, **opts):
+    def __init__(self, repo, upats, parent=None, **opts):
         super(SearchDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('view-filter'))
         self.setLayout(QVBoxLayout(self))
-        self._searchwidget = SearchWidget(upats, repo, parent=self, **opts)
+        self._searchwidget = SearchWidget(repo, upats, parent=self, **opts)
         self.layout().addWidget(self._searchwidget)
 
     def closeEvent(self, event):

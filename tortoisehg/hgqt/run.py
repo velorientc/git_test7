@@ -578,7 +578,7 @@ def grep(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import grep as grepmod
     repo = repoagent.rawRepo()
     upats = [hglib.tounicode(p) for p in pats]
-    return grepmod.SearchDialog(upats, repo, **opts)
+    return grepmod.SearchDialog(repo, upats, **opts)
 
 @command('^guess', [], _('thg guess'))
 def guess(ui, repoagent, *pats, **opts):

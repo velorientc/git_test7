@@ -698,7 +698,7 @@ class RepoWidget(QWidget):
 
     def createGrepWidget(self):
         upats = {}
-        gw = SearchWidget(upats, self.repo, self)
+        gw = SearchWidget(self.repo, upats, self)
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
         gw.progress.connect(self.progress)

@@ -97,7 +97,7 @@ class ManifestDialog(QMainWindow):
     def _createSearchDialog(self):
         from tortoisehg.hgqt import grep
         repo = self._repoagent.rawRepo()
-        return grep.SearchDialog([], repo)
+        return grep.SearchDialog(repo, [])
 
     @pyqtSlot(QString)
     def _linkHandler(self, link):
