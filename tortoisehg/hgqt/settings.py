@@ -295,11 +295,12 @@ class FontEntry(QWidget):
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
-        self.curvalue = curvalue
         if curvalue:
-            self.label.setText(hglib.tounicode(curvalue))
+            self.curvalue = QFont()
+            self.curvalue.fromString(hglib.tounicode(curvalue))
         else:
-            self.label.setText(_unspecstr)
+            self.curvalue = None
+        self.setCurrentFont(self.curvalue)
 
     def value(self):
         utext = self.label.text()
@@ -309,7 +310,7 @@ class FontEntry(QWidget):
             return hglib.fromunicode(utext)
 
     def isDirty(self):
-        return self.value() != self.curvalue
+        return self.font != self.curvalue
 
 class SettingsCheckBox(QCheckBox):
     def __init__(self, parent=None, **opts):
