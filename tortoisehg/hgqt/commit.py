@@ -93,7 +93,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         self.opts = opts = readrepoopts(repo) # user, date
 
-        self.stwidget = status.StatusWidget(repo, pats, opts, self)
+        self.stwidget = status.StatusWidget(repoagent, pats, opts, self)
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)

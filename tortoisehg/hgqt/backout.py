@@ -567,7 +567,7 @@ class CommitPage(BasePage):
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
         if cmd == 'view':
-            dlg = status.StatusDialog(self.repo, [], {}, self)
+            dlg = status.StatusDialog(self._repoagent, [], {}, self)
             dlg.exec_()
             self.refresh()
 

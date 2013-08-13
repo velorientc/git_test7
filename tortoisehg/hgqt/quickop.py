@@ -81,7 +81,7 @@ class QuickOpDialog(QDialog):
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
-        stwidget = status.StatusWidget(repo, pats, opts, self,
+        stwidget = status.StatusWidget(repoagent, pats, opts, self,
                                        defcheck=defcheck)
         toplayout.addWidget(stwidget, 1)
 

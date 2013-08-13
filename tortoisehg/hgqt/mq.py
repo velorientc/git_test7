@@ -527,7 +527,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
 
-        self.stwidget = status.StatusWidget(repo, None, opts, self)
+        self.stwidget = status.StatusWidget(repoagent, None, opts, self)
         self.stwidget.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
 

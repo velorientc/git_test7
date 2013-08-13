@@ -1031,7 +1031,7 @@ def status(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return statusmod.StatusDialog(repo, pats, opts)
+    return statusmod.StatusDialog(repoagent, pats, opts)
 
 @command('^strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
