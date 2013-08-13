@@ -852,7 +852,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         else:
             super(MQWidget, self).dropEvent(event)
             return
-        dlg = thgimport.ImportDialog(self.repo, self, mq=True)
+        dlg = thgimport.ImportDialog(self._repoagent, self, mq=True)
         dlg.setfilepaths(patches)
         dlg.exec_()
 

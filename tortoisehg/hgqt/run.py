@@ -779,8 +779,7 @@ def hgignore(ui, repoagent, *pats, **opts):
 def import_(ui, repoagent, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt import thgimport
-    repo = repoagent.rawRepo()
-    dlg = thgimport.ImportDialog(repo, None, **opts)
+    dlg = thgimport.ImportDialog(repoagent, None, **opts)
     dlg.setfilepaths(pats)
     return dlg
 

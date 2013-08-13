@@ -817,7 +817,7 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def thgimport(self, paths=None):
-        dlg = thgimport.ImportDialog(self.repo, self)
+        dlg = thgimport.ImportDialog(self._repoagent, self)
         dlg.patchImported.connect(self.gotoTip)
         if paths:
             dlg.setfilepaths(paths)

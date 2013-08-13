@@ -26,7 +26,7 @@ class ImportDialog(QDialog):
     """Dialog to import patches"""
     patchImported = pyqtSignal()
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint
@@ -34,7 +34,7 @@ class ImportDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-import'))
 
         self.tempfiles = []
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -141,6 +141,10 @@ class ImportDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def commitActivated(self):
         dlg = commit.CommitDialog(self.repo, [], {}, self)
