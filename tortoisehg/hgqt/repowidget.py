@@ -1556,7 +1556,7 @@ class RepoWidget(QWidget):
                 InfoMsgBox(_('Unable to compress history'),
                            _('Selected changeset pair not related'))
                 return
-            dlg = compress.CompressDialog(self.repo, revs, self)
+            dlg = compress.CompressDialog(self._repoagent, revs, self)
             dlg.exec_()
 
         menu = QMenu(self)
