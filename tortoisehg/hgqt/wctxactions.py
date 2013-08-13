@@ -250,7 +250,7 @@ class WctxActions(QObject):
             self._filedialogs.open(path)
 
     def _createFileDialog(self, path):
-        return filedialogs.FileLogDialog(self.repo, path)
+        return filedialogs.FileLogDialog(self._repoagent, path)
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)

@@ -36,9 +36,9 @@ otherside = {'left': 'right', 'right': 'left'}
 class _AbstractFileDialog(QMainWindow):
     finished = pyqtSignal(int)
 
-    def __init__(self, repo, filename):
+    def __init__(self, repoagent, filename):
         QMainWindow.__init__(self)
-        self.repo = repo
+        self._repoagent = repoagent
 
         self.setupUi(self)
         self._show_rev = None
@@ -46,6 +46,7 @@ class _AbstractFileDialog(QMainWindow):
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
                             % (repo.displayname, hglib.tounicode(filename)))
         self.setWindowIcon(qtlib.geticon('hg-log'))
@@ -59,6 +60,10 @@ class _AbstractFileDialog(QMainWindow):
     def closeEvent(self, event):
         super(_AbstractFileDialog, self).closeEvent(event)
         self.finished.emit(0)  # mimic QDialog exit
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def reload(self):
         'Reload toolbar action handler'
@@ -77,8 +82,8 @@ class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    def __init__(self, repo, filename):
-        super(FileLogDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileLogDialog, self).__init__(repoagent, filename)
         self._readSettings()
         self.menu = None
         self.dualmenu = None
@@ -400,8 +405,8 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    def __init__(self, repo, filename):
-        super(FileDiffDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileDiffDialog, self).__init__(repoagent, filename)
         self._readSettings()
         self.menu = None
 

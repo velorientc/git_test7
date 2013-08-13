@@ -383,8 +383,7 @@ def _filelog(ui, repoagent, *pats, **opts):
     if len(pats) != 1:
         raise util.Abort(_('requires a single filename'))
     filename = hglib.canonpaths(pats)[0]
-    repo = repoagent.rawRepo()
-    return filedialogs.FileLogDialog(repo, filename)
+    return filedialogs.FileLogDialog(repoagent, filename)
 
 def _workbench(ui, *pats, **opts):
     root = opts.get('root') or paths.find_root()

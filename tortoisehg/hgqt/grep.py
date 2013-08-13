@@ -671,28 +671,32 @@ class MatchTree(QTableView):
                 root = paths.find_root(abs)
                 if root and abs.startswith(root):
                     path = abs[len(root)+1:]
+                    # TODO: do not instantiate repo here
                     srepo = thgrepo.repository(None, root)
-                    self._openAnnotateDialog(srepo, rev, path, line)
+                    srepoagent = srepo._pyqtobj
+                    self._openAnnotateDialog(srepoagent, rev, path, line)
                 else:
                     continue
             else:
-                self._openAnnotateDialog(repo, rev, path, line)
+                self._openAnnotateDialog(self._repoagent, rev, path, line)
 
-    def _openAnnotateDialog(self, repo, rev, path, line):
+    def _openAnnotateDialog(self, repoagent, rev, path, line):
         if rev is None:
+            repo = repoagent.rawRepo()
             rev = repo['.'].rev()
 
-        dlg = self._filedialogs.open(repo, path)
+        dlg = self._filedialogs.open(repoagent, path)
         dlg.setFileViewMode(fileview.AnnMode)
         dlg.goto(rev)
         dlg.showLine(line)
         dlg.setSearchPattern(hglib.tounicode(self.pattern))
         dlg.setSearchCaseInsensitive(self.icase)
 
-    def _createFileDialog(self, repo, path):
-        return filedialogs.FileLogDialog(repo, path)
+    def _createFileDialog(self, repoagent, path):
+        return filedialogs.FileLogDialog(repoagent, path)
 
-    def _genFileDialogKey(self, repo, path):
+    def _genFileDialogKey(self, repoagent, path):
+        repo = repoagent.rawRepo()
         return repo.wjoin(path)
 
     def onViewChangeset(self):
