@@ -1937,7 +1937,7 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createEmailDialog, tuple(revs))
 
     def _createEmailDialog(self, revs):
-        return hgemail.EmailDialog(self.repo, revs)
+        return hgemail.EmailDialog(self._repoagent, revs)
 
     def archiveRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)

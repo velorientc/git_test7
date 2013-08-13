@@ -545,13 +545,12 @@ def drag_move(ui, repoagent, *pats, **opts):
 def email(ui, repoagent, *revs, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt import hgemail
-    repo = repoagent.rawRepo()
     # TODO: same options as patchbomb
     if opts.get('rev'):
         if revs:
             raise util.Abort(_('use only one form to specify the revision'))
         revs = opts.get('rev')
-    return hgemail.EmailDialog(repo, revs)
+    return hgemail.EmailDialog(repoagent, revs)
 
 @command('forget', [], _('thg forget [FILE]...'))
 def forget(ui, repoagent, *pats, **opts):

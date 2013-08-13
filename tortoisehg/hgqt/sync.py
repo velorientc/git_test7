@@ -985,7 +985,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(cmdline, ('force', 'branch', 'rev'))
 
     def _createEmailDialog(self, revs, outgoingrevs):
-        return hgemail.EmailDialog(self.repo, revs, outgoing=True,
+        return hgemail.EmailDialog(self._repoagent, revs, outgoing=True,
                                    outgoingrevs=outgoingrevs)
 
     def unbundle(self):
