@@ -29,11 +29,12 @@ ICONS = { 'add': 'fileadd',
 
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
-    def __init__(self, repo, command, pats, parent):
+    def __init__(self, repoagent, command, pats, parent):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.pats = pats
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         os.chdir(repo.root)
 
         # Handle rm alias
@@ -143,6 +144,10 @@ class QuickOpDialog(QDialog):
         qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self,
                                     self.stwidget.refreshWctx)
         QShortcut(QKeySequence('Escape'), self, self.reject)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def commandStarted(self):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
@@ -260,9 +265,10 @@ class QuickOpDialog(QDialog):
             self.cmd.run(cmdline)
 
 class HeadlessQuickop(QObject):
-    def __init__(self, repo, cmdline):
+    def __init__(self, repoagent, cmdline):
         QObject.__init__(self)
         self.files = cmdline[1:]
+        repo = repoagent.rawRepo()
         os.chdir(repo.root)
         self.cmd = cmdui.Runner(True, None)  # parent must be QWidget or None
         self.cmd.commandFinished.connect(self.commandFinished)
@@ -286,6 +292,6 @@ def run(ui, repoagent, *pats, **opts):
     imm = repo.ui.config('tortoisehg', 'immediate', '')
     if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
-        return HeadlessQuickop(repo, cmdline)
+        return HeadlessQuickop(repoagent, cmdline)
     else:
-        return QuickOpDialog(repo, command, pats, None)
+        return QuickOpDialog(repoagent, command, pats, None)
