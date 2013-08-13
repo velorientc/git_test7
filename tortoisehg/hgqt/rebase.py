@@ -226,7 +226,7 @@ class RebaseDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.exec_()
             self.checkResolve()
         elif cmd == 'commit':

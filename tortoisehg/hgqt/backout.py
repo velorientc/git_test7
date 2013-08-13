@@ -399,7 +399,7 @@ class BackoutPage(BasePage):
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             if self.autonext.isChecked():

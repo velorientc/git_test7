@@ -427,7 +427,7 @@ class UpdateDialog(QDialog):
             if status == 'u':
                 qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                  _('File conflicts need to be resolved'))
-                dlg = resolve.ResolveDialog(self.repo, self)
+                dlg = resolve.ResolveDialog(self._repoagent, self)
                 dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
                 break

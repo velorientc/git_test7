@@ -812,7 +812,7 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def resolve(self):
-        dlg = resolve.ResolveDialog(self.repo, self)
+        dlg = resolve.ResolveDialog(self._repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
