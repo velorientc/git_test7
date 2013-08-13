@@ -70,7 +70,8 @@ class WctxActions(QObject):
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
         make(_('De&tect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename', slot=self.runDialogAction)
-        make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
+        make(_('&Ignore...'), ignore, frozenset('?'), 'ignore',
+             slot=self.runDialogAction)
         make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
         make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
         allactions.append(None)
@@ -381,9 +382,9 @@ def guessRename(parent, repoagent, files):
     dlg.exec_()
     return ret[0]
 
-def ignore(parent, ui, repo, files):
+def ignore(parent, repoagent, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
-    dlg = HgignoreDialog(repo, parent, *files)
+    dlg = HgignoreDialog(repoagent, parent, *files)
     dlg.finished.connect(dlg.deleteLater)
     return dlg.exec_() == QDialog.Accepted
 

@@ -25,14 +25,15 @@ class HgignoreDialog(QDialog):
 
     contextmenu = None
 
-    def __init__(self, repo, parent=None, *pats):
+    def __init__(self, repoagent, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
         self.setWindowFlags(self.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.pats = pats
         self.setWindowTitle(_('Ignore filter - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('ignore'))
@@ -122,6 +123,10 @@ class HgignoreDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('hgignore/geom').toByteArray())
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def eventFilter(self, obj, event):
         if obj != self.ignorelist:
