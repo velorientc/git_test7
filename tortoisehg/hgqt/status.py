@@ -139,7 +139,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
-        self.actions = wctxactions.WctxActions(self.repo, self, checkable)
+        self.actions = wctxactions.WctxActions(self._repoagent, self, checkable)
         self.actions.refreshNeeded.connect(self.refreshWctx)
         self.actions.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)

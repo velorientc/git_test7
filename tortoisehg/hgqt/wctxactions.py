@@ -22,11 +22,11 @@ class WctxActions(QObject):
     refreshNeeded = pyqtSignal()
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent, checkable=True):
+    def __init__(self, repoagent, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
 
         self.menu = QMenu(parent)
-        self.repo = repo
+        self._repoagent = repoagent
         self._filedialogs = qtlib.DialogKeeper(WctxActions._createFileDialog,
                                                parent=self)
         allactions = []
@@ -82,6 +82,10 @@ class WctxActions(QObject):
             make(_('Check'), check, frozenset('MARC?!IS'), '')
             make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
         self.allactions = allactions
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def updateActionSensitivity(self, selrows):
         'Enable/Disable permanent actions based on current selection'
