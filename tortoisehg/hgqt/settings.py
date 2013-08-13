@@ -303,11 +303,11 @@ class FontEntry(QWidget):
         self.setCurrentFont(self.curvalue)
 
     def value(self):
-        utext = self.label.text()
-        if utext == _unspecstr:
+        if not self.font:
             return None
-        else:
-            return hglib.fromunicode(utext)
+
+        utext = self.font.toString()
+        return hglib.fromunicode(utext)
 
     def isDirty(self):
         return self.font != self.curvalue
