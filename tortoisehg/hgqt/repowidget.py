@@ -2173,7 +2173,7 @@ class RepoWidget(QWidget):
         sel = self.menuselection[0]
         if not isinstance(sel, str):
             sel = self.repo.changectx(sel).thgmqpatchname()
-        dlg = qrename.QRenameDialog(self.repo, sel, self)
+        dlg = qrename.QRenameDialog(self._repoagent, sel, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()

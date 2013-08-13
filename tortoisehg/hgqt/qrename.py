@@ -20,14 +20,15 @@ class QRenameDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, patchname, parent):
+    def __init__(self, repoagent, patchname, parent):
         super(QRenameDialog, self).__init__(parent)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Patch rename - %s') % repo.displayname)
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.setMinimumWidth(400)
-        self.repo = repo
         self.oldpatchname = patchname
         self.newpatchname = ''
 
@@ -54,6 +55,10 @@ class QRenameDialog(QDialog):
 
         self.le.setFocus()
         self.le.selectAll()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):

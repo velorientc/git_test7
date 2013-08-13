@@ -127,7 +127,7 @@ class QReorderDialog(QDialog):
 
     def qrenamePatch(self):
         patchname = self.menuselection
-        dlg = qrename.QRenameDialog(self.repo, patchname, self)
+        dlg = qrename.QRenameDialog(self._repoagent, patchname, self)
         dlg.finished.connect(dlg.deleteLater)
         if self.parent():
             dlg.output.connect(self.parent().output)
