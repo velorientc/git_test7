@@ -928,7 +928,7 @@ def rebase(ui, repoagent, *pats, **opts):
                                            'progress')))
     elif not opts['source'] or not opts['dest']:
         raise util.Abort(_('You must provide source and dest arguments'))
-    return rebasemod.RebaseDialog(repo, None, **opts)
+    return rebasemod.RebaseDialog(repoagent, None, **opts)
 
 @command('rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):

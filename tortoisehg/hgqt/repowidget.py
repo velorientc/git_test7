@@ -2074,7 +2074,7 @@ class RepoWidget(QWidget):
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
         opts = {'source' : self.rev, 'dest': self.repo['.'].rev()}
-        dlg = rebase.RebaseDialog(self.repo, self, **opts)
+        dlg = rebase.RebaseDialog(self._repoagent, self, **opts)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 

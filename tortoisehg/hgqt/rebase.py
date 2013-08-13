@@ -21,12 +21,13 @@ BB = QDialogButtonBox
 class RebaseDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(RebaseDialog, self).__init__(parent)
         self.setWindowIcon(qtlib.geticon('hg-rebase'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.opts = opts
         self.aborted = False
 
@@ -115,6 +116,10 @@ class RebaseDialog(QDialog):
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Rebase - %s') % self.repo.displayname)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def checkStatus(self):
         repo = self.repo

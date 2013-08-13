@@ -768,7 +768,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             # handle file conflicts during rebase
             if self.opts.get('rebase') or self.opts.get('updateorrebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
-                    dlg = rebase.RebaseDialog(self.repo, self)
+                    dlg = rebase.RebaseDialog(self._repoagent, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
