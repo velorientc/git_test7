@@ -314,10 +314,6 @@ class SummaryPage(BasePage):
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
             self.runner.run(cmdline)
-        elif cmd == 'view':
-            dlg = status.StatusDialog(repo, [], {}, self)
-            dlg.exec_()
-            self.refresh()
         else:
             raise 'unknown command: %s' % cmd
 
