@@ -141,7 +141,6 @@ class Workbench(QMainWindow):
 
         self.menuFile = self.menubar.addMenu(_("&File"))
         self.menuView = self.menubar.addMenu(_("&View"))
-        self.menuViewregistryopts = QMenu(_('Workbench Toolbars'), self)
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
