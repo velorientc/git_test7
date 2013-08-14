@@ -223,7 +223,7 @@ def _describeFont(font):
     if not font:
         return _unspecstr
 
-    s = font.family()
+    s = unicode(font.family())
     s += ", "  + _("%dpt") % font.pointSize()
     if font.bold():
         s += ", " + _("Bold")
