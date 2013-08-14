@@ -65,8 +65,11 @@ class MessageEntry(qscilib.Scintilla):
 
     @pyqtSlot(QPoint)
     def menuRequested(self, point):
+        menu = self._createContextMenu(point)
+        menu.exec_(self.viewport().mapToGlobal(point))
+
+    def _createContextMenu(self, point):
         line = self.lineAt(point)
-        point = self.viewport().mapToGlobal(point)
         lexerenabled = self.lexer() is not None
 
         def apply():
@@ -109,7 +112,7 @@ class MessageEntry(qscilib.Scintilla):
                 action = menu.addAction(name)
                 action.triggered.connect(func)
             add(name, func)
-        menu.exec_(point)
+        return menu
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
