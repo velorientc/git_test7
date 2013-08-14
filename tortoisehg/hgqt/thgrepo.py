@@ -294,10 +294,6 @@ class RepoAgent(QObject):
         # TODO: remove repo-to-agent references later; all widgets should own
         # RepoAgent instead of thgrepository.
         repo._pyqtobj = self
-        repo.configChanged = self.configChanged
-        repo.repositoryChanged = self.repositoryChanged
-        repo.repositoryDestroyed = self.repositoryDestroyed
-        repo.workingBranchChanged = self.workingBranchChanged
 
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self._onConfigChanged)
