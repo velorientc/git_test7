@@ -144,7 +144,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.revpanel.linkActivated.connect(self.onLinkActivated)
         vbox.addWidget(self.revpanel, 0)
 
-        self.textView = fileview.HgFileView(self.repo, self)
+        self.textView = fileview.HgFileView(self._repoagent, self)
         self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 

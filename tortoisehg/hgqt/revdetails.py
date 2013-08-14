@@ -157,7 +157,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.message.setFont(f.font())
         f.changed.connect(self.forwardFont)
 
-        self.fileview = HgFileView(self.repo, self.messagesplitter)
+        self.fileview = HgFileView(self._repoagent, self.messagesplitter)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(5)

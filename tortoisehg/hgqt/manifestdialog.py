@@ -181,7 +181,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self.revpanel = revpanel.RevPanelWidget(self._repo)
         self.revpanel.linkActivated.connect(self.linkActivated)
         vbox.addWidget(self.revpanel, 0)
-        self._fileview = fileview.HgFileView(self._repo, self)
+        self._fileview = fileview.HgFileView(self._repoagent, self)
         vbox.addWidget(self._fileview, 0)
         w = QWidget()
         w.setLayout(vbox)

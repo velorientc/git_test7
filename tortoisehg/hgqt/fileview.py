@@ -42,7 +42,7 @@ class HgFileView(QFrame):
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         QFrame.__init__(self, parent)
         framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
@@ -51,6 +51,9 @@ class HgFileView(QFrame):
         l.setContentsMargins(0,0,0,0)
         l.setSpacing(0)
 
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
         self.repo = repo
         self._diffs = []
         self.changes = None
@@ -93,7 +96,7 @@ class HgFileView(QFrame):
 
         self.blk = blockmatcher.BlockList(self)
         self.blksearch = blockmatcher.BlockList(self)
-        self.sci = AnnotateView(repo, self)
+        self.sci = AnnotateView(repoagent, self)
         self._forceviewindicator = None
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
@@ -243,8 +246,7 @@ class HgFileView(QFrame):
     def launchShelve(self):
         from tortoisehg.hgqt import shelve
         # TODO: pass self._filename
-        repoagent = self.repo._pyqtobj  # TODO
-        dlg = shelve.ShelveDialog(repoagent, self)
+        dlg = shelve.ShelveDialog(self._repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.shelveToolExited.emit()
@@ -980,12 +982,17 @@ class AnnotateView(qscilib.Scintilla):
 
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, qsci.TextMarginRightJustified)
         self.setMouseTracking(False)
+
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        # TODO: replace by repoagent if sci.repo = bundlerepo can be removed
+        self.repo = repo
 
         self._annotation_enabled = False
         self._links = []  # by line
@@ -997,10 +1004,9 @@ class AnnotateView(qscilib.Scintilla):
         self._thread = AnnotateThread(self, diffopts=diffopts)
         self._thread.finished.connect(self.fillModel)
 
-        self.repo = repo
         self._initAnnotateOptionActions()
 
-        self.repo.configChanged.connect(self.configChanged)
+        self._repoagent.configChanged.connect(self.configChanged)
         self.configChanged()
         self._loadAnnotateSettings()
 

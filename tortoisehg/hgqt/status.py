@@ -178,7 +178,7 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         self.docf = docf
 
-        self.fileview = fileview.HgFileView(self.repo, self)
+        self.fileview = fileview.HgFileView(self._repoagent, self)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
