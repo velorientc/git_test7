@@ -203,9 +203,8 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(
-            _('R&epository Registry Options'))
-        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
+        menu = self.menuView.addMenu(_('R&epository Registry Options'))
+        menu.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
         newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
