@@ -247,14 +247,9 @@ class FontEntry(QWidget):
         self.setMinimumWidth(ENTRY_WIDTH)
 
     def onSetClicked(self, checked):
-        def newFont(font):
-            self.setCurrentFont(font)
-            thgf.setFont(font)
         thgf = qtlib.getfont(self.fname)
         origfont = self.currentFont() or thgf.font()
-        dlg = QFontDialog(self)
-        dlg.currentFontChanged.connect(newFont)
-        font, isok = dlg.getFont(origfont, self)
+        font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
         self.setCurrentFont(font)
