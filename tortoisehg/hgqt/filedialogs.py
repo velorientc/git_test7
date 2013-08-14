@@ -466,6 +466,7 @@ class FileDiffDialog(_AbstractFileDialog):
         menu = sci.createStandardContextMenu()
         point = sci.viewport().mapToGlobal(point)
         menu.exec_(point)
+        menu.setParent(None)
 
     def setupViews(self):
         self.tableViews = {'left': self.tableView_revisions_left,

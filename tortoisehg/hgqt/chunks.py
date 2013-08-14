@@ -616,6 +616,7 @@ class DiffBrowser(QFrame):
     def menuRequested(self, point):
         menu = self.sci.createStandardContextMenu()
         menu.exec_(self.sci.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)

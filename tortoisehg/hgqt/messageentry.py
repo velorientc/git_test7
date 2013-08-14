@@ -67,6 +67,7 @@ class MessageEntry(qscilib.Scintilla):
     def menuRequested(self, point):
         menu = self._createContextMenu(point)
         menu.exec_(self.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def _createContextMenu(self, point):
         line = self.lineAt(point)

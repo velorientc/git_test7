@@ -182,7 +182,7 @@ class Scintilla(QsciScintilla):
         return QRect(x, y, w, self.textHeight(l))
 
     def createStandardContextMenu(self):
-        """Create standard context menu"""
+        """Create standard context menu; ownership is transferred to caller"""
         menu = QMenu(self)
         if not self.isReadOnly():
             a = menu.addAction(_('&Undo'), self.undo)

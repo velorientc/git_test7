@@ -848,6 +848,7 @@ class HgFileView(QFrame):
     def menuRequest(self, point):
         menu = self._createContextMenu(point)
         menu.exec_(self.sci.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def _createContextMenu(self, point):
         menu = self.sci.createStandardContextMenu()
