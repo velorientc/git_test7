@@ -846,9 +846,12 @@ class HgFileView(QFrame):
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
+        menu = self._createContextMenu(point)
+        menu.exec_(self.sci.viewport().mapToGlobal(point))
+
+    def _createContextMenu(self, point):
         menu = self.sci.createStandardContextMenu()
         line = self.sci.lineNearPoint(point)
-        point = self.sci.viewport().mapToGlobal(point)
 
         selection = self.sci.selectedText()
         def sreq(**opts):
@@ -876,8 +879,7 @@ class HgFileView(QFrame):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
                     add(name, func)
-            menu.exec_(point)
-            return
+            return menu
 
         menu.addSeparator()
         annoptsmenu = QMenu(_('Annotate Op&tions'), self)
@@ -885,8 +887,7 @@ class HgFileView(QFrame):
         menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
-            menu.exec_(point)
-            return
+            return menu
 
         menu.addSeparator()
 
@@ -946,7 +947,7 @@ class HgFileView(QFrame):
                 add(name, func)
         menu.addMenu(anngotomenu)
         menu.addMenu(annviewmenu)
-        menu.exec_(point)
+        return menu
 
     def resizeEvent(self, event):
         super(HgFileView, self).resizeEvent(event)
