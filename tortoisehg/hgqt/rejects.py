@@ -137,8 +137,8 @@ class RejectsDialog(QDialog):
 
     @pyqtSlot(QPoint)
     def menuRequested(self, point):
-        point = self.editor.viewport().mapToGlobal(point)
-        self.editor.createStandardContextMenu().exec_(point)
+        menu = self.editor.createStandardContextMenu()
+        menu.exec_(self.editor.viewport().mapToGlobal(point))
 
     def updateChunkList(self):
         self.updating = True
@@ -259,8 +259,8 @@ class RejectBrowser(qscilib.Scintilla):
 
     @pyqtSlot(QPoint)
     def menuRequested(self, point):
-        point = self.viewport().mapToGlobal(point)
-        self.createStandardContextMenu().exec_(point)
+        menu = self.createStandardContextMenu()
+        menu.exec_(self.viewport().mapToGlobal(point))
 
     def showChunk(self, lines):
         utext = []
