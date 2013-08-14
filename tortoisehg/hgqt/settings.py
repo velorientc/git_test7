@@ -219,6 +219,22 @@ class TextEntry(QTextEdit):
         return os.linesep.join(lines)
 
 
+def _describeFont(font):
+    if not font:
+        return _unspecstr
+
+    s = font.family()
+    s += ", %d" % font.pointSize() + _("pt")
+    if font.bold():
+        s += ", " + _("Bold")
+    if font.italic():
+        s += ", " + _("Italic")
+    if font.strikeOut():
+        s += ", " + _("Strike")
+    if font.underline():
+        s += ", " + _("Underline")
+    return s
+
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
@@ -260,23 +276,7 @@ class FontEntry(QWidget):
 
     def setCurrentFont(self, font):
         self.font = font
-        self.label.setText(self.parseFont(self.font))
-
-    def parseFont(self, font):
-        if not font:
-            return _unspecstr
-
-        s = font.family()
-        s += ", %d" % font.pointSize() + _("pt")
-        if font.bold():
-            s += ", " + _("Bold")
-        if font.italic():
-            s += ", " + _("Italic")
-        if font.strikeOut():
-            s += ", " + _("Strike")
-        if font.underline():
-            s += ", " + _("Underline")
-        return s
+        self.label.setText(_describeFont(self.font))
 
     ## common APIs for all edit widgets
 
