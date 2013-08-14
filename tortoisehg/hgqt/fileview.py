@@ -882,9 +882,8 @@ class HgFileView(QFrame):
             return menu
 
         menu.addSeparator()
-        annoptsmenu = QMenu(_('Annotate Op&tions'), self)
+        annoptsmenu = menu.addMenu(_('Annotate Op&tions'))
         annoptsmenu.addActions(self.sci.annotateOptionActions())
-        menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
             return menu
@@ -899,7 +898,7 @@ class HgFileView(QFrame):
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            annsearchmenu = QMenu(_('Search Selected Text'), self)
+            annsearchmenu = menu.addMenu(_('Search Selected Text'))
             for name, func in [(_('In Current &File'), sann),
                                (_('In &Current Revision'),
                                 sreq(rev='.')),
@@ -910,7 +909,6 @@ class HgFileView(QFrame):
                     action = annsearchmenu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
-            menu.addMenu(annsearchmenu)
 
         data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
@@ -920,8 +918,8 @@ class HgFileView(QFrame):
             self.editSelected(*data)
         menu.addSeparator()
         origrev = fctx.rev()
-        anngotomenu = QMenu(_('Go to'), self)
-        annviewmenu = QMenu(_('View File at'), self)
+        anngotomenu = menu.addMenu(_('Go to'))
+        annviewmenu = menu.addMenu(_('View File at'))
         for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
                            (_('&Originating Revision'), editorig, annviewmenu)]:
             def add(name, func):
@@ -945,8 +943,6 @@ class HgFileView(QFrame):
                     action.run = lambda: func(action.data)
                     action.triggered.connect(action.run)
                 add(name, func)
-        menu.addMenu(anngotomenu)
-        menu.addMenu(annviewmenu)
         return menu
 
     def resizeEvent(self, event):
