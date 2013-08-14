@@ -63,6 +63,7 @@ class MessageEntry(qscilib.Scintilla):
             self.setLexer(None)
             self.setFont(font)
 
+    @pyqtSlot(QPoint)
     def menuRequested(self, point):
         line = self.lineAt(point)
         point = self.viewport().mapToGlobal(point)
