@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-07-24 10:22-0300\n"
-"PO-Revision-Date: 2013-07-26 16:42+0000\n"
-"Last-Translator: leolarrel Wang <Unknown>\n"
+"PO-Revision-Date: 2013-08-07 06:52+0000\n"
+"Last-Translator: Elson Wei <elson.wei@gmail.com>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-07-27 05:04+0000\n"
-"X-Generator: Launchpad (build 16700)\n"
+"X-Launchpad-Export-Date: 2013-08-08 04:41+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -4010,7 +4010,7 @@ msgid "The selected command is empty"
 msgstr "選擇的命令是空的"
 
 msgid "Failed to execute custom command"
-msgstr ""
+msgstr "自訂工具執行失敗"
 
 #, python-format
 msgid "The command \"%s\" could not be executed."
@@ -4894,7 +4894,7 @@ msgid "Settings"
 msgstr "設定"
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<未指定>"
 
 msgid "&True"
 msgstr ""
@@ -4906,10 +4906,10 @@ msgid "&Unspecified"
 msgstr ""
 
 msgid "&Set..."
-msgstr ""
+msgstr "設定(&S)"
 
 msgid "&Clear"
-msgstr ""
+msgstr "清除(&C)"
 
 #, python-format
 msgid "Failed to load issue tracker: '%s': %s. "
@@ -5455,7 +5455,7 @@ msgid "Optional. Password to authenticate with at the proxy server"
 msgstr ""
 
 msgid "From"
-msgstr ""
+msgstr "寄件者"
 
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr ""
@@ -7416,7 +7416,7 @@ msgstr "推送可被推送的變更集到 %s"
 
 #, python-format
 msgid "Execute custom tool '%s'"
-msgstr ""
+msgstr "執行自訂工具 '%s'"
 
 msgid "Close tab"
 msgstr "關閉分頁"
