@@ -246,7 +246,7 @@ class FontEntry(QWidget):
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def onSetClicked(self, checked):
+    def onSetClicked(self):
         thgf = qtlib.getfont(self.fname)
         origfont = self.font or thgf.font()
         font, isok = QFontDialog.getFont(origfont, self)
@@ -255,7 +255,7 @@ class FontEntry(QWidget):
         self.setCurrentFont(font)
         thgf.setFont(font)
 
-    def onClearClicked(self, checked):
+    def onClearClicked(self):
         self.setCurrentFont(None)
 
     def setCurrentFont(self, font):
