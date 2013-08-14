@@ -876,7 +876,8 @@ class HgFileView(QFrame):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
                     add(name, func)
-            return menu.exec_(point)
+            menu.exec_(point)
+            return
 
         menu.addSeparator()
         annoptsmenu = QMenu(_('Annotate Op&tions'), self)
@@ -884,7 +885,8 @@ class HgFileView(QFrame):
         menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
-            return menu.exec_(point)
+            menu.exec_(point)
+            return
 
         menu.addSeparator()
 
