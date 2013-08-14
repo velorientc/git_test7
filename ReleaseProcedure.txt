@@ -3,7 +3,7 @@ Steps for making a release:
 * update url in qtlib.openhelpcontents()            (major release only)
 * build pdf hgbook, check into thg-winbuild         (major release only)
 * hg status -ar --rev 1.6:tip  # find new files that WiX needs to know about
-* Pull latest translations from Launchpad
+* pull latest translations from Launchpad, dropping location information (msgcat --no-location)
 * set revision number in doc/source/conf.py
 * tag stable branches of thg and shellext repos, push
 * build release installer
