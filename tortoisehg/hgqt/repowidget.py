@@ -1622,7 +1622,7 @@ class RepoWidget(QWidget):
                 dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
         def qfoldact():
-            dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
+            dlg = qfold.QFoldDialog(self._repoagent, self.menuselection, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
