@@ -109,7 +109,7 @@ class MessageEntry(qscilib.Scintilla):
                 action = menu.addAction(name)
                 action.triggered.connect(func)
             add(name, func)
-        return menu.exec_(point)
+        menu.exec_(point)
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
