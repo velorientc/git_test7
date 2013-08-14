@@ -215,15 +215,14 @@ class Scintilla(QsciScintilla):
         a.setShortcuts(QKeySequence.SelectAll)
 
         self._stdMenu.addSeparator()
-        editoptsmenu = QMenu(_('&Editor Options'), self)
-        self._stdMenu.addMenu(editoptsmenu)
+        editoptsmenu = self._stdMenu.addMenu(_('&Editor Options'))
         self._buildEditorOptionsMenu(editoptsmenu)
 
         return self._stdMenu
 
     def _buildEditorOptionsMenu(self, editoptsmenu):
         qsci = QsciScintilla
-        wrapmenu = QMenu(_('&Wrap'), self)
+        wrapmenu = QMenu(_('&Wrap'), editoptsmenu)
         for name, mode in ((_('&None', 'wrap mode'), qsci.WrapNone),
                            (_('&Word'), qsci.WrapWord),
                            (_('&Character'), qsci.WrapCharacter)):
@@ -233,7 +232,7 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.wrapMode() == m)
                 a.triggered.connect(lambda: self.setWrapMode(m))
             mkaction(name, mode)
-        wsmenu = QMenu(_('White&space'), self)
+        wsmenu = QMenu(_('White&space'), editoptsmenu)
         for name, mode in ((_('&Visible'), qsci.WsVisible),
                            (_('&Invisible'), qsci.WsInvisible),
                            (_('&AfterIndent'), qsci.WsVisibleAfterIndent)):
@@ -243,7 +242,7 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
-        vsmenu = QMenu(_('EOL &Visibility'), self)
+        vsmenu = QMenu(_('EOL &Visibility'), editoptsmenu)
         for name, mode in ((_('&Visible'), True),
                            (_('&Invisible'), False)):
             def mkaction(n, m):
@@ -256,7 +255,7 @@ class Scintilla(QsciScintilla):
         tabindentsmenu = None
         acmenu = None
         if not self.isReadOnly():
-            eolmodemenu = QMenu(_('EOL &Mode'), self)
+            eolmodemenu = QMenu(_('EOL &Mode'), editoptsmenu)
             for name, mode in ((_('&Windows'), qsci.EolWindows),
                                (_('&Unix'), qsci.EolUnix),
                                (_('&Mac'), qsci.EolMac)):
@@ -266,7 +265,7 @@ class Scintilla(QsciScintilla):
                     a.setChecked(self.eolMode() == m)
                     a.triggered.connect(lambda: self.setEolMode(m))
                 mkaction(name, mode)
-            tabindentsmenu = QMenu(_('&TAB Inserts'), self)
+            tabindentsmenu = QMenu(_('&TAB Inserts'), editoptsmenu)
             for name, mode in ((_('&Auto'), -1),
                                (_('&TAB'), True),
                                (_('&Spaces'), False)):
@@ -277,7 +276,7 @@ class Scintilla(QsciScintilla):
                         (self.autoUseTabs and m == -1))
                     a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
                 mkaction(name, mode)
-            acmenu = QMenu(_('&Auto-Complete'), self)
+            acmenu = QMenu(_('&Auto-Complete'), editoptsmenu)
             for name, value in ((_('&Enable'), 2),
                                 (_('&Disable'), -1)):
                 def mkaction(n, v):
