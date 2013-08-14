@@ -224,7 +224,7 @@ def _describeFont(font):
         return _unspecstr
 
     s = font.family()
-    s += ", %d" % font.pointSize() + _("pt")
+    s += ", "  + _("%dpt") % font.pointSize()
     if font.bold():
         s += ", " + _("Bold")
     if font.italic():
