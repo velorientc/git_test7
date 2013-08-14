@@ -213,7 +213,15 @@ class Scintilla(QsciScintilla):
         self._stdMenu.addSeparator()
         a = self._stdMenu.addAction(_('Select &All'), self.selectAll)
         a.setShortcuts(QKeySequence.SelectAll)
+
         self._stdMenu.addSeparator()
+        editoptsmenu = QMenu(_('&Editor Options'), self)
+        self._stdMenu.addMenu(editoptsmenu)
+        self._buildEditorOptionsMenu(editoptsmenu)
+
+        return self._stdMenu
+
+    def _buildEditorOptionsMenu(self, editoptsmenu):
         qsci = QsciScintilla
         wrapmenu = QMenu(_('&Wrap'), self)
         for name, mode in ((_('&None', 'wrap mode'), qsci.WrapNone),
@@ -279,7 +287,6 @@ class Scintilla(QsciScintilla):
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
 
-        editoptsmenu = QMenu(_('&Editor Options'), self)
         editoptsmenu.addMenu(wrapmenu)
         editoptsmenu.addSeparator()
         editoptsmenu.addMenu(wsmenu)
@@ -289,8 +296,6 @@ class Scintilla(QsciScintilla):
         if (eolmodemenu): editoptsmenu.addMenu(eolmodemenu)
         editoptsmenu.addSeparator()
         if (acmenu): editoptsmenu.addMenu(acmenu)
-        self._stdMenu.addMenu(editoptsmenu)
-        return self._stdMenu
 
     def saveSettings(self, qs, prefix):
         qs.setValue(prefix+'/wrap', self.wrapMode())
