@@ -217,15 +217,15 @@ class Scintilla(QsciScintilla):
     def _buildEditorOptionsMenu(self, editoptsmenu):
         qsci = QsciScintilla
         wrapmenu = QMenu(_('&Wrap'), editoptsmenu)
+        wrapmenu.triggered.connect(self._setWrapModeByMenu)
         for name, mode in ((_('&None', 'wrap mode'), qsci.WrapNone),
                            (_('&Word'), qsci.WrapWord),
                            (_('&Character'), qsci.WrapCharacter)):
-            def mkaction(n, m):
-                a = wrapmenu.addAction(n)
-                a.setCheckable(True)
-                a.setChecked(self.wrapMode() == m)
-                a.triggered.connect(lambda: self.setWrapMode(m))
-            mkaction(name, mode)
+            a = wrapmenu.addAction(name)
+            a.setCheckable(True)
+            a.setChecked(self.wrapMode() == mode)
+            a.setData(mode)
+
         wsmenu = QMenu(_('White&space'), editoptsmenu)
         for name, mode in ((_('&Visible'), qsci.WsVisible),
                            (_('&Invisible'), qsci.WsInvisible),
@@ -393,6 +393,11 @@ class Scintilla(QsciScintilla):
             mode = qsciEolModeFromOs()
         self.setEolMode(mode)
         return mode
+
+    @pyqtSlot(QAction)
+    def _setWrapModeByMenu(self, action):
+        mode, _ok = action.data().toInt()
+        self.setWrapMode(mode)
 
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
