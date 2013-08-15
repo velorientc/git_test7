@@ -260,16 +260,16 @@ class Scintilla(QsciScintilla):
                 a.setData(mode)
 
             tabindentsmenu = QMenu(_('&TAB Inserts'), editoptsmenu)
+            tabindentsmenu.triggered.connect(self._setIndentationsUseTabsByMenu)
             for name, mode in ((_('&Auto'), -1),
                                (_('&TAB'), True),
                                (_('&Spaces'), False)):
-                def mkaction(n, m):
-                    a = tabindentsmenu.addAction(n)
-                    a.setCheckable(True)
-                    a.setChecked(self.indentationsUseTabs() == m or \
-                        (self.autoUseTabs and m == -1))
-                    a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
-                mkaction(name, mode)
+                a = tabindentsmenu.addAction(name)
+                a.setCheckable(True)
+                a.setChecked(self.indentationsUseTabs() == mode
+                             or (self.autoUseTabs and mode == -1))
+                a.setData(mode)
+
             acmenu = QMenu(_('&Auto-Complete'), editoptsmenu)
             for name, value in ((_('&Enable'), 2),
                                 (_('&Disable'), -1)):
@@ -413,6 +413,11 @@ class Scintilla(QsciScintilla):
     def _setEolModeByMenu(self, action):
         mode, _ok = action.data().toInt()
         self.setEolMode(mode)
+
+    @pyqtSlot(QAction)
+    def _setIndentationsUseTabsByMenu(self, action):
+        mode, _ok = action.data().toInt()
+        self.setIndentationsUseTabs(mode)
 
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
