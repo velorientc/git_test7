@@ -762,9 +762,9 @@ class Workbench(QMainWindow):
         w = tw.currentWidget()
         if tw.count() == 0:
             self.setWindowTitle(_('TortoiseHg Workbench'))
-        elif w.repo.shortname != w.repo.displayname:
+        elif w.repo.ui.configbool('tortoisehg', 'fullpath'):
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
-                                (w.title(), w.repo.displayname))
+                                (w.title(), w.repoRootPath()))
         else:
             self.setWindowTitle(_('%s - TortoiseHg Workbench') % w.title())
 
