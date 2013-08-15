@@ -237,14 +237,14 @@ class Scintilla(QsciScintilla):
             a.setData(mode)
 
         vsmenu = QMenu(_('EOL &Visibility'), editoptsmenu)
+        vsmenu.triggered.connect(self._setEolVisibilityByMenu)
         for name, mode in ((_('&Visible'), True),
                            (_('&Invisible'), False)):
-            def mkaction(n, m):
-                a = vsmenu.addAction(n)
-                a.setCheckable(True)
-                a.setChecked(self.eolVisibility() == m)
-                a.triggered.connect(lambda: self.setEolVisibility(m))
-            mkaction(name, mode)
+            a = vsmenu.addAction(name)
+            a.setCheckable(True)
+            a.setChecked(self.eolVisibility() == mode)
+            a.setData(mode)
+
         eolmodemenu = None
         tabindentsmenu = None
         acmenu = None
@@ -403,6 +403,11 @@ class Scintilla(QsciScintilla):
     def _setWhitespaceVisibilityByMenu(self, action):
         mode, _ok = action.data().toInt()
         self.setWhitespaceVisibility(mode)
+
+    @pyqtSlot(QAction)
+    def _setEolVisibilityByMenu(self, action):
+        visible = action.data().toBool()
+        self.setEolVisibility(visible)
 
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
