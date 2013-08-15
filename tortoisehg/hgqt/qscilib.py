@@ -271,14 +271,13 @@ class Scintilla(QsciScintilla):
                 a.setData(mode)
 
             acmenu = QMenu(_('&Auto-Complete'), editoptsmenu)
+            acmenu.triggered.connect(self._setAutoCompletionThresholdByMenu)
             for name, value in ((_('&Enable'), 2),
                                 (_('&Disable'), -1)):
-                def mkaction(n, v):
-                    a = acmenu.addAction(n)
-                    a.setCheckable(True)
-                    a.setChecked(self.autoCompletionThreshold() == v)
-                    a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
-                mkaction(name, value)
+                a = acmenu.addAction(name)
+                a.setCheckable(True)
+                a.setChecked(self.autoCompletionThreshold() == value)
+                a.setData(value)
 
         editoptsmenu.addMenu(wrapmenu)
         editoptsmenu.addSeparator()
@@ -424,6 +423,11 @@ class Scintilla(QsciScintilla):
         if self.autoUseTabs and self.lines():
             tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
         super(Scintilla, self).setIndentationsUseTabs(tabs)
+
+    @pyqtSlot(QAction)
+    def _setAutoCompletionThresholdByMenu(self, action):
+        thresh, _ok = action.data().toInt()
+        self.setAutoCompletionThreshold(thresh)
 
     def lineNearPoint(self, point):
         """Return the closest line to the pixel position; similar to lineAt(),
