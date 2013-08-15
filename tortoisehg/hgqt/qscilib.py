@@ -250,15 +250,15 @@ class Scintilla(QsciScintilla):
         acmenu = None
         if not self.isReadOnly():
             eolmodemenu = QMenu(_('EOL &Mode'), editoptsmenu)
+            eolmodemenu.triggered.connect(self._setEolModeByMenu)
             for name, mode in ((_('&Windows'), qsci.EolWindows),
                                (_('&Unix'), qsci.EolUnix),
                                (_('&Mac'), qsci.EolMac)):
-                def mkaction(n, m):
-                    a = eolmodemenu.addAction(n)
-                    a.setCheckable(True)
-                    a.setChecked(self.eolMode() == m)
-                    a.triggered.connect(lambda: self.setEolMode(m))
-                mkaction(name, mode)
+                a = eolmodemenu.addAction(name)
+                a.setCheckable(True)
+                a.setChecked(self.eolMode() == mode)
+                a.setData(mode)
+
             tabindentsmenu = QMenu(_('&TAB Inserts'), editoptsmenu)
             for name, mode in ((_('&Auto'), -1),
                                (_('&TAB'), True),
@@ -408,6 +408,11 @@ class Scintilla(QsciScintilla):
     def _setEolVisibilityByMenu(self, action):
         visible = action.data().toBool()
         self.setEolVisibility(visible)
+
+    @pyqtSlot(QAction)
+    def _setEolModeByMenu(self, action):
+        mode, _ok = action.data().toInt()
+        self.setEolMode(mode)
 
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
