@@ -135,9 +135,11 @@ class RejectsDialog(QDialog):
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
 
+    @pyqtSlot(QPoint)
     def menuRequested(self, point):
-        point = self.editor.viewport().mapToGlobal(point)
-        return self.editor.createStandardContextMenu().exec_(point)
+        menu = self.editor.createStandardContextMenu()
+        menu.exec_(self.editor.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def updateChunkList(self):
         self.updating = True
@@ -256,9 +258,11 @@ class RejectBrowser(qscilib.Scintilla):
         lexer = lexers.difflexer(self)
         self.setLexer(lexer)
 
+    @pyqtSlot(QPoint)
     def menuRequested(self, point):
-        point = self.viewport().mapToGlobal(point)
-        return self.createStandardContextMenu().exec_(point)
+        menu = self.createStandardContextMenu()
+        menu.exec_(self.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def showChunk(self, lines):
         utext = []

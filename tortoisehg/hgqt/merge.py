@@ -332,14 +332,10 @@ class SummaryPage(BasePage):
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
             self.runner.run(cmdline)
-        elif cmd == 'view':
-            dlg = status.StatusDialog(repo, [], {}, self)
-            dlg.exec_()
-            self.refresh()
         elif cmd == 'skip':
             self.wizard().next()
         else:
-            raise 'unknown command: %s' % cmd
+            raise ValueError('unknown command: %s' % cmd)
 
 
 class MergePage(BasePage):

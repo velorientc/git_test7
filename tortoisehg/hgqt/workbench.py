@@ -141,7 +141,6 @@ class Workbench(QMainWindow):
 
         self.menuFile = self.menubar.addMenu(_("&File"))
         self.menuView = self.menubar.addMenu(_("&View"))
-        self.menuViewregistryopts = QMenu(_('Workbench Toolbars'), self)
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
@@ -204,9 +203,8 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(
-            _('R&epository Registry Options'))
-        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
+        menu = self.menuView.addMenu(_('R&epository Registry Options'))
+        menu.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
         newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,

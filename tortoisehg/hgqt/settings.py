@@ -219,11 +219,28 @@ class TextEntry(QTextEdit):
         return os.linesep.join(lines)
 
 
+def _describeFont(font):
+    if not font:
+        return _unspecstr
+
+    s = unicode(font.family())
+    s += ", "  + _("%dpt") % font.pointSize()
+    if font.bold():
+        s += ", " + _("Bold")
+    if font.italic():
+        s += ", " + _("Italic")
+    if font.strikeOut():
+        s += ", " + _("Strike")
+    if font.underline():
+        s += ", " + _("Underline")
+    return s
+
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
+        self.font = None
 
         self.label = QLabel()
         self.setButton = QPushButton(_('&Set...'))
@@ -245,45 +262,41 @@ class FontEntry(QWidget):
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def onSetClicked(self, checked):
+    def onSetClicked(self):
         thgf = qtlib.getfont(self.fname)
-        origfont = self.currentFont() or thgf.font()
+        origfont = self.font or thgf.font()
         font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
-        self.label.setText(font.toString())
+        self.setCurrentFont(font)
         thgf.setFont(font)
 
-    def onClearClicked(self, checked):
-        self.label.setText(_unspecstr)
+    def onClearClicked(self):
+        self.setCurrentFont(None)
 
-    def currentFont(self):
-        """currently selected QFont if specified"""
-        if not self.value():
-            return None
-
-        f = QFont()
-        f.fromString(hglib.tounicode(self.value()))
-        return f
+    def setCurrentFont(self, font):
+        self.font = font
+        self.label.setText(_describeFont(self.font))
 
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
-        self.curvalue = curvalue
         if curvalue:
-            self.label.setText(hglib.tounicode(curvalue))
+            self.curvalue = QFont()
+            self.curvalue.fromString(hglib.tounicode(curvalue))
         else:
-            self.label.setText(_unspecstr)
+            self.curvalue = None
+        self.setCurrentFont(self.curvalue)
 
     def value(self):
-        utext = self.label.text()
-        if utext == _unspecstr:
+        if not self.font:
             return None
-        else:
-            return hglib.fromunicode(utext)
+
+        utext = self.font.toString()
+        return hglib.fromunicode(utext)
 
     def isDirty(self):
-        return self.value() != self.curvalue
+        return self.font != self.curvalue
 
 class SettingsCheckBox(QCheckBox):
     def __init__(self, parent=None, **opts):

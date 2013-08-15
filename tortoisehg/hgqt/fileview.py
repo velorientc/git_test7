@@ -113,7 +113,8 @@ class HgFileView(QFrame):
 
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
+        keys = set((Qt.Key_Space,))
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self, keys))
         self.sci.setCaretLineVisible(False)
 
         # define markers for colorize zones of diff
@@ -845,9 +846,13 @@ class HgFileView(QFrame):
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
+        menu = self._createContextMenu(point)
+        menu.exec_(self.sci.viewport().mapToGlobal(point))
+        menu.setParent(None)
+
+    def _createContextMenu(self, point):
         menu = self.sci.createStandardContextMenu()
         line = self.sci.lineNearPoint(point)
-        point = self.sci.viewport().mapToGlobal(point)
 
         selection = self.sci.selectedText()
         def sreq(**opts):
@@ -875,15 +880,14 @@ class HgFileView(QFrame):
                         action = menu.addAction(name)
                         action.triggered.connect(func)
                     add(name, func)
-            return menu.exec_(point)
+            return menu
 
         menu.addSeparator()
-        annoptsmenu = QMenu(_('Annotate Op&tions'), self)
+        annoptsmenu = menu.addMenu(_('Annotate Op&tions'))
         annoptsmenu.addActions(self.sci.annotateOptionActions())
-        menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
-            return menu.exec_(point)
+            return menu
 
         menu.addSeparator()
 
@@ -895,7 +899,7 @@ class HgFileView(QFrame):
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            annsearchmenu = QMenu(_('Search Selected Text'), self)
+            annsearchmenu = menu.addMenu(_('Search Selected Text'))
             for name, func in [(_('In Current &File'), sann),
                                (_('In &Current Revision'),
                                 sreq(rev='.')),
@@ -906,7 +910,6 @@ class HgFileView(QFrame):
                     action = annsearchmenu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
-            menu.addMenu(annsearchmenu)
 
         data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
@@ -916,8 +919,8 @@ class HgFileView(QFrame):
             self.editSelected(*data)
         menu.addSeparator()
         origrev = fctx.rev()
-        anngotomenu = QMenu(_('Go to'), self)
-        annviewmenu = QMenu(_('View File at'), self)
+        anngotomenu = menu.addMenu(_('Go to'))
+        annviewmenu = menu.addMenu(_('View File at'))
         for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
                            (_('&Originating Revision'), editorig, annviewmenu)]:
             def add(name, func):
@@ -941,13 +944,29 @@ class HgFileView(QFrame):
                     action.run = lambda: func(action.data)
                     action.triggered.connect(action.run)
                 add(name, func)
-        menu.addMenu(anngotomenu)
-        menu.addMenu(annviewmenu)
-        menu.exec_(point)
+        return menu
 
     def resizeEvent(self, event):
         super(HgFileView, self).resizeEvent(event)
         self.updateScrollBar()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            if self.changeselection:
+                x, y = self.sci.getCursorPosition()
+                chunk = self.chunkContainsLine(x)
+                if self.updateChunk(chunk, not chunk.excluded):
+                    self.chunkSelectionChanged.emit()
+            return
+        return super(HgFileView, self).keyPressEvent(event)
+
+    def chunkContainsLine(self, line):
+        chunks = self.chunkatline
+        if line in chunks:
+            return chunks[line]
+
+        line = max(i for i in chunks.keys() if i < line)
+        return chunks[line]
 
     def updateScrollBar(self):
         sbWidth = self.sci.verticalScrollBar().width()
