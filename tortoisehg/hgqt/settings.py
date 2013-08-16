@@ -1196,14 +1196,15 @@ class SettingsDialog(QDialog):
         self._restartreqs.add(unicode(key))
 
     def applyChanges(self):
-        for i in xrange(self.conftabs.count()):
-            self.conftabs.widget(i).applyChanges()
+        results = [self.conftabs.widget(i).applyChanges()
+                   for i in xrange(self.conftabs.count())]
         if self._restartreqs:
             qtlib.InfoMsgBox(_('Settings'),
                              _('Restart all TortoiseHg applications '
                                'for the following changes to take effect:'),
                              ', '.join(sorted(self._restartreqs)))
             self._restartreqs.clear()
+        return util.all(results)
 
     def canExit(self):
         if self.isDirty():
@@ -1214,12 +1215,12 @@ class SettingsDialog(QDialog):
             if ret == 2:
                 return False
             elif ret == 0:
-                self.applyChanges()
-                return True
+                return self.applyChanges()
         return True
 
     def accept(self):
-        self.applyChanges()
+        if not self.applyChanges():
+            return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
         s.setValue('settings/lastpage', self._getactivepagename())
@@ -1597,7 +1598,7 @@ class SettingsForm(QWidget):
 
     def applyChanges(self):
         if self.readonly:
-            return
+            return True  # safely skipped because all fields are disabled
 
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
@@ -1617,9 +1618,11 @@ class SettingsForm(QWidget):
 
         try:
             wconfig.writefile(self.ini, self.fn)
+            return True
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
+            return False
 
     def applyChangesForExtensions(self):
         emitChanged = False
