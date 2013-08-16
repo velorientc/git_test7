@@ -835,7 +835,7 @@ class RepoWidget(QWidget):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-verify'))
-        dlg.setWindowTitle(_('%s - verify repository') % self.repo.shortname)
+        dlg.setWindowTitle(_('%s - verify repository') % self.repo.displayname)
         dlg.setWindowFlags(dlg.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
@@ -846,7 +846,7 @@ class RepoWidget(QWidget):
         cmdline = ['--repository', self.repo.root, 'recover', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-recover'))
-        dlg.setWindowTitle(_('%s - recover repository') % self.repo.shortname)
+        dlg.setWindowTitle(_('%s - recover repository') % self.repo.displayname)
         dlg.setWindowFlags(dlg.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
