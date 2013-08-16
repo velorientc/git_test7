@@ -117,7 +117,8 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types=None, icon=None, inmenu=None):
+        def make(text, func, types=None, icon=None, inmenu=None,
+                 slot=self.runAction):
             if not types & alltypes:
                 return
             if inmenu is None:
@@ -128,7 +129,7 @@ class WctxActions(QObject):
             if icon:
                 action.setIcon(qtlib.geticon(icon))
             if func is not None:
-                action.triggered.connect(self.runAction)
+                action.triggered.connect(slot)
             return action
 
         if len(repo.parents()) > 1:
@@ -136,8 +137,10 @@ class WctxActions(QObject):
 
         if len(selrows) == 1:
             menu.addSeparator()
-            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
-            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
+            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy',
+                 slot=self.runDialogAction)
+            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename',
+                 slot=self.runDialogAction)
 
         menu.addSeparator()
         customtools.addCustomToolsSubmenu(menu, repo.ui,
@@ -403,18 +406,18 @@ def delete(parent, ui, repo, files):
         os.unlink(wfile)
     return True
 
-def copy(parent, ui, repo, files):
+def copy(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repo, files, parent, iscopy=True)
+    dlg = RenameDialog(repoagent, files, parent, iscopy=True)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
 
-def rename(parent, ui, repo, files):
+def rename(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repo, files, parent)
+    dlg = RenameDialog(repoagent, files, parent)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
