@@ -1167,13 +1167,13 @@ class SettingsDialog(QDialog):
                                         readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
                                          _('%s project settings (.hg/projrc)')
-                                         % os.path.basename(repo.displayname))
+                                         % repo.shortname)
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
-                                 _('%s repository settings') % repo.displayname)
+                                 _('%s repository settings') % repo.shortname)
             rtab.restartRequested.connect(self._pushRestartRequest)
 
         BB = QDialogButtonBox
