@@ -1617,7 +1617,7 @@ class SettingsForm(QWidget):
 
         try:
             wconfig.writefile(self.ini, self.fn)
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
 
