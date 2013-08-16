@@ -1619,7 +1619,7 @@ class SettingsForm(QWidget):
             wconfig.writefile(self.ini, self.fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                str(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
 
     def applyChangesForExtensions(self):
         emitChanged = False
