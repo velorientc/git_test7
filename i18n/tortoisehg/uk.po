@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-07-24 10:22-0300\n"
+"POT-Creation-Date: 2013-08-14 14:21-0300\n"
 "PO-Revision-Date: 2013-02-27 15:10+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-07-25 05:19+0000\n"
-"X-Generator: Launchpad (build 16700)\n"
+"X-Launchpad-Export-Date: 2013-08-15 04:44+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер позначок TortoiseHg"
@@ -29,13 +29,13 @@ msgid "About"
 msgstr "Про програму"
 
 msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Copyright 2008-2013 Стів Бохо (Steve Borho) та інші"
+msgstr "Copyright 2008-2013 Стів Борхо (Steve Borho) та інші"
 
 msgid "Several icons are courtesy of the TortoiseSVN project"
 msgstr "Декілька значків запозичені з проекту TortoiseSVN"
 
 msgid "You can visit our site here"
-msgstr "Відвідайте на наш сайт"
+msgstr "Завітайте на наш сайт"
 
 msgid "&License"
 msgstr "&Ліцензійна угода"
@@ -64,10 +64,10 @@ msgid "Only files modified/created in this revision"
 msgstr "Тільки файли змінені/створенні в цій ревізії"
 
 msgid "Recurse into subrepositories"
-msgstr "Підсховища обробляти рекурсивно"
+msgstr "Рекурсивно обробляти підсховища"
 
 msgid "Destination path:"
-msgstr "Отримувач:"
+msgstr "Шлях отримувача:"
 
 msgid "Browse..."
 msgstr "Огляд..."
@@ -79,7 +79,7 @@ msgid "Directory of files"
 msgstr "Каталог з файлами"
 
 msgid "Uncompressed tar archive"
-msgstr "Архів tar, без стиснення"
+msgstr "Архів tar, не стисненений"
 
 msgid "Tar archive compressed using bzip2"
 msgstr "Архів tar, стиснений bzip2?"
@@ -88,7 +88,7 @@ msgid "Tar archive compressed using gzip"
 msgstr "Архів tar, стиснений gzip"
 
 msgid "Uncompressed zip archive"
-msgstr "Архів zip, без стиснення"
+msgstr "Архів zip, не стисненений"
 
 msgid "Zip archive compressed using deflate"
 msgstr "Архів zip, стиснений deflate"
@@ -116,7 +116,7 @@ msgid "Select Destination Folder"
 msgstr "Виберіть теку отримання"
 
 msgid "Select Destination File"
-msgstr "Обрати файл отримання"
+msgstr "Обрати файл отримувач"
 
 msgid "All files (*)"
 msgstr "Всі файли (*)"
@@ -134,14 +134,14 @@ msgid "Zip archives"
 msgstr "Архіви Zip"
 
 msgid "Duplicate Name"
-msgstr "Повторення назви"
+msgstr "Повтор назви"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr "Отримувач \"%s\" вже існує у вигляді файлу!"
+msgstr "Отримувач \"%s\" вже існує як файл!"
 
 msgid "Confirm Overwrite"
-msgstr "Підтвердження перезапису"
+msgstr "Підтвердіть перезапис"
 
 #, python-format
 msgid ""
@@ -159,20 +159,20 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"Файл \"%s\" вже існує!\n"
+"Файл \"%s\" існує!\n"
 "\n"
 "Ви дійсно бажаєте його перезаписати?"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
-msgstr "Отримувач \"%s\" вже існує, як тека!"
+msgstr "Отримувач \"%s\" існує, як тека!"
 
 #, python-format
 msgid "Backout - %s"
 msgstr "Повернення - %s"
 
 msgid "Prepare to backout"
-msgstr "Підготовка до повернення (зворотнього об'єднання)"
+msgstr "Підготувати повернення"
 
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
@@ -185,13 +185,13 @@ msgid "Backout revision not found"
 msgstr "Ревізія, що повертатиметься не знайдена"
 
 msgid "Backing out a parent revision is a single step operation"
-msgstr "Видалення помилок попередньої ревізії з одиничним кроком операції"
+msgstr "Видалення помилок попередньої ревізії покроково"
 
 msgid "Backout requires a parent revision"
-msgstr "Повернення вимагає попередню ревізію"
+msgstr "Для повернення потрібна попередня ревізія"
 
 msgid "Cannot backout change on a different branch"
-msgstr "Неможливо виконати повернення для іншої гілки"
+msgstr "Повернути зміни у іншу гілку неможливо"
 
 msgid "Backout revision"
 msgstr "Повернути ревізію"
@@ -203,28 +203,28 @@ msgid "Current local revision"
 msgstr "Поточна локальна ревізія"
 
 msgid "Merge parent to backout to"
-msgstr "Об'єднання попередників до повернення до"
+msgstr "Злити попередників до повернення"
 
 msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
 msgstr ""
-"При поверненні до ревізії <b>об'єднання</b> потрібно обрати цільового "
-"попередника (тобто того, чиї зміни будуть <i>збережені</i>)"
+"При поверненні до ревізії <b>злиття</b> потрібно обрати цільового "
+"попередника (тобто тому, кому зміни будуть <i>збережені</i>)"
 
 #, python-format
 msgid "First Parent: revision %s (%s)"
 msgstr "Перший попередник: ревізія %s (%s)"
 
 msgid "Backout to the first parent of the merge revision"
-msgstr "Повернутися до першого попередника для об'єднання ревізій"
+msgstr "Повернення до першого попередника об'єднаної ревізій"
 
 #, python-format
 msgid "Second Parent: revision %s (%s)"
 msgstr "Другий попередник: ревізія %s (%s)"
 
 msgid "Backout to the second parent of the merge revision"
-msgstr "Повернутися до другого попередника об'єднаної ревізії"
+msgstr "Повернення до другого попередника об'єднаної ревізії"
 
 msgid "Working directory status"
 msgstr "Стан робочого каталогу"
@@ -260,28 +260,29 @@ msgid "Discard outstanding changes to working directory?"
 msgstr "Відмовитись від змін у робочому каталозі?"
 
 msgid "Backing out, then merging..."
-msgstr "Видалення помилок, потім об'єднання..."
+msgstr "Повернення, потім злиття..."
 
 msgid "All conflicting files will be marked unresolved."
-msgstr "Всі файли з конфліктами позначити, як не улагоджені."
+msgstr "Всі файли з конфліктами позначити, як не розв'язані."
 
 msgid "Automatically advance to next page when backout and merge are complete."
 msgstr ""
-"Автоматичний перехід на наступну сторінку коли відкат та об'єднання виконане."
+"Автоматичний перехід на наступну сторінку, коли повернення та злиття "
+"виконані."
 
 #, python-format
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
 msgstr ""
-"%d файли мають <b>проблеми при об'єднанні</b> ви повинні <a href=\"resolve"
-"\"><b>улагодити</b></a>"
+"%d файлів матимуть <b>конфлікти під час злиття</b> ви повинні <a href="
+"\"resolve\"><b>розв'язати</b></a>"
 
 msgid "No merge conflicts, ready to commit"
-msgstr "Конфлікти об'єднання відсутні, можна фіксувати"
+msgstr "Конфлікти злиття відсутні, готовво до фіксації"
 
 msgid "Commit backout and merge results"
-msgstr "фіксувати повернення та об'єднання."
+msgstr "Зафіксувати результат повернення та злиття."
 
 msgid "Parents"
 msgstr "Попередники"
@@ -290,68 +291,67 @@ msgid "Working Directory"
 msgstr "Робочий каталог"
 
 msgid "Working Directory (merged)"
-msgstr "Робочий каталог (об'єднаний)"
+msgstr "Робочий каталог (злитий)"
 
 msgid "Commit message"
 msgstr "Повідомлення фіксації"
 
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
-"Пропускати останню сторінку з підтвердженням, закривати після фіксації."
+msgstr "Пропускати кінцеву сторінку підтвердження, закриваючи після фіксації."
 
 msgid "Backed out merge changeset: "
-msgstr "Повертаємо об'єднаний набір змін: "
+msgstr "Зміни, яким відмовлено у злитті: "
 
 msgid "Backed out changeset: "
-msgstr "Повернений набір змін: "
+msgstr "Проігноровані зміни: "
 
 msgid "Confirm Discard Message"
 msgstr "Підтвердіть відмову від повідомлення"
 
 msgid "Discard current backout message?"
-msgstr "Відмовитись від поточних зворотніх повідомлень?"
+msgstr "Відмовитись від поточних повідомлень?"
 
 msgid "Use English backout message"
-msgstr "Використовувати повідомлення англійською мовою"
+msgstr "Використовувати повідомлення англійською"
 
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr "Об'єднати ревізію та повернути до першого попередника (%s)"
+msgstr "Відмовитися зливати ревізію з першим попередником (%s)"
 
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr "Об'єднати ревізію та повернути до другого попередника (%s)"
+msgstr "Відмовитися зливати з другим попередником (%s)"
 
 msgid "Backing out and committing..."
-msgstr "Видалення помилок та фіксація..."
+msgstr "Відступитися та зафіксувати..."
 
 msgid "Please wait while making backout."
-msgstr "Будь ласка, зачекайте поки йде повернення."
+msgstr "Будь ласка, зачекайте виконується повернення."
 
 msgid "Committing..."
-msgstr "Фіксуємо..."
+msgstr "Фіксувати..."
 
 msgid "Please wait while committing merged files."
-msgstr "Будь ласка, зачекайте поки йде фіксація об'єднання."
+msgstr "Будь ласка, зачекайте виконується фіксація злитих файлів."
 
 msgid "Finished"
 msgstr "Завершено"
 
 msgid "Backout changeset"
-msgstr "Повернути набір змін"
+msgstr "Повернення змін"
 
 #, python-format
 msgid "Bisect - %s"
-msgstr "Відтяти - %s"
+msgstr "Навпіл - %s"
 
 msgid "Known good revision:"
-msgstr "Вдала ревізія:"
+msgstr "Наразі гарна ревізія:"
 
 msgid "Accept"
 msgstr "Прийняти"
 
 msgid "Known bad revision:"
-msgstr "Погана ревізія:"
+msgstr "Наразі погана ревізія:"
 
 msgid "Revision is Good"
 msgstr "Гарна ревізія"
@@ -375,7 +375,7 @@ msgid "Revision"
 msgstr "Ревізія"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr "Перевірка ревізії та звіт результатів. (добре/погано/пропустити)"
+msgstr "Перевірка ревізії та звіт результатів. (гарно/погано/пропустити)"
 
 #, python-format
 msgid "%s (hint: %s)"
@@ -394,7 +394,7 @@ msgid "&Add"
 msgstr "&Додати"
 
 msgid "Re&name"
-msgstr "&Змінити"
+msgstr "&Змінити назву"
 
 msgid "&Remove"
 msgstr "&Вилучити"
@@ -412,15 +412,15 @@ msgstr "Закладка з назвою \"%s\" вже існує"
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr "Закладка '%s' була додана"
+msgstr "Закладка '%s' додана"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr "Назва закладки \"%s\" неіснує"
+msgstr "Закладка з назвою \"%s\" не існує"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr "Закладка '%s' була переміщена"
+msgstr "Закладка '%s' була втрачена"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
@@ -428,27 +428,27 @@ msgstr "Закладка '%s' не існує"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr "Закладка '%s' була вилучена"
+msgstr "Закладка '%s' вилучена"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr "Закладка '%s' була перейменована у '%s'"
+msgstr "Закладка '%s' змінила назву на '%s'"
 
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - операційна гілка"
 
 msgid "Select branch of merge commit"
-msgstr "Оберіть гілку з якою зробити об'єднання"
+msgstr "Оберіть гілку для злиття та фіксації"
 
 msgid "Changes take effect on next commit"
-msgstr "Зміни вступлять у силу після наступної фіксації"
+msgstr "Зміни матимуть ефект в наступній фіксації"
 
 msgid "No branch changes"
-msgstr "Немає змін у гілці"
+msgstr "Змін в гілці немає"
 
 msgid "Open a new named branch"
-msgstr "Відкрити нову гілку з назвою"
+msgstr "Відкрити, як нову гілку з назвою"
 
 msgid "Close current branch"
 msgstr "Закрити поточну гілку"
@@ -458,7 +458,7 @@ msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr "Надішліть будь ласка, цю помилку нам <a href=\"%s\">bug tracker</a>"
 
 msgid "Checking for updates..."
-msgstr "Перевірити наявність оновлень..."
+msgstr "Перевірити оновлення..."
 
 msgid "Copy"
 msgstr "Скопіювати"
@@ -470,10 +470,10 @@ msgid "TortoiseHg Bug Report"
 msgstr "Звіт про помилку TortoiseHg"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr "Рекомендується оновитись до більш нової версії TortoiseHg."
+msgstr "Оновіться до нової версії TortoiseHg."
 
 msgid "Your TortoiseHg is up to date."
-msgstr "У Вас встановлена остання версія TortoiseHg."
+msgstr "Наразі маєте останню версію TortoiseHg."
 
 msgid "Save error report to"
 msgstr "Зберегти звіт про помилку до"
@@ -482,7 +482,7 @@ msgid "Text files (*.txt)"
 msgstr "Текстові файли (*.txt)"
 
 msgid "Error writing file"
-msgstr "Помилка під час запису у файл"
+msgstr "Помилка при записі у файл"
 
 msgid "TortoiseHg Error"
 msgstr "Помилка TortoiseHg"
@@ -491,17 +491,17 @@ msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
 msgstr ""
-"Якщо у Вас виникли проблеми, <a href=\"#bugreport\">please file a bug "
-"report</a>."
+"Якщо у Вас виникли проблеми, <a href=\"#bugreport\">будь ласка надішліть "
+"файл із звітом про помилку</a>."
 
 msgid "Visual Diff"
 msgstr "Наочне порівняння"
 
 msgid "View file changes in external diff tool"
-msgstr "Переглянути файл змін у зовнішньому засобі порівнянь"
+msgstr "Переглянути файл змін у зовнішньому приладді порівнянь"
 
 msgid "Edit Local"
-msgstr "Правити"
+msgstr "Правити локальну"
 
 msgid "Edit current file in working copy"
 msgstr "Правити поточний файл у робочій копії"
@@ -516,35 +516,34 @@ msgid "Patch failed to apply"
 msgstr "Латка не прийнята"
 
 msgid "Manually resolve rejected chunks?"
-msgstr "Ручне улагодження про відхилення клаптів?"
+msgstr "Відхиляти частки у ручному режимі?"
 
 msgid "Edit patched file and rejects?"
-msgstr "Змінити виправлений файл та відкинути?"
+msgstr "Правити латаний файл та відкинути?"
 
 msgid "No deletable chunks"
-msgstr "Клаптів для видалення не має"
+msgstr "Часток для видалення не має"
 
 msgid "Completely remove file from patch?"
 msgstr "Цілковито перемістити файли для латки?"
 
 msgid "Revert all file changes?"
-msgstr "Повернути всі зміни файлів?"
+msgstr "Повернути всі зміни до файлів?"
 
 msgid "No chunks remain"
-msgstr "Клаптів більше не залишилось"
+msgstr "Часток більше не залишилось"
 
 msgid "file has been deleted, refresh"
-msgstr "файл був знищений, оновіть зміст"
+msgstr "файл знищений, оновіть зміст"
 
 msgid "file has been modified, refresh"
 msgstr "файл був змінений, оновіть зміст"
 
 msgid "Unable to merge chunks"
-msgstr "Не вдалось об'єднати клапті"
+msgstr "Не вдалось злити частки"
 
 msgid "Add or remove patches must be merged in the working directory"
-msgstr ""
-"Латки додавання або вилучення повинні бути об'єднані в робочому сховищі"
+msgstr "Додані або вилучені латки повинні бути злиті з робочим каталогом"
 
 msgid "Unable to remove"
 msgstr "Неможливо вилучити"
@@ -569,14 +568,14 @@ msgid "Toggle display of text search bar"
 msgstr "Перемикання відображення пошуку текстового рядку"
 
 msgid "Diff Toolbar"
-msgstr "Різниця"
+msgstr "Пенал порівнянь"
 
 #, python-format
 msgid "Chunks selected: %d / %d"
-msgstr "Вибрано клаптів: %d / %d"
+msgstr "Вибрано часток: %d / %d"
 
 msgid "Please wait while the file is opened ..."
-msgstr "Будь ласка зачекайте, поки відкривається файл..."
+msgstr "Будь ласка зачекайте відкриття файлу..."
 
 msgid "Source:"
 msgstr "Джерело:"
@@ -591,10 +590,10 @@ msgid "Clone to revision:"
 msgstr "Клонувати до ревізії:"
 
 msgid "Do not update the new working directory"
-msgstr "Не можливо оновити новий робочий каталог"
+msgstr "Оновити новий робочий каталог не можливо"
 
 msgid "Use pull protocol to copy metadata"
-msgstr "Використовувати протокол затягування для копіювання метаданих"
+msgstr "Для копіювання метаданих використовувати протокол затягування"
 
 msgid "Use uncompressed transfer"
 msgstr "Не стискати при передачі"
@@ -603,7 +602,7 @@ msgid "Include patch queue"
 msgstr "Включаючи чергу латок"
 
 msgid "Use proxy server"
-msgstr "Використовувати проксі-сервер"
+msgstr "Користуватись проксі-сервером"
 
 msgid "Do not verify host certificate"
 msgstr "Не можливо перевірити сертифікат вузла"
@@ -618,7 +617,7 @@ msgid "&Clone"
 msgstr "&Клонувати"
 
 msgid "Detail"
-msgstr "Деталізація"
+msgstr "Розлого"
 
 #, python-format
 msgid "Clone - %s"
@@ -628,25 +627,25 @@ msgid "TortoiseHg Clone"
 msgstr "Клонування TortoiseHg"
 
 msgid "Error creating destination folder"
-msgstr "Помилка створення теки отримувача"
+msgstr "Помилка створення теки отримувачки"
 
 msgid "Please specify a different path."
-msgstr "Будь ласка, оберіть інший шлях."
+msgstr "Оберіть інший шлях."
 
 msgid "Source path is empty"
 msgstr "Шлях джерела порожній"
 
 msgid "Please enter a valid source path."
-msgstr "Вкажіть правильний шлях до джерела."
+msgstr "Вкажіть правильний шлях джерела."
 
 msgid "Source and destination are the same"
-msgstr "Джерело та отримувач однакові"
+msgstr "Джерело та отримувач збігаються"
 
 msgid "Please specify different paths."
-msgstr "Будь ласка, оберіть інший шлях."
+msgstr "Оберіть інші шляхи."
 
 msgid "Please enter a new destination path."
-msgstr "Вкажіть нового отримувача."
+msgstr "Введіть новий шлях для отримувача."
 
 msgid "Select source repository"
 msgstr "Оберіть джерельне сховище"
@@ -666,7 +665,7 @@ msgid "[command completed successfully %s]"
 msgstr "[команда виконана вдало %s]"
 
 msgid "failed to start command\n"
-msgstr "помилка під час запуску команди\n"
+msgstr "помилка при старті команди\n"
 
 msgid "error while running command\n"
 msgstr "помилка виконання команди\n"
@@ -684,7 +683,7 @@ msgid "Failed!"
 msgstr "Не вдалося!"
 
 msgid "TortoiseHg Command Dialog"
-msgstr "TortoiseHg Command Dialog"
+msgstr "Командний діалог TortoiseHg"
 
 msgid "Confirm Exit"
 msgstr "Підтвердіть вихід"
@@ -713,7 +712,7 @@ msgid "Copy message"
 msgstr "Копія повідомлення"
 
 msgid "Copy one of the recent commit messages"
-msgstr "Копірувати одну з останніх повідомлень фіксації"
+msgstr "Копіювати одну з останніх повідомлень фіксації"
 
 msgid "Show Issues"
 msgstr "Відобразити запити"
@@ -723,13 +722,13 @@ msgstr "Будь ласка, зачекайте..."
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr "Не вдалося визначити систему відстежування помилок '%s': %s"
+msgstr "Не вдалося завантажити систему відстеження питань '%s': %s"
 
 msgid "Issue Tracker"
-msgstr "Система відстежування помилок"
+msgstr "Відстеження питань"
 
 msgid "Show Issues..."
-msgstr "Відобразити запити..."
+msgstr "Відобразити питання..."
 
 msgid "Stop"
 msgstr "Зупинити"
@@ -744,7 +743,7 @@ msgid "Amend current revision"
 msgstr "Виправте поточну ревізію"
 
 msgid "Amend"
-msgstr "Виправлення"
+msgstr "Виправити"
 
 msgid "Create a new patch"
 msgstr "Створити новий шлях"
@@ -763,23 +762,23 @@ msgstr "Підтвердіть зміну гілки"
 
 #, python-format
 msgid "Named branch \"%s\" already exists, last used in revision %d\n"
-msgstr "Назва гілки \"%s\" вже існує, в останне використано у ревізії %d\n"
+msgstr "Назва гілки \"%s\" вже існує, останне використанння у ревізії %d\n"
 
 msgid "Restart &Branch"
-msgstr "Перезавантажити гілку"
+msgstr "Перезапустити гілку"
 
 msgid "&Commit to current branch"
-msgstr "Фіксувати поточну гілку"
+msgstr "Фіксувати до поточної гілки"
 
 msgid "Confirm New Branch"
-msgstr "Підтвердіть створення нової гілки"
+msgstr "Підтвердіть нову гілку"
 
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
-msgstr "Створити нову назви для гілки \"%s\" в цій фіксації?\n"
+msgstr "Створити нову гілку з назвою \"%s\" при фіксації?\n"
 
 msgid "Create &Branch"
-msgstr "Створити &Гілку"
+msgstr "Створити &гілку"
 
 msgctxt "start progress"
 msgid "MQ Action"
@@ -799,7 +798,7 @@ msgid "Parent:"
 msgstr "Попередник:"
 
 msgid "Patch name:"
-msgstr "Назва шляху:"
+msgstr "Назва латки:"
 
 #, python-format
 msgid "Close %s branch"
@@ -817,28 +816,28 @@ msgid "Rollback"
 msgstr "Повернення"
 
 msgid "Discard current commit message?"
-msgstr "Відхилити поточне повідомлення про фіксацію?"
+msgstr "Відкинути поточне повідомлення про фіксацію?"
 
 msgid "Message Translation Failure"
-msgstr "Помилка Переведення Повідомлення"
+msgstr "Помилка перекладу повідомлення"
 
 msgid ""
 "Unable to translate message to local encoding\n"
 "Consider setting HGENCODING environment variable\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Не вдається перекласти повідомлення в локальне кодування.\n"
+"Не вдається перекласти повідомлення локальним кодуванням.\n"
 "Спробуйте встановити параметр HGENCODING\n"
-"Заменити неперекладені змінні знаком \"?\"?\n"
+"Замінити неперекладені літери на \"?\"?\n"
 
 msgid "&Replace"
 msgstr "&Замінити"
 
 msgid "Nothing Commited"
-msgstr "Нічого вчиняти"
+msgstr "Нічого фіксувати"
 
 msgid "Please enter commit message"
-msgstr "Будь ласка, введіть повідомлення фіксації"
+msgstr "Введіть повідомлення фіксації"
 
 msgid ""
 "No issue link was found in the commit message.  The commit message should "
@@ -846,17 +845,17 @@ msgid ""
 "the settings."
 msgstr ""
 "В повідомленні фіксації не знайдено посилання на проблему. Потрібно "
-"вказувати посилання на проблему. Налаштуйте «Система відстежування помилок» "
-"у відповідній секції параметрів."
+"вказувати посилання на проблему. Налаштуйте у відповідній секції 'Система "
+"відстеження помилок'."
 
 msgid "No files checked"
-msgstr "Файли для перевірки відсутні"
+msgstr "Відсутні файли для перевірки"
 
 msgid "No modified files checkmarked for commit"
 msgstr "Відсутні змінені файли, які були б відмічені для фіксації"
 
 msgid "Confirm Add"
-msgstr "Підтвердження додавання"
+msgstr "Підтвердити додавання"
 
 msgid "Add selected untracked files?"
 msgstr "Додати файли у сховище?"
@@ -865,7 +864,7 @@ msgid "Confirm Remove"
 msgstr "Підтвердіть вилучення"
 
 msgid "Remove selected deleted files?"
-msgstr "Вилучити вказані на видалення файли?"
+msgstr "Вилучити файли вказані на видалення?"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -879,13 +878,13 @@ msgid "Set username:"
 msgstr "Користувач:"
 
 msgid "Save in Repo"
-msgstr "Зберегти в сховищі"
+msgstr "Зберегти в сховище"
 
 msgid "Save Global"
-msgstr "Зберегти для всіх"
+msgstr "Зберегти для загалу"
 
 msgid "Set Date:"
-msgstr "Встановити дата:"
+msgstr "Встановити дату:"
 
 msgid "Update"
 msgstr "Оновити"
@@ -894,34 +893,34 @@ msgid "Push After Commit:"
 msgstr "Виштовхнути після фіксації:"
 
 msgid "Auto Includes:"
-msgstr "Автоматично включено:"
+msgstr "Автоматично приєднати:"
 
 msgid "Recurse into subrepositories (--subrepos)"
-msgstr "Рекурсія всередині підсховища (--subrepos)"
+msgstr "Рекурсивно всередині підсховищ (--subrepos)"
 
 msgid "Unable to save username"
 msgstr "Неможливо зберегти ім'я користувача"
 
 msgid "Iniparse must be installed."
-msgstr "Приладдя для розбору ini-файлів повинно бути встановлено."
+msgstr "Приладдя для обробки ini-файлів повинно бути встановлено."
 
 msgid "Unable to write configuration file"
-msgstr "Не можливо записати налаштування файлу"
+msgstr "Не можливо записати налаштування у файл"
 
 msgid "Unable to save after commit push"
-msgstr "Неможливо зберігти після фіксації віштовхування"
+msgstr "Неможливо зберегти після фіксації віштовхування"
 
 msgid "Unable to save auto include list"
-msgstr "Не можливо автоматично зберігти перелік додавань"
+msgstr "Не можливо автоматично зберегти перелік включень"
 
 msgid "Unable to save recurse in subrepos."
-msgstr "Неможливо зберегти - рекурсія в підсховищі."
+msgstr "Неможливо зберегти - рекурсія у підсховищі."
 
 msgid "Invalid date format"
 msgstr "Помилковий формат дати"
 
 msgid "No username configured"
-msgstr "Не налаштоване ім'я користувача"
+msgstr "Не налаштовано ім'я користувача"
 
 #, python-format
 msgid "%s - commit"
@@ -931,10 +930,10 @@ msgid "TortoiseHg Commit"
 msgstr "TortoiseHg Фіксація"
 
 msgid "Are you sure that you want to cancel the commit operation?"
-msgstr "Ви впевнені, що бажаєте завершити операція фіксації?"
+msgstr "Ви впевнені, що бажаєте завершити операцію фіксації?"
 
 msgid "Compress changesets up to and including"
-msgstr "Стиснення змін і в тому числі"
+msgstr "Стиснути і в тому числі зміни"
 
 msgid "Onto destination"
 msgstr "На отримання"
@@ -954,7 +953,7 @@ msgstr ""
 "<a href=\"discard\"><b>відкинути</b></a> зміни."
 
 msgid "You may continue the compress"
-msgstr "Ви можете і далі стискати"
+msgstr "Ви маєте продовжити стискання"
 
 msgid "Changes have been moved, you must now commit"
 msgstr "Зміни будуть втрачені, Ви повинні зараз їх зафіксувати"
@@ -1025,7 +1024,7 @@ msgid "Displaying %(count)d of %(total)d items"
 msgstr "Відображати %(count)d з %(total)d елементів"
 
 msgid "Select a GUI location to edit:"
-msgstr "Оберіть елемент графічного інтерфейсу користувача для зміни:"
+msgstr "Оберіть елемент GUI для правки:"
 
 msgid "Select the toolbar or menu to change"
 msgstr "Оберіть пенал або меню для змін"
@@ -1049,10 +1048,10 @@ msgid "New Tool ..."
 msgstr "Нове приладдя ..."
 
 msgid "Edit Tool ..."
-msgstr "Уточнити приладдя ..."
+msgstr "Правити приладдя ..."
 
 msgid "Delete Tool"
-msgstr "Знищити приладдя"
+msgstr "Видалити приладдя"
 
 msgid "Type"
 msgstr "Тип"
@@ -1113,7 +1112,7 @@ msgid "<default icon>"
 msgstr "<типові значки>"
 
 msgid "Configure Custom Tool"
-msgstr "Налаштувати користувацьке приладдя"
+msgstr "Налаштувати приладдя користувача"
 
 msgid "Tool name"
 msgstr "Назва приладдя"
@@ -1141,17 +1140,17 @@ msgid ""
 msgstr ""
 
 msgid "Tool label"
-msgstr "Маркування приладдя"
+msgstr "Мітка приладдя"
 
 msgid ""
 "The tool label, which is what will be shown on the repowidget context menu.\n"
 "If no label is set, the tool name will be used as the tool label.\n"
 "If no tooltip is set, the label will be used as the tooltip as well."
 msgstr ""
-"Приладдя етикеток, буде виведене у контекстному меню repowidget-а.\n"
-"Якщо етикетка не встановлена, назва приладдя буде використовувати приладдя "
-"етикеток.\n"
-"Якщо мітка не встановлена в якості підказки буде використана також мітка."
+"Мітка приладдя відображатиметься у контекстному меню repowidget-а.\n"
+"Якщо мітка не призначена, назва приладдя використовуватиме етикетку "
+"приладдя.\n"
+"Якщо мітка не встановлена в якості підказки буде використовуватиметься мітка."
 
 msgid "Tooltip"
 msgstr "Підказка"
@@ -1162,8 +1161,8 @@ msgid ""
 "the workbench toolbar."
 msgstr ""
 "Підказка, яка буде виводитись на кнопці приладдя.\n"
-"Тільки у випадку зображення кнопки на\n"
-"пеналі в робочому середовищі."
+"Зокрема у випадку зображення кнопки на\n"
+"пеналі робочого середовища."
 
 msgid "Icon"
 msgstr "Значок"
@@ -1178,10 +1177,10 @@ msgid ""
 msgstr ""
 "Значок приладдя.\n"
 "Ви можете використовувати будь-який вбудований у TortoiseHg значок\n"
-"встановивши його змінною у TortoiseHg назва значка\n"
+"встановивши назва значка змінною у TortoiseHg \n"
 "(Наприклад clone, add, remove, sync, thg-logo, hg-update, тощо).\n"
 "Ви також можете вказати ці значення з абсолютним шляхом\n"
-"у файловій системі."
+"файлової системи."
 
 msgid "On repowidget, show for"
 msgstr "На repowidget для показу"
@@ -1191,8 +1190,8 @@ msgid ""
 "It is only taken into account when the tool is shown on the\n"
 "selected revision context menu."
 msgstr ""
-"Для деяких видів переглядів інструмент буде включений\n"
-"це враховується тіки коли інструмент показано\n"
+"Для деяких видів ревізій приладдя буде включено\n"
+"це враховується тільки коли приладдя показано\n"
 "доступним у контекстному меню ревізії."
 
 msgid "Show Output Log"
@@ -1206,7 +1205,7 @@ msgstr ""
 "Типово: виключено."
 
 msgid "You must set a tool name."
-msgstr "Ви повинні вказати назву приладдя."
+msgstr "Вкажіть назву приладдя."
 
 msgid "The tool name cannot have any spaces in it."
 msgstr "Назва приладдя не може містити прогалини."
@@ -1273,13 +1272,13 @@ msgid "Compare revisions of the selected file"
 msgstr "Порівняти ревізії обраних файлів"
 
 msgid "&Diff to Parent"
-msgstr "&Відмінність з попередником"
+msgstr "&Різниця до попередника"
 
 msgid "Diff to &Local"
-msgstr "Відмінність від &поточного"
+msgstr "Відмінність до &локального"
 
 msgid "View changes to current in external diff tool"
-msgstr "Перегляд змін в існуючому зовнішньому інструменті порівняння"
+msgstr "Переглянути зміни у зовнішньому інструменті порівняння"
 
 msgid "&View at Revision"
 msgstr "&Переглянути в ревізії"
@@ -1309,7 +1308,7 @@ msgid "&Revert to Revision..."
 msgstr "&Повернутись до ревізії..."
 
 msgid "Open S&ubrepository"
-msgstr "Відкрити підс&ховище"
+msgstr "Відкрити під&сховище"
 
 msgid "Open the selected subrepository"
 msgstr "Відкрити обране підсховище"
@@ -1324,7 +1323,7 @@ msgid "Open &Terminal"
 msgstr "Відкрити &термінал"
 
 msgid "Open a shell terminal in the selected folder"
-msgstr "Відкривати термінал оболонки у вибраній теці"
+msgstr "Відкривати термінал у вибраній теці"
 
 msgid "File(s) not found"
 msgstr ""
@@ -1336,7 +1335,7 @@ msgid "Cannot display visual diff"
 msgstr "Не можливо відобразити відмінності візуально"
 
 msgid "Visual diffs are not supported for unapplied patches"
-msgstr "Візуальне порівняння не підтримується для не застосованих латок."
+msgstr "Візуальне порівняння не підтримується для не прийнятих латок"
 
 msgid "Cannot open subrepository"
 msgstr "Неможливо відкрити підсховище"
@@ -1348,7 +1347,7 @@ msgid "Display the file anyway"
 msgstr "Показувати файл завжди"
 
 msgid "File or diffs not displayed: "
-msgstr "Файл або відмінності не відображаються: "
+msgstr "Файл або відмінності не показувані: "
 
 #, python-format
 msgid ""
@@ -1359,7 +1358,7 @@ msgstr ""
 "maxdiff = %s Kб"
 
 msgid "File is binary"
-msgstr "Файл є бінарним"
+msgstr "Файл є двійковим"
 
 msgid "File may be binary (maximum line length exceeded)"
 msgstr "Файл повинен бути двійковим (перевищення максимальної довжини рядка)"
@@ -1379,13 +1378,13 @@ msgid "exec mode has been <font color='red'>set</font>"
 msgstr "дозвіл виконувати був <font color='red'>встановлений</font>"
 
 msgid "exec mode has been <font color='red'>unset</font>"
-msgstr "дозвіл виконувати був <font color='red'>відмінений</font>"
+msgstr "дозвіл виконувати був <font color='red'>скасований</font>"
 
 msgid " <i>(is a symlink)</i>"
 msgstr " <i>(це посилання)</i>"
 
 msgid "Diff not displayed: "
-msgstr "Різниця не відображається: "
+msgstr "Різниця не відобразити: "
 
 #, python-format
 msgid ""
@@ -1414,7 +1413,7 @@ msgstr "Стан підсховища:"
 
 #, python-format
 msgid "changeset: %s"
-msgstr "набір змін: %s"
+msgstr "зміни: %s"
 
 msgid "Revision has changed to:"
 msgstr "Ревізія змінилася до:"
@@ -1429,30 +1428,30 @@ msgid "Further subrepository revision information cannot be retrieved."
 msgstr "Відновлення додаткової інформації про підсховище неможливе."
 
 msgid "Subrepository is either damaged or missing some revisions"
-msgstr "Підсховище пошкоджене або відсутні зміни"
+msgstr "Підсховище пошкоджене або відсутні ревізії"
 
 msgid ""
 "You may need to open the missing subrepository and manually\n"
 "pull the missing revisions from its source repository."
 msgstr ""
 "Для відкриття відсутнього підсховища Вам може знадобитись\n"
-"вручному режимі затягнути зміни відсутні у сховищі."
+"вручну затягнути зміни відсутні у сховищі."
 
 msgid "Initial revision"
 msgstr "Початкова ревізія"
 
 msgid "Not a Mercurial subrepo, not previewable"
-msgstr "Підсховище не належить Mercurial, перегляд неможливий"
+msgstr "Підсховище не Mercurial, непроглядне"
 
 #, python-format
 msgid "Error previewing subrepo: %s"
-msgstr "Помилка попереднього перегляду підсховища: %s"
+msgstr "Помилка при попередньому перегляді підсховища: %s"
 
 msgid "The subrepository is dirty."
-msgstr "Підсховище брудне."
+msgstr "Підсховище засране."
 
 msgid "File Status:"
-msgstr "Файл стану:"
+msgstr "Стан файл:"
 
 msgid "(is a changed sub-repository)"
 msgstr "(це змінилося у підсховищі)"
@@ -1461,7 +1460,7 @@ msgid "(is an unchanged sub-repository)"
 msgstr "(це не змінилося у підсховищі)"
 
 msgid "(is a dirty sub-repository)"
-msgstr "(це галіме підсховище)"
+msgstr "(це засране підсховище)"
 
 msgid "(is a new sub-repository)"
 msgstr "(є нові підсховища)"
@@ -1470,10 +1469,10 @@ msgid "(is a removed sub-repository)"
 msgstr "(є вилучені підсховища)"
 
 msgid "(is a changed and dirty sub-repository)"
-msgstr "(це змінене та галіме підсховище)"
+msgstr "(це змінене та засране підсховище)"
 
 msgid "(is a new and dirty sub-repository)"
-msgstr "(це нове та брудне підсховище)"
+msgstr "(це нове та засране підсховище)"
 
 msgid "open..."
 msgstr "відкрити..."
@@ -1501,7 +1500,7 @@ msgid "Hg file log viewer [%s] - %s"
 msgstr "Перегляд файлу журналу [%s] - %s"
 
 msgid "File History Log Columns"
-msgstr "Стовпці файлу журналу історії"
+msgstr "Стовпці журналу історії файлу"
 
 msgid "Back"
 msgstr "Назад"
@@ -1513,31 +1512,31 @@ msgid "&Diff Selected Changesets"
 msgstr "&Різниця між вибраними змінами"
 
 msgid "Diff Selected &File Revisions"
-msgstr "Різниця між обраним та &файлом редакції"
+msgstr "Різниця між обраним &файлом та ревізіями"
 
 msgid "&Diff Changeset to Parent"
-msgstr "&Різниця змін до попередника"
+msgstr "&Різниця між зміною та попередником"
 
 msgid "Diff Changeset to &Local"
-msgstr "Різниця змін до &поточного"
+msgstr "Різниця змін до &локального"
 
 msgid "Diff &File to Parent"
-msgstr "Різниця з базовим &файлом"
+msgstr "Різниця між &файлом та попередником"
 
 msgid "Diff File to Lo&cal"
-msgstr "Різниця з &поточним файлом"
+msgstr "Різниця між файлом та &локальним"
 
 msgid "Show Revision &Details"
-msgstr "Показати ревізію &детально"
+msgstr "Показати ревізію &розлого"
 
 msgid "You must select two revisions to diff"
-msgstr "Ви повинні обрати дві ревізії для порівняння"
+msgstr "Для порівняння потрібно обрати дві ревізії"
 
 msgid "Too many rows selected for menu"
 msgstr "Дуже мало стовпчиків обрано для меню"
 
 msgid "File Differences Log Columns"
-msgstr "Колонки журналу файлових відмінностей"
+msgstr "Колонки журналу відмінностей файлу"
 
 msgid "Next diff"
 msgstr "Наступна відмінність"
@@ -1550,7 +1549,7 @@ msgid "Filename"
 msgstr "Назва файлу"
 
 msgid " (excluded from the next commit)"
-msgstr " (виключені з наступної фіксації)"
+msgstr " (виключаються з наступною фіксацією)"
 
 msgid "View change as unified diff output"
 msgstr "Перегляд змін у вигляді уніфікованого формату змін"
@@ -1574,10 +1573,10 @@ msgid "Show changes from second parent"
 msgstr "Відобразити зміни від другого попередника"
 
 msgid "Open shelve tool"
-msgstr "Відкрити інструмент відкладання змін"
+msgstr "Відкрити приладдя відтермінування"
 
 msgid "Mark excluded changes"
-msgstr "Відмічати виключені зміни"
+msgstr "Відмітити виключені зміни"
 
 msgid "&Search in Current File"
 msgstr "&Пошук в поточному файлі"
@@ -1626,7 +1625,7 @@ msgid "Show &Revision"
 msgstr "Показати &ревізію"
 
 msgid "Interrupted graft operation found"
-msgstr "Знайдено пошкоджену операції щеплення"
+msgstr "Знайдено пошкодження при операції щеплення"
 
 msgid ""
 "An interrupted graft operation has been found.\n"
@@ -1635,7 +1634,7 @@ msgid ""
 "interrupted graft operation first."
 msgstr ""
 "Ви не зможете виконати інші операції щеплення, доки не припинете перервану "
-"операцію щеплення."
+"раніше операцію щеплення."
 
 msgid "Continue or abort interrupted graft operation?"
 msgstr "Тривати або перервати пошкоджену операцію щеплення?"
@@ -1657,14 +1656,14 @@ msgid "Append graft info to log message"
 msgstr ""
 
 msgid "Graft"
-msgstr "Прищепа"
+msgstr "Щепити"
 
 msgid "Abort"
 msgstr "Перервати"
 
 #, python-format
 msgid "Graft - %s"
-msgstr "Пришепа - %s"
+msgstr "Прищепа - %s"
 
 msgid "Graft changeset"
 msgstr "Набір прищеп"
@@ -1681,7 +1680,7 @@ msgstr ""
 "href=\"discard\"><b>відкинути</b></a> зміни."
 
 msgid "You may continue or start the graft"
-msgstr "Ви хочете продовжити або почати щеплення"
+msgstr "Ви бажаєте продовжити або почати щеплення"
 
 msgid "Graft is complete"
 msgstr "Щеплення закінчено"
@@ -1696,11 +1695,11 @@ msgid ""
 "Graft generated merge <b>conflicts</b> that must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
 msgstr ""
-"Щеплення генерує об'єднання <b>конфліктів</b> це потребує <a href=\"resolve"
-"\"><b>улагодження</b></a>"
+"Щеплення генерує злиття <b>конфліктів</b> що потребуватиме <a href=\"resolve"
+"\"><b>розв'язування</b></a>"
 
 msgid "You may continue the graft"
-msgstr "Ви повинні щепити далі"
+msgstr "Ви повинні продовжувати щепити"
 
 msgid "Exiting with an unfinished graft is not recommended."
 msgstr "Вихід з незакінченого щеплення не бажаний."
@@ -1715,7 +1714,7 @@ msgid "### regular expression search pattern ###"
 msgstr "### регулярний вираз для пошуку ###"
 
 msgid "Regexp:"
-msgstr "Регулярний вираз:"
+msgstr "Рег. вираз:"
 
 msgid "Ignore case"
 msgstr "Без урахування регістру"
@@ -1736,10 +1735,10 @@ msgid "Follow copies and renames"
 msgstr "Відстежувати копіювання та перейменування"
 
 msgid "Includes:"
-msgstr "З урахуванням:"
+msgstr "Враховуючи:"
 
 msgid "Excludes:"
-msgstr "Без урахування:"
+msgstr "Не враховуючи:"
 
 msgid ""
 "Comma separated list of exclusion file patterns. Exclusion patterns are "
@@ -1764,7 +1763,7 @@ msgstr "\"%s\" вилучено з історії пошуку"
 
 #, python-format
 msgid "\"%s\" removed from path history"
-msgstr "\"%s\" вилучено з шляхів пошуку"
+msgstr "\"%s\" вилучено з шляху пошуку"
 
 #, python-format
 msgid "grep: invalid match pattern: %s\n"
@@ -1776,7 +1775,7 @@ msgstr "grep: %s\n"
 
 #, python-format
 msgid "%d matches found"
-msgstr "%d знайдено збігів"
+msgstr "%d збігів знайдено"
 
 msgid "No matches found"
 msgstr "Збігів не знайдено"
@@ -1788,20 +1787,20 @@ msgid "history"
 msgstr "історія"
 
 msgid "Interrupted"
-msgstr "Перерваний"
+msgstr "Порушений"
 
 msgid "files"
 msgstr "файли"
 
 #, python-format
 msgid "Skipping %s, unable to read"
-msgstr "Неможливо прочитати, пропущений %s"
+msgstr "%s не читається, пропустити"
 
 msgid "Vi&ew File"
 msgstr "П&ереглянути файл"
 
 msgid "&View Changeset"
-msgstr "П&ереглянути набір змін"
+msgstr "П&ереглянути зміни"
 
 msgid "Annotate &File"
 msgstr "Опис &файлу"
@@ -1813,20 +1812,20 @@ msgid "Line"
 msgstr "Рядок"
 
 msgid "Rev"
-msgstr "Мод."
+msgstr "Рев."
 
 msgid "User"
 msgstr "Користувач"
 
 msgid "Match Text"
-msgstr "Текстові збіги"
+msgstr "Збіги"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
-msgstr "Виявлення копій/змін у назвах %s"
+msgstr "Виявлено  копій/змін у %s назвах"
 
 msgid "<b>Unrevisioned Files</b>"
-msgstr "<b>Файли, які не входять до ревізії</b>"
+msgstr "<b>Файли, поза ревізіями</b>"
 
 msgid "Refresh file list"
 msgstr "Оновити перелік файлів"
@@ -1840,14 +1839,14 @@ msgstr "Розглядати тільки знищені файли"
 
 msgid "Uncheck to consider all revisioned files for copy sources"
 msgstr ""
-"Зніміть мітку, аби розглядати всі підконтрольні файли в якості можливих для "
-"копіювання"
+"Зніміть мітку аби розглядати всі ревізійовані файли, як можливі для "
+"копіювання джерел"
 
 msgid "Find Renames"
 msgstr "Знайти зміни назв"
 
 msgid "Find copy and/or rename sources"
-msgstr "Знайти копію та/або переіменовані джерела"
+msgstr "Знайти копію та/або переіменовані джерел"
 
 msgid "<b>Candidate Matches</b>"
 msgstr "<b>Найкращий збіг</b>"
@@ -1868,13 +1867,13 @@ msgid "Cannot start a new search"
 msgstr "Неможу започаткувати новий пошук"
 
 msgid "No files to find"
-msgstr "Файли для пошуку відсутні"
+msgstr "Відсутні файли для пошуку"
 
 msgid "There are no files that may have been renamed"
 msgstr "Відсутні файли, які можуть бути перейменовані"
 
 msgid "Multiple sources chosen"
-msgstr "Багато джерел вибору"
+msgstr "Декілька джерел вибору"
 
 #, python-format
 msgid ""
@@ -1910,7 +1909,7 @@ msgid "Sending Email"
 msgstr "Надсилання Email"
 
 msgid "Email"
-msgstr "Електронна пошта"
+msgstr "Email"
 
 msgid "To:"
 msgstr "Кому:"
@@ -1957,12 +1956,12 @@ msgid ""
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
-"Відсікання заголовку Mercurial вилучає им'я користувача та інформацію про "
+"Відсікання заголовку Mercurial вилучатиме им'я користувача та інформацію про "
 "попередників. Це корисно, лише у випадку якщо отримувач не використовує "
 "Mercurial (та не хоче бачити ці заголовки)."
 
 msgid "Plain, do not prepend Hg header"
-msgstr "Plain, не передую Hg заголовку"
+msgstr "Звичайно, чи не випереджати заголовки Hg"
 
 msgid ""
 "Bundles store complete changesets in binary form. Upstream users can pull "
@@ -1983,7 +1982,7 @@ msgid "body"
 msgstr ""
 
 msgid "send patches as attachments"
-msgstr "надіслати вкладеними латками"
+msgstr "надсилати вкладеними латками"
 
 msgid "attach"
 msgstr "вкласти"
@@ -2008,18 +2007,18 @@ msgid ""
 "subject prefix."
 msgstr ""
 "Опис серії латок надіслано у первинному зведенні разом [Латка 0 of N] з "
-"темою. Вона повинна описувати вплив цілого ряду виправлень. При відправці у "
+"темою. Вона повинна описувати вплив цілої низки виправлень. При відправці у "
 "пакеті, ці поля утворюють тему повідомлення і тіло. Ознаками є перелік "
-"посилань, відокремлений комами, які вставлений у заголовок повідомлення."
+"посилань, відокремлений комами, які додані до заголовку повідомлення."
 
 msgid "Write patch series (bundle) description"
-msgstr "Написати серію описів (пакетів)"
+msgstr "Створити серійну латку опису (пакунків)"
 
 msgid "Subject:"
 msgstr "Тема:"
 
 msgid "Changesets"
-msgstr "Набір змін"
+msgstr "Зміни"
 
 msgid "Select &All"
 msgstr "Вибрати &всі"
@@ -2041,13 +2040,13 @@ msgstr "Надіслати &Email"
 
 #, python-format
 msgid "Ignore filter - %s"
-msgstr "Ігнорувати - %s"
+msgstr "Фільтр ігнорування - %s"
 
 msgid "Glob"
 msgstr "Glob"
 
 msgid "Regexp"
-msgstr "Регулярний вираз"
+msgstr "Рег. вираз"
 
 msgid "Add"
 msgstr "Додати"
@@ -2056,7 +2055,7 @@ msgid "Edit File"
 msgstr "Правити файл"
 
 msgid "<b>Ignore Filter</b>"
-msgstr "<b>Ігнорувати</b>"
+msgstr "<b>Фільтер ігнорування</b>"
 
 msgid "<b>Untracked Files</b>"
 msgstr "<b>Файли поза контролем</b>"
@@ -2071,32 +2070,32 @@ msgid "selected files"
 msgstr "обрані файли"
 
 msgid "Ignore "
-msgstr "Незважати "
+msgstr "Ігнорувати "
 
 msgid "Invalid glob expression"
-msgstr "Помилкове вираження для маски"
+msgstr "Помилкове вираз для glob"
 
 msgid "Invalid regexp expression"
-msgstr "Помилковий регулярний вираз"
+msgstr "Помилка в регулярному виразі"
 
 msgid "Unable to read repository status"
 msgstr "Не можливо прочитати стан сховища"
 
 msgid "New file created"
-msgstr "Новий файл створений"
+msgstr "Створений новий файл"
 
 msgid ""
 "TortoiseHg has created a new .hgignore file.  Would you like to add this "
 "file to the source code control repository?"
 msgstr ""
-"TortoiseHg створить новий файл .hgignore. Бажаєте додати цей файл в сховище "
-"для контролю версій?"
+"TortoiseHg створить новий файл .hgignore. Бажаєте додати цей файл у сховище "
+"під контроль версій?"
 
 msgid "Unable to write .hgignore file"
 msgstr "Не можливо записати до файлу .hgignore"
 
 msgid "Add special files (.hgignore, ...)"
-msgstr "Додати особливі файли (.hgignore, ...)"
+msgstr "Додавати особливі файли (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Створити сховище сумісне з Mercurial < 1.7"
@@ -2111,7 +2110,7 @@ msgid "New Repository"
 msgstr "Нове сховище"
 
 msgid "Error executing init"
-msgstr "Помилка ініціалізації"
+msgstr "Помилка виконання ініціалізації"
 
 msgid "Destination path is empty"
 msgstr "Шлях призначення порожній"
@@ -2120,12 +2119,11 @@ msgid "Please enter the directory path"
 msgstr "Будь ласка, вкажіть шлях до каталога"
 
 msgid "Init"
-msgstr "Створити нове сховище"
+msgstr "Створити сховище"
 
 #, python-format
 msgid "Are you sure about adding the new repository %d extra levels deep?"
-msgstr ""
-"Ви впевнені щодо додавання нового сховища %d з додатковими рівнями в глибину?"
+msgstr "Ви впевнені щодо додавання нового сховища з %d рівнями в глибину?"
 
 #, python-format
 msgid ""
@@ -2136,25 +2134,25 @@ msgid ""
 msgstr ""
 "Шлях існує до:\n"
 "%s\n"
-"і Ви просили:\n"
+"а Ви запитували:\n"
 "%s"
 
 #, python-format
 msgid "Cannot create folder %s"
-msgstr "Не можливо створити теку %s"
+msgstr "Створення теки %s не можливе"
 
 msgid "Unable to create new repository"
 msgstr "Неможливо створити нове сховище"
 
 msgid "Error when creating repository"
-msgstr "Помилка під час створення сховища"
+msgstr "Помилка при створенні сховища"
 
 #, python-format
 msgid "<p>Repository successfully created at</p><p>%s</p>"
 msgstr "<p>Сховище успішно створене у</p><p>%s</p>"
 
 msgid "Unable to create a config file"
-msgstr "Не мжливо створити файл з налаштуваннями"
+msgstr "Не можливо створити файл з налаштуваннями"
 
 msgid "Insufficient access rights."
 msgstr "Недостатньо прав доступу."
@@ -2172,14 +2170,14 @@ msgid ""
 msgstr ""
 "Деякі з файлів, які ви вибрали мають розмір більше 10 Мб. Ви можете більш "
 "ефективно використовувати дисковий простір шляхом додавання цих файлів як "
-"largefiles, які будуть зберігаються тільки у останній версії кожного файлу в "
-"локальному сховищі. Ви бажаєте додати ці файли, як largefiles?"
+"великі файли, які будуть зберігатимуться тільки останньою версією файлу у "
+"локальному сховищі. Бажаєте додати ці файли, як великі файли?"
 
 msgid "Add as &Largefiles"
-msgstr "Додати, як &Великий Файл"
+msgstr "Додати, як &великі файли"
 
 msgid "Add as &Normal Files"
-msgstr "Додати як &Нормальні файли"
+msgstr "Додати як &звичайні файли"
 
 msgid "License"
 msgstr "Ліцензійна угода"
@@ -2204,13 +2202,13 @@ msgid "Status"
 msgstr "Стан"
 
 msgid "Find revisions matching fields of:"
-msgstr "Знайти ревізії з відповідними полями:"
+msgstr "Знайти ревізії з однаковими полями:"
 
 msgid "Revision to Match:"
-msgstr "Відповідні ревізії:"
+msgstr "Однакові ревізії:"
 
 msgid "Fields to match:"
-msgstr "Поля для збігів:"
+msgstr "Однакові поля:"
 
 msgid "Summary (first description line)"
 msgstr "Загалом (перший рядок опису)"
@@ -2231,7 +2229,7 @@ msgid "Diff contents"
 msgstr "Відмінності змісту"
 
 msgid "Subrepo states"
-msgstr "Затвердити вкдадене сховище"
+msgstr "Затвердити підсховище"
 
 msgid "Branch"
 msgstr "Гілка"
@@ -2247,11 +2245,11 @@ msgid "Find matches - %s"
 msgstr "Знайдено збігів - %s"
 
 msgid "Revisions to Match:"
-msgstr "Ревізії, які збігаються:"
+msgstr "Однакові ревізії:"
 
 #, python-format
 msgid "Match any of <b><i>%d</i></b> revisions"
-msgstr "Збіги з будь-яких <b><i>%d</i></b> ревізій"
+msgstr "Збіги в будь-яких <b><i>%d</i></b> ревізіях"
 
 msgid "<b>Unknown revision!</b>"
 msgstr "<b>Невідома ревізія!</b>"
@@ -2261,7 +2259,7 @@ msgstr "<b>Помилка параметрів!</b>"
 
 #, python-format
 msgid "Merge - %s"
-msgstr "Об'єднання - %s"
+msgstr "Злиття - %s"
 
 msgid "Do you want to exit?"
 msgstr "Бажаєте вийти?"
@@ -2273,15 +2271,13 @@ msgid ""
 msgstr ""
 "Для завершення злиття потрібно зафіксувати робочий каталог.\n"
 "\n"
-"Для скасування злиття можна оновитись до однієї з ревізій попередніх злиттів."
+"Для скасування злиття можна оновитись до однієї з попередніх ревізій."
 
 msgid "Prepare to merge"
-msgstr "Підготовка до об'єднання"
+msgstr "Підготовка злиття"
 
 msgid "Verify merge targets and ensure your working directory is clean."
-msgstr ""
-"Переконайтеся з метою об'єднання та забезпечте чистоту свого робочого "
-"каталогу."
+msgstr "Впевніться з метою злиття та забезпечте чистоту робочого каталогу."
 
 msgid "Not a head revision!"
 msgstr "Це не вершина ревізії!"
@@ -2293,7 +2289,7 @@ msgid "Unable to merge"
 msgstr "Злиття не можливе"
 
 msgid "Merge revision not specified or not found"
-msgstr "Ревізію для об'єднання не зазначено або не знайдено"
+msgstr "Не знайдено зазначеної для злиття ревізії"
 
 msgid "Merge to (working directory)"
 msgstr "Злити до (робочий каталог)"
@@ -2303,17 +2299,17 @@ msgid ""
 "\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> existing "
 "merge."
 msgstr ""
-"Робочий каталог вже <b>об'єднано</b>. <a href=\"skip\"><b>Тривати</b></a> "
-"або <a href=\"discard\"><b>відкинути</b></a> існуючи об'єднання."
+"Робочий каталог вже <b>злито</b>. <a href=\"skip\"><b>Продовжити</b></a> або "
+"<a href=\"discard\"><b>відкинути</b></a> існуючи злиття."
 
 msgid ""
 "Before merging, you must <a href=\"commit\"><b>commit</b></a>, <a href="
 "\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
 "b></a> changes."
 msgstr ""
-"Перед об'єднанням Вам потрібно <a href=\"commit\"><b>зафіксувати</b></a>, <a "
-"href=\"shelve\"><b>заморозити</b></a> латати, або <a href=\"discard"
-"\"><b>відкинути</b></a> зміни."
+"Перед злиттям потрібно <a href=\"commit\"><b>зафіксувати</b></a>, <a href="
+"\"shelve\"><b>відкласти</b></a> латки, або <a href=\"discard\"><b>відкинути</"
+"b></a> зміни."
 
 msgid "Or use:"
 msgstr "або скористатися:"
@@ -2322,10 +2318,10 @@ msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Примусове злиття з простроченими змінами (-f/--force)"
 
 msgid "Discard all changes from merge target (other) revision"
-msgstr "Відкинути всі зміни аж до цільової (іншої) ревізії об'єднання"
+msgstr "Відкинути всі зміни аж до цільової (іншої) ревізії злиття"
 
 msgid "Confirm Discard Changes"
-msgstr "Підтвердіть відмову від змін"
+msgstr "Підтвердіть відхилення змін"
 
 #, python-format
 msgid ""
@@ -2333,7 +2329,7 @@ msgid ""
 "\n"
 "Are you sure this is what you want to do?"
 msgstr ""
-"Зміни з ревізії %s та всі не об'єднані попередники будуть відкинуті.\n"
+"Зміни з ревізії %s та всі не злиті попередники будуть відхилені.\n"
 "\n"
 "Ви впевнені, що бажаєте цього?"
 
@@ -2342,21 +2338,21 @@ msgid "Clean"
 msgstr "Чиста"
 
 msgid "Merging..."
-msgstr "Об'єднання..."
+msgstr "Злиття..."
 
 msgid "Automatically advance to next page when merge is complete."
-msgstr "автоматично перейти до наступної сторінки коли об'єднання завершиться."
+msgstr "По завершенню злиття автоматично переходити до наступної сторінки."
 
 #, python-format
 msgid ""
 "%d files were modified on both branches and must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
 msgstr ""
-"%d файлів були змінені в обох гілках і повинні бути <a href=\"resolve"
-"\"><b>улагоджені</b></a>"
+"%d файлів мають зміни у обох гілках, це повинно бути <a href=\"resolve"
+"\"><b>розв'язано</b></a>"
 
 msgid "Commit merge results"
-msgstr "Фіксувати результати об'єднання"
+msgstr "Зафіксувати результати злиття"
 
 msgid "Commit Options"
 msgstr "Параметри фіксації"
@@ -2372,21 +2368,21 @@ msgstr "Злити"
 
 #, python-format
 msgid "Merge with %s"
-msgstr "Об'єднати разом з %s"
+msgstr "Злиття з %s"
 
 msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg Фіксація злиття"
+msgstr "TortoiseHg фіксація злиття"
 
 #, python-format
 msgid ""
 "Error creating interpreting commit date (%s).\n"
 "Using current date instead."
 msgstr ""
-"Помилка при відновленні дати фіксації (%s).\n"
+"Помилка при інтерпретації дати фіксації (%s).\n"
 "Використовувати поточну дату."
 
 msgid "Merge changeset"
-msgstr "Злити набор змін"
+msgstr "Злити набір змін"
 
 msgid "Syntax Highlighting"
 msgstr "Підсвічувати синтаксис"
@@ -2395,7 +2391,7 @@ msgid "Paste &Filenames"
 msgstr "Вставити назву файлу"
 
 msgid "App&ly Format"
-msgstr "П&рийняти формат"
+msgstr "&Затвердити формат"
 
 msgid "C&onfigure Format"
 msgstr "&Налаштувати формат"
@@ -2408,7 +2404,7 @@ msgid "Push all"
 msgstr "Виштовхнути все"
 
 msgid "Apply all patches"
-msgstr "Прийняти всі латки"
+msgstr "Прийняти (затвердити) всі латки"
 
 msgctxt "MQ QPush"
 msgid "Push"
@@ -2421,7 +2417,7 @@ msgid "Guards"
 msgstr "Захистити"
 
 msgid "Configure guards for selected patch"
-msgstr "Налаштувати захист для обраних латок"
+msgstr "Налаштувати захист обраним латкам"
 
 msgid "Reorder patches"
 msgstr "Змінити порядок латок"
@@ -2433,13 +2429,13 @@ msgid "Delete selected patches"
 msgstr "Знищити обрані латки"
 
 msgid "Pop"
-msgstr "Виштовхнути"
+msgstr "Pop"
 
 msgid "Unapply one patch"
 msgstr "Одна латка внесених змін"
 
 msgid "Pop all"
-msgstr "Виштовхнути все"
+msgstr "Pop все"
 
 msgid "Unapply all patches"
 msgstr "Відхилити всі латки"
@@ -2451,8 +2447,8 @@ msgid ""
 "<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
 "them.<br><br>Continue?</p>"
 msgstr ""
-"<p>УВАГА!<br>Біли знайдені захист або коментарі.<br>Зміна порядку накладання "
-"латок знищить їх.<br><br>Далі?</p>"
+"<p>УВАГА!<br>Знайдено захист або коментар.<br>Зміна порядку накладання латок "
+"знищить їх.<br><br>Продовжити?</p>"
 
 msgid "Configure guards"
 msgstr "Налаштування захисту"
@@ -2462,10 +2458,10 @@ msgid "Input new guards for %s:"
 msgstr "Ввести новий захист для %s:"
 
 msgid "Guards must begin with \"+\" or \"-\""
-msgstr "Захист повинен починатись з \"+\" or \"-\""
+msgstr "Захист повинен починатись з \"+\" або \"-\""
 
 msgid "no guards"
-msgstr "без захисту"
+msgstr "не захищений"
 
 #, python-format
 msgid "Guards: %d/%d"
@@ -2481,13 +2477,13 @@ msgid "TortoiseHg Patch Queue"
 msgstr "черга латок TortoiseHg"
 
 msgid "QCommit"
-msgstr "Швидка фіксація"
+msgstr "Швидке фіксування"
 
 msgid "Create MQ repo"
-msgstr "Створити сховище MQ"
+msgstr "Створити сховище для MQ"
 
 msgid "Patch commit messages..."
-msgstr "Латка-повідомлення фіксації..."
+msgstr "Повідомлення фіксації латки..."
 
 msgid "MQ options"
 msgstr "MQ параметри"
@@ -2499,16 +2495,16 @@ msgid "Force push or pop (--force)"
 msgstr "Примусово виштовхнути або pop (--force)"
 
 msgid "Apply patch to its recorded parent (--exact)"
-msgstr "Прийняти латку для запису попередникам (--exact)"
+msgstr "Застосувати латку записану попередником (--exact)"
 
 msgid "Update date field with current date (--currentdate)"
 msgstr "Оновити поле дати поточною датою (--currentdate)"
 
 msgid "Specify an explicit date:"
-msgstr "Вкажіть дату:"
+msgstr "Явно вказати дату:"
 
 msgid "Update author field with current user (--currentuser)"
-msgstr "Оновити поле автора з поточним кристувачем (--currentuser)"
+msgstr "Оновити поле автора поточним користувачем (--currentuser)"
 
 msgid "Specify an explicit author:"
 msgstr "Явно вказати автора:"
@@ -2518,72 +2514,72 @@ msgstr "### назва латки ###"
 
 #, python-format
 msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr "%s містить відкинуті клапті, правити файл з використаною заплаткою?"
+msgstr "%s містить відкинуті шматки, правити файл разом з відкинутим?"
 
 msgid "Patch Name Required"
-msgstr "Вимагається назва латки"
+msgstr "Потрібна назва латки"
 
 msgid "You must enter a patch name"
-msgstr "Ви повинні ввести назву латки"
+msgstr "Ви повинні вказати назву латки"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
-msgstr "Pending Perforce набір змін - %s"
+msgstr "Очікують примусових змін - %s"
 
 msgid "Submitting p4 changelist..."
-msgstr "Надсилання p4 переліку змін..."
+msgstr "Надсилання переліку змін p4..."
 
 msgid "Reverting p4 changelist..."
-msgstr "Повернення p4 переліку змін..."
+msgstr "Повернення переліку змін p4..."
 
 msgid "Edit Repository URL"
 msgstr "Правити URL сховища"
 
 msgid "Patch Branch Toolbar"
-msgstr "Пенал гілки латок"
+msgstr "Пенал гілки для латок"
 
 msgid "Merge all pending dependencies"
-msgstr "Об'єднати всі не розв'язані залежності"
+msgstr "Злити разом не розв'язані залежності"
 
 msgid "Backout current patch branch"
 msgstr "Відновити поточні латки гілки"
 
 msgid "Backport part of a changeset to a dependency"
-msgstr "Backport part of a changeset to a dependency"
+msgstr "Backport частини залежних змін"
 
 msgid "Start a new patch branch"
-msgstr "Створити нову латку гілки"
+msgstr "Почати нову гілку латок"
 
 msgid "Edit patch dependency graph"
-msgstr "Змінити латку залежності граф"
+msgstr "Правити латку граф залежностей"
 
 msgid "will be closed"
 msgstr "буде закрито"
 
 #, python-format
 msgid "needs merge of %i heads\n"
-msgstr "потрібно об'єднання %i вершиною\n"
+msgstr "потрібує злиття з %i вершинами\n"
 
 #, python-format
 msgid "needs merge with %s (through %s)\n"
-msgstr "потрібне об'єднання з %s (з урахуванням %s)\n"
+msgstr "потрібує злиття з %s (врахувуючи %s)\n"
 
 #, python-format
 msgid "needs merge with %s\n"
-msgstr "потрібно злити з %s\n"
+msgstr "потрібує злиття з %s\n"
 
 #, python-format
 msgid "needs update of diff base to tip of %s\n"
-msgstr "потрібно оновити з різниці базової до вершини %s\n"
+msgstr "потрібує оновлення різницєю бази та натяку %s\n"
 
 msgid "&Goto (update workdir)"
-msgstr "&Перейти (оновити робочий каталог)"
+msgstr "&Перейти (оновить робочий каталог)"
 
 msgid "&Merge"
 msgstr "&Злити"
 
 msgid "No patch branch selected"
-msgstr "Не обрані латки для гілки"
+msgstr "У гілці відсутні латки"
 
 msgid "No editor found"
 msgstr "Редактора не знайдено"
@@ -2592,8 +2588,8 @@ msgid ""
 "Mercurial was unable to find an editor. Please configure Mercurial to use an "
 "editor installed on your system."
 msgstr ""
-"Mercurial не може знайти редактор. Будь ласка, налаштуйте Mercurial для "
-"використання редакторів, які є в системі."
+"Mercurial не може знайти редактор. Будь ласка, налаштуйте Mercurial на "
+"використання наявних в системі редакторів."
 
 msgid "Graph"
 msgstr "Граф"
@@ -2620,7 +2616,7 @@ msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "Параметри помилкові - сервер рецензування не налаштований"
 
 msgid "Invalid Settings - Please provide your ReviewBoard username"
-msgstr "Помилкові параметри - Будь ласка, перевірте Ваше ім'я, як інспектора"
+msgstr "Помилкові параметри - перевірте ваше ім'я, як інспектора"
 
 #, python-format
 msgid ""
@@ -2641,11 +2637,11 @@ msgstr "Помилка"
 
 #, python-format
 msgid "Review draft posted to %s\n"
-msgstr "Чорновик рецензії відправлений до %s\n"
+msgstr "Переглянути проекти розміщені на %s\n"
 
 #, python-format
 msgid "Review published to %s\n"
-msgstr "Рецензія опублікована в %s\n"
+msgstr "Переглянути опубліковані %s\n"
 
 msgid "Success"
 msgstr "Вдало"
@@ -2654,7 +2650,7 @@ msgid "Repository ID:"
 msgstr "ID сховища:"
 
 msgid "Post Review"
-msgstr "Після рецензування"
+msgstr "Після перегляду"
 
 msgid "Review ID:"
 msgstr "ID рецензії:"
@@ -2669,10 +2665,10 @@ msgid "Create diff with all outgoing changes"
 msgstr "Виявити відмінності до всіх вихідних змін"
 
 msgid "Create diff with all changes on this branch"
-msgstr "Збудувати відмінності до всіх змін у цій гілці"
+msgstr "Побудувати відмінності до всіх змін гілки"
 
 msgid "Publish request immediately"
-msgstr "Запит про негайну публікацію"
+msgstr "Опублікувати заявку негайно"
 
 msgid "%p%"
 msgstr "%p%"
@@ -2736,7 +2732,7 @@ msgid "Are you sure you want to delete these files and/or folders?"
 msgstr "Ви дійсно бажаєте знищити ці файли та/або теки?"
 
 msgid "Deletion failures"
-msgstr "Не вдале знищення"
+msgstr "Знищення не вдале"
 
 #, python-format
 msgid "Unable to delete %d file or folder"
@@ -2746,35 +2742,35 @@ msgstr[1] "Не можливо знищити %d файлів або тек"
 msgstr[2] "Не можливо знищити %d файлів або тек"
 
 msgid "Deleting trash folder..."
-msgstr "Знищуємо теку кошика..."
+msgstr "Видаляються теки з кошика..."
 
 #, python-format
 msgid "Deleted %d files"
-msgstr "Знищєно %d файлів"
+msgstr "%d файлів знищено"
 
 #, python-format
 msgid "Deleted %d files and %d folders"
-msgstr "Знищено %d файлів та %d тек"
+msgstr "%d файлів та %d тек знищено"
 
 #, python-format
 msgid "Patch remove - %s"
-msgstr "Вилучення латки - %s"
+msgstr "Вилучити латку - %s"
 
 msgid "Remove patches from queue?"
-msgstr "Вилучити з черги латок?"
+msgstr "Вилучити латки з черги?"
 
 msgid "Keep patch files"
-msgstr "Зберігати файли латок"
+msgstr "Зберегти файли латок"
 
 #, python-format
 msgid "Patch fold - %s"
-msgstr "Згорнута латка - %s"
+msgstr "Підшити латку - %s"
 
 msgid "New patch message:"
-msgstr "Повідомлення нової латки:"
+msgstr "Нове повідомлення латки:"
 
 msgid "Patches to fold"
-msgstr "Скласти латки"
+msgstr "Підшити до латки"
 
 msgid "Manage MQ patch queues"
 msgstr "Керування чергами латок MQ:"
@@ -2818,7 +2814,7 @@ msgstr "Нова назва черги латок"
 
 #, python-format
 msgid "Rename patch queue '%s' to"
-msgstr "Зміна черги латок '%s' на"
+msgstr "Зміна назви черги латок на '%s'"
 
 msgid "Confirm patch queue delete"
 msgstr "Підтвердіть знищення черги латок"
@@ -2860,10 +2856,10 @@ msgstr "QRename - перевірте назву латки"
 
 #, python-format
 msgid "Patch name <b>%s</b> already exists:"
-msgstr "Назва латки <b>%s</b> вже існує:"
+msgstr "Латка з назвою <b>%s</b> вже існує:"
 
 msgid "Add .OLD extension to existing patchfile"
-msgstr "Додати розширення .OLD до існуючих файлів латок"
+msgstr "Додавати розширення .OLD до існуючих файлів латок"
 
 msgid "Overwrite existing patchfile"
 msgstr "Перезаписати існуючі файли латок"
@@ -2872,13 +2868,13 @@ msgid "Go back and change new patchname"
 msgstr "Повернутися назад та змінити на нову назву латки"
 
 msgid "Reorder Unapplied Patches"
-msgstr "Змінити порядок не застосування латок"
+msgstr "Змінити порядок не застосуваних латок"
 
 msgid "Unapplied Patches - drag to reorder"
-msgstr "Не прийняті латки - перетягнути для зміни порядку застосування"
+msgstr "Не застосовані латки - перетягнути для зміни порядку"
 
 msgid "Applied Patches"
-msgstr "Накладені Латки"
+msgstr "Застосовані латки"
 
 msgid "Rename patch"
 msgstr "Зміна назви латки"
@@ -2954,7 +2950,7 @@ msgid "&Spaces"
 msgstr "&Прогалини"
 
 msgid "&Auto-Complete"
-msgstr "&Автоматичне доповнення"
+msgstr "&Авто-доповнення"
 
 msgid "&Enable"
 msgstr "&Увімкнути"
@@ -2969,10 +2965,10 @@ msgid "### regular expression ###"
 msgstr "### регулярний вираз ###"
 
 msgid "Regular expression search pattern"
-msgstr "Шукати шаблони регулярними виразами"
+msgstr "Шаблони шукати регулярними виразами"
 
 msgid "Wrap search"
-msgstr "Обернений пошук"
+msgstr "Пошук в середині"
 
 msgid "Prev"
 msgstr "Попередн."
@@ -2984,7 +2980,7 @@ msgid "Unable to read/write config file"
 msgstr "Не можливо прочитати/записати файл з налаштуваннями"
 
 msgid "Try refreshing your repository."
-msgstr "Спроба оновлення сховища."
+msgstr "Спробувати оновити сховище."
 
 #, python-format
 msgid ""
@@ -3016,22 +3012,22 @@ msgid "Keyboard interrupt"
 msgstr "Гарячі клавіші"
 
 msgid "Close this application?"
-msgstr "Закрити програму?"
+msgstr "Закрити додаток?"
 
 msgid "Repository Error"
 msgstr "Помилка сховища"
 
 msgid "No visual editor configured"
-msgstr "Відсутній візуальний редактор для налаштувань"
+msgstr "Не налаштований візуальний редактор"
 
 msgid "Please configure a visual editor."
-msgstr "Будь ласка, налаштуйте візуальний редактор."
+msgstr "Налаштуйте візуальний редактор."
 
 msgid "Editor launch failure"
 msgstr "Помилка запуску редактора"
 
 msgid "Save file to"
-msgstr "Зберегти файл"
+msgstr "Зберегти у файл"
 
 msgid "Unable to save file"
 msgstr "Неможливо зберегти файл"
@@ -3041,16 +3037,16 @@ msgstr "Помилка при відкритті шляху в термінал�
 
 #, python-format
 msgid "\"%s\" is not a valid directory"
-msgstr "\"%s\" не коректний каталог"
+msgstr "\"%s\" не існуючий каталог"
 
 msgid "Unable to start the following command:"
-msgstr "Не можливо започаткувати з обраної команди:"
+msgstr "Започаткування з обраної команди не можливе:"
 
 msgid "No shell configured"
 msgstr "Не налаштований командний процесор"
 
 msgid "A terminal shell must be configured"
-msgstr "Командний процесор терміналу повинен бути налаштованим"
+msgstr "Налаштуйье командний процесор терміналу"
 
 msgid "Show Log"
 msgstr "Відобразити журнал"
@@ -3059,7 +3055,7 @@ msgid "Please enter a username"
 msgstr "Введіть ім'я користувача"
 
 msgid "You must identify yourself to Mercurial"
-msgstr "Ви повинні ідентифікувати себе для Mercurial"
+msgstr "Ви повинні ідентифікувати себе в Mercurial"
 
 msgid "Text Translation Failure"
 msgstr "Текст перетворено з помилками"
@@ -3080,7 +3076,7 @@ msgid "Checkmark files to forget"
 msgstr "Помітити файли для відкидання"
 
 msgid "Forget"
-msgstr "Незважати"
+msgstr "Відкинути"
 
 msgid "Checkmark files to revert"
 msgstr "Відмітити файли для повернення"
@@ -3099,7 +3095,7 @@ msgid "%s - hg %s"
 msgstr "%s - hg %s"
 
 msgid "Do not save backup files (*.orig)"
-msgstr "Не зберігати копії файлів (*.orig)"
+msgstr "Копії файлів (*.orig) не зберігати"
 
 msgid "Force removal of modified files (--force)"
 msgstr "Примусова вилучати змінені файли (--force)"
@@ -3108,23 +3104,23 @@ msgid "Add &Largefiles"
 msgstr "Додавати &великі файли"
 
 msgid "No files selected"
-msgstr "Не вибрано файлів"
+msgstr "Не видмічено жодного файлу"
 
 msgid "No operation to perform"
-msgstr "Не виконувати операції"
+msgstr "Не виконувати операцію"
 
 msgid ""
 "You have selected one or more files that have been modified.  By default, "
 "these files will not be removed.  What would you like to do?"
 msgstr ""
 "Ви вибрали один або декілька файлів, які були змінені. Типово, ці файли не "
-"будуть видалені. Що б ви хотіли зробити?"
+"будуть видалені. Що б ви хочете зробити?"
 
 msgid "Remove &Unmodified Files"
 msgstr "Вилучити &немодифіковані файли"
 
 msgid "Remove &All Selected Files"
-msgstr "Вилучити &всі вибрані файли"
+msgstr "Вилучити &всі видмічені файли"
 
 msgid "Rebase changeset and descendants"
 msgstr "Зміна бази для набору змін та похідних"
@@ -3133,17 +3129,17 @@ msgid "To rebase destination"
 msgstr "Зміна бази для похідних"
 
 msgid "Keep original changesets"
-msgstr "Пропустити оригінальні набори змін"
+msgstr "Пропустити зміни оригіналу"
 
 msgid "Keep original branch names"
-msgstr "Пропустити оригінальні назви гілок"
+msgstr "Пропустити назви гілок оригіналу"
 
 msgid "Collapse the rebased changesets "
-msgstr "Колапс при зміні бази набору змін "
+msgstr "Колапс при зміні бази змін "
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
-"Зміна бази на неопубліковани вершини Subversion (перевизначити джерело, "
+"Зміна бази на неоприлюдненій вершині Subversion (перезаписати джерело, "
 "призначення)"
 
 msgid "Rebase"
@@ -3161,13 +3157,13 @@ msgstr ""
 "a> або <a href=\"discard\"><b>відмовитись від</b></a> змін."
 
 msgid "You may continue the rebase"
-msgstr "Можна продовжувати змінювати базу"
+msgstr "Можна продовжити змінювати базу"
 
 msgid "Rebase is complete"
 msgstr "База змінена"
 
 msgid "Rebase aborted"
-msgstr "Зміна бази перервано"
+msgstr "Зміна бази перервана"
 
 msgid "Rebase failed"
 msgstr "Помилка при зміні бази"
@@ -3176,27 +3172,28 @@ msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
 msgstr ""
-"Зміна бази призведе до об'єднання <b>конфліктів</b> потім потрібно буде <a "
-"href=\"resolve\"><b>їх улагодити</b></a>"
+"Зміна бази призведе до злиття <b>конфліктів</b> , потребуватиме <a href="
+"\"resolve\"><b>їх розв'язування</b></a>"
 
 msgid "Exiting with an unfinished rebase is not recommended."
-msgstr "Вихід, коли операція зміни бази є не завершеною, не рекомендується."
+msgstr "Вихід, коли операція зміни бази не завершена не рекомендується."
 
 msgid "Consider aborting the rebase first."
 msgstr "Врахувати спершу переривання зміни бази."
 
 #, python-format
 msgid "Merge rejected patch chunks into %s"
-msgstr "Об'єднанти відхилені клапті %s"
+msgstr "Злити відхилені частинки латок в %s"
 
 msgid "Mark this chunk as resolved, goto next unresolved"
-msgstr "Відмітити клаптик, як улагоджений та перейти до іншого не улагодженого"
+msgstr ""
+"Відмітити частинку, як розв'язану та перейти до наступної не розв'язаної"
 
 msgid "Mark this chunk as unresolved"
-msgstr "Відмітити клаптик, як не улагоджений"
+msgstr "Відмітити частинку, як не розв'язану"
 
 msgid "Unable to merge rejects"
-msgstr "Відкинуто те, що неможливо об'єднати"
+msgstr "Відкинуто те, що неможливо злити"
 
 msgid "Can't read this file (maybe deleted)"
 msgstr "Не можливо прочитати цей файл (можливо знищений)"
@@ -3223,18 +3220,18 @@ msgid ""
 "Click Yes to accept the file as is or No to continue resolving the rejected "
 "patch chunks."
 msgstr ""
-"Ви відмітили всі клапті, як улагоджені, хоча файл на панелі правки не "
+"Ви відмітили всі частинки, як розв'язані, хоча файл на панелі правки не "
 "змінився.\n"
 "\n"
-"Це може свідчити, що жоден код з відкинутих клаптів не потрапить до файлу.\n"
+"Це може свідчити, що жоден код з відкинутих частинок не потрапить до файлу.\n"
 "\n"
-"Ви дійсно бажаєте залишити файл без змін та розглядаєте відкинуті клапті як "
-"улагоджені?\n"
+"Ви дійсно бажаєте залишити файл без змін та розглядаєте відкинуті частинки, "
+"як розв'язані?\n"
 "\n"
-"Зробивши так, Ви знищите клапті з Полички та можете втратити їх назавжди!\n"
+"Зробивши так, Ви знищуєте відкладені та можете втратити їх назавжди!\n"
 "\n"
-"Натисніть Так, аби прийняти файл як є, або Ні - щоб далі улажувати відкинуті "
-"клапті латки."
+"Натисніть Так, аби прийняти файл як є, або Ні - щоб далі розв'язувати "
+"відкинуті частинки латок."
 
 msgid "Copy source -> destination"
 msgstr "Копіювання джерело  -> отримувач"
@@ -3266,10 +3263,10 @@ msgid "The destination must be within the repository tree."
 msgstr "Отримувач повинен бути всередині дерева сховища."
 
 msgid "Please give a destination that differs from the source"
-msgstr "Будь ласка, вкажіть отримувача, який відрізнятиметься від джерела"
+msgstr "Вкажіть отримувача, який відрізнятиметься від джерела"
 
 msgid "Destination file already exists."
-msgstr "Файл призначення вже існує."
+msgstr "Файл отримувача вже існує."
 
 msgid "Are you sure you want to overwrite it ?"
 msgstr "Ви впевнені, що бажаєте перезаписати це ?"
@@ -3328,7 +3325,7 @@ msgstr "Граф"
 
 msgctxt "column header"
 msgid "Rev"
-msgstr "Мод."
+msgstr "Рев."
 
 msgctxt "column header"
 msgid "Branch"
@@ -3400,25 +3397,25 @@ msgid "Delete Group '%s' and all its entries?"
 msgstr "Знищити групу '%s' а також всі її елементи?"
 
 msgid "Repository Registry"
-msgstr "Реєстр сховищ"
+msgstr "Сховища"
 
 msgid "Show &Paths"
 msgstr "Показати &шляхи"
 
 msgid "Show S&hort Paths"
-msgstr "Показувати з короткими шляхами"
+msgstr "Показувати короткі шляхи"
 
 msgid "&Scan Repositories at Startup"
 msgstr "&Сканувати сховища при старті"
 
 msgid "Scan &Remote Repositories"
-msgstr "Сканувати $віддалені сховища"
+msgstr "Сканувати $зовнішні сховища"
 
 msgid "&Refresh Repository List"
 msgstr "&Оновити перелік сховищ"
 
 msgid "Refresh the Repository Registry list"
-msgstr "Оновити перелік сховищ в реєстрі"
+msgstr "Оновити перелік зареєстрованих сховищ"
 
 msgid "&Open"
 msgstr "&Відкрити"
@@ -3430,7 +3427,7 @@ msgid "&Open All"
 msgstr "&Відкрити все"
 
 msgid "Open all repositories in new tabs"
-msgstr "Відкрити всі сховища у нових вкладках"
+msgstr "Відкривати всі сховища у нових вкладках"
 
 msgid "New &Group"
 msgstr "Нова &група"
@@ -3439,7 +3436,7 @@ msgid "Create a new group"
 msgstr "Створити нову групу"
 
 msgid "Rename the entry"
-msgstr "Зміни назву запису"
+msgstr "Зміни назви запису"
 
 msgid "Settin&gs"
 msgstr "Парамет&ри"
@@ -3453,7 +3450,7 @@ msgstr "Видалити з переліку"
 msgid ""
 "Remove the node and all its subnodes. Repositories are not deleted from disk."
 msgstr ""
-"Вилучити вузол і всі його дочірні вузли. Репозиторії не знищуються з диска."
+"Вилучити вузол і всі його дочірні вузли. Сховища не знищуються з диска."
 
 msgid "Clon&e..."
 msgstr "&Клонувати..."
@@ -3465,14 +3462,13 @@ msgid "E&xplore"
 msgstr "О&гляд"
 
 msgid "Open the repository in a file browser"
-msgstr "Відкрити сховище у файловим оглядачем"
+msgstr "Відкрити сховище у файловому оглядачеві"
 
 msgid "&Terminal"
 msgstr "&Термінал"
 
 msgid "Open a shell terminal in the repository root"
-msgstr ""
-"Відкрити в терміналі командний рядок сховища з правами суперкористувача"
+msgstr "Відкрити в терміналі командний рядок в корені сховища"
 
 msgid "&Add Repository..."
 msgstr "&Додати сховище..."
@@ -3481,13 +3477,13 @@ msgid "Add a repository to this group"
 msgstr "Додати сховище до групи"
 
 msgid "A&dd Subrepository..."
-msgstr "&Додати вкладене сховище..."
+msgstr "&Додати підсховище..."
 
 msgid "Convert an existing repository into a subrepository"
 msgstr "Перетворити існуюче сховище у підсховище"
 
 msgid "Copy the root path of the repository to the clipboard"
-msgstr "Скопіювати шлях суперкористувача сховища до буферу обміну"
+msgstr "Скопіювати шлях корня сховища до буферу обміну"
 
 msgid "Sort by &Name"
 msgstr "Сортувати за &назвою"
@@ -3511,14 +3507,14 @@ msgid "Select repository directory to add"
 msgstr "Обраний каталог сховища доданий"
 
 msgid "Select an existing repository to add as a subrepo"
-msgstr "Обрати існуюче сховище та додати як підсховище"
+msgstr "Обрати існуюче сховище та додати, як підсховище"
 
 msgid "Cannot add subrepository"
 msgstr "Не можливо додати підсховище"
 
 #, python-format
 msgid "%s is not a valid repository"
-msgstr "%s не є допустимим типом сховища"
+msgstr "%s не допустимий тип сховища"
 
 #, python-format
 msgid "\"%s\" is not a folder"
@@ -3534,20 +3530,19 @@ msgid ""
 "add a non trivial subrepository mapping you must manually edit the <i>."
 "hgsub</i> file"
 msgstr ""
-"Вибрану теку: <br><br><br>%s<br> з не всередині цілі сховища.<br><br>Це може "
-"бути дозволено, але сильно бентежить.<br>Якщо ви хочете додавати "
-"нетривіальне відображення підсховища ви повинні правити вручну<i>.hgsub</"
-"i>файл"
+"Вибрана тека: <br><br><br>%s<br> не з середини цільового сховища.<br><br>Це "
+"дозволено, але сильно бентежить.<br>Якщо схочете додати нетривіальне "
+"відображення підсховища потрібно буде вручну правити файл <i>.hgsub</i>"
 
 msgid "Cannot open repository"
 msgstr "Не можливо відкрити сховище"
 
 #, python-format
 msgid "The selected repository:<br><br>%s<br><br>cannot be open!"
-msgstr "Для обраного сховища:<br><br>%s<br><br>не може бути відкрите!"
+msgstr "Вибране сховище:<br><br>%s<br><br>не може бути відкрите!"
 
 msgid "Subrepository already exists"
-msgstr "Підсховище існує"
+msgstr "Підсховище вже існує"
 
 #, python-format
 msgid ""
@@ -3555,7 +3550,7 @@ msgid ""
 "<br><br>%s<br><br>as: \"%s\""
 msgstr ""
 "Для обраного сховища:<br><br>%s<br><br>а також для підсховищ:<br><br>"
-"%s<br><br>as: \"%s\""
+"%s<br><br>як: \"%s\""
 
 msgid "Failed to add subrepository"
 msgstr "Помилка при додаванні підсховища"
@@ -3582,9 +3577,9 @@ msgid ""
 "the .hgsub file in order to confirm the addition of the subrepo."
 msgstr ""
 "Обране підсховище:<br><br><i>%s</i><br><br>буде додано до .hgsub файлу в "
-"сховищі:<br><br><i>%s</i><br><br>Пам'ятайте, що для цього, аби завершити  "
-"<i>ви повинні <u>зафіксувати</u></i> зміни до .hgsub файлу для підтвердження "
-"додавання до підсховища."
+"сховищі:<br><br><i>%s</i><br><br>Пам'ятайте, аби завершити  <i>ви повинні "
+"<u>зафіксувати</u></i> зміни до .hgsub файлу підтвердивши додавання "
+"підсховища."
 
 #, python-format
 msgid "Cannot update the .hgsub file in:<br><br>%s"
@@ -3594,7 +3589,7 @@ msgid "New Group"
 msgstr "Нова група"
 
 msgid "Could not get subrepository list"
-msgstr "Не можливо отримати перелік підсховищ"
+msgstr "Перелік підсховищ отримати не можливо"
 
 #, python-format
 msgid ""
@@ -3611,12 +3606,12 @@ msgid ""
 "in:<br><br><i>%s</i><br><br>The following subrepositories may be missing, "
 "broken or on an inconsistent state and cannot be accessed:<br><br><i>%s</i>"
 msgstr ""
-"Неможливо було завантажити перелік підсховищ для сховища з:<br><br><i>%s</"
-"i><br><br>Наступні підсховища можуть бути втрачені, пошкоджені або "
-"знаходяться у поганому стані, тому до них немає доступу:<br><br><i>%s</i>"
+"Було неможливо отримати перелік підсховищ для сховища в:<br><br><i>%s</"
+"i><br><br>Наступні підсховища <br><br><i>%s</i> можуть бути втрачені, "
+"пошкоджені або знаходяться у поганому стані, тому до них немає доступу."
 
 msgid "Updating repository registry"
-msgstr "Оновлення реєстру сховищ"
+msgstr "Оновити реєстр сховищ"
 
 #, python-format
 msgid "Loading repository %s"
@@ -3642,7 +3637,7 @@ msgid "The exception error message was:<br><br>%s<br><br>"
 msgstr "Помилка:<br><br>%s<br><br>"
 
 msgid "Click OK to continue or Abort to exit."
-msgstr "Натисність Так аби тривати або Перервати для закінчення."
+msgstr "Натисність Так аби продовжити або Перервати для виходу."
 
 msgid "Error loading subrepos"
 msgstr "Помилка завантаження з підсховища"
@@ -3652,10 +3647,10 @@ msgstr "Не можливо оновити назву сховища"
 
 #, python-format
 msgid "An error occurred while updating the repository hgrc file (%s)"
-msgstr "Сталася помилка при оновленні файлу  hgrc сховища (%s)"
+msgstr "Сталася помилка при оновленні файлу hgrc сховища (%s)"
 
 msgid "default"
-msgstr "Типово"
+msgstr "типові"
 
 msgid "Path"
 msgstr "Шлях"
@@ -3669,14 +3664,14 @@ msgstr "Перехід попередника від %s до %s"
 
 #, python-format
 msgid "Can't find revision '%s'"
-msgstr "Не можливо знайти ревізію '%s'"
+msgstr "Не можливо знайти '%s' ревізію"
 
 msgid "Workbench Log Columns"
 msgstr "Стовпці журналу робочого середовища"
 
 msgctxt "tab tooltip"
 msgid "Revision details"
-msgstr "Деталі ревізії"
+msgstr "Ревізія розлого"
 
 msgctxt "tab tooltip"
 msgid "Commit"
@@ -3704,7 +3699,7 @@ msgstr "Гілка латок"
 
 #, python-format
 msgid "%s <incoming>"
-msgstr "%s <incoming>"
+msgstr "%s <вхідний>"
 
 #, python-format
 msgid "Found %d incoming changesets"
@@ -3739,31 +3734,31 @@ msgstr "відсутні вихідні набори змін"
 
 #, python-format
 msgid "no outgoing changesets in current branch (%s) / %d in total"
-msgstr "відсутні вихідні набори змін у поточні гілці (%s) / %d загалом"
+msgstr "відсутні вихідні зміни у поточні гілці (%s) / %d загалом"
 
 #, python-format
 msgid "no outgoing changesets up to current revision (#%d) / %d in total"
-msgstr "відсутні вихідні набори змін поточної ревізії (#%d) / %d загалом"
+msgstr "відсутні вихідні зміни поточної ревізії (#%d) / %d загалом"
 
 #, python-format
 msgid "no outgoing changesets up to revision #%d / %d in total"
-msgstr "відсутні вихідні набори змін ревізії #%d / %d загалом"
+msgstr "відсутні вихідні зміни ревізії #%d / %d загалом"
 
 #, python-format
 msgid "%d outgoing changesets"
-msgstr "%d вихідних наборів змін"
+msgstr "%d вихідних змін"
 
 #, python-format
 msgid "%d outgoing changesets in current branch (%s) / %d in total"
-msgstr "%d вихідні набори змін в поточній гілці (%s) / %d загалом"
+msgstr "%d вихідні зміни в поточній гілці (%s) / %d загалом"
 
 #, python-format
 msgid "%d outgoing changesets up to current revision (#%d) / %d in total"
-msgstr "%d вихідних наборів змін в поточній ревізії (#%d) / %d загалом"
+msgstr "%d вихідних змін в поточній ревізії (#%d) / %d загалом"
 
 #, python-format
 msgid "%d outgoing changesets up to revision #%d / %d in total"
-msgstr "%d вихідних наборів змін в ревізії #%d / %d загалом"
+msgstr "%d вихідних змін в ревізії #%d / %d загалом"
 
 msgid "Nothing to push"
 msgstr "Нічого виштовхувати"
@@ -3810,13 +3805,13 @@ msgid ""
 msgstr ""
 "Ваша поточна робоча ревізія (%d) буде знищена цим поверненням, залишивши не "
 "зафіксованими зміни.\n"
-" Далі?"
+" Продовжити?"
 
 msgid "Repository stripped, incoming preview cleared"
-msgstr "Сховище розрізали, що входить до попереднього перегляду очищається"
+msgstr "Вичістили попередньо переглянуті вхідні, сховище відтяли"
 
 msgid "Repository stripped, revision set cleared"
-msgstr "Сховище відтяли, ревізію почистили"
+msgstr "Набір ревізій вичистили, сховище відтяли"
 
 msgid "Commit tab cannot exit"
 msgstr "Вкладка фіксації не закривається"
@@ -3909,22 +3904,22 @@ msgid "&Finish Patch"
 msgstr "&Остаточна латка"
 
 msgid "Re&name Patch..."
-msgstr "Зміна назви латки..."
+msgstr "Змінити назву латки..."
 
 msgid "&Rebase..."
-msgstr "&Змінити базу"
+msgstr "&Змінити базу..."
 
 msgid "&Strip..."
-msgstr "&Навпіл..."
+msgstr "&Відтяти..."
 
 msgid "Post to Re&view Board..."
 msgstr "Відсилання на рецензію..."
 
 msgid "&Remote Update..."
-msgstr "Оновити віддалено..."
+msgstr "Оновити віддалене..."
 
 msgid "Write diff file"
-msgstr "Записати різницю в файл"
+msgstr "Записати різницю до файлу"
 
 msgid "Unable to write diff file"
 msgstr "Не можливо записати різницю до файлу"
@@ -3945,13 +3940,13 @@ msgid "Export Selected..."
 msgstr "Експорт обраного..."
 
 msgid "Email Selected..."
-msgstr "Email Selected..."
+msgstr "Обрати Email..."
 
 msgid "Copy Selected as Patch"
 msgstr "Копіювати обране, як латку"
 
 msgid "Export DAG Range..."
-msgstr "Export DAG діапазон..."
+msgstr "Експорт DAG діапазону..."
 
 msgid "Email DAG Range..."
 msgstr "Email DAG діапазон..."
@@ -3960,10 +3955,10 @@ msgid "Bundle DAG Range..."
 msgstr "Пакет DAG діапазону..."
 
 msgid "Bisect - Good, Bad..."
-msgstr "Розрізати навпіл - Добре, Погано..."
+msgstr "Навпіл - Добре, Погано..."
 
 msgid "Bisect - Bad, Good..."
-msgstr "Розрізати навпіл - Погане, Добре..."
+msgstr "Навпіл - Погано, Добре..."
 
 msgid "Compress History..."
 msgstr "Стиснути журнал..."
@@ -3972,7 +3967,7 @@ msgid "Goto common ancestor"
 msgstr "Перейти до загального попередника"
 
 msgid "Similar revisions..."
-msgstr "Подібні ревізії..."
+msgstr "Схожі ревізії..."
 
 msgid "Graft Selected to local..."
 msgstr "Щепити обране до локального..."
@@ -3990,13 +3985,13 @@ msgid "Fold patches..."
 msgstr "Підшити латку..."
 
 msgid "Delete patches..."
-msgstr "Знищення латок..."
+msgstr "Знищити латки..."
 
 msgid "Reorder patches..."
-msgstr "Зміна порядку накладання латок..."
+msgstr "Змінити порядок латок..."
 
 msgid "Rename patch..."
-msgstr "Зміна назви латки..."
+msgstr "Змінити назву латки..."
 
 msgid "Pull to here..."
 msgstr "Затягнути сюди..."
@@ -4005,10 +4000,10 @@ msgid "Visual diff..."
 msgstr "Наочне порівнювання..."
 
 msgid "Export patch"
-msgstr "Експорт латки"
+msgstr "Експортувати латки"
 
 msgid "Patch Files (*.patch)"
-msgstr "Файли Латок (*.patch)"
+msgstr "Файли з латками (*.patch)"
 
 msgid "Cannot export revision"
 msgstr "Неможливо експортувати ревізію"
@@ -4030,7 +4025,7 @@ msgid "Replace"
 msgstr "Замінити"
 
 msgid "Append"
-msgstr "Додати"
+msgstr "Прикріпити"
 
 #, python-format
 msgid ""
@@ -4038,14 +4033,14 @@ msgid ""
 "location (%s).\n"
 "\n"
 msgstr ""
-"Існують файли латок для %d ревізії (%s) у обраному місці (%s).\n"
+"Існують файли латок для %d ревізії (%s) у обраному розташуванні (%s).\n"
 "\n"
 
 msgid "What do you want to do?\n"
 msgstr "Що Ви бажаєте зробити?\n"
 
 msgid "Replace the existing patch files.\n"
-msgstr "Заміна фаілів латок, які існують.\n"
+msgstr "Заміна файлів латок, які існують.\n"
 
 msgid "Append the changes to the existing patch files.\n"
 msgstr "Прийняти зміни до існуючих файлів латок.\n"
@@ -4057,7 +4052,7 @@ msgid "Patch files already exist"
 msgstr "Файли латок вже існують"
 
 msgid "Patch exported"
-msgstr "Латка експортована"
+msgstr "Експортована латка"
 
 #, python-format
 msgid ""
@@ -4068,11 +4063,11 @@ msgstr ""
 "href=\"file:///%s\">%s</a>"
 
 msgid "Patches exported"
-msgstr "Латки експортовані"
+msgstr "Експортовані латки"
 
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
-msgstr "%d латор буде експортовано до:<p><a href=\"file:///%s\">%s</a>"
+msgstr "%d латок буде експортовано до:<p><a href=\"file:///%s\">%s</a>"
 
 msgid "You cannot merge a revision with itself"
 msgstr "Неможна зливати ревізію саму з собою"
@@ -4084,7 +4079,7 @@ msgid "Backwards phase change requested"
 msgstr "Запит зворотньої зміни фази"
 
 msgid "Do you really want to make this revision <i>secret</i>?"
-msgstr "Do you really want to make this revision <i>secret</i>?"
+msgstr "Ви дійсно бажаєте зробити цю ревізію <i>секретною</i>?"
 
 msgid ""
 "Making a \"<i>draft</i>\" revision \"<i>secret</i>\" is generally a safe "
@@ -4102,19 +4097,19 @@ msgid ""
 "Please be careful!"
 msgstr ""
 "Створення \"<i>чорнової</i>\" ревізії \"<i>секретною</i>\" як правило "
-"безпечної експлуатації.\n"
+"безпечною операцією.\n"
 "\n"
 "Однак, є кілька застережень:\n"
 "\n"
-"- \"секретні\" ревізії не виштовхувані. Це може заподіяти вам неприємності, "
+"- \"секретні\" ревізії не виштовхувані. Це може завдати вам неприємностей, "
 "якщо ви\n"
-"відносяться до таємниці перегляду subrepo.\n"
+"відносите ревізію до векретного підсховища.\n"
 "\n"
-"- Якщо ви впоралися з цим переглядом З не публікації сервера може бути\n"
-"повернувся в \"<i>draft</i>\" якщо ви знову тягнути з цього конкретного "
+"- Якщо ви виштовхнули цю ревізію на непублічний сервер може бути\n"
+"повернення в \"<i>чорновику</i>\" якщо знову тягнутимете з цього конкретного "
 "сервера.\n"
 "\n"
-"Будь ласка, будьте обережні!"
+"Будьте обережні!"
 
 msgid "&Make secret"
 msgstr "Створити секрет"
@@ -4139,15 +4134,15 @@ msgid ""
 "\n"
 "Please be careful!"
 msgstr ""
-"Ви збираєтеся пересунути фазу ревізії %d назад,\n"
+"Ви збираєтеся пересунути фазу на %d ревізій назад,\n"
 "з \"<i>%s</i>\" до \"<i>%s</i>\".\n"
 "\n"
 "Майте на увазі, що \"<i>%s</i>\" має рівень менше, ніж \"<i>%s</i>\".\n"
 "\n"
 "Пересувати фазу назад не варто.\n"
-"Наприклад, Ви можете отримати декілька верхівок \n"
-"у ревізії, якщо ви зміните фазу ревізії,\n"
-" яку ви вже виштовхнули на сервер.\n"
+"Наприклад, Ви можете отримати декілька голів \n"
+"у ревізії, при зміні фази ревізії,\n"
+" яку вже виштовхнули на сервер.\n"
 "\n"
 "Будьте обережні!"
 
@@ -4169,7 +4164,7 @@ msgid "Invalid command"
 msgstr "Помилкова команда"
 
 msgid "The selected command is empty"
-msgstr "Порожня команда"
+msgstr "Команда без аргументів"
 
 msgid "Failed to execute custom command"
 msgstr "Помилка при виконанні команди користувача"
@@ -4191,11 +4186,10 @@ msgstr ""
 "\n"
 "\"%s\"\n"
 "\n"
-"Будь ласка, перевірте правильність командного шляху та його відповідність "
-"додатку"
+"Перевірте правильність командного шляху та його відповідність додатку"
 
 msgid "Unable to start"
-msgstr "Запуск неможливий"
+msgstr "Стартувати неможливо"
 
 msgid "Previous command is still running"
 msgstr "Попередня команда ще виконується"
@@ -4211,25 +4205,25 @@ msgid "Other revision information"
 msgstr "Інша інформація про ревізію"
 
 msgid "Unresolved conflicts"
-msgstr "Не улагоджені конфлікти"
+msgstr "Не розв'язані конфлікти"
 
 msgid "Mercurial Re&solve"
-msgstr "Вирішувати Mercurial"
+msgstr "Розв'язувати Mercurial-ом"
 
 msgid "Attempt automatic (trivial) merge"
-msgstr "Спроба автоматичного об'єднання"
+msgstr "Спробувати автоматичне злиття"
 
 msgid "Tool &Resolve"
 msgstr "Приладдя &розв'язування"
 
 msgid "Merge using selected merge tool"
-msgstr "Об'єднати користуючись обраним приладдям об'єднання"
+msgstr "Злити використовуючи обраним приладдям злиття"
 
 msgid "&Take Local"
 msgstr "&Візьміть локальний"
 
 msgid "Accept the local file version (yours)"
-msgstr "Прийняти локальну версію файлу (Вашу)"
+msgstr "Прийняти локальну версію файлу (вашу)"
 
 msgid "Take &Other"
 msgstr "Візьміть &інший"
@@ -4238,76 +4232,77 @@ msgid "Accept the other file version (theirs)"
 msgstr "Прийняти іншу версію файлу (їхню)"
 
 msgid "&Mark as Resolved"
-msgstr "&Відмітити, як вирішений"
+msgstr "&Відмітити, як розв'язаний"
 
 msgid "Mark this file as resolved"
-msgstr "Помітити цей файл, як улагоджений"
+msgstr "Помітити цей файл, як розв'язаний"
 
 msgid "Diff &Local to Ancestor"
-msgstr "Відмінність локального з предком"
+msgstr "Відмінність локального до попередника"
 
 msgid "&Diff Other to Ancestor"
-msgstr "Відміннсть до інших предків"
+msgstr "Відміннсть до інших попередників"
 
 msgid "Resolved conflicts"
-msgstr "Владнати конфлікти"
+msgstr "Розв'язати конфлікти"
 
 msgid "&Edit File"
 msgstr "&Правити файл"
 
 msgid "Edit resolved file"
-msgstr "Правити улагоджений файл"
+msgstr "Правити розв'язаний файл"
 
 msgid "3-&Way Diff"
-msgstr "Сторонні інструменти порівняння"
+msgstr "Зовнішні інструменти порівняння"
 
 msgid "Visual three-way diff"
-msgstr "Наочні сторонні відмінності"
+msgstr "Візуальні сторонні інструменти порівняння"
 
 msgid "Visual diff between resolved file and first parent"
-msgstr "Візуальне порівняння улагодженого файлу з першим попередником"
+msgstr "Візуальне порівняння розв'язаного файлу та першого попередника"
 
 msgid "&Diff to Other"
-msgstr "Відмінності до іншого"
+msgstr "&Відмінність до іншого"
 
 msgid "Visual diff between resolved file and second parent"
-msgstr "Відмінності між улагодженим файлом та другого попередника"
+msgstr "Візуальні відмінності між розв'язаним файлом та другим попередником"
 
 msgid "Mark as &Unresolved"
-msgstr "Відмітити, як не узгоджений"
+msgstr "Відмітити, як не розв'язаний"
 
 msgid "Mark this file as unresolved"
-msgstr "Відмітити цей файл, як не улагоджене"
+msgstr "Відмітити цей файл, як не розв'язаний"
 
 msgid "Detected merge/diff tools:"
-msgstr "Визначено об'єднання/відмінность приладдя:"
+msgstr "Виявлено приладдя для злиття/порівняння:"
 
 msgid "Command output"
 msgstr "Командний рядок"
 
 msgid "Unable to show subrepository files"
-msgstr "неможливо відобразити файли підсховища"
+msgstr "Неможливо відобразити файли підсховища"
 
 msgid ""
 "Visual diffs are not supported for files in subrepositories. They will not "
 "be shown."
 msgstr ""
-"Наочне порівняння не підтримується у підсховищах. Вони не будуть відображені."
+"Наочне порівняння для файлів у підсховищах не підтримується. Вони не будуть "
+"відображені."
 
 msgid "There are merge <b>conflicts</b> to be resolved"
-msgstr "<b>Конфлікти</b> об'єднання повинні бути улагоджені"
+msgstr "<b>Конфлікти</b> злиття мають бути розв'язані"
 
 msgid "All conflicts are resolved."
-msgstr "Всі конфлікти вирішені."
+msgstr "Всі конфлікти розв'язані."
 
 msgid "There are no conflicting file merges."
-msgstr "Відсутні файли з конфліктами об'єднання."
+msgstr "Відсутні файли з конфліктами злиття."
 
 msgid "Exit without finishing resolve?"
-msgstr "Вийти не закінчивши владнання проблем?"
+msgstr "Вийти не закінчивши розв'язування?"
 
 msgid "Unresolved conflicts remain. Are you sure?"
-msgstr "Не владнані конфлікти залишаться не вирішеними. Ви впевнені?"
+msgstr "Не розв'язані конфлікти залишаться. Ви впевнені?"
 
 msgid "E&xit"
 msgstr "Вихід"
@@ -4328,20 +4323,20 @@ msgid "Update to this revision"
 msgstr "Оновити до цієї ревізії"
 
 msgid "Show All"
-msgstr "Відображати все"
+msgstr "Відобразити все"
 
 msgid "Toggle display of all files and the direction they were merged"
-msgstr "Переключити відображення всіх файлів і напрямку вони були об'єднані"
+msgstr "Перемикання відображення всіх файлів і напрямків їх злиття"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr "%s - Деталі ревізії (%s)"
 
 msgid "Cannot revert to working directory"
-msgstr "Не можливо повернутися до робочого каталогу"
+msgstr "Не можливо повернутися у робочий каталог"
 
 msgid "Reverting to the working directory revision does not make sense"
-msgstr "Повернення до робочого каталогу не має сенсу"
+msgstr "Повертатись у робочий каталог не має сенсу"
 
 #, python-format
 msgid "Revert - %s"
@@ -4366,12 +4361,12 @@ msgid ""
 "modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
 "update to checkout another revision)"
 msgstr ""
-"Повернення всіх файлів викличе заміну всіх змін та залишає фали "
-"недоторканими.<br><br>Ви дійсно бажаєте використати повернення?<br><br>"
-"(використайте оновлення аби перейти до наступної ревізії)"
+"Повернення всіх файлів викличе відмові від всіх змін та залишить файли "
+"недоторканими.<br><br>Ви дійсно бажаєте скористатись поверненням?<br><br>"
+"(користуйтесь оновленням для переходу до наступної ревізії)"
 
 msgid "Changeset:"
-msgstr "Набір змін:"
+msgstr "Змін:"
 
 msgid "Child:"
 msgstr "Наступник:"
@@ -4383,10 +4378,10 @@ msgid "Successors:"
 msgstr ""
 
 msgid "Head is closed!"
-msgstr "Вершина недоступна!"
+msgstr "Вершина недосяжна!"
 
 msgid "Changesets where username contains string."
-msgstr "Сховище, де ім'я користувача містить рядок."
+msgstr "Рядок, що містить зміни користувача."
 
 msgid ""
 "Search commit message, user name, and names of changed files for string."
@@ -4399,26 +4394,26 @@ msgid ""
 "Changesets not found in the specified destination repository, or the default "
 "push location."
 msgstr ""
-"Набір змін не знайдено у спеціально призначеному сховищі та виштовхнуто "
-"типово."
+"Зміни не знайдено у спеціально призначеному сховищі не знайдено та "
+"виштовхнуто до типового місця."
 
 msgid "The named bookmark or all bookmarks."
-msgstr "Назва закладки або всіх закладок."
+msgstr "Названі закладки або всі закладки."
 
 msgid "The named tag or all tags."
-msgstr "Назва ознаки або всіх ознак."
+msgstr "Названі ознаки або всі ознаки."
 
 msgid "Changeset is tagged."
-msgstr "Набору змін співставлене посилання."
+msgstr "Зміни означені."
 
 msgid "Changeset is a named branch head."
-msgstr "Набір змін названий вершиною гілки."
+msgstr "Зміни є назваю голови гілки."
 
 msgid "Changeset is a merge changeset."
-msgstr "Набір змін який є набором об'єднання."
+msgstr "Ревізія змін злиття."
 
 msgid "Changeset is closed."
-msgstr "Набір змін закритий."
+msgstr "Зміни закриті."
 
 msgid ""
 "Changesets within the interval, see <a href=\"http://www.selenic.com/"
@@ -4428,7 +4423,7 @@ msgstr ""
 "hg.1.html#dates\">довідку дат</a>"
 
 msgid "Greatest common ancestor of the two changesets."
-msgstr "Найкращий загальний попередник для двох змін."
+msgstr "Найкращий спільний попередник для двох змін."
 
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
@@ -4441,107 +4436,107 @@ msgid ""
 "Changesets affecting files matched by pattern.  See <a href=\"http://www."
 "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
 msgstr ""
-"Набір змін повинен відповідати зразкові.  Дивись <a href=\"http://www."
-"selenic.com/mercurial/hg.1.html#patterns\">довідка по зразкам</a>"
+"Зміни мусять відповідати зразкові. Дивись <a href=\"http://www.selenic.com/"
+"mercurial/hg.1.html#patterns\">довідку по зразкам</a>"
 
 msgid "Changesets which modify files matched by pattern."
-msgstr "Набір змін, що змінить файли відповідно до шаблону."
+msgstr "Зміни, що змінить файли згідно з зразком."
 
 msgid "Changesets which add files matched by pattern."
-msgstr "Набір змін, що додадуть файли відповідно до шаблону."
+msgstr "Зміни, що додадуть файли згідно з зразком."
 
 msgid "Changesets which remove files matched by pattern."
-msgstr "Набір змін, які вилучать файли відповідно до шаблону."
+msgstr "Зміни вилучені з файлів відповідно до шаблону."
 
 msgid "Changesets containing files matched by pattern."
-msgstr "Набір змін містить файли відповідно до шаблону."
+msgstr "Зміни, що містяться файли відповідно до шаблону."
 
 msgid "All changesets belonging to the branches of changesets in set."
-msgstr "Всі набори змін належать до набору гілок у наборах змін."
+msgstr "Всі зміни належать до набору гілок в сукупності змін."
 
 msgid "Members of a set with no children in set."
-msgstr "Члени множини, у яких у цій множині немає попередників."
+msgstr "Сукупність членів, що не мають попередників."
 
 msgid "Changesets which are descendants of changesets in set."
-msgstr "Набор змін, які є похідними від набору змін в множині."
+msgstr "Зміни, що є похідними в сукупності змін."
 
 msgid "Changesets that are ancestors of a changeset in set."
-msgstr "Зміни, що є попередниками змін в наборі змін."
+msgstr "Зміни, що є попередниками сукупності змін."
 
 msgid "Child changesets of changesets in set."
-msgstr "Набори змін, які є наступниками наборів множин."
+msgstr "Пов'язані зміни в сукупності змін."
 
 msgid "The set of all parents for all changesets in set."
-msgstr "Сукупність усіх батьків для всіх змін, в комплекті."
+msgstr "Сукупність всіх попередників всієї сукупності змін."
 
 msgid "First parent for all changesets in set, or the working directory."
-msgstr "Перший попередник для всіх змін в наборі, або робочий каталог."
+msgstr "Перший попередник для сукупності всіх змін, або робочий каталог."
 
 msgid "Second parent for all changesets in set, or the working directory."
-msgstr "Другий попередник для всіх змін в наборі, або робочий каталог."
+msgstr "Другий попередник для сукупності всіх змін, або робочий каталог."
 
 msgid "Changesets with no parent changeset in set."
-msgstr "Зміни без батьків у наборі змін."
+msgstr "Зміни без попередників у сукупності змін."
 
 msgid ""
 "An empty set, if any revision in set isn't found; otherwise, all revisions "
 "in set."
 msgstr ""
-"Порожня множина, якщо не знайдено жодної ревізії з набору. Інакше, всі "
-"ревізії з набору."
+"Порожня сукупність, якщо не знайдено жодної ревізії з сукупності; інакше, "
+"всі ревізії в сукупності."
 
 msgid "Changeset with lowest revision number in set."
-msgstr "Набір змін з найнижчим номером ревізії в наборі."
+msgstr "Зміна з найнижчим номером ревізії в сукупності."
 
 msgid "Changeset with highest revision number in set."
-msgstr "Набір змін з найвищим номером ревізії в наборі."
+msgstr "Зміна з найвищим номером ревізії в сукупності."
 
 msgid "First n members of a set."
-msgstr "Перші n членів набору."
+msgstr "Перші n членів сукупності."
 
 msgid ""
 "Sort set by keys.  The default sort order is ascending, specify a key as \"-"
 "key\" to sort in descending order."
 msgstr ""
-"Сортувати відповідно до встановлених ключів. Типовий порядок сортування - за "
+"Сортувати відповідно до виставлених ключів. Типовий порядок сортування - за "
 "зростанням, вкажіть ключ \"-key\", щоб відсортувати в порядку спадання."
 
 msgid "An alias for \"::.\" (ancestors of the working copy's first parent)."
-msgstr "Прізвисько для \"::.\" (попередники для робочих копій першої бази)."
+msgstr "Прізвисько для \"::.\" (походження робочої копії першого попередника)."
 
 msgid "All changesets, the same as 0:tip."
-msgstr "Всі набори змін, так само як 0:tip."
+msgstr "Всі зміни, так само як 0:tip."
 
 msgid "Revision Set Query"
-msgstr "Запит кількості ревізій"
+msgstr "Запит сукупності ревізій"
 
 msgid "all revisions converted from subversion"
-msgstr "з subversion перенесено всі ревізії"
+msgstr "всі ревізії з subversion перенесено"
 
 msgid "changeset which represents converted svn revision"
-msgstr "набір змін представлений конвертованою з svn ревізією"
+msgstr "зміна представлена конвертованою з svn ревізією"
 
 msgid "Common sets"
-msgstr "Звичайні виборки"
+msgstr "Звичайна сукупність"
 
 msgid "File pattern sets"
-msgstr "Набори шаблонів файлів"
+msgstr "Сукупність шаблонів файлів"
 
 msgid "Set Ancestry"
 msgstr "Визначити походження"
 
 msgid "Set Logic"
-msgstr "Логіка множин"
+msgstr "Встановити логіку"
 
 msgid ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help revsets</"
 "a>"
 msgstr ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">довідка по "
-"наборам ревізій</a>"
+"сукупності ревізій</a>"
 
 msgid "Searching..."
-msgstr "Виконується пошук..."
+msgstr "Пошук..."
 
 msgid "Running"
 msgstr "Виконується"
@@ -4560,7 +4555,7 @@ msgid ""
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
-"Отримано переривання з клавіатури, зупиняється.\n"
+"Отримано клавіатурне переривання, зупиняється.\n"
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4620,7 +4615,7 @@ msgid "start debugger"
 msgstr "започаткування зневадження"
 
 msgid "print command execution profile"
-msgstr "друк команд профілю"
+msgstr "друк виконуваних команд профілю"
 
 msgid "do not fork GUI process"
 msgstr "не виокремлювати інтерфейс користувача у окремий процес"
@@ -4632,7 +4627,7 @@ msgid "read file list from file"
 msgstr "читати перелік файлів з файлу"
 
 msgid "read file list from file encoding utf-8"
-msgstr "читати перелік файлів для файлів у кодуванні utf-8"
+msgstr "читати перелік файлів з файлу у кодуванні utf-8"
 
 msgid "open a new workbench window"
 msgstr "відкрити нове вікно робочого середовища"
@@ -4669,13 +4664,13 @@ msgid "thg archive"
 msgstr "thg archive"
 
 msgid "merge with old dirstate parent after backout"
-msgstr "об'єднати з старим попередником після повернення (роз'єднання)"
+msgstr "злити з старим попередником після повернення"
 
 msgid "parent to choose when backing out merge"
-msgstr "обрати попередників, за для об'єднання видалення помилок"
+msgstr "після закінчення злиття повернутися до обраного попередника"
 
 msgid "revision to backout"
-msgstr "ревізія, зміни якої потрібно повернути"
+msgstr "повернутись до ревізії"
 
 msgid "thg backout [OPTION]... [[-r] REV]"
 msgstr "thg backout [ПАРАМЕТРИ]... [[-r] РЕВ.]"
@@ -4693,10 +4688,10 @@ msgid "only one new bookmark name allowed"
 msgstr ""
 
 msgid "the clone will include an empty working copy (only a repository)"
-msgstr "клон буде включати порожню робочу копію (тільки сховища)"
+msgstr "клон буде містити порожню робочу копію (тільки сховища)"
 
 msgid "revision, tag or branch to check out"
-msgstr "модифікація, ознака або гілка для зняття з реєстрації"
+msgstr "ревізія, ознака або гілка для зняття з реєстрації"
 
 msgid "include the specified changeset"
 msgstr "включити зазначені зміни"
@@ -4705,7 +4700,7 @@ msgid "clone only the specified branch"
 msgstr "клонувати лише вказану гілку"
 
 msgid "use pull protocol to copy metadata"
-msgstr "для копіювання метаданих використовувати протокол затягування"
+msgstr "викорристовувати протокол затягування для копіювання метаданих"
 
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr "передавати без стискання (для швидких мереж)"
@@ -4714,10 +4709,10 @@ msgid "thg clone [OPTION]... SOURCE [DEST]"
 msgstr "thg clone [ПАРАМЕТРИ]... ДЖЕРЕЛО [ПРИЗНАЧЕННЯ]"
 
 msgid "record user as committer"
-msgstr "запам'ятати користувача з правами дописувача"
+msgstr "запам'ятати користувача як дописувача"
 
 msgid "record datecode as commit date"
-msgstr "записувати дату коду, як дату фіксації"
+msgstr "встановити дату коду, як дату фіксації"
 
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [ПАРАМЕТРИ] [ФАЙЛ]..."
@@ -4828,7 +4823,7 @@ msgid "thg hgignore [FILE]"
 msgstr "thg hgignore [ФАЙЛ]"
 
 msgid "import to the patch queue (MQ)"
-msgstr "завантажити для виправлення черги (MQ)"
+msgstr "завантажити чергу латок (MQ)"
 
 msgid "thg import [OPTION] [SOURCE]..."
 msgstr "thg import [ПАРАМЕТРИ] [ДЖЕРЕЛО]..."
@@ -4849,7 +4844,7 @@ msgid "thg manifest [-r REV] [FILE]"
 msgstr "thg manifest [-r РЕВ.] [ФАЙЛ]"
 
 msgid "revision to merge"
-msgstr "перегляд об'єднання"
+msgstr "перегляд злиття"
 
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] РЕВ.]"
@@ -4873,7 +4868,7 @@ msgid "thg qqueue"
 msgstr "thg qqueue"
 
 msgid "Please enable the MQ extension first."
-msgstr "Будь ласка, увімкніть додаток MQ."
+msgstr "Увімкніть додаток MQ."
 
 msgid "thg qreorder"
 msgstr "thg qreorder"
@@ -4894,13 +4889,13 @@ msgid "thg rebase -s REV -d REV [--keep]"
 msgstr "thg rebase -s REV -d REV [--keep]"
 
 msgid "Rebase already in progress"
-msgstr "Зміна бази в процесі"
+msgstr "В процесі зміни бази"
 
 msgid "Resuming rebase already in progress"
 msgstr "Відновлення зміни бази вже в процесі"
 
 msgid "You must provide source and dest arguments"
-msgstr "Ви повинні вказати джерело та призначення"
+msgstr "Ви повинні вказати аргументи для джерела та призначення"
 
 msgid "thg rejects [FILE]"
 msgstr "thg rejects [ФАЙЛ]"
@@ -4939,7 +4934,7 @@ msgid "thg rupdate [[-r] REV]"
 msgstr ""
 
 msgid "name of the hgweb config file (serve more than one repository)"
-msgstr "назва hgweb файлу шалаштувань (serve більше ніж одне сховище)"
+msgstr "назва hgweb файлу налаштувань (serve більше ніж одне сховище)"
 
 msgid "name of the hgweb config file (DEPRECATED)"
 msgstr "назва файлу налаштувань hgweb (DEPRECATED)"
@@ -5020,7 +5015,7 @@ msgid "thg userconfig"
 msgstr "thg userconfig"
 
 msgid "changeset to view in diff tool"
-msgstr "набір змін переглянути в приладді порівнювання"
+msgstr "зміну переглянути в приладді порівнювання"
 
 msgid "revisions to view in diff tool"
 msgstr "ревізії переглянути в приладді порівнювання"
@@ -5045,7 +5040,7 @@ msgid "Location:"
 msgstr "Розташування:"
 
 msgid "Discard remote changes, no backup (-C/--clean)"
-msgstr "Відмовитись від змін ззовні, без резервної копії (-C/--clean)"
+msgstr "Відкинути зовнішні зміни, без резервної копії (-C/--clean)"
 
 msgid "Perform a push before updating (-p/--push)"
 msgstr "Виконувати виштовхування перед оновленням (-p/--push)"
@@ -5054,7 +5049,7 @@ msgid "Allow pushing new branches (--new-branch)"
 msgstr "Дозволити виштовхувати до нових гілок (--new-branch)"
 
 msgid "Force push to remote location (-f/--force)"
-msgstr "Примусово виштовхувати назовні (-f/--force)"
+msgstr "Примусово виштовхувати до віддаленого (-f/--force)"
 
 msgid "Log"
 msgstr "Журнал"
@@ -5100,7 +5095,7 @@ msgid "&Unspecified"
 msgstr "Не &вказано"
 
 msgid "&Set..."
-msgstr "&Набір..."
+msgstr "&Сукупність..."
 
 msgid "&Clear"
 msgstr "&Очистити"
@@ -5119,7 +5114,7 @@ msgid "Specify your preferred user interface language (restart needed)"
 msgstr "Вкажіть мову інтерфейсу користувача (вимагатиме перезавантаження)"
 
 msgid "Three-way Merge Tool"
-msgstr "Стороннє приладдя об'єднання"
+msgstr "Стороннє приладдя злиття"
 
 msgid ""
 "Graphical merge program for resolving merge conflicts.  If left unspecified, "
@@ -5129,13 +5124,13 @@ msgid ""
 "local or other, or internal:dump to leave files in the working directory for "
 "manual merging"
 msgstr ""
-"Засіб об'єднання, використовуваний для владнання конфліктів об'єднання. Якщо "
-"не вказано, Mercurial буде використовувати першу лібшу програму, знайдену у "
-"Вашій системі. Якщо такої програми не знайдено, внутрішній засіб об'єднання "
-"вставить маркери конфліктів безпосередньо до файлу. Обравши internal:merge — "
-"будуть вставлені маркери конфліктів, internal:prompt — буде запит на вибір "
-"між двома версіями файлу, або internal:dump — файли будуть залишатися в "
-"робочому каталозі для об'єднання в ручному режимі."
+"Графічний додаток злиття, використовуваний для розв'язування конфліктів "
+"злиття. Якщо не вказано, Mercurial буде використовувати першу ліпшу "
+"програму, знайдену у Вашій системі. Якщо такої програми не знайдено, "
+"внутрішній засіб злиття вставить маркери конфліктів безпосередньо у файл. "
+"Обравши internal:merge — будуть вставлені маркери конфліктів, internal:"
+"prompt — буде запит на вибір між двома версіями файлу, або internal:dump — "
+"файли будуть залишатися в робочому каталозі до злиття в ручному режимі."
 
 msgid "Visual Diff Tool"
 msgstr "Приладдя наочного порівняння"
@@ -5146,9 +5141,9 @@ msgid ""
 "selected merge tool. Failing that it uses the first applicable tool it finds."
 msgstr ""
 "Оберіть приладдя для перегляду відмінностей, як описано в розділі [merge-"
-"tools] файлів налаштувань Mercurial. Якщо не вказано нічого, TortoiseHg буде "
-"використовувати такий самий редактор, як і для об'єднання. В іншому випадку, "
-"буде використано перший ліпший знайдений редактор."
+"tools] файлу налаштувань Mercurial. Якщо нічого не вказано, TortoiseHg буде "
+"використовувати той самий редактор, що і для злиття. В іншому випадку, буде "
+"використано перший ліпший знайдений редактор."
 
 msgid "Visual Editor"
 msgstr "Візуальний редактор"
@@ -5158,8 +5153,8 @@ msgid ""
 "Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
 "first applicable tool it finds."
 msgstr ""
-"Вкажіть візуальний редактор описавши його в секції [editor-tools] "
-"конфігураційного файлу Mercurial. В разі відсутності, TortoiseHg буде "
+"Вкажіть візуальний редактор описавши його в секції [editor-tools] файлу "
+"налаштувань Mercurial. В разі його відсутності, TortoiseHg буде "
 "використовувати перший ліпший знайдений редактор."
 
 msgid "Shell"
@@ -5173,11 +5168,11 @@ msgid ""
 "Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
 "other: xterm -T \"%(reponame)s\""
 msgstr ""
-"Вкажіть команду, яка запускатиме програму в термінальному режимі. Якщо "
+"Вкажіть команду, яка запускатиме додаток в термінальному режимі. Якщо "
 "значення включає рядок %(reponame)s, замість неї буде підставлена назва "
-"сховища (вимагається перезапуск)<br>Типово, на Windows: cmd.exe /K title "
-"%(reponame)s<br>Типово, на OS X: не встановлено<br>Типово на інших системах: "
-"xterm -T \"%(reponame)s\""
+"сховища (потребує перезапуску)<br>На Windows, типово: cmd.exe /K title "
+"%(reponame)s<br>На OS X, типово: не встановлено<br>На інших системах, "
+"типово: xterm -T \"%(reponame)s\""
 
 msgid "Immediate Operations"
 msgstr "Негайні операції"
@@ -5188,7 +5183,7 @@ msgid ""
 "forget\". Default: None (leave blank)"
 msgstr ""
 "Перелік операцій командної оболонки, відокремлених прогалинами, які "
-"виконувати негайно, без взаємодії з користувачем. Команди \"add remove "
+"виконуватимуться негайно, без взаємодії з користувачем. Команди \"add remove "
 "revert forget\". Типово: жодна (залишити порожнім)"
 
 msgid "Tab Width"
@@ -5206,7 +5201,7 @@ msgstr "Група вкладок сховища"
 
 msgid "Always show repo tabs, even for a single repo. Default: False"
 msgstr ""
-"Завжди відображати вкладки сховищ, навіть для одного сховища. Типово: ні"
+"Відображати вкладки сховищ завжди, навіть для одного сховища. Типово: ні"
 
 msgid "Monitor Repo Changes"
 msgstr "Пильнувати зміни сховища"
@@ -5215,7 +5210,7 @@ msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
 "always"
 msgstr ""
-"Контролювати зміни TortoiseHg на рівні файлової системи. Типово: завжди"
+"TortoiseHg пильнуватиме зміни на рівні файлової системи. Типово: завжди"
 
 msgid "Max Diff Size"
 msgstr "Максимальний обсяг відмінностей"
@@ -5226,8 +5221,8 @@ msgid ""
 "Default: 1024 (1MB)"
 msgstr ""
 "Максимальний розмір файлу (КБ), для якого TortoiseHg буде відображати "
-"відмінності у вікнах журналу змін, статуса та фіксації. Нульове значення "
-"означає - без обмежень.  Типово: 1024 (1МБ)"
+"відмінності у вікнах журналу змін, статусу та фіксації. Нуль означає - без "
+"обмежень. Типово: 1024 (1МБ)"
 
 msgid "Fork GUI"
 msgstr "Окремий GUI"
@@ -5236,8 +5231,8 @@ msgid ""
 "When running from the command line, fork a background process to run "
 "graphical dialogs.  Default: True"
 msgstr ""
-"Коли виконується командний рядок, визуальні діалоги переходять у фоновий "
-"процес. Типово: так"
+"Під час виконання командного рядку, визуальні діалоги переходитимуть у "
+"фоновий процес. Типово: так"
 
 msgid "Full Path Title"
 msgstr "Повний шлях у заголовку"
@@ -5247,10 +5242,10 @@ msgid ""
 "just the root directory name.  Default: False"
 msgstr ""
 "Відображати повний шлях до каталогу сховища в заголовку діалогу, а не просто "
-"назва кореневого каталогу. Типово: ні"
+"назву кореневого каталогу. Типово: ні"
 
 msgid "Auto-resolve merges"
-msgstr "Автоматичне вирішення проблем об'єднання"
+msgstr "Автоматичне розв'язання проблем злиття"
 
 msgid ""
 "Indicates whether TortoiseHg should attempt to automatically resolve changes "
@@ -5260,13 +5255,13 @@ msgid ""
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: False."
 msgstr ""
-"Вказує, чи повинна TortoiseHg намагатися автоматично дозволяти зміни з обох "
-"сторін в той же файл, а тільки повідомляють конфліктів злиття, коли це не "
-"представляється можливим. Якщо значення дорівнює False, всі файли із змінами "
-"по обидві сторони від злиття буде звітувати як суперечливі, навіть якщо "
-"зміни є в різні частини файлу. У кожному разі, при виникненні конфліктів, "
-"користувачеві буде запропоновано розглянути і вирішити зміни вручну. Типово: "
-"ні."
+"Вказує, чи повинна TortoiseHg намагатися автоматично розв'язувати зміни з "
+"обох сторін в той же файл, і повідомляти тільки тоді, коли це не "
+"представляється можливим. Якщо значення дорівнює False, всі файли для злиття "
+"із змінами з обидвох сторін звітуватимуть як суперечливі, навіть якщо зміни "
+"в різних частинах файлу. Кожного разу, при виникненні конфліктів, "
+"користувачеві буде запропоновано розглянути і розв'язати зміни вручну. "
+"Типово: ні."
 
 msgid "Single Workbench Window"
 msgstr "Одновіконне робоче середовище"
@@ -5320,19 +5315,19 @@ msgid ""
 "green for merge, red for non-trivial parents, black for normal. Default: "
 "False"
 msgstr ""
-"Підсвічувати різними кольорами набори змін різних авторів. Якщо виключено, "
-"тоді зміни підсвічуються зеленим для об'єднання, червоним для не звичних "
-"попередників, чорним для нормальних. Типово: ні"
+"Розфарбовувати кольорами зміни різних авторів. Якщо увімкнено, тоді зміни "
+"підсвічуються зеленим для злиття, червоним для не звичнайних попередників, "
+"чорним для нормальних. Типово: ні"
 
 msgid "Full Authorname"
-msgstr "ПІБ"
+msgstr "П.І.Б."
 
 msgid ""
 "Show full authorname in Logview. If not enabled, only a short part, usually "
 "name without email is shown. Default: False"
 msgstr ""
-"Показувати повний ім'я автора в журналі. Якщо не включене, тільки коротку "
-"частину, як правило, назва без електронної пошти. Типово: ні"
+"Показувати повне ім'я автора в журналі. Якщо не включене, тільки скорочено, "
+"як правило, ім'я без електронної пошти. Типово: ні"
 
 msgid "Task Tabs"
 msgstr "Вкладки завдань"
@@ -5341,8 +5336,9 @@ msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
 msgstr ""
-"Відображати вкладки вздовж однієї з сторін нижньої частини сховища, аби було "
-"можливо перемикатися між задачами без використання пеналу. Типово: вимкнено"
+"Відображати вкладки вздовж однієї з сторін нижньої частини сховища, аби була "
+"можливість перемикатися між задачами без використання пеналу. Типово: "
+"вимкнено"
 
 msgid "Task Toolbar Order"
 msgstr "Розташування задач на пеналі"
@@ -5354,12 +5350,11 @@ msgid ""
 "manifest grep and pbranch.<br>Default: log commit mq sync manifest grep "
 "pbranch"
 msgstr ""
-"Вкажіть, які завдання кнопки, які повинні відображатися на панелі завдань і "
-"в якому порядку. Інструменти типу список імен кнопку завдання. . Додати "
-"сепаратори, поставивши \"|\" між іменами кнопку завдання інструменти "
-"Допустимі імена є: увійти фіксації MQ синхронізації GREP проявляти і pbranch "
-"інструменти за замовчуванням: журнал фіксації MQ синхронізації проявляється "
-"GREP pbranch."
+"Вкажіть, задачі кнопкам, які повинні відображатися на панелі задач і в якому "
+"порядку. Назви кнопок задач для типового списку. Додати розділювачі, "
+"поставивши \"|\" між іменами кнопок задач.<br>Допустимими іменами є: log "
+"commit mq sync manifest grep and pbranch.<br>Типово: log commit mq sync "
+"manifest grep pbranch"
 
 msgid "Long Summary"
 msgstr "Повний звіт"
@@ -5368,8 +5363,8 @@ msgid ""
 "If true, concatenate multiple lines of changeset summary until they reach 80 "
 "characters. Default: False"
 msgstr ""
-"Якщо Так, тоді багаторядкові зведення наборів змін будуть об'єднані у один "
-"до 80 символів. Типово: ні"
+"Якщо Так, тоді багаторядкові зміни будуть з'єднані сумарно у один до 80 "
+"символів. Типово: ні"
 
 msgid "Log Batch Size"
 msgstr "довжина рядків журналу"
@@ -5431,7 +5426,7 @@ msgid ""
 msgstr ""
 
 msgid "Default Push"
-msgstr "Типове місце виштовхування"
+msgstr "Типовий шлях виштовхування"
 
 msgid ""
 "Select the revisions that will be pushed by default, whenever you click the "
@@ -5441,10 +5436,10 @@ msgid ""
 "u> the current revision</i>.</ul><p>Default: all"
 msgstr ""
 "Вибрати ревізії, які будуть виштовхуватись за типовим сценарієм при кожному "
-"натисканні на кнопку </i>.<li><b> всі </b>: Типово. Натисніть всі зміни в "
-"<i> всіх галузей </ I> <li> <b> філія </ B>: .. Натисніть всі зміни в "
-"поточній гілці <i> </ I> <li> <b> перегляду </ B>: Натисніть на зміни в "
-"поточній гілці  <i><u> до </u> поточна ревізія </i>.</ul><p>Типово: всіх"
+"натисканні на кнопку.</i><li><b>всі</b>: Типово. Виштовхнути всі зміни в "
+"<i>всі гілки</i>.<li><b>гілка</b>: Виштовхнути всі зміни в <i>поточну гілку</"
+"i>.<li><b>ревізії</b>: Виштовхнути всі зміни в поточну гілку <i><u>до</u> "
+"поточної ревізії</i>.</ul><p>Типово: всі"
 
 msgid "Confirm Push"
 msgstr ""
@@ -5468,14 +5463,15 @@ msgid ""
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
 msgstr ""
-"Виберіть, якщо TortoiseHg буде відображати рядки для активації закладки при "
-"оновленні ревізії, яка має одну або більше закладок.<ul><li><b> автоматично "
-"</ b>: Спробуйте автоматично активовувати закладки. При оновленні ревізії, "
-"який має одну закладку вона буде використана автоматично. Відображати "
-"негайно, якщо є більше однієї закладки на ревізію, яка була оновлена до "
-"<li><b>негайно</b>. Типово. Відображати негайно, коли оновлена ревізія має "
-"одну або більше закладок.<li><b> ніколи </b>: Ніколи не відображати жодного "
-"рядку для активації будь-якої закладки. </ul><p>Типово: негайно"
+"Виберіть, як швидко TortoiseHg покаже активацію закладки коли "
+"оновлюватиметься ревізія, яка має одну або більше закладок."
+"<ul><li><b>автоматично</b>: Спробувати автоматично активувати закладки. При "
+"оновленні ревізії, яка має одну закладку вона буде використана автоматично. "
+"Відображати негайно, якщо є більше однієї закладки на ревізію, яка була "
+"оновлена до <li><b>негайно</b>: Типово. Відображати негайно, коли оновлена "
+"ревізія має одну або більше закладок.<li><b>ніколи</b>: Ніколи не "
+"відображати жодного рядку для активації будь-якої закладки.</ul><p>Типово: "
+"негайно"
 
 msgid "Target combo"
 msgstr ""
@@ -5497,7 +5493,7 @@ msgid ""
 "Name associated with commits.  The common format is:<br>Full Name &lt;"
 "email@example.com&gt;"
 msgstr ""
-"Ім'я яке відповідає зафіксованому кодові. Формат наступний:<br>Ім'я Прізвище "
+"Ім'я яке відповідає зафіксованому кодові. Формат наступний:<br>Повне ім'я "
 "&lt;email@example.com&gt;"
 
 msgid "Summary Line Length"
@@ -5526,7 +5522,7 @@ msgid ""
 "Attempt to push to specified URL or alias after each successful commit.  "
 "Default: No push"
 msgstr ""
-"Спробувати виштовхнути до вказаних URL або псевдонімів після кожної вдалої "
+"Спробувати виштовхнути за вказаними URL або псевдонімами після кожної вдалої "
 "фіксації. Типово: не виштовхувати"
 
 msgid "Auto Commit List"
@@ -5537,9 +5533,9 @@ msgid ""
 "commit.  Intended for use only as a repository setting. Default: None (leave "
 "blank)"
 msgstr ""
-"Розділений комами перелік файлів, які автоматично додаються при кожній "
-"фіксації. Призначено для використання тільки в якості параметрів сховища. "
-"Типово: жоден (залишити порожнім)"
+"Відокремлений комами перелік файлів, які автоматично додаватимуться при "
+"кожній фіксації. Призначено для використання тільки в якості параметрів "
+"сховища. Типово: жоден (залишити порожнім)"
 
 msgid "Auto Exclude List"
 msgstr "Перелік автоматичних виключень"
@@ -5548,8 +5544,8 @@ msgid ""
 "Comma separated list of files that are automatically unchecked when the "
 "status, and commit dialogs are opened. Default: None (leave blank)"
 msgstr ""
-"Перелік файлів, розділений комами, з яких автоматично знімається статус, і "
-"відкриваються діалоги фіксації. Типово: жоден (залиште порожнім)"
+"Перелік файлів, відокремлений комами, з яких автоматично зніматиметься "
+"статус, і відкриватимуться діалоги фіксації. Типово: жоден (залиште порожнім)"
 
 msgid "English Messages"
 msgstr "Повідомлення англійською"
@@ -5561,7 +5557,7 @@ msgid ""
 msgstr ""
 "Створювати повідомлення фіксації англійською мовою, навіть якщо змінні "
 "середовища LANGUAGE або LANG встановлені не англійською. Ці параметри "
-"застосовується до об'єднання, ознак та повернення. Типово: ні"
+"застосовуватимуться до злиття, означення та повернення. Типово: ні"
 
 msgid "New Commit Phase"
 msgstr "Фаза нової фіксації"
@@ -5576,7 +5572,7 @@ msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr "Зробити MQ латки прихованими (instead або draft). Типово: ні"
 
 msgid "Monitor working<br>directory changes"
-msgstr "Контроль змін<br>в робочому каталозі"
+msgstr "Пильнування змін<br>в робочому каталозі"
 
 msgid ""
 "Select when the working directory status list will be refreshed:<br>- "
@@ -5624,9 +5620,9 @@ msgid ""
 "dialog.  Default: True"
 msgstr ""
 "Визначає, чи повинна TortoiseHg показати діалогове вікно підтвердження, "
-"перед вилученням файлів з фіксації. Якщо Так, діалогове вікно підтвердження "
-"вилучення буде показано. Якщо Ні, вибрані файли будуть вилучені з фіксації "
-"без діалогу підтвердження. Типово: так"
+"перед вилученням файлів під час фіксації. Якщо Так, діалогове вікно "
+"підтвердження вилучення буде показано. Якщо Ні, вибрані файли будуть "
+"вилучені під час фіксації без діалогу підтвердження. Типово: так"
 
 msgid "Server"
 msgstr "Сервер"
@@ -5654,8 +5650,8 @@ msgid ""
 "Repository name to use in the web interface, and by TortoiseHg as a "
 "shorthand name.  Default is the working directory."
 msgstr ""
-"Назва сховища для Web-інтерфейсу, буде використано також як коротка назва в "
-"TortoiseHg.  Типово: назва рабочого каталогу."
+"Назва сховища для Web-інтерфейсу, буде використано також, як коротка назва в "
+"TortoiseHg. Типово: назва рабочого каталогу."
 
 msgid "Textual description of the repository's purpose or contents."
 msgstr "Опис призначення або вмісту сховища"
@@ -5677,7 +5673,7 @@ msgstr "Формати архівів"
 
 msgid "Comma separated list of archive formats allowed for downloading"
 msgstr ""
-"Перелік форматів архівів дозволений для отримання, відокремлений комами"
+"Перелік форматів архівів, відокремлений комами, дозволений для отримання"
 
 msgid "Port"
 msgstr "Порт"
@@ -5728,10 +5724,10 @@ msgid ""
 "(separated by whitespace or \",\"). The contents of the allow_push list are "
 "examined after the deny_push list."
 msgstr ""
-"Кому дозволено виштовхувати у сховище. Якщо відсутнє або не вказано, тоді "
+"Кому дозволено виштовхувати у сховище. Якщо порожньо або не вказано, тоді "
 "виштовхувати заборонено. При спеціальному значенні \\\"*\\\" - будь хто "
 "ззовні може виштовхувати, враховуючи і тих хто не пройшов регістрацію. "
-"Інакше, користувач ззовні повинен пройти регістрацію та його ім'я повинно "
+"Інакше, зовнішній користувач повинен пройти реєстрацію та його ім'я повинно "
 "бути присутнім у цьому переліку (відокремлено прогалинами або \\\",\\\"). "
 "Зміст переліку дозволів на відправку розглядається після переліку заборон на "
 "виштовхування."
@@ -6175,10 +6171,10 @@ msgid ""
 "projrc file automatically, without requiring any user confirmation.</ul>"
 msgstr ""
 "Коли запитувати користувача про підтвердження оновлення локального \"projrc"
-"\" конфігураційного файлу коли віддалений projrc файл змінено. Можливі "
+"\" конфігураційного файлу при зміні зовнішнього projrc файлу. Можливі "
 "значення:<ul><li><b>постійно</b>- [<i>типово</i>] постійно показувати діалог "
 "підтвердження перед оновленням локального.hg/projrc файлу;<li><b>вперше</b> "
-"- показувати діалог підтвердження коли сховище клоноване або коли віддалений "
+"- показувати діалог підтвердження коли сховище клоноване або коли зовнішній "
 "projrc файл знайдено вперше.<li><b>Ніколи</b>- оновлювати локальний .hg/"
 "projrc файл автоматично, без запитів до користувача.</ul>"
 
@@ -6229,14 +6225,14 @@ msgid ""
 "ul><p>Default: never"
 msgstr ""
 "Дозволити користувачеві оновити projrc при вході:<ul><li><b>ніколи</b>: "
-"[<i>типово</i>] Показувати чи віддалений файл projrc був змінений, але не "
+"[<i>типово</i>] Показувати чи зовнішній файл projrc був змінений, але не "
 "оновлюватись (nor запит на оновлення) локального файлу projrc."
-"<li><b>підказка</b>: Переглядати зміни у файлі projrc. If there are changes "
-"_always_ show a confirmation prompt, asking the user if it wants to update "
-"its local projrc file.<li><b>auto</b>: Переглядати зміни до файлу projrc. "
-"Use the value of the \"projrc.confirm\" configuration key to determine "
-"whether to show a confirmation dialog or not before updating the local "
-"projrc file.</ul><p>Типово: ніколи"
+"<li><b>підказка</b>: Переглядати зміни у файлі projrc. Якщо є зміни _always_ "
+"показувати запит на підтвердження, питаючи користувача чи не хоче він "
+"оновити локальнийu файл projrc.<li><b>auto</b>: Переглядати зміни до файлу "
+"projrc. Використовуйте значення \"projrc.confirm\" конфігураційного ключа "
+"длявизначення показувати діалог підтвердження перед оновленням локального "
+"projrc файлу чи ні.</ul><p>Типово: ніколи"
 
 msgid "GnuPG"
 msgstr ""
@@ -6468,7 +6464,7 @@ msgid "A shelf file of that name already exists"
 msgstr "Файл поличок з такою назвою вже існує"
 
 msgid "New shelf created"
-msgstr "Створити нову Відкладення"
+msgstr "Створити нову відкладення"
 
 msgid "Are you sure?"
 msgstr "Ви впевнені?"
@@ -6545,6 +6541,9 @@ msgstr "%s - стан"
 
 msgid "status"
 msgstr "стан"
+
+msgid "Failed to refresh"
+msgstr ""
 
 msgid "No appropriate files"
 msgstr "Немає відповідних файлів"
@@ -6658,7 +6657,7 @@ msgid "Stop current operation"
 msgstr "Зупинити поточну операцію"
 
 msgid "Target:"
-msgstr "Ціль:"
+msgstr "Мета:"
 
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Обрані параметри:</b>"
@@ -7124,7 +7123,7 @@ msgstr "не вершина гілка (використовуйте force)"
 
 #, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
-msgstr "Перемістити ознаку %s в набір змін %s (для набору змін %s)"
+msgstr "Втратити ознаку %s в наборі змін %s (для набору змін %s)"
 
 #, python-format
 msgid "Added tag %s for changeset %s"
@@ -7132,7 +7131,7 @@ msgstr "Додана ознака %s для набору змін %s"
 
 #, python-format
 msgid "Tag '%s' has been moved"
-msgstr "Ознака '%s' була переміщена"
+msgstr "Ознака '%s' була втрачена"
 
 #, python-format
 msgid "Tag '%s' has been added"
@@ -7710,7 +7709,7 @@ msgid "R&epository Registry Options"
 msgstr "Налаштування списку сховищ"
 
 msgid "Save Open Repositories on E&xit"
-msgstr "Зберігати відкритими сховища при &виході"
+msgstr "При &виході зберігати відкриті сховища"
 
 msgid "&Commit"
 msgstr "&Зафіксувати"
@@ -7722,7 +7721,7 @@ msgid "&Patch Branch"
 msgstr "&Гілка Латок"
 
 msgid "Revision &Details"
-msgstr "&Деталізувати ревізію"
+msgstr "Ревізії &розлого"
 
 msgid "&Manifest"
 msgstr "&Огляд змін"
@@ -8617,9 +8616,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Universal Date"
 #~ msgstr "Світовий час"
 
-#~ msgid "Merge target (other)"
-#~ msgstr "Мета об'єднання (інша)"
-
 #~ msgid "used internally by daemon mode"
 #~ msgstr "використовувати у режимі демону (сервіс)"
 
@@ -8827,14 +8823,8 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Apply next patch"
 #~ msgstr "Прийняти наступну латку"
 
-#~ msgid "Confirm Fold"
-#~ msgstr "Підтвердіть складання"
-
 #~ msgid "_rename"
 #~ msgstr "_зміна назви"
-
-#~ msgid "Succeed"
-#~ msgstr "Добитися"
 
 #~ msgid "Open..."
 #~ msgstr "Відкрити..."
@@ -9254,9 +9244,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "file %s already exists\n"
 #~ msgstr "файл %s вже існує\n"
 
-#~ msgid "Bookmark \"%s\" has been moved"
-#~ msgstr "Закладка \"%s\" переміщена"
-
 #~ msgid "Bookmark \"%s\" has been renamed to \"%s\""
 #~ msgstr "Назва закладки \"%s\" була змінена на \"%s\""
 
@@ -9572,9 +9559,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Copy file to"
 #~ msgstr "Копіювати файл до"
 
-#~ msgid "Nothing Moved"
-#~ msgstr "Нічого не переміщено"
-
 #~ msgid ""
 #~ "\n"
 #~ "===== Diff to second parent %d:%s =====\n"
@@ -9766,15 +9750,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Hunk Selection"
 #~ msgstr "Вибрати частину"
 
-#~ msgid ""
-#~ "No movable files selected\n"
-#~ "\n"
-#~ "Note: only clean files can be moved."
-#~ msgstr ""
-#~ "Не обрано файли для переміщення\n"
-#~ "\n"
-#~ "Нотатка: лише незмінені файли можливо переміщати."
-
 #~ msgid "not up to date"
 #~ msgstr "не до сьогоднішнього дня"
 
@@ -9919,9 +9894,6 @@ msgstr "сховище %s не знайдено"
 
 #~ msgid "Confirm Rebase Revision"
 #~ msgstr "Підтвердіть зміну бази ревізій"
-
-#~ msgid "Must supply a target revision"
-#~ msgstr "Необхідно вказати цільову ревізію"
 
 #~ msgid "Current revision (local)"
 #~ msgstr "Поточна ревізія (локальна)"
@@ -10172,12 +10144,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Hg file log viewer - %s"
 #~ msgstr "Перегляд файлу журналу Hg - %s"
 
-#~ msgid "Filename required"
-#~ msgstr "Потребує назви файла"
-
-#~ msgid "Cannot open non mercurial repositories or subrepositories"
-#~ msgstr "Не можу відкрити не mercurial сховище або підсховище"
-
 #~ msgid "_Visual Diff"
 #~ msgstr "_Візуальне порівнювання"
 
@@ -10321,9 +10287,6 @@ msgstr "сховище %s не знайдено"
 
 #~ msgid "&Annotate"
 #~ msgstr "&Примітка"
-
-#~ msgid "annotate requires a single filename\n"
-#~ msgstr "потрібна примітка до одного файлу\n"
 
 #~ msgid "<p>But could not run Workbench for it.</p><p>%s</p>"
 #~ msgstr "<p>Не вдалося запустити робоче середовище для нього.</p><p>%s</p>"
@@ -10591,9 +10554,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Edit remote repository path"
 #~ msgstr "Правити шлях до зовнішнього сховища"
 
-#~ msgid "Failed to open Review Board dialog"
-#~ msgstr "Помилка при відкритті діалогу рецензування"
-
 #~ msgid "Load all"
 #~ msgstr "Отримати все"
 
@@ -10616,17 +10576,6 @@ msgstr "сховище %s не знайдено"
 #~ "не встановлено.\n"
 #~ "\n"
 #~ "наприклад: en, en_GB, en_US"
-
-#~ msgid ""
-#~ "Invalid reviewboard plugin. Please download the mercurial reviewboard "
-#~ "plugin version 3.5 or higher from the website below.\n"
-#~ "\n"
-#~ " %s"
-#~ msgstr ""
-#~ "Додаток Інспектування пошкоджений. Будь ласка, отримайте додаток "
-#~ "Інспектування версії 3.5 або вище з вищевказаного файлу.\n"
-#~ "\n"
-#~ " %s"
 
 #~ msgid "Show emails which would be sent"
 #~ msgstr "Відобразити надіслані листи"
@@ -10725,24 +10674,11 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Maximum number of files to list per changeset."
 #~ msgstr "Максимальна кількість файлів для переліку набору змін."
 
-#~ msgid ""
-#~ "Do you want to fold un-applied patch '%(target)s' into current patch "
-#~ "'%(qtip)s'?"
-#~ msgstr ""
-#~ "Бажаєте скласти не накладені латки '%(target)s' у поточну латку '%(qtip)"
-#~ "s'?"
-
 #~ msgid "Do you want to delete '%(name)s'?"
 #~ msgstr "Бажаєте знищити '%(name)s'?"
 
 #~ msgid "Do you want to delete these patches?"
 #~ msgstr "Бажаєте знищити ці латки??"
-
-#~ msgid ""
-#~ "Do you want to fold following un-applied patches into the current patch "
-#~ "'%(qtip)s'?"
-#~ msgstr ""
-#~ "Бажаєте наступного разу не накладати латки до поточного латки '%(qtip)s'?"
 
 #~ msgid "Name associated with commits"
 #~ msgstr "Ім'я ассоційоване з фіксаціями"
@@ -11337,12 +11273,6 @@ msgstr "сховище %s не знайдено"
 #~ msgid "Please select tag name to remove"
 #~ msgstr "Оберіть ознаку для вилучення"
 
-#~ msgid "tagged revisions"
-#~ msgstr "означити модифікації"
-
-#~ msgid "Tagged Revisions"
-#~ msgstr "Означити модифікації"
-
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Ігнорувати прогалину при порівнянні файлів. Типово: ні"
 
@@ -11390,6 +11320,9 @@ msgstr "сховище %s не знайдено"
 
 #~ msgid "Invalid revision set"
 #~ msgstr "Набір помилкових ревізій"
+
+#~ msgid "Tagged Revisions"
+#~ msgstr "Означити ревізії"
 
 #~ msgid "Import Revision to MQ"
 #~ msgstr "Імпортувати ревізію для MQ"
@@ -11482,16 +11415,6 @@ msgstr "сховище %s не знайдено"
 #~ "Скасувати неможливо!\n"
 #~ "Вершина ревізії відрізняється від останньої зафіксованої."
 
-#~ msgid ""
-#~ "Select whether you want to have a single workbench window. If you disable "
-#~ "this setting you will get a new workbench window everytime that you use "
-#~ "the \"Hg Workbench\"command on the explorer context menu. Default: True"
-#~ msgstr ""
-#~ "Виберіть, чи хочете ви мати одне вікно середовища. Якщо цей параметр "
-#~ "вимкнено, ви отримаєте нове вікно для кожного сховища, яке ви "
-#~ "використовуватиме \"Hg Workbench\" команди з контекстного меню "
-#~ "Провідника. Типово: так"
-
 #~ msgid "The specified line number \"%s\" is invalid."
 #~ msgstr "Зазначений номер рядка \"%s\" є недійсним."
 
@@ -11510,3 +11433,79 @@ msgstr "сховище %s не знайдено"
 #~ "існуючих латок на Git qrefresh. Якщо встановлено 'так' або 'ні', mq буде "
 #~ "переписувати [diff] секцію та завжди створювати git або regular латки, "
 #~ "для уникнення можливою втрати даних. Типово: авто"
+
+#~ msgid ""
+#~ "Invalid reviewboard plugin. Please download the mercurial reviewboard "
+#~ "plugin version 3.5 or higher from the website below.\n"
+#~ "\n"
+#~ " %s"
+#~ msgstr ""
+#~ "Додаток Інспектування пошкоджений. Звантажте додаток Інспектування версії "
+#~ "не нижче 3.5 з сайту вказаного нижче.\n"
+#~ "\n"
+#~ " %s"
+
+#~ msgid "Failed to open Review Board dialog"
+#~ msgstr "Помилка при відкритті діалогу перегляду"
+
+#~ msgid "Filename required"
+#~ msgstr "Потребна назва файлу"
+
+#~ msgid "Cannot open non mercurial repositories or subrepositories"
+#~ msgstr "Не можу відкрити, сховище або підсховище не mercurial"
+
+#~ msgid "annotate requires a single filename\n"
+#~ msgstr "потрібна примітка до єдиного файлу\n"
+
+#~ msgid ""
+#~ "Select whether you want to have a single workbench window. If you disable "
+#~ "this setting you will get a new workbench window everytime that you use "
+#~ "the \"Hg Workbench\"command on the explorer context menu. Default: True"
+#~ msgstr ""
+#~ "Виберіть, чи хочете ви мати одне вікно середовища. Якщо цей параметр "
+#~ "вимкнено, ви отримаєте нове вікно для кожного вашого сховища, яке "
+#~ "використовуватиме \"Hg Workbench\" команди з контекстного меню "
+#~ "Провідника. Типово: так"
+
+#~ msgid "Merge target (other)"
+#~ msgstr "Мета злиття (інша)"
+
+#~ msgid "Confirm Fold"
+#~ msgstr "Підтвердіть підшиття"
+
+#~ msgid "Succeed"
+#~ msgstr "Досягнути"
+
+#~ msgid "Bookmark \"%s\" has been moved"
+#~ msgstr "Закладка \"%s\" втрачена"
+
+#~ msgid "Nothing Moved"
+#~ msgstr "Нічого втрачати"
+
+#~ msgid ""
+#~ "No movable files selected\n"
+#~ "\n"
+#~ "Note: only clean files can be moved."
+#~ msgstr ""
+#~ "Не обрано файли для переміщення\n"
+#~ "\n"
+#~ "Нотатка: лише незмінені файли можливо втрачені."
+
+#~ msgid "Must supply a target revision"
+#~ msgstr "Потрібно вказати мету ревізії"
+
+#~ msgid ""
+#~ "Do you want to fold un-applied patch '%(target)s' into current patch "
+#~ "'%(qtip)s'?"
+#~ msgstr ""
+#~ "Бажаєте підшити не накладені латки '%(target)s' до поточної латки '%(qtip)"
+#~ "s'?"
+
+#~ msgid ""
+#~ "Do you want to fold following un-applied patches into the current patch "
+#~ "'%(qtip)s'?"
+#~ msgstr ""
+#~ "Бажаєте підшити наступні не накладені до поточного латки '%(qtip)s'?"
+
+#~ msgid "tagged revisions"
+#~ msgstr "означити ревізії"

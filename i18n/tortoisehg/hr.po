@@ -7,49 +7,49 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Croatian <hg@li.org>\n"
-"POT-Creation-Date: 2013-07-24 10:22-0300\n"
-"PO-Revision-Date: 2010-09-08 08:05+0000\n"
-"Last-Translator: freedomrun <Unknown>\n"
+"POT-Creation-Date: 2013-08-14 14:21-0300\n"
+"PO-Revision-Date: 2013-08-10 15:26+0000\n"
+"Last-Translator: Mario Šarić <mario.saric@helix.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-07-25 05:19+0000\n"
-"X-Generator: Launchpad (build 16700)\n"
+"X-Launchpad-Export-Date: 2013-08-15 04:44+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg poslužitelj prekrivnih ikona"
 
 msgid "Exit"
-msgstr "Izlaz"
+msgstr "Izlazak"
 
 msgid "About"
-msgstr ""
+msgstr "O programu"
 
 msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr ""
+msgstr "Autorska prava 2008-2013 Steve Borho i drugi"
 
 msgid "Several icons are courtesy of the TortoiseSVN project"
 msgstr "TortoiseSVN projekt je ustupio nekolicinu ikona"
 
 msgid "You can visit our site here"
-msgstr ""
+msgstr "Možete posjetiti naše stranice ovdje"
 
 msgid "&License"
-msgstr ""
+msgstr "Licence"
 
 msgid "&Close"
-msgstr ""
+msgstr "&Zatvori"
 
 #, python-format
 msgid "version %s"
-msgstr ""
+msgstr "inačica %s"
 
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr ""
+msgstr "pomoću Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 msgid "A new version of TortoiseHg is ready for download!"
 msgstr "Dostupna je nova inačica TortoiseHg!"
@@ -61,16 +61,16 @@ msgid "Revision:"
 msgstr "Revizija:"
 
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "Samo izmijenjene/nove datoteke u ovoj reviziji"
 
 msgid "Recurse into subrepositories"
-msgstr ""
+msgstr "Ponirući kroz subrepozitorije"
 
 msgid "Destination path:"
 msgstr "Odredišna staza:"
 
 msgid "Browse..."
-msgstr "Pregledaj..."
+msgstr "Pregled..."
 
 msgid "Archive types:"
 msgstr "Vrste arhive:"
@@ -94,19 +94,19 @@ msgid "Zip archive compressed using deflate"
 msgstr "Zip - sažimanje pomoću deflate"
 
 msgid "Hg command:"
-msgstr ""
+msgstr "Hg naredba:"
 
 msgid "Always show output"
-msgstr ""
+msgstr "Uvijek prikaži izlazne poruke"
 
 msgid "&Archive"
-msgstr ""
+msgstr "&Arhiva"
 
 msgid "&Detail"
-msgstr ""
+msgstr "&Detalji"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Prekini"
 
 #, python-format
 msgid "Archive - %s"
@@ -131,14 +131,14 @@ msgid "Gzip tar archives"
 msgstr "Gzip tar arhive"
 
 msgid "Zip archives"
-msgstr ""
+msgstr "ZIP arhive"
 
 msgid "Duplicate Name"
-msgstr ""
+msgstr "Dvostruko ime"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr ""
+msgstr "Odredište \"%s\" već postoji kao datoteka!"
 
 msgid "Confirm Overwrite"
 msgstr "Potvrdite prepisivanje"
@@ -149,6 +149,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"Mapa \"%s\" nije prazna!\n"
+"\n"
+"Želite li je prepisati?"
 
 #, python-format
 msgid ""
@@ -162,211 +165,221 @@ msgstr ""
 
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
-msgstr ""
+msgstr "Odredište \"%s\" već postoji kao mapa!"
 
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "Poništi - %s"
 
 msgid "Prepare to backout"
-msgstr ""
+msgstr "Pripremi poništenje (backout)"
 
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
+"Provjerite reviziju poništenja i osigurajte da je radni direktorij čist."
 
 msgid "Unable to backout"
-msgstr ""
+msgstr "Nije moguće poništiti"
 
 msgid "Backout revision not found"
-msgstr ""
+msgstr "Nije pronađena revizija poništenja"
 
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
+msgstr "Poništenje prethodne revizije je operacija jednog koraka"
 
 msgid "Backout requires a parent revision"
-msgstr ""
+msgstr "Poništenje zahtjeva prethodnu reviziju"
 
 msgid "Cannot backout change on a different branch"
-msgstr ""
+msgstr "Ne može se poništiti izmjena u drugoj grani"
 
 msgid "Backout revision"
-msgstr ""
+msgstr "Revizja poništenja"
 
 msgid "Not a head, backout will create a new head!"
-msgstr ""
+msgstr "Nije glava, poništenje će otvoriti novu glavu!"
 
 msgid "Current local revision"
-msgstr ""
+msgstr "Trenutna lokalna revizija"
 
 msgid "Merge parent to backout to"
-msgstr ""
+msgstr "Stopi prethodnu reviziju s revizijom poništenja"
 
 msgid ""
 "To backout a <b>merge</b> revision you must select which parent to backout "
 "to (i.e. whose changes will be <i>kept</i>)"
 msgstr ""
+"Kako bi poništili reviziju <b>stapanja</b> morate odabrati prethodnu "
+"reviziju na koju ćete se vratiti (čije izmjene će biti <i>sačuvane</i>)"
 
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "Prva prethodna revizija: %s (%s)"
 
 msgid "Backout to the first parent of the merge revision"
-msgstr ""
+msgstr "Poništiti na prvu prethodnu reviziju od revizije stapanja"
 
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Druga prethodna revizija: %s (%s)"
 
 msgid "Backout to the second parent of the merge revision"
-msgstr ""
+msgstr "Poništiti na drugu prethodnu reviziju od revizije stapanja"
 
 msgid "Working directory status"
-msgstr ""
+msgstr "Status radnog direktorija"
 
 msgid "Checking..."
-msgstr ""
+msgstr "Provjera u tijeku..."
 
 msgid ""
 "Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a href="
 "\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
 "b></a> changes."
 msgstr ""
+"Prije poništavanja, morate <a href=\"commit\"><b>pohraniti</b></a>, <a href="
+"\"shelve\"><b>odložiti</b></a> izmjene kao zakrpe, ili  <a href=\"discard"
+"\"><b>odbaciti</b></a> izmjene."
 
 msgid "Automatically resolve merge conflicts where possible"
-msgstr ""
+msgstr "Automatski razriješi sukobe stapanja kad je to moguće"
 
 msgid "<b>Uncommitted local changes are detected</b>"
-msgstr ""
+msgstr "<b>Postoje nepohranjene lokalne izmjene</b>"
 
 msgid "Clean"
-msgstr ""
+msgstr "Očisti"
 
 msgid "&Discard"
-msgstr ""
+msgstr "&Odbaci"
 
 msgid "Confirm Discard"
-msgstr ""
+msgstr "Potvrdi odbacivanje"
 
 msgid "Discard outstanding changes to working directory?"
-msgstr ""
+msgstr "Odbaciti lokalne izmjene u radnom direktoriju?"
 
 msgid "Backing out, then merging..."
-msgstr ""
+msgstr "Poništavanje i nakon toga stapanje..."
 
 msgid "All conflicting files will be marked unresolved."
-msgstr ""
+msgstr "Sve datoteke s konfliktom će biti označene neriješenima."
 
 msgid "Automatically advance to next page when backout and merge are complete."
 msgstr ""
+"Automatski prijeđi na sljedeću stranicu kad završe akcije poništenje i "
+"stapanje."
 
 #, python-format
 msgid ""
 "%d files have <b>merge conflicts</b> that must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
 msgstr ""
+"%d datoteka imaju <b>sukob stapanja</b> kojeg je potrebno <a href=\"resolve"
+"\"><b>razriješiti</b></a>"
 
 msgid "No merge conflicts, ready to commit"
-msgstr ""
+msgstr "Nema sukoba stapanja, spremno za pohranu"
 
 msgid "Commit backout and merge results"
-msgstr ""
+msgstr "Pohrani poništenje i rezultat stapanja"
 
 msgid "Parents"
-msgstr ""
+msgstr "Roditelji"
 
 msgid "Working Directory"
-msgstr ""
+msgstr "Radni direktorij"
 
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Radni direktorij (stopljen)"
 
 msgid "Commit message"
-msgstr ""
+msgstr "Poruka pohrane"
 
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "Preskoči dijalog potvrde, zatvori nakon pohrane"
 
 msgid "Backed out merge changeset: "
-msgstr ""
+msgstr "Poništena izmjena stapanja: "
 
 msgid "Backed out changeset: "
-msgstr ""
+msgstr "Poništena izmjena: "
 
 msgid "Confirm Discard Message"
 msgstr "Potvrdi Odbacivanje Poruke"
 
 msgid "Discard current backout message?"
-msgstr ""
+msgstr "Odbaci trenutnu poruku poništavanja?"
 
 msgid "Use English backout message"
-msgstr ""
+msgstr "Koristi englesku poruku za poništavanje"
 
 #, python-format
 msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
+msgstr "Poništena revizija stapanja na prvog roditelja (%s)"
 
 #, python-format
 msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
+msgstr "Poništena revizija stapanja na drugog roditelja (%s)"
 
 msgid "Backing out and committing..."
-msgstr ""
+msgstr "Poništavanje i pohrana..."
 
 msgid "Please wait while making backout."
-msgstr ""
+msgstr "Molim pričekajte dok se poništavanje ne završi."
 
 msgid "Committing..."
-msgstr ""
+msgstr "Pohrana..."
 
 msgid "Please wait while committing merged files."
-msgstr ""
+msgstr "Molim pričekajte da se pohrane stopljene datoteke."
 
 msgid "Finished"
-msgstr ""
+msgstr "Završeno"
 
 msgid "Backout changeset"
-msgstr ""
+msgstr "Revizija poništavanja"
 
 #, python-format
 msgid "Bisect - %s"
-msgstr ""
+msgstr "Presjek - %s"
 
 msgid "Known good revision:"
-msgstr ""
+msgstr "Poznata ispravna revizija:"
 
 msgid "Accept"
-msgstr ""
+msgstr "Prihvati"
 
 msgid "Known bad revision:"
-msgstr ""
+msgstr "Poznata neispravna revizija:"
 
 msgid "Revision is Good"
-msgstr ""
+msgstr "Revizija je ispravna"
 
 msgid "Revision is Bad"
-msgstr ""
+msgstr "Revizija je neispravna"
 
 msgid "Skip this Revision"
-msgstr ""
+msgstr "Preskoči ovu reviziju"
 
 msgid "Close"
 msgstr "Zatvori"
 
 msgid "Error encountered."
-msgstr ""
+msgstr "Greška prilikom izvršavanja"
 
 msgid "Culprit found."
-msgstr ""
+msgstr "Pronađena zapreka."
 
 msgid "Revision"
-msgstr ""
+msgstr "Revizija"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr ""
+msgstr "Testiraj ovu reviziju i izvijesti (ispravna/neispravna/preskoči)"
 
 #, python-format
 msgid "%s (hint: %s)"
-msgstr ""
+msgstr "%s (savjet: %s)"
 
 msgid "Bookmark:"
 msgstr "Oznaka:"
@@ -375,19 +388,19 @@ msgid "New Name:"
 msgstr "Novo ime:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "Aktiviraj:"
 
 msgid "&Add"
-msgstr ""
+msgstr "&Dodaj"
 
 msgid "Re&name"
-msgstr ""
+msgstr "&Promijeni ime"
 
 msgid "&Remove"
-msgstr ""
+msgstr "&Ukloni"
 
 msgid "&Move"
-msgstr ""
+msgstr "&Premjesti"
 
 #, python-format
 msgid "Bookmark - %s"
@@ -395,35 +408,35 @@ msgstr "Oznake - %s"
 
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "Oznaka s imenom \"%s\" već postoji"
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "Oznaka '%s' je dodana"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "Oznaka \"%s\" ne postoji"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "Oznaka '%s' je pomaknuta"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Oznaka '%s' ne postoji"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "Oznaka '%s' je uklonjena"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "Oznaka '%s' je promijenila ime u '%s'"
 
 #, python-format
 msgid "%s - branch operation"
-msgstr ""
+msgstr "%s - operacija nad granom"
 
 msgid "Select branch of merge commit"
 msgstr "Odaberite granu za pohranu stapanja"
@@ -438,14 +451,14 @@ msgid "Open a new named branch"
 msgstr "Otvori novu imenovanu granu"
 
 msgid "Close current branch"
-msgstr ""
+msgstr "Zatvori trenutnu granu"
 
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
-msgstr ""
+msgstr "Molimo otvorite grešku u našoj <a href=\"%s\">evidenciji predmeta</a>"
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "Provjera ažuriranja..."
 
 msgid "Copy"
 msgstr ""
@@ -6073,6 +6086,9 @@ msgid "%s - status"
 msgstr ""
 
 msgid "status"
+msgstr ""
+
+msgid "Failed to refresh"
 msgstr ""
 
 msgid "No appropriate files"
