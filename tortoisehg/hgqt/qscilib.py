@@ -390,7 +390,7 @@ class Scintilla(QsciScintilla):
 
     def setDefaultEolMode(self):
         if self.lines():
-            mode = qsciEolModeFromLine(hglib.fromunicode(self.text(0)))
+            mode = qsciEolModeFromLine(unicode(self.text(0)))
         else:
             mode = qsciEolModeFromOs()
         self.setEolMode(mode)
