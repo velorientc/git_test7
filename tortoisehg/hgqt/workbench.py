@@ -51,7 +51,6 @@ class Workbench(QMainWindow):
         self._repomanager.repositoryOpened.connect(self._updateRepoRegItem)
 
         self.setupUi()
-        self.setWindowTitle(_('TortoiseHg Workbench'))
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
