@@ -50,14 +50,14 @@ class StatusWidget(QWidget):
     grepRequested = pyqtSignal(unicode, dict)
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, pats, opts, parent=None, checkable=True,
+    def __init__(self, repoagent, pats, opts, parent=None, checkable=True,
                  defcheck='commit'):
         QWidget.__init__(self, parent)
 
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
-        self.repo = repo
+        self._repoagent = repoagent
         self.pats = pats
         self.checkable = checkable
         self.defcheck = defcheck
@@ -139,7 +139,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
-        self.actions = wctxactions.WctxActions(self.repo, self, checkable)
+        self.actions = wctxactions.WctxActions(self._repoagent, self, checkable)
         self.actions.refreshNeeded.connect(self.refreshWctx)
         self.actions.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
@@ -178,7 +178,7 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         self.docf = docf
 
-        self.fileview = fileview.HgFileView(self.repo, self)
+        self.fileview = fileview.HgFileView(self._repoagent, self)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
@@ -192,6 +192,10 @@ class StatusWidget(QWidget):
 
         self.split = split
         self.diffvbox = vbox
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def __get_defcheck(self):
         if self._defcheck is None:
@@ -1046,7 +1050,7 @@ class StatusFilterButton(QToolButton):
 
 class StatusDialog(QDialog):
     'Standalone status browser'
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repoagent, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
@@ -1054,7 +1058,8 @@ class StatusDialog(QDialog):
         self.setLayout(layout)
         toplayout = QVBoxLayout()
         toplayout.setContentsMargins(10, 10, 10, 0)
-        self.stwidget = StatusWidget(repo, pats, opts, self, checkable=False)
+        self.stwidget = StatusWidget(repoagent, pats, opts, self,
+                                     checkable=False)
         toplayout.addWidget(self.stwidget, 1)
         layout.addLayout(toplayout)
 
@@ -1082,8 +1087,10 @@ class StatusDialog(QDialog):
             self._subdialogs.open(link[len('repo:'):])
 
     def _createSubDialog(self, uroot):
+        # TODO: do not instantiate repo here
         repo = thgrepo.repository(None, hglib.fromunicode(uroot))
-        return StatusDialog(repo, [], {}, parent=self)
+        repoagent = repo._pyqtobj
+        return StatusDialog(repoagent, [], {}, parent=self)
 
     def loadSettings(self):
         s = QSettings()

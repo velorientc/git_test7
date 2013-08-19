@@ -31,18 +31,18 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, parent=None, logwidget=None):
+    def __init__(self, repoagent, parent=None, logwidget=None):
         QWidget.__init__(self, parent)
 
         # Set up variables and connect signals
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.pbranch = extensions.find('pbranch') # Unfortunately global instead of repo-specific
         self.show_internal_branches = False
 
-        repo.configChanged.connect(self.configChanged)
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        repoagent.configChanged.connect(self.configChanged)
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.workingBranchChanged.connect(self.workingBranchChanged)
 
         # Build child widgets
 
@@ -125,7 +125,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def PatchDiffDetails():
             # pdiff view of selected patc
-            self.patchdiff = revdetails.RevDetailsWidget(self.repo, self)
+            self.patchdiff = revdetails.RevDetailsWidget(self._repoagent, self)
             return self.patchdiff
 
         BuildChildWidgets()
@@ -136,6 +136,10 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def reload(self):
         'User has requested a reload'
@@ -565,7 +569,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         branch = self.selected_patch()
         # TODO: Fetch list of heads of branch
         # - use a list of revs if more than one found
-        dlg = update.UpdateDialog(self.repo, branch, self)
+        dlg = update.UpdateDialog(self._repoagent, branch, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)

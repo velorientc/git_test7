@@ -383,8 +383,7 @@ def _filelog(ui, repoagent, *pats, **opts):
     if len(pats) != 1:
         raise util.Abort(_('requires a single filename'))
     filename = hglib.canonpaths(pats)[0]
-    repo = repoagent.rawRepo()
-    return filedialogs.FileLogDialog(repo, filename)
+    return filedialogs.FileLogDialog(repoagent, filename)
 
 def _workbench(ui, *pats, **opts):
     root = opts.get('root') or paths.find_root()
@@ -455,9 +454,8 @@ def annotate(ui, repoagent, *pats, **opts):
 def archive(ui, repoagent, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt import archive as archivemod
-    repo = repoagent.rawRepo()
     rev = opts.get('rev')
-    return archivemod.ArchiveDialog(repo, rev)
+    return archivemod.ArchiveDialog(repoagent, rev)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),
@@ -467,21 +465,19 @@ def archive(ui, repoagent, *pats, **opts):
 def backout(ui, repoagent, *pats, **opts):
     """backout tool"""
     from tortoisehg.hgqt import backout as backoutmod
-    repo = repoagent.rawRepo()
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
     else:
         rev = 'tip'
-    return backoutmod.BackoutDialog(rev, repo, None)
+    return backoutmod.BackoutDialog(repoagent, rev)
 
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, repoagent, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt import bisect as bisectmod
-    repo = repoagent.rawRepo()
-    return bisectmod.BisectDialog(repo, opts)
+    return bisectmod.BisectDialog(repoagent, opts)
 
 @command('bookmarks|bookmark',
     [('r', 'rev', '', _('revision'))],
@@ -493,7 +489,7 @@ def bookmark(ui, repoagent, *names, **opts):
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
     if len(names) > 1:
         raise util.Abort(_('only one new bookmark name allowed'))
-    dlg = bookmarkmod.BookmarkDialog(repo, rev)
+    dlg = bookmarkmod.BookmarkDialog(repoagent, rev)
     if names:
         dlg.setBookmarkName(hglib.tounicode(names[0]))
     return dlg
@@ -523,7 +519,7 @@ def commit(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return commitmod.CommitDialog(repo, pats, opts)
+    return commitmod.CommitDialog(repoagent, pats, opts)
 
 @command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):
@@ -548,13 +544,12 @@ def drag_move(ui, repoagent, *pats, **opts):
 def email(ui, repoagent, *revs, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt import hgemail
-    repo = repoagent.rawRepo()
     # TODO: same options as patchbomb
     if opts.get('rev'):
         if revs:
             raise util.Abort(_('use only one form to specify the revision'))
         revs = opts.get('rev')
-    return hgemail.EmailDialog(repo, revs)
+    return hgemail.EmailDialog(repoagent, revs)
 
 @command('forget', [], _('thg forget [FILE]...'))
 def forget(ui, repoagent, *pats, **opts):
@@ -572,7 +567,7 @@ def graft(ui, repoagent, *revs, **opts):
     revs.extend(opts['rev'])
     if not os.path.exists(repo.join('graftstate')) and not revs:
         raise util.Abort(_('You must provide revisions to graft'))
-    return graftmod.GraftDialog(repo, None, source=revs)
+    return graftmod.GraftDialog(repoagent, None, source=revs)
 
 @command('^grep|search',
     [('i', 'ignorecase', False, _('ignore case during search'))],
@@ -580,16 +575,14 @@ def graft(ui, repoagent, *revs, **opts):
 def grep(ui, repoagent, *pats, **opts):
     """grep/search dialog"""
     from tortoisehg.hgqt import grep as grepmod
-    repo = repoagent.rawRepo()
     upats = [hglib.tounicode(p) for p in pats]
-    return grepmod.SearchDialog(upats, repo, **opts)
+    return grepmod.SearchDialog(repoagent, upats, **opts)
 
 @command('^guess', [], _('thg guess'))
 def guess(ui, repoagent, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt import guess as guessmod
-    repo = repoagent.rawRepo()
-    return guessmod.DetectRenameDialog(repo, None, *pats)
+    return guessmod.DetectRenameDialog(repoagent, None, *pats)
 
 ### help management, adapted from mercurial.commands.help_()
 @command('help', [], _('thg help [COMMAND]'))
@@ -773,10 +766,9 @@ def help_(ui, name=None, with_version=False, **opts):
 def hgignore(ui, repoagent, *pats, **opts):
     """ignore filter editor"""
     from tortoisehg.hgqt import hgignore as hgignoremod
-    repo = repoagent.rawRepo()
     if pats and pats[0].endswith('.hgignore'):
         pats = []
-    return hgignoremod.HgignoreDialog(repo, None, *pats)
+    return hgignoremod.HgignoreDialog(repoagent, None, *pats)
 
 @command('import',
     [('', 'mq', False, _('import to the patch queue (MQ)'))],
@@ -784,8 +776,7 @@ def hgignore(ui, repoagent, *pats, **opts):
 def import_(ui, repoagent, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt import thgimport
-    repo = repoagent.rawRepo()
-    dlg = thgimport.ImportDialog(repo, None, **opts)
+    dlg = thgimport.ImportDialog(repoagent, None, **opts)
     dlg.setfilepaths(pats)
     return dlg
 
@@ -844,7 +835,7 @@ def manifest(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import manifestdialog
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-    dlg = manifestdialog.ManifestDialog(repo, rev)
+    dlg = manifestdialog.ManifestDialog(repoagent, rev)
     if pats:
         path = hglib.canonpaths(pats)[0]
         if opts.get('line'):
@@ -865,20 +856,18 @@ def manifest(ui, repoagent, *pats, **opts):
 def merge(ui, repoagent, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt import merge as mergemod
-    repo = repoagent.rawRepo()
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]
     if not rev:
         raise util.Abort(_('Merge revision not specified or not found'))
-    return mergemod.MergeDialog(rev, repo, None)
+    return mergemod.MergeDialog(repoagent, rev)
 
 @command('mq', [], _('thg mq'))
 def mq(ui, repoagent, *pats, **opts):
     """Mercurial Queue tool"""
     from tortoisehg.hgqt import mq as mqmod
-    repo = repoagent.rawRepo()
-    return mqmod.MQWidget(repo, None, **opts)
+    return mqmod.MQWidget(repoagent, None, **opts)
 
 @command('postreview',
     [('r', 'rev', [], _('a revision to post'))],
@@ -892,14 +881,13 @@ def postreview(ui, repoagent, *pats, **opts):
         revs = pats[0]
     if not revs:
         raise util.Abort(_('no revisions specified'))
-    return postreviewmod.PostReviewDialog(repo.ui, repo, revs)
+    return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
 
 @command('^purge', [], _('thg purge'))
 def purge(ui, repoagent, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt import purge as purgemod
-    repo = repoagent.rawRepo()
-    return purgemod.PurgeDialog(repo, None)
+    return purgemod.PurgeDialog(repoagent)
 
 @command('^qqueue', [], _('thg qqueue'))
 def qqueue(ui, repoagent, *pats, **opts):
@@ -908,7 +896,7 @@ def qqueue(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     if not hasattr(repo, 'mq'):
         raise util.Abort(_('Please enable the MQ extension first.'))
-    return qqueuemod.QQueueDialog(repo)
+    return qqueuemod.QQueueDialog(repoagent)
 
 @command('^qreorder', [], _('thg qreorder'))
 def qreorder(ui, repoagent, *pats, **opts):
@@ -917,7 +905,7 @@ def qreorder(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     if not hasattr(repo, 'mq'):
         raise util.Abort(_('Please enable the MQ extension first.'))
-    return qreordermod.QReorderDialog(repo)
+    return qreordermod.QReorderDialog(repoagent)
 
 @command('^rebase',
     [('', 'keep', False, _('keep original changesets')),
@@ -937,7 +925,7 @@ def rebase(ui, repoagent, *pats, **opts):
                                            'progress')))
     elif not opts['source'] or not opts['dest']:
         raise util.Abort(_('You must provide source and dest arguments'))
-    return rebasemod.RebaseDialog(repo, None, **opts)
+    return rebasemod.RebaseDialog(repoagent, None, **opts)
 
 @command('rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):
@@ -959,9 +947,8 @@ def remove(ui, repoagent, *pats, **opts):
 def rename(ui, repoagent, *pats, **opts):
     """rename dialog"""
     from tortoisehg.hgqt import rename as renamemod
-    repo = repoagent.rawRepo()
     iscopy = (opts.get('alias') == 'copy')
-    return renamemod.RenameDialog(repo, pats, iscopy=iscopy)
+    return renamemod.RenameDialog(repoagent, pats, iscopy=iscopy)
 
 @command('^repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],
@@ -975,8 +962,7 @@ def repoconfig(ui, repoagent, *pats, **opts):
 def resolve(ui, repoagent, *pats, **opts):
     """resolve dialog"""
     from tortoisehg.hgqt import resolve as resolvemod
-    repo = repoagent.rawRepo()
-    return resolvemod.ResolveDialog(repo)
+    return resolvemod.ResolveDialog(repoagent)
 
 @command('^revdetails',
     [('r', 'rev', '', _('the revision to show'))],
@@ -987,7 +973,7 @@ def revdetails(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     os.chdir(repo.root)
     rev = opts.get('rev', '.')
-    return revdetailsmod.RevDetailsDialog(repo, rev=rev)
+    return revdetailsmod.RevDetailsDialog(repoagent, rev=rev)
 
 @command('revert', [], _('thg revert [FILE]...'))
 def revert(ui, repoagent, *pats, **opts):
@@ -1000,13 +986,12 @@ def revert(ui, repoagent, *pats, **opts):
 def rupdate(ui, repoagent, *pats, **opts):
     """update a remote repository"""
     from tortoisehg.hgqt import rupdate as rupdatemod
-    repo = repoagent.rawRepo()
     rev = None
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return rupdatemod.rUpdateDialog(repo, rev, None, opts)
+    return rupdatemod.rUpdateDialog(repoagent, rev, None, opts)
 
 @command('^serve',
     [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
@@ -1030,8 +1015,7 @@ if os.name == 'nt':
 def shelve(ui, repoagent, *pats, **opts):
     """Move changes between working directory and patches"""
     from tortoisehg.hgqt import shelve as shelvemod
-    repo = repoagent.rawRepo()
-    return shelvemod.ShelveDialog(repo)
+    return shelvemod.ShelveDialog(repoagent)
 
 @command('^status|st',
     [('c', 'clean', False, _('show files without changes')),
@@ -1043,7 +1027,7 @@ def status(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
-    return statusmod.StatusDialog(repo, pats, opts)
+    return statusmod.StatusDialog(repoagent, pats, opts)
 
 @command('^strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
@@ -1053,20 +1037,18 @@ def status(ui, repoagent, *pats, **opts):
 def strip(ui, repoagent, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt import thgstrip
-    repo = repoagent.rawRepo()
     rev = None
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return thgstrip.StripDialog(repo, rev=rev, opts=opts)
+    return thgstrip.StripDialog(repoagent, rev=rev, opts=opts)
 
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repoagent, *pats, **opts):
     """Synchronize with other repositories"""
     from tortoisehg.hgqt import sync as syncmod
-    repo = repoagent.rawRepo()
-    w = syncmod.SyncWidget(repo, None, **opts)
+    w = syncmod.SyncWidget(repoagent, None, **opts)
     if pats:
         w.setUrl(hglib.tounicode(pats[0]))
     return w
@@ -1081,7 +1063,6 @@ def sync(ui, repoagent, *pats, **opts):
 def tag(ui, repoagent, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt import tag as tagmod
-    repo = repoagent.rawRepo()
     kargs = {}
     tag = len(pats) > 0 and pats[0] or None
     if tag:
@@ -1089,7 +1070,7 @@ def tag(ui, repoagent, *pats, **opts):
     rev = opts.get('rev')
     if rev:
         kargs['rev'] = rev
-    return tagmod.TagDialog(repo, opts=opts, **kargs)
+    return tagmod.TagDialog(repoagent, opts=opts, **kargs)
 
 @command('thgstatus',
     [('',  'delay', None, _('wait until the second ticks over')),
@@ -1111,13 +1092,12 @@ def thgstatus(ui, *pats, **opts):
 def update(ui, repoagent, *pats, **opts):
     """update/checkout tool"""
     from tortoisehg.hgqt import update as updatemod
-    repo = repoagent.rawRepo()
     rev = None
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return updatemod.UpdateDialog(repo, rev, None, opts)
+    return updatemod.UpdateDialog(repoagent, rev, None, opts)
 
 @command('^userconfig',
     [('', 'focus', '', _('field to give initial focus'))],

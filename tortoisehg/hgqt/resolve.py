@@ -17,12 +17,13 @@ from tortoisehg.hgqt import qtlib, cmdui, csinfo, visdiff, thgrepo
 MARGINS = (8, 0, 0, 0)
 
 class ResolveDialog(QDialog):
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         super(ResolveDialog, self).__init__(parent)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.setWindowFlags(Qt.Window)
         self.setWindowTitle(_('Resolve Conflicts - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-merge'))
-        self.repo = repo
 
         self.setLayout(QVBoxLayout())
         self.layout().setSpacing(5)
@@ -217,8 +218,12 @@ class ResolveDialog(QDialog):
         self.refresh()
         self.utree.selectAll()
         self.utree.setFocus()
-        repo.configChanged.connect(self.configChanged)
-        repo.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def repositoryChanged(self):

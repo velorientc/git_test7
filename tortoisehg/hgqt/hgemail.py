@@ -20,7 +20,7 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
 
-    def __init__(self, repo, revs, parent=None, outgoing=False,
+    def __init__(self, repoagent, revs, parent=None, outgoing=False,
                  outgoingrevs=None):
         """Create EmailDialog for the given repo and revs
 
@@ -32,7 +32,7 @@ class EmailDialog(QDialog):
         """
         super(EmailDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
-        self._repo = repo
+        self._repoagent = repoagent
         self._outgoing = outgoing
         self._outgoingrevs = outgoingrevs or []
 
@@ -107,6 +107,10 @@ class EmailDialog(QDialog):
                                             parent=self)
         self._changesets.dataChanged.connect(self._updateforms)
         self._qui.changesets_view.setModel(self._changesets)
+
+    @property
+    def _repo(self):
+        return self._repoagent.rawRepo()
 
     @property
     def _ui(self):

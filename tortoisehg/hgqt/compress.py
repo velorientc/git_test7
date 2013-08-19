@@ -18,11 +18,11 @@ BB = QDialogButtonBox
 class CompressDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, revs, parent):
+    def __init__(self, repoagent, revs, parent):
         super(CompressDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self._repoagent = repoagent
         self.revs = revs
 
         box = QVBoxLayout()
@@ -69,9 +69,14 @@ class CompressDialog(QDialog):
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Compress - %s') % repo.displayname)
 
         self.restoreSettings()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def checkStatus(self):
         repo = self.repo
@@ -133,7 +138,7 @@ class CompressDialog(QDialog):
         descs = [self.repo[c].description() for c in revs]
         self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
-        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.showMessage.emit(_('Compress is complete, old history untouched'))
@@ -143,7 +148,7 @@ class CompressDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
+            dlg = commit.CommitDialog(self._repoagent, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkStatus()

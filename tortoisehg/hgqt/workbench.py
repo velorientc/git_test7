@@ -51,7 +51,6 @@ class Workbench(QMainWindow):
         self._repomanager.repositoryOpened.connect(self._updateRepoRegItem)
 
         self.setupUi()
-        self.setWindowTitle(_('TortoiseHg Workbench'))
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
@@ -141,7 +140,6 @@ class Workbench(QMainWindow):
 
         self.menuFile = self.menubar.addMenu(_("&File"))
         self.menuView = self.menubar.addMenu(_("&View"))
-        self.menuViewregistryopts = QMenu(_('Workbench Toolbars'), self)
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
@@ -204,9 +202,8 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(
-            _('R&epository Registry Options'))
-        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
+        menu = self.menuView.addMenu(_('R&epository Registry Options'))
+        menu.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
         newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
@@ -764,9 +761,9 @@ class Workbench(QMainWindow):
         w = tw.currentWidget()
         if tw.count() == 0:
             self.setWindowTitle(_('TortoiseHg Workbench'))
-        elif w.repo.shortname != w.repo.displayname:
+        elif w.repo.ui.configbool('tortoisehg', 'fullpath'):
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
-                                (w.title(), w.repo.displayname))
+                                (w.title(), w.repoRootPath()))
         else:
             self.setWindowTitle(_('%s - TortoiseHg Workbench') % w.title())
 
@@ -855,14 +852,15 @@ class Workbench(QMainWindow):
             self.updateHistoryActions()
             self.updateMenu()
             self.log.setCurrentRepoRoot(w.repoRootPath())
+            repoagent = self._repomanager.repoAgent(w.repoRootPath())
+            self.mqpatches.setRepoAgent(repoagent)
             self.reporegistry.setActiveTabRepo(w.repoRootPath())
             self._setupCustomTools(w.repo.ui)
             self._setupUrlCombo(w.repo)
         else:
             self.log.setCurrentRepoRoot(None)
+            self.mqpatches.setRepoAgent(None)
             self.reporegistry.setActiveTabRepo('')
-        repo = w and w.repo or None
-        self.mqpatches.setrepo(repo)
 
     #@pyqtSlot(unicode)
     def _updateRepoTabTitle(self, title):

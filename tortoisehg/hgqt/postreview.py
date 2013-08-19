@@ -84,11 +84,11 @@ class LoadReviewDataThread(QThread):
 
 class PostReviewDialog(QDialog):
     """Dialog for sending patches to reviewboard"""
-    def __init__(self, ui, repo, revs, parent=None):
+    def __init__(self, ui, repoagent, revs, parent=None):
         super(PostReviewDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui
-        self.repo = repo
+        self._repoagent = repoagent
         self.error_message = None
         self.cmd = None
 
@@ -103,6 +103,10 @@ class PostReviewDialog(QDialog):
         self.review_thread.start()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def passwordPrompt(self):

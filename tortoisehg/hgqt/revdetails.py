@@ -28,9 +28,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     updateToRevision = pyqtSignal(int)
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent, rev=None):
+    def __init__(self, repoagent, parent, rev=None):
         QWidget.__init__(self, parent)
 
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
         self.repo = repo
         self.ctx = repo[rev]
         self.splitternames = []
@@ -40,7 +43,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.setupModels()
 
         self._deschtmlize = qtlib.descriptionhtmlizer(repo.ui)
-        repo.configChanged.connect(self._updatedeschtmlizer)
+        repoagent.configChanged.connect(self._updatedeschtmlizer)
 
     def setRepo(self, repo):
         self.repo = repo
@@ -154,7 +157,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.message.setFont(f.font())
         f.changed.connect(self.forwardFont)
 
-        self.fileview = HgFileView(self.repo, self.messagesplitter)
+        self.fileview = HgFileView(self._repoagent, self.messagesplitter)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(5)
@@ -341,7 +344,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 class RevDetailsDialog(QDialog):
     'Standalone revision details tool, a wrapper for RevDetailsWidget'
 
-    def __init__(self, repo, rev='.', parent=None):
+    def __init__(self, repoagent, rev='.', parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-log'))
@@ -354,7 +357,7 @@ class RevDetailsDialog(QDialog):
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
 
-        revdetails = RevDetailsWidget(repo, parent, rev=rev)
+        revdetails = RevDetailsWidget(repoagent, parent, rev=rev)
         toplayout.addWidget(revdetails, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -366,7 +369,7 @@ class RevDetailsDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('revdetails/geom').toByteArray())
         revdetails.loadSettings(s)
-        repo.repositoryChanged.connect(self.refresh)
+        repoagent.repositoryChanged.connect(self.refresh)
 
         self.revdetails = revdetails
         self.setRev(rev)

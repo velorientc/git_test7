@@ -21,12 +21,12 @@ class StripDialog(QDialog):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
         self.setWindowIcon(qtlib.geticon('menudelete'))
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -130,6 +130,10 @@ class StripDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def get_rev(self):
         """Return the integer revision number of the input or None"""

@@ -23,10 +23,13 @@ class PurgeDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+
+        self._repoagent = repoagent
+
         layout = QVBoxLayout()
         layout.setMargin(0)
         layout.setSpacing(0)
@@ -75,9 +78,9 @@ class PurgeDialog(QDialog):
         self.showMessage.connect(self.stbar.showMessage)
         layout.addWidget(self.stbar)
 
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('%s - purge') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-purge'))
-        self.repo = repo
 
         self.bb.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Checking'), '...'))
@@ -88,6 +91,10 @@ class PurgeDialog(QDialog):
 
         self.th = None
         QTimer.singleShot(0, self.checkStatus)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def checkStatus(self):
         repo = self.repo

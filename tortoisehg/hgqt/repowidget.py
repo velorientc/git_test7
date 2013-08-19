@@ -196,7 +196,7 @@ class RepoWidget(QWidget):
         tt.setDocumentMode(True)
         self.updateTaskTabs()
 
-        self.revDetailsWidget = w = RevDetailsWidget(self.repo, self)
+        self.revDetailsWidget = w = RevDetailsWidget(self._repoagent, self)
         self.revDetailsWidget.filelisttbar.setStyleSheet(qtlib.tbstylesheet)
         w.linkActivated.connect(self._openLink)
         w.revisionSelected.connect(self.repoview.goto)
@@ -404,7 +404,7 @@ class RepoWidget(QWidget):
 
     def createCommitWidget(self):
         pats, opts = {}, {}
-        cw = CommitWidget(self.repo, pats, opts, True, self, rev=self.rev)
+        cw = CommitWidget(self._repoagent, pats, opts, True, self, rev=self.rev)
         cw.buttonHBox.addWidget(cw.commitSetupButton())
         cw.loadSettings(QSettings(), 'workbench')
 
@@ -433,7 +433,7 @@ class RepoWidget(QWidget):
             rev = None
         else:
             rev = self.rev
-        w = ManifestWidget(self.repo, rev, self)
+        w = ManifestWidget(self._repoagent, rev, self)
         w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
         w.linkActivated.connect(self._openLink)
@@ -445,7 +445,7 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        sw = SyncWidget(self.repo, self)
+        sw = SyncWidget(self._repoagent, self)
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
@@ -698,7 +698,7 @@ class RepoWidget(QWidget):
 
     def createGrepWidget(self):
         upats = {}
-        gw = SearchWidget(upats, self.repo, self)
+        gw = SearchWidget(self._repoagent, upats, self)
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
         gw.progress.connect(self.progress)
@@ -706,7 +706,7 @@ class RepoWidget(QWidget):
         return gw
 
     def createMQWidget(self):
-        mqw = mq.MQWidget(self.repo, self)
+        mqw = mq.MQWidget(self._repoagent, self)
         mqw.output.connect(self.output)
         mqw.progress.connect(self.progress)
         mqw.makeLogVisible.connect(self.makeLogVisible)
@@ -716,7 +716,7 @@ class RepoWidget(QWidget):
         return mqw
 
     def createPatchBranchWidget(self):
-        pbw = PatchBranchWidget(self.repo, parent=self)
+        pbw = PatchBranchWidget(self._repoagent, parent=self)
         pbw.output.connect(self.output)
         pbw.progress.connect(self.progress)
         pbw.makeLogVisible.connect(self.makeLogVisible)
@@ -807,17 +807,17 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def bisect(self):
-        dlg = bisect.BisectDialog(self.repo, {}, self)
+        dlg = bisect.BisectDialog(self._repoagent, {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def resolve(self):
-        dlg = resolve.ResolveDialog(self.repo, self)
+        dlg = resolve.ResolveDialog(self._repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def thgimport(self, paths=None):
-        dlg = thgimport.ImportDialog(self.repo, self)
+        dlg = thgimport.ImportDialog(self._repoagent, self)
         dlg.patchImported.connect(self.gotoTip)
         if paths:
             dlg.setfilepaths(paths)
@@ -827,7 +827,7 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createShelveDialog)
 
     def _createShelveDialog(self):
-        dlg = shelve.ShelveDialog(self.repo, self)
+        dlg = shelve.ShelveDialog(self._repoagent, self)
         dlg.finished.connect(self._refreshCommitTabIfNeeded)
         return dlg
 
@@ -894,7 +894,7 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def purge(self):
-        dlg = purge.PurgeDialog(self.repo, self)
+        dlg = purge.PurgeDialog(self._repoagent, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         dlg.showMessage.connect(self.showMessage)
@@ -1536,13 +1536,13 @@ class RepoWidget(QWidget):
         def bisectNormal():
             revA, revB = self.menuselection
             opts = {'good':str(revA), 'bad':str(revB)}
-            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg = bisect.BisectDialog(self._repoagent, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def bisectReverse():
             revA, revB = self.menuselection
             opts = {'good':str(revB), 'bad':str(revA)}
-            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg = bisect.BisectDialog(self._repoagent, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def compressDlg():
@@ -1556,7 +1556,7 @@ class RepoWidget(QWidget):
                 InfoMsgBox(_('Unable to compress history'),
                            _('Selected changeset pair not related'))
                 return
-            dlg = compress.CompressDialog(self.repo, revs, self)
+            dlg = compress.CompressDialog(self._repoagent, revs, self)
             dlg.exec_()
 
         menu = QMenu(self)
@@ -1618,11 +1618,11 @@ class RepoWidget(QWidget):
                         break
                 return cont
             if checkGuardsOrComments():
-                dlg = qreorder.QReorderDialog(self.repo, self)
+                dlg = qreorder.QReorderDialog(self._repoagent, self)
                 dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
         def qfoldact():
-            dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
+            dlg = qfold.QFoldDialog(self._repoagent, self.menuselection, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -1817,7 +1817,7 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def updateToRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)
-        dlg = update.UpdateDialog(self.repo, rev, self)
+        dlg = update.UpdateDialog(self._repoagent, rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
@@ -1851,7 +1851,7 @@ class RepoWidget(QWidget):
             dlg.setRev(self.rev)
 
     def _createManifestDialog(self):
-        return ManifestDialog(self.repo, self.rev)
+        return ManifestDialog(self._repoagent, self.rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
@@ -1863,10 +1863,10 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createMergeDialog, self.rev)
 
     def _createMergeDialog(self, rev):
-        return merge.MergeDialog(rev, self.repo, self)
+        return merge.MergeDialog(self._repoagent, rev, self)
 
     def tagToRevision(self):
-        dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
+        dlg = tag.TagDialog(self._repoagent, rev=str(self.rev), parent=self)
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -1874,7 +1874,7 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def bookmarkRevision(self):
-        dlg = bookmark.BookmarkDialog(self.repo, self.rev, self)
+        dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -1895,19 +1895,20 @@ class RepoWidget(QWidget):
             revlist.append(str(rev))
         if not revlist:
             revlist = [self.rev]
-        dlg = graft.GraftDialog(self.repo, self, source=revlist)
+        dlg = graft.GraftDialog(self._repoagent, self, source=revlist)
         dlg.finished.connect(dlg.deleteLater)
         if dlg.valid:
             dlg.exec_()
 
     def backoutToRevision(self):
-        dlg = backout.BackoutDialog(self.rev, self.repo, self)
+        dlg = backout.BackoutDialog(self._repoagent, self.rev, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def stripRevision(self):
         'Strip the selected revision and all descendants'
-        dlg = thgstrip.StripDialog(self.repo, rev=str(self.rev), parent=self)
+        dlg = thgstrip.StripDialog(self._repoagent, rev=str(self.rev),
+                                   parent=self)
         dlg.showBusyIcon.connect(self.onShowBusyIcon)
         dlg.hideBusyIcon.connect(self.onHideBusyIcon)
         dlg.finished.connect(dlg.deleteLater)
@@ -1918,11 +1919,11 @@ class RepoWidget(QWidget):
                            tuple(self.repoview.selectedRevisions()))
 
     def _createPostReviewDialog(self, revs):
-        return postreview.PostReviewDialog(self.repo.ui, self.repo, revs)
+        return postreview.PostReviewDialog(self.repo.ui, self._repoagent, revs)
 
     def rupdate(self):
         import rupdate
-        dlg = rupdate.rUpdateDialog(self.repo, self.rev, self)
+        dlg = rupdate.rUpdateDialog(self._repoagent, self.rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
@@ -1936,11 +1937,11 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createEmailDialog, tuple(revs))
 
     def _createEmailDialog(self, revs):
-        return hgemail.EmailDialog(self.repo, revs)
+        return hgemail.EmailDialog(self._repoagent, revs)
 
     def archiveRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)
-        dlg = archive.ArchiveDialog(self.repo, rev, self)
+        dlg = archive.ArchiveDialog(self._repoagent, rev, self)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
@@ -2073,7 +2074,7 @@ class RepoWidget(QWidget):
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
         opts = {'source' : self.rev, 'dest': self.repo['.'].rev()}
-        dlg = rebase.RebaseDialog(self.repo, self, **opts)
+        dlg = rebase.RebaseDialog(self._repoagent, self, **opts)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
@@ -2173,7 +2174,7 @@ class RepoWidget(QWidget):
         sel = self.menuselection[0]
         if not isinstance(sel, str):
             sel = self.repo.changectx(sel).thgmqpatchname()
-        dlg = qrename.QRenameDialog(self.repo, sel, self)
+        dlg = qrename.QRenameDialog(self._repoagent, sel, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()

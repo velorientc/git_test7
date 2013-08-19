@@ -20,8 +20,10 @@ class QFoldDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, patches, parent):
+    def __init__(self, repoagent, patches, parent):
         super(QFoldDialog, self).__init__(parent)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Patch fold - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-qfold'))
 
@@ -41,7 +43,6 @@ class QFoldDialog(QDialog):
         self.keepchk.setChecked(True)
         self.layout().addWidget(self.keepchk)
 
-        self.repo = repo
         q = self.repo.mq
         q.parseseries()
         self.patches = [p for p in q.series if p in patches]
@@ -100,12 +101,16 @@ class QFoldDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
-        self.repo.configChanged.connect(self.configChanged)
+        self._repoagent.configChanged.connect(self.configChanged)
 
         self._readsettings()
 
         self.msgte.setText(self.composeMsg(self.patches))
         self.msgte.refresh(self.repo)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def showSummary(self, item):
         patchname = hglib.fromunicode(item.text())

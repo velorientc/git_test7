@@ -22,11 +22,11 @@ class WctxActions(QObject):
     refreshNeeded = pyqtSignal()
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent, checkable=True):
+    def __init__(self, repoagent, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
 
         self.menu = QMenu(parent)
-        self.repo = repo
+        self._repoagent = repoagent
         self._filedialogs = qtlib.DialogKeeper(WctxActions._createFileDialog,
                                                parent=self)
         allactions = []
@@ -69,8 +69,9 @@ class WctxActions(QObject):
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
         make(_('De&tect Renames...'), guessRename, frozenset('A?!'),
-             'detect_rename')
-        make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
+             'detect_rename', slot=self.runDialogAction)
+        make(_('&Ignore...'), ignore, frozenset('?'), 'ignore',
+             slot=self.runDialogAction)
         make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
         make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
         allactions.append(None)
@@ -82,6 +83,10 @@ class WctxActions(QObject):
             make(_('Check'), check, frozenset('MARC?!IS'), '')
             make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
         self.allactions = allactions
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def updateActionSensitivity(self, selrows):
         'Enable/Disable permanent actions based on current selection'
@@ -112,7 +117,8 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types=None, icon=None, inmenu=None):
+        def make(text, func, types=None, icon=None, inmenu=None,
+                 slot=self.runAction):
             if not types & alltypes:
                 return
             if inmenu is None:
@@ -123,7 +129,7 @@ class WctxActions(QObject):
             if icon:
                 action.setIcon(qtlib.geticon(icon))
             if func is not None:
-                action.triggered.connect(self.runAction)
+                action.triggered.connect(slot)
             return action
 
         if len(repo.parents()) > 1:
@@ -131,8 +137,10 @@ class WctxActions(QObject):
 
         if len(selrows) == 1:
             menu.addSeparator()
-            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
-            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
+            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy',
+                 slot=self.runDialogAction)
+            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename',
+                 slot=self.runDialogAction)
 
         menu.addSeparator()
         customtools.addCustomToolsSubmenu(menu, repo.ui,
@@ -177,7 +185,7 @@ class WctxActions(QObject):
             str(action.data().toString()), files)
 
     def runAction(self):
-        'run wrapper for all action methods'
+        'run wrapper for direct action methods'
 
         repo, action, parent = self.repo, self.sender(), self.parent()
         func = action._runfunc
@@ -223,12 +231,26 @@ class WctxActions(QObject):
             self.refreshNeeded.emit()
 
     #@pyqtSlot()
+    def runDialogAction(self):
+        'run wrapper for modal dialog action methods'
+
+        repo, action, parent = self.repo, self.sender(), self.parent()
+        func = action._runfunc
+        files = self._filesForAction(action)
+
+        notify = func(parent, self._repoagent, files)
+        if notify:
+            wfiles = [repo.wjoin(x) for x in files]
+            shlib.shell_notify(wfiles)
+            self.refreshNeeded.emit()
+
+    #@pyqtSlot()
     def log(self):
         for path in self._filesForAction(self.sender()):
             self._filedialogs.open(path)
 
     def _createFileDialog(self, path):
-        return filedialogs.FileLogDialog(self.repo, path)
+        return filedialogs.FileLogDialog(self._repoagent, path)
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
@@ -352,9 +374,9 @@ def addlf(parent, ui, repo, files):
     commands.add(ui, repo, lfsize='', normal=None, large=True, *files)
     return True
 
-def guessRename(parent, ui, repo, files):
+def guessRename(parent, repoagent, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog
-    dlg = DetectRenameDialog(repo, parent, *files)
+    dlg = DetectRenameDialog(repoagent, parent, *files)
     def matched():
         ret[0] = True
     ret = [False]
@@ -363,9 +385,9 @@ def guessRename(parent, ui, repo, files):
     dlg.exec_()
     return ret[0]
 
-def ignore(parent, ui, repo, files):
+def ignore(parent, repoagent, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
-    dlg = HgignoreDialog(repo, parent, *files)
+    dlg = HgignoreDialog(repoagent, parent, *files)
     dlg.finished.connect(dlg.deleteLater)
     return dlg.exec_() == QDialog.Accepted
 
@@ -384,18 +406,18 @@ def delete(parent, ui, repo, files):
         os.unlink(wfile)
     return True
 
-def copy(parent, ui, repo, files):
+def copy(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repo, files, parent, iscopy=True)
+    dlg = RenameDialog(repoagent, files, parent, iscopy=True)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
 
-def rename(parent, ui, repo, files):
+def rename(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repo, files, parent)
+    dlg = RenameDialog(repoagent, files, parent)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True

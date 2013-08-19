@@ -76,13 +76,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
+    def __init__(self, repoagent, pats, opts, embedded=False, parent=None,
+                 rev=None):
         QWidget.__init__(self, parent)
 
-        repo.configChanged.connect(self.refresh)
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.refresh)
-        self.repo = repo
+        repoagent.configChanged.connect(self.refresh)
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.workingBranchChanged.connect(self.refresh)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self._rev = rev
         self.lastAction = None
         self.lastCommitMsg = ''
@@ -91,7 +93,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         self.opts = opts = readrepoopts(repo) # user, date
 
-        self.stwidget = status.StatusWidget(repo, pats, opts, self)
+        self.stwidget = status.StatusWidget(repoagent, pats, opts, self)
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
@@ -237,6 +239,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @property
     def rev(self):
@@ -1305,7 +1311,7 @@ class DetailsDialog(QDialog):
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
 
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repoagent, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-commit'))
@@ -1320,7 +1326,7 @@ class CommitDialog(QDialog):
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
 
-        commit = CommitWidget(repo, pats, opts, False, self, rev='.')
+        commit = CommitWidget(repoagent, pats, opts, False, self, rev='.')
         toplayout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -1349,9 +1355,10 @@ class CommitDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadSettings(s, 'committool')
-        repo.repositoryChanged.connect(self.updateUndo)
+        repoagent.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
 
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('%s - commit') % repo.displayname)
         self.commit = commit
         self.commit.reload()
@@ -1365,8 +1372,10 @@ class CommitDialog(QDialog):
             self._subdialogs.open(link[len('repo:'):])
 
     def _createSubDialog(self, uroot):
+        # TODO: do not instantiate repo here
         repo = thgrepo.repository(None, hglib.fromunicode(uroot))
-        return CommitDialog(repo, [], {}, parent=self)
+        repoagent = repo._pyqtobj
+        return CommitDialog(repoagent, [], {}, parent=self)
 
     @pyqtSlot()
     def updateUndo(self):

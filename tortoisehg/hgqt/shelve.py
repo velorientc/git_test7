@@ -22,13 +22,14 @@ class ShelveDialog(QDialog):
 
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
         self.setWindowIcon(qtlib.geticon('shelve'))
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.shelves = []
         self.patches = []
 
@@ -191,10 +192,14 @@ class ShelveDialog(QDialog):
                            'in .hg/Trashcan/'))
 
         self.refreshCombos()
-        repo.repositoryChanged.connect(self.refreshCombos)
+        repoagent.repositoryChanged.connect(self.refreshCombos)
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def moveFileRight(self):

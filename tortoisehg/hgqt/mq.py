@@ -31,7 +31,7 @@ class MQPatchesWidget(QDockWidget):
 
     def __init__(self, parent, **opts):
         QDockWidget.__init__(self, parent)
-        self.repo = None
+        self._repoagent = None
         self.opts = opts
         self.refreshing = False
         self.finishfunc = None
@@ -133,13 +133,18 @@ class MQPatchesWidget(QDockWidget):
 
         QTimer.singleShot(0, self.reload)
 
-    def setrepo(self, repo):
-        if self.repo:
-            self.repo.repositoryChanged.disconnect(self.reload)
-        self.repo = None
-        if repo and 'mq' in repo.extensions():
-            self.repo = repo
-            self.repo.repositoryChanged.connect(self.reload)
+    @property
+    def repo(self):
+        if self._repoagent:
+            return self._repoagent.rawRepo()
+
+    def setRepoAgent(self, repoagent):
+        if self._repoagent:
+            self._repoagent.repositoryChanged.disconnect(self.reload)
+        self._repoagent = None
+        if repoagent and 'mq' in repoagent.rawRepo().extensions():
+            self._repoagent = repoagent
+            self._repoagent.repositoryChanged.connect(self.reload)
         QTimer.singleShot(0, self.reload)
 
     def getUserOptions(self, *optionlist):
@@ -229,7 +234,7 @@ class MQPatchesWidget(QDockWidget):
                     break
             return cont
         if checkGuardsOrComments():
-            dlg = qreorder.QReorderDialog(self.repo, self)
+            dlg = qreorder.QReorderDialog(self._repoagent, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
@@ -455,10 +460,11 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     makeLogVisible = pyqtSignal(bool)
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         QWidget.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.opts = opts
         self.refreshing = False
         self.finishfunc = None
@@ -521,7 +527,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
 
-        self.stwidget = status.StatusWidget(repo, None, opts, self)
+        self.stwidget = status.StatusWidget(repoagent, None, opts, self)
         self.stwidget.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
 
@@ -560,8 +566,8 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         QShortcut(QKeySequence('Ctrl+Return'), self, self.onQNewOrQRefresh)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
 
-        self.repo.configChanged.connect(self.onConfigChanged)
-        self.repo.repositoryChanged.connect(self.reload)
+        self._repoagent.configChanged.connect(self.onConfigChanged)
+        self._repoagent.repositoryChanged.connect(self.reload)
         self.setAcceptDrops(True)
 
         if parent:
@@ -579,6 +585,10 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def getUserOptions(self, *optionlist):
         return mqutil.getUserOptions(self.opts, *optionlist)
@@ -676,8 +686,10 @@ class MQWidget(QWidget, qtlib.TaskWidget):
     def qinitOrCommit(self):
         if os.path.isdir(self.repo.mq.join('.hg')):
             from tortoisehg.hgqt import commit
+            # TODO: do not instantiate repo here
             mqrepo = thgrepo.repository(None, self.repo.mq.path)
-            dlg = commit.CommitDialog(mqrepo, [], {}, self)
+            repoagent = mqrepo._pyqtobj
+            dlg = commit.CommitDialog(repoagent, [], {}, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.reload()
@@ -687,7 +699,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot()
     def launchQQueueTool(self):
-        dlg = qqueue.QQueueDialog(self.repo, True, self)
+        dlg = qqueue.QQueueDialog(self._repoagent, True, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -842,7 +854,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
         else:
             super(MQWidget, self).dropEvent(event)
             return
-        dlg = thgimport.ImportDialog(self.repo, self, mq=True)
+        dlg = thgimport.ImportDialog(self._repoagent, self, mq=True)
         dlg.setfilepaths(patches)
         dlg.exec_()
 

@@ -24,26 +24,26 @@ class RenameDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, repo, pats, parent=None, iscopy=False):
+    def __init__(self, repoagent, pats, parent=None, iscopy=False):
         super(RenameDialog, self).__init__(parent)
+        self._repoagent = repoagent
         self.iscopy = iscopy
         # pats: local; src, dest: unicode
-        src, dest = self.init_data(repo, pats)
+        src, dest = self.init_data(pats)
         self.init_view(src, dest)
 
-    def init_data(self, repo, pats):
+    def init_data(self, pats):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
-        self.root = repo.root
-        self.repo = repo
+        root = self.repo.root
         cwd = os.getcwd()
         try:
-            fname = scmutil.canonpath(self.root, cwd, pats[0])
-            target = scmutil.canonpath(self.root, cwd, pats[1])
+            fname = scmutil.canonpath(root, cwd, pats[0])
+            target = scmutil.canonpath(root, cwd, pats[1])
         except:
             pass
-        os.chdir(self.root)
+        os.chdir(root)
         fname = hglib.tounicode(util.normpath(fname))
         if target:
             target = hglib.tounicode(util.normpath(target))
@@ -164,6 +164,10 @@ class RenameDialog(QDialog):
         self.rename_btn.setText(self.msgTitle)
         self.setWindowTitle(wt)
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def get_src(self):
         return hglib.fromunicode(self.src_txt.text())
 
@@ -207,7 +211,7 @@ class RenameDialog(QDialog):
         if not fullpath:
             return
         fullpath = util.normpath(unicode(fullpath))
-        pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+        pathprefix = util.normpath(hglib.tounicode(self.repo.root)) + '/'
         if not os.path.normcase(fullpath).startswith(os.path.normcase(pathprefix)):
             return
         return fullpath[len(pathprefix):]

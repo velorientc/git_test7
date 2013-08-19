@@ -26,13 +26,13 @@ class ManifestDialog(QMainWindow):
     finished = pyqtSignal(int)
     linkActivated = pyqtSignal(QString)
 
-    def __init__(self, repo, rev=None, parent=None):
+    def __init__(self, repoagent, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
-        self._repo = repo
+        self._repoagent = repoagent
         self.setWindowIcon(qtlib.geticon('hg-annotate'))
         self.resize(400, 300)
 
-        self._manifest_widget = ManifestWidget(repo, rev)
+        self._manifest_widget = ManifestWidget(repoagent, rev)
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
@@ -96,14 +96,15 @@ class ManifestDialog(QMainWindow):
 
     def _createSearchDialog(self):
         from tortoisehg.hgqt import grep
-        return grep.SearchDialog([], self._repo)
+        return grep.SearchDialog(self._repoagent, [])
 
     @pyqtSlot(QString)
     def _linkHandler(self, link):
         ulink = unicode(link)
         if ulink.startswith('cset:'):
+            repo = self._repoagent.rawRepo()
             changeid = hglib.fromunicode(ulink[len('cset:'):])
-            rev = self._repo[changeid].rev()
+            rev = repo[changeid].rev()
             self._manifest_widget.setRev(rev)
         else:
             self.linkActivated.emit(link)
@@ -136,9 +137,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def canswitch(self):
         return False
 
-    def __init__(self, repo, rev=None, parent=None):
+    def __init__(self, repoagent, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
-        self._repo = repo
+        self._repoagent = repoagent
+        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
+        self._repo = repoagent.rawRepo()
         self._rev = rev
         self._selectedrev = rev
 
@@ -178,7 +181,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self.revpanel = revpanel.RevPanelWidget(self._repo)
         self.revpanel.linkActivated.connect(self.linkActivated)
         vbox.addWidget(self.revpanel, 0)
-        self._fileview = fileview.HgFileView(self._repo, self)
+        self._fileview = fileview.HgFileView(self._repoagent, self)
         vbox.addWidget(self._fileview, 0)
         w = QWidget()
         w.setLayout(vbox)
